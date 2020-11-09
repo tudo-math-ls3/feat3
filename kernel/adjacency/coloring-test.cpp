@@ -5,45 +5,45 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/adjacency/colouring.hpp>
+#include <kernel/adjacency/coloring.hpp>
 
 using namespace FEAT;
 using namespace FEAT::TestSystem;
 using namespace FEAT::Adjacency;
 
 /**
- * \brief Test class for the Colouring class.
+ * \brief Test class for the Coloring class.
  *
- * \test Tests the Colouring class.
+ * \test Tests the Coloring class.
  *
  * \author Constantin Christof
  */
 
-  class ColouringTest
+  class ColoringTest
   : public TaggedTest<Archs::None, Archs::None>
 {
 public:
-  ColouringTest() :
-    TaggedTest<Archs::None, Archs::None>("colouring_test")
+  ColoringTest() :
+    TaggedTest<Archs::None, Archs::None>("coloring_test")
   {
   }
 
-  virtual ~ColouringTest()
+  virtual ~ColoringTest()
   {
   }
 
-  bool test_c(Colouring& c) const
+  bool test_c(Coloring& c) const
   {
     // check against analytic solution
     Index col_ref[7] = {0, 0, 1, 1, 1, 2, 2};
 
-    // fetch the colouring array
-    Index* _colouring = c.get_colouring();
+    // fetch the coloring array
+    Index* _coloring = c.get_coloring();
 
     // compare index arrays
     for(Index j(0); j < 7; ++j)
     {
-      if(col_ref[j] != _colouring[j])
+      if(col_ref[j] != _coloring[j])
       {
         return false;
       }
@@ -51,18 +51,18 @@ public:
     return true;
   }
 
-  bool test_c_ordered(Colouring& c) const
+  bool test_c_ordered(Coloring& c) const
   {
     // check against analytic solution
     Index col_ref[7] = {2, 2, 1, 1, 0, 0, 0};
 
-    // fetch the colouring array
-    Index* _colouring = c.get_colouring();
+    // fetch the coloring array
+    Index* _coloring = c.get_coloring();
 
     // compare index arrays
     for(Index j(0); j < 7; ++j)
     {
-      if(col_ref[j] != _colouring[j])
+      if(col_ref[j] != _coloring[j])
       {
         return false;
       }
@@ -96,13 +96,13 @@ public:
     };
     Graph g(7, 7, 20, g_ptr, g_idx);
 
-    // create a colouring object for this graph
-    Colouring c(g);
+    // create a coloring object for this graph
+    Coloring c(g);
 
     // validate
     TEST_CHECK(test_c(c));
 
-    // ordered colouring
+    // ordered coloring
 
     // define permutation array
     Index _order[7] =
@@ -110,11 +110,11 @@ public:
       5, 2, 4, 1, 3, 0, 6
     };
 
-    // create a colouring object corresponding to _order
-    Colouring co(g, _order);
+    // create a coloring object corresponding to _order
+    Coloring co(g, _order);
 
     // validate
     TEST_CHECK(test_c_ordered(co));
 
   }
-} colouring_test;
+} coloring_test;

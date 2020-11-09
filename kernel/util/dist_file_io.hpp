@@ -140,7 +140,7 @@ namespace FEAT
      * The name of the file to be read.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] root_rank
      * Specifies which rank should actually read the file. Ignored if compiled without MPI.
@@ -168,7 +168,7 @@ namespace FEAT
      * The name of the file to be read.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] root_rank
      * Specifies which rank should actually read the file. Ignored if compiled without MPI.
@@ -196,7 +196,7 @@ namespace FEAT
      * The pattern that is to be used for filename generation.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \throws FileNotFound if the file could not be opened.
      */
@@ -222,7 +222,7 @@ namespace FEAT
      * The pattern that is to be used for filename generation.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \throws FileNotFound if the file could not be opened.
      */
@@ -245,7 +245,7 @@ namespace FEAT
      * The pattern that is to be used for filename generation.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] truncate
      * Specifies whether the output file(s) are to be truncated to the output size.
@@ -273,7 +273,7 @@ namespace FEAT
      * The pattern that is to be used for filename generation.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] truncate
      * Specifies whether the output file(s) are to be truncated to the output size.
@@ -304,7 +304,7 @@ namespace FEAT
      * The name of the common input file. Must be the same on all calling processes.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      */
     static void read_ordered(void* buffer, const std::size_t size, const String& filename, const Dist::Comm& comm);
 
@@ -333,7 +333,7 @@ namespace FEAT
      * The name of the common output file. Must be the same on all calling processes.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] truncate
      * Specifies whether the output file(s) are to be truncated to the output size.
@@ -362,7 +362,7 @@ namespace FEAT
      * The name of the common output file. Must be the same on all calling processes.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] truncate
      * Specifies whether the output file(s) are to be truncated to the output size.
@@ -400,7 +400,7 @@ namespace FEAT
      * The name of the common output file. Must be the same on all calling processes.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] root_rank
      * Specifies which process should actually read the file. Ignored if compiled without MPI.
@@ -438,7 +438,7 @@ namespace FEAT
      * The name of the common output file. Must be the same on all calling processes.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation. Ignored if compiled without MPI.
+     * The communicator to be used for synchronization. Ignored if compiled without MPI.
      *
      * \param[in] root_rank
      * Specifies which rank should actually write the file. Ignored if compiled without MPI.

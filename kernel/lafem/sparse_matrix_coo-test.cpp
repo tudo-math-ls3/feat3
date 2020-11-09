@@ -145,16 +145,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixCOOSerialiseTest
+class SparseMatrixCOOSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-   SparseMatrixCOOSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOSerialiseTest")
+   SparseMatrixCOOSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCOOSerializeTest")
   {
   }
 
-  virtual ~SparseMatrixCOOSerialiseTest()
+  virtual ~SparseMatrixCOOSerializeTest()
   {
   }
 
@@ -190,16 +190,16 @@ public:
     SparseMatrixCOO<Mem_, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
 
-    auto kp = f.serialise(LAFEM::SerialConfig(false, false));
+    auto kp = f.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixCOO<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, f);
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = f.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = f.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixCOO<Mem_, DT_, IT_> zlib(zl);
     TEST_CHECK_EQUAL(zlib, f);
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zf = zfp_tester.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    auto zf = zfp_tester.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixCOO<Mem_, DT_, IT_> zfp(zf);
     for(Index i_ind(0) ; i_ind < zfp_tester.rows() ; ++i_ind)
     {
@@ -211,15 +211,15 @@ public:
 #endif
   }
 };
-SparseMatrixCOOSerialiseTest<Mem::Main, float, unsigned int> sparse_matrix_coo_serialise_test_float_uint;
-SparseMatrixCOOSerialiseTest<Mem::Main, double, unsigned int> sparse_matrix_coo_serialise_test_double_uint;
-SparseMatrixCOOSerialiseTest<Mem::Main, float, unsigned long> sparse_matrix_coo_serialise_test_float_ulong;
-SparseMatrixCOOSerialiseTest<Mem::Main, double, unsigned long> sparse_matrix_coo_serialise_test_double_ulong;
+SparseMatrixCOOSerializeTest<Mem::Main, float, unsigned int> sparse_matrix_coo_serialize_test_float_uint;
+SparseMatrixCOOSerializeTest<Mem::Main, double, unsigned int> sparse_matrix_coo_serialize_test_double_uint;
+SparseMatrixCOOSerializeTest<Mem::Main, float, unsigned long> sparse_matrix_coo_serialize_test_float_ulong;
+SparseMatrixCOOSerializeTest<Mem::Main, double, unsigned long> sparse_matrix_coo_serialize_test_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCOOSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_coo_serialise_test_float_uint;
-SparseMatrixCOOSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_coo_serialise_test_double_uint;
-SparseMatrixCOOSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_coo_serialise_test_float_ulong;
-SparseMatrixCOOSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_coo_serialise_test_double_ulong;
+SparseMatrixCOOSerializeTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_coo_serialize_test_float_uint;
+SparseMatrixCOOSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_coo_serialize_test_double_uint;
+SparseMatrixCOOSerializeTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_coo_serialize_test_float_ulong;
+SparseMatrixCOOSerializeTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_coo_serialize_test_double_ulong;
 #endif
 
 template<

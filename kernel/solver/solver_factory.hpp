@@ -35,7 +35,7 @@
 #include <kernel/solver/matrix_stock.hpp>
 #include <kernel/solver/idrs.hpp>
 
-// Includes for nonlinear optimisers
+// Includes for nonlinear optimizers
 #include <kernel/solver/linesearch.hpp>
 #include <kernel/solver/fixed_step_linesearch.hpp>
 #include <kernel/solver/newton_raphson_linesearch.hpp>
@@ -376,7 +376,7 @@ namespace FEAT
          * \brief Create solver tree based on PropertyMap
          *
          * \param[in] matrix_stock
-         *      A MatrixStock object, initialised with Systemlevels etc
+         *      A MatrixStock object, initialized with Systemlevels etc
          *
          * \param[in] base
          *      A pointer to the PropertyMap that contains all solver related informations
@@ -726,7 +726,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Creates a new nonlinear optimiser according to a configuration
+         * \brief Creates a new nonlinear optimizer according to a configuration
          *
          * \param[in] base
          * The PropertyMap containing the configuration of this solver
@@ -747,7 +747,7 @@ namespace FEAT
          */
         template<typename Functional_, typename Filter_>
         static std::shared_ptr<Solver::IterativeSolver<typename Functional_::VectorTypeR>>
-        create_nonlinear_optimiser(Functional_& functional, Filter_& filter, PropertyMap* base, String section_name,
+        create_nonlinear_optimizer(Functional_& functional, Filter_& filter, PropertyMap* base, String section_name,
         std::shared_ptr<Solver::NLOptPrecond<typename Functional_::VectorTypeR, Filter_>> precon = nullptr)
         {
           typedef typename Functional_::VectorTypeR VectorTypeR;
@@ -774,7 +774,7 @@ namespace FEAT
             XASSERTM(inner_solver_p.first != "QPenalty", "QPenalty cannot be the inner solver for QPenalty.");
 
             std::shared_ptr<Solver::IterativeSolver<VectorTypeR>> inner_solver;
-            inner_solver = create_nonlinear_optimiser(functional, filter, base, inner_solver_p.first, precon);
+            inner_solver = create_nonlinear_optimizer(functional, filter, base, inner_solver_p.first, precon);
 
             result = Solver::new_qpenalty<Functional_>(
               section_name, section, derefer<VectorTypeR>(functional, nullptr), inner_solver);
@@ -842,7 +842,7 @@ namespace FEAT
           }
 
           return result;
-        } // create_nonlinear_optimiser
+        } // create_nonlinear_optimizer
 
         /// returns the object, if T_ has a GateType, i.e. is a GlobalVector - SFINAE at its best
         template <typename Evaluator_, typename T_>

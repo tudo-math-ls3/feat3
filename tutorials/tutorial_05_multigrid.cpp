@@ -158,7 +158,7 @@ namespace Tutorial05
 
     // This constructor will create a mesh, trafo and space based on the mesh factory.
     // Note that the other member variables of this level (matrix, filter, etc.) are
-    // not initialised here - this will be performed in the main function below.
+    // not initialized here - this will be performed in the main function below.
     explicit Level(Geometry::Factory<MeshType>& mesh_factory) :
       mesh(mesh_factory),
       trafo(mesh),
@@ -460,16 +460,16 @@ namespace Tutorial05
     std::cout << std::endl << "Solving..." << std::endl;
 
     // Finally, there is one important point to keep in mind when using a multigrid solver:
-    // The "multigrid" object, which we have created above, does not initialise its smoothers
-    // and coarse grid solver. We have to initialise the multigrid hierarchy by hand *before*
+    // The "multigrid" object, which we have created above, does not initialize its smoothers
+    // and coarse grid solver. We have to initialize the multigrid hierarchy by hand *before*
     // initialising the remaining solver tree by calling its init() function.
     // This may seem inconvenient, but this is the only way to go when building more complex
     // multigrid solver configurations like e.g. the ScaRC solver, so we have to live with that.
 
-    // So, initialise the multigrid hierarchy first:
+    // So, initialize the multigrid hierarchy first:
     multigrid_hierarchy->init();
 
-    // Now we can initialise our solver:
+    // Now we can initialize our solver:
     solver->init();
 
     // As always, enable the convergence plot:
@@ -524,8 +524,8 @@ namespace Tutorial05
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Initialise our runtime environment
-  Runtime::initialise(argc, argv);
+  // Initialize our runtime environment
+  Runtime::initialize(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #05: Geometric Multigrid" << std::endl;
@@ -582,6 +582,6 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial05::main(level_max, level_min);
 
-  // Finalise our runtime environment
-  return Runtime::finalise();
+  // Finalize our runtime environment
+  return Runtime::finalize();
 }

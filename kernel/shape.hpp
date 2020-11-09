@@ -116,7 +116,7 @@ namespace FEAT
 
     /// \cond internal
     /**
-     * \brief explicit FaceTraits specialisation for Vertex shape
+     * \brief explicit FaceTraits specialization for Vertex shape
      */
     template<>
     struct FaceTraits<Vertex, 0>
@@ -129,7 +129,7 @@ namespace FEAT
     }; // struct FaceTraits<Vertex,0>
 
     /**
-     * \brief partial FaceTraits specialisation for Simplex shape
+     * \brief partial FaceTraits specialization for Simplex shape
      *
      * \author Peter Zajac
      */
@@ -154,7 +154,7 @@ namespace FEAT
     }; // struct FaceTraits<Simplex<...>, ...>
 
     /**
-     * \brief partial FaceTraits specialisation for Simplex shape and Vertex faces
+     * \brief partial FaceTraits specialization for Simplex shape and Vertex faces
      *
      * \author Peter Zajac
      */
@@ -171,7 +171,7 @@ namespace FEAT
     }; // struct FaceTraits<Simplex<...>, 0>
 
     /**
-     * \brief FaceTraits specialisation for Hypercube shape
+     * \brief FaceTraits specialization for Hypercube shape
      *
      * \author Peter Zajac
      */
@@ -196,7 +196,7 @@ namespace FEAT
     }; // struct FaceTraits<Hypercube<...>, ...>
 
     /**
-     * \brief partial FaceTraits specialisation for Hypercube shape and Vertex faces
+     * \brief partial FaceTraits specialization for Hypercube shape and Vertex faces
      *
      * \author Peter Zajac
      */
@@ -293,7 +293,7 @@ namespace FEAT
 
     /// \cond internal
     /**
-     * \brief ReferenceCell specialisation for Vertex shape
+     * \brief ReferenceCell specialization for Vertex shape
      *
      * \author Peter Zajac
      */
@@ -323,7 +323,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Partial ReferenceCell specialisation for Simplex shape
+     * \brief Partial ReferenceCell specialization for Simplex shape
      *
      * \author Peter Zajac
      */
@@ -374,7 +374,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Partial ReferenceCell specialisation for Hypercube shape
+     * \brief Partial ReferenceCell specialization for Hypercube shape
      *
      * \author Peter Zajac
      */

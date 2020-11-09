@@ -275,9 +275,9 @@ namespace FEAT
           this->gate_sys.set_comm(dom_layer.comm_ptr());
 
           // loop over all ranks
-          for(Index i(0); i < dom_layer.neighbour_count(); ++i)
+          for(Index i(0); i < dom_layer.neighbor_count(); ++i)
           {
-            int rank = dom_layer.neighbour_rank(i);
+            int rank = dom_layer.neighbor_rank(i);
 
             // try to find our halo
             auto* halo = dom_level.find_halo_part(rank);
@@ -447,7 +447,7 @@ namespace FEAT
               for(Index i(0); i < loc_prol.rows(); ++i)
                 v_wb[i] = v_ws[i];
 
-              // synchronise blocked weight vector
+              // synchronize blocked weight vector
               this->gate_velo.sync_0(loc_vec_weight);
 
               // copy weights from blocked to scalar
@@ -503,7 +503,7 @@ namespace FEAT
               Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
               space_f, space_c, cubature);
 
-              // synchronise weight vector
+              // synchronize weight vector
               this->gate_pres.sync_0(loc_vec_weight);
 
               // invert components
@@ -577,14 +577,14 @@ namespace FEAT
                 tmp_elements[idense] = sfv_elements[isparse];
               }
 
-              // Synchronise the temporary DenseVector
+              // Synchronize the temporary DenseVector
               my_col_gate.sync_0(tmp);
 
               // Copy sparse filter vector contents to DenseVector
               for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
               {
                 Index idense(slip_filter_vector.indices()[isparse]);
-                tmp_elements[idense].normalise();
+                tmp_elements[idense].normalize();
                 sfv_elements[isparse] = tmp_elements[idense];
 
               }

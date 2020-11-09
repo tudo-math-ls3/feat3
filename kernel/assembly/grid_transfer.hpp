@@ -142,7 +142,7 @@ namespace FEAT
         // allocate local vector data for weight vector
         Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
 
-        // pivot array for factorisation
+        // pivot array for factorization
         int pivot[FineSpaceEvaluator::max_local_dofs];
 
         // helper struct to calculate fine mesh cell index
@@ -282,7 +282,7 @@ namespace FEAT
        * \attention
        * This function <b>must not</b> be used to assemble prolongation matrices for
        * parallel (i.e. global) simulations, as it will be scaled incorrectly due to
-       * missing weight synchronisation!\n
+       * missing weight synchronization!\n
        * Use this function only in serial simulations!
        *
        * \param[in,out] matrix
@@ -437,7 +437,7 @@ namespace FEAT
         // allocate local vector data for weight vector
         Tiny::Vector<DataType, CoarseSpaceEvaluator::max_local_dofs> lvd;
 
-        // pivot array for factorisation
+        // pivot array for factorization
         int pivot[CoarseSpaceEvaluator::max_local_dofs];
 
         // helper struct to calculate fine mesh cell index
@@ -576,7 +576,7 @@ namespace FEAT
        * \attention
        * This function <b>must not</b> be used to assemble truncation matrices for
        * parallel (i.e. global) simulations, as it will be scaled incorrectly due to
-       * missing weight synchronisation!\n
+       * missing weight synchronization!\n
        * Use this function only in serial simulations!
        *
        * \param[in,out] matrix

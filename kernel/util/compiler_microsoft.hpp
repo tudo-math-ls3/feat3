@@ -70,7 +70,7 @@
 #  pragma warning(disable: 4512)
 
 // C4514: 'function': unreferenced inline function has been removed
-// This is an annoying optimisation information.
+// This is an annoying optimization information.
 #  pragma warning(disable: 4514)
 
 // C4555: expression has no effect; expected expression with side-effect
@@ -97,15 +97,15 @@
 #  pragma warning(disable: 4702)
 
 // C4710: 'function': function not inlined
-// This is an annoying optimisation information.
+// This is an annoying optimization information.
 #  pragma warning(disable: 4710)
 
 // C4711: function 'function' selected for inline expansion
-// This is an annoying optimisation information.
+// This is an annoying optimization information.
 #  pragma warning(disable: 4711)
 
 // C4738: storing 32-bit float result in memory, possible loss of performance
-// This is an optimisation warning, which arises from the strict fp-model.
+// This is an optimization warning, which arises from the strict fp-model.
 #  pragma warning(disable: 4738)
 
 // C4820: 'bytes' bytes padding added after construct 'member_name'
@@ -113,7 +113,7 @@
 #  pragma warning(disable: 4820)
 
 // C4883: function size suppresses optimizations
-// This is an annoying optimisation information.
+// This is an annoying optimization information.
 #  pragma warning(disable: 4883)
 
 // C4938: 'var' : Floating point reduction variable may cause inconsistent results

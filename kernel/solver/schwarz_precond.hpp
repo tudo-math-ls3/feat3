@@ -18,7 +18,7 @@ namespace FEAT
     /**
      * \brief Schwarz preconditioner class template declaration.
      *
-     * \note This class is only specialised for Global::Vector types.
+     * \note This class is only specialized for Global::Vector types.
      * There exists no generic implementation.
      *
      * \tparam Vector_
@@ -31,7 +31,7 @@ namespace FEAT
     class SchwarzPrecond;
 
     /**
-     * \brief Schwarz preconditioner specialisation for Global::Vector
+     * \brief Schwarz preconditioner specialization for Global::Vector
      *
      * This class template implements an additive Schwarz preconditioner,
      * i.e. this class implements a global preconditioner by synchronously
@@ -130,7 +130,7 @@ namespace FEAT
         Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_local_solver->name()));
         Status status = _local_solver->apply(vec_cor.local(), vec_def.local());
 
-        // synchronise local status over communicator to obtain
+        // synchronize local status over communicator to obtain
         // a consistent status code on all processes
         const Dist::Comm* comm = vec_cor.get_comm();
         if(comm != nullptr)
@@ -152,7 +152,7 @@ namespace FEAT
         // did all processes succeed?
         if(status == Status::success)
         {
-          // synchronise correction vector
+          // synchronize correction vector
           vec_cor.sync_1();
 
           // apply filter

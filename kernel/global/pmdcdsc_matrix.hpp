@@ -129,7 +129,7 @@ namespace FEAT
        * type of the matrix is LocalMatrixTypeB rather than LocalMatrixTypeD.
        *
        * This pre-multiplied matrix is required for the \e efficient numerical assembly of
-       * the Neighbour Schur-Matrices, which is performed by the #_asm_neighbour_schur_matrix()
+       * the Neighbor Schur-Matrices, which is performed by the #_asm_neighbor_schur_matrix()
        * function. Unfortunately, it does not seem to be possible to implement that assembly
        * without the transpose of D in an efficient way. A previous attempt to implement that
        * numerical assembly without this explicit transpose has lead to a slow-down of factor
@@ -142,49 +142,49 @@ namespace FEAT
        * - The B-matrix may be filtered due to boundary conditions.
        * - The B-matrix may contain additional terms due to a Newton method applied onto
        *   non-newtonian Navier-Stokes equations with pressure-dependent viscosity.
-       * - The B-matrix may contain additional stuff like stabilisation or penalty terms.
+       * - The B-matrix may contain additional stuff like stabilization or penalty terms.
        */
       LocalMatrixTypeB _matrix_da;
 
-      /// neighbour process ranks
+      /// neighbor process ranks
       std::vector<int> _ranks;
 
       /**
        * \brief Pressure DOF mirrors
        *
-       * For each neighbour process, this mirror stores the indices of all pressure DOFs
-       * that have to be send to that particular neighbour process, so that it can perform
-       * its matrix-vector product with its corresponding neighbour Schur-complement matrix.
+       * For each neighbor process, this mirror stores the indices of all pressure DOFs
+       * that have to be send to that particular neighbor process, so that it can perform
+       * its matrix-vector product with its corresponding neighbor Schur-complement matrix.
        * This mirror contains all pressure DOFs which are defined on elements which are
-       * directly adjacent to the communication halo mesh-part of the neighbour.
+       * directly adjacent to the communication halo mesh-part of the neighbor.
        */
       std::vector<MirrorTypeP> _pres_mirrors;
 
       /**
        * \brief B-matrix data mirrors
        *
-       * For each neighbour process, this vector stores the indices of all B-matrix entries
-       * that have to be send to that particular neighbour process, so that it can pre-compute
-       * its neighbour Schur-complement matrix during numeric initialisation.
+       * For each neighbor process, this vector stores the indices of all B-matrix entries
+       * that have to be send to that particular neighbor process, so that it can pre-compute
+       * its neighbor Schur-complement matrix during numeric initialization.
        */
       std::vector<MirrorTypeP> _data_mirrors;
 
       /**
-       * \brief Neighbour B-matrix adjacency graphs
+       * \brief Neighbor B-matrix adjacency graphs
        *
-       * For each neighbour process, this vector stores the adjacency graph of the neighbour's
-       * B-matrix restricted to the pressure DOFs that this particular neighbour send to us.
+       * For each neighbor process, this vector stores the adjacency graph of the neighbor's
+       * B-matrix restricted to the pressure DOFs that this particular neighbor send to us.
        */
-      std::vector<Adjacency::Graph> _neighbour_graphs;
+      std::vector<Adjacency::Graph> _neighbor_graphs;
 
       /**
-       * \brief Pre-multiplied neighbour Schur-complement matrices
+       * \brief Pre-multiplied neighbor Schur-complement matrices
        *
-       * For each neighbour process, this vector stores the pre-multiplied Schur-complement
-       * matrix (D*A*B_k), where B_k is the part of the neighbour's B-matrix, whose rows
-       * correlate to the velocity DOFs shared by this process and the neighbour process.
+       * For each neighbor process, this vector stores the pre-multiplied Schur-complement
+       * matrix (D*A*B_k), where B_k is the part of the neighbor's B-matrix, whose rows
+       * correlate to the velocity DOFs shared by this process and the neighbor process.
        */
-      std::vector<NeighMatrixTypeS> _neighbour_matrices;
+      std::vector<NeighMatrixTypeS> _neighbor_matrices;
 
       /// total symbolic/numeric init time
       StopWatch watch_init_symbolic;
@@ -196,8 +196,8 @@ namespace FEAT
       StopWatch watch_init_sym_reduced_b;
       /// reduced B-matrix data mirror assembly time
       StopWatch watch_init_sym_data_mirror;
-      /// neighbour Schur-Matrix symbolic assembly time
-      StopWatch watch_init_sym_neighbour_s;
+      /// neighbor Schur-Matrix symbolic assembly time
+      StopWatch watch_init_sym_neighbor_s;
 
       /// total numeric init time
       StopWatch watch_init_numeric;
@@ -207,21 +207,21 @@ namespace FEAT
       StopWatch watch_init_num_gather_b;
       /// pre-multiply D*A time
       StopWatch watch_init_num_premult_da;
-      /// neighbour Schur-matrix numeric assembly time
-      StopWatch watch_init_num_neighbour_s;
+      /// neighbor Schur-matrix numeric assembly time
+      StopWatch watch_init_num_neighbor_s;
 
       /// total apply time
       mutable StopWatch watch_apply;
       /// local Schur-Matrix apply time
       mutable StopWatch watch_apply_matrix_loc;
-      /// neighbour Matrix apply time
-      mutable StopWatch watch_apply_neighbour_s;
+      /// neighbor Matrix apply time
+      mutable StopWatch watch_apply_neighbor_s;
 
     public:
       /**
        * \brief Constructor
        *
-       * \note This constructor just saves the references, but does \b not perform any further initialisation.
+       * \note This constructor just saves the references, but does \b not perform any further initialization.
        * This has to be done by hand by calling the #init_symbolic() and #init_numeric() functions.
        *
        * \param[in] diagonal_a
@@ -276,9 +276,9 @@ namespace FEAT
        * \brief Extracts the main diagonal
        *
        * \note
-       * The main diagonal vector does not need to be synchronised, because the
+       * The main diagonal vector does not need to be synchronized, because the
        * underlying pressure space is discontinuous by definition/assumption.
-       * However, nothing bad will happen if you synchronise the vector anyway.
+       * However, nothing bad will happen if you synchronize the vector anyway.
        *
        * \param[out] vec_diag
        * A vector that receives the main diagonal of our matrix (D*A*B).
@@ -292,9 +292,9 @@ namespace FEAT
        * \brief Extracts the main diagonal
        *
        * \note
-       * The main diagonal vector does not need to be synchronised, because the
+       * The main diagonal vector does not need to be synchronized, because the
        * underlying pressure space is discontinuous by definition/assumption.
-       * However, nothing bad will happen if you synchronise the vector anyway.
+       * However, nothing bad will happen if you synchronize the vector anyway.
        *
        * \returns
        * A vector that contains the main diagonal of our matrix (D*A*B).
@@ -314,15 +314,15 @@ namespace FEAT
         watch_init_sym_pres_mirror.reset();
         watch_init_sym_reduced_b.reset();
         watch_init_sym_data_mirror.reset();
-        watch_init_sym_neighbour_s.reset();
+        watch_init_sym_neighbor_s.reset();
         watch_init_numeric.reset();
         watch_init_num_matrix_loc.reset();
         watch_init_num_gather_b.reset();
         watch_init_num_premult_da.reset();
-        watch_init_num_neighbour_s.reset();
+        watch_init_num_neighbor_s.reset();
         watch_apply.reset();
         watch_apply_matrix_loc.reset();
-        watch_apply_neighbour_s.reset();
+        watch_apply_neighbor_s.reset();
       }
 
       /**
@@ -343,15 +343,15 @@ namespace FEAT
           watch_init_sym_pres_mirror.elapsed(),
           watch_init_sym_reduced_b.elapsed(),
           watch_init_sym_data_mirror.elapsed(),
-          watch_init_sym_neighbour_s.elapsed(),
+          watch_init_sym_neighbor_s.elapsed(),
           watch_init_numeric.elapsed(),
           watch_init_num_matrix_loc.elapsed(),
           watch_init_num_gather_b.elapsed(),
           watch_init_num_premult_da.elapsed(),
-          watch_init_num_neighbour_s.elapsed(),
+          watch_init_num_neighbor_s.elapsed(),
           watch_apply.elapsed(),
           watch_apply_matrix_loc.elapsed(),
-          watch_apply_neighbour_s.elapsed()
+          watch_apply_neighbor_s.elapsed()
         };
 
         this->get_comm()->allreduce(tloc, tsum, nt, Dist::op_sum);
@@ -366,28 +366,28 @@ namespace FEAT
 
         String s;
         s += String(34, ' ') + "Mean Time      Max Time\n";
-        s += _fmt_time(tsum[0], tmax[0], "Total Symbolic Initialisation");
+        s += _fmt_time(tsum[0], tmax[0], "Total Symbolic Initialization");
         s += _fmt_time(tsum[0], tmax[0], tsum[1], tmax[1], "Local Schur Matrix Structure");
         s += _fmt_time(tsum[0], tmax[0], tsum[2], tmax[2], "Pressure Mirror");
         s += _fmt_time(tsum[0], tmax[0], tsum[3], tmax[3], "Reduced-B Matrix Structure");
         s += _fmt_time(tsum[0], tmax[0], tsum[4], tmax[4], "Reduced-B Data Mirror");
-        s += _fmt_time(tsum[0], tmax[0], tsum[5], tmax[5], "Neighbour Matrix Structure");
+        s += _fmt_time(tsum[0], tmax[0], tsum[5], tmax[5], "Neighbor Matrix Structure");
         double tsym_other_sum = tsum[0] - tsum[1] - tsum[2] - tsum[3] - tsum[4] - tsum[5];
         double tsym_other_max = tmax[0] - tmax[1] - tmax[2] - tmax[3] - tmax[4] - tmax[5];
         s += _fmt_time(tsum[0], tmax[0], tsym_other_sum, tsym_other_max, "Other Symbolic");
 
-        s += _fmt_time(tsum[6], tmax[6], "Total Numeric Initialisation");
+        s += _fmt_time(tsum[6], tmax[6], "Total Numeric Initialization");
         s += _fmt_time(tsum[6], tmax[6], tsum[7], tmax[7], "Local Schur Matrix Values");
         s += _fmt_time(tsum[6], tmax[6], tsum[8], tmax[8], "Reduced-B Gather");
         s += _fmt_time(tsum[6], tmax[6], tsum[9], tmax[9], "Pre-Multiply D*A");
-        s += _fmt_time(tsum[6], tmax[6], tsum[10], tmax[10], "Neighbour Matrix Values");
+        s += _fmt_time(tsum[6], tmax[6], tsum[10], tmax[10], "Neighbor Matrix Values");
         double tnum_other_sum = tsum[6] - tsum[7] - tsum[8] - tsum[9] - tsum[10];
         double tnum_other_max = tmax[6] - tmax[7] - tmax[8] - tmax[9] - tmax[10];
         s += _fmt_time(tsum[6], tmax[6], tnum_other_sum, tnum_other_max, "Other Numeric");
 
         s += _fmt_time(tsum[11], tmax[11], "Total Matrix Apply");
         s += _fmt_time(tsum[11], tmax[11], tsum[12], tmax[12], "Local Schur Matrix");
-        s += _fmt_time(tsum[11], tmax[11], tsum[13], tmax[13], "Neighbour Schur Matrix");
+        s += _fmt_time(tsum[11], tmax[11], tsum[13], tmax[13], "Neighbor Schur Matrix");
         double tapp_other_sum = tsum[11] - tsum[12] - tsum[13];
         double tapp_other_max = tmax[11] - tmax[12] - tmax[13];
         s += _fmt_time(tsum[11], tmax[11], tapp_other_sum, tapp_other_max, "Other Apply");
@@ -395,7 +395,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs both symbolic and numeric initialisation of the matrix.
+       * \brief Performs both symbolic and numeric initialization of the matrix.
        */
       void init()
       {
@@ -404,24 +404,24 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs the symbolic initialisation of the matrix.
+       * \brief Performs the symbolic initialization of the matrix.
        *
        * This function performs the following internal tasks:
        * -# Pre-compute the layout of the local Schur-complement matrix (D*A*B)
-       * -# For each neighbour, compute a mirror of all pressure DOFs, which couple
-       *    to at least one velocity DOF shared with that neighbour via our B-matrix.
-       *    These are the pressure DOFs that have to be send to that neighbour during
+       * -# For each neighbor, compute a mirror of all pressure DOFs, which couple
+       *    to at least one velocity DOF shared with that neighbor via our B-matrix.
+       *    These are the pressure DOFs that have to be send to that neighbor during
        *    the matrix-vector multiplication in the #apply() function.
-       * -# For each neighbour, compute the layout of the reduced B-matrix, which
+       * -# For each neighbor, compute the layout of the reduced B-matrix, which
        *    contains all B-matrix entries, whose column indices correspond to the
        *    pressure DOFs in the previously assembled pressure mirror. Translate the
        *    column indices from "local pressure DOF indices" to pressure mirror DOF
        *    indices during this step.
-       * -# For each neighbour, compute the data-mirror of the reduced B-matrix.
-       * -# Send the reduced B-matrix layouts to the corresponding neighbour processes.
-       * -# For each neighbour, pre-compute the layout of the neighbour Schur-complement
+       * -# For each neighbor, compute the data-mirror of the reduced B-matrix.
+       * -# Send the reduced B-matrix layouts to the corresponding neighbor processes.
+       * -# For each neighbor, pre-compute the layout of the neighbor Schur-complement
        *    matrix S_k := (D*A*B_k), where B_k is the reduced B-matrix received from that
-       *    particular neighbour process.
+       *    particular neighbor process.
        */
       void init_symbolic()
       {
@@ -451,15 +451,15 @@ namespace FEAT
         // get our communicator
         const Dist::Comm& comm = *gate_v->get_comm();
 
-        // get neighbour ranks
+        // get neighbor ranks
         this->_ranks = gate_v->_ranks;
 
-        // get the number of our neighbours
+        // get the number of our neighbors
         const std::size_t num_neighs = this->_ranks.size();
         if(num_neighs <= std::size_t(0))
         {
           watch_init_symbolic.stop();
-          return; // no neighbours, no problems :)
+          return; // no neighbors, no problems :)
         }
 
         // copy the layout of B into (D*A)^T
@@ -468,19 +468,19 @@ namespace FEAT
         // resize our member arrays
         this->_pres_mirrors.resize(num_neighs);
         this->_data_mirrors.resize(num_neighs);
-        this->_neighbour_graphs.resize(num_neighs);
-        this->_neighbour_matrices.resize(num_neighs);
+        this->_neighbor_graphs.resize(num_neighs);
+        this->_neighbor_matrices.resize(num_neighs);
 
         // allocate a vector of graphs for B
         std::vector<Adjacency::Graph> my_graphs(num_neighs);
 
-        // loop over all neighbour processes
+        // loop over all neighbor processes
         for(std::size_t i(0); i < num_neighs; ++i)
         {
           // get the velocity mirror
           const MirrorTypeV& mirror_v = gate_v->_mirrors.at(i);
 
-          // assemble the pressure mirror for this neighbour
+          // assemble the pressure mirror for this neighbor
           watch_init_sym_pres_mirror.start();
           MirrorTypeP& mirror_p = this->_pres_mirrors.at(i);
           this->_asm_pres_mirror(mirror_p, mirror_v, this->_matrix_b.local());
@@ -528,13 +528,13 @@ namespace FEAT
           XASSERT(rdim[0] == gate_v->_mirrors.at(i).num_indices());
 
           // allocate graph of corresponding dimensions
-          this->_neighbour_graphs.at(i) = Adjacency::Graph(rdim[0], rdim[1], rdim[2]);
+          this->_neighbor_graphs.at(i) = Adjacency::Graph(rdim[0], rdim[1], rdim[2]);
         }
 
         // post domain-pointer array receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          recv_reqs[i] = comm.irecv(this->_neighbour_graphs.at(i).get_domain_ptr(),
+          recv_reqs[i] = comm.irecv(this->_neighbor_graphs.at(i).get_domain_ptr(),
             recv_dims.at(i)[0] + std::size_t(1),  this->_ranks.at(i));
         }
 
@@ -554,7 +554,7 @@ namespace FEAT
         // post image-index array receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          recv_reqs[i] = comm.irecv(this->_neighbour_graphs.at(i).get_image_idx(),
+          recv_reqs[i] = comm.irecv(this->_neighbor_graphs.at(i).get_image_idx(),
             recv_dims.at(i)[2],  this->_ranks.at(i));
         }
 
@@ -573,21 +573,21 @@ namespace FEAT
         // wait for all previous sends to finish
         send_reqs.wait_all();
 
-        // compute Schur-matrix structures for neighbours
+        // compute Schur-matrix structures for neighbors
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          watch_init_sym_neighbour_s.start();
+          watch_init_sym_neighbor_s.start();
 
           // D*M^T = (M*B)^T
           Adjacency::Graph graph_dm(Adjacency::RenderType::injectify_transpose, gate_v->_mirrors.at(i), this->_matrix_b.local());
 
           // S = (D*M^T) * B'
-          Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, graph_dm, this->_neighbour_graphs.at(i));
+          Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, graph_dm, this->_neighbor_graphs.at(i));
 
           // allocate Schur-matrix
-          this->_neighbour_matrices.at(i).convert(NeighMatrixTypeS(graph_s));
+          this->_neighbor_matrices.at(i).convert(NeighMatrixTypeS(graph_s));
 
-          watch_init_sym_neighbour_s.stop();
+          watch_init_sym_neighbor_s.stop();
         }
 
         // that's it
@@ -595,15 +595,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs the numeric initialisation of the matrix.
+       * \brief Performs the numeric initialization of the matrix.
        *
        * This function performs the following internal tasks:
        * -# Compute the numerical values of the local Schur-complement matrix S = (D*A*B).
-       * -# For each neighbour, extract all matrix entries of our local matrix B, which
-       *    coincide with entries of the reduced B-matrix for that particular neighbour,
-       *    and send these matrix entries over to that neighbour process.
-       * -# For each neighbour, receive the entries of the reduced B-matrix and pre-compute
-       *    the numerical values of the neighbour Schur-complement matrix S_k := (D*A*B_k).
+       * -# For each neighbor, extract all matrix entries of our local matrix B, which
+       *    coincide with entries of the reduced B-matrix for that particular neighbor,
+       *    and send these matrix entries over to that neighbor process.
+       * -# For each neighbor, receive the entries of the reduced B-matrix and pre-compute
+       *    the numerical values of the neighbor Schur-complement matrix S_k := (D*A*B_k).
        */
       void init_numeric()
       {
@@ -615,12 +615,12 @@ namespace FEAT
         _asm_local_schur_matrix(this->_matrix_s, this->_matrix_d.local(), this->_diagonal_a.local(), this->_matrix_b.local());
         watch_init_num_matrix_loc.stop();
 
-        // get the number of our neighbours
+        // get the number of our neighbors
         const std::size_t num_neighs = this->_ranks.size();
         if(num_neighs <= std::size_t(0))
         {
           watch_init_numeric.stop();
-          return; // no neighbours, no problems :)
+          return; // no neighbors, no problems :)
         }
 
         // get our communicator
@@ -633,7 +633,7 @@ namespace FEAT
         // allocate receive buffer matrices B' and post receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          recv_bufs.at(i) = BufferVectorType(Index(dim) * this->_neighbour_graphs.at(i).get_num_indices());
+          recv_bufs.at(i) = BufferVectorType(Index(dim) * this->_neighbor_graphs.at(i).get_num_indices());
           recv_reqs[i] = comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), this->_ranks.at(i));
         }
 
@@ -651,14 +651,14 @@ namespace FEAT
         _premult_da(this->_matrix_da, this->_matrix_d.local(), this->_diagonal_a.local());
         watch_init_num_premult_da.stop();
 
-        // process receives and compute neighbour schur matrices
+        // process receives and compute neighbor schur matrices
         for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
-          watch_init_num_neighbour_s.start();
-          this->_neighbour_matrices.at(i).format();
-          _asm_neighbour_schur_matrix(this->_neighbour_matrices.at(i), this->_matrix_da,
-            this->_matrix_b.get_row_gate()->_mirrors.at(i), this->_neighbour_graphs.at(i), recv_bufs.at(i));
-          watch_init_num_neighbour_s.stop();
+          watch_init_num_neighbor_s.start();
+          this->_neighbor_matrices.at(i).format();
+          _asm_neighbor_schur_matrix(this->_neighbor_matrices.at(i), this->_matrix_da,
+            this->_matrix_b.get_row_gate()->_mirrors.at(i), this->_neighbor_graphs.at(i), recv_bufs.at(i));
+          watch_init_num_neighbor_s.stop();
         }
 
         // wait for all previous sends to finish
@@ -700,7 +700,7 @@ namespace FEAT
        * This function computes the layout of the ADP matrix which corresponds to this
        * PMDCDSC matrix, i.e. the matrix, which contains all rows of the virtual global
        * matrix, which correspond to the global DOFs owned by this process.
-       * This function is used by the Solver::ADPSolverBase class specialisation for
+       * This function is used by the Solver::ADPSolverBase class specialization for
        * this class.
        *
        * \param[out] glob_dof_offset
@@ -714,7 +714,7 @@ namespace FEAT
        */
       LocalMatrixTypeS asm_adp_symbolic(Index& glob_dof_offset, Index& glob_dof_count) const
       {
-        // no neighbours?
+        // no neighbors?
         if(_ranks.empty())
         {
           glob_dof_offset = Index(0);
@@ -734,11 +734,11 @@ namespace FEAT
         comm.exscan(&num_loc_dofs, &glob_dof_offset, std::size_t(1), Dist::op_sum);
         comm.allreduce(&num_loc_dofs, &glob_dof_count, std::size_t(1), Dist::op_sum);
 
-        // The columns of our neighbour matrices correspond to the entries in the pressure mirror.
+        // The columns of our neighbor matrices correspond to the entries in the pressure mirror.
         // However, for the desired ADP matrix, we have to translate these into global DOF indices.
         // For this, each process has to map the DOF in its pressure mirrors to global DOFs and then
-        // send these DOF indices to the corresponding neighbour, so that it can map the column
-        // indices of its neighbour matrix to global DOF indices.
+        // send these DOF indices to the corresponding neighbor, so that it can map the column
+        // indices of its neighbor matrix to global DOF indices.
 
         // send/receive mirrors and requests
         std::vector<std::vector<IndexType>> recv_dofs(num_neighs), send_dofs(num_neighs);
@@ -747,7 +747,7 @@ namespace FEAT
         // allocate receive vectors and post receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          recv_dofs.at(i).resize(_neighbour_graphs.at(i).get_num_nodes_image());
+          recv_dofs.at(i).resize(_neighbor_graphs.at(i).get_num_nodes_image());
           recv_reqs[i] = comm.irecv(recv_dofs.at(i).data(), recv_dofs.at(i).size(), this->_ranks.at(i));
         }
 
@@ -774,7 +774,7 @@ namespace FEAT
         for(Index i(0); i  < num_rows; ++i)
           row_aux[i] = (row_ptr_s[i+1] - row_ptr_s[i]);
 
-        for(const auto& x : _neighbour_matrices)
+        for(const auto& x : _neighbor_matrices)
         {
           num_nzes += x.used_elements();
           const Index used_rows = x.used_rows();
@@ -802,11 +802,11 @@ namespace FEAT
         // Note: For the sake of compatibility with picky third-party libraries, we want to
         // ensure that the column indices of the output matrix are in ascending order.
         // For this, we have to combine the matrix layout from our own local matrix and
-        // the matrices of our neighbours in rank-ascending order. So we first create two
-        // rank maps for our neighbours with lower and higher ranks, so that we can easily
+        // the matrices of our neighbors in rank-ascending order. So we first create two
+        // rank maps for our neighbors with lower and higher ranks, so that we can easily
         // loop over all matrices in rank-order.
 
-        // create two neighbours maps: one of all lower ranks and one of all higher ranks
+        // create two neighbors maps: one of all lower ranks and one of all higher ranks
         std::map<int, std::size_t> neigh_map_l, neigh_map_h;
         for(std::size_t ineigh(0); ineigh < num_neighs; ++ineigh)
         {
@@ -819,14 +819,14 @@ namespace FEAT
         // wait for all receive requests to finish
         recv_reqs.wait_all();
 
-        // first, insert all neighbour matrices with a lower rank in rank-ascending order
+        // first, insert all neighbor matrices with a lower rank in rank-ascending order
         for(auto it = neigh_map_l.begin(); it != neigh_map_l.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
-          const IndexType* col_idx_x = _neighbour_matrices.at(ineigh).col_ind();
+          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
+          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
+          const IndexType* col_idx_x = _neighbor_matrices.at(ineigh).col_ind();
           const IndexType* dof_idx_x = recv_dofs.at(ineigh).data();
           for(Index i(0); i < used_rows; ++i)
           {
@@ -845,14 +845,14 @@ namespace FEAT
           row_aux[i] = k;
         }
 
-        // finally, insert all neighbour matrices with a higher rank in rank-ascending order
+        // finally, insert all neighbor matrices with a higher rank in rank-ascending order
         for(auto it = neigh_map_h.begin(); it != neigh_map_h.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
-          const IndexType* col_idx_x = _neighbour_matrices.at(ineigh).col_ind();
+          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
+          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
+          const IndexType* col_idx_x = _neighbor_matrices.at(ineigh).col_ind();
           const IndexType* dof_idx_x = recv_dofs.at(ineigh).data();
           for(Index i(0); i < used_rows; ++i)
           {
@@ -889,7 +889,7 @@ namespace FEAT
        */
       void asm_adp_numeric(LocalMatrixTypeS& matrix) const
       {
-        // no neighbours?
+        // no neighbors?
         if(_ranks.empty())
         {
           // copy values
@@ -917,7 +917,7 @@ namespace FEAT
         // get this process's rank
         const int my_rank = this->get_comm()->rank();
 
-        // create two neighbours maps: one of all lower ranks and one of all higher ranks
+        // create two neighbors maps: one of all lower ranks and one of all higher ranks
         std::map<int, std::size_t> neigh_map_l, neigh_map_h;
         for(std::size_t ineigh(0); ineigh < _ranks.size(); ++ineigh)
         {
@@ -927,14 +927,14 @@ namespace FEAT
             neigh_map_h.emplace(_ranks.at(ineigh), ineigh);
         }
 
-        // first, copy all neighbour matrices with a lower rank in rank-ascending order
+        // first, copy all neighbor matrices with a lower rank in rank-ascending order
         for(auto it = neigh_map_l.begin(); it != neigh_map_l.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
-          const DataType* val_x = _neighbour_matrices.at(ineigh).val();
+          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
+          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
+          const DataType* val_x = _neighbor_matrices.at(ineigh).val();
           for(Index i(0); i < used_rows; ++i)
           {
             IndexType& k = row_aux[row_idx_x[i]];
@@ -952,14 +952,14 @@ namespace FEAT
           row_aux[i] = k;
         }
 
-        // finally, copy all neighbour matrices with a higher rank in rank-ascending order
+        // finally, copy all neighbor matrices with a higher rank in rank-ascending order
         for(auto it = neigh_map_h.begin(); it != neigh_map_h.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbour_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbour_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbour_matrices.at(ineigh).row_numbers();
-          const DataType* val_x = _neighbour_matrices.at(ineigh).val();
+          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
+          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
+          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
+          const DataType* val_x = _neighbor_matrices.at(ineigh).val();
           for(Index i(0); i < used_rows; ++i)
           {
             IndexType& k = row_aux[row_idx_x[i]];
@@ -1087,7 +1087,7 @@ namespace FEAT
           // loop over all non-zeroes in the row of B / B'
           for(IndexType j(row_ptr[irow]), k(dom_ptr[i]); j < row_ptr[irow+1]; ++j, ++k)
           {
-            // initialise invalid index for assertion below
+            // initialize invalid index for assertion below
             img_idx[k] = ~IndexType(0);
 
             // try to find this column index (=pressure DOF) in our pressure DOF mirror
@@ -1153,7 +1153,7 @@ namespace FEAT
           // loop over all non-zeroes in the row of B / B'
           for(Index k(dom_ptr[i]); k < dom_ptr[i+1]; ++k)
           {
-            // initialise invalid index for assertion below
+            // initialize invalid index for assertion below
             dat_idx[k] = ~IndexType(0);
 
             // get the B-column index (=pressure DOF index)
@@ -1224,14 +1224,14 @@ namespace FEAT
         return s;
       }
 
-      /// auxiliary function for _asm_neighbour_schur_matrix: multiply two values D*A and store in transposed form
+      /// auxiliary function for _asm_neighbor_schur_matrix: multiply two values D*A and store in transposed form
       inline static void _mat_mult_d_a(ValueTypeB& val_da, const ValueTypeD& val_d, const ValueTypeA& val_a)
       {
         for(int i(0); i < dim; ++i)
           val_da(i, 0) = val_d(0, i) * val_a(i);
       }
 
-      /// auxiliary function for _asm_neighbour_schur_matrix: multiply two values DA*B with DA in transposed form
+      /// auxiliary function for _asm_neighbor_schur_matrix: multiply two values DA*B with DA in transposed form
       inline static DataType _mat_mult_da_b(const ValueTypeB& val_da, const ValueTypeB& val_b)
       {
         DataType s = DataType(0);
@@ -1341,10 +1341,10 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles a neighbour Schur-Matrix S_k = (D*A*M_k^T*B_k)
+       * \brief Assembles a neighbor Schur-Matrix S_k = (D*A*M_k^T*B_k)
        *
        * \param[inout] s
-       * The neighbour Schur-Matrix S_k that is to be assembled.
+       * The neighbor Schur-Matrix S_k that is to be assembled.
        *
        * \param[in] da
        * The pre-multiplied matrix (D*A) stored in CSC format (transposed CSR)
@@ -1358,7 +1358,7 @@ namespace FEAT
        * \param[in] buffer_b
        * A buffer vector containing the data array of the matrix B_k.
        */
-      static void _asm_neighbour_schur_matrix(NeighMatrixTypeS& s, const LocalMatrixTypeB& da,
+      static void _asm_neighbor_schur_matrix(NeighMatrixTypeS& s, const LocalMatrixTypeB& da,
         const MirrorTypeV& mirror_v, const Adjacency::Graph& graph_b, const BufferVectorType& buffer_b)
       {
         // validate matrix dimensions
@@ -1450,10 +1450,10 @@ namespace FEAT
        */
       void _apply(LocalVectorTypeP& r, const LocalVectorTypeP& x, const LocalVectorTypeP& y, const DataType alpha, bool only_Ax) const
       {
-        // get the number of our neighbours
+        // get the number of our neighbors
         const std::size_t num_neighs = this->_ranks.size();
 
-        // no neighbours?
+        // no neighbors?
         if(num_neighs <= std::size_t(0))
         {
           // multiply by local schur matrix and return
@@ -1476,7 +1476,7 @@ namespace FEAT
         // allocate receive buffer vectors and post receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          recv_bufs.at(i) = BufferVectorType(this->_neighbour_matrices.at(i).columns());
+          recv_bufs.at(i) = BufferVectorType(this->_neighbor_matrices.at(i).columns());
           recv_reqs[i] = comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), this->_ranks.at(i));
         }
 
@@ -1496,12 +1496,12 @@ namespace FEAT
           this->_matrix_s.apply(r, x, y, alpha);
         watch_apply_matrix_loc.stop();
 
-        // process receives and multiply by neighbour schur matrices
+        // process receives and multiply by neighbor schur matrices
         for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
-          watch_apply_neighbour_s.start();
-          this->_neighbour_matrices.at(i).apply(r, recv_bufs.at(i), r, (only_Ax ? DataType(1) : alpha));
-          watch_apply_neighbour_s.stop();
+          watch_apply_neighbor_s.start();
+          this->_neighbor_matrices.at(i).apply(r, recv_bufs.at(i), r, (only_Ax ? DataType(1) : alpha));
+          watch_apply_neighbor_s.stop();
         }
 
         // wait for all previous sends to finish

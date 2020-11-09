@@ -220,7 +220,7 @@ namespace FEAT
     class PatchHaloFactory;
 
     /**
-     * \brief Factory for creating halo mesh-parts between neighbour patches on a base-mesh.
+     * \brief Factory for creating halo mesh-parts between neighbor patches on a base-mesh.
      *
      * Note to self:
      * Do *NOT* switch this class from "ranks-at-elem" version back to "elems-at-rank" version,

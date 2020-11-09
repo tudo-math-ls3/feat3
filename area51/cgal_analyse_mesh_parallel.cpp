@@ -78,7 +78,7 @@ namespace AnalyseMeshCGALParallel
     // Let's print out the shape-type name just for convenience:
     comm.print("Shape Type: " + ShapeType::name());
 
-    // Now that we know the shape-type that we want to use in this specialisation of the
+    // Now that we know the shape-type that we want to use in this specialization of the
     // 'run' function template, we can continue with the remaining typedefs as usual:
 
     // Use the unstructured conformal mesh class
@@ -421,7 +421,7 @@ namespace AnalyseMeshCGALParallel
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     AnalyseMeshCGALParallel::main(argc, argv);
@@ -436,7 +436,7 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }
 
 #else

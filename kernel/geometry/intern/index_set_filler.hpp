@@ -69,7 +69,7 @@ namespace FEAT
       }; // struct IndexSetFiller<int>
 
       /**
-       * \brief Explicit specialisation as end of template recursion.
+       * \brief Explicit specialization as end of template recursion.
        */
       template<>
       struct IndexSetFiller<0>

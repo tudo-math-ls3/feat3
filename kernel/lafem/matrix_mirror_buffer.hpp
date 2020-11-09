@@ -185,7 +185,7 @@ namespace FEAT
       explicit MatrixMirrorBuffer(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        deserialise<DT2_, IT2_>(input);
+        deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -256,29 +256,29 @@ namespace FEAT
       }
 
       /**
-       * \brief Deserialisation of complete container entity.
+       * \brief Deserialization of complete container entity.
        *
        * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void deserialise(std::vector<char> input)
+      void deserialize(std::vector<char> input)
       {
-        this->template _deserialise<DT2_, IT2_>(FileMode::fm_csr, input);
+        this->template _deserialize<DT2_, IT2_>(FileMode::fm_csr, input);
       }
 
       /**
-       * \brief Serialisation of complete container entity.
+       * \brief Serialization of complete container entity.
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAT::LAFEM::Container::_serialise for details.
+       * See \ref FEAT::LAFEM::Container::_serialize for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialise()
+      std::vector<char> serialize()
       {
-        return this->template _serialise<DT2_, IT2_>(FileMode::fm_csr);
+        return this->template _serialize<DT2_, IT2_>(FileMode::fm_csr);
       }
 
       /**

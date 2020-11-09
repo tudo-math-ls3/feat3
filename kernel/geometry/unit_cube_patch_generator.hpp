@@ -133,7 +133,7 @@ namespace FEAT
           node = new MeshNodeType(new MeshType(factory));
         }
 
-        // left neighbour
+        // left neighbor
         if(ii > 0)
         {
           ranks.push_back(Index(ii-1));
@@ -145,7 +145,7 @@ namespace FEAT
         {
           node->add_mesh_part("bnd:0", create_halo0(0));
         }
-        // right neighbour
+        // right neighbor
         if(ii+1 < n)
         {
           ranks.push_back(Index(ii+1));
@@ -330,28 +330,28 @@ namespace FEAT
           node = new MeshNodeType(new MeshType(factory));
         }
 
-        // lower left neighbour
+        // lower left neighbor
         if((ii > 0) && (jj > 0))
         {
           ranks.push_back(Index(n*(jj-1) + ii-1));
           ctags.push_back(cto_x0 + Index((n-1)*(jj-1) + ii-1));
           node->add_halo(int(ranks.back()), create_halo0(0));
         }
-        // lower right neighbour
+        // lower right neighbor
         if((ii+1 < n) && (jj > 0))
         {
           ranks.push_back(Index(n*(jj-1) + ii+1));
           ctags.push_back(cto_x1 + Index((n-1)*(jj-1) + ii));
           node->add_halo(int(ranks.back()), create_halo0(1));
         }
-        // upper left neighbour
+        // upper left neighbor
         if((ii > 0) && (jj+1 < n))
         {
           ranks.push_back(Index(n*(jj+1) + ii-1));
           ctags.push_back(cto_x1 + Index((n-1)*jj + ii-1));
           node->add_halo(int(ranks.back()), create_halo0(2));
         }
-        // upper right neighbour
+        // upper right neighbor
         if((ii+1 < n) && (jj+1 < n))
         {
           ranks.push_back(Index(n*(jj+1) + ii+1));
@@ -359,7 +359,7 @@ namespace FEAT
           node->add_halo(int(ranks.back()), create_halo0(3));
         }
 
-        // bottom neighbour
+        // bottom neighbor
         if(jj > 0)
         {
           ranks.push_back(Index(n*(jj-1) + ii));
@@ -371,7 +371,7 @@ namespace FEAT
         {
           node->add_mesh_part("bnd:0", create_halo1(0));
         }
-        // top neighbour
+        // top neighbor
         if(jj+1 < n)
         {
           ranks.push_back(Index(n*(jj+1) + ii));
@@ -383,7 +383,7 @@ namespace FEAT
         {
           node->add_mesh_part("bnd:1", create_halo1(1));
         }
-        // left neighbour
+        // left neighbor
         if(ii > 0)
         {
           ranks.push_back(Index(n*(jj) + ii-1));
@@ -395,7 +395,7 @@ namespace FEAT
         {
           node->add_mesh_part("bnd:2", create_halo1(2));
         }
-        // right neighbour
+        // right neighbor
         if(ii+1 < n)
         {
           ranks.push_back(Index(n*(jj) + ii+1));
@@ -674,28 +674,28 @@ namespace FEAT
         // lower/upper -> kk
         // south/north -> jj
         // west /east  -> ii
-        // lower south west neighbour
+        // lower south west neighbor
         if((ii > 0) && (jj > 0) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*(jj-1) + ii-1));
           ctags.push_back(cto_x0 + Index((n-1)*(n-1)*(kk-1) + (n-1)*(jj-1) + ii-1));
           node->add_halo(int(ranks.back()), create_halo0(0));
         }
-        // lower south east neighbour
+        // lower south east neighbor
         if((ii+1 < n) && (jj > 0) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*(jj-1) + ii+1));
           ctags.push_back(cto_x1 + Index((n-1)*(n-1)*(kk-1) + (n-1)*(jj-1) + ii));
           node->add_halo(int(ranks.back()), create_halo0(1));
         }
-        // lower north west neighbour
+        // lower north west neighbor
         if((ii > 0) && (jj+1 < n) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*(jj+1) + ii-1));
           ctags.push_back(cto_x2 + Index((n-1)*(n-1)*(kk-1) + (n-1)*jj + ii-1));
           node->add_halo(int(ranks.back()), create_halo0(2));
         }
-        // lower north east neighbour
+        // lower north east neighbor
         if((ii+1 < n) && (jj+1 < n) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*(jj+1) + ii+1));
@@ -710,21 +710,21 @@ namespace FEAT
           ctags.push_back(cto_x3 + Index((n-1)*(n-1)*(kk) + (n-1)*(jj-1) + ii-1));
           node->add_halo(int(ranks.back()), create_halo0(4));
         }
-        // upper south east neighbour
+        // upper south east neighbor
         if((ii+1 < n) && (jj > 0) && (kk+1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*(jj-1) + ii+1));
           ctags.push_back(cto_x2 + Index((n-1)*(n-1)*(kk) + (n-1)*(jj-1) + ii));
           node->add_halo(int(ranks.back()), create_halo0(5));
         }
-        // upper north west neighbour
+        // upper north west neighbor
         if((ii > 0) && (jj+1 < n) && (kk+1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*(jj+1) + ii-1));
           ctags.push_back(cto_x1 + Index((n-1)*(n-1)*(kk) + (n-1)*jj + ii-1));
           node->add_halo(int(ranks.back()), create_halo0(6));
         }
-        // upper north east neighbour
+        // upper north east neighbor
         if((ii+1 < n) && (jj+1 < n) && (kk+1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*(jj+1) + ii+1));
@@ -732,28 +732,28 @@ namespace FEAT
           node->add_halo(int(ranks.back()), create_halo0(7));
         }
 
-        // lower south neighbour
+        // lower south neighbor
         if((jj > 0) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*(jj-1) + ii));
           ctags.push_back(cto_h0 + Index((n-1)*n*(kk-1) + n*(jj-1) + ii));
           node->add_halo(int(ranks.back()), create_halo1(0));
         }
-        // lower north neighbour
+        // lower north neighbor
         if((jj + 1 < n) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*(jj+1) + ii));
           ctags.push_back(cto_h1 + Index((n-1)*n*(kk-1) + n*jj + ii));
           node->add_halo(int(ranks.back()), create_halo1(1));
         }
-        // upper south neighbour
+        // upper south neighbor
         if((jj > 0) && (kk + 1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*(jj-1) + ii));
           ctags.push_back(cto_h1 + Index((n-1)*n*(kk) + n*(jj-1) + ii));
           node->add_halo(int(ranks.back()), create_halo1(2));
         }
-        // upper north neighbour
+        // upper north neighbor
         if((jj + 1 < n) && (kk + 1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*(jj+1) + ii));
@@ -761,28 +761,28 @@ namespace FEAT
           node->add_halo(int(ranks.back()), create_halo1(3));
         }
 
-        // lower west neighbour
+        // lower west neighbor
         if((ii > 0) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*jj + ii-1));
           ctags.push_back(cto_v0 + Index((n-1)*n*(kk-1) + n*jj + ii-1));
           node->add_halo(int(ranks.back()), create_halo1(4));
         }
-        // lower east neighbour
+        // lower east neighbor
         if((ii + 1 < n) && (kk > 0))
         {
           ranks.push_back(Index(n*n*(kk-1) + n*jj + ii+1));
           ctags.push_back(cto_v1 + Index((n-1)*n*(kk-1) + n*jj + ii));
           node->add_halo(int(ranks.back()), create_halo1(5));
         }
-        // upper west neighbour
+        // upper west neighbor
         if((ii > 0) && (kk + 1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*jj + ii-1));
           ctags.push_back(cto_v1 + Index((n-1)*n*(kk) + n*jj + ii-1));
           node->add_halo(int(ranks.back()), create_halo1(6));
         }
-        // upper east neighbour
+        // upper east neighbor
         if((ii + 1 < n) && (kk + 1 < n))
         {
           ranks.push_back(Index(n*n*(kk+1) + n*jj + ii+1));
@@ -790,28 +790,28 @@ namespace FEAT
           node->add_halo(int(ranks.back()), create_halo1(7));
         }
 
-        // south west neighbour
+        // south west neighbor
         if((ii > 0) && (jj > 0))
         {
           ranks.push_back(Index(n*n*kk + n*(jj-1) + ii-1));
           ctags.push_back(cto_z0 + Index((n-1)*(n-1)*(kk) + (n-1)*(jj-1) + ii-1));
           node->add_halo(int(ranks.back()), create_halo1(8));
         }
-        // south east neighbour
+        // south east neighbor
         if((ii + 1 < n) && (jj > 0))
         {
           ranks.push_back(Index(n*n*kk + n*(jj-1) + ii+1));
           ctags.push_back(cto_z1 + Index((n-1)*(n-1)*(kk) + (n-1)*(jj-1) + ii));
           node->add_halo(int(ranks.back()), create_halo1(9));
         }
-        // north west neighbour
+        // north west neighbor
         if((ii > 0) && (jj + 1 < n))
         {
           ranks.push_back(Index(n*n*kk + n*(jj+1) + ii-1));
           ctags.push_back(cto_z1 + Index((n-1)*(n-1)*(kk) + (n-1)*jj + ii-1));
           node->add_halo(int(ranks.back()), create_halo1(10));
         }
-        // north east neighbour
+        // north east neighbor
         if((ii + 1 < n) && (jj + 1 < n))
         {
           ranks.push_back(Index(n*n*kk + n*(jj+1) + ii+1));
@@ -819,7 +819,7 @@ namespace FEAT
           node->add_halo(int(ranks.back()), create_halo1(11));
         }
 
-        // lower neighbour
+        // lower neighbor
         if(kk > 0)
         {
           ranks.push_back(Index(n*n*(kk-1) + n*jj + ii));
@@ -829,7 +829,7 @@ namespace FEAT
         }
         else
           node->add_mesh_part("bnd:0", create_halo2(0));
-        // upper neighbour
+        // upper neighbor
         if(kk + 1 < n)
         {
           ranks.push_back(Index(n*n*(kk+1) + n*jj + ii));
@@ -839,7 +839,7 @@ namespace FEAT
         }
         else
           node->add_mesh_part("bnd:1", create_halo2(1));
-        // south neighbour
+        // south neighbor
         if(jj > 0)
         {
           ranks.push_back(Index(n*n*kk + n*(jj-1) + ii));
@@ -849,7 +849,7 @@ namespace FEAT
         }
         else
           node->add_mesh_part("bnd:2", create_halo2(2));
-        // north neighbour
+        // north neighbor
         if(jj + 1 < n)
         {
           ranks.push_back(Index(n*n*kk + n*(jj+1) + ii));
@@ -859,7 +859,7 @@ namespace FEAT
         }
         else
           node->add_mesh_part("bnd:3", create_halo2(3));
-        // west neighbour
+        // west neighbor
         if(ii > 0)
         {
           ranks.push_back(Index(n*n*kk + n*jj + ii-1));
@@ -869,7 +869,7 @@ namespace FEAT
         }
         else
           node->add_mesh_part("bnd:4", create_halo2(4));
-        // east neighbour
+        // east neighbor
         if(ii + 1 < n)
         {
           ranks.push_back(Index(n*n*kk + n*jj + ii+1));

@@ -968,7 +968,7 @@ namespace FEAT
         char * array(result.data());
         std::uint64_t * uiarray(reinterpret_cast<std::uint64_t *>(array));
         uiarray[0] = 101; /// \todo globale liste anlegen
-        uiarray[1] = 1; //fixed num_blocks for tuple vector specialisation
+        uiarray[1] = 1; //fixed num_blocks for tuple vector specialization
 
         file.write(result.data(), long(result.size()));
 

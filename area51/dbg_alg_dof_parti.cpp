@@ -292,13 +292,13 @@ namespace Tutorial06
 
     std::shared_ptr<RootMeshNodeType> root_mesh_node;
 
-    std::vector<int> neighbour_ranks;
+    std::vector<int> neighbor_ranks;
 
     Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(
-      comm.rank(), comm.size(), root_mesh_node, neighbour_ranks);
+      comm.rank(), comm.size(), root_mesh_node, neighbor_ranks);
 
-    String msg = "Neighbours of process " + stringify(comm.rank()) + ":";
-    for(int i : neighbour_ranks)
+    String msg = "Neighbors of process " + stringify(comm.rank()) + ":";
+    for(int i : neighbor_ranks)
       msg += " " + stringify(i);
     comm.allprint(msg);
 
@@ -320,15 +320,15 @@ namespace Tutorial06
 
 
     GateType gate(comm);
-    for(auto it = neighbour_ranks.begin(); it != neighbour_ranks.end(); ++it)
+    for(auto it = neighbor_ranks.begin(); it != neighbor_ranks.end(); ++it)
     {
-      const int neighbour_rank = *it;
-      const MeshPartType* neighbour_halo = root_mesh_node->get_halo(neighbour_rank);
+      const int neighbor_rank = *it;
+      const MeshPartType* neighbor_halo = root_mesh_node->get_halo(neighbor_rank);
 
-      XASSERTM(neighbour_halo != nullptr, "Failed to retrieve neighbour halo!");
-      VectorMirrorType neighbour_mirror;
-      Assembly::MirrorAssembler::assemble_mirror(neighbour_mirror, space, *neighbour_halo);
-      gate.push(neighbour_rank, std::move(neighbour_mirror));
+      XASSERTM(neighbor_halo != nullptr, "Failed to retrieve neighbor halo!");
+      VectorMirrorType neighbor_mirror;
+      Assembly::MirrorAssembler::assemble_mirror(neighbor_mirror, space, *neighbor_halo);
+      gate.push(neighbor_rank, std::move(neighbor_mirror));
     }
 
     gate.compile(LocalVectorType(space.get_num_dofs()));
@@ -416,7 +416,7 @@ namespace Tutorial06
       s += " : ";
       s += stringify(adp.get_num_global_dofs()).pad_front(4);
       s += " : S[";
-      for(const auto& x : adp._neighbours_owner)
+      for(const auto& x : adp._neighbors_owner)
       {
         s += " ";
         s += stringify(x.first);
@@ -424,7 +424,7 @@ namespace Tutorial06
         s += stringify(x.second.num_indices());
       }
       s += " ] : R[";
-      for(const auto& x : adp._neighbours_donee)
+      for(const auto& x : adp._neighbors_donee)
       {
         s += " ";
         s += stringify(x.first);
@@ -682,7 +682,7 @@ namespace Tutorial06
 
     // In a parallel simulation, each process will write a separate VTU file, which contains the
     // data that is defined on the patch of the corresponding process. Moreover, one process
-    // writes a single additional PVTU file, which can be read by ParaView to visualise
+    // writes a single additional PVTU file, which can be read by ParaView to visualize
     // the whole domain that consists of all patches.
 
     // Build the VTK filename; we also append the number of processes to the filename:
@@ -715,8 +715,8 @@ namespace Tutorial06
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Specify the desired mesh refinement level, defaulted to 5.
   Index level(2);
@@ -748,6 +748,6 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial06::main(level, dbg_rank);
 
-  // And finally, finalise our runtime environment.
-  return Runtime::finalise();
+  // And finally, finalize our runtime environment.
+  return Runtime::finalize();
 }

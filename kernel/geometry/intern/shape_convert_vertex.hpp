@@ -26,7 +26,7 @@ namespace FEAT
       struct ShapeConvertVertex
       {
         // This generic implementation works for both Simplex<n> and Hypercube<m> shapes,
-        // where 1<=n<=3 and 2<=m<=3. The case Hypercube<1> is specialised below.
+        // where 1<=n<=3 and 2<=m<=3. The case Hypercube<1> is specialized below.
         static_assert(Shape_::dimension > 0, "invalid shape");
         static_assert(Shape_::dimension <= 3, "invalid shape");
 

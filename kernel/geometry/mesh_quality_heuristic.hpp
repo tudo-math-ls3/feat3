@@ -22,7 +22,7 @@ namespace FEAT
      * Shape of the cells to compute the quality for
      *
      * The exact type of quality indicator depends on this. This class is an empty generic template, all implementations
-     * are specialisations in Shape_.
+     * are specializations in Shape_.
      *
      * \author Jordi Paul
      */
@@ -164,7 +164,7 @@ namespace FEAT
           rho_min = Math::min(rho_min, my_rho);
         }
         // We want the quality to go to zero if rho_max goes to infinity, so we take 1/rho_max. The absolute minimum
-        // of rho is for the triangle with all angles = 60 degrees, so we scale with its rho for normalisation.
+        // of rho is for the triangle with all angles = 60 degrees, so we scale with its rho for normalization.
         qual_min = Math::sqrt(CoordType(4)/Math::sqrt(CoordType(3)))*rho_min;
         qual_sum = Math::sqrt(CoordType(4)/Math::sqrt(CoordType(3)))*rho_sum;
       }
@@ -301,7 +301,7 @@ namespace FEAT
           rho_min = Math::min(rho_min, my_rho);
         }
         // We want the quality to go to zero if rho_max goes to infinity, so we take 1/rho_max. The absolute minimum
-        // of rho is for the triangle with all angles = 60 degrees, so we scale with its rho for normalisation.
+        // of rho is for the triangle with all angles = 60 degrees, so we scale with its rho for normalization.
         qual_min = fac*rho_min;
         qual_sum = fac*rho_sum;
       }

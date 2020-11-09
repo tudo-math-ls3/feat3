@@ -24,7 +24,7 @@ namespace FEAT
      * A space config class that specifies what data shall be supplied. See Space::ConfigBase for details.
      *
      * \note
-     * When compiling in debug mode, all values are initialised to NaN.
+     * When compiling in debug mode, all values are initialized to NaN.
      *
      * \author Peter Zajac
      */
@@ -76,7 +76,7 @@ namespace FEAT
      * A space config class that specifies what data shall be supplied. See Space::ConfigBase for details.
      *
      * \note
-     * When compiling in debug mode, all values are initialised to NaN.
+     * When compiling in debug mode, all values are initialized to NaN.
      *
      * \author Peter Zajac
      */

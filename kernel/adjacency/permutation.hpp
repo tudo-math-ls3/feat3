@@ -26,7 +26,7 @@ namespace FEAT
       /// Construction type enumeration
       enum ConstrType
       {
-        /// create uninitialised permutation
+        /// create uninitialized permutation
         type_none,
         /// create identity permutation
         type_identity,
@@ -65,7 +65,7 @@ namespace FEAT
        *
        * \param[in] constr_type
        * Specifies the construction type:
-       * - \c type_none \n Create an uninitialised permutation.\n
+       * - \c type_none \n Create an uninitialized permutation.\n
        *   The permutation array has to be set up after the object is created.\n
        *   The input array \p v is ignored.
        * - \c type_identity \n Create an identity permutation.\n The input array \p v is ignored.
@@ -75,7 +75,7 @@ namespace FEAT
        * - \c type_inv_swap \n Interpret the input array as an inverse swap-position array.
        *
        * \param[in] v
-       * The input array for the initialisation. The interpretation of the array's content depends on the
+       * The input array for the initialization. The interpretation of the array's content depends on the
        * \p constr_type parameter.
        */
       explicit Permutation(

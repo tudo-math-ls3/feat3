@@ -163,11 +163,11 @@ namespace FEAT
 
     public:
 
-      /// time of partitioning in seconds, needs initialisation
+      /// time of partitioning in seconds, needs initialization
       static double toe_partition;
-      /// time of assembly in seconds, needs initialisation
+      /// time of assembly in seconds, needs initialization
       static double toe_assembly;
-      /// time of solution in seconds, needs initialisation
+      /// time of solution in seconds, needs initialization
       static double toe_solve;
       /// the current solver's descriptive string
       static String expression_target;

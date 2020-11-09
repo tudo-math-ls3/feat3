@@ -15,17 +15,17 @@ namespace FEAT
   class Runtime
   {
   private:
-    /// signals, if initialise was called
-    static bool _initialised;
+    /// signals, if initialize was called
+    static bool _initialized;
 
-    /// signals, if finalise was called
+    /// signals, if finalize was called
     static bool _finished;
 
   public:
     /**
-     * \brief FEAT initialisation
+     * \brief FEAT initialization
      *
-     * This function performs the basic initialisation of the FEAT library.
+     * This function performs the basic initialization of the FEAT library.
      *
      * \attention
      * This function should be the first functional called in an application's
@@ -34,7 +34,7 @@ namespace FEAT
      * \param[in] argc, argv
      * The argument parameters of the calling \p main function.
      */
-    static void initialise(int& argc, char**& argv);
+    static void initialize(int& argc, char**& argv);
 
     /**
      * \brief FEAT abortion
@@ -49,25 +49,25 @@ namespace FEAT
     [[noreturn]] static void abort(bool dump_call_stack = true);
 
     /**
-     * \brief FEAT finalisation
+     * \brief FEAT finalization
      *
-     * This function finalises the FEAT library.
+     * This function finalizes the FEAT library.
      *
      * \attention
      * This function should be the last function called in an application's
      * \p main function.
      *
      * \note
-     * Internally this functions calls the MemoryPool::finalise function.
+     * Internally this functions calls the MemoryPool::finalize function.
      * To get proper warnings one memory that is still in use and not freed correctly
-     * one has to make sure, that any FEAT Container has been destructed when calling the finalise method.
+     * one has to make sure, that any FEAT Container has been destructed when calling the finalize method.
      * This is usually achieved by keeping the C++ main function slim and kicking off all the fancy application stuff in a separate function/method.
      * Thus (at most) every FEAT related stuff is destructed when this separate function/method ends.
      *
      * \returns
      * An exit code (<c>EXIT_SUCCESS</c>) that can be returned by the \p main function.
      */
-    static int finalise();
+    static int finalize();
   };
 
 } // namespace FEAT

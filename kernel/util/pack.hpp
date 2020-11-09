@@ -454,7 +454,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for floating point types
+      // specialization for floating point types
       template<>
       struct TypeHelper<FEAT::Type::FloatingClass, true>
       {
@@ -509,7 +509,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for signed integer types
+      // specialization for signed integer types
       template<>
       struct TypeHelper<FEAT::Type::IntegralClass, true>
       {
@@ -555,7 +555,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for unsigned integer types
+      // specialization for unsigned integer types
       template<>
       struct TypeHelper<FEAT::Type::IntegralClass, false>
       {

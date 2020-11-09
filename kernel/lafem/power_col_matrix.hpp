@@ -39,7 +39,7 @@ namespace FEAT
       int blocks_>
     class PowerColMatrix
     {
-      // Note: the case = 1 is specialised below
+      // Note: the case = 1 is specialized below
       static_assert(blocks_ > 1, "invalid block size");
 
       // declare this class template as a friend for recursive inheritance

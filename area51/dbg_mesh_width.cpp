@@ -48,7 +48,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   args.parse("ray", ray_3[0], ray_3[1], ray_3[2]);
 
   Tiny::Vector<double, world_dim> ray(ray_3.template size_cast<world_dim>());
-  ray.normalise();
+  ray.normalize();
 
   std::cout << "Ray = [ " << stringify(ray[0]);
   for(int i(1); i < world_dim; ++i)
@@ -207,8 +207,8 @@ int run(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   int ret = run(argc, argv);
-  Runtime::finalise();
+  Runtime::finalize();
   return ret;
 }

@@ -31,7 +31,7 @@
 #include <control/stokes_blocked.hpp>
 #include <control/time/nvs_bdf_q.hpp>
 
-// For validating the time discretisation with analytic solutions
+// For validating the time discretization with analytic solutions
 //#define ANALYTIC_SOLUTION
 using namespace FEAT;
 
@@ -182,8 +182,8 @@ class ExtrudedPartiDomainControl :
         // Create coarse mesh node for this domain control
         std::shared_ptr<MeshNodeType> mesh_node(nullptr);
         MeshExtruder::create(mesh_node, coarse_mesh_node_2d, slices, z_min, z_max, z_min_part_name, z_max_part_name);
-        // Copy the neighbours information from the lower dimensional domain control
-        this->_layers.front()->set_neighbour_ranks(_dom_ctrl_2d.front().layer().get_neighbour_ranks());
+        // Copy the neighbors information from the lower dimensional domain control
+        this->_layers.front()->set_neighbor_ranks(_dom_ctrl_2d.front().layer().get_neighbor_ranks());
 
         // Add coarse mesh node to layer_levels
         auto& laylevs = this->_layer_levels.front();
@@ -319,7 +319,7 @@ struct NavierStokesScrewsApp
 
   /// The only transformation available is the standard P1 or Q1 transformation
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
-  /// FE space for the transformation. The mesh optimisation problem is solved on this
+  /// FE space for the transformation. The mesh optimization problem is solved on this
   typedef typename Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoFESpace;
 
   /// The domain level, including trafo and FE space
@@ -409,8 +409,8 @@ struct NavierStokesScrewsApp
 
     // Solve the flow problem?
     bool solve_flow(false);
-    // Optimise the mesh in every time step?
-    bool solve_mesh_optimisation(false);
+    // Optimize the mesh in every time step?
+    bool solve_mesh_optimization(false);
 
     // The Reynolds number for the flow problem
     DataType reynolds(1);
@@ -459,21 +459,21 @@ struct NavierStokesScrewsApp
     XASSERTM(app_settings_section != nullptr,
     "Application config is missing the mandatory ApplicationSettings section!");
 
-    // Get the mesh optimiser key from the application settings
-    auto meshoptimiser_key_p = app_settings_section->query("mesh_optimiser");
-    XASSERTM(meshoptimiser_key_p.second,
-    "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
+    // Get the mesh optimizer key from the application settings
+    auto meshoptimizer_key_p = app_settings_section->query("mesh_optimizer");
+    XASSERTM(meshoptimizer_key_p.second,
+    "ApplicationConfig section is missing the mandatory meshoptimizer entry!");
 
     // End time
     auto t_end_p = app_settings_section->query("t_end");
     XASSERTM(t_end_p.second, "Application config section is missing the mandatory t_end entry!");
     t_end = DataType(std::stod(t_end_p.first));
 
-    // Solve the mesh_optimisation problem?
-    auto solve_mesh_optimisation_p = app_settings_section->query("solve_mesh_optimisation");
-    XASSERTM(solve_mesh_optimisation_p.second,
-    "Application config section is missing the mandatory solve_mesh_optimisation entry!");
-    solve_mesh_optimisation = (std::stoi(solve_mesh_optimisation_p.first) == 1);
+    // Solve the mesh_optimization problem?
+    auto solve_mesh_optimization_p = app_settings_section->query("solve_mesh_optimization");
+    XASSERTM(solve_mesh_optimization_p.second,
+    "Application config section is missing the mandatory solve_mesh_optimization entry!");
+    solve_mesh_optimization = (std::stoi(solve_mesh_optimization_p.first) == 1);
 
     // Solve the flow problem?
     auto solve_flow_p = app_settings_section->query("solve_flow");
@@ -541,12 +541,12 @@ struct NavierStokesScrewsApp
       slices = Index(std::stoul(slices_p.first));
     }
 
-    // Get the time discretisation settings section
-    auto time_disc_settings = application_config.query_section("TimeDiscretisation");
+    // Get the time discretization settings section
+    auto time_disc_settings = application_config.query_section("TimeDiscretization");
     XASSERTM(time_disc_settings!= nullptr,
-    "Application config is missing the mandatory TimeDiscretisation section!");
+    "Application config is missing the mandatory TimeDiscretization section!");
 
-    // Create BDF time discretisation coefficients in startup mode
+    // Create BDF time discretization coefficients in startup mode
     Control::Time::NvsBdfQ<DataType> time_disc(time_disc_settings, reynolds, use_deformation, true);
 
     // Create domain control
@@ -639,11 +639,11 @@ struct NavierStokesScrewsApp
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
 
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
-      dom_ctrl, meshoptimiser_key_p.first, &meshopt_config, &solver_config);
+      dom_ctrl, meshoptimizer_key_p.first, &meshopt_config, &solver_config);
 
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_preproc(nullptr);
-    // Get mesh optimiser settings section
-    auto meshopt_settings_section = meshopt_config.query_section(meshoptimiser_key_p.first);
+    // Get mesh optimizer settings section
+    auto meshopt_settings_section = meshopt_config.query_section(meshoptimizer_key_p.first);
     if(meshopt_settings_section != nullptr)
     {
       auto preproc_p = meshopt_settings_section->query("preprocessor_config");
@@ -772,12 +772,12 @@ struct NavierStokesScrewsApp
       }
     }
 
-    if(solve_mesh_optimisation)
+    if(solve_mesh_optimization)
     {
-      // Optimise the mesh
+      // Optimize the mesh
       FEAT::Statistics::expression_target = "meshopt_preproc";
       watch_meshopt.start();
-      meshopt_ctrl->optimise();
+      meshopt_ctrl->optimize();
       extruded_dom_ctrl.extrude_vertex_sets();
       watch_meshopt.stop();
 
@@ -797,22 +797,22 @@ struct NavierStokesScrewsApp
       String msg("");
       comm.print(msg);
 
-      msg = String("Optimised total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
+      msg = String("Optimized total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
       comm.print(msg);
 
-      msg = String("Optimised QI min/mean").pad_back(pad_width,' ') + String(": ") + stringify_fp_sci(qi_min) + String(" / ") + stringify_fp_sci(qi_mean);
+      msg = String("Optimized QI min/mean").pad_back(pad_width,' ') + String(": ") + stringify_fp_sci(qi_min) + String(" / ") + stringify_fp_sci(qi_mean);
       comm.print(msg);
 
-      msg = String("Optimised worst edge angle").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_fix(edge_angle);
+      msg = String("Optimized worst edge angle").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_fix(edge_angle);
       comm.print(msg);
 
-      msg = String("Optimised cell size defect").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_sci(cell_size_defect);
+      msg = String("Optimized cell size defect").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_sci(cell_size_defect);
       comm.print(msg);
 
-      msg = String("Optimised lambda min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(lambda_min) + String(" / ") + stringify_fp_sci(lambda_max) ;
+      msg = String("Optimized lambda min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(lambda_min) + String(" / ") + stringify_fp_sci(lambda_max) ;
       comm.print(msg);
 
-      msg = String("Optimised vol fraction min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol_min) + " / " + stringify_fp_sci(vol_max);
+      msg = String("Optimized vol fraction min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol_min) + " / " + stringify_fp_sci(vol_max);
       comm.print(msg);
 
       msg = String("");
@@ -825,19 +825,19 @@ struct NavierStokesScrewsApp
       {
         if( edge_angle < DT_(28))
         {
-          comm.print("FAILED: Optimised worst edge angle should be >= "+stringify_fp_fix(28)
+          comm.print("FAILED: Optimized worst edge angle should be >= "+stringify_fp_fix(28)
               + " but is "+stringify_fp_fix(edge_angle));
           ++failed_checks;
         }
         if( qi_min < DT_(3e-2))
         {
-          comm.print("FAILED: Optimised minimal quality indicator should be >= "+stringify_fp_fix(3e-2)
+          comm.print("FAILED: Optimized minimal quality indicator should be >= "+stringify_fp_fix(3e-2)
               + " but is "+stringify_fp_fix(edge_angle));
           ++failed_checks;
         }
         if( cell_size_defect > DT_(6.8e-1))
         {
-          comm.print("FAILED: Optimised cell size defect should be <= "+stringify_fp_fix(6.8e-1)
+          comm.print("FAILED: Optimized cell size defect should be <= "+stringify_fp_fix(6.8e-1)
               + " but is "+stringify_fp_fix(edge_angle));
           ++failed_checks;
         }
@@ -1386,7 +1386,7 @@ struct NavierStokesScrewsApp
       comm.print("Timestep "+stringify(time_step)+": t = "+stringify_fp_fix(time)+", angle = "
           +stringify_fp_fix(alpha/(DataType(2)*pi)*DataType(360)) + " degrees\n");
 
-      if(solve_mesh_optimisation)
+      if(solve_mesh_optimization)
       {
         watch_meshopt.start();
         // Save old vertex coordinates
@@ -1463,7 +1463,7 @@ struct NavierStokesScrewsApp
           comm.print("Meshopt preprocessor:");
           FEAT::Statistics::expression_target = "meshopt_preproc";
           meshopt_preproc->prepare(new_coords);
-          meshopt_preproc->optimise();
+          meshopt_preproc->optimize();
           comm.print("");
           new_coords.copy(meshopt_preproc->get_coords());
           watch_meshopt_preproc.stop();
@@ -1496,11 +1496,11 @@ struct NavierStokesScrewsApp
         }
         watch_meshopt.start();
 
-        comm.print("Mesh optimisation:");
+        comm.print("Mesh optimization:");
         // Now prepare the functional
         FEAT::Statistics::expression_target = "meshopt";
         meshopt_ctrl->prepare(new_coords);
-        meshopt_ctrl->optimise();
+        meshopt_ctrl->optimize();
         new_coords.copy(meshopt_ctrl->get_coords());
         extruded_dom_ctrl.extrude_vertex_sets();
         comm.print("");
@@ -1529,7 +1529,7 @@ struct NavierStokesScrewsApp
 
           extruded_dom_ctrl.extrude_vertex_vector(extruded_mesh_velocity.local(), mesh_velocity.local());
         }
-      } // solve_mesh_optimisation
+      } // solve_mesh_optimization
 
       // Now the flow problem
       if(solve_flow)
@@ -1544,7 +1544,7 @@ struct NavierStokesScrewsApp
         if((time_step == time_disc.get_max_num_steps())
             && (time_disc.get_num_steps() != time_disc.get_max_num_steps()))
             {
-              comm.print("Switching time discretisation to BDF"+stringify(time_disc.get_max_num_steps()));
+              comm.print("Switching time discretization to BDF"+stringify(time_disc.get_max_num_steps()));
               time_disc.finish_startup();
 
               // Update the coefficients in the Burgers matrix assembler
@@ -1717,7 +1717,7 @@ struct NavierStokesScrewsApp
             cubature, time_disc.coeff_rhs_v_phi.at(step));
         }
 
-        // Synchronise the rhs vector after the local assemblers are finished
+        // Synchronize the rhs vector after the local assemblers are finished
         vec_rhs_v.sync_0();
 
         //// Add phi gradient on rhs - superseeded by the GradOperatorAssembler above
@@ -1726,7 +1726,7 @@ struct NavierStokesScrewsApp
         //  matrix_b.apply(vec_rhs_v, vec_sol_phi.at(step+Index(1)), vec_rhs_v, time_disc.coeff_rhs_v_phi.at(step));
         //}
 
-        // Add pressure gradient on rhs if it got extrapolated at all. This does not have to be synchronised because
+        // Add pressure gradient on rhs if it got extrapolated at all. This does not have to be synchronized because
         // it is a multiplication with a Global::Matrix
         if(time_disc.get_p_extrapolation_steps() > Index(0))
         {
@@ -1775,7 +1775,7 @@ struct NavierStokesScrewsApp
         }
         watch_asm_mat.stop();
 
-        // Phase 3: initialise linear solvers
+        // Phase 3: initialize linear solvers
         watch_sol_init.start();
         matrix_stock_velo.hierarchy_init_numeric();
         solver_a->init_numeric();
@@ -1819,7 +1819,7 @@ struct NavierStokesScrewsApp
         filter_p.filter_rhs(vec_rhs_phi);
         watch_asm_rhs.stop();
 
-        // initialise pressure poisson solver
+        // initialize pressure poisson solver
         watch_sol_init.start();
         matrix_stock_pres.hierarchy_init_numeric();
         solver_s->init_numeric();
@@ -1861,7 +1861,7 @@ struct NavierStokesScrewsApp
         }
         watch_asm_rhs.stop();
 
-        // Update the pressure mass matrix and initialise the solver
+        // Update the pressure mass matrix and initialize the solver
         watch_sol_init.start();
         ms_mass_p.refresh();
         solver_m_p->init_numeric();
@@ -1896,9 +1896,9 @@ struct NavierStokesScrewsApp
           Assembly::ScalarErrorInfo<DataType> error_p = Assembly::ScalarErrorComputer<0>::compute(
             vec_sol_p.at(0).local(), pres_sol, the_domain_level.space_pres, cubature);
 
-          // synchronise all local errors
-          error_v.synchronise(comm);
-          error_p.synchronise(comm);
+          // synchronize all local errors
+          error_v.synchronize(comm);
+          error_p.synchronize(comm);
 
           err_v_L2_max = Math::max(err_v_L2_max, error_v.norm_h0);
           err_v_H1_max = Math::max(err_v_H1_max, error_v.norm_h1);
@@ -1928,7 +1928,7 @@ struct NavierStokesScrewsApp
 
         watch_vtk.start();
         // 2d export
-        //if(solve_mesh_optimisation)
+        //if(solve_mesh_optimization)
         //{
         //  String vtk_name = String("mesh_post_n"+stringify(comm.size())+"_"+stringify(time_step));
         //  comm.print("Writing "+vtk_name+".vtk");
@@ -2115,7 +2115,7 @@ struct NavierStokesScrewsApp
         dump_time(comm, "Solver-A time", t_solver_a, t_total);
         dump_time(comm, "Solver-S time", t_solver_s, t_total);
         dump_time(comm, "Solver-M_p time", t_solver_m_p, t_total);
-        dump_time(comm, "Mesh optimisation time", t_meshopt, t_total);
+        dump_time(comm, "Mesh optimization time", t_meshopt, t_total);
         dump_time(comm, "Mesh opt preproc time", t_meshopt_preproc, t_total);
         dump_time(comm, "Mesh quality computation time", t_mesh_quality, t_total);
         dump_time(comm, "VTK write time", t_vtk, t_total);
@@ -2262,7 +2262,7 @@ struct NavierStokesScrewsApp
       dump_time(comm, "Solver-A time", t_solver_a, t_total);
       dump_time(comm, "Solver-S time", t_solver_s, t_total);
       dump_time(comm, "Solver-M_p time", t_solver_m_p, t_total);
-      dump_time(comm, "Mesh optimisation time", t_meshopt, t_total);
+      dump_time(comm, "Mesh optimization time", t_meshopt, t_total);
       dump_time(comm, "Mesh quality computation time", t_mesh_quality, t_total);
       dump_time(comm, "VTK write time", t_vtk, t_total);
       dump_time(comm, "Other time", t_total-t_sum, t_total);
@@ -2357,7 +2357,7 @@ int run_app(int argc, char* argv[])
   PropertyMap meshopt_config;
   PropertyMap solver_config;
 
-  // If we are not in test mode, parse command line arguments, read files, synchronise streams
+  // If we are not in test mode, parse command line arguments, read files, synchronize streams
   if(!test)
   {
     // Read the application config file, required
@@ -2376,7 +2376,7 @@ int run_app(int argc, char* argv[])
       DistFileIO::read_common(synchstream_app_config, application_config_filename);
     }
 
-    // Parse the application config from the (synchronised) stream
+    // Parse the application config from the (synchronized) stream
     application_config.read(synchstream_app_config, true);
 
     // Get the application settings section
@@ -2387,13 +2387,13 @@ int run_app(int argc, char* argv[])
     auto mesh_files_p = app_settings_section->query("mesh_files");
     mesh_files = mesh_files_p.first.split_by_whitespaces();
 
-    // Read configuration for mesh optimisation to stream
+    // Read configuration for mesh optimization to stream
     auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
 
     XASSERTM(meshopt_config_filename_p.second,
     "ApplicationConfig section is missing the mandatory meshopt_config_file entry!");
 
-    comm.print("Reading mesh optimisation config from file "+meshopt_config_filename_p.first);
+    comm.print("Reading mesh optimization config from file "+meshopt_config_filename_p.first);
     DistFileIO::read_common(synchstream_meshopt_config, meshopt_config_filename_p.first);
     meshopt_config.read(synchstream_meshopt_config, true);
 
@@ -2454,19 +2454,19 @@ int run_app(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   int ret = run_app(argc, argv);
-  FEAT::Runtime::finalise();
+  FEAT::Runtime::finalize();
   return ret;
 }
 
 static void read_test_application_config(std::stringstream& iss)
 {
   iss << "[ApplicationSettings]" << std::endl;
-  iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
+  iss << "mesh_optimizer = HyperelasticityDefault" << std::endl;
   iss << "t_end = 1e-4" << std::endl;
   iss << "solve_flow = 1" << std::endl;
-  iss << "solve_mesh_optimisation = 1" << std::endl;
+  iss << "solve_mesh_optimization = 1" << std::endl;
   iss << "reynolds = 1e1" << std::endl;
   iss << "use_deformation = 0" << std::endl;
 
@@ -2479,7 +2479,7 @@ static void read_test_application_config(std::stringstream& iss)
   iss << "z_max = 1.0" << std::endl;
   iss << "slices = 1" << std::endl;
 
-  iss << "[TimeDiscretisation]" << std::endl;
+  iss << "[TimeDiscretization]" << std::endl;
   iss << "delta_t = 1e-4" << std::endl;
   iss << "num_steps = 2" << std::endl;
   iss << "p_extrapolation_steps = 1" << std::endl;

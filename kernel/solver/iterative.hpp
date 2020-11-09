@@ -194,7 +194,7 @@ namespace FEAT
       /**
        * \brief Protected constructor
        *
-       * This constructor initialises the following values:
+       * This constructor initializes the following values:
        *
        * - relative tolerance: sqrt(eps) (~1E-8 for double)
        * - absolute tolerance: 1/eps^2 (~1E+32 for double)
@@ -940,7 +940,7 @@ namespace FEAT
      * \brief Abstract base-class for preconditioned iterative solvers.
      *
      * This class extends the functionality of the IterativeSolver class template by providing overrides
-     * for the initialisation and finalisation methods of the SolverBase class template, which take
+     * for the initialization and finalization methods of the SolverBase class template, which take
      * care of forwarding these steps to the preconditioner.
      *
      * \tparam Vector_

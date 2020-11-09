@@ -33,7 +33,7 @@ Convert a matrix file from one format into another.
 \todo add documentation
 
 \section tools_solver Solver tools
-\subsection tools_subsec_dbg_nlopt Tool for debugging of nonlinear optimisers
+\subsection tools_subsec_dbg_nlopt Tool for debugging of nonlinear optimizers
 This is located in the <c>tools/dbg_nlopt</c> and the documentation can be found on the \ref tools_dbg_nlopt page.
 
 **/

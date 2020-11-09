@@ -50,7 +50,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] system_matrix
-         * A reference to the system matrix to be factorised.
+         * A reference to the system matrix to be factorized.
          */
         explicit CuSolverLU(const LAFEM::SparseMatrixCSR<Mem::Main, double, unsigned int> & system_matrix) :
           _system_matrix(system_matrix)
@@ -64,7 +64,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Solves a linear system with the factorised system matrix.
+         * \brief Solves a linear system with the factorized system matrix.
          *
          * \param[in,out] x
          * A reference to the solution vector. The vector must be allocated to the correct length, but its
@@ -102,7 +102,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] system_matrix
-         * A reference to the system matrix to be factorised.
+         * A reference to the system matrix to be factorized.
          */
         explicit CuSolverQR(const LAFEM::SparseMatrixCSR<Mem::CUDA, double, unsigned int> & system_matrix) :
           _system_matrix(system_matrix)

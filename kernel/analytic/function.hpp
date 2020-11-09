@@ -150,7 +150,7 @@ namespace FEAT
        *
        * \tparam Traits_
        * A traits class that contains various typedefs which specify the data types
-       * for the evaluation. See Analytic::EvalTraitsBase and its specialisations for
+       * for the evaluation. See Analytic::EvalTraitsBase and its specializations for
        * all contained types.
        */
       template<typename Traits_>

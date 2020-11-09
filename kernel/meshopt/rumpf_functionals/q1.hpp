@@ -73,11 +73,11 @@ namespace FEAT
 
 
         private:
-          /// The gradient of the local reference mapping of the normalised reference cell to the current cell
+          /// The gradient of the local reference mapping of the normalized reference cell to the current cell
           TgradR grad_R;
-          /// The inverse matrix of the local reference mapping of the normalised reference cell to the current cell
+          /// The inverse matrix of the local reference mapping of the normalized reference cell to the current cell
           TgradR inv_grad_R;
-          /// The cofactor matrix of the local reference mapping of the normalised reference cell to the current cell
+          /// The cofactor matrix of the local reference mapping of the normalized reference cell to the current cell
           TgradR cof_grad_R;
 
           /// Factory for creating the cubature rule
@@ -91,8 +91,8 @@ namespace FEAT
           DataType _frobenius_cof_grad_R;
           /// \f$ det(\nabla R_K) \f$
           DataType _det_grad_R;
-          /// The volume of the normalised reference cell
-          DataType _normalised_ref_cell_vol;
+          /// The volume of the normalized reference cell
+          DataType _normalized_ref_cell_vol;
 
           /// Exponent of the det terms
           const int _exponent_det;
@@ -132,7 +132,7 @@ namespace FEAT
             _frobenius_grad_R(0),
             _frobenius_cof_grad_R(0),
             _det_grad_R(0),
-            _normalised_ref_cell_vol(1<<world_dim),
+            _normalized_ref_cell_vol(1<<world_dim),
             _exponent_det(exponent_det_),
             _compute_frobenius( (fac_frobenius_ > DataType(0)) ),
             _compute_cof( (fac_cof_ > 0) ),
@@ -211,7 +211,7 @@ namespace FEAT
            */
           DataType compute_frobenius_part()
           {
-            return Math::sqr(Math::sqr(_frobenius_grad_R) - DataType(TgradR::n))/_normalised_ref_cell_vol;
+            return Math::sqr(Math::sqr(_frobenius_grad_R) - DataType(TgradR::n))/_normalized_ref_cell_vol;
           }
 
           /**
@@ -219,7 +219,7 @@ namespace FEAT
            */
           DataType compute_cof_part()
           {
-            return Math::sqr(Math::sqr(_frobenius_cof_grad_R) - DataType(TgradR::n))/_normalised_ref_cell_vol;
+            return Math::sqr(Math::sqr(_frobenius_cof_grad_R) - DataType(TgradR::n))/_normalized_ref_cell_vol;
           }
 
           /**
@@ -229,11 +229,11 @@ namespace FEAT
           {
             if(_exponent_det == 1)
             {
-              return _det_grad_R/_normalised_ref_cell_vol;
+              return _det_grad_R/_normalized_ref_cell_vol;
             }
             else
             {
-              return Math::sqr(_det_grad_R)/_normalised_ref_cell_vol;
+              return Math::sqr(_det_grad_R)/_normalized_ref_cell_vol;
             }
           }
 
@@ -254,11 +254,11 @@ namespace FEAT
 
             if(_exponent_det == 1)
             {
-              return fac/_normalised_ref_cell_vol;
+              return fac/_normalized_ref_cell_vol;
             }
             else
             {
-              return Math::sqr(fac)/_normalised_ref_cell_vol;
+              return Math::sqr(fac)/_normalized_ref_cell_vol;
             }
           }
 
@@ -378,7 +378,7 @@ namespace FEAT
             const DataType fac)
           {
             DataType my_fac(fac*DataType(4)*(Math::sqr(_frobenius_grad_R) - DataType(TgradR::n)));
-            my_fac /= _normalised_ref_cell_vol;
+            my_fac /= _normalized_ref_cell_vol;
 
             for(int i(0); i < SpaceEvalData::max_local_dofs; ++i)
             {
@@ -395,7 +395,7 @@ namespace FEAT
           void add_grad_cof(Tx& grad, const SpaceEvalData& space_data, const TgradR& mat_tensor, const DataType fac)
           {
             DataType my_fac(fac*DataType(4)*(Math::sqr(_frobenius_cof_grad_R) - DataType(TgradR::n)));
-            my_fac /= _normalised_ref_cell_vol;
+            my_fac /= _normalized_ref_cell_vol;
 
             TgradR cof_grad_R_transpose(0);
             cof_grad_R_transpose.set_transpose(cof_grad_R);
@@ -422,11 +422,11 @@ namespace FEAT
             DataType my_fac(fac);
             if(_exponent_det == 1)
             {
-              my_fac *= _det_grad_R/_normalised_ref_cell_vol;
+              my_fac *= _det_grad_R/_normalized_ref_cell_vol;
             }
             else
             {
-              my_fac *= DataType(2)*Math::sqr(_det_grad_R)/_normalised_ref_cell_vol;
+              my_fac *= DataType(2)*Math::sqr(_det_grad_R)/_normalized_ref_cell_vol;
             }
 
             for(int i(0); i < SpaceEvalData::max_local_dofs; ++i)
@@ -444,7 +444,7 @@ namespace FEAT
           void add_grad_rec_det(
             Tx& grad, const SpaceEvalData& space_data, const TgradR& mat_tensor, const DataType fac)
           {
-            DataType my_fac(-fac/_normalised_ref_cell_vol);
+            DataType my_fac(-fac/_normalized_ref_cell_vol);
             if(_exponent_det == 1)
             {
               my_fac *= _det_grad_R / Math::sqrt(Math::sqr(this->_fac_reg) + Math::sqr(_det_grad_R));
@@ -507,9 +507,9 @@ namespace FEAT
 
               // Add outer parts of the chain rule derivatives, which are different in every integration point
               frobenius_der_h += weight*DataType(4)*(Math::sqr(_frobenius_grad_R) - DataType(world_dim))*
-                Math::sqr(_frobenius_grad_R)/_normalised_ref_cell_vol;
+                Math::sqr(_frobenius_grad_R)/_normalized_ref_cell_vol;
 
-              det_der_h += weight*_det_grad_R/_normalised_ref_cell_vol;
+              det_der_h += weight*_det_grad_R/_normalized_ref_cell_vol;
 
               DataType fac;
               if(_det_grad_R >= DataType(0))
@@ -521,7 +521,7 @@ namespace FEAT
                 fac = this->_fac_reg;
               }
 
-              rec_det_der_h += weight*_det_grad_R/(fac*(_det_grad_R + fac))/_normalised_ref_cell_vol;
+              rec_det_der_h += weight*_det_grad_R/(fac*(_det_grad_R + fac))/_normalized_ref_cell_vol;
 
             }
 

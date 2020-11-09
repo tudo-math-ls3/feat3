@@ -32,7 +32,7 @@ namespace FEAT
   namespace Control
   {
     /**
-     * \brief Control layer for mesh optimisation
+     * \brief Control layer for mesh optimization
      */
     namespace Meshopt
     {
@@ -162,9 +162,9 @@ namespace FEAT
           CoordType& vol_min, CoordType& vol_max, CoordType& vol) const = 0;
 
           /**
-           * \brief Optimises the current mesh
+           * \brief Optimizes the current mesh
            */
-          virtual void optimise() = 0;
+          virtual void optimize() = 0;
 
           /**
            * \brief Sets the internal state variable
@@ -265,10 +265,10 @@ namespace FEAT
          * The mean quality indicator overa all cells.
          *
          * \param[out] edge_angle_cellwise
-         * For debugging or visualisation purposes, this can receive the worst edge angle for every cell.
+         * For debugging or visualization purposes, this can receive the worst edge angle for every cell.
          *
          * \param[out] qi_cellwise
-         * For debugging or visualisation purposes, this can receive the quality indicator for every cell.
+         * For debugging or visualization purposes, this can receive the quality indicator for every cell.
          *
          * \param[in] lvl_index
          * Index of the level to compute everything for. Defaults to the maximum level.
@@ -535,9 +535,9 @@ namespace FEAT
 
 
           /**
-           * \brief Synchronises the system filters
+           * \brief Synchronizes the system filters
            *
-           * If there is a global functional (like Global::Functional<SomeClass>) that handles the synchronisation
+           * If there is a global functional (like Global::Functional<SomeClass>) that handles the synchronization
            * after each call to prepare(), is is not needed. For quadratic functionals, where there is no global
            * functional but only a Global::Matrix, this routine is provided.
            */
@@ -591,7 +591,7 @@ namespace FEAT
            *
            * Note that this is always homogeneous and filtered.
            *
-           * \returns A right hand side vector for the mesh optimisation problem on this level.
+           * \returns A right hand side vector for the mesh optimization problem on this level.
            */
           GlobalSystemVectorL assemble_rhs_vector() const
           {
@@ -640,9 +640,9 @@ namespace FEAT
             gate_scalar.set_comm(dom_layer.comm_ptr());
 
             // Loop over all ranks
-            for(Index i(0); i < dom_layer.neighbour_count(); ++i)
+            for(Index i(0); i < dom_layer.neighbor_count(); ++i)
             {
-              int rank(dom_layer.neighbour_rank(i));
+              int rank(dom_layer.neighbor_rank(i));
 
               // try to find our halo
               auto* halo = local_functional.get_mesh_node()->get_halo(rank);
@@ -714,7 +714,7 @@ namespace FEAT
               Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
               local_functional.trafo_space, level_coarse.local_functional.trafo_space, cubature_factory);
 
-              // Synchronise weight vector
+              // Synchronize weight vector
               glob_vec_weight.sync_0();
 
               // Invert components
@@ -745,7 +745,7 @@ namespace FEAT
        * \tparam Functional_
        * The (patch-) local quadratic mesh quality functional
        *
-       * Since the mesh quality functional is quadratic, it can be minimised by solving the the linear system of
+       * Since the mesh quality functional is quadratic, it can be minimized by solving the the linear system of
        * equations given by its gradient, represented by the GlobalSystemMatrix.
        *
        */

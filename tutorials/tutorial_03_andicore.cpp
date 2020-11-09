@@ -158,7 +158,7 @@ namespace Tutorial03
     const AndicoreData& _data;
 
   public:
-    // And a simple initialisation constructor for our operator:
+    // And a simple initialization constructor for our operator:
     explicit AndicoreOperator(const AndicoreData& data) :
       _data(data)
     {
@@ -370,7 +370,7 @@ namespace Tutorial03
 
       // Each type of evaluator has a 'prepare' and a 'finish' member function which are called
       // for each cell of the mesh that the assembler iterates over. However, as this simple
-      // functional does not require any type of additional initialisation, we do not need to
+      // functional does not require any type of additional initialization, we do not need to
       // implement these function, as our base-class provides empty implementations for us.
 
       // Now we come to learn a new function, which is present in all bilinear operator and
@@ -426,7 +426,7 @@ namespace Tutorial03
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Initial data setup
 
-    // First of all, we create and initialise the data object for our PDE:
+    // First of all, we create and initialize the data object for our PDE:
     AndicoreData andicore_data;
 
     // Choose a (non-symmetric) positive definite matrix A for the diffusion
@@ -559,7 +559,7 @@ namespace Tutorial03
     // Enable convergence plot
     solver->set_plot_mode(Solver::PlotMode::iter);
 
-    // Initialise the solver
+    // Initialize the solver
     solver->init();
 
     // Solve our linear system
@@ -612,8 +612,8 @@ namespace Tutorial03
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #03: Andicore" << std::endl;
@@ -641,6 +641,6 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial03::main(level);
 
-  // Finalise the runtime
-  return Runtime::finalise();
+  // Finalize the runtime
+  return Runtime::finalize();
 }

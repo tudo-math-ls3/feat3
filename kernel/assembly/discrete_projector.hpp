@@ -107,7 +107,7 @@ namespace FEAT
           // format local matrix
           lvad.format();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch local vector
@@ -130,7 +130,7 @@ namespace FEAT
           {
             typename AsmTraits::DomainPointType dom_point;
 
-            // initialise domain point
+            // initialize domain point
             for(int i(0); i < shape_dim; ++i)
             {
               dom_point[i] = Shape::ReferenceCell<ShapeType>::template vertex<DataType>(k, i);
@@ -297,7 +297,7 @@ namespace FEAT
           // format local matrix
           lvad.format();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch local vector

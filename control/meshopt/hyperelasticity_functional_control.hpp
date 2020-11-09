@@ -134,7 +134,7 @@ namespace FEAT
           std::shared_ptr<Solver::IterativeSolver<typename SystemLevelType::GlobalSystemVectorR>> solver;
           /// The preconditioner. As this might involve a matrix to be assembled, we keep it between solves.
           std::shared_ptr<PrecondType> precond;
-          /// The level index (= number of refinements since the mesh file) to optimise the mesh on
+          /// The level index (= number of refinements since the mesh file) to optimize the mesh on
           int meshopt_lvl;
           /// The position of this level in the deque of system levels
           size_t meshopt_lvl_pos;
@@ -146,7 +146,7 @@ namespace FEAT
            * The domaincontrol holding all geometry information for all levels
            *
            * \param[in] meshopt_lvl_
-           * Index of the level to perform the mesh optimisation on
+           * Index of the level to perform the mesh optimization on
            *
            * \param[in] dirichlet_list
            * List of meshpart identifiers for Dirichlet boundary conditions
@@ -191,7 +191,7 @@ namespace FEAT
 
               XASSERT(meshopt_lvl <= dom_ctrl.max_level_index());
 
-              // Now find the position of the mesh optimisation level in the domain levels
+              // Now find the position of the mesh optimization level in the domain levels
               for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
               {
                 if(dom_ctrl.at(i)->get_level_index() == meshopt_lvl)
@@ -233,7 +233,7 @@ namespace FEAT
 
               precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);
 
-              solver = Solver::SolverFactory::create_nonlinear_optimiser
+              solver = Solver::SolverFactory::create_nonlinear_optimizer
                 (_system_levels.at(meshopt_lvl_pos)->global_functional,
                 _system_levels.at(meshopt_lvl_pos)->filter_sys, &solver_config, solver_name, precond);
               solver->init();
@@ -309,7 +309,7 @@ namespace FEAT
               + stringify(this->_dom_ctrl.max_level_index()) + String(" / ")
               + stringify(this->_dom_ctrl.min_level_index()) + String("\n");
 
-            msg += String("optimisation on level").pad_back(pad_width, '.') + String(": ")
+            msg += String("optimization on level").pad_back(pad_width, '.') + String(": ")
               + stringify(meshopt_lvl) + String("\n");
 
             for(const auto& it : this->get_dirichlet_boundaries())
@@ -469,8 +469,8 @@ namespace FEAT
 
           }
 
-          /// \copydoc BaseClass::optimise()
-          virtual void optimise() override
+          /// \copydoc BaseClass::optimize()
+          virtual void optimize() override
           {
             // fetch our finest levels
             SystemLevelType& the_system_level = *_system_levels.at(meshopt_lvl_pos);
@@ -488,7 +488,7 @@ namespace FEAT
             the_system_level.global_functional.reset_num_evals();
             solver->correct(vec_sol, vec_rhs);
 
-            //If the mesh was not optimised on the finest domain level, we now need to prolongate the solution by:
+            //If the mesh was not optimized on the finest domain level, we now need to prolongate the solution by:
             // - refine the coarse vertex set using the StandardRefinery
             // - copy the results to the CoordsBuffer
             // - convert the CoordsBuffer to a vector type that we can filter with the system's Dirichlet filter

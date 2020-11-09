@@ -214,7 +214,7 @@ namespace FEAT
           /// <vec_pn, vec_grad>. We want to find the minimum of the functional value along vec_pn
           DataType df(0);
 
-          // Perform initialisations and checks
+          // Perform initializations and checks
           Status st = this->_startup(alpha, fval, df, vec_sol, vec_dir);
           //alpha = this->_alpha_0;
           if(st != Status::progress)
@@ -222,7 +222,7 @@ namespace FEAT
             return st;
           }
 
-          // Scaling if we are to use step sizes wrt. to the non-normalised search direction
+          // Scaling if we are to use step sizes wrt. to the non-normalized search direction
           // This appears to be the right thing theoretically, but in practice not using the search direction norm as
           // initial guess for the step size works better. Stupid reality...
           //if(this->_dir_scaling)

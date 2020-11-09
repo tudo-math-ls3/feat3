@@ -379,7 +379,7 @@ namespace Stokes3Field
     MeshPartType boundary(boundary_factory);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Trafo and Finite Element Space initialisation
+    // Trafo and Finite Element Space initialization
 
     // Create the trafo
     TrafoType trafo(mesh);
@@ -499,7 +499,7 @@ namespace Stokes3Field
 
     auto solver = Solver::new_generic_umfpack(matrix);
 
-    // Okay, our solver is set up, so initialise it now:
+    // Okay, our solver is set up, so initialize it now:
     try
     {
       solver->init();
@@ -562,7 +562,7 @@ namespace Stokes3Field
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   Stokes3Field::main(argc, argv);
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

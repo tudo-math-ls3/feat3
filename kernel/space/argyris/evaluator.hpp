@@ -146,7 +146,7 @@ namespace FEAT
             DataType(1) - DataType(2*sim.map(2, 0))
           };
 
-          // initialise edge vectors
+          // initialize edge vectors
           ImagePointType edge_vec[3];
           edge_vec[0].format();
           edge_vec[1].format();
@@ -173,7 +173,7 @@ namespace FEAT
             edge_vec[(vi+1) % 3] += img_point;
             edge_vec[(vi+2) % 3] -= img_point;
 
-            // initialise monomial powers
+            // initialize monomial powers
             Tiny::Vector<DataType, 6> vx, vy;
             vx(0) = vy(0) = DataType(1);
             for(int l(0); l < 5; ++l)
@@ -222,7 +222,7 @@ namespace FEAT
             DataType dnx = +(edge_vec[ei](1) * edge_ori[ei]) / dnorm;
             DataType dny = -(edge_vec[ei](0) * edge_ori[ei]) / dnorm;
 
-            // initialise monomial powers
+            // initialize monomial powers
             Tiny::Vector<DataType, 6> vx, vy;
             vx(0) = vy(0) = DataType(1);
             for(int l(0); l < 5; ++l)
@@ -255,7 +255,7 @@ namespace FEAT
           EvalData<SpaceEvalTraits, space_cfg_>& phi,
           const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& tau) const
         {
-          // initialise monomial powers
+          // initialize monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
           vx(0) = vy(0) = DataType(1);
           for(int l(0); l < 5; ++l)
@@ -281,7 +281,7 @@ namespace FEAT
           EvalData<SpaceEvalTraits, space_cfg_>& phi,
           const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& tau) const
         {
-          // initialise monomial powers
+          // initialize monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
           vx(0) = vy(0) = DataType(1);
           for(int l(0); l < 5; ++l)
@@ -315,7 +315,7 @@ namespace FEAT
           EvalData<SpaceEvalTraits, space_cfg_>& phi,
           const Trafo::EvalData<TrafoEvalTraits, trafo_cfg_>& tau) const
         {
-          // initialise monomial powers
+          // initialize monomial powers
           Tiny::Vector<DataType, 6> vx, vy;
           vx(0) = vy(0) = DataType(1);
           for(int l(0); l < 5; ++l)

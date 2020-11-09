@@ -41,7 +41,7 @@ namespace FEAT
       typedef SparseMatrixCOO<MemType_, DataType_, IndexType_> ScalarMatrixD;
     };
 
-    // CUDA specialisation: There is no COO implementation, so we choose ELL for D matrices
+    // CUDA specialization: There is no COO implementation, so we choose ELL for D matrices
     template<typename DataType_, typename IndexType_>
     struct MetaMatrixTestHelper<Mem::CUDA, DataType_, IndexType_>
     {

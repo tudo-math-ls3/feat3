@@ -20,11 +20,11 @@ namespace FEAT
       switch(constr_type)
       {
       case type_none:
-        // leave arrays uninitialised
+        // leave arrays uninitialized
         return;
 
       case type_identity:
-        // initialise identity permutation
+        // initialize identity permutation
         for(Index i(0); i < _num_entries; ++i)
         {
           _perm_pos[i] = _swap_pos[i] = i;
@@ -70,7 +70,7 @@ namespace FEAT
 
       case type_inv_swap:
         // construct from inverse swap array;
-        // initialise identity permutation
+        // initialize identity permutation
         for(Index i(0); i < _num_entries; ++i)
         {
           _perm_pos[i] = i;
@@ -163,7 +163,7 @@ namespace FEAT
 
     void Permutation::calc_perm_from_swap()
     {
-      // initialise identity permuation
+      // initialize identity permuation
       for(Index i(0); i < _num_entries; ++i)
       {
         _perm_pos[i] = i;

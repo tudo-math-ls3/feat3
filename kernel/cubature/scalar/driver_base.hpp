@@ -24,8 +24,8 @@ namespace FEAT
       class DriverBase
       {
       public:
-        /// by default, tensorise the cubature forumula
-        static constexpr bool tensorise = true;
+        /// by default, tensorize the cubature forumula
+        static constexpr bool tensorize = true;
 
         /**
          * \brief Applies an alias-functor.

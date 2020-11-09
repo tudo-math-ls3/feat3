@@ -147,7 +147,7 @@ namespace FEAT
           test_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // incorporate local matrix

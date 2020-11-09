@@ -30,7 +30,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Vertex shape
+       * \brief Specialization of standard trafo evaluator for Vertex shape
        *
        * \author Peter Zajac
        */
@@ -145,7 +145,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Simplex<1> shape
+       * \brief Specialization of standard trafo evaluator for Simplex<1> shape
        *
        * \author Peter Zajac
        */
@@ -313,10 +313,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -331,7 +331,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Simplex<2> shape
+       * \brief Specialization of standard trafo evaluator for Simplex<2> shape
        *
        * \author Peter Zajac
        */
@@ -505,10 +505,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -554,7 +554,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Simplex<3> shape
+       * \brief Specialization of standard trafo evaluator for Simplex<3> shape
        *
        * \author Stefan Wahlers
        */
@@ -735,10 +735,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -781,7 +781,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Hypercube<1> shape
+       * \brief Specialization of standard trafo evaluator for Hypercube<1> shape
        *
        * \author Peter Zajac
        */
@@ -948,10 +948,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -966,7 +966,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Hypercube<2> shape
+       * \brief Specialization of standard trafo evaluator for Hypercube<2> shape
        *
        * \author Peter Zajac
        */
@@ -1162,10 +1162,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -1193,7 +1193,7 @@ namespace FEAT
       }; // class Evaluator<Hypercube<2>,...>
 
       /**
-       * \brief Specialisation of standard trafo evaluator for Hypercube<3> shape
+       * \brief Specialization of standard trafo evaluator for Hypercube<3> shape
        *
        * \author Stefan Wahlers
        */
@@ -1409,10 +1409,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.

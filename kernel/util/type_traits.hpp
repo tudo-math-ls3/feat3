@@ -91,7 +91,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>float</c>
+     * \brief Type Traits specialization for <c>float</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -125,7 +125,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>double</c>
+     * \brief Type Traits specialization for <c>double</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -159,7 +159,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>long double</c>
+     * \brief Type Traits specialization for <c>long double</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -193,7 +193,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>unsigned int</c>
+     * \brief Type Traits specialization for <c>unsigned int</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -227,7 +227,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>signed int</c>
+     * \brief Type Traits specialization for <c>signed int</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -261,7 +261,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>unsigned char</c>
+     * \brief Type Traits specialization for <c>unsigned char</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -295,7 +295,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>signed char</c>
+     * \brief Type Traits specialization for <c>signed char</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -329,7 +329,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>unsigned short</c>
+     * \brief Type Traits specialization for <c>unsigned short</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -363,7 +363,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>signed short</c>
+     * \brief Type Traits specialization for <c>signed short</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -397,7 +397,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>unsigned long</c>
+     * \brief Type Traits specialization for <c>unsigned long</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -431,7 +431,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>signed long</c>
+     * \brief Type Traits specialization for <c>signed long</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -465,7 +465,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>unsigned long long</c>
+     * \brief Type Traits specialization for <c>unsigned long long</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -499,7 +499,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>signed long long</c>
+     * \brief Type Traits specialization for <c>signed long long</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -533,7 +533,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Type Traits specialisation for <c>bool</c>
+     * \brief Type Traits specialization for <c>bool</c>
      *
      * \author Dirk Ribbrock
      * \author Peter Zajac
@@ -568,7 +568,7 @@ namespace FEAT
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     /**
-     * \brief Type Traits specialisation for <c>__float128</c>
+     * \brief Type Traits specialization for <c>__float128</c>
      *
      * \author Peter Zajac
      */
@@ -603,7 +603,7 @@ namespace FEAT
 
 #if defined(FEAT_HAVE_HALFMATH) && !defined(__CUDACC__)
     /**
-     * \brief Type Traits specialisation for <c>half</c>
+     * \brief Type Traits specialization for <c>half</c>
      *
      * \author Dirk Ribbrock
      */
@@ -638,7 +638,7 @@ namespace FEAT
 
 #if defined(FEAT_HAVE_FLOATX) && !defined(__CUDACC__)
     /**
-     * \brief Type Traits specialisation for FloatX class
+     * \brief Type Traits specialization for FloatX class
      *
      * \author Peter Zajac
      */

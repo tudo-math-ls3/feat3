@@ -127,16 +127,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixBCSRSerialiseTest
+class SparseMatrixBCSRSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-   SparseMatrixBCSRSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRSerialiseTest")
+   SparseMatrixBCSRSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBCSRSerializeTest")
   {
   }
 
-  virtual ~SparseMatrixBCSRSerialiseTest()
+  virtual ~SparseMatrixBCSRSerializeTest()
   {
   }
   virtual void run() const override
@@ -169,16 +169,16 @@ public:
     SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
     TEST_CHECK_EQUAL(j2, f);*/
 
-    auto kp = c.serialise(LAFEM::SerialConfig(false, false));
+    auto kp = c.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> k(kp);
     TEST_CHECK_EQUAL(k, c);
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = c.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = c.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zlib(zl);
     TEST_CHECK_EQUAL(k, c);
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zf = c.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixBCSR<Mem_, DT_, IT_, 2, 3> zfp(zf);
     for(Index i(0) ; i < c.rows() ; ++i)
     {
@@ -197,15 +197,15 @@ public:
   }
 };
 
-SparseMatrixBCSRSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_serialise_test_float_ulong;
-SparseMatrixBCSRSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_serialise_test_double_ulong;
-SparseMatrixBCSRSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_serialise_test_float_uint;
-SparseMatrixBCSRSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_serialise_test_double_uint;
+SparseMatrixBCSRSerializeTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_float_ulong;
+SparseMatrixBCSRSerializeTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_double_ulong;
+SparseMatrixBCSRSerializeTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_float_uint;
+SparseMatrixBCSRSerializeTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_double_uint;
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_serialise_test_float_ulong;
-SparseMatrixBCSRSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_serialise_test_double_ulong;
-SparseMatrixBCSRSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_serialise_test_float_uint;
-SparseMatrixBCSRSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_serialise_test_double_uint;
+SparseMatrixBCSRSerializeTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_float_ulong;
+SparseMatrixBCSRSerializeTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_double_ulong;
+SparseMatrixBCSRSerializeTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_float_uint;
+SparseMatrixBCSRSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_double_uint;
 #endif
 /**
  * \brief Test class for the sparse matrix csr blocked apply method.

@@ -94,7 +94,7 @@ namespace FEAT
      * ParsedFunction class in the datatype, thus adding support for other interesting floating
      * point types like the <c>__float128</c> type of GCC's libquadmath. Unfortunately, most of
      * the auxiliary function templates implemented in the depths of the 'fparser' library are
-     * only specialised for the common build-in types without offering any generic implementation.
+     * only specialized for the common build-in types without offering any generic implementation.
      * Therefore, trying to use the <c>FunctionParserBase</c> class template with a somewhat
      * interesting type like <c>__float128</c> is unfortunately doomed to end in linker errors :(
      *
@@ -258,7 +258,7 @@ namespace FEAT
           throw ParsedFunctionParseError(msg);
         }
 
-        // optimise the parsed function
+        // optimize the parsed function
         _parser.Optimize();
       }
 
@@ -514,7 +514,7 @@ namespace FEAT
             throw ParsedFunctionParseError(msg);
           }
 
-          // optimise the parsed function
+          // optimize the parsed function
           _parsers.at(i).Optimize();
         }
       }

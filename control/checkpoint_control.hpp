@@ -274,7 +274,7 @@ namespace FEAT
       /**
          * \brief Constructor
          *
-         * Initalise the input array as NULL pointer.
+         * Initalize the input array as NULL pointer.
          *
          * \param[in] comm The communicator common to all stored objects
          * \param[in] config A config class, controlling the compression of the written out data
@@ -296,7 +296,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Set a new serialise configuration
+       * \brief Set a new serialize configuration
        *
        * \param[in] conf LAFEM::SerialConfig, a config class holding information about the compression parameters.
        *

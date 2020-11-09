@@ -24,7 +24,7 @@ namespace FEAT
     /**
      * \brief Saddle-Point matrix element helper class template
      *
-     * This class template is a helper to realise the "at" member function of the SaddlePointMatrix class template.
+     * This class template is a helper to realize the "at" member function of the SaddlePointMatrix class template.
      *
      * \author Peter Zajac
      */

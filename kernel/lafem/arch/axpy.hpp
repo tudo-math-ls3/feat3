@@ -35,7 +35,7 @@ namespace FEAT
 #ifdef FEAT_HAVE_MKL
         static void dv(float * r, const float a, const float * const x, const float * const y, const Index size)
         {
-        /// \compilerhack icc (in combination with mkl)  crashes kernel/solver/optimiser-test when calculating axpy on very small vectors (size=2)
+        /// \compilerhack icc (in combination with mkl)  crashes kernel/solver/optimizer-test when calculating axpy on very small vectors (size=2)
 #ifdef FEAT_COMPILER_INTEL
           if (size < 17)
             dv_generic(r, a, x, y, size);
@@ -46,7 +46,7 @@ namespace FEAT
 
         static void dv(double * r, const double a, const double * const x, const double * const y, const Index size)
         {
-        /// \compilerhack icc (in combination with mkl)  crashes kernel/solver/optimiser-test when calculating axpy on very small vectors (size=2)
+        /// \compilerhack icc (in combination with mkl)  crashes kernel/solver/optimizer-test when calculating axpy on very small vectors (size=2)
 #ifdef FEAT_COMPILER_INTEL
           if (size < 17)
             dv_generic(r, a, x, y, size);

@@ -15,7 +15,7 @@ namespace FEAT
   namespace Control
   {
     /**
-     * Time discretisations
+     * Time discretizations
      */
     namespace Time
     {

@@ -195,7 +195,7 @@ namespace PoissonNeumann
 
     comm.print("Solving...");
 
-    // initialise
+    // initialize
     multigrid_hierarchy->init();
     solver->init();
 
@@ -217,7 +217,7 @@ namespace PoissonNeumann
         (vec_sol.local(), sol_func, the_domain_level.space, cubature);
 
       // synhronise all local errors
-      errors.synchronise(comm);
+      errors.synchronize(comm);
 
       // print errors
       comm.print("");
@@ -333,7 +333,7 @@ namespace PoissonNeumann
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     PoissonNeumann::main(argc, argv);
@@ -348,5 +348,5 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

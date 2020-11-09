@@ -5,7 +5,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of adjacency source files
 ADD_LIBRARY(kernel-adjacency STATIC
-  colouring.cpp
+  coloring.cpp
   cuthill_mckee.cpp
   graph.cpp
   permutation.cpp
@@ -16,7 +16,7 @@ endif (FEAT_COTIRE)
 
 # list of adjacency tests
 SET (test_list
-  colouring-test
+  coloring-test
   cuthill_mckee-test
   graph-test
   permutation-test

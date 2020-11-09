@@ -229,7 +229,7 @@ nextj:
     template<typename Matrix_, typename Filter_>
     class SPAIPrecond;
 
-    /// general spai implementation without any optimisations
+    /// general spai implementation without any optimizations
     template<typename DT_, typename IT_, typename Filter_>
       class SPAIPrecond<LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>, Filter_> : public SolverBase<typename LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>::VectorTypeL>
     {
@@ -267,7 +267,7 @@ nextj:
         }
     };
 
-    /// general spai implementation without any optimisations
+    /// general spai implementation without any optimizations
     template<typename DT_, typename IT_, typename Filter_>
       class SPAIPrecond<LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>, Filter_> : public SolverBase<typename LAFEM::SparseMatrixELL<Mem::Main, DT_, IT_>::VectorTypeL>
     {
@@ -492,7 +492,7 @@ nextj:
       }; // class SPAIPrecond<...>
 #endif
 
-    /// SPAIPrecond specialisation for saddle point matrices
+    /// SPAIPrecond specialization for saddle point matrices
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename Filter_>
     class SPAIPrecond<LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>, Filter_> :
       public SolverBase<LAFEM::TupleVector<typename MatrixB_::VectorTypeL, typename MatrixD_::VectorTypeL>>
@@ -567,7 +567,7 @@ nextj:
 
       }; // class SPAIPrecond<...>
 
-    /// Dummy class for not implemented specialisations
+    /// Dummy class for not implemented specializations
     template<typename Matrix_, typename Filter_>
     class SPAIPrecond :
       public SolverBase<typename Matrix_::VectorTypeL>

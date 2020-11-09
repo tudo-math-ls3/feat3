@@ -85,7 +85,7 @@ namespace FEAT
        *
        * This constructor creates a new graph and allocates the Graph's arrays to the corresponding lengths.
        *
-       * \note This constructor does not initialise the allocated arrays -- they have to be initialised by the user
+       * \note This constructor does not initialize the allocated arrays -- they have to be initialized by the user
        * after construction.
        *
        * \param[in] num_nodes_domain

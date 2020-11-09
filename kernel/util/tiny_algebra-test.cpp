@@ -26,7 +26,7 @@ private:
   // machine exactness
   const DataType_ _eps;
 
-  // initialise Lehmer-Matrix; see http://en.wikipedia.org/wiki/Lehmer_matrix
+  // initialize Lehmer-Matrix; see http://en.wikipedia.org/wiki/Lehmer_matrix
   template<int n_, int sm_, int sn_>
   static void _init_lehmer_mat(Matrix<DataType_, n_, n_, sm_, sn_>& a)
   {
@@ -39,7 +39,7 @@ private:
     }
   }
 
-  // initialise Lehmer-Matrix inverse
+  // initialize Lehmer-Matrix inverse
   template<int n_, int sm_, int sn_>
   static void _init_lehmer_inv(Matrix<DataType_, n_, n_, sm_, sn_>& a)
   {
@@ -81,7 +81,7 @@ public:
     // set tolerance
     const DataType_ tol(Math::pow(_eps, DataType_(0.75)));
 
-    // initialise a Lehmer-Matrix
+    // initialize a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a, b, c;
     _init_lehmer_mat(a);
     _init_lehmer_inv(b);
@@ -109,7 +109,7 @@ public:
     // set tolerance
     const DataType_ tol(Math::pow(_eps, DataType_(0.75)));
 
-    // initialise a Lehmer-Matrix
+    // initialize a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a;
     _init_lehmer_mat(a);
 
@@ -139,7 +139,7 @@ public:
     // Set tolerance
     const DataType_ tol(Math::pow(_eps, DataType_(0.75)));
 
-    // Initialise a Lehmer-Matrix
+    // Initialize a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a, b, c;
     _init_lehmer_mat(a);
     _init_lehmer_inv(b);
@@ -167,32 +167,32 @@ public:
   virtual void run() const override
   {
     // test matrix inversion
-    test_mat_inv_lehmer<1>(); // specialised
-    test_mat_inv_lehmer<2>(); // specialised
-    test_mat_inv_lehmer<3>(); // specialised
-    test_mat_inv_lehmer<4>(); // specialised
-    test_mat_inv_lehmer<5>(); // specialised
-    test_mat_inv_lehmer<6>(); // specialised
+    test_mat_inv_lehmer<1>(); // specialized
+    test_mat_inv_lehmer<2>(); // specialized
+    test_mat_inv_lehmer<3>(); // specialized
+    test_mat_inv_lehmer<4>(); // specialized
+    test_mat_inv_lehmer<5>(); // specialized
+    test_mat_inv_lehmer<6>(); // specialized
     test_mat_inv_lehmer<7>(); // generic
     test_mat_inv_lehmer<8>(); // generic
     test_mat_inv_lehmer<9>(); // generic
 
     // test matrix determinant calculation
-    test_mat_det_lehmer<1>(); // specialised
-    test_mat_det_lehmer<2>(); // specialised
-    test_mat_det_lehmer<3>(); // specialised
-    test_mat_det_lehmer<4>(); // specialised
-    test_mat_det_lehmer<5>(); // specialised
-    test_mat_det_lehmer<6>(); // specialised
+    test_mat_det_lehmer<1>(); // specialized
+    test_mat_det_lehmer<2>(); // specialized
+    test_mat_det_lehmer<3>(); // specialized
+    test_mat_det_lehmer<4>(); // specialized
+    test_mat_det_lehmer<5>(); // specialized
+    test_mat_det_lehmer<6>(); // specialized
     test_mat_det_lehmer<7>(); // generic
     test_mat_det_lehmer<8>(); // generic
     test_mat_det_lehmer<9>(); // generic
 
-    test_mat_cof_lehmer<2>(); // specialised
-    test_mat_cof_lehmer<3>(); // specialised
-    test_mat_cof_lehmer<4>(); // specialised
-    test_mat_cof_lehmer<5>(); // specialised
-    test_mat_cof_lehmer<6>(); // specialised
+    test_mat_cof_lehmer<2>(); // specialized
+    test_mat_cof_lehmer<3>(); // specialized
+    test_mat_cof_lehmer<4>(); // specialized
+    test_mat_cof_lehmer<5>(); // specialized
+    test_mat_cof_lehmer<6>(); // specialized
     test_mat_cof_lehmer<7>(); // generic
     test_mat_cof_lehmer<8>(); // generic
     test_mat_cof_lehmer<9>(); // generic

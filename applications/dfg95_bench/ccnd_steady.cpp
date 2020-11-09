@@ -11,7 +11,7 @@
 //
 //     M. Schaefer and S. Turek: Benchmark Computations of Laminar Flow Around a Cylinder
 //
-// The system is discretised using an isoparametric Q2/P1dc finite element discretisation.
+// The system is discretized using an isoparametric Q2/P1dc finite element discretization.
 // The monolithic nonlinear Oseen systems are solved using an adaptive Newton-Multigrid solver
 // with an additive matrix-based Vanka smoother ("AmaVanka") and using UMFPACK (if available)
 // as a coarse grid solver. This application supports recursive partitioning.
@@ -48,8 +48,8 @@
 // Defaults to 1.5 in 2D and 2.25 in 3D.
 //
 // --upsam <ups>
-// Specifies the stabilisation parameter <ups> for the streamline diffusion stabilisation.
-// Defaults to 0, i.e. unstabilised.
+// Specifies the stabilization parameter <ups> for the streamline diffusion stabilization.
+// Defaults to 0, i.e. unstabilized.
 //
 // --stokes
 // If specified, only the steady-state Stokes equations are solved and the nonlinear iteration
@@ -124,7 +124,7 @@
 // which do not deserve a custom section of their own.
 //
 // --vtk <filename> [<stepping>]
-// Specifies that the application should write a VTK visualisation output file every <stepping>
+// Specifies that the application should write a VTK visualization output file every <stepping>
 // time steps. The stepping parameter is optional and defaults to 1.
 //
 // --ext-stats
@@ -501,7 +501,7 @@ namespace DFG95
       Solver::MultiGridHierarchy<GlobalSystemMatrix, GlobalSystemFilter, GlobalSystemTransfer>>(domain.size_virtual());
 
     // array of Vanka pointers - this is only required to collect the memory usage
-    // statistics of the Vankas, as we need the memory usage after factorisation
+    // statistics of the Vankas, as we need the memory usage after factorization
     std::deque<
       std::shared_ptr<
         Solver::AmaVanka<
@@ -574,7 +574,7 @@ namespace DFG95
 
     comm.print("\nSolving Stokes system...");
 
-    // initialise solver
+    // initialize solver
     watch_nonlin_solver_init.start();
     multigrid_hierarchy->init();
     solver->init();
@@ -746,7 +746,7 @@ namespace DFG95
         }
         watch_nonlin_mat_asm.stop();
 
-        // initialise linear solver
+        // initialize linear solver
         watch_nonlin_solver_init.start();
         multigrid_hierarchy->init_numeric();
         solver->init_numeric();
@@ -958,7 +958,7 @@ namespace DFG95
     {
       Assembly::VelocityInfo<DataType, dim> vi = Assembly::VelocityAnalyser::compute(
         vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature_postproc);
-      vi.synchronise(comm);
+      vi.synchronize(comm);
 
       summary.velo_info = vi;
     }
@@ -1249,7 +1249,7 @@ namespace DFG95
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     DFG95::main(argc, argv);
@@ -1264,5 +1264,5 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

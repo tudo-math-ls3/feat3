@@ -57,7 +57,7 @@ namespace FEAT
         VectorType _vec_initial_sol;
         /// temporary vector
         VectorType _vec_tmp;
-        /// descend direction vector, normalised for better numerical stability
+        /// descend direction vector, normalized for better numerical stability
         VectorType _vec_pn;
 
         /// Functional functional value
@@ -263,7 +263,7 @@ namespace FEAT
         /**
          * \brief Determines if search direction scaling is to be used
          *
-         * Internally, the search direction vector gets normalised ( \f$ \| p \|_2 = 1 \f$) for numerical stablility.
+         * Internally, the search direction vector gets normalized ( \f$ \| p \|_2 = 1 \f$) for numerical stablility.
          * Some line searches have a heuristic for choosing the initial step length \f$ \alpha_0 \f$, which can use
          * \f$ \| p \|_2 \f$ if \c _dir_scaling is set to \c true. This is useful when using a preconditioner
          * (e.g. Newton).
@@ -328,8 +328,8 @@ namespace FEAT
          * \f]
          *
          * Used for determining if the linesearch stagnated without updating the solution in a significant way.
-         * As this base class normalises \f$ d \f$ in _startup(), it just return \f$ \alpha \f$. Derived classes
-         * NOT performing this normalisation must overwrite this.
+         * As this base class normalizes \f$ d \f$ in _startup(), it just return \f$ \alpha \f$. Derived classes
+         * NOT performing this normalization must overwrite this.
          *
          * \returns The relative update.
          */
@@ -487,7 +487,7 @@ namespace FEAT
             XABORTM("Search direction is not a descent direction: " +stringify_fp_sci(this->_delta_0));
           }
 
-          // Compute initial defect. We want to minimise d^T * grad(_functional)
+          // Compute initial defect. We want to minimize d^T * grad(_functional)
           this->_def_init = Math::abs(this->_delta_0);
 
           // Norm of the initial guess

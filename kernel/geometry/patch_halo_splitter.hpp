@@ -100,13 +100,13 @@ namespace FEAT
        * \brief Adds a base-mesh halo to the splitter and returns the required buffer size.
        *
        * \param[in] halo_rank
-       * The rank of the neighbour process that is adjacent to this halo wrt the parent partitioning.
+       * The rank of the neighbor process that is adjacent to this halo wrt the parent partitioning.
        *
        * \param[in] halo
        * The halo mesh-part that is to be split.
        *
        * \returns
-       * The size of the buffer that is required to store the serialised split halo.
+       * The size of the buffer that is required to store the serialized split halo.
        * If the halo and the patch are disjoint, then the split halo is empty and this function returns 0.
        */
       std::size_t add_halo(int halo_rank, const MeshPartType& halo)
@@ -123,24 +123,24 @@ namespace FEAT
       }
 
       /**
-       * \brief Serialises a split halo into a buffer.
+       * \brief Serializes a split halo into a buffer.
        *
        * \param[in] halo_rank
-       * The rank of the halo whose split data is to be serialised.
+       * The rank of the halo whose split data is to be serialized.
        *
        * \param[in] child_rank
-       * The rank of the neighbour process that is adjacent to this halo wrt to the child partitioning.
+       * The rank of the neighbor process that is adjacent to this halo wrt to the child partitioning.
        *
        * \returns
-       * A vector containing the serialised split halo data.
+       * A vector containing the serialized split halo data.
        */
-      std::vector<Index> serialise_split_halo(int halo_rank, int child_rank) const
+      std::vector<Index> serialize_split_halo(int halo_rank, int child_rank) const
       {
         const auto it = _split_halos.find(halo_rank);
         XASSERT(it != _split_halos.end());
 
         std::vector<Index> buffer;
-        it->second->serialise(buffer, child_rank);
+        it->second->serialize(buffer, child_rank);
         return buffer;
       }
 
@@ -151,13 +151,13 @@ namespace FEAT
        * The rank of the halo whose split data is to be intersected with the foreign split halo.
        *
        * \param[in] buffer
-       * The buffer vector containing the serialised split halo data of the potential neighbour child processes.
+       * The buffer vector containing the serialized split halo data of the potential neighbor child processes.
        *
        * \param[in] buffer_offset
-       * The offset of the current neighbour split halo data within the buffer vector.
+       * The offset of the current neighbor split halo data within the buffer vector.
        *
        * \returns
-       * \c true, if the split halo of this patch and the current neighbour process intersect, or
+       * \c true, if the split halo of this patch and the current neighbor process intersect, or
        * \c false, if the split halos are disjoint.
        */
       bool intersect_split_halo(int halo_rank, const std::vector<Index>& buffer, const Index buffer_offset)
@@ -323,7 +323,7 @@ namespace FEAT
           return s == std::size_t(0) ? s : ++s + _halo_idx.size();
         }
 
-        void serialise(std::vector<Index>& buffer, int child_rank)
+        void serialize(std::vector<Index>& buffer, int child_rank)
         {
           const std::size_t s = this->size();
           if(this->size() == std::size_t(0))

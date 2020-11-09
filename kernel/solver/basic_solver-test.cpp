@@ -75,7 +75,7 @@ public:
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
-    // initialise solver
+    // initialize solver
     solver.init();
 
     // solve
@@ -127,7 +127,7 @@ public:
     VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
     matrix.apply(vec_rhs, vec_ref);
 
-    // initialise sol vector
+    // initialize sol vector
     VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
 
     // test plain CG
@@ -305,7 +305,7 @@ public:
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
-    // initialise solver
+    // initialize solver
     solver.init();
 
     // solve
@@ -357,7 +357,7 @@ public:
     VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
     matrix.apply(vec_rhs, vec_ref);
 
-    // initialise sol vector
+    // initialize sol vector
     VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
 
     // test plain CG
@@ -531,7 +531,7 @@ public:
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
-    // initialise solver
+    // initialize solver
     solver.init();
 
     // solve
@@ -580,7 +580,7 @@ public:
     VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
     matrix.apply(vec_rhs, vec_ref);
 
-    // initialise sol vector
+    // initialize sol vector
     VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
 
     // test plain CG
@@ -635,7 +635,7 @@ public:
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
-    // initialise solver
+    // initialize solver
     solver.init();
 
     // solve
@@ -724,7 +724,7 @@ public:
     VectorType vec_rhs(vec_ref.clone(LAFEM::CloneMode::Layout));
     matrix.apply(vec_rhs, vec_ref);
 
-    // initialise sol vector
+    // initialize sol vector
     VectorType vec_sol(vec_ref.clone(LAFEM::CloneMode::Layout));
 
     // test Richardson-ILU

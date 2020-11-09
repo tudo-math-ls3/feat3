@@ -253,16 +253,16 @@ namespace FEAT
         };
 
       protected:
-        /// inverse linearised trafo config
+        /// inverse linearized trafo config
         static constexpr TrafoTags inv_lin_trafo_config = TrafoTags::dom_point | TrafoTags::img_point | TrafoTags::jac_inv;
 
-        /// inverse linearised trafo data
+        /// inverse linearized trafo data
         typedef typename TrafoEvaluator::template ConfigTraits<inv_lin_trafo_config>::EvalDataType InvLinTrafoData;
 
-        /// inverse linearised trafo matrix
+        /// inverse linearized trafo matrix
         JacobianInverseType _inv_lin_mat;
 
-        // inverse linearised trafo vector
+        // inverse linearized trafo vector
         ImagePointType _inv_lin_vec;
 
       public:
@@ -307,7 +307,7 @@ namespace FEAT
           InvLinTrafoData trafo_data;
           trafo_eval(trafo_data, dom_point);
 
-          // store inverse trafo linearisation
+          // store inverse trafo linearization
           _inv_lin_mat = trafo_data.jac_inv;
           _inv_lin_vec = trafo_data.img_point;
         }
@@ -345,7 +345,7 @@ namespace FEAT
             for(int j(0); j < shape_dim_; ++j)
               loc_grad[j] = DataType(i == (j+1) ? 1 : 0);
 
-            // multiply by transpose inverse linearised trafo matrix for chain rule
+            // multiply by transpose inverse linearized trafo matrix for chain rule
             data.phi[i].grad.set_vec_mat_mult(loc_grad, _inv_lin_mat);
           }
         }

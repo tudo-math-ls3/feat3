@@ -32,7 +32,7 @@ namespace FEAT
     template<typename Shape_>
     class SilvesterOpenDriver DOXY({});
 
-    // Simplex<2> specialisation
+    // Simplex<2> specialization
     template<>
     class SilvesterOpenDriver<Shape::Simplex<2> > :
       public SymmetricSimplexDriver<Shape::Simplex<2> >

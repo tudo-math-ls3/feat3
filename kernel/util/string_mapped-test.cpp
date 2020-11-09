@@ -64,7 +64,7 @@ public:
     my_precon_map.insert(std::make_pair("iluk", MyPrecon::iluk));
     my_precon_map.insert(std::make_pair("juno", MyPrecon::juno));
 
-    // create a few enumeration objects and initialise them to 'none'
+    // create a few enumeration objects and initialize them to 'none'
     MyPrecon my_precon1(MyPrecon::none);
     MyPrecon my_precon2(MyPrecon::none);
     MyPrecon my_precon3(MyPrecon::none);

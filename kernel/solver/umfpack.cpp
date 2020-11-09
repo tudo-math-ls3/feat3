@@ -44,14 +44,14 @@ namespace FEAT
      *
      * \tparam eq_
      * Specifies whether 'int' and 'SuiteSparse_long' have the same size.
-     * If so, the specialisation for 64-bit integers is disabled, as UMFPACK does not offer it.
+     * If so, the specialization for 64-bit integers is disabled, as UMFPACK does not offer it.
      *
      * \author Peter Zajac
      */
     template<typename Idx_, int sidx_ = sizeof(Idx_), bool eq_ = (sizeof(int) == sizeof(SuiteSparse_long))>
     struct UmfpackWrapper;
 
-    // specialisation for Idx_ = 32-bit integer
+    // specialization for Idx_ = 32-bit integer
     template<typename Idx_, bool eq_>
     struct UmfpackWrapper<Idx_, sizeof(int), eq_>
     {
@@ -98,7 +98,7 @@ namespace FEAT
       }
     };
 
-    /// specialisation for Idx_ = 64-bit integer (only non-32-bit-windows systems)
+    /// specialization for Idx_ = 64-bit integer (only non-32-bit-windows systems)
     template<typename Idx_>
     struct UmfpackWrapper<Idx_, sizeof(SuiteSparse_long), false>
     {
@@ -159,7 +159,7 @@ namespace FEAT
       _num_mem_size(0),
       _umf_peak_size(0)
     {
-      // initialise default umfpack control values
+      // initialize default umfpack control values
       UmfpackWrapper<Index>::init_defaults(_umf_control);
     }
 
@@ -177,12 +177,12 @@ namespace FEAT
 
       // ensure that we don't have a system matrix assigned
       if(_umf_symbolic != nullptr)
-        throw SolverException("UMFPACK: already have symbolic factorisation");
+        throw SolverException("UMFPACK: already have symbolic factorization");
 
       // umfpack info array
       double info[UMFPACK_INFO];
 
-      // try to perform symbolic factorisation
+      // try to perform symbolic factorization
       int status = UmfpackWrapper<Index>::init_symbolic(
         _system_matrix.rows(),
         _system_matrix.columns(),
@@ -231,12 +231,12 @@ namespace FEAT
       BaseClass::init_numeric();
 
       if(_umf_symbolic == nullptr)
-        throw SolverException("UFMPACK: symbolic factorisation missing");
+        throw SolverException("UFMPACK: symbolic factorization missing");
 
       // umfpack info array
       double info[UMFPACK_INFO];
 
-      // try to perform symbolic factorisation
+      // try to perform symbolic factorization
       int status = UmfpackWrapper<Index>::init_numeric(
         _system_matrix.row_ptr(),
         _system_matrix.col_ind(),
@@ -369,7 +369,7 @@ namespace FEAT
       _vec_x = _solver_matrix.create_vector_r();
       _vec_b = _solver_matrix.create_vector_r();
 
-      // initialise umfpack
+      // initialize umfpack
       _umfpack.init_symbolic();
     }
 
@@ -422,7 +422,7 @@ namespace FEAT
 
       // okay, solver matrix data assembly completed
 
-      // initialise umfpack
+      // initialize umfpack
       _umfpack.init_numeric();
     }
 

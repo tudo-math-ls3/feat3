@@ -18,7 +18,7 @@ FEAT_RESTORE_WARNINGS
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/adjacency/colouring.hpp>
+#include <kernel/adjacency/coloring.hpp>
 
 #include <map>
 #include <vector>
@@ -33,7 +33,7 @@ namespace FEAT
     class PartiMetis;
 
     /**
-     * \brief Metis based Partitioner class template specialisation for ConformalMesh
+     * \brief Metis based Partitioner class template specialization for ConformalMesh
      *
      * The basic usage of this class is as follows:
      * -# Refine the mesh until it contains at least num_rank cells.
@@ -51,7 +51,7 @@ namespace FEAT
         const Index _num_elems;
         /// number of desired ranks/patches
         const Index _num_ranks;
-        /// the achieved optimisation value
+        /// the achieved optimization value
         idx_t * _objval;
         /// node to partition mapping
         idx_t * _part;
@@ -104,7 +104,7 @@ namespace FEAT
 
         idx_t options[METIS_NOPTIONS];
         METIS_SetDefaultOptions(options);
-        options[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM; //avoid randomisation effects
+        options[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM; //avoid randomization effects
         options[METIS_OPTION_NUMBERING] = 0;
         options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
 

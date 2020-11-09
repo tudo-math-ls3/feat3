@@ -29,7 +29,7 @@
 //
 // The basic program flow of this application is as follows:
 //
-// 1. Define the required types for spatial discretisation and linear algebra.
+// 1. Define the required types for spatial discretization and linear algebra.
 //
 // 2. Create a mesh and a boundary mesh-part by using a factory.
 //
@@ -108,7 +108,7 @@ namespace Tutorial01
 {
   // We start with a set of typedefs, which make up the basic configuration for this
   // tutorial application. The general idea of these typedefs is (1) to avoid typing and
-  // (2) specialise FEAT to do, out of the many possibilities, only what we want to do in
+  // (2) specialize FEAT to do, out of the many possibilities, only what we want to do in
   // this tutorial.
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -217,7 +217,7 @@ namespace Tutorial01
   // vector class, which is implemented by the "LAFEM::DenseVector" class template:
   typedef LAFEM::DenseVector<MemType, DataType, IndexType> VectorType;
 
-  // Furthermore, for the discretised Poisson operator, we require a scalar sparse matrix type.
+  // Furthermore, for the discretized Poisson operator, we require a scalar sparse matrix type.
   // We choose the famous CSR format here, because it is pretty much standard for unstructured FEM:
   typedef LAFEM::SparseMatrixCSR<MemType, DataType, IndexType> MatrixType;
 
@@ -270,7 +270,7 @@ namespace Tutorial01
 
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Trafo and Finite Element Space initialisation
+    // Trafo and Finite Element Space initialization
 
     std::cout << "Creating Trafo and Space..." << std::endl;
 
@@ -312,7 +312,7 @@ namespace Tutorial01
     VectorType vec_rhs = matrix.create_vector_l();
 
     // Okay, we now have a matrix and two vectors. The internal arrays of those object are
-    // allocated, but their data arrays are still uninitialised (automatic initialisation is
+    // allocated, but their data arrays are still uninitialized (automatic initialization is
     // not performed due to performance reasons). Before we can continue with the numerical
     // assembly, we first need to reset the matrix and data arrays, i.e. set all entries
     // to zero, which is done by calling the "format" function. This is required because the
@@ -433,7 +433,7 @@ namespace Tutorial01
     // ...and the solution vector.
     filter.filter_sol(vec_sol);
 
-    // Now we have set up the linear system representing our discretised Poisson PDE, including
+    // Now we have set up the linear system representing our discretized Poisson PDE, including
     // the homogeneous Dirichlet boundary conditions.
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -460,8 +460,8 @@ namespace Tutorial01
     // Set the maximum number of iterations to 1000:
     solver->set_max_iter(1000);
 
-    // Next, we need to initialise the solver. During this call, the solver and all of its
-    // sub-solvers and preconditioners allocate required temporary vectors, perform factorisation
+    // Next, we need to initialize the solver. During this call, the solver and all of its
+    // sub-solvers and preconditioners allocate required temporary vectors, perform factorization
     // and all the other stuff that our solvers need to do before they can actually start
     // solving anything.
     solver->init();
@@ -473,7 +473,7 @@ namespace Tutorial01
 
     // Once we do not require the solver anymore, we have to release it. This is done by calling
     // the 'done' member function, which is the counterpart of the 'init' member function, i.e.
-    // this will release all temporary vectors and factorisations.
+    // this will release all temporary vectors and factorizations.
     solver->done();
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -551,8 +551,8 @@ namespace Tutorial01
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #01: Poisson" << std::endl;
@@ -590,7 +590,7 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial01::main(level);
 
-  // And finally, finalise our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
+  // And finally, finalize our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
   // so we can simply return this as the result of our main function to indicate a successful run.
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

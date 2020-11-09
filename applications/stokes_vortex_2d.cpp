@@ -361,7 +361,7 @@ namespace StokesVortex2D
 
     solver->set_max_iter(1000);
 
-    // initialise
+    // initialize
     multigrid_hierarchy_a->init();
     solver->init();
 
@@ -397,8 +397,8 @@ namespace StokesVortex2D
         vp, pres_func, the_domain_level.space_pres, cubature);
 
       // synhronise all local errors
-      vxerr.synchronise(comm);
-      vyerr.synchronise(comm);
+      vxerr.synchronize(comm);
+      vyerr.synchronize(comm);
 
       // compute field errors
       DataType vv_h0 = Math::sqrt(Math::sqr(vxerr.norm_h0) + Math::sqr(vyerr.norm_h0));
@@ -509,7 +509,7 @@ namespace StokesVortex2D
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     StokesVortex2D::main(argc, argv);
@@ -524,5 +524,5 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

@@ -98,16 +98,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseVectorBlockedSerialiseTest
+class SparseVectorBlockedSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseVectorBlockedSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorBlockedSerialiseTest")
+  SparseVectorBlockedSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorBlockedSerializeTest")
   {
   }
 
-  virtual ~SparseVectorBlockedSerialiseTest()
+  virtual ~SparseVectorBlockedSerializeTest()
   {
   }
 
@@ -130,16 +130,16 @@ public:
     SparseVectorBlocked<Mem::Main, DT_, IT_, 2> bin(FileMode::fm_svb, bs);
     TEST_CHECK_EQUAL(bin, a);
 
-    auto op = a.serialise(LAFEM::SerialConfig(false, false));
+    auto op = a.serialize(LAFEM::SerialConfig(false, false));
     SparseVectorBlocked<Mem_, DT_, IT_, 2> o(op);
     TEST_CHECK_EQUAL(a, o);
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = a.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = a.serialize(LAFEM::SerialConfig(true, false));
     SparseVectorBlocked<Mem_, DT_, IT_, 2> zlib(zl);
     TEST_CHECK_EQUAL(zlib, a);
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zf = a.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseVectorBlocked<Mem_, DT_, IT_, 2> zfp(zf);
     for (Index i(0) ; i < a.size() ; ++i)
     {
@@ -151,9 +151,9 @@ public:
 #endif
   }
 };
-SparseVectorBlockedSerialiseTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_serialise_test_float;
-SparseVectorBlockedSerialiseTest<Mem::Main, double, Index> cpu_sparse_vector_blocked_serialise_test_double;
+SparseVectorBlockedSerializeTest<Mem::Main, float, Index> cpu_sparse_vector_blocked_serialize_test_float;
+SparseVectorBlockedSerializeTest<Mem::Main, double, Index> cpu_sparse_vector_blocked_serialize_test_double;
 #ifdef FEAT_HAVE_CUDA
-SparseVectorBlockedSerialiseTest<Mem::CUDA, float, Index> cuda_sparse_vector_blocked_serialise_test_float;
-SparseVectorBlockedSerialiseTest<Mem::CUDA, double, Index> cuda_sparse_vector_blocked_serialise_test_double;
+SparseVectorBlockedSerializeTest<Mem::CUDA, float, Index> cuda_sparse_vector_blocked_serialize_test_float;
+SparseVectorBlockedSerializeTest<Mem::CUDA, double, Index> cuda_sparse_vector_blocked_serialize_test_double;
 #endif

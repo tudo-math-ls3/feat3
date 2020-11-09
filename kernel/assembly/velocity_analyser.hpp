@@ -98,15 +98,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Synchronises the velocity information over a communicator
+       * \brief Synchronizes the velocity information over a communicator
        *
        * This function sums up the velocity information of all patches in a
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronise.
+       * The communication over which to synchronize.
        */
-      void synchronise(const Dist::Comm& comm)
+      void synchronize(const Dist::Comm& comm)
       {
         DataType_ verr[2*dim_+4] =
         {
@@ -278,7 +278,7 @@ namespace FEAT
         // create matrix scatter-axpy
         Intern::MultiGather<VectorType> multi_gather(vector);
 
-        // initialise result
+        // initialize result
         VelocityInfo<DataType_, dim_> info;
 
         // local velocity values
@@ -293,7 +293,7 @@ namespace FEAT
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch local basis values
@@ -448,7 +448,7 @@ namespace FEAT
         // create matrix scatter-axpy
         typename VectorType::GatherAxpy gather(vector);
 
-        // initialise result
+        // initialize result
         VelocityInfo<DataType_, dim_> info;
 
         // local velocity values
@@ -463,7 +463,7 @@ namespace FEAT
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch local basis values

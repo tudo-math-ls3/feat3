@@ -278,7 +278,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of iso-parametric trafo evaluator for Vertex shape
+       * \brief Specialization of iso-parametric trafo evaluator for Vertex shape
        *
        * \author Peter Zajac
        */
@@ -393,7 +393,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of iso-parametric trafo evaluator for Hypercube<1> shape
+       * \brief Specialization of iso-parametric trafo evaluator for Hypercube<1> shape
        *
        * \author Peter Zajac
        */
@@ -595,10 +595,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -613,7 +613,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of iso-parametric trafo evaluator for Hypercube<2> shape
+       * \brief Specialization of iso-parametric trafo evaluator for Hypercube<2> shape
        *
        * \author Peter Zajac
        */
@@ -767,7 +767,7 @@ namespace FEAT
             if(chart == nullptr)
               continue;
 
-            // initialise indices for this edge
+            // initialize indices for this edge
             int y = oy[e];
             int x = ox[e];
 
@@ -926,10 +926,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
@@ -944,7 +944,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of iso-parametric trafo evaluator for Hypercube<3> shape
+       * \brief Specialization of iso-parametric trafo evaluator for Hypercube<3> shape
        *
        * \author Peter Zajac
        */
@@ -1157,7 +1157,7 @@ namespace FEAT
             if(chart == nullptr)
               continue;
 
-            // initialise indices for this edge
+            // initialize indices for this edge
             int z = eoz[e];
             int y = eoy[e];
             int x = eox[e];
@@ -1228,7 +1228,7 @@ namespace FEAT
             if(chart == nullptr)
               continue;
 
-            // initialise indices for this quad
+            // initialize indices for this quad
             int z = qoz[q];
             int y = qoy[q];
             int x = qox[q];
@@ -1411,10 +1411,10 @@ namespace FEAT
         /**
          * \brief Computes and returns the directed mesh width.
          *
-         * This function approximates the cell width along a given normalised ray direction vector.
+         * This function approximates the cell width along a given normalized ray direction vector.
          *
          * \param[in] ray
-         * A (normalised) direction vector. Must not be a null vector.
+         * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.

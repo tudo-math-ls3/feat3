@@ -496,8 +496,8 @@ namespace MultiPrecHierarchBench
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Initialise our runtime environment
-  Runtime::initialise(argc, argv);
+  // Initialize our runtime environment
+  Runtime::initialize(argc, argv);
 
   Index level_max(5), level_min(1);
   bool reduce(false);
@@ -586,6 +586,6 @@ int main(int argc, char* argv[])
   MemoryUsage mem_use;
   std::cout << std::endl << mem_use.get_formatted_memory_usage() << std::endl;
 
-  // Finalise our runtime environment
-  return Runtime::finalise();
+  // Finalize our runtime environment
+  return Runtime::finalize();
 }

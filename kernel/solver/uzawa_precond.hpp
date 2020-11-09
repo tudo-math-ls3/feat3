@@ -70,7 +70,7 @@ namespace FEAT
      * The types of the filters for the velocity and pressure components, respectively.
      *
      * \note
-     * This class template is specialised for Global::Matrix and Global::Filter instances below.
+     * This class template is specialized for Global::Matrix and Global::Filter instances below.
      *
      * \author Peter Zajac
      */
@@ -108,7 +108,7 @@ namespace FEAT
       std::shared_ptr<SolverS> _solver_s;
       /// our Uzawa type
       UzawaType _uzawa_type;
-      /// auto-initialise of S-solver
+      /// auto-initialize of S-solver
       const bool _auto_init_s;
       /// a temporary defect vector
       VectorTypeV _vec_tmp_v;
@@ -135,8 +135,8 @@ namespace FEAT
        *
        * \param[in] auto_init_s
        * Specifies whether this solver object should call the init/done functions of the \p solver_s
-       * object. If set to \c false, then the caller is responsible for the initialisation and
-       * finalisation of the S-block solver object.
+       * object. If set to \c false, then the caller is responsible for the initialization and
+       * finalization of the S-block solver object.
        */
       explicit UzawaPrecond(
         const MatrixA_& matrix_a,
@@ -363,7 +363,7 @@ namespace FEAT
     }; // class UzawaPrecond<...>
 
     /**
-     * \brief UzawaPrecond specialisation for Global matrices
+     * \brief UzawaPrecond specialization for Global matrices
      *
      * \author Peter Zajac
      */
@@ -679,7 +679,7 @@ namespace FEAT
      * Specifies the type of the preconditioner.
      *
      * \param[in] auto_init_s
-     * Specifies whether to automatically initialise the S-matrix solver.
+     * Specifies whether to automatically initialize the S-matrix solver.
      *
      * \returns
      * A shared pointer to a new UzawaPrecond object.

@@ -162,7 +162,7 @@ namespace FEAT
   /// \cond internal
   namespace Intern
   {
-    // Random integer class; this class is the base class for the integer specialisation
+    // Random integer class; this class is the base class for the integer specialization
     // of the RandomNumber class defined below.
     template<typename T_, size_t num_bytes_ = sizeof(T_)>
     class RandomInteger;
@@ -178,7 +178,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for signed integer types
+    // specialization for signed integer types
     template<typename T_>
     class NonNegInt<T_, true>
     {
@@ -189,7 +189,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for 8-bit integers
+    // specialization for 8-bit integers
     template<typename T_>
     class RandomInteger<T_, 1>
     {
@@ -200,7 +200,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for 16-bit integers
+    // specialization for 16-bit integers
     template<typename T_>
     class RandomInteger<T_, 2>
     {
@@ -211,7 +211,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for 32-bit integers
+    // specialization for 32-bit integers
     template<typename T_>
     class RandomInteger<T_, 4>
     {
@@ -222,7 +222,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for 64-bit integers
+    // specialization for 64-bit integers
     template<typename T_>
     class RandomInteger<T_, 8>
     {
@@ -233,7 +233,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for integers
+    // specialization for integers
     template<typename T_>
     class RandomNumber<T_, Type::IntegralClass> :
       public RandomInteger<T_>
@@ -254,7 +254,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for floating point numbers
+    // specialization for floating point numbers
     template<typename T_>
     class RandomNumber<T_, Type::FloatingClass>
     {
@@ -280,7 +280,7 @@ namespace FEAT
       }
     };
 
-    // specialisation for bool
+    // specialization for bool
     template<typename T_>
     class RandomNumber<T_, Type::BooleanClass>
     {

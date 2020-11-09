@@ -18,7 +18,7 @@ namespace FEAT
     namespace Time
     {
       /**
-       * \brief Set of coefficients for operator splitting time discretisations based on BDF(q)
+       * \brief Set of coefficients for operator splitting time discretizations based on BDF(q)
        *
        * \tparam DT_
        * The floating point precision
@@ -57,8 +57,8 @@ namespace FEAT
        * on \f$ \partial \Omega \f$.
        *
        * It is possible to skip computing \f$ u \f$ explicitly. For the convection term, extrapolation in time can be
-       * used for linearisation and using \f$ u \f$ over \f$ \tilde{u} \f$ does not have any advantages. The only
-       * other term using \f$ u \f$ is then the time discretisation, where the projection update can be carried out
+       * used for linearization and using \f$ u \f$ over \f$ \tilde{u} \f$ does not have any advantages. The only
+       * other term using \f$ u \f$ is then the time discretization, where the projection update can be carried out
        * implicitly by using the auxillary variable \f$ \phi \f$. Assuming that
        * \f$ \nabla \cdot (u \cdot \nabla) u = 0 \f$ and \f$ \nabla \cdot \Delta u =0 \f$, applying the divergence
        * operator to the momentum equation yields
@@ -66,7 +66,7 @@ namespace FEAT
        *   \nabla \cdot \frac{D }{\delta_t} u^k - \Delta p & = 0
        * \f}
        *
-       * To linearise the convection term, the extrapolated velocity
+       * To linearize the convection term, the extrapolated velocity
        * \f$ u^{*,k} = 2\tilde{u}^{k-1} - \tilde{u}^{k-2}\f$
        * is used.
        *
@@ -209,16 +209,16 @@ namespace FEAT
              visc_handling(TermHandling::off)
              {
                XASSERT(config_section != nullptr);
-               // Get time discretisation order
+               // Get time discretization order
                auto num_steps_p = config_section->query("num_steps");
-               XASSERTM(num_steps_p.second, "TimeDiscretisation section is missing the mandatory num_steps entry!");
+               XASSERTM(num_steps_p.second, "TimeDiscretization section is missing the mandatory num_steps entry!");
                _num_steps = Index(std::stoul(num_steps_p.first));
                XASSERTM(_num_steps == Index(1) || _num_steps == Index(2),"Only BDF1 and BDF2 are implemented!");
 
                // Get the order for extrapolation of the pressure in time
                auto p_extrapolation_p = config_section->query("p_extrapolation_steps");
                XASSERTM(p_extrapolation_p.second,
-               "TimeDiscretisation section is missing the mandatory p_extrapolation_steps entry!");
+               "TimeDiscretization section is missing the mandatory p_extrapolation_steps entry!");
                _p_extrapolation_steps = Index(std::stoul(p_extrapolation_p.first));
                XASSERTM(_p_extrapolation_steps < Index(3),"p extrapolation is only implemented for order 0, 1, 2!");
                _p_extrapolation_steps_startup = Math::min(_p_extrapolation_steps, Index(1));
@@ -226,33 +226,33 @@ namespace FEAT
                // Use the rotational form?
                auto use_rotational_form_p = config_section->query("use_rotational_form");
                XASSERTM(use_rotational_form_p.second,
-               "TimeDiscretisation section is missing the mandatory use_rotational_form entry!");
+               "TimeDiscretization section is missing the mandatory use_rotational_form entry!");
                XASSERTM(std::stoi(use_rotational_form_p.first) == 0 || std::stoi(use_rotational_form_p.first) == 1,
                "use_rotational has to be set to 0 or 1");
                _use_rotational_form = std::stoi(use_rotational_form_p.first) == 1;
 
                // Get timestep size
                auto delta_t_p = config_section->query("delta_t");
-               XASSERTM(delta_t_p.second, "TimeDiscretisation section is missing the mandatory delta_t entry!");
+               XASSERTM(delta_t_p.second, "TimeDiscretization section is missing the mandatory delta_t entry!");
                _delta_t = DataType(std::stod(delta_t_p.first));
                XASSERT(_delta_t > DataType(0));
 
                // Use ale (meaning solve Navier-Stokes instead of plain Stokes)?
                auto ale_p = config_section->query("ALE");
                XASSERTM(ale_p.second,
-               "TimeDiscretisation section is missing the mandatory ALE entry!");
+               "TimeDiscretization section is missing the mandatory ALE entry!");
                ale_p.first.parse(ale_handling);
 
                // Use convection (meaning solve Navier-Stokes instead of plain Stokes)?
                auto convection_p = config_section->query("convection");
                XASSERTM(convection_p.second,
-               "TimeDiscretisation section is missing the mandatory convection entry!");
+               "TimeDiscretization section is missing the mandatory convection entry!");
                convection_p.first.parse(conv_handling);
 
                // Use viscous (meaning solve Navier-Stokes instead of plain Stokes)?
                auto viscous_p = config_section->query("viscous");
                XASSERTM(viscous_p.second,
-               "TimeDiscretisation section is missing the mandatory viscous entry!");
+               "TimeDiscretization section is missing the mandatory viscous entry!");
                viscous_p.first.parse(visc_handling);
 
                coeff_rhs_v_phi.clear();

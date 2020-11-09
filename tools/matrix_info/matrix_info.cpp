@@ -236,7 +236,7 @@ namespace MatrixInfo
     std::vector<Index> diag_ptr(nmin, ~Index(0));
     std::vector<Index> row_degree_distribution_counts(10, Index(0));
 
-    // initialise statistical values
+    // initialize statistical values
     Index row_degree = 0;
     Index row_degree_idx = 0;
     Index row_bandw = 0;

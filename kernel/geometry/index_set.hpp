@@ -663,7 +663,7 @@ namespace FEAT
      * Codimension wrt. the subshape that causes the size updates.
      *
      * When using meshes that contain only the vertex\@shape information, the number of edges/faces is unknown so the
-     * corresponding IndexSets in the IndexSetHolder are initialised with size 0. If the IndexSet to dimensions
+     * corresponding IndexSets in the IndexSetHolder are initialized with size 0. If the IndexSet to dimensions
      * (shape_dim_-co_dim_, 0) is created, all IndexSets using the number of entities of dimension shape_dim_-co_dim_
      * need to be updated.
      *
@@ -699,7 +699,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Specialisation for codimension 1
+     * \brief Specialization for codimension 1
      *
      */
     template<int shape_dim_>
@@ -723,7 +723,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Specialisation for codimension 2
+     * \brief Specialization for codimension 2
      *
      */
     template<int shape_dim_>
@@ -770,8 +770,8 @@ namespace FEAT
      * the _mesh_data object. After fill_index_sets() is called, the size of these index set in the corresponding
      * IndexSetHolder gives the right number of edges/faces.
      *
-     * Because the get_index_set routine uses the dimensions as template parameters, the loop has to be realised
-     * by template recursion and as the end of that recursion needs partial specialisation, a helper class.
+     * Because the get_index_set routine uses the dimensions as template parameters, the loop has to be realized
+     * by template recursion and as the end of that recursion needs partial specialization, a helper class.
      *
      * \author Jordi Paul
      */
@@ -802,7 +802,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Full specialisation of NumEntitiesExtractor as end of the template recursion
+     * \brief Full specialization of NumEntitiesExtractor as end of the template recursion
      *
      * As num_entities[0] = number of vertices and this information must be present and correct, this stops at 1.
      *

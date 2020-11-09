@@ -97,7 +97,7 @@ namespace FEAT
         }
       }; // class BoundaryFaceComputer<...>
 
-      // Specialisation for cell_dim_ = shape_dim_-1
+      // Specialization for cell_dim_ = shape_dim_-1
       template<typename Shape_, int shape_dim_>
       class BoundaryFaceComputer<Shape_, shape_dim_, shape_dim_> :
         public BoundaryFaceComputer<Shape_, shape_dim_, shape_dim_-1>

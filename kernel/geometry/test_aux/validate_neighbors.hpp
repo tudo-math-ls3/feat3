@@ -19,7 +19,7 @@ namespace FEAT
     namespace TestAux
     {
       /**
-       * \brief Checks if the neighbour information is consistent.
+       * \brief Checks if the neighbor information is consistent.
        *
        * \tparam MeshType
        * Type of the mesh to validate
@@ -28,15 +28,15 @@ namespace FEAT
        * The mesh to check
        *
        * This checks:
-       *  - if k1 has a neighbour k2, then k2 has k1 as neighbour as well
-       *  - if k1's facet l says there is no neighbour, then l is at the boundary
+       *  - if k1 has a neighbor k2, then k2 has k1 as neighbor as well
+       *  - if k1's facet l says there is no neighbor, then l is at the boundary
        *
        */
       template<typename MeshType>
-      void validate_neighbours(const MeshType& mesh)
+      void validate_neighbors(const MeshType& mesh)
       {
         static constexpr int facet_dim = MeshType::shape_dim-1;
-        const auto& neigh = mesh.get_neighbours();
+        const auto& neigh = mesh.get_neighbors();
         const auto& facet_idx = mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
 
         Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
@@ -62,16 +62,16 @@ namespace FEAT
           for(int j(0); j < facet_idx.num_indices; ++j)
           {
             Index other_cell(neigh(k,j));
-            // If we have a neighbour...
+            // If we have a neighbor...
             if(other_cell != ~Index(0))
             {
               bool ok(false);
               // ... then this should NOT be the boundary
               if(at_boundary[facet_idx(k,j)])
                 throw String("Facet "+stringify(facet_idx(k,j))+
-                    " is at the boundary, but the _neighbourinformation says it is not!");
+                    " is at the boundary, but the _neighborinformation says it is not!");
 
-              // Check for vice versa neighbour relationship
+              // Check for vice versa neighbor relationship
               for(int i(0); i < facet_idx.num_indices; ++i)
               {
                 if(neigh(other_cell,i) == k)
@@ -81,14 +81,14 @@ namespace FEAT
                 }
               }
               if(!ok)
-                throw String("Cell "+stringify(k)+" has neighbour "+stringify(other_cell)+" but not vice versa!");
+                throw String("Cell "+stringify(k)+" has neighbor "+stringify(other_cell)+" but not vice versa!");
             }
             else
             {
-              /// So we do not have a neighbour. Then we SHOULD be at the boundary
+              /// So we do not have a neighbor. Then we SHOULD be at the boundary
               if(!at_boundary[facet_idx(k,j)])
                throw String("Facet "+stringify(facet_idx(k,j))+
-                   " is not at the boundary, but the _neighbour information says it is!");
+                   " is not at the boundary, but the _neighbor information says it is!");
             }
           }
 

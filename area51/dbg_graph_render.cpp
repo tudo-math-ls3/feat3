@@ -376,7 +376,7 @@ void run()
 
   const auto& vidx = mesh->get_index_set<2,0>();
 
-  Adjacency::Graph neighbours;
+  Adjacency::Graph neighbors;
 
   TimeStamp ts_0;
   Adjacency::Graph verts_at_elem(Adjacency::RenderType::as_is, vidx);
@@ -387,23 +387,23 @@ void run()
   TimeStamp ts_2;
   std::cout << "2 TRANSPOSE    : " << ts_2.elapsed_string(ts_1).pad_front(7) << std::endl;
 
-  neighbours = render_injectify_new(elems_at_vert, verts_at_elem);
+  neighbors = render_injectify_new(elems_at_vert, verts_at_elem);
   TimeStamp ts_3;
   std::cout << "3 INJECT NEW   : " << ts_3.elapsed_string(ts_2).pad_front(7) << std::endl;
 
-  neighbours = render_injectify_old(elems_at_vert, verts_at_elem);
+  neighbors = render_injectify_old(elems_at_vert, verts_at_elem);
   TimeStamp ts_4;
   std::cout << "4 INJECT OLD   : " << ts_4.elapsed_string(ts_3).pad_front(7) << std::endl;
 
-  neighbours = render_injectify_mask(elems_at_vert, verts_at_elem);
+  neighbors = render_injectify_mask(elems_at_vert, verts_at_elem);
   TimeStamp ts_5;
   std::cout << "5 INJECT MASK  : " << ts_5.elapsed_string(ts_4).pad_front(7) << std::endl;
 
-  neighbours.sort_indices();
+  neighbors.sort_indices();
   TimeStamp ts_6;
   std::cout << "6 LIN INS SORT : " << ts_6.elapsed_string(ts_5).pad_front(7) << std::endl;
 
-  Adjacency::Graph matrix = neighbours.clone();
+  Adjacency::Graph matrix = neighbors.clone();
   Adjacency::Graph tmp1, tmp2;
 
   Index lev(level_max);
@@ -451,7 +451,7 @@ void run()
 
 int main(int argc, char** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   run();
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

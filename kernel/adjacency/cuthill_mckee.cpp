@@ -49,7 +49,7 @@ namespace FEAT
 
       while(lvl2 < num_nodes)
       {
-        // initialise root
+        // initialize root
         Index root = num_nodes + 1;
 
         // get the root node
@@ -107,7 +107,7 @@ namespace FEAT
         // if something very odd has happened
         XASSERTM(root < num_nodes, "No root node found!");
 
-        // initialise the first level of the root node
+        // initialize the first level of the root node
         ++lvl1;
         lvl2 = lvl1;
         lvl3 = lvl1;

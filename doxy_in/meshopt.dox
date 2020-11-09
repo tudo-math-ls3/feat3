@@ -1,11 +1,11 @@
 /**
-\page meshopt_design Description of the mesh optimisation tools
+\page meshopt_design Description of the mesh optimization tools
 
 \section basic_overview Basic overview
 
-The Meshopt namespace contains all tools for mesh optimisation (sometimes also called <i> mesh smoothing </i>). These two terms are used synonymously. The baseclass is \ref FEAT::Meshopt::MeshQualityFunctional and shall be used for illustrational purposes in this section.
+The Meshopt namespace contains all tools for mesh optimization (sometimes also called <i> mesh smoothing </i>). These two terms are used synonymously. The baseclass is \ref FEAT::Meshopt::MeshQualityFunctional and shall be used for illustrational purposes in this section.
 
-A MeshQualityFunctional measures the quality of a mesh in some sense and can be used in conjuction with a (non-)linear solver to <i>optimise</i> the mesh by minimising the functional value. It always refers to exactly one mesh (through a FEAT::Geometry::RootMeshNode), contains a pointer to it and can modify exactly this mesh and nothing more. The main use cases are:
+A MeshQualityFunctional measures the quality of a mesh in some sense and can be used in conjuction with a (non-)linear solver to <i>optimize</i> the mesh by minimising the functional value. It always refers to exactly one mesh (through a FEAT::Geometry::RootMeshNode), contains a pointer to it and can modify exactly this mesh and nothing more. The main use cases are:
 
  -# The mesh is moving, where only the boundary movement is known (i.e. decoupled fluid-structure interactions, Navier Stokes with free capillary boundary etc.).
 
@@ -15,7 +15,7 @@ A MeshQualityFunctional measures the quality of a mesh in some sense and can be 
   \f[ - \Delta u = 0 ~ \mathrm{in} ~ \Omega, u = u_D ~\mathrm{on}~ \partial \Omega \f]
   with finite element tools on the FE space the transformation is from, where \f$ u_D \f$ are the new boundary coordinates. The solution then contains the new vertex coordinates in the interiour.
 
-  This is also called <i>Laplacian smoothing</i> and is nothing more than minimising the harmonic energy of the transformation which satisfies the appropriate boundary conditions. This is implemented in \ref FEAT::Meshopt::LaplaceFunctional. The boundary coordinates \f$ u_D \f$ are then the trace of the FE function \f$ u \f$ on \f$ \partial \Omega \f$ and the solving of the above problem was the application of one possible inverse trace operator. The solution is also the minimiser of the harmonic energy on the space with the appropriate boundary values.
+  This is also called <i>Laplacian smoothing</i> and is nothing more than minimising the harmonic energy of the transformation which satisfies the appropriate boundary conditions. This is implemented in \ref FEAT::Meshopt::LaplaceFunctional. The boundary coordinates \f$ u_D \f$ are then the trace of the FE function \f$ u \f$ on \f$ \partial \Omega \f$ and the solving of the above problem was the application of one possible inverse trace operator. The solution is also the minimizer of the harmonic energy on the space with the appropriate boundary values.
 
  -# A given mesh is to be improved according to some quality measure.
 
@@ -33,7 +33,7 @@ These use cases are in no way disjoint: There are cases of moving meshes with an
 
 It is recommended to use all classes derived from MeshQualityFunctional through their respective <i>control classes</i> from the FEAT::Control::Meshopt namespace, namely FEAT::Control::Meshopt::DuDvFunctionalControl and FEAT::Control::Meshopt::HyperelasticityFunctionalControl. The easiest way to configure and use them is through configuration files which can be read at startup time to create FEAT::PropertyMap s, which can be used in the FEAT::Control::Meshopt::ControlFactory to create these objects at runtime. Their basic interface is made available through a FEAT::Control::Meshopt::MeshoptControlBase base class pointer and should be sufficient to access and use the underlying object. Examples of this can be found in the applications folder (i.e. meshopt_r_adapt-app, meshopt_boundary-app, meshopt_refinement-app), while the (more primitive) meshopt_hyperelasticity_resize-app uses the FEAT::Meshopt::HyperelasticityFunctional directly. The solver used by these objects are created using the FEAT::Control::MeshoptSolverFactory and the FEAT::Control::Meshopt::MeshoptPrecondFactory. Note that this makes heavy use of the classes from the FEAT::Control::Domain namespace.
 
-After creating a control object \c meshopt_ctrl from a Control::DomainControl, its \c prepare() function needs to be called before optimising the mesh by calling \c meshopt_ctrl->optimise().
+After creating a control object \c meshopt_ctrl from a Control::DomainControl, its \c prepare() function needs to be called before optimising the mesh by calling \c meshopt_ctrl->optimize().
 One can write the current mesh coordinates to the object's buffer using meshopt_ctrl->mesh_to_buffer() and get a reference to the buffer by meshopt_ctrl->get_coords(). One can call <c>auto new_coords = meshopt_ctrl->get_coords().clone(LAFEM::CloneMode::Deep)</c>  to obtain a deep copy of the mesh's vertex coordinates, manipulate them, and then call \c meshopt_ctrl->prepare(old_coords) to prepare the functional.
 
 If we have a FEAT::Geometry::ExportVTK object for writing the date to a .vtu file, we can simply call \c meshopt_ctrl->add_to_vtk_exporter to add the relevant data to it. Refer to the class documentation for details.
@@ -47,6 +47,6 @@ Currently there are two main classes of MeshQualityFunctionals:
  -# Nonlinear functionals based on the polyconvex stored-energy functionals for hyperelastic materials, see \cite Rum96. These support computation of extension operators, \e r-adaptivity and \e mesh alignment.
   - FEAT::Meshopt::HyperelasticityFunctional
 
-For more information on mesh optimisation, refer to \cite HR11.
+For more information on mesh optimization, refer to \cite HR11.
 
 **/

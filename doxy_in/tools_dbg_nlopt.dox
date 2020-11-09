@@ -1,10 +1,10 @@
-/** \page tools_dbg_nlopt The nonlinear optimiser debugging tool
+/** \page tools_dbg_nlopt The nonlinear optimizer debugging tool
 
-The tool can be used for testing nonlinear optimisers on a few well-known functions. It has been used for nonlinear operators generated from AnalyticFunctions using the AnalyticFunctionOperator wrapper class. Have a look at the Analytic::Common namespace candidates. There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp specifying the real minima and a starting point.
+The tool can be used for testing nonlinear optimizers on a few well-known functions. It has been used for nonlinear operators generated from AnalyticFunctions using the AnalyticFunctionOperator wrapper class. Have a look at the Analytic::Common namespace candidates. There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp specifying the real minima and a starting point.
 
 Some part of the solver configuration can be done on the command line (solvertype, direction update, preconditioner), while other options must be specified at compile time (the linesearch, memory architecture and floating point precision). The solver by default logs all iterates and produces a vtk output of the domain of interest (named <c>dbg_nlopt_[FUNCTIONNAME]_domain.vtu</c>) and a polyline of all iterates (named <c>dbg_nlopt_[FUNCTIONNAME]_iterates.vtu</c>) so one can study the convergence behaviour of the solver.
 
-This can easily be extended to use nonlinear operators from other sources, but the whole plotting procedures require that we optimise a scalar function in two or three variables.
+This can easily be extended to use nonlinear operators from other sources, but the whole plotting procedures require that we optimize a scalar function in two or three variables.
 
 If FEAT3 was compiled with <c>alglib</c> in the buildid, the ALGLIBMinCG solver is available as well.
 

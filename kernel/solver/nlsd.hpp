@@ -22,12 +22,12 @@ namespace FEAT
      * \brief Nonlinear Steepest Descent method for finding a minimum of an functional's gradient
      *
      * \tparam Functional_
-     * Nonlinear Functional to minimise the gradient of
+     * Nonlinear Functional to minimize the gradient of
      *
      * \tparam Filter_
      * Filter to apply to the functional's gradient
      *
-     * See \cite NW06 for an overview of optimisation techniques.
+     * See \cite NW06 for an overview of optimization techniques.
      *
      */
     template<typename Functional_, typename Filter_>

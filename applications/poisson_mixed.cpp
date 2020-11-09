@@ -232,7 +232,7 @@ namespace PoissonMixed
       //  // r <- r + alpha*A*x
       //  _matrix.apply(*r, *x, *r, alpha);
 
-      //  // synchronise r
+      //  // synchronize r
       //  r.sync_0_async();
       //}
 
@@ -376,7 +376,7 @@ namespace PoissonMixed
 
         // This shallow-copies the filters to filter_sys
         system_levels.at(i)->compile_system_filter();
-        // After assembling to local filters, we need to call this to synchronise e.g. the slip filters
+        // After assembling to local filters, we need to call this to synchronize e.g. the slip filters
         system_levels.at(i)->assemble_global_filters();
         // Compile the system matrix
         system_levels.at(i)->compile_system_matrix();
@@ -562,7 +562,7 @@ namespace PoissonMixed
     solver->set_tol_rel(1E-8);
     solver->set_max_iter(1000);
 
-    // initialise
+    // initialize
     multigrid_hierarchy->init();
     solver->init();
 
@@ -598,8 +598,8 @@ namespace PoissonMixed
       Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
         (vec_sol.local(), sol_func, the_domain_level.space_pres, cubature);
 
-      // synchronise all local errors
-      errors.synchronise(comm);
+      // synchronize all local errors
+      errors.synchronize(comm);
 
       // print errors
       comm.print("");
@@ -764,10 +764,10 @@ namespace PoissonMixed
 
 int main(int argc, char* argv [])
 {
-  // initialise
-  FEAT::Runtime::initialise(argc, argv);
+  // initialize
+  FEAT::Runtime::initialize(argc, argv);
 
   PoissonMixed::main(argc, argv);
   // okay
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

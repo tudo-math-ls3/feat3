@@ -193,8 +193,8 @@ namespace Tutorial01
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Specify the desired mesh refinement level, defaulted to 3.
   // Note that FEAT uses its own "Index" type rather than a wild mixture of int, uint, long
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial01::main(level);
 
-  // And finally, finalise our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
+  // And finally, finalize our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
   // so we can simply return this as the result of our main function to indicate a successful run.
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

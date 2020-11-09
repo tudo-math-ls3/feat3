@@ -138,7 +138,7 @@ namespace FEAT
          * \brief Computes the main diagonal block sizes of a Vanka matrix.
          *
          * \note
-         * This function is only implemented in specialised overloads,
+         * This function is only implemented in specialized overloads,
          * i.e. there exists no generic implementation.
          *
          * \param[in] matrix
@@ -153,21 +153,21 @@ namespace FEAT
         }
 #endif // DOXYGEN
 
-        /// specialisation for LAFEM::SparseMatrixCSR
+        /// specialization for LAFEM::SparseMatrixCSR
         template<typename Mem_, typename DT_, typename IT_>
         static void block_sizes(const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>&, std::vector<Index>& sizes)
         {
           sizes.push_back(Index(1));
         }
 
-        /// specialisation for LAFEM::SparseMatrixBCSR
+        /// specialization for LAFEM::SparseMatrixBCSR
         template<typename Mem_, typename DT_, typename IT_, int bs_>
         static void block_sizes(const LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bs_, bs_>&, std::vector<Index>& sizes)
         {
           sizes.push_back(Index(bs_));
         }
 
-        /// specialisation for LAFEM::TupleMatrix
+        /// specialization for LAFEM::TupleMatrix
         template<typename... Rows_>
         static void block_sizes(const LAFEM::TupleMatrix<Rows_...>& matrix, std::vector<Index>& sizes)
         {
@@ -360,7 +360,7 @@ namespace FEAT
          * \brief Gathers the local matrix part of a system matrix w.r.t. a macro
          *
          * \note
-         * This function is only implemented in specialised overloads,
+         * This function is only implemented in specialized overloads,
          * i.e. there exists no generic implementation.
          *
          * \param[in] matrix
@@ -401,7 +401,7 @@ namespace FEAT
         }
 #endif // DOXYGEN
 
-        /// specialisation for LAFEM::NullMatrix
+        /// specialization for LAFEM::NullMatrix
         template<typename DT_, typename IT_, int bh_, int bw_>
         static std::pair<Index,Index> gather(const LAFEM::NullMatrix<Mem::Main, DT_, IT_, bh_, bw_>&,
           DT_*, const Index, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -419,7 +419,7 @@ namespace FEAT
           return std::make_pair(num_rows * Index(bh_), num_cols * Index(bw_));
         }
 
-        /// specialisation for LAFEM::SparseMatrixCSR
+        /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
         static std::pair<Index,Index> gather(const LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -452,7 +452,7 @@ namespace FEAT
             // get the index of this row in the big matrix
             const Index irow = row_img_idx[i];
 
-            // initialise loop variable for local columns
+            // initialize loop variable for local columns
             Index j = Index(0);
 
             // row over the row
@@ -480,7 +480,7 @@ namespace FEAT
           return std::make_pair(num_rows, num_cols);
         }
 
-        /// specialisation for LAFEM::SparseMatrixBCSR
+        /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
         static std::pair<Index,Index> gather(const LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -513,7 +513,7 @@ namespace FEAT
             // get the index of this row in the big matrix
             const Index irow = row_img_idx[i];
 
-            // initialise loop variable for local columns
+            // initialize loop variable for local columns
             Index j = Index(0);
 
             // row over the row
@@ -554,7 +554,7 @@ namespace FEAT
           return std::make_pair(num_rows * Index(bh_), num_cols * Index(bw_));
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow
+        /// specialization for LAFEM::TupleMatrixRow
         template<typename DT_, typename First_, typename Second_, typename... Rest_>
         static std::pair<Index,Index> gather(const LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -571,7 +571,7 @@ namespace FEAT
           return std::make_pair(nrc_f.first, nrc_f.second + nrc_r.second);
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow (single column)
+        /// specialization for LAFEM::TupleMatrixRow (single column)
         template<typename DT_, typename First_>
         static std::pair<Index,Index> gather(const LAFEM::TupleMatrixRow<First_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -581,7 +581,7 @@ namespace FEAT
             macro_dofs, row_off, row_block, col_off, col_block);
         }
 
-        /// specialisation for LAFEM::TupleMatrix
+        /// specialization for LAFEM::TupleMatrix
         template<typename DT_, typename FirstRow_, typename SecondRow_, typename... RestRows_>
         static std::pair<Index,Index> gather(const LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -598,7 +598,7 @@ namespace FEAT
           return std::make_pair(nrc_f.first + nrc_r.first, nrc_f.second);
         }
 
-        /// specialisation for LAFEM::TupleMatrix (single row)
+        /// specialization for LAFEM::TupleMatrix (single row)
         template<typename DT_, typename FirstRow_>
         static std::pair<Index,Index> gather(const LAFEM::TupleMatrix<FirstRow_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -608,7 +608,7 @@ namespace FEAT
             macro_dofs, row_off, row_block, col_off, col_block);
         }
 
-        /// specialisation for LAFEM::SaddlePointMatrix
+        /// specialization for LAFEM::SaddlePointMatrix
         template<typename DT_, typename MatrixA_, typename MatrixB_, typename MatrixD_>
         static std::pair<Index,Index> gather(const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix,
           DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -639,7 +639,7 @@ namespace FEAT
          * \brief Allocates the Vanka matrix based on the macro-dof graphs
          *
          * \note
-         * This function is only implemented in specialised overloads,
+         * This function is only implemented in specialized overloads,
          * i.e. there exists no generic implementation.
          *
          * \param[out] matrix
@@ -665,7 +665,7 @@ namespace FEAT
         }
 #endif // DOXYGEN
 
-        /// specialisation for LAFEM::SparseMatrixCSR
+        /// specialization for LAFEM::SparseMatrixCSR
         template<typename Mem_, typename DT_, typename IT_>
         static void alloc(LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -678,7 +678,7 @@ namespace FEAT
           matrix.convert(matrix_main);
         }
 
-        /// specialisation for LAFEM::SparseMatrixBCSR
+        /// specialization for LAFEM::SparseMatrixBCSR
         template<typename Mem_, typename DT_, typename IT_, int bh_, int bw_>
         static void alloc(LAFEM::SparseMatrixBCSR<Mem_, DT_, IT_, bh_, bw_>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -691,7 +691,7 @@ namespace FEAT
           matrix.convert(matrix_main);
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow
+        /// specialization for LAFEM::TupleMatrixRow
         template<typename First_, typename Second_, typename... Rest_>
         static void alloc(LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -701,7 +701,7 @@ namespace FEAT
           AmaVankaCore::alloc(matrix.rest(), dof_macros, macro_dofs, row_block, col_block + Index(1));
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow (single column)
+        /// specialization for LAFEM::TupleMatrixRow (single column)
         template<typename First_>
         static void alloc(LAFEM::TupleMatrixRow<First_>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -710,7 +710,7 @@ namespace FEAT
           AmaVankaCore::alloc(matrix.first(), dof_macros, macro_dofs, row_block, col_block);
         }
 
-        /// specialisation for LAFEM::TupleMatrix
+        /// specialization for LAFEM::TupleMatrix
         template<typename FirstRow_, typename SecondRow_, typename... RestRows_>
         static void alloc(LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -720,7 +720,7 @@ namespace FEAT
           AmaVankaCore::alloc(matrix.rest(), dof_macros, macro_dofs, row_block + Index(1), col_block);
         }
 
-        /// specialisation for LAFEM::TupleMatrix (single row)
+        /// specialization for LAFEM::TupleMatrix (single row)
         template<typename FirstRow_>
         static void alloc(LAFEM::TupleMatrix<FirstRow_>& matrix,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -739,7 +739,7 @@ namespace FEAT
          * This function is virtually the counter-part of the gather() function.
          *
          * \note
-         * This function is only implemented in specialised overloads,
+         * This function is only implemented in specialized overloads,
          * i.e. there exists no generic implementation.
          *
          * \param[inout] matrix
@@ -780,7 +780,7 @@ namespace FEAT
         }
 #endif // DOXYGEN
 
-        /// specialisation for LAFEM::SparseMatrixCSR
+        /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
         static std::pair<Index,Index> scatter_add(LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -813,7 +813,7 @@ namespace FEAT
             // get the index of this row in the big matrix
             const Index irow = row_img_idx[i];
 
-            // initialise loop variable for local columns
+            // initialize loop variable for local columns
             Index j = Index(0);
 
             // row over the row
@@ -840,7 +840,7 @@ namespace FEAT
           return std::make_pair(num_rows, num_cols);
         }
 
-        /// specialisation for LAFEM::SparseMatrixBCSR
+        /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
         static std::pair<Index,Index> scatter_add(LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -873,7 +873,7 @@ namespace FEAT
             // get the index of this row in the big matrix
             const Index irow = row_img_idx[i];
 
-            // initialise loop variable for local columns
+            // initialize loop variable for local columns
             Index j = Index(0);
 
             // row over the row
@@ -914,7 +914,7 @@ namespace FEAT
           return std::make_pair(num_rows * Index(bh_), num_cols * Index(bw_));
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow
+        /// specialization for LAFEM::TupleMatrixRow
         template<typename DT_, typename First_, typename Second_, typename... Rest_>
         static std::pair<Index,Index> scatter_add(LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -931,7 +931,7 @@ namespace FEAT
           return std::make_pair(nrc_f.first, nrc_f.second + nrc_r.second);
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow (single column)
+        /// specialization for LAFEM::TupleMatrixRow (single column)
         template<typename DT_, typename First_>
         static std::pair<Index,Index> scatter_add(LAFEM::TupleMatrixRow<First_>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -941,7 +941,7 @@ namespace FEAT
             macro_dofs, row_off, row_block, col_off, col_block);
         }
 
-        /// specialisation for LAFEM::TupleMatrix
+        /// specialization for LAFEM::TupleMatrix
         template<typename DT_, typename FirstRow_, typename SecondRow_, typename... RestRows_>
         static std::pair<Index,Index> scatter_add(LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -958,7 +958,7 @@ namespace FEAT
           return std::make_pair(nrc_f.first + nrc_r.first, nrc_f.second);
         }
 
-        /// specialisation for LAFEM::TupleMatrix (single row)
+        /// specialization for LAFEM::TupleMatrix (single row)
         template<typename DT_, typename FirstRow_>
         static std::pair<Index,Index> scatter_add(LAFEM::TupleMatrix<FirstRow_>& matrix,
           const DT_* local, const Index stride, const Index macro, const std::vector<Adjacency::Graph>& macro_dofs,
@@ -975,7 +975,7 @@ namespace FEAT
          * \brief Scales the rows of a Vanka matrix.
          *
          * \note
-         * This function is only implemented in specialised overloads,
+         * This function is only implemented in specialized overloads,
          * i.e. there exists no generic implementation.
          *
          * \param[inout] matrix
@@ -997,7 +997,7 @@ namespace FEAT
         }
 #endif // DOXYGEN
 
-        /// specialisation for LAFEM::SparseMatrixCSR
+        /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
         static void scale_rows(LAFEM::SparseMatrixCSR<Mem::Main, DT_, IT_>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
@@ -1036,7 +1036,7 @@ namespace FEAT
           }
         }
 
-        /// specialisation for LAFEM::SparseMatrixBCSR
+        /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
         static void scale_rows(LAFEM::SparseMatrixBCSR<Mem::Main, DT_, IT_, bh_, bw_>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
@@ -1075,7 +1075,7 @@ namespace FEAT
           }
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow
+        /// specialization for LAFEM::TupleMatrixRow
         template<typename DT_, typename First_, typename Second_, typename... Rest_>
         static void scale_rows(LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
@@ -1084,7 +1084,7 @@ namespace FEAT
           AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block);
         }
 
-        /// specialisation for LAFEM::TupleMatrixRow (single column)
+        /// specialization for LAFEM::TupleMatrixRow (single column)
         template<typename DT_, typename First_>
         static void scale_rows(LAFEM::TupleMatrixRow<First_>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
@@ -1092,7 +1092,7 @@ namespace FEAT
           AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
         }
 
-        /// specialisation for LAFEM::TupleMatrix
+        /// specialization for LAFEM::TupleMatrix
         template<typename DT_, typename FirstRow_, typename SecondRow_, typename... RestRows_>
         static void scale_rows(LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
@@ -1101,7 +1101,7 @@ namespace FEAT
           AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block + Index(1));
         }
 
-        /// specialisation for LAFEM::TupleMatrix (single row)
+        /// specialization for LAFEM::TupleMatrix (single row)
         template<typename DT_, typename FirstRow_>
         static void scale_rows(LAFEM::TupleMatrix<FirstRow_>& matrix, const DT_ omega,
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
@@ -1175,7 +1175,7 @@ namespace FEAT
      *
      * \attention
      * In contrast to the Solver::Vanka class, one must specify the macros for the Vanka smoother for each
-     * finite element space which is used to discretise the individual blocks of the solution space by
+     * finite element space which is used to discretize the individual blocks of the solution space by
      * using the #push_macro_dofs() function. The only exception is for the LAFEM::SaddlePointMatrix,
      * as for this matrix type, there exists an automatic macro deduction algorithm, which will compute
      * the element-wise macro graphs based on the sparsity patterns of the B and D matrices, resp.
@@ -1241,9 +1241,9 @@ namespace FEAT
       /// temporary vectors
       VectorType _vec_c, _vec_d;
 
-      // stop watch for symbolic factorisation
+      // stop watch for symbolic factorization
       StopWatch watch_init_symbolic;
-      // stop watch for numeric factorisation
+      // stop watch for numeric factorization
       StopWatch watch_init_numeric;
       // stop watch for apply time
       StopWatch watch_apply;
@@ -1364,7 +1364,7 @@ namespace FEAT
        * \brief Returns the total data size used by the AmaVanka smoother.
        *
        * \returns
-       * The total data size, i.e. the total number of floating point values used in the factorisation.
+       * The total data size, i.e. the total number of floating point values used in the factorization.
        */
       std::size_t data_size() const
       {
@@ -1382,7 +1382,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the total accumulated time for symbolic initialisation.
+       * \brief Returns the total accumulated time for symbolic initialization.
        */
       double time_init_symbolic() const
       {
@@ -1390,7 +1390,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the total accumulated time for numeric initialisation.
+       * \brief Returns the total accumulated time for numeric initialization.
        */
       double time_init_numeric() const
       {
@@ -1411,7 +1411,7 @@ namespace FEAT
         return "AmaVanka";
       }
 
-      /// Performs symbolic factorisation
+      /// Performs symbolic factorization
       virtual void init_symbolic() override
       {
         watch_init_symbolic.start();
@@ -1460,7 +1460,7 @@ namespace FEAT
         watch_init_symbolic.stop();
       }
 
-      /// Releases the symbolic factorisation data
+      /// Releases the symbolic factorization data
       virtual void done_symbolic() override
       {
         this->_vanka.clear();
@@ -1476,7 +1476,7 @@ namespace FEAT
         BaseClass::done_symbolic();
       }
 
-      /// Performs numeric factorisation
+      /// Performs numeric factorization
       virtual void init_numeric() override
       {
         const DataType eps = Math::eps<DataType>();

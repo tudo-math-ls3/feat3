@@ -259,7 +259,7 @@ namespace Tutorial07
       space_eval_stress.prepare(trafo_eval);
       space_eval_velo.prepare(trafo_eval);
 
-      // initialise dof-mapping
+      // initialize dof-mapping
       dof_mapping_stress.prepare(cell);
       dof_mapping_velo.prepare(cell);
 
@@ -430,7 +430,7 @@ namespace Tutorial07
     MeshPartType boundary(boundary_factory);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Trafo and Finite Element Space initialisation
+    // Trafo and Finite Element Space initialization
 
     std::cout << "Creating Trafo and Spaces..." << std::endl;
 
@@ -749,8 +749,8 @@ namespace Tutorial07
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #07: Stokes" << std::endl;
@@ -788,7 +788,7 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial07::main(level);
 
-  // And finally, finalise our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
+  // And finally, finalize our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
   // so we can simply return this as the result of our main function to indicate a successful run.
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

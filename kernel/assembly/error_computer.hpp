@@ -252,15 +252,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Synchronises the error information over a communicator
+       * \brief Synchronizes the error information over a communicator
        *
        * This function sums up the error information of all patches in a
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronise.
+       * The communication over which to synchronize.
        */
-      void synchronise(const Dist::Comm& comm)
+      void synchronize(const Dist::Comm& comm)
       {
         DataType_ verr[3] =
         {
@@ -452,7 +452,7 @@ namespace FEAT
         // create matrix scatter-axpy
         typename VectorType::GatherAxpy gather_axpy(vector);
 
-        // initialise result
+        // initialize result
         ScalarErrorInfo<DataType> result;
         result.have_h0 = (max_norm_ >= 0);
         result.have_h1 = (max_norm_ >= 1);
@@ -469,7 +469,7 @@ namespace FEAT
           // format local vector
           lvad.format();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
@@ -774,15 +774,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Synchronises the error information over a communicator
+       * \brief Synchronizes the error information over a communicator
        *
        * This function sums up the error information of all patches in a
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronise.
+       * The communication over which to synchronize.
        */
-      void synchronise(const Dist::Comm& comm)
+      void synchronize(const Dist::Comm& comm)
       {
         DataType_ verr[3+3*dim_] =
         {
@@ -1028,7 +1028,7 @@ namespace FEAT
         // create matrix scatter-axpy
         typename VectorType::GatherAxpy gather_axpy(vector);
 
-        // initialise result
+        // initialize result
         VectorErrorInfo<DataType, dim> info;
         info.have_h0 = (max_norm_ >= 0);
         info.have_h1 = (max_norm_ >= 1);
@@ -1045,7 +1045,7 @@ namespace FEAT
           // format local vector
           lvad.format();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // incorporate local matrix

@@ -424,7 +424,7 @@ namespace FEAT
     /// \cond internal
     namespace Intern
     {
-      // JacobiHelper specialisation for PowerFullMatrix
+      // JacobiHelper specialization for PowerFullMatrix
       template<int n_>
       struct ExtDiagPFM
       {

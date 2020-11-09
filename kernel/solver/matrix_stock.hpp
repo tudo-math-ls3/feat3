@@ -1272,7 +1272,7 @@ namespace FEAT
 #endif
         }
 
-        /// initialise any multigrid hierarchy in use
+        /// initialize any multigrid hierarchy in use
         void hierarchy_init()
         {
           for (auto& h : local_hierarchy_map_main_float_ulong)
@@ -1314,7 +1314,7 @@ namespace FEAT
 #endif
         }
 
-        /// initialise any multigrid hierarchy in use
+        /// initialize any multigrid hierarchy in use
         void hierarchy_init_symbolic()
         {
           for (auto& h : local_hierarchy_map_main_float_ulong)
@@ -1356,7 +1356,7 @@ namespace FEAT
 #endif
         }
 
-        /// initialise any multigrid hierarchy in use
+        /// initialize any multigrid hierarchy in use
         /// \note this includes a call to refresh() to update the actual matrices in use
         void hierarchy_init_numeric()
         {

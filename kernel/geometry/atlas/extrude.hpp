@@ -42,7 +42,7 @@ namespace FEAT
         typedef typename BaseClass::CoordType CoordType;
         /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
-        /// Vector type for parametrisation points, aka domain points
+        /// Vector type for parametrization points, aka domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
         typedef typename SubChart_::WorldPoint SubWorldPoint;

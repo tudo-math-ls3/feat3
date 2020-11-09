@@ -37,7 +37,7 @@ namespace FEAT
    * \warning For efficiency reasons, \f$ B^T \f$ needs to be explicitly computed and passed as \f$ D \f$, but this
    * property is only checked very superficially (and only in debug mode).
    *
-   * \note In the current implementation, all container template parameters must be Global:: as the synchronisation
+   * \note In the current implementation, all container template parameters must be Global:: as the synchronization
    * is done manually by using local() objects and calling sync_0()
    *
    * \author Jordi Paul
@@ -144,7 +144,7 @@ namespace FEAT
 
       void update_lumped_a(const LumpedMatrixA_& lumped_matrix_a_)
       {
-        // If these were initialised empty (as it frequently happens with Global containers), adjust the sizes
+        // If these were initialized empty (as it frequently happens with Global containers), adjust the sizes
         if(_vec_ml.local().size() == Index(0))
         {
           _vec_ml.local().clone(lumped_matrix_a_.local(), LAFEM::CloneMode::Layout);
@@ -251,12 +251,12 @@ namespace FEAT
        *
        * \note This operation is only possible because A = diag(a)
        *
-       * \warning If the matrix \f$ B \f$ is a distributed matrix, this requires synchronisation which is expensive.
+       * \warning If the matrix \f$ B \f$ is a distributed matrix, this requires synchronization which is expensive.
        *
        */
       void extract_diag(VectorTypeL& diag, bool sync=true) const
       {
-        // If we have a gate and it contains neighbours, we have to do it the complicated way
+        // If we have a gate and it contains neighbors, we have to do it the complicated way
         if(diag.get_gate() != nullptr && !diag.get_gate()->_ranks.empty() )
         {
           diag.format();

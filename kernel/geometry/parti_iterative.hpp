@@ -43,8 +43,8 @@ namespace FEAT
         typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
         static constexpr int facet_dim = MeshType::shape_dim-1;
         const auto& facet_idx = mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
-        // nachbar zu zelle i sind neighbours[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbours != ~Index(0)
-        auto& neighbours = mesh.get_neighbours();
+        // nachbar zu zelle i sind neighbors[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbors != ~Index(0)
+        auto& neighbors = mesh.get_neighbors();
 
         Index num_elems(mesh.get_num_elements());
 
@@ -78,11 +78,11 @@ namespace FEAT
             return distances;
           }
 
-          //update all neighbours
+          //update all neighbors
           for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
           {
-            Index other_cell(neighbours[next_node][j]);
-            //update neighbour cell distance, if neighbour exists and neighbour is in the queue of pending nodes
+            Index other_cell(neighbors[next_node][j]);
+            //update neighbor cell distance, if neighbor exists and neighbor is in the queue of pending nodes
             if (other_cell != ~Index(0) && pending_nodes.count(other_cell) > 0)
             {
               Index new_distance = distances.at(next_node) + 1;
@@ -201,8 +201,8 @@ namespace FEAT
 
           static constexpr int facet_dim = MeshType::shape_dim-1;
           const auto& facet_idx = mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
-          // nachbar zu zelle i sind neighbours[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbours != ~Index(0)
-          auto& neighbours = mesh.get_neighbours();
+          // nachbar zu zelle i sind neighbors[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbors != ~Index(0)
+          auto& neighbors = mesh.get_neighbors();
 
           //setup boundary cells
           for (Index patch(0) ; patch < _num_patches ; ++patch)
@@ -211,8 +211,8 @@ namespace FEAT
             {
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[cell][j]);
-                // if neighbour exists and is not in our own patch
+                Index other_cell(neighbors[cell][j]);
+                // if neighbor exists and is not in our own patch
                 if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != patch)
                 {
                   _boundary_cells.at(patch).insert(cell);
@@ -231,8 +231,8 @@ namespace FEAT
         {
           static constexpr int facet_dim = MeshType::shape_dim-1;
           const auto& facet_idx = mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
-          // nachbar zu zelle i sind neighbours[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbours != ~Index(0)
-          auto& neighbours = mesh.get_neighbours();
+          // nachbar zu zelle i sind neighbors[i][j] mit j = 0 bis faced_idx.get_num_indices() und neighbors != ~Index(0)
+          auto& neighbors = mesh.get_neighbors();
 
           Index mutation_count(0);
           Index tries(0);
@@ -257,63 +257,63 @@ namespace FEAT
               cell = *it;
             }
 
-            // list of neighbour cells in other patches
-            std::list<Index> trans_patch_neighbours;
+            // list of neighbor cells in other patches
+            std::list<Index> trans_patch_neighbors;
             for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
             {
-              Index other_cell(neighbours[cell][j]);
-              // if neighbour exists and is not in our own patch
+              Index other_cell(neighbors[cell][j]);
+              // if neighbor exists and is not in our own patch
               if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != patch)
               {
-                trans_patch_neighbours.push_back(other_cell);
+                trans_patch_neighbors.push_back(other_cell);
               }
             }
 
-            //check if any neighbour has a smaller patch
+            //check if any neighbor has a smaller patch
             Index smallest_patch(patch);
             Index smallest_size = Index(_cells_per_patch.at(patch).size());
-            for (auto neighbour : trans_patch_neighbours)
+            for (auto neighbor : trans_patch_neighbors)
             {
-              if (_cells_per_patch.at(_patch_per_cell.at(neighbour)).size() < smallest_size)
+              if (_cells_per_patch.at(_patch_per_cell.at(neighbor)).size() < smallest_size)
               {
-                smallest_size = Index(_cells_per_patch.at(_patch_per_cell.at(neighbour)).size());
-                smallest_patch = _patch_per_cell.at(neighbour);
+                smallest_size = Index(_cells_per_patch.at(_patch_per_cell.at(neighbor)).size());
+                smallest_patch = _patch_per_cell.at(neighbor);
               }
             }
 
             if (smallest_patch == patch)
               continue;
 
-            //build up list of neighbours in the same (old) patch
-            std::list<Index> in_patch_neighbours;
+            //build up list of neighbors in the same (old) patch
+            std::list<Index> in_patch_neighbors;
             for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
             {
-              Index other_cell(neighbours[cell][j]);
-              // if neighbour exists and is in our own patch
+              Index other_cell(neighbors[cell][j]);
+              // if neighbor exists and is in our own patch
               if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) == patch)
               {
-                in_patch_neighbours.push_back(other_cell);
+                in_patch_neighbors.push_back(other_cell);
               }
             }
-            //check if we would isolate one of our neighbours completly and abort
-            //i.e. our neighbour from the same patch has only us as a link to its patch
-            bool neighbour_missing = false;
-            for (auto neighbour : in_patch_neighbours)
+            //check if we would isolate one of our neighbors completly and abort
+            //i.e. our neighbor from the same patch has only us as a link to its patch
+            bool neighbor_missing = false;
+            for (auto neighbor : in_patch_neighbors)
             {
-              bool other_neighbour = false;
+              bool other_neighbor = false;
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[neighbour][j]);
+                Index other_cell(neighbors[neighbor][j]);
                 if (other_cell != ~Index(0) && other_cell != cell && _patch_per_cell.at(other_cell) == patch)
                 {
-                  other_neighbour = true;
+                  other_neighbor = true;
                   break;
                 }
               }
-              if (other_neighbour == false)
-                neighbour_missing = true;
+              if (other_neighbor == false)
+                neighbor_missing = true;
             }
-            if (neighbour_missing)
+            if (neighbor_missing)
               continue;
 
             //found new patch for our cell, update structures
@@ -325,17 +325,17 @@ namespace FEAT
             _boundary_cells.at(patch).erase(cell);
             _boundary_cells.at(smallest_patch).insert(cell);
 
-            //update neighbour cells in other patch if they loose their boundary property due to our patch switch
-            for (auto neighbour : trans_patch_neighbours)
+            //update neighbor cells in other patch if they loose their boundary property due to our patch switch
+            for (auto neighbor : trans_patch_neighbors)
             {
               //update only cells in common new patch
-              if (_patch_per_cell.at(neighbour) != smallest_patch)
+              if (_patch_per_cell.at(neighbor) != smallest_patch)
                 continue;
 
               bool boundary(false);
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[neighbour][j]);
+                Index other_cell(neighbors[neighbor][j]);
                 if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != smallest_patch)
                 {
                   boundary = true;
@@ -344,13 +344,13 @@ namespace FEAT
               }
 
               if (! boundary)
-                _boundary_cells.at(smallest_patch).erase(neighbour);
+                _boundary_cells.at(smallest_patch).erase(neighbor);
             }
 
-            //update our own patchs neighbours to become a boundary cell
-            for (auto neighbour : in_patch_neighbours)
+            //update our own patchs neighbors to become a boundary cell
+            for (auto neighbor : in_patch_neighbors)
             {
-              _boundary_cells.at(patch).insert(neighbour);
+              _boundary_cells.at(patch).insert(neighbor);
             }
 
             //we mutate successfully
@@ -364,7 +364,7 @@ namespace FEAT
         {
           static constexpr int facet_dim = MeshType::shape_dim-1;
           const auto& facet_idx = _mesh.template get_index_set<MeshType::shape_dim, facet_dim>();
-          auto& neighbours = _mesh.get_neighbours();
+          auto& neighbors = _mesh.get_neighbors();
 
           for (Index patch(0) ; patch < _num_patches ; ++patch)
           {
@@ -373,7 +373,7 @@ namespace FEAT
             {
               for (int j(0) ; j < facet_idx.get_num_indices() ; ++j)
               {
-                Index other_cell(neighbours[cell][j]);
+                Index other_cell(neighbors[cell][j]);
                 if (other_cell != ~Index(0) && _patch_per_cell.at(other_cell) != patch)
                 {
                   ++sum;
@@ -452,7 +452,7 @@ namespace FEAT
     class PartiIterative;
 
     /**
-     * \brief Iterative-Partitioner class template specialisation for ConformalMesh
+     * \brief Iterative-Partitioner class template specialization for ConformalMesh
      *
      * The basic usage of this class is as follows:
      * -# Refine the mesh until it contains at least num_patches cells.
@@ -494,7 +494,7 @@ namespace FEAT
        * The amount of seconds to be used for initial patch center search.
        *
        * \param[in] time_mutate
-       * The amount of seconds to be used for partitioning optimisation via patch mutation.
+       * The amount of seconds to be used for partitioning optimization via patch mutation.
        */
       explicit PartiIterative(MeshType& mesh, const Dist::Comm & comm, Index num_patches, double time_init, double time_mutate) :
         _num_elems(mesh.get_num_elements()),
@@ -505,7 +505,7 @@ namespace FEAT
         Random::SeedType seed(Random::SeedType(time(nullptr)));
         Random rng(seed + Random::SeedType(comm.rank()));
 
-        mesh.fill_neighbours();
+        mesh.fill_neighbors();
 
         {
           Geometry::Intern::PartiIterativeIndividual<Shape_, num_coords_, Coord_> indi(mesh, rng, _num_patches);

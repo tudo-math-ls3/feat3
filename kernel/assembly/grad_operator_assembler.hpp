@@ -195,7 +195,7 @@ namespace FEAT
           test_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mappings
+          // initialize dof-mappings
           test_dof_mapping.prepare(cell);
           trial_dof_mapping.prepare(cell);
 
@@ -338,7 +338,7 @@ namespace FEAT
           test_eval.prepare(trafo_eval);
           trial_eval.prepare(trafo_eval);
 
-          // Initialise trial DoF mapping
+          // Initialize trial DoF mapping
           trial_dof_mapping.prepare(cell);
 
           // Gather our local input DoF
@@ -393,7 +393,7 @@ namespace FEAT
           test_eval.finish();
           trafo_eval.finish();
 
-          // Initialise test DoF mapping
+          // Initialize test DoF mapping
           test_dof_mapping.prepare(cell);
 
           // scatter into vector

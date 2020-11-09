@@ -40,7 +40,7 @@ namespace FEAT
     class PowerVector
     {
     private:
-      // Note: the case = 1 is specialised below
+      // Note: the case = 1 is specialized below
       static_assert(count_ > 1, "invalid block size");
 
       // declare this class template as a friend for recursive inheritance
@@ -121,7 +121,7 @@ namespace FEAT
        * The size of any sub-vector of this power-vector.
        *
        * \param[in] value
-       * The value that the sub-vectors are to be initialised with.
+       * The value that the sub-vectors are to be initialized with.
        */
       explicit PowerVector(Index sub_size, DataType value) :
         _first(sub_size, value),
@@ -683,7 +683,7 @@ namespace FEAT
 
     /// \cond internal
     /**
-     * \brief Specialisation of PowerVector for only one block
+     * \brief Specialization of PowerVector for only one block
      *
      * \author Peter Zajac
      */
@@ -1137,7 +1137,7 @@ namespace FEAT
         char * array(result.data());
         std::uint64_t * uiarray(reinterpret_cast<std::uint64_t *>(array));
         uiarray[0] = 100; /// \todo globale liste anlegen
-        uiarray[1] = 1; //fixed count_ for power vector specialisation
+        uiarray[1] = 1; //fixed count_ for power vector specialization
 
         file.write(result.data(), long(result.size()));
 

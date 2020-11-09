@@ -358,7 +358,7 @@ namespace FEAT
         bool enable_>
       struct StaticFunctionWrapper;
 
-      // specialisation for 1D functions
+      // specialization for 1D functions
       template<template<typename> class Function_, typename DataType_>
       struct StaticFunctionWrapper<Function_, DataType_, 1, true>
       {
@@ -381,7 +381,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for 2D functions
+      // specialization for 2D functions
       template<template<typename> class Function_, typename DataType_>
       struct StaticFunctionWrapper<Function_, DataType_, 2, true>
       {
@@ -408,7 +408,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for 3D functions
+      // specialization for 3D functions
       template<template<typename> class Function_, typename DataType_>
       struct StaticFunctionWrapper<Function_, DataType_, 3, true>
       {

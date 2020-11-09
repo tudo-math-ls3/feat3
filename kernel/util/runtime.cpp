@@ -26,11 +26,11 @@
 
 using namespace FEAT;
 
-// static member initialisation
-bool Runtime::_initialised = false;
+// static member initialization
+bool Runtime::_initialized = false;
 bool Runtime::_finished = false;
 
-void Runtime::initialise(int& argc, char**& argv)
+void Runtime::initialize(int& argc, char**& argv)
 {
   /// \platformswitch
   /// On Windows, these two function calls MUST come before anything else,
@@ -41,38 +41,38 @@ void Runtime::initialise(int& argc, char**& argv)
   Windows::install_seh_filter();
 #endif
 
-  if (_initialised)
+  if (_initialized)
   {
-    std::cerr << "ERROR: Runtime::initialise called twice!" << std::endl;
+    std::cerr << "ERROR: Runtime::initialize called twice!" << std::endl;
     std::cerr.flush();
     Runtime::abort();
   }
   if (_finished)
   {
-    std::cerr << "ERROR: Runtime::initialise called after Runtime::finalise!" << std::endl;
+    std::cerr << "ERROR: Runtime::initialize called after Runtime::finalize!" << std::endl;
     std::cerr.flush();
     Runtime::abort();
   }
 
-  // initialise Dist operations
-  if(!Dist::initialise(argc, argv))
+  // initialize Dist operations
+  if(!Dist::initialize(argc, argv))
   {
-    std::cerr << "ERROR: Failed to initialise Dist operations!" << std::endl;
+    std::cerr << "ERROR: Failed to initialize Dist operations!" << std::endl;
     std::cerr.flush();
     Runtime::abort();
   }
 
-  // initialise memory pool for main memory
-  MemoryPool<Mem::Main>::initialise();
+  // initialize memory pool for main memory
+  MemoryPool<Mem::Main>::initialize();
 
 #ifdef FEAT_HAVE_CUDA
-  // initialise memory pool for CUDA memory
+  // initialize memory pool for CUDA memory
   int rank = Dist::Comm::world().rank();
-  MemoryPool<Mem::CUDA>::initialise(rank, 1, 1, 1);
+  MemoryPool<Mem::CUDA>::initialize(rank, 1, 1, 1);
   MemoryPool<Mem::CUDA>::set_blocksize(256, 256, 256, 256);
 #endif
 
-  _initialised = true;
+  _initialized = true;
 }
 
 void Runtime::abort(bool dump_call_stack)
@@ -114,28 +114,28 @@ void Runtime::abort(bool dump_call_stack)
   }
 }
 
-int Runtime::finalise()
+int Runtime::finalize()
 {
-  if (!_initialised)
+  if (!_initialized)
   {
-    std::cerr << "ERROR: Runtime::finalise called before Runtime::initialise!" << std::endl;
+    std::cerr << "ERROR: Runtime::finalize called before Runtime::initialize!" << std::endl;
     std::cerr.flush();
     Runtime::abort();
   }
   if (_finished)
   {
-    std::cerr << "ERROR: Runtime::finalise called twice!" << std::endl;
+    std::cerr << "ERROR: Runtime::finalize called twice!" << std::endl;
     std::cerr.flush();
     Runtime::abort();
   }
 
-  MemoryPool<Mem::Main>::finalise();
+  MemoryPool<Mem::Main>::finalize();
 #ifdef FEAT_HAVE_CUDA
-  MemoryPool<Mem::CUDA>::finalise();
+  MemoryPool<Mem::CUDA>::finalize();
 #endif
 
-  // finalise Dist operations
-  Dist::finalise();
+  // finalize Dist operations
+  Dist::finalize();
 
   _finished = true;
 

@@ -176,7 +176,7 @@ namespace PoissonSolverFactory
 
     matrix_stock.hierarchy_init();
 
-    // initialise
+    // initialize
     solver->init();
 
     Statistics::reset();
@@ -369,7 +369,7 @@ namespace PoissonSolverFactory
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     PoissonSolverFactory::main(argc, argv);
@@ -384,5 +384,5 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

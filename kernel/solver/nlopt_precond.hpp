@@ -15,7 +15,7 @@ namespace FEAT
   namespace Solver
   {
     /**
-     * \brief Abstract base class for preconditioners for nonlinear optimisation
+     * \brief Abstract base class for preconditioners for nonlinear optimization
      *
      * \tparam VectorType_
      * The type of vectors the preconditioner acts upon.

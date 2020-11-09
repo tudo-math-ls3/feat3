@@ -389,7 +389,7 @@ namespace FEAT
     }; // template class TupleMatrixRow
 
     /// \cond internal
-    // specialisation for a single sub-matrix
+    // specialization for a single sub-matrix
     template<typename First_>
     class TupleMatrixRow<First_>
     {
@@ -645,7 +645,7 @@ namespace FEAT
     class TupleMatrixElement
     {
     public:
-      static_assert(i_ > 0, "invalid row index"); // i_=0 is specialised below
+      static_assert(i_ > 0, "invalid row index"); // i_=0 is specialized below
       static_assert(j_ >= 0, "invalid column index");
 
       typedef typename TupleMatrixElement<i_-1, j_, RestRows_...>::Type Type;
@@ -664,8 +664,8 @@ namespace FEAT
     };
 
     /// \cond internal
-    // specialisation for i_ = 0;
-    // Note: This specialisation explicitly assumes that 'FirstRow_' is an instance of
+    // specialization for i_ = 0;
+    // Note: This specialization explicitly assumes that 'FirstRow_' is an instance of
     // 'TupleMatrixRow', which is ensured by a static_assert in the TupleMatrix class.
     template<int j_, typename First_, typename... Rest_, typename... RestRows_>
     class TupleMatrixElement<0, j_, TupleMatrixRow<First_, Rest_...>, RestRows_... >
@@ -1095,7 +1095,7 @@ namespace FEAT
     }; // template class TupleMatrix
 
     /// \cond internal
-    // specialisation for 1 row
+    // specialization for 1 row
     template<typename FirstRow_>
     class TupleMatrix<FirstRow_>
     {

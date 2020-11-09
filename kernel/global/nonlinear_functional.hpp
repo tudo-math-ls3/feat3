@@ -193,7 +193,7 @@ namespace FEAT
         void init()
         {
           _nonlinear_functional.init_pre_sync();
-          // Synchronise the necessary parts
+          // Synchronize the necessary parts
           while(!_nonlinear_functional.sync_scalars.empty())
           {
             auto it = _nonlinear_functional.sync_scalars.begin();
@@ -230,7 +230,7 @@ namespace FEAT
           // Prepare the patch local nonlinear functional, computing everything that does need synchronising
           _nonlinear_functional.prepare_pre_sync(vec_state.local(), filter.local());
 
-          // Synchronise the necessary parts
+          // Synchronize the necessary parts
           while(!_nonlinear_functional.sync_scalars.empty())
           {
             auto it = _nonlinear_functional.sync_scalars.begin();
@@ -281,7 +281,7 @@ namespace FEAT
                 for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
                 {
                   Index idense(slip_filter_vector.indices()[isparse]);
-                  tmp_elements[idense].normalise();
+                  tmp_elements[idense].normalize();
                   sfv_elements[isparse] = tmp_elements[idense];
 
                 }
@@ -357,7 +357,7 @@ namespace FEAT
             fval += get_penalty_param()*DataType(0.5)*Math::sqr(constraint);
           }
 
-          // Synchronise the gradient vector
+          // Synchronize the gradient vector
           grad.sync_0();
         }
 

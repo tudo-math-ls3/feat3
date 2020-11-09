@@ -21,9 +21,9 @@ namespace FEAT
   {
 
     /**
-     * \brief Baseclass for mesh optimisation algorithms
+     * \brief Baseclass for mesh optimization algorithms
      *
-     * This abstract class is the baseclass for all mesh optimisation algorithms, which can be direct, variational
+     * This abstract class is the baseclass for all mesh optimization algorithms, which can be direct, variational
      * or something entirely different.
      *
      * \tparam TrafoType_
@@ -36,7 +36,7 @@ namespace FEAT
     class MeshQualityFunctional
     {
       public:
-        /// Type of the mesh to optimise
+        /// Type of the mesh to optimize
         typedef MeshType_ MeshType;
         /// Our datatype
         typedef typename MeshType::CoordType CoordType;
@@ -64,7 +64,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] mesh_node_
-         * The RootMeshNode this mesh optimiser will refer to.
+         * The RootMeshNode this mesh optimizer will refer to.
          *
          */
         explicit MeshQualityFunctional(Geometry::RootMeshNode<MeshType>* mesh_node_) :
@@ -217,14 +217,14 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs one-time initialisations
+         * \brief Performs one-time initializations
          *
-         * Because of the whole class inheritance hierarchy, some one time initialisations cannot be performed in the
+         * Because of the whole class inheritance hierarchy, some one time initializations cannot be performed in the
          * constructors.
          */
         virtual void init() = 0;
 
-        ///// \brief Prepares the mesh optimiser for application
+        ///// \brief Prepares the mesh optimizer for application
         //virtual void prepare(VectorTypeR&) = 0;
 
         /**

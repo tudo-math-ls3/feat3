@@ -292,7 +292,7 @@ namespace FEAT
             if(!chart.can_explicit())
               return false;
 
-            // Try to fetch the parametrisation attribute.
+            // Try to fetch the parametrization attribute.
             const AttributeSetType* attrib = part.find_attribute("param");
             if(attrib == nullptr)
               return false;

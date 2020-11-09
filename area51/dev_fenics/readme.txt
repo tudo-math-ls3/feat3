@@ -1,4 +1,4 @@
-This folder contains FEniCS sample code for mesh optimisation/smoothing.
+This folder contains FEniCS sample code for mesh optimization/smoothing.
 The classes and routines mimick the ones implemented in C++ in FEAT3 and are
 for comparison purposes and "trying things, quick and dirty".
 

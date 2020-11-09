@@ -329,7 +329,7 @@ namespace FEAT
       explicit DenseVector(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        deserialise<DT2_, IT2_>(input);
+        deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -480,34 +480,34 @@ namespace FEAT
       }
 
       /**
-       * \brief Deserialisation of complete container entity.
+       * \brief Deserialization of complete container entity.
        *
        * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void deserialise(std::vector<char> input)
+      void deserialize(std::vector<char> input)
       {
-        this->template _deserialise<DT2_, IT2_>(FileMode::fm_dv, input);
+        this->template _deserialize<DT2_, IT2_>(FileMode::fm_dv, input);
       }
 
       /**
-       * \brief Serialisation of complete container entity.
+       * \brief Serialization of complete container entity.
        *
-       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
        * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
        *
        * \returns A std::vector, containing the byte array.
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAT::LAFEM::Container::_serialise for details.
+       * See \ref FEAT::LAFEM::Container::_serialize for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialise(const LAFEM::SerialConfig& config = LAFEM::SerialConfig())
+      std::vector<char> serialize(const LAFEM::SerialConfig& config = LAFEM::SerialConfig())
       {
-        return this->template _serialise<DT2_, IT2_>(FileMode::fm_dv, config);
+        return this->template _serialize<DT2_, IT2_>(FileMode::fm_dv, config);
       }
 
       /**
@@ -711,7 +711,7 @@ namespace FEAT
         }
         case FileMode::fm_dv:
         case FileMode::fm_binary:
-          this->template _deserialise<double, std::uint64_t>(FileMode::fm_dv, file);
+          this->template _deserialize<double, std::uint64_t>(FileMode::fm_dv, file);
           break;
         default:
           XABORTM("Filemode not supported!");
@@ -777,7 +777,7 @@ namespace FEAT
         }
         case FileMode::fm_dv:
         case FileMode::fm_binary:
-          this->template _serialise<double, std::uint64_t>(FileMode::fm_dv, file);
+          this->template _serialize<double, std::uint64_t>(FileMode::fm_dv, file);
           break;
         default:
           XABORTM("Filemode not supported!");
@@ -834,7 +834,7 @@ namespace FEAT
 
       /**
        * \brief Create temporary object for direct data manipulation.
-       * \warning Be aware, that any synchronisation only takes place, when the object is destroyed!
+       * \warning Be aware, that any synchronization only takes place, when the object is destroyed!
        *
        * \param[in] index The index of the vector element.
        */

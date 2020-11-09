@@ -58,11 +58,11 @@ namespace DbgDistFileIO
     const std::uint64_t my_seed = 0xDEADBEEFC0DEBABEull ^ ((unsigned)comm.rank() * 17ull);
     const std::size_t my_size = 4*(1 + (comm.rank() % 5));
 
-    // initialise shared
+    // initialize shared
     shared1.resize(str_shared.size());
     memcpy(shared1.data(), str_shared.c_str(), str_shared.size());
 
-    // initialise buffer with random values
+    // initialize buffer with random values
     {
       Random rng(my_seed);
       buffer1.resize(my_size);
@@ -153,7 +153,7 @@ namespace DbgDistFileIO
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   DbgDistFileIO::main(/*argc, argv*/);
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

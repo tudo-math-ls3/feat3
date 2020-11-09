@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/geometry/factory.hpp>
-#include <kernel/geometry/intern/facet_neighbours.hpp>
+#include <kernel/geometry/intern/facet_neighbors.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 #include <kernel/geometry/index_calculator.hpp>
@@ -93,7 +93,7 @@ namespace FEAT
           > Type;
       }; // struct IndexSet<...>
 
-      typedef typename IndexSet<shape_dim, shape_dim-1>::Type NeighbourSetType;
+      typedef typename IndexSet<shape_dim, shape_dim-1>::Type NeighborSetType;
 
     protected:
       /// number of entities for each shape dimension
@@ -106,7 +106,7 @@ namespace FEAT
       IndexSetHolderType _index_set_holder;
 
       /// Information about cells sharing a facet
-      NeighbourSetType _neighbours;
+      NeighborSetType _neighbors;
 
     private:
       /// \brief Copy assignment operator declared but not implemented
@@ -125,7 +125,7 @@ namespace FEAT
       explicit ConformalMesh(const Index num_entities[]) :
         _vertex_set(num_entities[0]),
         _index_set_holder(num_entities),
-        _neighbours(num_entities[shape_dim])
+        _neighbors(num_entities[shape_dim])
       {
         for(int i(0); i <= shape_dim; ++i)
         {
@@ -145,7 +145,7 @@ namespace FEAT
       explicit ConformalMesh(Factory<ConformalMesh>& factory) :
         _vertex_set(factory.get_num_entities(0)),
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
-        _neighbours(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim])
+        _neighbors(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim])
       {
         // Compute entity counts
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
@@ -160,9 +160,9 @@ namespace FEAT
         // number of edges/faces might not be known until after fill_index_sets is called
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
-        // Fill neighbour information. This needs facet at cell information, so it needs to be called after
+        // Fill neighbor information. This needs facet at cell information, so it needs to be called after
         // fill_index_sets() etc.
-        fill_neighbours();
+        fill_neighbors();
 
       }
 
@@ -170,7 +170,7 @@ namespace FEAT
       ConformalMesh(ConformalMesh&& other) :
         _vertex_set(std::forward<VertexSetType>(other._vertex_set)),
         _index_set_holder(std::forward<IndexSetHolderType>(other._index_set_holder)),
-        _neighbours(std::forward<NeighbourSetType>(other._neighbours))
+        _neighbors(std::forward<NeighborSetType>(other._neighbors))
       {
         for(int i(0); i <= shape_dim; ++i)
         {
@@ -187,7 +187,7 @@ namespace FEAT
 
         _vertex_set = std::forward<VertexSetType>(other._vertex_set);
         _index_set_holder = std::forward<IndexSetHolderType>(other._index_set_holder);
-        _neighbours = std::forward<NeighbourSetType>(other._neighbours);
+        _neighbors = std::forward<NeighborSetType>(other._neighbors);
         for(int i(0); i <= shape_dim; ++i)
         {
           _num_entities[i] = other.get_num_entities(i);
@@ -204,7 +204,7 @@ namespace FEAT
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
-        return _vertex_set.bytes() + _index_set_holder.bytes() + _neighbours.bytes();
+        return _vertex_set.bytes() + _index_set_holder.bytes() + _neighbors.bytes();
       }
 
       /**
@@ -241,30 +241,30 @@ namespace FEAT
         return _num_entities[shape_dim];
       }
 
-      void fill_neighbours()
+      void fill_neighbors()
       {
         // Facet at cell index set
         auto& facet_idx = get_index_set<shape_dim, shape_dim -1>();
 
         XASSERTM(get_num_entities(shape_dim-1) == facet_idx.get_index_bound(), "mesh num_entities / index_set num_entities mismatch");
 
-        if(_neighbours.get_num_indices() == Index(0))
-          _neighbours = std::move(typename IndexSet<shape_dim, shape_dim-1>::Type(get_num_entities(shape_dim)));
+        if(_neighbors.get_num_indices() == Index(0))
+          _neighbors = std::move(typename IndexSet<shape_dim, shape_dim-1>::Type(get_num_entities(shape_dim)));
 
-        Intern::FacetNeighbours::compute(_neighbours, facet_idx);
+        Intern::FacetNeighbors::compute(_neighbors, facet_idx);
 
       }
 
-      /// \returns A reference to the facet neighbour relations
-      typename IndexSet<shape_dim, shape_dim-1>::Type& get_neighbours()
+      /// \returns A reference to the facet neighbor relations
+      typename IndexSet<shape_dim, shape_dim-1>::Type& get_neighbors()
       {
-        return _neighbours;
+        return _neighbors;
       }
 
-      /// \copydoc get_neighbours()
-      const typename IndexSet<shape_dim, shape_dim-1>::Type& get_neighbours() const
+      /// \copydoc get_neighbors()
+      const typename IndexSet<shape_dim, shape_dim-1>::Type& get_neighbors() const
       {
-        return _neighbours;
+        return _neighbors;
       }
 
       /// Returns a reference to the vertex set of the mesh.
@@ -337,7 +337,7 @@ namespace FEAT
       {
         RedundantIndexSetBuilder<ShapeType>::compute(_index_set_holder);
         NumEntitiesExtractor<shape_dim>::set_num_entities(_index_set_holder, _num_entities);
-        this->fill_neighbours();
+        this->fill_neighbors();
       }
 
       /**
@@ -385,7 +385,7 @@ namespace FEAT
     /* ************************************************************************************************************* */
 
     /**
-     * \brief Factory specialisation for ConformalMesh class template
+     * \brief Factory specialization for ConformalMesh class template
      *
      * \author Peter Zajac
      */

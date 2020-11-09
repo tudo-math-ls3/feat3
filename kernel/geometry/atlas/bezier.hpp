@@ -749,10 +749,10 @@ namespace FEAT
             }
           }
 
-          // If the point was far enough away from the interface, we can normalise the difference vector
+          // If the point was far enough away from the interface, we can normalize the difference vector
           if(best_distance_sqr > Math::sqr(Math::eps<DataType>()) && best_sign != DataType(0))
           {
-            grad_dist.normalise();
+            grad_dist.normalize();
             grad_dist *= -best_sign;
           }
           // If we are too close, we take the normal in the projected point. We do not ALWAYS do this because the
@@ -760,7 +760,7 @@ namespace FEAT
           else
           {
             grad_dist = DataType(-1)*best_nu;
-            grad_dist.normalise();
+            grad_dist.normalize();
             XASSERT(Math::abs(grad_dist.norm_euclid()-DataType(1)) < Math::sqrt(Math::eps<DataType>()));
           }
 

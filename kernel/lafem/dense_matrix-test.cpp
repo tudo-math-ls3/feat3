@@ -115,18 +115,18 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class DenseMatrixSerialiseTest
+class DenseMatrixSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 
 public:
 
-  DenseMatrixSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixSerialiseTest")
+  DenseMatrixSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixSerializeTest")
   {
   }
 
-  virtual ~DenseMatrixSerialiseTest()
+  virtual ~DenseMatrixSerializeTest()
   {
   }
 
@@ -140,16 +140,16 @@ public:
         test_mat(i,j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
       }
     }
-    auto kp = test_mat.serialise(LAFEM::SerialConfig(false, false));
+    auto kp = test_mat.serialize(LAFEM::SerialConfig(false, false));
     DenseMatrix<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, test_mat);
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = test_mat.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = test_mat.serialize(LAFEM::SerialConfig(true, false));
     DenseMatrix<Mem_, DT_, IT_> k1(zl);
     TEST_CHECK_EQUAL(k1, test_mat);
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zfp = test_mat.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-6)));
+    auto zfp = test_mat.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-6)));
     DenseMatrix<Mem_, DT_, IT_> k2(zfp);
     for(Index i(0) ; i < k2.rows() ; ++i)
     {
@@ -229,15 +229,15 @@ public:
     */
   }
 };
-DenseMatrixSerialiseTest<Mem::Main, float, unsigned int> cpu_dense_matrix_serialise_test_float_uint;
-DenseMatrixSerialiseTest<Mem::Main, double, unsigned int> cpu_dense_matrix_serialise_test_double_uint;
-DenseMatrixSerialiseTest<Mem::Main, float, unsigned long> cpu_dense_matrix_serialise_test_float_ulong;
-DenseMatrixSerialiseTest<Mem::Main, double, unsigned long> cpu_dense_matrix_serialise_test_double_ulong;
+DenseMatrixSerializeTest<Mem::Main, float, unsigned int> cpu_dense_matrix_serialize_test_float_uint;
+DenseMatrixSerializeTest<Mem::Main, double, unsigned int> cpu_dense_matrix_serialize_test_double_uint;
+DenseMatrixSerializeTest<Mem::Main, float, unsigned long> cpu_dense_matrix_serialize_test_float_ulong;
+DenseMatrixSerializeTest<Mem::Main, double, unsigned long> cpu_dense_matrix_serialize_test_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixSerialiseTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_serialise_test_float_uint;
-DenseMatrixSerialiseTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_serialise_test_double_uint;
-DenseMatrixSerialiseTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_serialise_test_float_ulong;
-DenseMatrixSerialiseTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_serialise_test_double_ulong;
+DenseMatrixSerializeTest<Mem::CUDA, float, unsigned int> cuda_dense_matrix_serialize_test_float_uint;
+DenseMatrixSerializeTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_serialize_test_double_uint;
+DenseMatrixSerializeTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_serialize_test_float_ulong;
+DenseMatrixSerializeTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_serialize_test_double_ulong;
 #endif
 
 template<

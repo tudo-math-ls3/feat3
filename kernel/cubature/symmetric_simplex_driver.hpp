@@ -27,7 +27,7 @@ namespace FEAT
     template<typename Shape_>
     class SymmetricSimplexDriver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<>
     class SymmetricSimplexDriver<Shape::Simplex<2> > :
       public DriverBase<Shape::Simplex<2> >

@@ -173,7 +173,7 @@ void run()
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int>, 2>();
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned long>, 2>();
@@ -183,5 +183,5 @@ int main(int argc, char ** argv)
 #ifdef FEAT_HAVE_MKL
   run<Algo::MKL, SparseMatrixCSR<Mem::Main, double, unsigned long>, 2>();
 #endif
-  Runtime::finalise();
+  Runtime::finalize();
 }

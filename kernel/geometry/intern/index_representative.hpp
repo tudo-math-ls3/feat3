@@ -48,7 +48,7 @@ namespace FEAT
       };
 #endif // DOXYGEN
 
-      // specialisation for Hypercube<1>
+      // specialization for Hypercube<1>
       template<>
       struct IndexRepresentative< Shape::Hypercube<1> >
       {
@@ -62,7 +62,7 @@ namespace FEAT
         }
       }; // IndexRepresentative< Shape::Hypercube<1> >
 
-      // specialisation for Hypercube<2>
+      // specialization for Hypercube<2>
       template<>
       struct IndexRepresentative< Shape::Hypercube<2> >
       {
@@ -95,7 +95,7 @@ namespace FEAT
         }
       }; // IndexRepresentative< Shape::Hypercube<2> >
 
-      // specialisation for Simplex<1>
+      // specialization for Simplex<1>
       template<>
       struct IndexRepresentative< Shape::Simplex<1> >
       {
@@ -109,7 +109,7 @@ namespace FEAT
         }
       }; // IndexRepresentative< Shape::Simplex<1> >
 
-      // specialisation for Simplex<2>
+      // specialization for Simplex<2>
       template<>
       struct IndexRepresentative< Shape::Simplex<2> >
       {

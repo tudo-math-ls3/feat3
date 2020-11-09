@@ -164,9 +164,9 @@ namespace FEAT
 
     public:
       /**
-       * \brief Symbolic Initialisation
+       * \brief Symbolic Initialization
        *
-       * This function creates the HYPRE matrix and vector objects and initialises their
+       * This function creates the HYPRE matrix and vector objects and initializes their
        * structure/layout by using the algebraic DOF partitioning (ADP) that is managed by the
        * base-class. This function also performs an initial upload of the matrix and vector
        * values from the ADP structures (because HYPRE requires this), although these values
@@ -189,7 +189,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Numeric Initialisation
+       * \brief Numeric Initialization
        *
        * This function uploads the numerical values of the ADP matrix, which
        * is managed by the base-class, to the HYPRE matrix.
@@ -205,7 +205,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic Finalisation
+       * \brief Symbolic Finalization
        *
        * This function destroys all HYPRE objects managed by this class
        * and resets all auxiliary vectors and pointers.
@@ -402,7 +402,7 @@ namespace FEAT
       void* _solver;
 
       /// integer parameters:
-      // 0: factorisation level for ILU(k), default: 1
+      // 0: factorization level for ILU(k), default: 1
       int _iparam[1];
 
       /// double parameters:

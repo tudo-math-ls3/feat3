@@ -99,7 +99,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of Iso-Sphere trafo evaluator for Vertex shape
+       * \brief Specialization of Iso-Sphere trafo evaluator for Vertex shape
        *
        * \author Peter Zajac
        */
@@ -174,9 +174,9 @@ namespace FEAT
           // prepare base-class
           BaseClass::prepare(cell_index);
 
-          // fetch the vertex and normalise
+          // fetch the vertex and normalize
           _coeff = this->_trafo.get_mesh().get_vertex_set()[cell_index];
-          _coeff.normalise();
+          _coeff.normalize();
         }
 
         /**
@@ -198,7 +198,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of Iso-Sphere trafo evaluator for Simplex<1> shape
+       * \brief Specialization of Iso-Sphere trafo evaluator for Simplex<1> shape
        *
        * \author Peter Zajac
        */
@@ -296,9 +296,9 @@ namespace FEAT
           // get edge midpoint
           _coeffs[2] = _coeffs[0] + _coeffs[1];
 
-          // normalise all coefficients
+          // normalize all coefficients
           for(int i(0); i < 3; ++i)
-            _coeffs[i].normalise();
+            _coeffs[i].normalize();
         }
 
         /**
@@ -366,7 +366,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of Iso-Sphere trafo evaluator for Simplex<2> shape
+       * \brief Specialization of Iso-Sphere trafo evaluator for Simplex<2> shape
        *
        * \author Peter Zajac
        */
@@ -467,9 +467,9 @@ namespace FEAT
           _coeffs[4] = _coeffs[0] + _coeffs[2];
           _coeffs[5] = _coeffs[0] + _coeffs[1];
 
-          // normalise all coefficients
+          // normalize all coefficients
           for(int i(0); i < 6; ++i)
-            _coeffs[i].normalise();
+            _coeffs[i].normalize();
         }
 
         /**
@@ -556,7 +556,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of Iso-Sphere trafo evaluator for Hypercube<1> shape
+       * \brief Specialization of Iso-Sphere trafo evaluator for Hypercube<1> shape
        *
        * \author Peter Zajac
        */
@@ -654,9 +654,9 @@ namespace FEAT
           // compute edge midpoints
           _coeffs[2] = _coeffs[0] + _coeffs[1];
 
-          // normalise all coefficients
+          // normalize all coefficients
           for(int i(0); i < 3; ++i)
-            _coeffs[i].normalise();
+            _coeffs[i].normalize();
         }
 
         /**
@@ -723,7 +723,7 @@ namespace FEAT
       /* ************************************************************************************* */
 
       /**
-       * \brief Specialisation of Iso-Sphere trafo evaluator for Hypercube<2> shape
+       * \brief Specialization of Iso-Sphere trafo evaluator for Hypercube<2> shape
        *
        * \author Peter Zajac
        */
@@ -829,9 +829,9 @@ namespace FEAT
           // compute quad midpoint
           _coeffs[8] = _coeffs[0] + _coeffs[1] + _coeffs[2] + _coeffs[3];
 
-          // normalise all coefficients
+          // normalize all coefficients
           for(int i(0); i < 9; ++i)
-            _coeffs[i].normalise();
+            _coeffs[i].normalize();
         }
 
         /**

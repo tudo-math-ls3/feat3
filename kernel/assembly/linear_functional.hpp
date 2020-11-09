@@ -72,9 +72,9 @@ namespace FEAT
         }
 
         /**
-         * \brief Point initialisation function
+         * \brief Point initialization function
          *
-         * This function is called to initialise the evaluator for a new evaluation point.
+         * This function is called to initialize the evaluator for a new evaluation point.
          *
          * \param[in] tau
          * The transformation data in the current evaluation point. \see Trafo::EvalData

@@ -40,7 +40,7 @@ namespace FEAT
     class Parti2Lvl;
 
     /**
-     * \brief 2-Level-Partitioner class template specialisation for ConformalMesh
+     * \brief 2-Level-Partitioner class template specialization for ConformalMesh
      *
      * This class implements a <em>2-Level-Partitioner</em>, i.e. a simple partitioner
      * that exploits the 2-level refinement algorithm and numbering.

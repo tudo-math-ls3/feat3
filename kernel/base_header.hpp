@@ -59,7 +59,7 @@
 #define FORCE_INLINE inline
 #endif
 
-// If the compiler does not support a loop vectorisation specifier, we'll define it as an empty macro.
+// If the compiler does not support a loop vectorization specifier, we'll define it as an empty macro.
 #ifndef FEAT_PRAGMA_IVDEP
 #define FEAT_PRAGMA_IVDEP
 #endif

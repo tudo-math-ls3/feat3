@@ -30,7 +30,7 @@ namespace FEAT
     template<typename Shape_>
     class LaufferD2Driver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<int dim_>
     class LaufferD2Driver<Shape::Simplex<dim_> > :
       public DriverBase<Shape::Simplex<dim_> >
@@ -113,7 +113,7 @@ namespace FEAT
     template<typename Shape_>
     class LaufferD4Driver DOXY({});
 
-    // Tetrahedron specialisation
+    // Tetrahedron specialization
     template<>
     class LaufferD4Driver<Shape::Simplex<3> > :
       public DriverBase<Shape::Simplex<3> >

@@ -24,7 +24,7 @@ namespace FEAT
      * A trafo data config class that specifies what data shall be supplied.
      *
      * \note
-     * When compiling in debug mode, all values are initialised to NaN.
+     * When compiling in debug mode, all values are initialized to NaN.
      *
      * \author Peter Zajac
      */

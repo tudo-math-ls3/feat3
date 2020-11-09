@@ -1363,13 +1363,13 @@ namespace FEAT
       template<
         typename Shape_,
         int cell_dim_,
-        // The following "dummy" argument is necessary for partial specialisation;
+        // The following "dummy" argument is necessary for partial specialization;
         // shape_dim_ *must* coincide with Shape_::dimension !!!
         int shape_dim_ = Shape_::dimension>
       struct ShapeConvertIndexShapeWrapper
       {
         static_assert(shape_dim_ == Shape_::dimension, "invalid shape dimension");
-        // the case shape_dim_ = cell_dim_ is specialised below
+        // the case shape_dim_ = cell_dim_ is specialized below
         static_assert(shape_dim_ > cell_dim_, "invalid cell dimension");
         static_assert(cell_dim_ > 0, "invalid cell dimension");
 
@@ -1456,7 +1456,7 @@ namespace FEAT
         int cell_dim_ = Shape_::dimension>
       struct ShapeConvertIndexWrapper
       {
-        // the case cell_dim_ = 1 is handled by the partial specialisation below
+        // the case cell_dim_ = 1 is handled by the partial specialization below
         static_assert(cell_dim_ > 1, "invalid cell dimension");
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
 

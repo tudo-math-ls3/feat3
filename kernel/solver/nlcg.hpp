@@ -85,12 +85,12 @@ namespace FEAT
      * \brief Nonlinear Conjugate Gradient method for finding a minimum of an functional's gradient
      *
      * \tparam Functional_
-     * Nonlinear Functional to minimise the gradient of
+     * Nonlinear Functional to minimize the gradient of
      *
      * \tparam Filter_
      * Filter to apply to the functional's gradient
      *
-     * See \cite NW06 for an overview of optimisation techniques.
+     * See \cite NW06 for an overview of optimization techniques.
      *
      * Possible update strategies for the search direction are Dai-Yuan \cite DY99, Fletcher-Reeves \cite FR64,
      * Hager-Zhang \cite HZ05, Hestenes-Stiefel \cite HS52 and Polak-Ribiere \cite PR64.

@@ -78,7 +78,7 @@ SET (test_list
   basic_solver-test
   cusolver-test
   hypre-test
-  optimiser-test
+  optimizer-test
   umfpack-test
   vanka-test
 )

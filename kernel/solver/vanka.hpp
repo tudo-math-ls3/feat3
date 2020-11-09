@@ -43,7 +43,7 @@ namespace FEAT
        * - Gather the local defect vector entries.
        * - Scatter the local correction vector entries.
        *
-       * Currently, the following specialisations exist:
+       * Currently, the following specializations exist:
        * - LAFEM::DenseVector<Mem::Main,...>
        * - LAFEM::PowerVector<...>
        *
@@ -59,7 +59,7 @@ namespace FEAT
        * - Gather the local matrix entries (full or diagonal only)
        * - Compute the local defect vector entries.
        *
-       * Currently, the following specialisations exist:
+       * Currently, the following specializations exist:
        * - LAFEM::SparseMatrixCSR<Mem::Main,...>
        * - LAFEM::PowerDiagMatrix<...>
        * - LAFEM::PowerFullMatrix<...>
@@ -259,7 +259,7 @@ namespace FEAT
             // get row index
             const IT_ ri = ridx[i];
 
-            // initialise loop variable for local columns
+            // initialize loop variable for local columns
             IT_ j = IT_(0);
 
             // loop over the ri row of our matrix
@@ -372,7 +372,7 @@ namespace FEAT
             // get row index
             const IT_ ri = ridx[i];
 
-            // initialise loop variable for local columns
+            // initialize loop variable for local columns
             IT_ j = IT_(0);
 
             // loop over the ri row of our matrix
@@ -911,7 +911,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Vanka Factorisation Error
+     * \brief Vanka Factorization Error
      *
      * This exception is thrown by the Vanka preconditioner if the inversion
      * of a local system failed. This indicates that the system matrix may
@@ -921,14 +921,14 @@ namespace FEAT
       public SolverException
     {
     public:
-      VankaFactorError() : SolverException("Vanka Factorisation Error") {}
+      VankaFactorError() : SolverException("Vanka Factorization Error") {}
     };
 
     /**
      * \brief Vanka preconditioner/smoother class template.
      *
      * This class template is only implemented for LAFEM::SaddlePointMatrix;
-     * see the documentation of the corresponding specialisation for information.
+     * see the documentation of the corresponding specialization for information.
      *
      * \author Peter Zajac
      */
@@ -991,9 +991,9 @@ namespace FEAT
      *   expensive and lead to faster convergence in most cases.
      * - If the pressure space is continuous, one should stick to the nodal variants.\n
      *   Moreover, never use full variants for continuous pressure spaces, as these may require
-     *   astronomical amounts of memory for the factorisation!
+     *   astronomical amounts of memory for the factorization!
      * - Diagonal variants usually require (significantly) less memory than full variants.
-     *   Therefore, when trying to configure a Vanka for a new type of problem and/or discretisation,
+     *   Therefore, when trying to configure a Vanka for a new type of problem and/or discretization,
      *   one should first try whether a diagonal variant works before trying a full variant.
      * - For more complex problems (like convection-dominant Navier-Stokes), the full variants
      *   are often more stable than the diagonal variants.
@@ -1062,16 +1062,16 @@ namespace FEAT
       std::vector<IndexType> _block_v_ptr, _block_v_idx;
       /// pressure block structure
       std::vector<IndexType> _block_p_ptr, _block_p_idx;
-      /// factorisation data
+      /// factorization data
       std::vector<DataType> _data;
       /// local defect/correction vectors
       std::vector<DataType> _vdef, _vcor;
       /// temporary vectors (additive types only)
       VectorType _vec_scale, _vec_tmp1, _vec_tmp2;
 
-      // stop watch for symbolic factorisation
+      // stop watch for symbolic factorization
       StopWatch watch_init_symbolic;
-      // stop watch for numeric factorisation
+      // stop watch for numeric factorization
       StopWatch watch_init_numeric;
       // stop watch for apply time
       StopWatch watch_apply;
@@ -1111,7 +1111,7 @@ namespace FEAT
         return "Vanka";
       }
 
-      /// Performs symbolic factorisation
+      /// Performs symbolic factorization
       virtual void init_symbolic() override
       {
         watch_init_symbolic.start();
@@ -1132,7 +1132,7 @@ namespace FEAT
         // compute velocity block graph
         this->_build_v_block();
 
-        // allocate memory for numerical factorisation
+        // allocate memory for numerical factorization
         this->_alloc_data();
 
         // allocate temporary vector for additive
@@ -1146,7 +1146,7 @@ namespace FEAT
         watch_init_symbolic.stop();
       }
 
-      /// Releases the symbolic factorisation data
+      /// Releases the symbolic factorization data
       virtual void done_symbolic() override
       {
         _vec_tmp2.clear();
@@ -1161,7 +1161,7 @@ namespace FEAT
         _block_p_idx.clear();
       }
 
-      /// Performs numeric factorisation
+      /// Performs numeric factorization
       virtual void init_numeric() override
       {
         watch_init_numeric.start();
@@ -1228,7 +1228,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the total accumulated time for symbolic initialisation.
+       * \brief Returns the total accumulated time for symbolic initialization.
        */
       double time_init_symbolic() const
       {
@@ -1236,7 +1236,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the total accumulated time for numeric initialisation.
+       * \brief Returns the total accumulated time for numeric initialization.
        */
       double time_init_numeric() const
       {
@@ -1405,7 +1405,7 @@ namespace FEAT
         }
       }
 
-      /// Allocates the data arrays for numerical factorisation
+      /// Allocates the data arrays for numerical factorization
       void _alloc_data()
       {
         // get the dimension of our system
@@ -1490,7 +1490,7 @@ namespace FEAT
         this->_vec_scale.component_invert(this->_vec_scale);
       }
 
-      /// Performs the 'full' numerical factorisation
+      /// Performs the 'full' numerical factorization
       void _factor_full()
       {
         Intern::VankaMatrix<MatrixA_> vanka_a(_matrix.block_a());
@@ -1692,7 +1692,7 @@ namespace FEAT
         Statistics::add_flops(flops);
       }
 
-      /// Performs the 'diagonal' numerical factorisation
+      /// Performs the 'diagonal' numerical factorization
       void _factor_diag()
       {
         Intern::VankaMatrix<MatrixA_> vanka_a(_matrix.block_a());

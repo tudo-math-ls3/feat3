@@ -142,7 +142,7 @@ namespace FEAT
       {
         BaseClass::init_symbolic();
 
-        // initialise preconditioners
+        // initialize preconditioners
         if(_precond_l)
           _precond_l->init_symbolic();
         if((_precond_r) && (_precond_r != _precond_l))
@@ -177,7 +177,7 @@ namespace FEAT
       {
         BaseClass::init_numeric();
 
-        // initialise preconditioners
+        // initialize preconditioners
         if(_precond_l)
           _precond_l->init_numeric();
         if((_precond_r) && (_precond_r != _precond_l))

@@ -163,7 +163,7 @@ namespace FEAT
         std::deque<String> _extern_parti_names;
         /// required number of elements per rank for a-posteriori partitioning
         int _required_elems_per_rank;
-        /// time for genetic partitioner initialisation
+        /// time for genetic partitioner initialization
         double _genetic_time_init;
         /// time for genetic partitioner mutation
         double _genetic_time_mutate;
@@ -865,12 +865,12 @@ namespace FEAT
           }
 
           // extract our patch
-          std::vector<int> neighbour_ranks;
+          std::vector<int> neighbor_ranks;
           std::shared_ptr<MeshNodeType> patch_mesh_node(
-            base_mesh_node->extract_patch(neighbour_ranks, ancestor.parti_graph, this->_comm.rank()));
+            base_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, this->_comm.rank()));
 
-          // set the neighbour ranks of our child layer
-          layer->set_neighbour_ranks(neighbour_ranks);
+          // set the neighbor ranks of our child layer
+          layer->set_neighbor_ranks(neighbor_ranks);
 
           // refine up to minimum level
           for(; lvl < ancestor.desired_level_min; ++lvl)
@@ -1089,15 +1089,15 @@ namespace FEAT
             }
 
             // extract our patch
-            std::vector<int> neighbour_ranks;
+            std::vector<int> neighbor_ranks;
             std::shared_ptr<MeshNodeType> patch_mesh_node(
-              base_mesh_node->extract_patch(neighbour_ranks, ancestor.parti_graph, ancestor.progeny_child));
+              base_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, ancestor.progeny_child));
 
-            // translate neighbour ranks by progeny group to obtain the neighbour ranks
+            // translate neighbor ranks by progeny group to obtain the neighbor ranks
             // w.r.t. this layer's communicator
             {
               std::map<int,int> halo_map;
-              for(auto& i : neighbour_ranks)
+              for(auto& i : neighbor_ranks)
               {
                 int old_i(i);
                 halo_map.emplace(old_i, i += ancestor.progeny_group);
@@ -1145,13 +1145,13 @@ namespace FEAT
             }
 
             // split the halos of our base-mesh and compute the halos of our patches from that
-            this->_split_basemesh_halos(ancestor, *base_mesh_node, *patch_mesh_node, neighbour_ranks);
+            this->_split_basemesh_halos(ancestor, *base_mesh_node, *patch_mesh_node, neighbor_ranks);
 
             // does this process participate in the child layer?
             if(ancestor.layer >= 0)
             {
-              // set the neighbour ranks in our child layer
-              this->_layers.at(std::size_t(ancestor.layer))->set_neighbour_ranks(neighbour_ranks);
+              // set the neighbor ranks in our child layer
+              this->_layers.at(std::size_t(ancestor.layer))->set_neighbor_ranks(neighbor_ranks);
             }
 
             // set chosen minimum level for this layer
@@ -1210,14 +1210,14 @@ namespace FEAT
          * \param[inout] patch_mesh_node
          * The patch-mesh node that represents the partition whose halos are to be computed.
          *
-         * \param[inout] neighbour_ranks
-         * The vector that receives the ranks of the new neighbours that derive from halo splitting.
+         * \param[inout] neighbor_ranks
+         * The vector that receives the ranks of the new neighbors that derive from halo splitting.
          */
         void _split_basemesh_halos(
           const Ancestor& ancestor,
           const MeshNodeType& base_mesh_node,
           MeshNodeType& patch_mesh_node,
-          std::vector<int>& neighbour_ranks)
+          std::vector<int>& neighbor_ranks)
         {
           // get the map of the base-mesh halos
           const std::map<int, MeshPartType*>& base_halo_map = base_mesh_node.get_halo_map();
@@ -1245,7 +1245,7 @@ namespace FEAT
             halo_sizes.push_back(halo_splitter.add_halo(it->first, *it->second));
           }
 
-          // This vector will receive the split halo data from all our potential neighbour processes
+          // This vector will receive the split halo data from all our potential neighbor processes
           std::vector<Index> halo_recv_data;
           std::vector<std::vector<Index>> halo_send_data;
 
@@ -1275,15 +1275,15 @@ namespace FEAT
               std::vector<std::vector<Index>> halo_split_data(num_halos);
               Dist::RequestVector send_reqs(num_halos);
 
-              // serialise all split halos
+              // serialize all split halos
               for(std::size_t i(0); i < num_halos; ++i)
               {
                 // skip empty halos
                 if(halo_sizes.at(i) == Index(0))
                   continue;
 
-                // serialise split halo data
-                halo_split_data.at(i) = halo_splitter.serialise_split_halo(halo_ranks[i], layer_rank);
+                // serialize split halo data
+                halo_split_data.at(i) = halo_splitter.serialize_split_halo(halo_ranks[i], layer_rank);
                 XASSERT(halo_split_data.at(i).size() == halo_sizes.at(i));
 
                 // send split data over to our parent process
@@ -1324,14 +1324,14 @@ namespace FEAT
                 // store child count as first entry of buffer
                 halo_buffer[0u] = num_halo_childs;
 
-                // initialise offset for first child
+                // initialize offset for first child
                 offset = num_halo_childs + Index(1);
                 Index coi = 0u; // child offset index
 
                 // collect my own split halo
                 if(sibl_halo_sizes.at(i) > Index(0))
                 {
-                  std::vector<Index> my_data(halo_splitter.serialise_split_halo(halo_ranks[i], layer_rank));
+                  std::vector<Index> my_data(halo_splitter.serialize_split_halo(halo_ranks[i], layer_rank));
                   std::size_t data_size = sibl_halo_sizes.at(i);
                   halo_buffer[++coi] = Index(offset);
                   for(std::size_t k(0); k < data_size; ++k)
@@ -1353,7 +1353,7 @@ namespace FEAT
                   // store offset for this child
                   halo_buffer[++coi] = Index(offset);
 
-                  // receive serialised data from this sibling
+                  // receive serialized data from this sibling
                   sibl_recv_reqs[j] = sibling_comm.irecv(&halo_buffer[offset], data_size, int(j));
                   offset += data_size;
                 }
@@ -1489,14 +1489,14 @@ namespace FEAT
               if(!halo_splitter.intersect_split_halo(halo_ranks[i], halo_recv_data, buffer_offset))
                 continue; // no intersection
 
-              // get the new neighbour's rank
-              const int neighbour_rank = int(halo_recv_data.at(buffer_offset));
+              // get the new neighbor's rank
+              const int neighbor_rank = int(halo_recv_data.at(buffer_offset));
 
-              // add the new neighbour to our list
-              neighbour_ranks.push_back(neighbour_rank);
+              // add the new neighbor to our list
+              neighbor_ranks.push_back(neighbor_rank);
 
               // create new mesh-part
-              patch_mesh_node.add_halo(neighbour_rank, new MeshPartType(halo_splitter));
+              patch_mesh_node.add_halo(neighbor_rank, new MeshPartType(halo_splitter));
             }
           }
         }
@@ -1677,7 +1677,7 @@ namespace FEAT
 
           // build element adjacency graph
           // connectivity by facets
-          /// \todo dirk: use centralised method for adj graph retrieval
+          /// \todo dirk: use centralized method for adj graph retrieval
           /// \todo dirk: does any partitioner need self-adjacencies? -> remove it in creation
           ///       peter: yes, other partitioners need self-adjacencies
           const auto dimension = MeshNodeType::MeshType::ShapeType::dimension;

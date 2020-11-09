@@ -217,7 +217,7 @@ namespace FEAT
         // r <- r + alpha*A*x
         _matrix.apply(r.local(), x.local(), r.local(), alpha);
 
-        // synchronise r
+        // synchronize r
         r.sync_0();
       }
 
@@ -232,7 +232,7 @@ namespace FEAT
         // r <- r + alpha*A*x
         _matrix.apply(r.local(), x.local(), r.local(), alpha);
 
-        // synchronise r
+        // synchronize r
         return r.sync_0_async();
       }
 
@@ -243,7 +243,7 @@ namespace FEAT
        * The vector receiving the lumped rows
        *
        * \param[in] sync
-       * Synchronise the lumped rows vector?
+       * Synchronize the lumped rows vector?
        *
        * Each entry in the returned lumped rows vector contains the the sum of all matrix elements in the
        * corresponding row.

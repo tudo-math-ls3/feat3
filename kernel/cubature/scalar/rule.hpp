@@ -65,7 +65,7 @@ namespace FEAT
         /**
          * \brief Constructor
          *
-         * This constructor allocates the weights and coords arrays, but does not initialise them.
+         * This constructor allocates the weights and coords arrays, but does not initialize them.
          *
          * \param[in] num_points
          * The number of points to be allocated.

@@ -94,7 +94,7 @@ namespace FEAT
        * \brief Creates a buffer matrix based on a BCSR template matrix.
        *
        * \param[in] matrix
-       * A reference to the template matrix. Its structure must be initialised,
+       * A reference to the template matrix. Its structure must be initialized,
        * but the numerical content is ignored
        *
        * \returns
@@ -111,7 +111,7 @@ namespace FEAT
        * \brief Creates a buffer matrix based on a CSR template matrix.
        *
        * \param[in] matrix
-       * A reference to the template matrix. Its structure must be initialised,
+       * A reference to the template matrix. Its structure must be initialized,
        * but the numerical content is ignored
        *
        * \returns
@@ -127,7 +127,7 @@ namespace FEAT
        * \brief Creates a buffer matrix based on an ELL template matrix.
        *
        * \param[in] matrix
-       * A reference to the template matrix. Its structure must be initialised,
+       * A reference to the template matrix. Its structure must be initialized,
        * but the numerical content is ignored
        *
        * \returns
@@ -143,7 +143,7 @@ namespace FEAT
        * \brief Creates a buffer matrix based on a banded template matrix.
        *
        * \param[in] matrix
-       * A reference to the template matrix. Its structure must be initialised,
+       * A reference to the template matrix. Its structure must be initialized,
        * but the numerical content is ignored
        *
        * \returns

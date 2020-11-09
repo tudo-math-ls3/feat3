@@ -47,7 +47,7 @@ struct MeshoptRAdaptApp
 
   /// The only transformation available is the standard P1 or Q1 transformation
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
-  /// FE space for the transformation. The mesh optimisation problem is solved on this
+  /// FE space for the transformation. The mesh optimization problem is solved on this
   typedef typename Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoFESpace;
 
   /// The domain level, including trafo and FE space
@@ -136,10 +136,10 @@ struct MeshoptRAdaptApp
     t_end = std::stod(t_end_p.first);
     XASSERT(t_end >= DataType(0));
 
-    // Get the mesh optimiser key from the application settings
-    auto meshoptimiser_key_p = app_settings_section->query("mesh_optimiser");
-    XASSERTM(meshoptimiser_key_p.second,
-    "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
+    // Get the mesh optimizer key from the application settings
+    auto meshoptimizer_key_p = app_settings_section->query("mesh_optimizer");
+    XASSERTM(meshoptimizer_key_p.second,
+    "ApplicationConfig section is missing the mandatory meshoptimizer entry!");
 
     // Get the application settings section
     auto domain_control_settings_section = application_config.query_section("DomainControlSettings");
@@ -189,7 +189,7 @@ struct MeshoptRAdaptApp
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
-      dom_ctrl, meshoptimiser_key_p.first, &meshopt_config, &solver_config);
+      dom_ctrl, meshoptimizer_key_p.first, &meshopt_config, &solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
 
@@ -301,8 +301,8 @@ struct MeshoptRAdaptApp
       }
     }
 
-    // Optimise the mesh
-    meshopt_ctrl->optimise();
+    // Optimize the mesh
+    meshopt_ctrl->optimize();
 
     // Write output again
     if(write_vtk)
@@ -346,22 +346,22 @@ struct MeshoptRAdaptApp
       String msg("");
       comm.print(msg);
 
-      msg = String("Optimised total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
+      msg = String("Optimized total volume").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol);
       comm.print(msg);
 
-      msg = String("Optimised QI min/mean").pad_back(pad_width,' ') + String(": ") + stringify_fp_sci(qi_min) + String(" / ") + stringify_fp_sci(qi_mean);
+      msg = String("Optimized QI min/mean").pad_back(pad_width,' ') + String(": ") + stringify_fp_sci(qi_min) + String(" / ") + stringify_fp_sci(qi_mean);
       comm.print(msg);
 
-      msg = String("Optimised worst edge angle").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_fix(edge_angle);
+      msg = String("Optimized worst edge angle").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_fix(edge_angle);
       comm.print(msg);
 
-      msg = String("Optimised cell size defect").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_sci(cell_size_defect);
+      msg = String("Optimized cell size defect").pad_back(pad_width, ' ' ) + String(": ") + stringify_fp_sci(cell_size_defect);
       comm.print(msg);
 
-      msg = String("Optimised lambda min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(lambda_min) + String(" / ") + stringify_fp_sci(lambda_max) ;
+      msg = String("Optimized lambda min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(lambda_min) + String(" / ") + stringify_fp_sci(lambda_max) ;
       comm.print(msg);
 
-      msg = String("Optimised vol fraction min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol_min) + " / " + stringify_fp_sci(vol_max);
+      msg = String("Optimized vol fraction min/max").pad_back(pad_width, ' ') + String(": ") + stringify_fp_sci(vol_min) + " / " + stringify_fp_sci(vol_max);
       comm.print(msg);
 
       msg = String("");
@@ -486,7 +486,7 @@ struct MeshoptRAdaptApp
       // Now prepare the functional
       meshopt_ctrl->prepare(new_coords);
 
-      meshopt_ctrl->optimise();
+      meshopt_ctrl->optimize();
 
       // Compute mesh velocity
       {
@@ -776,7 +776,7 @@ int run_app(int argc, char* argv[])
   PropertyMap meshopt_config;
   PropertyMap solver_config;
 
-  // If we are not in test mode, parse command line arguments, read files, synchronise streams
+  // If we are not in test mode, parse command line arguments, read files, synchronize streams
   if(test_number == 0)
   {
     // Read the application config file, required
@@ -795,7 +795,7 @@ int run_app(int argc, char* argv[])
       DistFileIO::read_common(synchstream_app_config, application_config_filename);
     }
 
-    // Parse the application config from the (synchronised) stream
+    // Parse the application config from the (synchronized) stream
     application_config.read(synchstream_app_config, true);
 
     // Get the application settings section
@@ -806,13 +806,13 @@ int run_app(int argc, char* argv[])
     auto mesh_files_p = app_settings_section->query("mesh_files");
     mesh_files = mesh_files_p.first.split_by_whitespaces();
 
-    // Read configuration for mesh optimisation to stream
+    // Read configuration for mesh optimization to stream
     auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
 
     XASSERTM(meshopt_config_filename_p.second,
     "ApplicationConfig section is missing the mandatory meshopt_config_file entry!");
 
-    comm.print("Reading mesh optimisation config from file "+meshopt_config_filename_p.first);
+    comm.print("Reading mesh optimization config from file "+meshopt_config_filename_p.first);
     DistFileIO::read_common(synchstream_meshopt_config, meshopt_config_filename_p.first);
     meshopt_config.read(synchstream_meshopt_config, true);
 
@@ -883,9 +883,9 @@ int run_app(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   int ret = run_app(argc, argv);
-  FEAT::Runtime::finalise();
+  FEAT::Runtime::finalize();
   return ret;
 }
 
@@ -913,7 +913,7 @@ static void read_test_application_config(std::stringstream& iss)
   //iss << "mesh_file = ./unit-square-tria.xml" << std::endl;
   //iss << "chart_file = ./moving_circle_chart.xml" << std::endl;
   //iss << "meshopt_config_file = ./meshopt_config.ini" << std::endl;
-  iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
+  iss << "mesh_optimizer = HyperelasticityDefault" << std::endl;
   iss << "solver_config_file = ./solver_config.ini" << std::endl;
   iss << "delta_t = 1e-2" << std::endl;
   iss << "t_end = 2e-2" << std::endl;

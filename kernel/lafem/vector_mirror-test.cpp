@@ -84,7 +84,7 @@ public:
       VectorType c1(Index(3), DT_(0));
       VectorType c2(Index(3), DT_(0));
 
-      // initialise local vectors
+      // initialize local vectors
       a1(Index(0), DT_(4));
       a1(Index(1), DT_(7));
       a1(Index(2), DT_(2));
@@ -95,7 +95,7 @@ public:
       c1(Index(1), DT_(5));
       c1(Index(2), DT_(2));
 
-      // initialise global vectors
+      // initialize global vectors
       a2(Index(0), DT_(7));
       a2(Index(1), DT_(9));
       a2(Index(2), DT_(3));

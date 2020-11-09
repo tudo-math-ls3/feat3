@@ -122,16 +122,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseVectorSerialiseTest
+class SparseVectorSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseVectorSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorSerialiseTest")
+  SparseVectorSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseVectorSerializeTest")
   {
   }
 
-  virtual ~SparseVectorSerialiseTest()
+  virtual ~SparseVectorSerializeTest()
   {
   }
 
@@ -155,29 +155,29 @@ public:
     SparseVector<Mem::Main, DT_, IT_> bin(FileMode::fm_sv, bs);
     TEST_CHECK_EQUAL(bin, a);
 
-    auto op = a.serialise(LAFEM::SerialConfig(false, false));
+    auto op = a.serialize(LAFEM::SerialConfig(false, false));
     SparseVector<Mem_, DT_, IT_> o(op);
     for (Index i(0) ; i < a.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(o(i), a(i), DT_(1e-5));
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = a.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = a.serialize(LAFEM::SerialConfig(true, false));
     SparseVector<Mem_, DT_, IT_> zlib(zl);
     for (Index i(0) ; i < a.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), a(i), DT_(1e-5));
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zf = a.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseVector<Mem_, DT_, IT_> zfp(zf);
     for (Index i(0) ; i < a.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), a(i), DT_(1e-4));
 #endif
   }
 };
-SparseVectorSerialiseTest<Mem::Main, float, Index> cpu_sparse_vector_serialise_test_float;
-SparseVectorSerialiseTest<Mem::Main, double, Index> cpu_sparse_vector_serialise_test_double;
-//SparseVectorSerialiseTest<Mem::Main, Index> cpu_sparse_vector_serialise_test_index;
+SparseVectorSerializeTest<Mem::Main, float, Index> cpu_sparse_vector_serialize_test_float;
+SparseVectorSerializeTest<Mem::Main, double, Index> cpu_sparse_vector_serialize_test_double;
+//SparseVectorSerializeTest<Mem::Main, Index> cpu_sparse_vector_serialize_test_index;
 #ifdef FEAT_HAVE_CUDA
-SparseVectorSerialiseTest<Mem::CUDA, float, Index> cuda_sparse_vector_serialise_test_float;
-SparseVectorSerialiseTest<Mem::CUDA, double, Index> cuda_sparse_vector_serialise_test_double;
-//SparseVectorSerialiseTest<Mem::CUDA, Index> cuda_sparse_vector_serialise_test_index;
+SparseVectorSerializeTest<Mem::CUDA, float, Index> cuda_sparse_vector_serialize_test_float;
+SparseVectorSerializeTest<Mem::CUDA, double, Index> cuda_sparse_vector_serialize_test_double;
+//SparseVectorSerializeTest<Mem::CUDA, Index> cuda_sparse_vector_serialize_test_index;
 #endif

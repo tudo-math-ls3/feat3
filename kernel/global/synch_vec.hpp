@@ -39,7 +39,7 @@ namespace FEAT
       bool _finished;
 
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
-      /// the vector to be synchronised
+      /// the vector to be synchronized
       VT_& _target;
       /// our communicator
       const Dist::Comm& _comm;
@@ -56,16 +56,16 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[inout] target
-       * The type-0 vector to be synchronised
+       * The type-0 vector to be synchronized
        *
        * \param[in] comm
        * The communicator
        *
        * \param[in] ranks
-       * The neighbour ranks within the communicator
+       * The neighbor ranks within the communicator
        *
        * \param[in] mirrors
-       * The vector mirrors to be used for synchronisation
+       * The vector mirrors to be used for synchronization
        */
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       SynchVectorTicket(VT_ & target, const Dist::Comm& comm, const std::vector<int>& ranks, const std::vector<VMT_> & mirrors) :
@@ -164,19 +164,19 @@ namespace FEAT
     }; // class SynchVectorTicket
 
     /**
-     * \brief Synchronises a type-0 vector
+     * \brief Synchronizes a type-0 vector
      *
      * \param[inout] target
-     * The type-0 vector to be synchronised
+     * The type-0 vector to be synchronized
      *
      * \param[in] comm
      * The communicator
      *
      * \param[in] ranks
-     * The neighbour ranks within the communicator
+     * The neighbor ranks within the communicator
      *
      * \param[in] mirrors
-     * The vector mirrors to be used for synchronisation
+     * The vector mirrors to be used for synchronization
      */
     template<typename VT_, typename VMT_>
     void synch_vector(VT_& target, const Dist::Comm& comm, const std::vector<int>& ranks, const std::vector<VMT_>& mirrors)

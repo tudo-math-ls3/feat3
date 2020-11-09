@@ -90,7 +90,7 @@ void run()
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   run<Algo::Generic, DenseMatrix<Mem::Main, float, Index> >();
   run<Algo::Generic, DenseMatrix<Mem::Main, double, Index> >();
 #ifdef FEAT_HAVE_MKL
@@ -101,5 +101,5 @@ int main(int argc, char ** argv)
   run<Algo::CUDA, DenseMatrix<Mem::CUDA, float, Index> >();
   run<Algo::CUDA, DenseMatrix<Mem::CUDA, double, Index> >();
 #endif
-  Runtime::finalise();
+  Runtime::finalize();
 }

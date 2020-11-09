@@ -141,7 +141,7 @@ namespace FEAT
     };
 
     /**
-     * \brief Partial specialisation of DofMappingSingleEntity for co-dimension zero
+     * \brief Partial specialization of DofMappingSingleEntity for co-dimension zero
      *
      * \author Peter Zajac
      */
@@ -284,7 +284,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for cell_dim_ = shape_dim_
+      // specialization for cell_dim_ = shape_dim_
       template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int cell_dim_>
       struct UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_, cell_dim_>
       {
@@ -315,7 +315,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for cell_dim_ = 0
+      // specialization for cell_dim_ = 0
       template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int shape_dim_>
       struct UniformDofMappingHelper<Shape_, Traits_, Tag_, 0, shape_dim_>
       {

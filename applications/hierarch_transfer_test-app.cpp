@@ -415,7 +415,7 @@ namespace HierarchTransferTestApp
 
 int main(int argc, char** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   try
   {
     HierarchTransferTestApp::run(argc, argv);
@@ -430,5 +430,5 @@ int main(int argc, char** argv)
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

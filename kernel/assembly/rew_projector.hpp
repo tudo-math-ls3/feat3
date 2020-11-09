@@ -112,7 +112,7 @@ namespace FEAT
         // allocate fine-mesh mass matrix
         typename AsmTraits::LocalMatrixType mass;
 
-        // pivot array for factorisation
+        // pivot array for factorization
         int pivot[mass.n];
 
         // create local vector data
@@ -195,7 +195,7 @@ namespace FEAT
           space_eval.finish();
           trafo_eval.finish();
 
-          // try to factorise the local mass matrix
+          // try to factorize the local mass matrix
           Math::invert_matrix(num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
 
           // solve M*x=f

@@ -124,9 +124,9 @@ namespace FEAT
           String solver_name;
           /// The solver
           std::shared_ptr<Solver::SolverBase<GlobalSystemVectorR>> solver;
-          /// Whether to reassemble the system matrix in every call of optimise
+          /// Whether to reassemble the system matrix in every call of optimize
           const bool fixed_reference_domain;
-          /// The level index (= number of refinements since the mesh file) to optimise the mesh on
+          /// The level index (= number of refinements since the mesh file) to optimize the mesh on
           int meshopt_lvl;
           /// The position of this level in the deque of system levels
           size_t meshopt_lvl_pos;
@@ -138,7 +138,7 @@ namespace FEAT
            * The domaincontrol holding all geometry information for all levels
            *
            * \param[in] meshopt_lvl_
-           * Index of the level to perform the mesh optimisation on
+           * Index of the level to perform the mesh optimization on
            *
            * \param[in] dirichlet_list
            * List of meshpart identifiers for Dirichlet boundary conditions
@@ -183,7 +183,7 @@ namespace FEAT
 
               XASSERT(meshopt_lvl<= dom_ctrl.max_level_index());
 
-              // Now find the position of the coarsest mesh optimisation level in the domain levels
+              // Now find the position of the coarsest mesh optimization level in the domain levels
               for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
               {
                 if(dom_ctrl.at(i)->get_level_index() == meshopt_lvl)
@@ -239,10 +239,10 @@ namespace FEAT
               solver = Solver::SolverFactory::create_scalar_solver(
                 _mst, &solver_config, solver_name, meshopt_lvl_pos);
 
-              // Now initialise the multigrid hierarchy in the MatrixStock
+              // Now initialize the multigrid hierarchy in the MatrixStock
               _mst.hierarchy_init();
 
-              // After this, we can initialise the solver
+              // After this, we can initialize the solver
               solver->init();
             }
 
@@ -285,7 +285,7 @@ namespace FEAT
               + stringify(this->_dom_ctrl.max_level_index()) + String(" / ")
               + stringify(this->_dom_ctrl.min_level_index()) + String("\n");
 
-            msg += String("optimisation on level").pad_back(pad_width, '.') + String(": ")
+            msg += String("optimization on level").pad_back(pad_width, '.') + String(": ")
               + stringify(meshopt_lvl) + String("\n");
 
             msg += String("Fixed reference domain").pad_back(pad_width, '.') + String(": ")
@@ -500,8 +500,8 @@ namespace FEAT
             return Solver::solve(*solver, vec_sol, vec_rhs, mat_sys, filter_sys);
           }
 
-          /// \copydoc BaseClass()::optimise()
-          virtual void optimise() override
+          /// \copydoc BaseClass()::optimize()
+          virtual void optimize() override
           {
             // Reassemble the system matrix
             init_numeric();
@@ -526,7 +526,7 @@ namespace FEAT
 
             the_system_level.local_functional.buffer_to_mesh();
 
-            //If the mesh was not optimised on the finest domain level, we now need to prolongate the solution by:
+            //If the mesh was not optimized on the finest domain level, we now need to prolongate the solution by:
             // - refine the coarse vertex set using the StandardRefinery
             // - copy the results to the CoordsBuffer
             // - convert the CoordsBuffer to a vector type that we can filter with the system's Dirichlet filter
@@ -584,7 +584,7 @@ namespace FEAT
               _system_levels.at(pos)->local_functional.buffer_to_mesh();
             }
 
-          } // void optimise()
+          } // void optimize()
       };
 
     } // namespace Meshopt

@@ -20,7 +20,7 @@ namespace FEAT
     /**
      * \brief FGMRES(k) solver implementation
      *
-     * This class implements the Restarted Flexible Generalised Minimal Residual solver (FGMRES(k)).
+     * This class implements the Restarted Flexible Generalized Minimal Residual solver (FGMRES(k)).
      *
      * \see
      * Y. Saad: A flexible inner-outer preconditioned GMRES algorithm;
@@ -260,7 +260,7 @@ namespace FEAT
           _c.clear();
           _q.push_back(this->_def_cur);
 
-          // normalise v[0]
+          // normalize v[0]
           this->_vec_v.at(0).scale(this->_vec_v.at(0), DataType(1) / _q.back());
 
           // inner GMRES loop
@@ -287,7 +287,7 @@ namespace FEAT
               this->_vec_v.at(i+1).axpy(this->_vec_v.at(k), this->_vec_v.at(i+1), -this->_h.at(i).at(k));
             }
 
-            // normalise v[i+1]
+            // normalize v[i+1]
             DataType alpha = this->_vec_v.at(i+1).norm2();
             this->_vec_v.at(i+1).scale(this->_vec_v.at(i+1), DataType(1) / alpha);
 

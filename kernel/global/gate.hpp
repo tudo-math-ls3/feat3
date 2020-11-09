@@ -131,7 +131,7 @@ namespace FEAT
 
       void compile(LocalVector_&& vector)
       {
-        // initialise frequency vector
+        // initialize frequency vector
         _freqs = std::move(vector);
         _freqs.format(DataType(1));
 
@@ -157,7 +157,7 @@ namespace FEAT
        * On entry, the type-1 vector to be converted.
        * On exit, the converted type-0 vector.
        *
-       * \note This function does not perform any synchronisation.
+       * \note This function does not perform any synchronization.
        */
       void from_1_to_0(LocalVector_& vector) const
       {
@@ -168,11 +168,11 @@ namespace FEAT
       }
 
       /**
-       * \brief Synchronises a type-0 vector, resulting in a type-1 vector.
+       * \brief Synchronizes a type-0 vector, resulting in a type-1 vector.
        *
        * \param[inout] vector
-       * On entry, the type-0 vector to be synchronised.\n
-       * On exit, the synchronised type-1 vector.
+       * On entry, the type-0 vector to be synchronized.\n
+       * On exit, the synchronized type-1 vector.
        */
       void sync_0(LocalVector_& vector) const
       {
@@ -188,11 +188,11 @@ namespace FEAT
       }
 
       /**
-       * \brief Synchronises a type-1 vector, resulting in a type-1 vector.
+       * \brief Synchronizes a type-1 vector, resulting in a type-1 vector.
        *
        * \param[inout] vector
-       * On entry, the type-1 vector to be synchronised.\n
-       * On exit, the synchronised type-1 vector.
+       * On entry, the type-1 vector to be synchronized.\n
+       * On exit, the synchronized type-1 vector.
        *
        * \note
        * This function effectively applies the from_1_to_0() and sync_0()
@@ -214,7 +214,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Computes a synchronised dot-product of two type-1 vectors.
+       * \brief Computes a synchronized dot-product of two type-1 vectors.
        *
        * \param[in] x, y
        * The two type-1 vector whose dot-product is to be computed.
@@ -229,12 +229,12 @@ namespace FEAT
         {
           return x.dot(y);
         }
-        // Even if there are no neighbours, we still need to sum up globally
+        // Even if there are no neighbors, we still need to sum up globally
         else if(_ranks.empty())
         {
           return sum(x.dot(y));
         }
-        // If there are neighbours, we have to use the frequencies and sum up globally
+        // If there are neighbors, we have to use the frequencies and sum up globally
         else
         {
           return sum(_freqs.triple_dot(x, y));

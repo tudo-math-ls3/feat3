@@ -664,7 +664,7 @@ namespace FEAT
       }
     }; // class SSORPrecond<SparseMatrixBCSR<Mem::CUDA>>
 
-    /// Dummy class for not implemented specialisations
+    /// Dummy class for not implemented specializations
     template<typename Matrix_, typename Filter_>
     class SSORPrecond :
       public SolverBase<typename Matrix_::VectorTypeL>

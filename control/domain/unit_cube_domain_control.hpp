@@ -48,8 +48,8 @@ namespace FEAT
           std::shared_ptr<MeshNodeType> mesh_node;
           int lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(rank, Math::max(nprocs,1), mesh_node, ranks);
 
-          // set front layer neighbour ranks
-          this->_layers.front()->set_neighbour_ranks(ranks);
+          // set front layer neighbor ranks
+          this->_layers.front()->set_neighbor_ranks(ranks);
 
           // adjust lvl_max and lvl_min
           lvl_max = Math::max(lvl_max, 0);
@@ -192,20 +192,20 @@ namespace FEAT
             const int crank = _2lvl2lexi(layer.comm().rank(), csize);
 
             std::vector<int> ranks;
-            std::map<int,int> reranks; // neighbour rank map: lexi -> 2lvl
+            std::map<int,int> reranks; // neighbor rank map: lexi -> 2lvl
 
             // create root mesh node
             std::shared_ptr<MeshNodeType> mesh_node;
             const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(crank, csize, mesh_node, ranks);
 
-            // translate neighbour ranks from lexi to 2lvl
+            // translate neighbor ranks from lexi to 2lvl
             _lexi22lvl(ranks, reranks, csize);
 
             // rename halos
             mesh_node->rename_halos(reranks);
 
-            // set layer neighbours
-            layer.set_neighbour_ranks(ranks);
+            // set layer neighbors
+            layer.set_neighbor_ranks(ranks);
 
             // create domain level
             laylevs.push_front(std::make_shared<LevelType>(base_lvl, mesh_node));
@@ -484,20 +484,20 @@ namespace FEAT
             const int crank = _2lvl2lexi(layer.comm().rank(), csize);
 
             std::vector<int> ranks;
-            std::map<int,int> reranks; // neighbour rank map: lexi -> 2lvl
+            std::map<int,int> reranks; // neighbor rank map: lexi -> 2lvl
 
             // create root mesh node
             std::shared_ptr<MeshNodeType> mesh_node;
             const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(crank, csize, mesh_node, ranks);
 
-            // translate neighbour ranks from lexi to 2lvl
+            // translate neighbor ranks from lexi to 2lvl
             _lexi22lvl(ranks, reranks, csize);
 
             // rename halos
             mesh_node->rename_halos(reranks);
 
-            // set layer neighbours
-            layer.set_neighbour_ranks(ranks);
+            // set layer neighbors
+            layer.set_neighbor_ranks(ranks);
 
             // create domain level
             laylevs.push_front(std::make_shared<LevelType>(base_lvl, mesh_node));

@@ -35,10 +35,10 @@ struct helperclass;
 /// \cond internal
 
 /**
- * \brief Test for Hyperelasticity-based mesh optimisation
+ * \brief Test for Hyperelasticity-based mesh optimization
  *
  * The input mesh consists of a single Rumpf reference cell of some target scaling. This is then rescaled and the
- * mesh optimiser is supposed to scale it back to the original scaling.
+ * mesh optimizer is supposed to scale it back to the original scaling.
  *
  * If the resulting cell is optimal in the defined sense, the Frobenius norm term should be zero and the determinant
  * should be 1 (mind the scaling from fac_det etc. in the functional!).
@@ -139,7 +139,7 @@ template
 
       // Dummy vector for rhs
       auto rhs = rumpflpumpfl.create_vector_r();
-      // Vector to save the gradient in for visualisation
+      // Vector to save the gradient in for visualization
       auto grad = rumpflpumpfl.create_vector_r();
       // Solver vector containing the initial guess
       auto new_coords = rumpflpumpfl.get_coords().clone(LAFEM::CloneMode::Deep);
@@ -165,7 +165,7 @@ template
       solver->set_tol_rel(Math::pow(Math::eps<DataType>(), DataType(0.9)));
       solver->correct(new_coords, rhs);
       solver->done();
-      // Compute functional value post optimisation
+      // Compute functional value post optimization
       DataType fval_post(0);
       rumpflpumpfl.eval_fval_cellwise(fval_post, &func_norm, &func_cof, &func_det);
 
@@ -179,14 +179,14 @@ template
       // Because of how the stability term depend on 1/det and det=1 for the identity mapping, this should be 2*fac_det
       TEST_CHECK_EQUAL_WITHIN_EPS(func_det, fac_det*DataType(2), eps);
 
-      // Now do the negative test: Change the functional in a nonsensical manner. Calling the optimiser should NOT
+      // Now do the negative test: Change the functional in a nonsensical manner. Calling the optimizer should NOT
       // give the correctly scaled element
       cell_functional->_fac_rec_det = DataType(0.6676);
 
       // Compute initial functional value
       rumpflpumpfl.eval_fval_cellwise(fval_pre, &func_norm, &func_cof, &func_det);
 
-      // Optimise again
+      // Optimize again
       rumpflpumpfl.init();
       rumpflpumpfl.prepare(new_coords, my_filter);
 
@@ -236,7 +236,7 @@ HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctiona
 //HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_1_u(1);
 //HyperelasticityFunctionalTest<double, Shape::Simplex<3>, Meshopt::RumpfFunctionalUnrolled, MyQualityFunctional> test_s3_2_u(2);
 
-/// \brief Specialisation for hypercubes
+/// \brief Specialization for hypercubes
 template<int shape_dim>
 struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
 {
@@ -264,7 +264,7 @@ struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
   }
 };
 
-/// \brief Specialisation for 2d simplices
+/// \brief Specialization for 2d simplices
 template<>
 struct helperclass< FEAT::Shape::Simplex<2> >
 {
@@ -291,7 +291,7 @@ struct helperclass< FEAT::Shape::Simplex<2> >
   }
 };
 
-/// \brief Specialisation for 3d simplices
+/// \brief Specialization for 3d simplices
 template<>
 struct helperclass< FEAT::Shape::Simplex<3> >
 {

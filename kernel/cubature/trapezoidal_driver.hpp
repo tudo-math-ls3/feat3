@@ -49,7 +49,7 @@ namespace FEAT
     template<typename Shape_>
     class TrapezoidalDriver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<int dim_>
     class TrapezoidalDriver<Shape::Simplex<dim_> > :
       public Intern::TrapezoidalDriverBase<Shape::Simplex<dim_> >
@@ -83,7 +83,7 @@ namespace FEAT
       }
     }; // class TrapezoidalDriver<Simplex<...>>
 
-    // Hypercube specialisation
+    // Hypercube specialization
     template<int dim_>
     class TrapezoidalDriver<Shape::Hypercube<dim_> > :
       public Intern::TrapezoidalDriverBase<Shape::Hypercube<dim_> >

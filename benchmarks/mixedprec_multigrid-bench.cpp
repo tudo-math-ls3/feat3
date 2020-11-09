@@ -23,7 +23,7 @@
 //
 // This code does not use any of FEAT's sophisticated containers, but implements
 // all linear algebra operations and assemblies by hand to allow for efficient
-// OpenMP parallelisation, which is crucial when working with emulated quad precision.
+// OpenMP parallelization, which is crucial when working with emulated quad precision.
 //
 // \author Peter Zajac
 //
@@ -83,7 +83,7 @@ namespace MixedPrecMultiGridBench
   // Note: we cannot use 'std::size_t' because OpenMP doesn't like that
   typedef long long int llint;
 
-  // minimum vector length for OpenMP parallelisation
+  // minimum vector length for OpenMP parallelization
 #define N_MIN_OMP 1000
 
   // assemble RHS vector by linearform evaluation
@@ -113,7 +113,7 @@ namespace MixedPrecMultiGridBench
     // pre-compute factor
     const F_ fac = F_(2*n+2) * (F_(1) - Math::cos(pi*h));
 
-    // initialise rhs entries
+    // initialize rhs entries
     FEAT_PRAGMA_OMP(parallel for if(n > N_MIN_OMP))
     for(llint i = 0; i < n; ++i)
     {
@@ -398,7 +398,7 @@ namespace MixedPrecMultiGridBench
     // assemble RHS
     assemble_rhs_sin(the_vec_rhs);
 
-    // initialise finest level stuff
+    // initialize finest level stuff
     copy(finest.vec_rhs, the_vec_rhs);
     format(finest.vec_sol);
 
@@ -437,7 +437,7 @@ namespace MixedPrecMultiGridBench
         return;
       }
 
-      // initialise multigrid vectors
+      // initialize multigrid vectors
       copy(levels.back().vec_rhs, finest.vec_def);
       copy(levels.back().vec_def, levels.back().vec_rhs);
       format(levels.back().vec_sol);
@@ -634,7 +634,7 @@ namespace MixedPrecMultiGridBench
 
 int main(int argc,char** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   MixedPrecMultiGridBench::main(argc, argv);
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

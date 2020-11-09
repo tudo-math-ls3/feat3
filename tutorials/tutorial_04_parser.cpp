@@ -416,7 +416,7 @@ namespace Tutorial04
     // Now we will parse the formulae for our PDE functions if the fparser library in enabled.
 
 #ifdef FEAT_HAVE_FPARSER
-    // Let's initialise our reference solution, the rhs and the dbc function formulae
+    // Let's initialize our reference solution, the rhs and the dbc function formulae
     // to empty strings
     String formula_u("");
     String formula_f("");
@@ -634,7 +634,7 @@ namespace Tutorial04
     else
     {
       // We have neither a boundary condition function nor a solution function, so we
-      // initialise homogeneous Dirichlet boundary conditions.
+      // initialize homogeneous Dirichlet boundary conditions.
       unit_asm.assemble(filter, space);
     }
 
@@ -665,7 +665,7 @@ namespace Tutorial04
       solver->set_plot_mode(Solver::PlotMode::iter);
     }
 
-    // Initialise the solver
+    // Initialize the solver
     solver->init();
 
     // Solve our linear system
@@ -721,8 +721,8 @@ namespace Tutorial04
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Initialise the runtime
-  Runtime::initialise(argc, argv);
+  // Initialize the runtime
+  Runtime::initialize(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #04: Parser" << std::endl;
@@ -730,6 +730,6 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial04::main(argc, argv);
 
-  // Finalise the runtime
-  return Runtime::finalise();
+  // Finalize the runtime
+  return Runtime::finalize();
 }

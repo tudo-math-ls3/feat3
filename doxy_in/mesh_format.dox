@@ -172,7 +172,7 @@ If the mesh file contains a 2D quadrilateral mesh, then the root node would be
 \endcode
 
 \section meshfile_charts Chart Description
-Charts are descriptions of geometric object like circles, spheres or splines, which are often used for parameterisation
+Charts are descriptions of geometric object like circles, spheres or splines, which are often used for parameterization
 of domain boundaries or ficticious boundaries within the domain.
 
 Each chart is embedded in a seperate <c>Chart</c> node, whose one and only attribute is the mandatory \b name attribute,
@@ -186,10 +186,10 @@ The Circle chart supports the following attributes:
 - \b midpoint (mandatory): the X- and Y-coordinates of the circle midpoint, separated by whitespace(s)
 - \b domain (optional): the left and right borders of the interval that is mapped onto the circle.
 
-\subsection meshfile_chart_circle_param Circle Parameterisation
+\subsection meshfile_chart_circle_param Circle Parameterization
 
 Let \f$m_x, m_y\f$ denote the coordinates of the circle midpoint, \f$r\f$ the circle radius and \f$d_L, d_R\f$
-the left and right domain interval borders, then the parameterisation of the circle is defined as follows:
+the left and right domain interval borders, then the parameterization of the circle is defined as follows:
 
 \f[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\f]
 \f[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\f]
@@ -433,7 +433,7 @@ Extruding a 2D \c Circle chart effectively yields a 3D cylinder:
 \endcode
 
 \section meshfile_mesh Root Mesh Description
-The \c RootMesh node defines the actual root mesh, i.e. the mesh that is used for the domain discretisation.
+The \c RootMesh node defines the actual root mesh, i.e. the mesh that is used for the domain discretization.
 Note that each mesh file can contain at most one root mesh.
 
 The \c RootMesh node has the following attributes:
@@ -583,7 +583,7 @@ and 1 hexahedron:
 Mesh-parts are used to represent certain regions of interest of the root mesh such as e.g. boundary regions.
 In the most simple case, a mesh-part consists only of a list of vertices, edges, etc. of the root mesh that are
 assigned to that mesh-part. In more complex cases, mesh parts may have their own topology as well as sets of attributes
-that are assigned to the mesh-part's vertices and can be used for e.g. boundary parameterisation.
+that are assigned to the mesh-part's vertices and can be used for e.g. boundary parameterization.
 
 A \c MeshPart node has the following attributes:
 - \b name (mandatory): a unique name for the mesh-part
@@ -593,7 +593,7 @@ A \c MeshPart node has the following attributes:
   - \c none: the mesh part does not have a topology
   - \c full: the full topology for the mesh-part is explicitly given
   - \c parent: the full topology is deducted automatically from the parent mesh
-- \b chart (optional): specifies the name of the chart for the parameterisation of the mesh-part.
+- \b chart (optional): specifies the name of the chart for the parameterization of the mesh-part.
 
 
 \subsection meshfile_meshpart_mapping Mapping Description
@@ -625,7 +625,7 @@ An \c Attribute node has two attributes:
 - \b name (mandatory): the name of the attribute set.
 - \b dim (mandatory): the dimension of an attribute, i.e. the number of values assigned to a vertex.
 
-One special case of an attribute is the parameterisation, which is represented by the name \c param,
+One special case of an attribute is the parameterization, which is represented by the name \c param,
 which is used to define the (root mesh) vertex coordinates via the chart that the mesh-part is assigned to.
 
 \subsection meshfile_meshpart_examples MeshPart Examples
@@ -650,7 +650,7 @@ used for the \ref meshfile_mesh_examples_2d_unit_square_quad root mesh to repres
 \subsubsection meshfile_meshpart_example_unit_circle 2D Unit-Circle Boundary Mesh-Part
 The following example mesh-part represents the parameterised boundary mesh-part of the
 \ref meshfile_mesh_examples_2d_unit_circle_tria root mesh.
-This mesh-part contains four vertices, where the first one is stored duplicated for the parameterisation, thus the
+This mesh-part contains four vertices, where the first one is stored duplicated for the parameterization, thus the
 total number of vertex indices is 5. The mesh-part contains all four boundary edges of the mesh.
 
 \code{.xml}

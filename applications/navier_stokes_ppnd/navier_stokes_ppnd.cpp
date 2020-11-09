@@ -1350,7 +1350,7 @@ namespace NavierStokesPP
         system_levels.at(i)->inverse_lumped_mass_velo.component_invert(system_levels.at(i)->inverse_lumped_mass_velo);
       }
 
-      // perform symbolic initialisation of Schur-complement matrix
+      // perform symbolic initialization of Schur-complement matrix
       if((i == Index(0)) || cfg.multigrid_s)
       {
         system_levels.at(i)->matrix_s.init_symbolic();
@@ -1427,7 +1427,7 @@ namespace NavierStokesPP
         // apply velocity filter onto inverse lumped mass matrix
         fil_loc_v.filter_cor(system_levels.at(i)->inverse_lumped_mass_velo.local());
 
-        // perform numeric initialisation of Schur-complement matrix
+        // perform numeric initialization of Schur-complement matrix
         if((i == Index(0)) || cfg.multigrid_s)
         {
           system_levels.at(i)->matrix_s.init_numeric();
@@ -1614,7 +1614,7 @@ namespace NavierStokesPP
     solver_a->set_max_iter(cfg.max_iter_a);
     solver_a->set_tol_rel(cfg.tol_rel_a);
 
-    // for the velocity multigrid/solver, we can only perform symbolic initialisation up to now:
+    // for the velocity multigrid/solver, we can only perform symbolic initialization up to now:
     if(cfg.multigrid_a)
     {
       multigrid_hierarchy_velo->init_symbolic();
@@ -1644,7 +1644,7 @@ namespace NavierStokesPP
     solver_s->set_tol_rel(0.99); // 'deactivation' of the relative tolerance
     solver_s->set_tol_abs(cfg.tol_abs_s/ (cfg.time_max / DataType(cfg.time_steps)));
 
-    // for the pressure multigrid, we can perform full initialisation:
+    // for the pressure multigrid, we can perform full initialization:
     if(cfg.multigrid_s)
     {
       multigrid_hierarchy_pres->init();
@@ -2050,7 +2050,7 @@ namespace NavierStokesPP
           }
 
           //
-          //  initialise linear solvers
+          //  initialize linear solvers
           //
           watch_sol_init.start();
           if(cfg.multigrid_a)
@@ -2725,7 +2725,7 @@ namespace NavierStokesPP
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     NavierStokesPP::main(argc, argv);
@@ -2740,5 +2740,5 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

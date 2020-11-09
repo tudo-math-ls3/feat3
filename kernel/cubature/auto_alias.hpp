@@ -35,7 +35,7 @@ namespace FEAT
     class AutoAlias
     {
     public:
-      /// Maximum specialised auto-degree parameter.
+      /// Maximum specialized auto-degree parameter.
       static constexpr int max_auto_degree = Intern::AutoDegree<Shape_>::max_degree;
 
       static String map(const String& name)

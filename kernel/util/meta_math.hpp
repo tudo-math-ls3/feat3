@@ -31,9 +31,9 @@ namespace FEAT
     template<int n_, int m_ = 0>
     struct Factorial
     {
-      // Ensure that the parameter m_ is non-negative. The case n_ = 0 is handled by specialisation below.
+      // Ensure that the parameter m_ is non-negative. The case n_ = 0 is handled by specialization below.
       static_assert(m_ >= 0, "parameter m_ must be non-negative");
-      // Ensure that n_ >= m_. The case m_ = n_ is handled by partial specialisation below.
+      // Ensure that n_ >= m_. The case m_ = n_ is handled by partial specialization below.
       static_assert(n_ > m_, "parameter m_ must not be greater than parameter n_");
 
       /// value of the factorial
@@ -41,7 +41,7 @@ namespace FEAT
     }; // struct Factorial<n_,m_>
 
     /// \cond internal
-    // partial specialisation for n_ = m_
+    // partial specialization for n_ = m_
     template<int n_>
     struct Factorial<n_, n_>
     {
@@ -49,7 +49,7 @@ namespace FEAT
       static constexpr int value = n_;
     }; // struct Factorial<n_,n_>
 
-    // explicit specialisation for n_ = m_ = 0; the partial specialisation above for n_ = m_ would return 0
+    // explicit specialization for n_ = m_ = 0; the partial specialization above for n_ = m_ would return 0
     template<>
     struct Factorial<0, 0>
     {
@@ -69,7 +69,7 @@ namespace FEAT
     template<int n_, int k_>
     struct Binomial
     {
-      // note: the valid cases k_ = 0 and k_ = n_ are specialised below
+      // note: the valid cases k_ = 0 and k_ = n_ are specialized below
       static_assert(k_ > 0, "parameter k_ must be non-negative");
       static_assert(n_ > k_, "parameter k_ must not be greater than parameter n_");
 
@@ -78,7 +78,7 @@ namespace FEAT
     }; // struct Binomial<n_,k_>
 
     /// \cond internal
-    // partial specialisation for k_ = n_
+    // partial specialization for k_ = n_
     template<int n_>
     struct Binomial<n_,n_>
     {
@@ -86,7 +86,7 @@ namespace FEAT
       static constexpr int value = 1;
     };
 
-    // partial specialisation for k_ = 0
+    // partial specialization for k_ = 0
     template<int n_>
     struct Binomial<n_, 0>
     {
@@ -94,7 +94,7 @@ namespace FEAT
       static constexpr int value = 1;
     };
 
-    // explicit specialisation for k_ = n_ = 0; this is only needed for disambiguation
+    // explicit specialization for k_ = n_ = 0; this is only needed for disambiguation
     template<>
     struct Binomial<0, 0>
     {

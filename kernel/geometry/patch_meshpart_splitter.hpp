@@ -31,13 +31,13 @@ namespace FEAT
      * \tparam Mesh_
      * The mesh type the MeshParts etc. refer to.
      *
-     * Generic class template. The implementations are in specialisations wrt. Mesh_.
+     * Generic class template. The implementations are in specializations wrt. Mesh_.
      */
     template<typename Mesh_>
     class PatchMeshPartSplitter;
 
     /**
-     * \brief Class for creating MeshParts referring to a patch BaseMesh, ConformalMesh specialisation.
+     * \brief Class for creating MeshParts referring to a patch BaseMesh, ConformalMesh specialization.
      *
      * \tparam Shape_
      * Shape type of the mesh cells
@@ -352,7 +352,7 @@ namespace FEAT
          *
          * The whole purpose of MeshPart topologies is to be different from the BaseMesh's topology. Think of the
          * polygon representing the boundary of a 2d domain. Then the last vertex in the last edge is the same as
-         * the first vertex in the first edge. Add a parametrisation variable. This needs to be different at the
+         * the first vertex in the first edge. Add a parametrization variable. This needs to be different at the
          * vertex from above depending from which edge it is referenced. This can be easily be achieved by adding
          * another vertex to the MeshPart and changing the topology accordingly, meaning the last edge's last vertex
          * gets mapped to the new vertex.

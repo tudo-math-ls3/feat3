@@ -35,9 +35,9 @@ using namespace FEAT;
 using namespace FEAT::Solver;
 
 /**
- * \brief Tool for debugging of nonlinear optimisers
+ * \brief Tool for debugging of nonlinear optimizers
  *
- * The tool can be used for testing nonlinear optimisers on a few well-known functions. It has been used for
+ * The tool can be used for testing nonlinear optimizers on a few well-known functions. It has been used for
  * nonlinear operators generated from AnalyticFunctions using the AnalyticFunctionOperator wrapper class. Have a look
  * at the Analytic::Common namespace candidates. There must be an implementation of a helper traits class in
  * kernel/solver/test_aux/function_traits.hpp specifying the real minima and a starting point.
@@ -48,7 +48,7 @@ using namespace FEAT::Solver;
  * interest and a polyline of all iterates so one can study the convergence behaviour of the solver.
  *
  * This can easily be extended to use nonlinear operators from other sources, but the whole plotting procedures
- * require that we optimise a scalar function in two or three variables.
+ * require that we optimize a scalar function in two or three variables.
  *
  */
 
@@ -67,7 +67,7 @@ int run(Solver_& solver, Operator_& op)
   typedef LAFEM::DenseVector<MemType, DataType, IndexType> VertexVectorType;
   typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VertexFieldVectorType;
 
-  typedef OptimisationTestTraits<DataType, FunctionType> TestTraitsType;
+  typedef OptimizationTestTraits<DataType, FunctionType> TestTraitsType;
 
   // Get an initial guess from the Traits class for the given function
   PointType starting_point(DataType(0));
@@ -117,7 +117,7 @@ int run(Solver_& solver, Operator_& op)
   // We need a dummy rhs
   auto rhs = op.create_vector_r();
 
-  // Solve the optimisation problem
+  // Solve the optimization problem
   solver->correct(sol, rhs);
 
   // Check the distance between solution and minimal points
@@ -230,7 +230,7 @@ int run(Solver_& solver, Operator_& op)
 
 static void display_help()
 {
-  std::cout << "dbg-nlopt: Nonlinear optimiser debugging tool." << std::endl;
+  std::cout << "dbg-nlopt: Nonlinear optimizer debugging tool." << std::endl;
   std::cout << "Required arguments:" << std::endl;
   std::cout << " --solver [String]: Available solvers are NLCG, NLSD" << std::endl;
 #ifdef FEAT_HAVE_ALGLIB
@@ -264,13 +264,13 @@ static void display_help()
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
 
   typedef Mem::Main MemType;
   typedef double DataType;
   typedef unsigned int IndexType;
 
-  // The analytic function we want to minimise. Look at the Analytic::Common namespace for other candidates.
+  // The analytic function we want to minimize. Look at the Analytic::Common namespace for other candidates.
   // There must be an implementation of a helper traits class in kernel/solver/test_aux/function_traits.hpp
   // specifying the real minima and a starting point.
   typedef Analytic::Common::RosenbrockFunction AnalyticFunctionType;
@@ -388,7 +388,7 @@ int main(int argc, char* argv[])
 
     // Clean up
     my_solver.reset();
-    Runtime::finalise();
+    Runtime::finalize();
     return ret;
   }
   else if(solver_name == "NLSD")
@@ -440,7 +440,7 @@ int main(int argc, char* argv[])
 
     // Clean up
     my_solver.reset();
-    Runtime::finalise();
+    Runtime::finalize();
     return ret;
   }
 #ifdef FEAT_HAVE_ALGLIB
@@ -451,7 +451,7 @@ int main(int argc, char* argv[])
     int ret = run(my_solver, my_op);
 
     my_solver.reset();
-    Runtime::finalise();
+    Runtime::finalize();
     return ret;
   }
   else if (solver_name == "ALGLIBMinCG")
@@ -474,7 +474,7 @@ int main(int argc, char* argv[])
     int ret = run(my_solver, my_op);
 
     my_solver.reset();
-    Runtime::finalise();
+    Runtime::finalize();
     return ret;
   }
 #endif // FEAT_HAVE_ALGLIB

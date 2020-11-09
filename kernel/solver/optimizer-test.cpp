@@ -23,7 +23,7 @@ using namespace FEAT::Solver;
 using namespace FEAT::TestSystem;
 
 /**
- * \brief Test class template for the nonlinear CG optimiser
+ * \brief Test class template for the nonlinear CG optimizer
  *
  * This has the analytic function and the linesearch as template parameters because not all linesearches are suitable
  * for all functions. Same with preconditioners.
@@ -36,7 +36,7 @@ class NLCGTest:
   public:
     typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
-    typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
+    typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
 
@@ -134,7 +134,7 @@ class NLCGTest:
       TestTraitsType::get_starting_point(starting_point);
       sol(0,starting_point);
 
-      // Solve the optimisation problem
+      // Solve the optimization problem
       solver->correct(sol, rhs);
 
       // From the traits class, get the set of minimal points
@@ -233,7 +233,7 @@ nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none"
 #endif
 
 /**
- * \brief Test class template for the nonlinear Steepest Descent optimiser
+ * \brief Test class template for the nonlinear Steepest Descent optimizer
  *
  * This has the analytic function and the linesearch as template parameters because not all linesearches are suitable
  * for all functions. Same with preconditioners.
@@ -246,7 +246,7 @@ class NLSDTest:
   public:
     typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
-    typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
+    typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
 
@@ -345,7 +345,7 @@ class NLSDTest:
       TestTraitsType::get_starting_point(starting_point);
       sol(0,starting_point);
 
-      // Solve the optimisation problem
+      // Solve the optimization problem
       solver->correct(sol, rhs);
 
       solver->done();
@@ -422,7 +422,7 @@ nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian");
 
 #ifdef FEAT_HAVE_ALGLIB
 /**
- * \brief Test class template for ALGLIB's lBFGS optimiser
+ * \brief Test class template for ALGLIB's lBFGS optimizer
  *
  */
 template < typename Mem_, typename DT_, typename IT_, typename Function_ >
@@ -432,7 +432,7 @@ class ALGLIBMinLBFGSTest:
   public:
     typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
-    typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
+    typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
 
@@ -482,7 +482,7 @@ class ALGLIBMinLBFGSTest:
       TestTraitsType::get_starting_point(starting_point);
       sol(0,starting_point);
 
-      // Solve the optimisation problem
+      // Solve the optimization problem
       solver->correct(sol, rhs);
 
       solver->done();
@@ -548,7 +548,7 @@ ALGLIBMinLBFGSTest<Mem::Main, double, unsigned int, Analytic::Common::GoldsteinP
 alg_lbfgs_gp_d(double(0.65), Index(15), Index(79));
 
 /**
- * \brief Test class template for ALGLIB's mincg optimiser
+ * \brief Test class template for ALGLIB's mincg optimizer
  *
  */
 template < typename Mem_, typename DT_, typename IT_, typename Function_ >
@@ -558,7 +558,7 @@ class ALGLIBMinCGTest:
   public:
     typedef AnalyticFunctionOperator<Mem_, DT_, IT_, Function_> OperatorType;
     typedef typename OperatorType::PointType PointType;
-    typedef OptimisationTestTraits<DT_, Function_> TestTraitsType;
+    typedef OptimizationTestTraits<DT_, Function_> TestTraitsType;
 
     typedef LAFEM::NoneFilterBlocked<Mem_, DT_, IT_, 2> FilterType;
 
@@ -611,7 +611,7 @@ class ALGLIBMinCGTest:
       TestTraitsType::get_starting_point(starting_point);
       sol(0,starting_point);
 
-      // Solve the optimisation problem
+      // Solve the optimization problem
       solver->correct(sol, rhs);
 
       solver->done();

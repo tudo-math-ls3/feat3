@@ -33,7 +33,7 @@ namespace FEAT
      *   'finer' v cycle and let the let the ConvertPrecond object call the 'coarser' v cycle as its own solver.
      *
      * \note
-     * This class template is specialised for Global::Matrix and Global::Filter instances below.
+     * This class template is specialized for Global::Matrix and Global::Filter instances below.
      *
      * \author Dirk Ribbrock
      */
@@ -136,7 +136,7 @@ namespace FEAT
 
 
     /**
-     * \brief Convert preconditioner specialisation for Global::Vector
+     * \brief Convert preconditioner specialization for Global::Vector
      */
     template<typename LocalVectorOuter_, typename LocalVectorInner_, typename MirrorOuter_, typename MirrorInner_>
     class ConvertPrecond<Global::Vector<LocalVectorOuter_, MirrorOuter_>, Global::Vector<LocalVectorInner_, MirrorInner_>> :

@@ -111,7 +111,7 @@ public:
     VectorType vec_rhs(vec_ref.clone(CloneMode::Layout));
     matrix.apply(vec_rhs, vec_ref);
 
-    // initialise sol vector
+    // initialize sol vector
     VectorType vec_sol(vec_ref.clone(CloneMode::Layout));
     vec_sol.format();
 

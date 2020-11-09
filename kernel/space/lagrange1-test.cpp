@@ -405,7 +405,7 @@ public:
       space_eval.finish();
       trafo_eval.finish();
 
-      // initialise dof-mapper
+      // initialize dof-mapper
       dof_mapping.prepare(cell);
 
       // test function loop

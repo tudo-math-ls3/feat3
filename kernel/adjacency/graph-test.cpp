@@ -5,7 +5,7 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/adjacency/colouring.hpp>
+#include <kernel/adjacency/coloring.hpp>
 #include <kernel/adjacency/permutation.hpp>
 
 using namespace FEAT;
@@ -314,18 +314,18 @@ public:
     }
   }
 
-  void test_constr_colour() const
+  void test_constr_color() const
   {
-    // test the creation out of a colouring object
+    // test the creation out of a coloring object
 
-    // colouring array
-    Index colour[15] =
+    // coloring array
+    Index color[15] =
     {
       1, 2, 1, 1, 3, 4, 2, 3, 1, 4, 4, 0, 0, 1, 2
     };
 
-    // create colouring object
-    Colouring col(15, colour);
+    // create coloring object
+    Coloring col(15, color);
 
     // construct graph
     Graph fcol(col.create_partition_graph());
@@ -343,9 +343,9 @@ public:
     // 3 |  .  .  .  . 10  .  . 11  .  .  .  .  .  .  .
     // 4 |  .  .  .  .  . 12  .  .  . 13 14  .  .  .  .
 
-    // corresponding colouring (see run()):
+    // corresponding coloring (see run()):
     // nodes:   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-    // colours: 1, 2, 1, 1, 3, 4, 2, 3, 1, 4, 4, 0, 0, 1, 2
+    // colors: 1, 2, 1, 1, 3, 4, 2, 3, 1, 4, 4, 0, 0, 1, 2
 
     const Index domain_ref[6] = {0, 2, 7, 10, 12, 15};
     const Index image_ref[15] =
@@ -714,8 +714,8 @@ public:
     // test permutation constructor
     test_constr_perm();
 
-    // test colour constructor
-    test_constr_colour();
+    // test color constructor
+    test_constr_color();
   }
 
 } graph_test;

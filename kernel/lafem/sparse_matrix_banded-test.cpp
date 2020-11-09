@@ -154,16 +154,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixBandedSerialiseTest
+class SparseMatrixBandedSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  SparseMatrixBandedSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedSerialiseTest")
+  SparseMatrixBandedSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixBandedSerializeTest")
   {
   }
 
-  virtual ~SparseMatrixBandedSerialiseTest()
+  virtual ~SparseMatrixBandedSerializeTest()
   {
   }
 
@@ -203,17 +203,17 @@ public:
     SparseMatrixBanded<Mem_, DT_, IT_> f(FileMode::fm_bm, bs);
     TEST_CHECK_EQUAL(f, c);
 
-    auto kp = c.serialise(LAFEM::SerialConfig(false, false));
+    auto kp = c.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixBanded<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, c);
 
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = c.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = c.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixBanded<Mem_, DT_, IT_> zlib(zl);
     TEST_CHECK_EQUAL(zlib, c);
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zf = c.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixBanded<Mem_, DT_, IT_> zfp(zf);
     for(Index i(0); i < c.rows() ; ++i)
     {
@@ -225,15 +225,15 @@ public:
 #endif
   }
 };
-SparseMatrixBandedSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_serialise_test_float_ulong;
-SparseMatrixBandedSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_serialise_test_double_ulong;
-SparseMatrixBandedSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_serialise_test_float_uint;
-SparseMatrixBandedSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_serialise_test_double_uint;
+SparseMatrixBandedSerializeTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_banded_serialize_test_float_ulong;
+SparseMatrixBandedSerializeTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_banded_serialize_test_double_ulong;
+SparseMatrixBandedSerializeTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_banded_serialize_test_float_uint;
+SparseMatrixBandedSerializeTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_banded_serialize_test_double_uint;
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_serialise_test_float_ulong;
-SparseMatrixBandedSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_serialise_test_double_ulong;
-SparseMatrixBandedSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_serialise_test_float_uint;
-SparseMatrixBandedSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_serialise_test_double_uint;
+SparseMatrixBandedSerializeTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_banded_serialize_test_float_ulong;
+SparseMatrixBandedSerializeTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_banded_serialize_test_double_ulong;
+SparseMatrixBandedSerializeTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_banded_serialize_test_float_uint;
+SparseMatrixBandedSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_banded_serialize_test_double_uint;
 #endif
 
 template<

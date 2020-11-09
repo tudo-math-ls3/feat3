@@ -29,8 +29,8 @@ namespace FEAT
       public:
         /// this rule is not variadic
         static constexpr bool variadic = false;
-        /// disable tensorisation
-        static constexpr bool tensorise = false;
+        /// disable tensorization
+        static constexpr bool tensorize = false;
         /// this rule has 1 point
         static constexpr int num_points = 1;
 

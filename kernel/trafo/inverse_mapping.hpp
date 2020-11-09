@@ -204,7 +204,7 @@ namespace FEAT
        * \param[in] domain_tol
        * The coordinate tolerance for the unmapped domain points.
        *
-       * This constructor automatically initialises the bounding boxes and
+       * This constructor automatically initializes the bounding boxes and
        * sets the default parameters for the Newton iteration to:
        * - tolerance: eps^(0.9)
        * - max. iterations: 10
@@ -227,7 +227,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialises the cell bounding boxes array
+       * \brief Initializes the cell bounding boxes array
        *
        * \param[in] bbox_tol
        * The bounding box tolerance used for building the cell bounding boxes.
@@ -435,7 +435,7 @@ namespace FEAT
         // define the trafo eval data
         typename TrafoEvaluator::template ConfigTraits<trafo_tags>::EvalDataType trafo_data;
 
-        // initialise output domain point to cell centre
+        // initialize output domain point to cell centre
         for(int i(0); i < shape_dim; ++i)
           dom_point[i] = Shape::ReferenceCell<ShapeType>::template centre<DataType>(i);
 

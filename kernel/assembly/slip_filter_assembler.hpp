@@ -220,7 +220,7 @@ namespace FEAT
             //{
             //  Index j(nu.indices()[i]);
             //  tmp = nu(j);
-            //  tmp.normalise();
+            //  tmp.normalize();
 
             //  nu(j,tmp);
             //}
@@ -540,7 +540,7 @@ namespace FEAT
                   tmp += lagrange_1_vector(idx(shape, j));
 
                 tmp *= DataType(1)/DataType(idx.get_num_indices());
-                tmp.normalise();
+                tmp.normalize();
 
                 // prepare dof-assignment
                 dof_assign.prepare(shape);
@@ -569,7 +569,7 @@ namespace FEAT
                   tmp += lagrange_1_vector(idx(ts[shape], j));
 
                 tmp *= DataType(1)/DataType(idx.get_num_indices());
-                tmp.normalise();
+                tmp.normalize();
 
                 // prepare dof-assignment
                 dof_assign.prepare(ts[shape]);

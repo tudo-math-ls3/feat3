@@ -23,12 +23,12 @@ namespace FEAT
      * \brief Base-Class for Solvers based on Algebraic-DOF-Partitioning
      *
      * This class template specifies a common interface for solvers based on algebraic DOF partitioning.
-     * There are two specialisations of this class, which depend on the type of the system matrix.
+     * There are two specializations of this class, which depend on the type of the system matrix.
      *
      * \attention
      * This class is only defined for this doxygen documentation! There exists no generic implementation
-     * of this class template, but only the two specialisations for Global::Matrix and Global::PMDCDSCMatrix,
-     * however, both these specialisations implement the same protected interface, which is defined in
+     * of this class template, but only the two specializations for Global::Matrix and Global::PMDCDSCMatrix,
+     * however, both these specializations implement the same protected interface, which is defined in
      * this generic template.
      *
      * \tparam Matrix_
@@ -105,7 +105,7 @@ namespace FEAT
      * \brief Implementation of ADPSolverBase interface for Global::Matrix instances
      *
      * This class implements the ADPSolverBase interface for Global::Matrix instances, which derive
-     * from standard (scalar) finite element discretisations. Most of the dirty work is outsourced
+     * from standard (scalar) finite element discretizations. Most of the dirty work is outsourced
      * to the Global::AlgDofParti, Global::AlgDofPartiVector and Global::AlgDoPartiMatrix classes.
      *
      * \note
@@ -174,7 +174,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic Initialisation
+       * \brief Symbolic Initialization
        *
        * This function assembles the algebraic DOF partitioning, creates the ADP matrix,
        * uploads the matrix structure and creates the two ADP vectors.
@@ -201,7 +201,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Numeric Initialisation
+       * \brief Numeric Initialization
        *
        * This function uploads the numeric matrix values and
        * applies the filter onto the ADP matrix.
@@ -305,7 +305,7 @@ namespace FEAT
      *
      * This class implements the ADPSolverBase interface for Global::PMDCDSCMatrix instances,
      * which are used to implement the global Schur-complement matrices appearing in Navier-Stokes
-     * equations with discontinuous pressure spaces. The most prominent use of this specialisation
+     * equations with discontinuous pressure spaces. The most prominent use of this specialization
      * is the Pressure-Poisson-Problem solver of the infamous "PP" application.
      *
      * Most of the dirty work is outsourced to the Global::PMDCDSCMatrix class, most notably to

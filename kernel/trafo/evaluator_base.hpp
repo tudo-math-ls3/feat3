@@ -309,12 +309,12 @@ namespace FEAT
        * where
        * - \f$J_\tau\f$ is the Jacobian matrix of the transformation from the reference hypercube
        *   or a regular (equilateral) simplex, evaluated in the barycentre of that element.
-       * - \e v is the given (normalised) ray direction vector.
+       * - \e v is the given (normalized) ray direction vector.
        * - \e L is an appropriate scaling factor, which is chosen to ensure that this function
        *   returns a value of 1 for the unit element with all edge lengths equal to 1
        *
        * \param[in] ray
-       * A (normalised) direction vector. Must not be a null vector.
+       * A (normalized) direction vector. Must not be a null vector.
        *
        * \returns
        * The mesh width in direction of the input ray vector.

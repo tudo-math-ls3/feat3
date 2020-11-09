@@ -18,15 +18,15 @@ namespace FEAT
   {
 
     /**
-     * \brief Base class for line search based nonlinear optimisers
+     * \brief Base class for line search based nonlinear optimizers
      *
      * \tparam Functional_
-     * The nonlinear functional to be minimised
+     * The nonlinear functional to be minimized
      *
      * \tparam Filter_
      * The filters representing essential (boundary) conditions for the functional's state
      *
-     * This is the base class for all nonlinear optimisers which use line searches. These solvers try to minimise a
+     * This is the base class for all nonlinear optimizers which use line searches. These solvers try to minimize a
      * nonlinear functional (given by Op_) by finding critical points \f$x \f$, meaning
      * \f$ \mathrm{grad} \mathcal{F}(x) = 0.\f$
      * The line search methods can be based on Solver::Linesearch, or they can be implicit like the ones used by

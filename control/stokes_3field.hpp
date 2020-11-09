@@ -261,9 +261,9 @@ namespace FEAT
         this->gate_sys.set_comm(dom_layer.comm_ptr());
 
         // loop over all ranks
-        for(Index i(0); i < dom_layer.neighbour_count(); ++i)
+        for(Index i(0); i < dom_layer.neighbor_count(); ++i)
         {
-          int rank = dom_layer.neighbour_rank(i);
+          int rank = dom_layer.neighbor_rank(i);
 
           // try to find our halo
           auto* halo = dom_level.find_halo_part(rank);
@@ -459,7 +459,7 @@ namespace FEAT
           for(Index i(0); i < loc_prol.rows(); ++i)
             v_wb[i] = v_ws[i];
 
-          // synchronise blocked weight vector
+          // synchronize blocked weight vector
           this->gate_velo.sync_0(loc_vec_weight);
 
           // copy weights from blocked to scalar
@@ -518,7 +518,7 @@ namespace FEAT
           Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
             space_f, space_c, cubature);
 
-          // synchronise weight vector
+          // synchronize weight vector
           this->gate_pres.sync_0(loc_vec_weight);
 
           // invert components
@@ -588,7 +588,7 @@ namespace FEAT
           for(Index i(0); i < loc_prol.rows(); ++i)
             v_wb[i] = v_ws[i];
 
-          // synchronise blocked weight vector
+          // synchronize blocked weight vector
           this->gate_stress.sync_0(loc_vec_weight);
 
           // copy weights from blocked to scalar
@@ -677,12 +677,12 @@ namespace FEAT
         for(Index i(0); i < loc_trunc.rows(); ++i)
           v_wb[i] = v_ws[i];
 
-        // We now need to synchronise the weight vector in analogy to the prolongation matrix assembly.
-        // Note that the weight vector is now a coarse-level vector, so we need to synchronise over
+        // We now need to synchronize the weight vector in analogy to the prolongation matrix assembly.
+        // Note that the weight vector is now a coarse-level vector, so we need to synchronize over
         // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
         // level, as in this case we have to join/split around the synch operation.
 
-        // synchronise weight vector using the muxer/gate
+        // synchronize weight vector using the muxer/gate
         if(!virt_lvl_coarse.is_child())
         {
           // The coarse level is a simple (non-child) level that exists on all processes,
@@ -773,12 +773,12 @@ namespace FEAT
         // assemble truncation matrix
         Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_vec_weight, space_f, space_c, cubature);
 
-        // We now need to synchronise the weight vector in analogy to the prolongation matrix assembly.
-        // Note that the weight vector is now a coarse-level vector, so we need to synchronise over
+        // We now need to synchronize the weight vector in analogy to the prolongation matrix assembly.
+        // Note that the weight vector is now a coarse-level vector, so we need to synchronize over
         // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
         // level, as in this case we have to join/split around the synch operation.
 
-        // synchronise weight vector using the muxer/gate
+        // synchronize weight vector using the muxer/gate
         if(!virt_lvl_coarse.is_child())
         {
           // The coarse level is a simple (non-child) level that exists on all processes,
@@ -880,12 +880,12 @@ namespace FEAT
         for(Index i(0); i < loc_trunc.rows(); ++i)
           v_wb[i] = v_ws[i];
 
-        // We now need to synchronise the weight vector in analogy to the prolongation matrix assembly.
-        // Note that the weight vector is now a coarse-level vector, so we need to synchronise over
+        // We now need to synchronize the weight vector in analogy to the prolongation matrix assembly.
+        // Note that the weight vector is now a coarse-level vector, so we need to synchronize over
         // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
         // level, as in this case we have to join/split around the synch operation.
 
-        // synchronise weight vector using the muxer/gate
+        // synchronize weight vector using the muxer/gate
         if(!virt_lvl_coarse.is_child())
         {
           // The coarse level is a simple (non-child) level that exists on all processes,

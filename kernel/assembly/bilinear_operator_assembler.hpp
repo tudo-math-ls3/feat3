@@ -173,7 +173,7 @@ namespace FEAT
           test_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mappings
+          // initialize dof-mappings
           test_dof_mapping.prepare(cell);
           trial_dof_mapping.prepare(cell);
 
@@ -323,7 +323,7 @@ namespace FEAT
           space_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
@@ -503,7 +503,7 @@ namespace FEAT
           test_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mappings
+          // initialize dof-mappings
           test_dof_mapping.prepare(cell);
           trial_dof_mapping.prepare(cell);
 
@@ -673,7 +673,7 @@ namespace FEAT
           space_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
@@ -789,7 +789,7 @@ namespace FEAT
             coeff_loc.format();
             ret_loc.format();
 
-            // initialise dof-mapping
+            // initialize dof-mapping
             dof_mapping.prepare(cell);
 
             // prepare trafo evaluator
@@ -967,7 +967,7 @@ namespace FEAT
             coeff_loc.format();
             ret_loc.format();
 
-            // initialise dof-mappings
+            // initialize dof-mappings
             test_dof_mapping.prepare(cell);
             trial_dof_mapping.prepare(cell);
 

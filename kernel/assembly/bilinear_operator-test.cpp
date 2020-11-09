@@ -393,7 +393,7 @@ public:
     const Index num_slices[2] = {Index(4), Index(4)};
     QuadMesh mesh(num_slices);
 
-    // initialise our 5x5 vertices
+    // initialize our 5x5 vertices
     auto& v = mesh.get_vertex_set();
     for(Index i(0), k(0); i <= num_slices[0]; ++i)
     {

@@ -440,7 +440,7 @@ namespace FEAT
           trafo_eval.finish();
           trafo_facet_eval.finish();
 
-          // initialise dof-mappings
+          // initialize dof-mappings
           test_dof_mapping.prepare(cell);
           trial_dof_mapping.prepare(cell);
 
@@ -605,7 +605,7 @@ namespace FEAT
           trafo_eval.finish();
           trafo_facet_eval.finish();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
@@ -781,7 +781,7 @@ namespace FEAT
           space_eval_v.prepare(trafo_eval);
           space_eval_p.prepare(trafo_eval);
 
-          // initialise dof-mappings
+          // initialize dof-mappings
           dof_mapping_v.prepare(cell);
           dof_mapping_p.prepare(cell);
 
@@ -855,9 +855,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles the jump-stabilisation operator onto a matrix.
+       * \brief Assembles the jump-stabilization operator onto a matrix.
        *
-       * This function assembles the jump stabilisation operator:
+       * This function assembles the jump stabilization operator:
        *   \f[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\f]
        *
        * \attention
@@ -874,7 +874,7 @@ namespace FEAT
        * The cubature for integration. Note that this is a cubature rule on the facets.
        *
        * \param[in] gamma
-       * The scaling factor gamma for the jump stabilisation operator.
+       * The scaling factor gamma for the jump stabilization operator.
        *
        * \param[in] jacdet_scal
        * The scaling factor \e s for the Jacobian determinant factor.
@@ -1065,7 +1065,7 @@ namespace FEAT
               if(i_2 > -1) jump_grad[i] -= space_data_2.phi[i_2].grad;
             }
 
-            // assemble jump stabilisation operator
+            // assemble jump stabilization operator
             for(int i(0); i < num_local_dofs; ++i)
             {
               for(int j(0); j < num_local_dofs; ++j)
@@ -1294,7 +1294,7 @@ namespace FEAT
               if(i_2 > -1) jump_value[i] -= space_data_2.phi[i_2].value;
             }
 
-            // assemble jump stabilisation operator
+            // assemble jump stabilization operator
             for(int i(0); i < num_local_dofs; ++i)
             {
               for(int j(0); j < num_local_dofs; ++j)

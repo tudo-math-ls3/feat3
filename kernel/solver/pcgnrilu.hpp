@@ -18,7 +18,7 @@ namespace FEAT
     /**
      * \brief ILU(p)-preconditioned Conjugate-Gradient on Normal Equations solver implementation
      *
-     * Let \f$M = LU\f$ denote the ILU(p)-factorisation of a (possibly unsymmetric and indefinite)
+     * Let \f$M = LU\f$ denote the ILU(p)-factorization of a (possibly unsymmetric and indefinite)
      * system matrix \f$A\f$, then this class implements a Conjugate-Gradient solver applied onto
      * the preconditioned normal equation system:
      *
@@ -66,7 +66,7 @@ namespace FEAT
       VectorType _vec_r, _vec_p, _vec_q, _vec_s, _vec_t;
       /// ilu fill-in
       int _ilu_p;
-      /// ilu factorisation data
+      /// ilu factorization data
       Intern::ILUCoreScalar<DataType, IndexType> _ilu;
 
     public:
@@ -160,7 +160,7 @@ namespace FEAT
         if(_ilu_p >= 0)
         {
           _ilu.set_struct(this->_system_matrix);
-          _ilu.factorise_symbolic(_ilu_p);
+          _ilu.factorize_symbolic(_ilu_p);
           _ilu.alloc_data();
         }
       }
@@ -186,7 +186,7 @@ namespace FEAT
         if(_ilu_p >= 0)
         {
           _ilu.copy_data(_system_matrix);
-          _ilu.factorise_numeric_il_du();
+          _ilu.factorize_numeric_il_du();
         }
       }
 

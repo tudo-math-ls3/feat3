@@ -39,7 +39,7 @@ namespace FEAT
     // Note:
     // The following block serves as an element interface documentation and is therefore only
     // visible to doxygen. The actual functionality has to be supplied by the implementation
-    // of specialisations in TrafoType_.
+    // of specializations in TrafoType_.
 #else
     template<typename TrafoType_, typename DataType_>
     struct RumpfTrafo
@@ -164,7 +164,7 @@ namespace FEAT
     /**
      * \brief Computes local mesh size h for Rumpf smoothers
      *
-     * Specialisation for Hypercube<2> meshes
+     * Specialization for Hypercube<2> meshes
      *
      * \tparam DataType_
      * Our data type
@@ -312,7 +312,7 @@ namespace FEAT
     /**
      * \brief Computes local mesh size h for Rumpf smoothers
      *
-     * Specialisation for Hypercube<3> meshes
+     * Specialization for Hypercube<3> meshes
      *
      * \tparam DataType_
      * Our data type
@@ -487,7 +487,7 @@ namespace FEAT
     /**
      * \brief Computes local mesh size h for Rumpf smoothers
      *
-     * Specialisation for Simplex<2> meshes
+     * Specialization for Simplex<2> meshes
      *
      * \tparam DataType_
      * Our data type
@@ -637,7 +637,7 @@ namespace FEAT
     /**
      * \brief Computes local mesh size h for Rumpf smoothers
      *
-     * Specialisation for Simplex<3> meshes
+     * Specialization for Simplex<3> meshes
      *
      * \tparam DataType_
      * Our data type

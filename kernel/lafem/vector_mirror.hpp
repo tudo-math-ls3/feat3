@@ -21,7 +21,7 @@ namespace FEAT
   namespace LAFEM
   {
     /**
-     * \brief Handles vector prolongation, restriction and serialisation
+     * \brief Handles vector prolongation, restriction and serialization
      *
      * \tparam Mem_
      * Memory architecture
@@ -32,7 +32,7 @@ namespace FEAT
      * \tparam IT_
      * Type for indexing
      *
-     * A Mirror handles the restriction of a given vector to a subvector of itself and the serialisation into
+     * A Mirror handles the restriction of a given vector to a subvector of itself and the serialization into
      * buffer vector (which always is a LAFEM::DenseVector), as well as the prolongation of such buffer vectors.
      * The buffer vectors then can be communicated via MPI etc.
      *
@@ -87,8 +87,8 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * This constructor initialises the mirror dimensions and allocates the internal
-       * indices array. This array is uninitialised and has to be filled after construction.
+       * This constructor initializes the mirror dimensions and allocates the internal
+       * indices array. This array is uninitialized and has to be filled after construction.
        *
        * \param[in] size_in
        * Specifies the size of the mirror, i.e. the length

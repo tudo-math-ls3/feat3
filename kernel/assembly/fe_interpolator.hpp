@@ -32,7 +32,7 @@ namespace FEAT
      * This is the (currently empty) generic inter-FE space interpolator. For this, the node functionals from
      * ToSpace_ need to be applied to a function from FromSpace_, which might not be trivial (e.g. the Lagrange1
      * node functionals map to the function values at the mesh's vertices, where a P1~ or Q1~ function is not
-     * continuous). Therefore, these operators shall be implemented by specialisations in ToSpace_ and FromSpace_.
+     * continuous). Therefore, these operators shall be implemented by specializations in ToSpace_ and FromSpace_.
      *
      * \author Jordi Paul
      */

@@ -96,7 +96,7 @@ public:
     MatrixType rip_matrix;
     Assembly::SymbolicAssembler::assemble_matrix_ext_facet1(rip_matrix, space_c);
 
-    // initialise to coarse-mesh identity matrix "I_c"
+    // initialize to coarse-mesh identity matrix "I_c"
     {
       const IndexType num_rows = IndexType(rip_matrix.rows());
       const IndexType* row_ptr = rip_matrix.row_ptr();

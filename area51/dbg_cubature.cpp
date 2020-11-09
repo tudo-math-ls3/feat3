@@ -416,7 +416,7 @@ namespace DbgCubature
 
 int main(int argc, char** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   DbgCubature::main(argc, argv);
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

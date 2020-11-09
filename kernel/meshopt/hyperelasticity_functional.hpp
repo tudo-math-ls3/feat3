@@ -111,7 +111,7 @@ namespace FEAT
     /// \endcond
 
     /**
-     * \brief Baseclass for a family of variational mesh optimisation algorithms.
+     * \brief Baseclass for a family of variational mesh optimization algorithms.
      *
      * \tparam Mem_
      * Memory architecture for solving.
@@ -129,15 +129,15 @@ namespace FEAT
      * (Cell-)local functional used for defining mesh quality. \see RumpfFunctional
      *
      * \tparam RefCellTrafo_
-     * Basically choses the reference cell according to which to optimise the mesh quality for.
+     * Basically choses the reference cell according to which to optimize the mesh quality for.
      *
-     * Mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96.
+     * Mesh optimization algorithms derived from Martin Rumpf's paper \cite Rum96.
      *
      * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
      * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
-     * family of mesh optimisation algorithms is implemented for Mem::Main only.
+     * family of mesh optimization algorithms is implemented for Mem::Main only.
      *
-     * See the specialisation for Mem::Main.
+     * See the specialization for Mem::Main.
      *
      */
     template
@@ -151,7 +151,7 @@ namespace FEAT
     >
     class HyperelasticityFunctional;
     /**
-     * \brief Baseclass for a family of variational mesh optimisation algorithms.
+     * \brief Baseclass for a family of variational mesh optimization algorithms.
      *
      * \tparam DT_
      * Floating point type for solving.
@@ -166,13 +166,13 @@ namespace FEAT
      * (Cell-)local functional used for defining mesh quality. \see RumpfFunctional
      *
      * \tparam RefCellTrafo_
-     * Basically choses the reference cell according to which to optimise the mesh quality for.
+     * Basically choses the reference cell according to which to optimize the mesh quality for.
      *
-     * Mesh optimisation algorithms derived from Martin Rumpf's paper \cite Rum96.
+     * Mesh optimization algorithms derived from Martin Rumpf's paper \cite Rum96.
      *
      * \note The evaluation of the nonlinear functional requires operations that are essentially similar to an
      * assembly of an operator into a matrix. This is implemented for Mem::Main only. This in turn means that this
-     * family of mesh optimisation algorithms is implemented for Mem::Main only.
+     * family of mesh optimization algorithms is implemented for Mem::Main only.
      *
      * Assume we have a regular, conforming mesh \f$ \mathcal{T} \f$ and each cell \f$ K \in \mathcal{T} \f$ can
      * be expressed as the image of an (optimal) reference cell \f$ \hat{K} \f$ such that
@@ -182,7 +182,7 @@ namespace FEAT
      * \f]
      * which ensures that the mapping is nonsingular and that the orientation of the reference cell is preserved. We
      * are now looking for a deformation \f$ \Phi: \mathcal{T} \to \Phi(\mathcal{T})\f$ such that
-     * \f$ \Phi(\mathcal{T} \f$ is optimal in the sense that it minimises a functional of the form
+     * \f$ \Phi(\mathcal{T} \f$ is optimal in the sense that it minimizes a functional of the form
      *
      * \f[
      *   \mathcal{F}(\Phi) = \int_\Omega \mathcal{L}(\Phi,x) dx = \sum_{K \in \mathcal{T}} \mu_K \int_K
@@ -300,9 +300,9 @@ namespace FEAT
       public:
         /// The FE space for the transformation, needed for filtering
         SpaceType trafo_space;
-        /// These are the scalars that need to be synchronised in init() or prepare()
+        /// These are the scalars that need to be synchronized in init() or prepare()
         std::map<String, DataType*> sync_scalars;
-        /// These are the vectors that need to be synchronised (type-0 to type-1)
+        /// These are the vectors that need to be synchronized (type-0 to type-1)
         std::set<VectorTypeR*> sync_vecs;
 
       private:
@@ -321,9 +321,9 @@ namespace FEAT
         /// This is the sum of the determinant of the transformation of the reference cell to the mesh cell over all
         /// cells
         DataType _sum_det;
-        /// The sum of all lambda (= optimal cell size) over all cells before normalisation
+        /// The sum of all lambda (= optimal cell size) over all cells before normalization
         DataType _sum_lambda;
-        /// The sum of all mu (= cell weights) over all cells before normalisation
+        /// The sum of all mu (= cell weights) over all cells before normalization
         DataType _sum_mu;
 
       public:
@@ -642,7 +642,7 @@ namespace FEAT
          * The exporter to add our data to.
          *
          * \note This does not compute and/or add the functional's gradient to the exporter because this requires
-         * filtering and synchronisation if there is more than one patch. Compute the gradient at a point where
+         * filtering and synchronization if there is more than one patch. Compute the gradient at a point where
          * you know these things (e.g. in the application itself, or in Control::Meshopt::HyperelasticityControl).
          *
          */
@@ -735,9 +735,9 @@ namespace FEAT
         //}
 
         /**
-         * \brief Performs intialisations that cannot be done in the constructor
+         * \brief Performs intializations that cannot be done in the constructor
          *
-         * \note This needs some synchronisation, so if this object lives on just one of many patches, use
+         * \note This needs some synchronization, so if this object lives on just one of many patches, use
          * init_pre_sync() and init_post_sync() like the Global::NonlinearFunctional class does.
          */
         virtual void init() override
@@ -747,7 +747,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs initialisations that cannot be done in the constructor, pre synchronisation phase
+         * \brief Performs initializations that cannot be done in the constructor, pre synchronization phase
          *
          * \see init()
          */
@@ -773,14 +773,14 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs initialisations that cannot be done in the constructor, post synchronisation phase
+         * \brief Performs initializations that cannot be done in the constructor, post synchronization phase
          *
          * \see init()
          */
         virtual void init_post_sync()
         {
           // Scale mu so that || mu ||_1 = 1
-          // For this, _sum_mu needs to have been summed up over all patches in the synchronisation phase.
+          // For this, _sum_mu needs to have been summed up over all patches in the synchronization phase.
           if(_sum_mu != DataType(1))
           {
             _mu.scale(_mu, DataType(1)/_sum_mu);
@@ -788,7 +788,7 @@ namespace FEAT
           }
 
           // Scale lambda so that || lambda ||_1 = 1
-          // For this, _sum_lambda needs to have been summed up over all patches in the synchronisation phase.
+          // For this, _sum_lambda needs to have been summed up over all patches in the synchronization phase.
           if(_sum_lambda != DataType(1))
           {
             _lambda.scale(_lambda, DataType(1)/_sum_lambda);
@@ -796,7 +796,7 @@ namespace FEAT
           }
 
           // Compute the new optimal scales. For this, lambda needs to be scaled correctly and _sum_det needs to be
-          // summed up over all patches in the synchronisation phase.
+          // summed up over all patches in the synchronization phase.
           RefCellTrafo_::compute_h(_h, _lambda, _sum_det);
         }
 
@@ -819,7 +819,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Prepares the functional for evaluation, pre synchronisation phase
+         * \brief Prepares the functional for evaluation, pre synchronization phase
          *
          * \param[in] vec_state
          * The state to evaluate the functional at.
@@ -895,7 +895,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Prepares the functional for evaluation, post synchronisation phase
+         * \brief Prepares the functional for evaluation, post synchronization phase
          *
          * \param[in] vec_state
          * The state to evaluate the functional at.
@@ -968,7 +968,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronization phase
          *
          * \param[out] vol_min
          * Minimum cell volume
@@ -1005,7 +1005,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronization phase
          *
          * \param[out] lambda_min
          * Minimum of the optimal cell size lambda over all cells

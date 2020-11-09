@@ -47,7 +47,7 @@ namespace FEAT
       class DriverFactory DOXY({});
 
       /**
-       * \brief DriverFactory specialisation for non-variadic drivers.
+       * \brief DriverFactory specialization for non-variadic drivers.
        *
        * \author Peter Zajac
        */
@@ -58,7 +58,7 @@ namespace FEAT
         typedef Driver_ DriverType;
 
         static constexpr bool variadic = false;
-        static constexpr bool tensorise = DriverType::tensorise;
+        static constexpr bool tensorize = DriverType::tensorize;
         static constexpr int num_points = DriverType::num_points;
 
       public:
@@ -135,7 +135,7 @@ namespace FEAT
       }; // class DriverFactory<...>
 
       /**
-       * \brief DriverFactory specialisation for variadic drivers.
+       * \brief DriverFactory specialization for variadic drivers.
        *
        * \author Peter Zajac
        */
@@ -146,7 +146,7 @@ namespace FEAT
         typedef Driver_ DriverType;
 
         static constexpr bool variadic = true;
-        static constexpr bool tensorise = DriverType::tensorise;
+        static constexpr bool tensorize = DriverType::tensorize;
         static constexpr int min_points = DriverType::min_points;
         static constexpr int max_points = DriverType::max_points;
 

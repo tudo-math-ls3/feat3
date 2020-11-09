@@ -261,7 +261,7 @@ namespace StokesDriCav2D
 
     solver->set_max_iter(1000);
 
-    // initialise
+    // initialize
     multigrid_hierarchy_a->init();
     solver->init();
 
@@ -287,8 +287,8 @@ namespace StokesDriCav2D
         vec_sol.local().template at<1>(), zero_func, the_domain_level.space_pres, cubature);
 
       // synhronise all local errors
-      vi.synchronise(comm);
-      pi.synchronise(comm);
+      vi.synchronize(comm);
+      pi.synchronize(comm);
 
       // print errors
       comm.print("");
@@ -390,7 +390,7 @@ namespace StokesDriCav2D
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     StokesDriCav2D::main(argc, argv);
@@ -405,5 +405,5 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

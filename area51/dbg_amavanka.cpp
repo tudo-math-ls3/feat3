@@ -485,7 +485,7 @@ namespace DbgAmaVanka
     MeshPartType boundary(boundary_factory);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Trafo and Finite Element Space initialisation
+    // Trafo and Finite Element Space initialization
 
     // Create the trafo
     TrafoType trafo(mesh);
@@ -756,7 +756,7 @@ namespace DbgAmaVanka
     MeshPartType boundary(boundary_factory);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Trafo and Finite Element Space initialisation
+    // Trafo and Finite Element Space initialization
 
     // Create the trafo
     TrafoType trafo(mesh);
@@ -949,7 +949,7 @@ namespace DbgAmaVanka
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   DbgAmaVanka::main(argc, argv);
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

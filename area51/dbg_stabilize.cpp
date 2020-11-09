@@ -212,8 +212,8 @@ namespace Andicore
     DataType nu = 1E-5;   // diffusion
     DataType beta = 1.0;  // convection
     DataType theta = 0.0; // reaction
-    DataType upsam = 0.1; // stabilisation
-    DataType gamma = 0.01; // EOJ stabilisation
+    DataType upsam = 0.1; // stabilization
+    DataType gamma = 0.01; // EOJ stabilization
     Index level = 5;
 
     args.parse("level", level);
@@ -294,8 +294,8 @@ namespace Andicore
     solver->init_symbolic();
 
 
-    // unstabilised
-    std::cout << "Solving Unstabilised System..." << std::endl;
+    // unstabilized
+    std::cout << "Solving Unstabilized System..." << std::endl;
     burgers.nu = nu;
     burgers.beta = beta;
     burgers.theta = theta;
@@ -313,7 +313,7 @@ namespace Andicore
 
 
     // streamline diffusion
-    std::cout << "Solving Streamline Diffusion Stabilised System..." << std::endl;
+    std::cout << "Solving Streamline Diffusion Stabilized System..." << std::endl;
     burgers.sd_delta = upsam;
     burgers.sd_nu = nu;
     burgers.set_sd_v_norm(vec_conv);
@@ -330,8 +330,8 @@ namespace Andicore
     std::cout << errors_2 << std::endl;
 
 
-    // EOJ stabilisation
-    std::cout << "Solving Jump Stabilised System..." << std::endl;
+    // EOJ stabilization
+    std::cout << "Solving Jump Stabilized System..." << std::endl;
     burgers.nu = nu;
     burgers.beta = beta;
     burgers.theta = theta;
@@ -358,7 +358,7 @@ namespace Andicore
 
     if(args.check("vtk") >= 0)
     {
-      String vtk_name(String("./dbg-stabilise-lvl") + stringify(level));
+      String vtk_name(String("./dbg-stabilize-lvl") + stringify(level));
       args.parse("vtk", vtk_name);
 
       std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
@@ -379,7 +379,7 @@ namespace Andicore
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   Andicore::main(argc, argv);
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

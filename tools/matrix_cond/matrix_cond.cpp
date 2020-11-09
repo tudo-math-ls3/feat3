@@ -180,7 +180,7 @@ namespace MatrixCond
     {
       const DataType eps_sqr = Math::sqr(Math::eps<DataType>());
 
-      // normalise initial vector
+      // normalize initial vector
       value = vec.norm2();
       vec.scale(vec, DataType(1) / value);
       VectorType vec_tmp(vec.clone());
@@ -193,7 +193,7 @@ namespace MatrixCond
         // compute new norm
         DataType sv_old = value;
         value = vec_tmp.norm2();
-        // compute normalised vector
+        // compute normalized vector
         vec.scale(vec_tmp, DataType(1) / value);
         // print new norm
         if(plot)
@@ -296,7 +296,7 @@ namespace MatrixCond
       solver.init();
       solver.set_max_iter(pcg_maxiter);
 
-      // normalise initial vector
+      // normalize initial vector
       value = vec.norm2();
       vec.scale(vec, DataType(1) / value);
       VectorType vec_tmp(vec.clone());
@@ -320,7 +320,7 @@ namespace MatrixCond
         // compute new norm
         DataType sv_old = value;
         value = vec_tmp.norm2();
-        // compute normalised vector
+        // compute normalized vector
         vec.scale(vec_tmp, DataType(1) / value);
         // print new norm
         if(plot)

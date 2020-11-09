@@ -1090,7 +1090,7 @@ namespace Stokes3Field
 
     comm.print("");
 
-    // initialise solver
+    // initialize solver
     multigrid_hierarchy->init();
     solver->init();
 
@@ -1310,7 +1310,7 @@ namespace Stokes3Field
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     Stokes3Field::main(argc, argv);
@@ -1325,5 +1325,5 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

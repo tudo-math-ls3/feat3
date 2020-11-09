@@ -224,7 +224,7 @@ namespace FEAT
           }
 
           template <typename DT_, typename IT_, Index C_>
-          struct ProductMatVecSpecialisation
+          struct ProductMatVecSpecialization
           {
             static void f(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
                           const IT_ * const cl, const DT_ * const x, const Index /*C*/, const Index rows)
@@ -255,7 +255,7 @@ namespace FEAT
           };
 
           template <typename DT_, typename IT_, Index C_>
-          struct ApplySpecialisation
+          struct ApplySpecialization
           {
             static void f(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b,
                           const DT_ * const val, const IT_ * const col_ind, const IT_ * const cs,
@@ -358,19 +358,19 @@ namespace FEAT
         switch (C)
         {
         case 2:
-          Intern::ApplyELL::ApplySpecialisation<DT_, IT_, 2>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
+          Intern::ApplyELL::ApplySpecialization<DT_, IT_, 2>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
           break;
         case 4:
-          Intern::ApplyELL::ApplySpecialisation<DT_, IT_, 4>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
+          Intern::ApplyELL::ApplySpecialization<DT_, IT_, 4>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
           break;
         case 8:
-          Intern::ApplyELL::ApplySpecialisation<DT_, IT_, 8>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
+          Intern::ApplyELL::ApplySpecialization<DT_, IT_, 8>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
           break;
         case 16:
-          Intern::ApplyELL::ApplySpecialisation<DT_, IT_,16>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
+          Intern::ApplyELL::ApplySpecialization<DT_, IT_,16>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
           break;
         case 32:
-          Intern::ApplyELL::ApplySpecialisation<DT_, IT_,32>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
+          Intern::ApplyELL::ApplySpecialization<DT_, IT_,32>::f(r, a, x, b, val, col_ind, cs, cl, C, rows);
           break;
         default:
 #ifdef DEBUG

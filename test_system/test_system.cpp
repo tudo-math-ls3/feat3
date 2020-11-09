@@ -15,7 +15,7 @@ using namespace FEAT::TestSystem;
 int main(int argc, char** argv)
 {
   // Initialse FEAT runtime
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
 
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
 
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
       << tests_failed << " tests FAILED!" << std::endl;
   }
 
-  Runtime::finalise();
+  Runtime::finalize();
 
   return result;
 }

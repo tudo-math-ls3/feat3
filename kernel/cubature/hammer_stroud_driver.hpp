@@ -31,7 +31,7 @@ namespace FEAT
     template<typename Shape_>
     class HammerStroudD2Driver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<int dim_>
     class HammerStroudD2Driver<Shape::Simplex<dim_> > :
       public DriverBase<Shape::Simplex<dim_> >
@@ -94,7 +94,7 @@ namespace FEAT
     template<typename Shape_>
     class HammerStroudD3Driver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<int dim_>
     class HammerStroudD3Driver<Shape::Simplex<dim_> > :
       public DriverBase<Shape::Simplex<dim_> >
@@ -169,7 +169,7 @@ namespace FEAT
     template<typename Shape_>
     class HammerStroudD5Driver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<>
     class HammerStroudD5Driver<Shape::Simplex<3> > :
       public DriverBase<Shape::Simplex<3> >

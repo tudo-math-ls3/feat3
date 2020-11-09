@@ -105,11 +105,11 @@ namespace FEAT
 
           // Get Meshopt configuration section
           auto meshopt_section = meshopt_config->query_section(section_key);
-          XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimiser section!");
+          XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimizer section!");
 
           // Verify the type
           auto type_p = meshopt_section->query("type");
-          XASSERTM(type_p.second, "MeshOptimiser section is missing the mandatory type!");
+          XASSERTM(type_p.second, "MeshOptimizer section is missing the mandatory type!");
           XASSERTM(type_p.first == "DuDv", "Invalid type string!");
 
           // Get list of boundary conditions
@@ -128,7 +128,7 @@ namespace FEAT
           }
 
           auto config_section_p = meshopt_section->query("config_section");
-          XASSERTM(config_section_p.second, "MeshOptimiser config section is missing config_section entry!");
+          XASSERTM(config_section_p.second, "MeshOptimizer config section is missing config_section entry!");
 
           auto dudv_config_section = meshopt_config->query_section(config_section_p.first);
           if(dudv_config_section == nullptr)
@@ -199,11 +199,11 @@ namespace FEAT
 
           // Get Meshopt configuration section
           auto meshopt_section = meshopt_config->query_section(section_key);
-          XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimiser section!");
+          XASSERTM(meshopt_section != nullptr, "Application config is missing the mandatory MeshOptimizer section!");
 
           // Verify the type
           auto type_p = meshopt_section->query("type");
-          XASSERTM(type_p.second, "MeshOptimiser section is missing the mandatory type!");
+          XASSERTM(type_p.second, "MeshOptimizer section is missing the mandatory type!");
           XASSERTM(type_p.first == "Hyperelasticity", "Invalid type!");
 
           // Get list of boundary conditions
@@ -221,14 +221,14 @@ namespace FEAT
             meshopt_lvl = std::stoi(meshopt_lvl_p.first);
           }
 
-          // Get the name of the MeshOptimiser configuration section
+          // Get the name of the MeshOptimizer configuration section
           auto config_section_p = meshopt_section->query("config_section");
           if(!config_section_p.second)
           {
             XABORTM("config_section "+config_section_p.first+" not found");
           }
 
-          // Get the MeshOptimiser configuration section
+          // Get the MeshOptimizer configuration section
           auto hyperelasticity_config_section = meshopt_config->query_section(config_section_p.first);
 
           // Get fac_norm
@@ -321,7 +321,7 @@ namespace FEAT
          * The DomainControl containing meshes on all levels, the atlas etc.
          *
          * \param[in] meshopt_lvl
-         * The level (as in domain level) to optimise the mesh on. For all other levels, this solution gets
+         * The level (as in domain level) to optimize the mesh on. For all other levels, this solution gets
          * prolongated/restricted.
          *
          * \param[in] hyperelasticity_config_section
@@ -431,7 +431,7 @@ namespace FEAT
          * The type of domain control
          *
          * \param[in] dom_ctrl
-         * The domain control containing the meshes etc. for the mesh optimisation
+         * The domain control containing the meshes etc. for the mesh optimization
          *
          * \param[in] section_key
          * The name of the configuration section for this object
@@ -464,7 +464,7 @@ namespace FEAT
             auto type_p = meshopt_section->query("type");
             if(!type_p.second)
             {
-              XABORTM("MeshOptimiser section is missing the mandatory type!");
+              XABORTM("MeshOptimizer section is missing the mandatory type!");
             }
             else
             {
@@ -483,7 +483,7 @@ namespace FEAT
 
           if(result == nullptr)
           {
-            XABORTM("MeshOptimiser section has unhandled type "+type);
+            XABORTM("MeshOptimizer section has unhandled type "+type);
           }
 
           return result;

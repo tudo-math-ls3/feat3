@@ -159,7 +159,7 @@ namespace FEAT
           space_eval_s.prepare(trafo_eval);
           space_eval_v.prepare(trafo_eval);
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping_s.prepare(cell);
           dof_mapping_v.prepare(cell);
 

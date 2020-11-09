@@ -80,7 +80,7 @@ namespace FEAT
      * This class template implements a 3rd order tensor whose value type and size is given at compile-time. The value
      * type can be a primitive type, or some other object like a Vector.
      *
-     * Technically, the Tensor3 class template realises a l-tuple of m-by-n matrices.
+     * Technically, the Tensor3 class template realizes a l-tuple of m-by-n matrices.
      *
      * \tparam T_
      * The datatype that the vector shall contain.
@@ -377,12 +377,12 @@ namespace FEAT
       }
 
       /**
-       * \brief Normalises the vector.
+       * \brief Normalizes the vector.
        */
-      void normalise()
+      void normalize()
       {
         DataType norm2(this->norm_euclid());
-        ASSERTM(norm2 > Math::eps<DataType>(), "Trying to normalise a zero vector!");
+        ASSERTM(norm2 > Math::eps<DataType>(), "Trying to normalize a zero vector!");
         norm2 = DataType(1)/norm2;
         (*this) *= norm2;
       }
@@ -1602,7 +1602,7 @@ namespace FEAT
      * The m_ x (m_-1) matrix.
      *
      * \returns
-     * A vector that is orthogonal to the m_-1 columns of the input matrix, but not normalised.
+     * A vector that is orthogonal to the m_-1 columns of the input matrix, but not normalized.
      *
      * \note So far, this is only implemented for m_ = 2,3.
      */

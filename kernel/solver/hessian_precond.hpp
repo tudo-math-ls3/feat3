@@ -26,7 +26,7 @@ namespace FEAT
      *
      * \see Solver::NLOptPrecond
      *
-     * Note that only specialisations in Operator_ are implemented at the moment.
+     * Note that only specializations in Operator_ are implemented at the moment.
      *
      * \author Jordi Paul
      */
@@ -173,7 +173,7 @@ namespace FEAT
      *
      * \see Solver::NLOptPrecond
      *
-     * Note that only specialisations in Operator_ are implemented at the moment.
+     * Note that only specializations in Operator_ are implemented at the moment.
      *
      *
      * \author Jordi Paul

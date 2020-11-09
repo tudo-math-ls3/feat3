@@ -205,7 +205,7 @@ namespace FEAT
           /// <vec_pn, vec_grad>. We want to find the minimum of the functional value along vec_pn
           DataType df(0);
 
-          // Perform initialisations and checks
+          // Perform initializations and checks
           Status st = this->_startup(alpha, fval, df, vec_sol, vec_dir);
           // Use the additional information about the preconditioned search direction's length?
           if(this->_dir_scaling)

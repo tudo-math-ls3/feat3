@@ -63,7 +63,7 @@ template
   > struct ResizeApp
 {
   /**
-   * \brief Runs mesh optimiser stuff
+   * \brief Runs mesh optimizer stuff
    *
    */
   static void run()
@@ -163,7 +163,7 @@ template
 
     // Dummy vector for rhs
     auto rhs = rumpflpumpfl.create_vector_r();
-    // Vector to save the gradient in for visualisation
+    // Vector to save the gradient in for visualization
     auto grad = rumpflpumpfl.create_vector_r();
     // Solver vector containing the initial guess
     auto new_coords = rumpflpumpfl.get_coords().clone(LAFEM::CloneMode::Deep);
@@ -181,7 +181,7 @@ template
       (rmn->get_mesh())->template get_index_set<MeshType::shape_dim, 0>(), (rmn->get_mesh())->get_vertex_set(),
       worst_angle_cellwise);
 
-    std::cout << "Pre optimisation: fval = " << stringify_fp_sci(fval) <<
+    std::cout << "Pre optimization: fval = " << stringify_fp_sci(fval) <<
       " Shape quality: " << stringify_fp_sci(qual_min) <<
       " Worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
 
@@ -225,11 +225,11 @@ template
     worst_angle = Geometry::MeshQualityHeuristic<typename MeshType::ShapeType>::angle(
       (rmn->get_mesh())->template get_index_set<MeshType::shape_dim, 0>(), (rmn->get_mesh())->get_vertex_set());
 
-    std::cout << "Post optimisation: fval = " << stringify_fp_sci(fval) <<
+    std::cout << "Post optimization: fval = " << stringify_fp_sci(fval) <<
       " Shape quality: " << stringify_fp_sci(qual_min) <<
       " Worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
 
-    // Write optimised initial mesh
+    // Write optimized initial mesh
     filename = "post_" + helperclass<ShapeType>::print_typename();
     Geometry::ExportVTK<MeshType> writer_initial_post(*(rmn->get_mesh()));
     writer_initial_post.add_cell_scalar("Shape Quality Heuristic", qual_cellwise);
@@ -260,14 +260,14 @@ using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D, E>;
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
 
   ResizeApp<double, Shape::Hypercube<3>, MyLocalFunctional, MyQualityFunctional>::run();
 
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }
 
-/// \brief Specialisation for hypercubes
+/// \brief Specialization for hypercubes
 template<int shape_dim>
 struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
 {
@@ -313,7 +313,7 @@ struct helperclass< FEAT::Shape::Hypercube<shape_dim> >
   }
 };
 
-/// \brief Specialisation for 2d simplices
+/// \brief Specialization for 2d simplices
 template<>
 struct helperclass< FEAT::Shape::Simplex<2> >
 {
@@ -341,7 +341,7 @@ struct helperclass< FEAT::Shape::Simplex<2> >
   }
 };
 
-/// \brief Specialisation for 3d simplices
+/// \brief Specialization for 3d simplices
 template<>
 struct helperclass< FEAT::Shape::Simplex<3> >
 {

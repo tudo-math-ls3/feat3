@@ -196,7 +196,7 @@ namespace FEAT
           velo_eval.finish();
           trafo_eval.finish();
 
-          // initialise dof-mappings
+          // initialize dof-mappings
           velo_dof_mapping.prepare(cell);
           pres_dof_mapping.prepare(cell);
 

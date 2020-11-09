@@ -827,7 +827,7 @@ class InverseMappingTest
       }
 
       coords[world_dim] = Tiny::orthogonal(tmp_coords);
-      coords[world_dim].normalise();
+      coords[world_dim].normalize();
 
       Tiny::Matrix<DT_, num_points, world_dim> points(DT_(0));
       // Point inside
@@ -894,7 +894,7 @@ class InverseMappingTest
       }
 
       coords[world_dim] = Tiny::orthogonal(tmp_coords);
-      coords[world_dim].normalise();
+      coords[world_dim].normalize();
 
       Tiny::Matrix<DT_, num_points, world_dim> points(DT_(0));
       // Point inside
@@ -962,7 +962,7 @@ class InverseMappingTest
       }
 
       coords[world_dim] = Tiny::orthogonal(tmp_coords);
-      coords[world_dim].normalise();
+      coords[world_dim].normalize();
 
       Tiny::Matrix<DT_, num_points, world_dim> points(DT_(0));
       // Point inside

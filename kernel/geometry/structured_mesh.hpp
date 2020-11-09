@@ -21,7 +21,7 @@ namespace FEAT
      *
      * \todo detailed documentation
      * \todo define index set type
-     * \todo Implement neighbours lookup
+     * \todo Implement neighbors lookup
      *
      * \tparam shape_dim_
      * The dimension of the shape (Hypercube) to be used for the mesh.
@@ -296,7 +296,7 @@ namespace FEAT
     /* ************************************************************************************************************* */
 
     /**
-     * \brief Factory specialisation for StructuredMesh class template
+     * \brief Factory specialization for StructuredMesh class template
      *
      * \author Peter Zajac
      */

@@ -26,14 +26,14 @@
 //
 // The basic program flow of this application is as follows:
 //
-//  1. Define the basic spatial discretisation types, as usual.
+//  1. Define the basic spatial discretization types, as usual.
 //
 //  2. Define the local and global linear algebra container classes.
 //
 //  3. Create a distributed communicator for inter-process communication.
 //
 //  4. Create a mesh-node that represents the patch (sub-domain) of this process
-//     along with neighbourhood information required for communication.
+//     along with neighborhood information required for communication.
 //
 //  5. Create a trafo and a finite element space for the patch of this process.
 //
@@ -190,7 +190,7 @@ namespace Tutorial06
   typedef LAFEM::VectorMirror<MemType, DataType, IndexType> VectorMirrorType;
 
   // Now comes the second core component of a global linear algebra system: the "gate".
-  // A gate is responsible for providing basic parallel synchronisation and communication
+  // A gate is responsible for providing basic parallel synchronization and communication
   // functionality, which is used by the global linear algebra containers that we will
   // define in a moment. We will not use any of the gate's functionality directly after
   // its initial creation, as we will simply work with global matrices and vectors, which
@@ -260,7 +260,7 @@ namespace Tutorial06
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Geometry initialisation
+    // Geometry initialization
 
     // Now comes the first really interesting part:
     // We need a decomposition (partitioning) of our computational domain.
@@ -317,28 +317,28 @@ namespace Tutorial06
     std::shared_ptr<RootMeshNodeType> root_mesh_node;
 
     // The generator class will not only give us a mesh-node representing our patch of the domain,
-    // but it will also tell us the ranks of all processes that manage our neighbour patches.
+    // but it will also tell us the ranks of all processes that manage our neighbor patches.
     // We will require these ranks to set up the communication "mirrors" that are required for
     // the global simulation. For this, we need to create a std::vector of ints, which will be
-    // filled with our neighbour process ranks:
-    std::vector<int> neighbour_ranks;
+    // filled with our neighbor process ranks:
+    std::vector<int> neighbor_ranks;
 
-    // Now we can call our generator to obtain our patch mesh-node as well as our neighbour ranks.
+    // Now we can call our generator to obtain our patch mesh-node as well as our neighbor ranks.
     // Moreover, the create function returns an index that corresponds to the refinement level
     // of the global unit-square domain - we will require this for the further refinement below.
     Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(
       comm.rank(),          // input:  the rank of this process
       comm.size(),          // input:  the total number of processes
       root_mesh_node,       // output: the root-mesh-node shared pointer
-      neighbour_ranks);     // output: the neighbour ranks vector
+      neighbor_ranks);     // output: the neighbor ranks vector
 
-    // At this point, we have our root mesh node as well as the neighbour ranks.
-    // Just for fun, we let each process write its neighbour ranks to the console.
+    // At this point, we have our root mesh node as well as the neighbor ranks.
+    // Just for fun, we let each process write its neighbor ranks to the console.
     // However, if we just write to std::cout, the output may be scrambled by a poor
     // MPI implementation. To circumvent this, we first build a String object that
     // contains the message to be printed on each process:
-    String msg = "Neighbours of process " + stringify(comm.rank()) + ":";
-    for(int i : neighbour_ranks)
+    String msg = "Neighbors of process " + stringify(comm.rank()) + ":";
+    for(int i : neighbor_ranks)
       msg += " " + stringify(i);
 
     // Now we pass this message to the 'allprint' function of the communicator.
@@ -351,7 +351,7 @@ namespace Tutorial06
     // communication between all processes and performs sequential execution;
     // so this function should be only used in exceptional cases such as debugging.
     // Also note that the usual 'print' function does not require communication,
-    // so there is no problem with sequentialisation there.
+    // so there is no problem with sequentialization there.
 
     // As mentioned before, the generator returned a level index that represents the
     // refinement level of the mesh-node that it has generated. We want to print that out:
@@ -382,7 +382,7 @@ namespace Tutorial06
     // of the way we obtained the root-mesh-node for our patch.
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Trafo and Space initialisation
+    // Trafo and Space initialization
 
     comm.print("Creating Trafo and Space...");
 
@@ -412,45 +412,45 @@ namespace Tutorial06
     GateType gate(comm);
 
     // The generator that we have used to obtain a mesh-node for our patch has also given us
-    // a vector of the process ranks, which contains the neighbour patches of this process.
-    // We need to create a mirror for each of our neighbours, which will then be used for
-    // the communication with that neighbour - so let's loop over all neighbour ranks:
-    for(auto it = neighbour_ranks.begin(); it != neighbour_ranks.end(); ++it)
+    // a vector of the process ranks, which contains the neighbor patches of this process.
+    // We need to create a mirror for each of our neighbors, which will then be used for
+    // the communication with that neighbor - so let's loop over all neighbor ranks:
+    for(auto it = neighbor_ranks.begin(); it != neighbor_ranks.end(); ++it)
     {
-      // Get the rank of our neighbour process:
-      const int neighbour_rank = *it;
+      // Get the rank of our neighbor process:
+      const int neighbor_rank = *it;
 
       // As already mentioned before, our mesh-node does not only contain the mesh itself,
       // but also other important stuff, such as the "halos", which describe the overlap of
-      // neighboured patches. For the assembly of the mirror, we need to get the halo mesh-part
+      // neighbored patches. For the assembly of the mirror, we need to get the halo mesh-part
       // from the mesh-node first:
-      const MeshPartType* neighbour_halo = root_mesh_node->get_halo(neighbour_rank);
+      const MeshPartType* neighbor_halo = root_mesh_node->get_halo(neighbor_rank);
 
-      // Ensure that we have a halo for this neighbour rank:
-      XASSERTM(neighbour_halo != nullptr, "Failed to retrieve neighbour halo!");
+      // Ensure that we have a halo for this neighbor rank:
+      XASSERTM(neighbor_halo != nullptr, "Failed to retrieve neighbor halo!");
 
       // Now that we have the halo mesh-part, we can create and assemble the corresponding mirror:
-      VectorMirrorType neighbour_mirror;
+      VectorMirrorType neighbor_mirror;
 
       // Call the MirrorAssembler to do the dirty work for us:
       Assembly::MirrorAssembler::assemble_mirror(
-        neighbour_mirror,   // the mirror that is to be assembled
+        neighbor_mirror,   // the mirror that is to be assembled
         space,              // the FE space for which we want to assemble the mirror
-        *neighbour_halo     // the halo mesh-part that the mirror is to be assembled on
+        *neighbor_halo     // the halo mesh-part that the mirror is to be assembled on
       );
 
       // Once the mirror is assembled, we give it over to our gate.
       gate.push(
-        neighbour_rank,               // the process rank of the neighbour
-        std::move(neighbour_mirror)   // the mirror for the neighbour
+        neighbor_rank,               // the process rank of the neighbor
+        std::move(neighbor_mirror)   // the mirror for the neighbor
       );
 
-      // continue with next neighbour rank
+      // continue with next neighbor rank
     }
 
     // At this point, our gate contains all the mirrors required for the communication with our
-    // neighbours. However, we are not done yet, as the gate needs to perform further internal
-    // initialisation. This initialisation is performed by calling the 'compile' function,
+    // neighbors. However, we are not done yet, as the gate needs to perform further internal
+    // initialization. This initialization is performed by calling the 'compile' function,
     // which requires a local vector for some internal computations. Unfortunately, we do not
     // have a (local) matrix yet, whose create_vector_l/r function could create a vector for us,
     // so we need to create a local vector on foot this time. For DenseVector objects, we can
@@ -481,7 +481,7 @@ namespace Tutorial06
     // "local" matrix that is defined on the patch of this process -- the gate will take care
     // of everything else. For vectors and filters, the process is similar, i.e. we also need
     // to assemble the corresponding local vectors and filters, but depending on the vector or
-    // filter type, some manual synchronisation may be required, as we will see further below.
+    // filter type, some manual synchronization may be required, as we will see further below.
 
     // Create a global matrix: the first two mandatory arguments are the gates for the test- and
     // trial spaces, all further arguments (in our case: none) are passed through to the internal
@@ -541,7 +541,7 @@ namespace Tutorial06
     // We first need to assemble the internal local vector just as in the non-parallel case.
     // However, there is one additional step to be done here right after the local assembly...
 
-    // Initialise the right-hand-side vector entries to zero.
+    // Initialize the right-hand-side vector entries to zero.
     vec_rhs_local.format();
 
     // Again, we use the sine-bubble as a reference solution:
@@ -556,20 +556,20 @@ namespace Tutorial06
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // Now comes the small but significant difference:
-    // In contrast to global matrices, global rhs vectors *must* be synchronised manually after the
+    // In contrast to global matrices, global rhs vectors *must* be synchronized manually after the
     // local vector assembly!!! This task is easy but also easily overlooked, as we just have to
     // call the 'sync_0' member function of the global vector object:
     vec_rhs.sync_0();
 
     // But Beware:
-    // If you forget to synchronise the global RHS vector, you will not experience any crashes
+    // If you forget to synchronize the global RHS vector, you will not experience any crashes
     // or solver breakdowns, which would indicate that something is wrong, but you will get
     // wrong results -- and by "wrong" I do not mean "inaccurate" -- I mean *GARBAGE* !
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Solution initialisation.
+    // Solution initialization.
 
     // Clear the initial solution vector:
     vec_sol.format();
@@ -714,7 +714,7 @@ namespace Tutorial06
 
     // The rest of the solver step is identical to the previous tutorials:
 
-    // Initialise the solver.
+    // Initialize the solver.
     solver->init();
 
     // Solve our linear system:
@@ -733,9 +733,9 @@ namespace Tutorial06
     Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
       vec_sol_local, sol_function, space, cubature_factory);
 
-    // And then we need to synchronise the errors over our communicator to sum up the errors of
+    // And then we need to synchronize the errors over our communicator to sum up the errors of
     // each patch to obtain the errors over the whole domain:
-    errors.synchronise(comm);
+    errors.synchronize(comm);
 
     // And let's print the errors to the console; we need to use the "format_string" function here,
     // as the "print" function accepts only String objects as input:
@@ -748,7 +748,7 @@ namespace Tutorial06
 
     // In a parallel simulation, each process will write a separate VTU file, which contains the
     // data that is defined on the patch of the corresponding process. Moreover, one process
-    // writes a single additional PVTU file, which can be read by ParaView to visualise
+    // writes a single additional PVTU file, which can be read by ParaView to visualize
     // the whole domain that consists of all patches.
 
     // Build the VTK filename; we also append the number of processes to the filename:
@@ -778,8 +778,8 @@ namespace Tutorial06
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Specify the desired mesh refinement level, defaulted to 5.
   Index level(5);
@@ -806,6 +806,6 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial06::main(level);
 
-  // And finally, finalise our runtime environment.
-  return Runtime::finalise();
+  // And finally, finalize our runtime environment.
+  return Runtime::finalize();
 }

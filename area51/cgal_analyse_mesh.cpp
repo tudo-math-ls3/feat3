@@ -79,13 +79,13 @@ namespace AnalyseMeshCGAL
   //
   // 2) We could out-source the actual application code into a separate function template (named e.g.
   //    'run'), which is templatised in the mesh shape-type, and then use an if-else cascade to
-  //    call the corresponding shape-type specialisation of that function template based on the
+  //    call the corresponding shape-type specialization of that function template based on the
   //    shape-type of the input mesh file(s).
   //
   // In this application, we choose the second solution, which is (slightly) more complex to implement
   // than the first one. For this, we have to split the application code over two functions:
   //
-  // 1) The 'main' function, which performs most of the basic initialisation prior to the actual
+  // 1) The 'main' function, which performs most of the basic initialization prior to the actual
   //    mesh object construction. In this application, this boils down to setting up the SimpleArgParser
   //    and creating and initialising the MeshFileReader to obtain the shape-type of the input
   //    mesh files.
@@ -186,7 +186,7 @@ namespace AnalyseMeshCGAL
     // Now all these parts are usually combined in a single mesh file for the sake of
     // convenience, but it is also possible to split this data among several disjoint
     // files. This is especially interesting if you have several different meshes that
-    // discretise the same analytic domain and you want to "outsource" the common
+    // discretize the same analytic domain and you want to "outsource" the common
     // analytic domain description into a separate common file.
 
     // Therefore, we always have to expect that the user does not supply just one filename,
@@ -272,7 +272,7 @@ namespace AnalyseMeshCGAL
     // of the mesh that is stored in the mesh-file(s). At this point, we check all
     // five mesh-types that are supported by this application using the
     // following if-else cascade and call the corresponding "run" function template
-    // specialisation for the required shape-type and pass our SimpleArgParser and
+    // specialization for the required shape-type and pass our SimpleArgParser and
     // MeshFileReader objects as parameters to it:
     // Note that everything else than the 3d-meshes is commented out
     // because the cgal-wrapper supports only 3d-situations at the time of coding.
@@ -311,7 +311,7 @@ namespace AnalyseMeshCGAL
     // Let's print out the shape-type name just for convenience:
     std::cout << "Shape Type: " << ShapeType::name() << std::endl;
 
-    // Now that we know the shape-type that we want to use in this specialisation of the
+    // Now that we know the shape-type that we want to use in this specialization of the
     // 'run' function template, we can continue with the remaining typedefs as usual:
 
     // Use the unstructured conformal mesh class
@@ -370,7 +370,7 @@ namespace AnalyseMeshCGAL
     std::cout << "Mesh Parts: " << stringify_join(meshpart_names, " ") << std::endl;
 
     // In many cases, the mesh-file only contains a relatively "coarse" mesh that first has to be
-    // refined a few times to obtain a mesh that is fine enough for a finite element discretisation.
+    // refined a few times to obtain a mesh that is fine enough for a finite element discretization.
     // The main reason for this is that FEAT is a software package that uses geometric multigrid as
     // one of its core components, and geometric multigrid needs a mesh hierarchy.
     // However, we do not want to deal with multigrid in this application, but we probably still need
@@ -491,14 +491,14 @@ namespace AnalyseMeshCGAL
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Initialise the runtime
-  Runtime::initialise(argc, argv);
+  // Initialize the runtime
+  Runtime::initialize(argc, argv);
 
   // call the tutorial's main function
   AnalyseMeshCGAL::main(argc, argv);
 
-  // Finalise the runtime
-  return Runtime::finalise();
+  // Finalize the runtime
+  return Runtime::finalize();
 }
 #else
 int main(/*int argc, char* argv[]*/)

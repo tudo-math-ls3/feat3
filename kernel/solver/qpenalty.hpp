@@ -14,22 +14,22 @@ namespace FEAT
      * \brief Quadratic penalty iteration
      *
      * \tparam Functional_
-     * The functional (or functional) for the constrained optimisation problem.
+     * The functional (or functional) for the constrained optimization problem.
      *
-     * This class implements an outer solver for a quadratic penalty iteration. Assume we have an optimisation
+     * This class implements an outer solver for a quadratic penalty iteration. Assume we have an optimization
      * problem of the form
      * \f[
      *   x^* = \mathrm{argmin}_{x \in D} f(x) ~ \mathrm{subject~to~} \forall i \in E: c_i(x) = 0
      * \f]
-     * \f$ c_i \f$ are <em>equality constraints</em> turning the minimisation of \f$ f \f$ into a
-     * <em>constrained optimisation problem</em>. To solve this constrained problem, one can solve a series of
+     * \f$ c_i \f$ are <em>equality constraints</em> turning the minimization of \f$ f \f$ into a
+     * <em>constrained optimization problem</em>. To solve this constrained problem, one can solve a series of
      * unconstrained problems with the quadratic penalty iteration by defining the quadratic penalty function
      * \f[
      *   Q(x,\mu) := f(x) + \frac{\mu}{2} \sum_{i \in E} c_i^2(x)
      * \f]
      * and solving it for a series
      * \f$ (\mu_k)_k \in \mathbb{N}, \mu_k \stackrel{k \to \infty}{\longrightarrow} \infty \f$.
-     * Because the penalty terms are smooth, tools from unconstrained optimisation can be applied (see
+     * Because the penalty terms are smooth, tools from unconstrained optimization can be applied (see
      * \cite NW06 Chapter 17.1). The greatest advantage of this is that this needs no constraint qualifications and
      * is still applicable if \f$ \mathrm{dim}( \mathrm{ker} (\nabla c_{i_1}, \dots, \nabla c_{i_M}) ) > 0 \f$,
      * which is required by all more sophisticated methods like augmented Lagragian etc.
@@ -41,7 +41,7 @@ namespace FEAT
      * might violate the constraints quite strongly. The rate of increase has to be fast enough that the number of
      * penalty iterations remains small (i.e. \f$ \leq 10 \f$), but the systematic ill-conditioning of the penalty
      * function means that we cannot be too quick about this. If the increase is too quick, the previous iterate will
-     * be too far away of a minimiser of the new problem and the inner solver will fail to converge. So take care.
+     * be too far away of a minimizer of the new problem and the inner solver will fail to converge. So take care.
      *
      * \author Jordi Paul
      */
@@ -61,7 +61,7 @@ namespace FEAT
       private:
         /// The functional that takes the penalty parameters and is assembled in the inner solver
         FunctionalType& _functional;
-        /// The inner solver for the penalised, unconstrained optimisation problem
+        /// The inner solver for the penalized, unconstrained optimization problem
         std::shared_ptr<IterativeSolver<VectorType>> _inner_solver;
         /// We start with this initial penalty parameter
         DataType _initial_penalty_param;
@@ -73,10 +73,10 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] functional
-         * The functional for the inner constrained optimisation problem.
+         * The functional for the inner constrained optimization problem.
          *
          * \param[in] inner_solver
-         * The solver for the inner penalised unconstrained optimisation problem.
+         * The solver for the inner penalized unconstrained optimization problem.
          *
          * \param[in] initial_penalty_param
          * The starting penalty parameter, defaults to 1.
@@ -109,7 +109,7 @@ namespace FEAT
          * The quadratic penalty function \f$ Q \f$.
          *
          * \param[in] inner_solver
-         * The inner solver for solving the penalised unconstrained optimisation problem.
+         * The inner solver for solving the penalized unconstrained optimization problem.
          */
         explicit QPenalty(const String& section_name, PropertyMap* section,
           FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
@@ -386,7 +386,7 @@ namespace FEAT
      * The quadratic penalty function \f$ Q \f$.
      *
      * \param[in] inner_solver
-     * The inner solver for solving the penalised unconstrained optimisation problem.
+     * The inner solver for solving the penalized unconstrained optimization problem.
      *
      * \returns An std::shared_ptr to the new QPenalty solver object
      */
@@ -415,7 +415,7 @@ namespace FEAT
      * The quadratic penalty function \f$ Q \f$.
      *
      * \param[in] inner_solver
-     * The inner solver for solving the penalised unconstrained optimisation problem.
+     * The inner solver for solving the penalized unconstrained optimization problem.
      *
      * \returns An std::shared_ptr to the new QPenalty solver object
      */

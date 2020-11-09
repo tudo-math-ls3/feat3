@@ -63,7 +63,7 @@ namespace FEAT
     template<typename Shape_>
     class BarycentreDriver DOXY({});
 
-    // Simplex specialisation
+    // Simplex specialization
     template<int dim_>
     class BarycentreDriver<Shape::Simplex<dim_> > :
       public Intern::BarycentreDriverBase<Shape::Simplex<dim_> >
@@ -91,7 +91,7 @@ namespace FEAT
       }
     }; // class BarycentreDriver<Simplex<...>>
 
-    // Hypercube specialisation
+    // Hypercube specialization
     template<int dim_>
     class BarycentreDriver<Shape::Hypercube<dim_> > :
       public Intern::BarycentreDriverBase<Shape::Hypercube<dim_> >

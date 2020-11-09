@@ -52,18 +52,18 @@ namespace FEAT
       template<
         typename ScalarDriver_,
         typename Shape_,
-        bool tensorise_ = ScalarDriver_::tensorise>
+        bool tensorize_ = ScalarDriver_::tensorize>
       class TensorProductFunctorHelper;
 
       template<
         typename ScalarDriver_,
-        bool tensorise_ = ScalarDriver_::tensorise>
+        bool tensorize_ = ScalarDriver_::tensorize>
       class SimplexScalarFunctorHelper;
     } // namespace Intern
     /// \endcond
 
     /**
-     * \brief Explicitly Specialised Cubature Factory Wrapper class template
+     * \brief Explicitly Specialized Cubature Factory Wrapper class template
      *
      * \author Peter Zajac
      */
@@ -71,7 +71,7 @@ namespace FEAT
     class FactoryExplicitWrapper DOXY({});
 
     /**
-     * \brief Explicit specialisation for Simplex<1> shape
+     * \brief Explicit specialization for Simplex<1> shape
      *
      * \author Peter Zajac
      */
@@ -148,7 +148,7 @@ namespace FEAT
     }; // class FactoryExplicitWrapper<Simplex<1>,...>
 
     /**
-     * \brief Explicit specialisation for Simplex<2> shape
+     * \brief Explicit specialization for Simplex<2> shape
      *
      * \author Peter Zajac
      */
@@ -204,7 +204,7 @@ namespace FEAT
     }; // class FactoryExplicitWrapper<Simplex<2>,...>
 
     /**
-     * \brief Explicit specialisation for Simplex<3> shape
+     * \brief Explicit specialization for Simplex<3> shape
      *
      * \author Peter Zajac
      */
@@ -261,7 +261,7 @@ namespace FEAT
     }; // class FactoryExplicitWrapper<Simplex<3>,...>
 
     /**
-     * \brief Explicit specialisation for Hypercube<1> shape
+     * \brief Explicit specialization for Hypercube<1> shape
      *
      * \author Peter Zajac
      */
@@ -312,7 +312,7 @@ namespace FEAT
     }; // class FactoryExplicitWrapper<Hypercube<1>,...>
 
     /**
-     * \brief Explicit specialisation for Hypercube<2> shape
+     * \brief Explicit specialization for Hypercube<2> shape
      *
      * \author Peter Zajac
      */
@@ -363,7 +363,7 @@ namespace FEAT
     }; // class FactoryExplicitWrapper<Hypercube<2>,...>
 
     /**
-     * \brief Explicit specialisation for Hypercube<3> shape
+     * \brief Explicit specialization for Hypercube<3> shape
      *
      * \author Peter Zajac
      */
@@ -414,7 +414,7 @@ namespace FEAT
     }; // class FactoryExplicitWrapper<Hypercube<3>,...>
 
     /**
-     * \brief Partially Specialised Cubature Factory Wrapper class template
+     * \brief Partially Specialized Cubature Factory Wrapper class template
      *
      * \author Peter Zajac
      */
@@ -422,7 +422,7 @@ namespace FEAT
     class FactoryPartialWrapper DOXY({});
 
     /**
-     * \brief Partial specialisation for Simplex shapes
+     * \brief Partial specialization for Simplex shapes
      *
      * \author Peter Zajac
      */
@@ -481,7 +481,7 @@ namespace FEAT
     }; // class FactoryPartialWrapper<Simplex<...>,...>
 
     /**
-     * \brief Partial specialisation for Hypercube shapes
+     * \brief Partial specialization for Hypercube shapes
      *
      * \author Peter Zajac
      */

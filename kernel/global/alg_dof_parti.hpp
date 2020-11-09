@@ -28,7 +28,7 @@ namespace FEAT
     /**
      * \brief Algebraic DOF Partitioning implementation class template
      *
-     * See the documentation of the specialisation of this class template for details.
+     * See the documentation of the specialization of this class template for details.
      */
     template<typename LocalVector_, typename Mirror_>
     class AlgDofParti;
@@ -56,26 +56,26 @@ namespace FEAT
      * - "local" DOFs always means the DOFs as they are used in the domain decomposition world.
      * - "shared" DOFs are all local DOFs are "shared" by at least two processes in the domain
      *   decomposition world. In other words: Each local DOF, which is part of at least one
-     *   neighbour mirror in the Global::Gate, is a shared DOF.
+     *   neighbor mirror in the Global::Gate, is a shared DOF.
      * - "owned" DOFs are all local DOFs, which:
      *   - are not shared with any other process
      *   - are only shared with processes of higher rank
      * - "donee" DOFs are all shared DOFs, which are not owned DOFs
      *
-     * Furthermore, the neighbour ranks and mirrors, which are used in the Global::Gate of the
-     * domain-decomposition based approach, are converted into "owner" and "donee" neighbour
+     * Furthermore, the neighbor ranks and mirrors, which are used in the Global::Gate of the
+     * domain-decomposition based approach, are converted into "owner" and "donee" neighbor
      * ranks and mirrors in this algebraic approach. The basic idea is the following: Assume
-     * that three processes A, B and C share a common set of DOFs, i.e. they are neighbours in
+     * that three processes A, B and C share a common set of DOFs, i.e. they are neighbors in
      * the domain-decomposition sense, and assume that process A has a lower rank than process B
      * and process C. Due to the "ownership" rule (lowest rank is owner), process A becomes the
      * "owner" of the shared DOFs and thus is responsible for enumerating and managing all DOFs
      * shared by A, B and C, which  in turn makes processes B and C "donees". Now, because
      * process A owns at least one DOF that is also a local DOF of process B and a local DOF
      * of process C in the domain decomposition sense, we have that:
-     * - process A is an "owner neighbour" of process B
-     * - process A is an "owner neighbour" of process C
-     * - process B is a "donee neighbour" of process A
-     * - process C is a "donee neighbour" of process A
+     * - process A is an "owner neighbor" of process B
+     * - process A is an "owner neighbor" of process C
+     * - process B is a "donee neighbor" of process A
+     * - process C is a "donee neighbor" of process A
      *
      * \todo decide what happens if this process has no dofs at all
      * \todo make sure that this works for discontinuous elements, too
@@ -114,9 +114,9 @@ namespace FEAT
       /// mirror for this process's owned DOFs
       MirrorType _owned_mirror;
       /// rank/mirror-pair of DOF-owner processes
-      std::vector<std::pair<int, MirrorType>> _neighbours_owner;
+      std::vector<std::pair<int, MirrorType>> _neighbors_owner;
       /// rank/mirror-pair of DOF-donee processes
-      std::vector<std::pair<int, MirrorType>> _neighbours_donee;
+      std::vector<std::pair<int, MirrorType>> _neighbors_donee;
 
       /// global DOF offsets of all processes, \see #allgather()
       std::vector<int> _all_glob_dof_offset;
@@ -139,8 +139,8 @@ namespace FEAT
         _glob_dof_count = Index(0);
         _glob_dof_idx.clear();
         _owned_mirror.clear();
-        _neighbours_owner.clear();
-        _neighbours_donee.clear();
+        _neighbors_owner.clear();
+        _neighbors_donee.clear();
         _all_glob_dof_offset.clear();
         _all_glob_dof_counts.clear();
       }
@@ -221,78 +221,78 @@ namespace FEAT
         return this->_owned_mirror;
       }
 
-      /// \returns The number of owner neighbours.
-      Index get_num_owner_neighbours() const
+      /// \returns The number of owner neighbors.
+      Index get_num_owner_neighbors() const
       {
-        return Index(this->_neighbours_owner.size());
+        return Index(this->_neighbors_owner.size());
       }
 
-      /// \returns The number of donee neighbours.
-      Index get_num_donee_neighbours() const
+      /// \returns The number of donee neighbors.
+      Index get_num_donee_neighbors() const
       {
-        return Index(this->_neighbours_donee.size());
+        return Index(this->_neighbors_donee.size());
       }
 
       /**
-       * \brief Returns an owner neighbour rank.
+       * \brief Returns an owner neighbor rank.
        *
        * \param[in] i
-       * The index of the owner neighbour.
+       * The index of the owner neighbor.
        *
        * \returns
-       * The rank of the i-th owner neighbour.
+       * The rank of the i-th owner neighbor.
        */
       int get_owner_rank(Index i) const
       {
-        return this->_neighbours_owner.at(i).first;
+        return this->_neighbors_owner.at(i).first;
       }
 
       /**
-       * \brief Returns an donee neighbour rank.
+       * \brief Returns an donee neighbor rank.
        *
        * \param[in] i
-       * The index of the donee neighbour.
+       * The index of the donee neighbor.
        *
        * \returns
-       * The rank of the i-th donee neighbour.
+       * The rank of the i-th donee neighbor.
        */
       int get_donee_rank(Index i) const
       {
-        return this->_neighbours_donee.at(i).first;
+        return this->_neighbors_donee.at(i).first;
       }
 
       /**
-       * \brief Returns an owner neighbour mirror.
+       * \brief Returns an owner neighbor mirror.
        *
        * \note
-       * The indices of an owner neighbour mirror are owned DOF indices.
+       * The indices of an owner neighbor mirror are owned DOF indices.
        *
        * \param[in] i
-       * The index of the owner neighbour.
+       * The index of the owner neighbor.
        *
        * \returns
-       * The mirror of the i-th owner neighbour.
+       * The mirror of the i-th owner neighbor.
        */
       const MirrorType& get_owner_mirror(Index i) const
       {
-        return this->_neighbours_owner.at(i).second;
+        return this->_neighbors_owner.at(i).second;
       }
 
       /**
-       * \brief Returns a donee neighbour mirror.
+       * \brief Returns a donee neighbor mirror.
        *
        * \note
-       * The indices of a donee neighbour mirror are local DOF indices.
+       * The indices of a donee neighbor mirror are local DOF indices.
        *
        * \param[in] i
-       * The index of the donee neighbour.
+       * The index of the donee neighbor.
        *
        * \returns
-       * The mirror of the i-th donee neighbour.
+       * The mirror of the i-th donee neighbor.
        */
       const MirrorType& get_donee_mirror(Index i) const
       {
-        return this->_neighbours_donee.at(i).second;
+        return this->_neighbors_donee.at(i).second;
       }
 
       /**
@@ -371,9 +371,9 @@ namespace FEAT
         // get the communicator
         const Dist::Comm& comm = *this->_comm;
 
-        // get my rank and neighbour ranks
+        // get my rank and neighbor ranks
         const int my_rank = comm.rank();
-        const std::vector<int>& neighbour_ranks = gate._ranks;
+        const std::vector<int>& neighbor_ranks = gate._ranks;
 
         // get number of local DOFs on our patch
         const Index num_local_dofs = gate._freqs.size();
@@ -387,26 +387,26 @@ namespace FEAT
         // startup assume that we own all local DOFs.
         std::vector<int> dof_owners(num_local_dofs, my_rank);
 
-        // Now loop over all our neighbour processes
-        for(std::size_t i(0); i < neighbour_ranks.size(); ++i)
+        // Now loop over all our neighbor processes
+        for(std::size_t i(0); i < neighbor_ranks.size(); ++i)
         {
-          // Check whether the neighbours rank is less than our rank, as otherwise
-          // that particular neighbour can not own any of our local DOFs.
-          const int neighbour_rank = neighbour_ranks.at(i);
-          if(neighbour_rank < my_rank)
+          // Check whether the neighbors rank is less than our rank, as otherwise
+          // that particular neighbor can not own any of our local DOFs.
+          const int neighbor_rank = neighbor_ranks.at(i);
+          if(neighbor_rank < my_rank)
           {
-            // loop over all DOFs in the mirror of that neighbour
+            // loop over all DOFs in the mirror of that neighbor
             const MirrorType& mirror = gate._mirrors.at(i);
             const Index num_indices = mirror.num_indices();
             const IndexType* idx = mirror.indices();
             for(Index j(0); j < num_indices; ++j)
             {
               // get a reference to the current owner rank of that DOF and
-              // update the DOF owner if that neighbour has a lower rank
+              // update the DOF owner if that neighbor has a lower rank
               // than the previous "owner candidate"
               int& dof_owner = dof_owners.at(idx[j]);
-              if(neighbour_rank < dof_owner)
-                dof_owner = neighbour_rank;
+              if(neighbor_rank < dof_owner)
+                dof_owner = neighbor_rank;
             }
           }
         }
@@ -419,7 +419,7 @@ namespace FEAT
 
         // Furthermore, we need the 'inverse' information, i.e. for each of our
         // local DOFs, we have to store the "owned DOF index" if we own this
-        // particular DOF. We initialise the vector with ~0, which stands for
+        // particular DOF. We initialize the vector with ~0, which stands for
         // "not my DOF":
         std::vector<Index> own_dof_idx(num_local_dofs, ~Index(0));
 
@@ -454,53 +454,53 @@ namespace FEAT
         // easily generate from our "owned_dofs" vector:
         this->_owned_mirror = _vidx2mirror(num_local_dofs, owned_dofs);
 
-        // Now we also have to create the mirrors for each of our neighbour processes:
-        for(std::size_t i(0); i < neighbour_ranks.size(); ++i)
+        // Now we also have to create the mirrors for each of our neighbor processes:
+        for(std::size_t i(0); i < neighbor_ranks.size(); ++i)
         {
-          // get the neighbour rank and its mirror
-          const int neighbour_rank = neighbour_ranks.at(i);
+          // get the neighbor rank and its mirror
+          const int neighbor_rank = neighbor_ranks.at(i);
           const MirrorType& mirror = gate._mirrors.at(i);
 
           // There are two cases now:
-          // 1) The neighbour process has a lower rank, so it is a (potential) owner
+          // 1) The neighbor process has a lower rank, so it is a (potential) owner
           //    of at least one of our local DOFs.
-          // 2) The neighbour process has a greater rank, so we are an owner of at least
-          //    one of the neighbour process's local DOFs.
-          if(neighbour_rank < my_rank)
+          // 2) The neighbor process has a greater rank, so we are an owner of at least
+          //    one of the neighbor process's local DOFs.
+          if(neighbor_rank < my_rank)
           {
-            // This is a potential "owner-neighbour", which may own one or several of
+            // This is a potential "owner-neighbor", which may own one or several of
             // our local DOFs. We call a helper function, which will create a vector
-            // of all *local* DOF indices, which are owned by that neighbour process.
+            // of all *local* DOF indices, which are owned by that neighbor process.
             // Note that it is perfectly legit if the vector is empty, as this simply
             // means that all our local DOFs, which are shared with that particular
-            // neighbour, are owned by some *other* neighbour process(es) and not by
-            // the particular neighbour that we are currently considering.
-            std::vector<Index> v = _owner_vidx(mirror, dof_owners, neighbour_rank);
+            // neighbor, are owned by some *other* neighbor process(es) and not by
+            // the particular neighbor that we are currently considering.
+            std::vector<Index> v = _owner_vidx(mirror, dof_owners, neighbor_rank);
             if(!v.empty())
             {
-              // That neighbour owns at least one of our local DOFs, so create a mirror
-              // from the index-vector and push it into our list of "owner-neighbours".
+              // That neighbor owns at least one of our local DOFs, so create a mirror
+              // from the index-vector and push it into our list of "owner-neighbors".
               // Note that the indices in the mirror are *local* DOF indices.
-              _neighbours_owner.emplace_back(std::make_pair(neighbour_rank, _vidx2mirror(num_local_dofs, v)));
+              _neighbors_owner.emplace_back(std::make_pair(neighbor_rank, _vidx2mirror(num_local_dofs, v)));
             }
           }
           else
           {
-            // This is a potential "donee-neighbour", which shares one or several of
+            // This is a potential "donee-neighbor", which shares one or several of
             // our local DOFs, which we might own. We call a helper function, which
             // will create a vector of all our *owned* DOF indices, which are shared
-            // with that particular neighbour process.
+            // with that particular neighbor process.
             // Note that it is perfectly legit if the vector is empty, as this simply
             // means that all our local DOFs, which are shared with that particular
-            // neighbour, are owned by some *other* neighbour process(es) and not by
+            // neighbor, are owned by some *other* neighbor process(es) and not by
             // this process (i.e. us).
             std::vector<Index> v = _donee_vidx(mirror, own_dof_idx);
             if(!v.empty())
             {
-              // We own at least of one of the neighbour's local DOFs, so create a mirror
-              // from the index-vector and push it into our list of "donee-neighbours".
+              // We own at least of one of the neighbor's local DOFs, so create a mirror
+              // from the index-vector and push it into our list of "donee-neighbors".
               // Note that the indices in the mirror are *owned* DOF indices.
-              _neighbours_donee.emplace_back(std::make_pair(neighbour_rank, _vidx2mirror(num_owned_dofs, v)));
+              _neighbors_donee.emplace_back(std::make_pair(neighbor_rank, _vidx2mirror(num_owned_dofs, v)));
             }
           }
         }
@@ -510,7 +510,7 @@ namespace FEAT
         // is required for the assembly of matrices later on, so we have to store this in
         // a member-variable vector.
 
-        // Let's create the vector of the required length, initialise all its indices to
+        // Let's create the vector of the required length, initialize all its indices to
         // ~0, which will can be used for a sanity check later on to ensure that we know
         // the global indices of all our local DOFs:
         this->_glob_dof_idx.resize(num_local_dofs, ~Index(0));
@@ -522,30 +522,30 @@ namespace FEAT
           this->_glob_dof_idx[owned_dofs[i]] = this->_glob_dof_offset + Index(i);
 
         // Finally, we also need to query the global DOF indices of all our local DOFs,
-        // which are owned by some neighbour process (i.e. we are the donee for these DOFs).
+        // which are owned by some neighbor process (i.e. we are the donee for these DOFs).
         // Of course, we also have to send the global DOF indices of all DOFs that we own
-        // to all of our "donee-neighbours".
+        // to all of our "donee-neighbors".
 
-        // Allocate index buffers and post receives for all of our owner-neighbours:
-        const Index num_neigh_owner = Index(_neighbours_owner.size());
+        // Allocate index buffers and post receives for all of our owner-neighbors:
+        const Index num_neigh_owner = Index(_neighbors_owner.size());
         Dist::RequestVector recv_reqs(num_neigh_owner);
         std::vector<std::vector<Index>> recv_bufs(num_neigh_owner);
         for(Index i(0); i < num_neigh_owner; ++i)
         {
-          const std::size_t num_idx = _neighbours_owner.at(i).second.num_indices();
+          const std::size_t num_idx = _neighbors_owner.at(i).second.num_indices();
           recv_bufs.at(i).resize(num_idx);
-          recv_reqs[i] = comm.irecv(recv_bufs.at(i).data(), num_idx, _neighbours_owner.at(i).first);
+          recv_reqs[i] = comm.irecv(recv_bufs.at(i).data(), num_idx, _neighbors_owner.at(i).first);
         }
 
         // Allocate index buffers, fill them with the global DOF indices of our owned
-        // DOFs and send them to the donee-neighbours:
-        const Index num_neigh_donee = Index(_neighbours_donee.size());
+        // DOFs and send them to the donee-neighbors:
+        const Index num_neigh_donee = Index(_neighbors_donee.size());
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<std::vector<Index>> send_bufs(num_neigh_donee);
         for(Index i(0); i < num_neigh_donee; ++i)
         {
-          // Get the mirror for this donee-neighbour:
-          const MirrorType& mirror = _neighbours_donee.at(i).second;
+          // Get the mirror for this donee-neighbor:
+          const MirrorType& mirror = _neighbors_donee.at(i).second;
           const Index num_idx = mirror.num_indices();
           const Index* mir_idx = mirror.indices();
           // Allocate buffer of required size and translate the indices of our mirror,
@@ -555,17 +555,17 @@ namespace FEAT
           Index* jdx = send_bufs.at(i).data();
           for(Index j(0); j < num_idx; ++j)
             jdx[j] = this->_glob_dof_offset + mir_idx[j];
-          send_reqs[i] = comm.isend(send_bufs.at(i).data(), num_idx, _neighbours_donee.at(i).first);
+          send_reqs[i] = comm.isend(send_bufs.at(i).data(), num_idx, _neighbors_donee.at(i).first);
         }
 
-        // Now process all receive requests from our owner-neighbours:
+        // Now process all receive requests from our owner-neighbors:
         for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
-          const MirrorType& mirror = _neighbours_owner.at(i).second;
+          const MirrorType& mirror = _neighbors_owner.at(i).second;
           const Index num_idx = mirror.num_indices();
           const Index* mir_idx = mirror.indices();
           const Index* jdx = recv_bufs.at(i).data();
-          // Scatter the global DOF indices, which our friendly owner-neighbour has
+          // Scatter the global DOF indices, which our friendly owner-neighbor has
           // provided us with, into our global DOF index vector:
           for(Index j(0); j < num_idx; ++j)
             this->_glob_dof_idx[mir_idx[j]] = jdx[j];
@@ -597,9 +597,9 @@ namespace FEAT
       }
 
       // auxiliary function: create an index vector of all *local DOFs*
-      // which are owned by the process with the given neighbour rank:
+      // which are owned by the process with the given neighbor rank:
       static std::vector<Index> _owner_vidx(const MirrorType& old_mir,
-        const std::vector<int>& dof_owners, const int neighbour_rank)
+        const std::vector<int>& dof_owners, const int neighbor_rank)
       {
         std::vector<Index> v;
         v.reserve(old_mir.num_indices());
@@ -607,8 +607,8 @@ namespace FEAT
         const IndexType* old_idx = old_mir.indices();
         for(Index i(0); i < old_mir.num_indices(); ++i)
         {
-          // is this neighbour the owner?
-          if(neighbour_rank == dof_owners[old_idx[i]])
+          // is this neighbor the owner?
+          if(neighbor_rank == dof_owners[old_idx[i]])
             v.push_back(old_idx[i]);
         }
         return v;
@@ -643,7 +643,7 @@ namespace FEAT
      * - \b upload: copy the DOFs of a Global::Vector into this AlgDofPartiVector
      * - \b download: copy the DOFs of this AlgDofPartiVector into a Global::Vector
      *
-     * Note that objects of this class do not require any additional initialisation as
+     * Note that objects of this class do not require any additional initialization as
      * the constructor, which expects and AlgDofPartiObject as its parameters, will
      * automatically allocate the internal vector.
      *
@@ -701,7 +701,7 @@ namespace FEAT
        * \brief Creates a ADP vector based on an algebraic dof partitioning
        *
        * Once this constructor returns, this vector does not require any further
-       * initialisation and is therefore ready-to-use.
+       * initialization and is therefore ready-to-use.
        *
        * \param[in] adp_in
        * The algebraic dof partitioning to be used for this vector.
@@ -757,7 +757,7 @@ namespace FEAT
        * Do not use this function except for <b>small-scale debugging</b> purposes. You have been warned.
        *
        * \param[inout] vec_full
-       * A vector that receives all global dofs. Its length is assumed to be initialised to
+       * A vector that receives all global dofs. Its length is assumed to be initialized to
        * the global number of degrees of freedom.
        */
       void allgather(BufferVectorType& vec_full) const
@@ -832,16 +832,16 @@ namespace FEAT
         // get the communicator
         const Dist::Comm& comm = *this->get_comm();
 
-        // get the number of owner- and donee-neighbours
-        const Index num_neigh_owner = adp.get_num_owner_neighbours();
-        const Index num_neigh_donee = adp.get_num_donee_neighbours();
+        // get the number of owner- and donee-neighbors
+        const Index num_neigh_owner = adp.get_num_owner_neighbors();
+        const Index num_neigh_donee = adp.get_num_donee_neighbors();
 
         // The basic idea is simple:
-        // 1) Send the shared DOFs to all of our donee-neighbours
-        // 2) Receive the shared DOFs from all of our owner-neighbours
+        // 1) Send the shared DOFs to all of our donee-neighbors
+        // 2) Receive the shared DOFs from all of our owner-neighbors
         // 3) Scatter our own owned DOFs into our local vector
 
-        // Create receive buffers and post receives for all owner-neighbours
+        // Create receive buffers and post receives for all owner-neighbors
         Dist::RequestVector recv_reqs(num_neigh_owner);
         std::vector<BufferVectorType> recv_bufs(num_neigh_owner);
         for(Index i(0); i < num_neigh_owner; ++i)
@@ -849,12 +849,12 @@ namespace FEAT
           // create a vector buffer
           // note: owner mirrors relate to local DOF indices
           recv_bufs.at(i) = adp.get_owner_mirror(i).create_buffer(local_vector);
-          // post receive from owner neighbour
+          // post receive from owner neighbor
           recv_reqs[i] = comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), adp.get_owner_rank(i));
         }
 
         // Create send buffers, fill them with our owned DOFs and send this
-        // to our donee-neighbours
+        // to our donee-neighbors
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<BufferVectorType> send_bufs(num_neigh_donee);
         for(Index i(0); i < num_neigh_donee; ++i)
@@ -864,7 +864,7 @@ namespace FEAT
           const MirrorType& mir = adp.get_donee_mirror(i);
           send_bufs.at(i) = mir.create_buffer(this->_vector);
           mir.gather(send_bufs.at(i), this->_vector);
-          // post send to donee neighbour
+          // post send to donee neighbor
           send_reqs[i] = comm.isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), adp.get_donee_rank(i));
         }
 
@@ -874,7 +874,7 @@ namespace FEAT
         // scatter our own owned DOFs into our output vector
         adp.get_owned_mirror().scatter_axpy(local_vector, this->_vector);
 
-        // process receives from our owner-neighbours
+        // process receives from our owner-neighbors
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter received DOFs into our output vector
@@ -896,8 +896,8 @@ namespace FEAT
      * DOF partitioning. A matrix of this class will contain only the (full) rows corresponding
      * to the owned DOFs of this process, where the column indices are global DOF indices.
      *
-     * In contrast to the AlgDofPartiVector, objects of this class need further initialisation
-     * after the call of the constructor. This additional initialisation is performed by
+     * In contrast to the AlgDofPartiVector, objects of this class need further initialization
+     * after the call of the constructor. This additional initialization is performed by
      * uploading at least the layout of a given Global::Matrix. In analogy to the concept of
      * our (linear) solvers, the "upload" process is split into two functions:
      * - upload_symbolic(): creates all internal data structures and computes the internal
@@ -955,9 +955,9 @@ namespace FEAT
       /// the internal matrix storing our owned matrix rows
       OwnedMatrixType _matrix;
 
-      /// the matrix buffers for our donee and owner neighbours
+      /// the matrix buffers for our donee and owner neighbors
       std::vector<BufferMatrixType> _donee_bufs, _owner_bufs;
-      /// the data array mirrors for our donee and owner neighbours
+      /// the data array mirrors for our donee and owner neighbors
       std::vector<MirrorType> _data_donee_mirs, _data_owner_mirs;
       /// the data array "mirror" for this process
       std::vector<std::pair<Index,Index>> _my_data_mir;
@@ -975,9 +975,9 @@ namespace FEAT
        *
        * \attention
        * In contrast to the AlgDofPartiVector class, this matrix class is \b not
-       * fully initialised after this constructor returns. It is at least required
+       * fully initialized after this constructor returns. It is at least required
        * to set up the internal data structures by calling the #upload_symbolic()
-       * or #upload() function and passing an initialised matrix to it.
+       * or #upload() function and passing an initialized matrix to it.
        *
        * \param[in] adp_in
        * The algebraic dof partitioning to be used for this matrix.
@@ -1061,10 +1061,10 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialises this algebraic dof-partitioned matrix from a global matrix.
+       * \brief Initializes this algebraic dof-partitioned matrix from a global matrix.
        *
        * \param[in] mat_a
-       * The global matrix whose layout and values are to be used to initialise this matrix.
+       * The global matrix whose layout and values are to be used to initialize this matrix.
        */
       void upload(const GlobalMatrixType& mat_a)
       {
@@ -1072,10 +1072,10 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialises this algebraic dof-partitioned matrix from a global matrix.
+       * \brief Initializes this algebraic dof-partitioned matrix from a global matrix.
        *
        * \param[in] mat_a
-       * The global matrix whose layout and values are to be used to initialise this matrix.
+       * The global matrix whose layout and values are to be used to initialize this matrix.
        */
       void upload(const LocalMatrixType& mat_a)
       {
@@ -1084,16 +1084,16 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialises this algebraic dof-partitioned matrix from a global matrix.
+       * \brief Initializes this algebraic dof-partitioned matrix from a global matrix.
        *
-       * This function performs the "symbolic" initialisation of this algebraic-dof-partitioned
+       * This function performs the "symbolic" initialization of this algebraic-dof-partitioned
        * matrix based on the layout of the given input matrix. After the call of ths function,
-       * this matrix object is fully initialised, although the actual numerical values of
+       * this matrix object is fully initialized, although the actual numerical values of
        * the matrix entries are still undefined and have to be copied from the global input
        * matrix lateron by using the #upload_numeric() function.
        *
        * \param[in] mat_a
-       * The global matrix whose layout is to be used to initialise this matrix.
+       * The global matrix whose layout is to be used to initialize this matrix.
        */
       void upload_symbolic(const GlobalMatrixType& mat_a)
       {
@@ -1101,16 +1101,16 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialises this algebraic-dof-partitioned matrix from a local matrix.
+       * \brief Initializes this algebraic-dof-partitioned matrix from a local matrix.
        *
-       * This function performs the "symbolic" initialisation of this algebraic-dof-partitioned
+       * This function performs the "symbolic" initialization of this algebraic-dof-partitioned
        * matrix based on the layout of the given input matrix. After the call of this function,
-       * this matrix object is fully initialised, although the actual numerical values of
+       * this matrix object is fully initialized, although the actual numerical values of
        * the matrix entries are still undefined and have to be copied from the local input
        * matrix later on by using the #upload_numeric() function.
        *
        * \param[in] mat_a
-       * The local matrix whose layout is to be used to initialise this matrix.
+       * The local matrix whose layout is to be used to initialize this matrix.
        */
       void upload_symbolic(const LocalMatrixType& mat_a)
       {
@@ -1157,8 +1157,8 @@ namespace FEAT
         // format our internal matrix
         this->_matrix.format();
 
-        const Index num_neigh_owner = adp.get_num_owner_neighbours();
-        const Index num_neigh_donee = adp.get_num_donee_neighbours();
+        const Index num_neigh_owner = adp.get_num_owner_neighbors();
+        const Index num_neigh_donee = adp.get_num_donee_neighbors();
 
         Dist::RequestVector recv_reqs(num_neigh_donee);
         Dist::RequestVector send_reqs(num_neigh_owner);
@@ -1286,7 +1286,7 @@ namespace FEAT
        *
        * \param[in] local_matrix
        * The local matrix that acts as a layout template.\n
-       * Its layout must be initialised, but its numerical values are ignored.
+       * Its layout must be initialized, but its numerical values are ignored.
        *
        * \param[in] mirror
        * The mirror that contains the local DOF indices, which correspond to the
@@ -1343,7 +1343,7 @@ namespace FEAT
        *
        * \param[in] local_matrix
        * The local matrix that acts as a layout template.\n
-       * Its layout must be initialised, but its numerical values are ignored.
+       * Its layout must be initialized, but its numerical values are ignored.
        */
       void _assemble_buffers(const LocalMatrixType& local_matrix)
       {
@@ -1353,9 +1353,9 @@ namespace FEAT
         // get out communicator
         const Dist::Comm& comm = *this->get_comm();
 
-        // get number of neighbours and allocate buffer vectors
-        const Index num_neigh_owner = adp.get_num_owner_neighbours();
-        const Index num_neigh_donee = adp.get_num_donee_neighbours();
+        // get number of neighbors and allocate buffer vectors
+        const Index num_neigh_owner = adp.get_num_owner_neighbors();
+        const Index num_neigh_donee = adp.get_num_donee_neighbors();
         _owner_bufs.resize(num_neigh_owner);
         _donee_bufs.resize(num_neigh_donee);
 
@@ -1366,11 +1366,11 @@ namespace FEAT
             adp.get_global_dof_indices(), adp.get_num_global_dofs());
         }
 
-        // We have assembled our owner-neighbour matrix buffers, however, we cannot
-        // assemble the donee-neighbour matrix buffers on our own. Instead, each owner
-        // neighbour has to receive its donee-buffers from its donee-neighbours, because
+        // We have assembled our owner-neighbor matrix buffers, however, we cannot
+        // assemble the donee-neighbor matrix buffers on our own. Instead, each owner
+        // neighbor has to receive its donee-buffers from its donee-neighbors, because
         // only the donee knows the matrix layout of those buffers.
-        // Yes, this is brain-twisting, but believe me, it cannot be realised otherwise.
+        // Yes, this is brain-twisting, but believe me, it cannot be realized otherwise.
 
         // Note:
         // The following code is effectively just copy-&-paste from the SynchMatrix::init()
@@ -1464,7 +1464,7 @@ namespace FEAT
        *
        * \param[in] local_matrix
        * The local matrix that acts as a layout template.\n
-       * Its layout must be initialised, but its numerical values are ignored.
+       * Its layout must be initialized, but its numerical values are ignored.
        */
       void _assemble_structure(const LocalMatrixType& local_matrix)
       {
@@ -1502,11 +1502,11 @@ namespace FEAT
           }
         }
 
-        // process all donee-neighbour buffers
-        const Index num_neigh_donee = adp.get_num_donee_neighbours();
+        // process all donee-neighbor buffers
+        const Index num_neigh_donee = adp.get_num_donee_neighbors();
         for(Index ineigh(0); ineigh < num_neigh_donee; ++ineigh)
         {
-          // get the mirror and the matrix buffer of that donee neighbour
+          // get the mirror and the matrix buffer of that donee neighbor
           // note: the donee mirror indices are owned DOF indices
           const MirrorType& mir = adp.get_donee_mirror(ineigh);
           const BufferMatrixType& buf = this->_donee_bufs.at(ineigh);
@@ -1539,14 +1539,14 @@ namespace FEAT
       }
 
       /**
-       * \brief Auxiliary function: assembles a data-mirror for a donee-neighbour
+       * \brief Auxiliary function: assembles a data-mirror for a donee-neighbor
        *
        * \param[in] local_matrix
        * The local matrix that acts as a layout template.\n
-       * Its layout must be initialised, but its numerical values are ignored.
+       * Its layout must be initialized, but its numerical values are ignored.
        *
        * \param[in] mirror
-       * The mirror of the donee-neighbour.
+       * The mirror of the donee-neighbor.
        *
        * \param[in] buffer
        * The matrix buffer for the donee-mirror.
@@ -1594,14 +1594,14 @@ namespace FEAT
       }
 
       /**
-       * \brief Auxiliary function: assembles a data-mirror for an owner-neighbour
+       * \brief Auxiliary function: assembles a data-mirror for an owner-neighbor
        *
        * \param[in] local_matrix
        * The local matrix that acts as a layout template.\n
-       * Its layout must be initialised, but its numerical values are ignored.
+       * Its layout must be initialized, but its numerical values are ignored.
        *
        * \param[in] mirror
-       * The mirror of the owner-neighbour.
+       * The mirror of the owner-neighbor.
        *
        * \param[in] buffer
        * The matrix buffer for the owner-mirror.
@@ -1653,16 +1653,16 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles the data-mirrors for all owner- and donee-neighbours.
+       * \brief Assembles the data-mirrors for all owner- and donee-neighbors.
        *
        * This functions assembles the data-mirrors, which are used for the communication
        * of the numerical values of a matrix in the #upload_numeric() function.
-       * This allows that the matrix values can be uploaded and synchronised without the
+       * This allows that the matrix values can be uploaded and synchronized without the
        * need to re-communicate the unchanged matrix buffer layouts every time.
        *
        * \param[in] local_matrix
        * The local matrix that acts as a layout template.\n
-       * Its layout must be initialised, but its numerical values are ignored.
+       * Its layout must be initialized, but its numerical values are ignored.
        */
       void _assemble_data_mirrors(const LocalMatrixType& local_matrix)
       {
@@ -1746,7 +1746,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Gathers the values of a local matrix into an owner-neighbour buffer-vector
+       * \brief Gathers the values of a local matrix into an owner-neighbor buffer-vector
        *
        * \param[out] buffer
        * A buffer vector that receives the gathered values.
@@ -1772,7 +1772,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Scatters the values of a donee-neighbour buffer-vector into a local matrix
+       * \brief Scatters the values of a donee-neighbor buffer-vector into a local matrix
        *
        * \param[inout] local_matrix
        * The local matrix that receives the scattered values.

@@ -47,7 +47,7 @@ struct MeshoptRefinementApp
 
   /// The only transformation available is the standard P1 or Q1 transformation
   typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
-  /// FE space for the transformation. The mesh optimisation problem is solved on this
+  /// FE space for the transformation. The mesh optimization problem is solved on this
   typedef typename Meshopt::Intern::TrafoFE<TrafoType>::Space TrafoFESpace;
 
   /// The domain level, including trafo and FE space
@@ -82,7 +82,7 @@ struct MeshoptRefinementApp
     int lvl_max(-1);
     // Do we want to write vtk files. Read from the command line arguments
     bool write_vtk(false);
-    // Do we want to write the optimised mesh to xml. Read from the command line arguments
+    // Do we want to write the optimized mesh to xml. Read from the command line arguments
     bool write_xml(false);
     // Is the application running as a test? Read from the command line arguments
     int test_number(0);
@@ -121,10 +121,10 @@ struct MeshoptRefinementApp
     XASSERTM(app_settings_section != nullptr,
     "Application config is missing the mandatory ApplicationSettings section!");
 
-    // Get the mesh optimiser key from the application settings
-    auto meshoptimiser_key_p = app_settings_section->query("mesh_optimiser");
-    XASSERTM(meshoptimiser_key_p.second,
-    "ApplicationConfig section is missing the mandatory meshoptimiser entry!");
+    // Get the mesh optimizer key from the application settings
+    auto meshoptimizer_key_p = app_settings_section->query("mesh_optimizer");
+    XASSERTM(meshoptimizer_key_p.second,
+    "ApplicationConfig section is missing the mandatory meshoptimizer entry!");
 
     // Get the application settings section
     auto domain_control_settings_section = application_config.query_section("DomainControlSettings");
@@ -190,7 +190,7 @@ struct MeshoptRefinementApp
     // Create MeshoptControl
     std::shared_ptr<Control::Meshopt::MeshoptControlBase<DomCtrl>> meshopt_ctrl(nullptr);
     meshopt_ctrl = Control::Meshopt::ControlFactory<Mem_, DT_, IT_>::create_meshopt_control(
-      dom_ctrl, meshoptimiser_key_p.first, &meshopt_config, &solver_config);
+      dom_ctrl, meshoptimizer_key_p.first, &meshopt_config, &solver_config);
 
     String file_basename(name()+"_n"+stringify(comm.size()));
 
@@ -304,8 +304,8 @@ struct MeshoptRefinementApp
       }
     }
 
-    // Optimise the mesh
-    meshopt_ctrl->optimise();
+    // Optimize the mesh
+    meshopt_ctrl->optimize();
 
     // Write output again
     if(write_vtk)
@@ -575,7 +575,7 @@ int run_app(int argc, char* argv[])
   PropertyMap meshopt_config;
   PropertyMap solver_config;
 
-  // If we are not in test mode, parse command line arguments, read files, synchronise streams
+  // If we are not in test mode, parse command line arguments, read files, synchronize streams
   if(test_number == 0)
   {
     // Read the application config file, required
@@ -594,7 +594,7 @@ int run_app(int argc, char* argv[])
       DistFileIO::read_common(synchstream_app_config, application_config_filename);
     }
 
-    // Parse the application config from the (synchronised) stream
+    // Parse the application config from the (synchronized) stream
     application_config.read(synchstream_app_config, true);
 
     // Get the application settings section
@@ -605,13 +605,13 @@ int run_app(int argc, char* argv[])
     auto mesh_files_p = app_settings_section->query("mesh_files");
     mesh_files = mesh_files_p.first.split_by_whitespaces();
 
-    // Read configuration for mesh optimisation to stream
+    // Read configuration for mesh optimization to stream
     auto meshopt_config_filename_p = app_settings_section->query("meshopt_config_file");
 
     XASSERTM(meshopt_config_filename_p.second,
     "ApplicationConfig section is missing the mandatory meshopt_config_file entry!");
 
-    comm.print("Reading mesh optimisation config from file "+meshopt_config_filename_p.first);
+    comm.print("Reading mesh optimization config from file "+meshopt_config_filename_p.first);
     DistFileIO::read_common(synchstream_meshopt_config, meshopt_config_filename_p.first);
     meshopt_config.read(synchstream_meshopt_config, true);
 
@@ -682,9 +682,9 @@ int run_app(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   int ret = run_app(argc, argv);
-  FEAT::Runtime::finalise();
+  FEAT::Runtime::finalize();
   return ret;
 }
 
@@ -693,7 +693,7 @@ static void read_test_application_config(std::stringstream& iss, const int test_
   if(test_number == 1)
   {
     iss << "[ApplicationSettings]" << std::endl;
-    iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
+    iss << "mesh_optimizer = HyperelasticityDefault" << std::endl;
     iss << "solver_config_file = ./solver_config.ini" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
@@ -705,7 +705,7 @@ static void read_test_application_config(std::stringstream& iss, const int test_
   else if(test_number == 2)
   {
     iss << "[ApplicationSettings]" << std::endl;
-    iss << "mesh_optimiser = HyperelasticityDefault" << std::endl;
+    iss << "mesh_optimizer = HyperelasticityDefault" << std::endl;
     iss << "solver_config_file = ./solver_config.ini" << std::endl;
 
     iss << "[DomainControlSettings]" << std::endl;
@@ -932,7 +932,7 @@ static void display_help(const Dist::Comm& comm)
   if(comm.rank() == 0)
   {
     std::cout << "meshopt_refinement-app: This refines a mesh without boundary adaption, then just adapts the" <<
-      " finest mesh and uses a mesh optimiser on this" << std::endl;
+      " finest mesh and uses a mesh optimizer on this" << std::endl;
     std::cout << "Mandatory arguments:" << std::endl;
     std::cout << " --application_config: Path to the application configuration file" << std::endl;
     std::cout << " --mesh-path: Path to the mesh directory" << std::endl;

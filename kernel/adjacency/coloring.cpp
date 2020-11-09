@@ -5,7 +5,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/adjacency/colouring.hpp>
+#include <kernel/adjacency/coloring.hpp>
 #include <kernel/adjacency/graph.hpp>
 
 // includes, system
@@ -18,49 +18,49 @@ namespace FEAT
   namespace Adjacency
   {
     // Default constructor.
-    Colouring::Colouring() :
+    Coloring::Coloring() :
       _num_nodes(0),
-      _num_colours(0),
-      _colouring(nullptr)
+      _num_colors(0),
+      _coloring(nullptr)
     {
     }
 
     // Allocation Constructor.
-    Colouring::Colouring(
+    Coloring::Coloring(
       Index num_nodes,
-      Index num_colours)
+      Index num_colors)
        :
       _num_nodes(num_nodes),
-      _num_colours(num_colours),
-      _colouring(nullptr)
+      _num_colors(num_colors),
+      _coloring(nullptr)
     {
-      _colouring = new Index[_num_nodes];
+      _coloring = new Index[_num_nodes];
     }
 
     // Array Constructor
-    Colouring::Colouring(
+    Coloring::Coloring(
       Index num_nodes,
-      Index* colouring)
+      Index* coloring)
     {
       _num_nodes = num_nodes;
 
       std::unordered_set<Index> colors;
       for (Index i(0) ; i < _num_nodes ; ++i)
       {
-        colors.insert(colouring[i]);
+        colors.insert(coloring[i]);
       }
-      _num_colours = Index(colors.size());
+      _num_colors = Index(colors.size());
       colors.clear();
 
-      _colouring = new Index[_num_nodes];
+      _coloring = new Index[_num_nodes];
       for(Index i(0); i< _num_nodes; i++)
       {
-        _colouring[i] = colouring[i];
+        _coloring[i] = coloring[i];
       }
     }
 
     // Creation out of a given Graph
-    Colouring::Colouring(const Graph& graph)
+    Coloring::Coloring(const Graph& graph)
     {
       // get the graph's data
       Index num_nodes_domain = graph.get_num_nodes_domain();
@@ -69,26 +69,26 @@ namespace FEAT
 
       _num_nodes = num_nodes_domain;
 
-      // allocate the colouring array
-      _colouring = new Index[_num_nodes];
+      // allocate the coloring array
+      _coloring = new Index[_num_nodes];
 
-      // highest possible number of colours
+      // highest possible number of colors
       Index mnc = graph.degree() + 1;
 
-      // number of used colours
-      _num_colours = 0;
+      // number of used colors
+      _num_colors = 0;
 
-      // auxiliary vector storing temporary information about used colours
+      // auxiliary vector storing temporary information about used colors
       std::vector<Index> col_aux(mnc);
 
-      // auxiliary vector storing the number of colour uses
+      // auxiliary vector storing the number of color uses
       std::vector<Index> col_num(mnc, Index(0));
 
       // auxiliary variables
       Index lower_bound;
       Index upper_bound;
-      Index min_colour_uses;
-      Index min_colour_index;
+      Index min_color_uses;
+      Index min_color_index;
 
       // loop over all nodes
       for(Index i(0); i < num_nodes_domain; ++i)
@@ -106,51 +106,51 @@ namespace FEAT
         {
           if(image_idx[j] < i)
           {
-            // mark the used colour
-            col_aux[_colouring[image_idx[j]]] = 1;
+            // mark the used color
+            col_aux[_coloring[image_idx[j]]] = 1;
           }
         }
 
-        // calculate new colour:
+        // calculate new color:
 
-        // minimum number of colour uses so far
-        min_colour_uses = num_nodes_domain + 1;
+        // minimum number of color uses so far
+        min_color_uses = num_nodes_domain + 1;
 
-        // colour with min_colour_uses
-        min_colour_index = num_nodes_domain + 1;
+        // color with min_color_uses
+        min_color_index = num_nodes_domain + 1;
 
-        // loop over all colours
-        for(Index j(0); j < _num_colours; ++j)
+        // loop over all colors
+        for(Index j(0); j < _num_colors; ++j)
         {
           if(col_aux[j] !=1)
           {
-            if(col_num[j] < min_colour_uses)
+            if(col_num[j] < min_color_uses)
             {
-              min_colour_uses = col_num[j];
-              min_colour_index = j;
+              min_color_uses = col_num[j];
+              min_color_index = j;
             }
           }
         }
 
-        // check if an old colour was found or if a new colour is needed
-        if(min_colour_index != num_nodes_domain +1)
+        // check if an old color was found or if a new color is needed
+        if(min_color_index != num_nodes_domain +1)
         {
-          // if an old colour is acceptable
-          _colouring[i] = min_colour_index;
-          ++col_num[min_colour_index];
+          // if an old color is acceptable
+          _coloring[i] = min_color_index;
+          ++col_num[min_color_index];
         }
         else
         {
-          // if a new colour is needed
-          _colouring[i] = _num_colours;
-          ++col_num[_num_colours];
-          ++_num_colours;
+          // if a new color is needed
+          _coloring[i] = _num_colors;
+          ++col_num[_num_colors];
+          ++_num_colors;
         }
       }
     }
 
     // Creation out of a given Graph with a prescribed order
-    Colouring::Colouring(const Graph& graph, const Index* order)
+    Coloring::Coloring(const Graph& graph, const Index* order)
     {
       // get the graph's data
       Index num_nodes_domain = graph.get_num_nodes_domain();
@@ -159,34 +159,34 @@ namespace FEAT
 
       _num_nodes = num_nodes_domain;
 
-      // allocate the colouring array
-      _colouring = new Index[_num_nodes];
+      // allocate the coloring array
+      _coloring = new Index[_num_nodes];
 
-      // highest possible number of colours
+      // highest possible number of colors
       Index mnc = graph.degree() + 1;
 
-      // number of used colours
-      _num_colours = 0;
+      // number of used colors
+      _num_colors = 0;
 
-      // auxiliary vector storing temporary information about used colours
+      // auxiliary vector storing temporary information about used colors
       std::vector<Index> col_aux(mnc);
 
-      // auxiliary vector storing the number of colour uses
+      // auxiliary vector storing the number of color uses
       std::vector<Index> col_num(mnc, Index(0));
 
       // auxiliary variables
       Index lower_bound;
       Index upper_bound;
-      Index min_colour_uses;
-      Index min_colour_index;
+      Index min_color_uses;
+      Index min_color_index;
 
       // auxiliary index
       Index i;
 
-      // initialise colouring data
+      // initialize coloring data
       for(Index j(0); j < num_nodes_domain; ++j)
       {
-        _colouring[j] = num_nodes_domain + 1;
+        _coloring[j] = num_nodes_domain + 1;
       }
 
       // loop over all nodes
@@ -206,92 +206,92 @@ namespace FEAT
         upper_bound = domain_ptr[i+1];
         for(Index j(lower_bound); j < upper_bound; ++j)
         {
-          if(_colouring[image_idx[j]] != num_nodes_domain + 1)
+          if(_coloring[image_idx[j]] != num_nodes_domain + 1)
           {
-            // mark the used colour
-            col_aux[_colouring[image_idx[j]]] = 1;
+            // mark the used color
+            col_aux[_coloring[image_idx[j]]] = 1;
           }
         }
 
-        // calculate new colour:
+        // calculate new color:
 
-        // minimum number of colour uses so far
-        min_colour_uses = num_nodes_domain + 1;
+        // minimum number of color uses so far
+        min_color_uses = num_nodes_domain + 1;
 
-        // colour with min_colour_uses
-        min_colour_index = num_nodes_domain + 1;
+        // color with min_color_uses
+        min_color_index = num_nodes_domain + 1;
 
-        // loop over all colours
-        for(Index j(0); j < _num_colours; ++j)
+        // loop over all colors
+        for(Index j(0); j < _num_colors; ++j)
         {
           if(col_aux[j] !=1)
           {
-            if(col_num[j] < min_colour_uses)
+            if(col_num[j] < min_color_uses)
             {
-              min_colour_uses = col_num[j];
-              min_colour_index = j;
+              min_color_uses = col_num[j];
+              min_color_index = j;
             }
           }
         }
 
-        // check if an old colour was found or if a new colour is needed
-        if(min_colour_index != num_nodes_domain +1)
+        // check if an old color was found or if a new color is needed
+        if(min_color_index != num_nodes_domain +1)
         {
-          // if an old colour is acceptable
-          _colouring[i] = min_colour_index;
-          ++col_num[min_colour_index];
+          // if an old color is acceptable
+          _coloring[i] = min_color_index;
+          ++col_num[min_color_index];
         }
         else
         {
-          // if a new colour is needed
-          _colouring[i] = _num_colours;
-          ++col_num[_num_colours];
-          ++_num_colours;
+          // if a new color is needed
+          _coloring[i] = _num_colors;
+          ++col_num[_num_colors];
+          ++_num_colors;
         }
       }
     }
 
     // move ctor
-    Colouring::Colouring(Colouring&& other) :
+    Coloring::Coloring(Coloring&& other) :
       _num_nodes(other._num_nodes),
-      _num_colours(other._num_colours),
-      _colouring(other._colouring)
+      _num_colors(other._num_colors),
+      _coloring(other._coloring)
     {
-      other._num_nodes = other._num_colours = Index(0);
-      other._colouring = nullptr;
+      other._num_nodes = other._num_colors = Index(0);
+      other._coloring = nullptr;
     }
 
     // move-assign operator
-    Colouring& Colouring::operator=(Colouring&& other)
+    Coloring& Coloring::operator=(Coloring&& other)
     {
       // avoid self-move
       if(this == &other)
         return *this;
 
-      if(_colouring != nullptr)
-        delete [] _colouring;
+      if(_coloring != nullptr)
+        delete [] _coloring;
 
       _num_nodes = other._num_nodes;
-      _num_colours = other._num_colours;
-      _colouring = other._colouring;
+      _num_colors = other._num_colors;
+      _coloring = other._coloring;
 
-      other._num_nodes = other._num_colours = Index(0);
-      other._colouring = nullptr;
+      other._num_nodes = other._num_colors = Index(0);
+      other._coloring = nullptr;
 
       return *this;
     }
 
     // virtual destructor
-    Colouring::~Colouring()
+    Coloring::~Coloring()
     {
-      if(_colouring != nullptr)
-        delete [] _colouring;
+      if(_coloring != nullptr)
+        delete [] _coloring;
     }
 
-    Graph Colouring::create_partition_graph() const
+    Graph Coloring::create_partition_graph() const
     {
       // allocate a new graph
-      Graph graph(get_max_colour() + 1, get_num_nodes(), get_num_nodes());
+      Graph graph(get_max_color() + 1, get_num_nodes(), get_num_nodes());
 
       // create domain array
       Index* domain_ptr = graph.get_domain_ptr();
@@ -303,14 +303,14 @@ namespace FEAT
       // index counter
       Index idx_counter = Index(0);
 
-      // loop over all colours
-      for(Index i(0); i < _num_colours; ++i)
+      // loop over all colors
+      for(Index i(0); i < _num_colors; ++i)
       {
         // loop over all nodes
         for(Index j(0); j < _num_nodes; ++j)
         {
-          // if node j has the colour i
-          if(i == _colouring[j])
+          // if node j has the color i
+          if(i == _coloring[j])
           {
             image_idx[idx_counter] = j;
             ++idx_counter;

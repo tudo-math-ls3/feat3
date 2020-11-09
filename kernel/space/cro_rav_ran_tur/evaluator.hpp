@@ -320,10 +320,10 @@ namespace FEAT
         };
 
       protected:
-        /// inverse linearised trafo config
+        /// inverse linearized trafo config
         static constexpr TrafoTags inv_lin_trafo_config = TrafoTags::dom_point | TrafoTags::img_point | TrafoTags::jac_inv;
 
-        /// inverse linearised trafo data
+        /// inverse linearized trafo data
         typedef typename TrafoEvaluator::template ConfigTraits<inv_lin_trafo_config>::EvalDataType InvLinTrafoData;
 
         /// trafo evaluator for facets (=edges)
@@ -340,10 +340,10 @@ namespace FEAT
         /// basis function coefficient matrix
         typedef Tiny::Matrix<DataType, 4, 4> CoeffMatrixType;
 
-        /// inverse linearised trafo matrix
+        /// inverse linearized trafo matrix
         JacobianInverseType _inv_lin_mat;
 
-        // inverse linearised trafo vector
+        // inverse linearized trafo vector
         ImagePointType _inv_lin_vec;
 
         /// basis function coefficient matrix
@@ -358,7 +358,7 @@ namespace FEAT
           InvLinTrafoData trafo_data;
           trafo_eval(trafo_data, dom_point);
 
-          // store inverse trafo linearisation
+          // store inverse trafo linearization
           _inv_lin_mat = trafo_data.jac_inv;
           _inv_lin_vec = trafo_data.img_point;
         }
@@ -395,7 +395,7 @@ namespace FEAT
           // loop over all 4 edges of the quad
           for(int i(0); i < 4; ++i)
           {
-            // initialise facet evaluator
+            // initialize facet evaluator
             facet_eval.prepare(Index(facet_index_set(cell, i)));
 
             // map first cubature point
@@ -460,7 +460,7 @@ namespace FEAT
          */
         void prepare(const TrafoEvaluator& trafo_eval)
         {
-          // prepare inverse linearised trafo
+          // prepare inverse linearized trafo
           _build_inv_lin_trafo(trafo_eval);
 
           // build coefficient matrix
@@ -506,7 +506,7 @@ namespace FEAT
             loc_grad(0) = _coeff_mat(i,1) + DataType(2) * _coeff_mat(i,3) * pt[0];
             loc_grad(1) = _coeff_mat(i,2) - DataType(2) * _coeff_mat(i,3) * pt[1];
 
-            // multiply by transpose inverse linearised trafo matrix for chain rule
+            // multiply by transpose inverse linearized trafo matrix for chain rule
             data.phi[i].grad.set_vec_mat_mult(loc_grad, _inv_lin_mat);
           }
         }
@@ -585,10 +585,10 @@ namespace FEAT
         };
 
       protected:
-        /// inverse linearised trafo config
+        /// inverse linearized trafo config
         static constexpr TrafoTags inv_lin_trafo_config = TrafoTags::dom_point | TrafoTags::img_point | TrafoTags::jac_inv;
 
-        /// inverse linearised trafo data
+        /// inverse linearized trafo data
         typedef typename TrafoEvaluator::template ConfigTraits<inv_lin_trafo_config>::EvalDataType InvLinTrafoData;
 
         /// trafo evaluator for facets
@@ -605,10 +605,10 @@ namespace FEAT
         /// basis function coefficient matrix
         typedef Tiny::Matrix<DataType, 6, 6> CoeffMatrixType;
 
-        /// inverse linearised trafo matrix
+        /// inverse linearized trafo matrix
         JacobianInverseType _inv_lin_mat;
 
-        // inverse linearised trafo vector
+        // inverse linearized trafo vector
         ImagePointType _inv_lin_vec;
 
         /// basis function coefficient matrix
@@ -623,7 +623,7 @@ namespace FEAT
           InvLinTrafoData trafo_data;
           trafo_eval(trafo_data, dom_point);
 
-          // store inverse trafo linearisation
+          // store inverse trafo linearization
           _inv_lin_mat = trafo_data.jac_inv;
           _inv_lin_vec = trafo_data.img_point;
         }
@@ -666,7 +666,7 @@ namespace FEAT
           // loop over all 6 faces of the hexa
           for(int i(0); i < 6; ++i)
           {
-            // initialise facet evaluator
+            // initialize facet evaluator
             facet_eval.prepare(Index(facet_index_set(cell, i)));
 
             // map first cubature point
@@ -747,7 +747,7 @@ namespace FEAT
         */
         void prepare(const TrafoEvaluator& trafo_eval)
         {
-          // prepare inverse linearised trafo
+          // prepare inverse linearized trafo
           _build_inv_lin_trafo(trafo_eval);
 
           // build coefficient matrix
@@ -797,7 +797,7 @@ namespace FEAT
             loc_grad[1] = _coeff_mat(i,2) + DataType(2) * pt[1] * (_coeff_mat(i,5) - _coeff_mat(i,4));
             loc_grad[2] = _coeff_mat(i,3) - DataType(2) * pt[2] * _coeff_mat(i,5);
 
-            // multiply by transpose inverse linearised trafo matrix for chain rule
+            // multiply by transpose inverse linearized trafo matrix for chain rule
             data.phi[i].grad.set_vec_mat_mult(loc_grad, _inv_lin_mat);
           }
         }

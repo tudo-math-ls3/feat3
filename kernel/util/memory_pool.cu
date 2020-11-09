@@ -46,14 +46,14 @@ namespace FEAT
 
 using namespace FEAT;
 
-// static member initialisation
+// static member initialization
 std::map<void*, Util::Intern::MemoryInfo> MemoryPool<Mem::CUDA>::_pool;
 Index MemoryPool<Mem::CUDA>::blocksize_misc = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_reduction = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_spmv = 256;
 Index MemoryPool<Mem::CUDA>::blocksize_axpy = 256;
 
-void MemoryPool<Mem::CUDA>::initialise(int rank, int /*ranks_per_node*/, int /*ranks_per_uma*/, int gpus_per_node)
+void MemoryPool<Mem::CUDA>::initialize(int rank, int /*ranks_per_node*/, int /*ranks_per_uma*/, int gpus_per_node)
 {
   /// \todo enable non cuda ranks and ensure balance of ranks per numa section
   int device = rank % gpus_per_node;
@@ -71,7 +71,7 @@ void MemoryPool<Mem::CUDA>::initialise(int rank, int /*ranks_per_node*/, int /*r
   cusparseSetPointerMode(Util::Intern::cusparse_handle, CUSPARSE_POINTER_MODE_HOST);
 }
 
-void MemoryPool<Mem::CUDA>::finalise()
+void MemoryPool<Mem::CUDA>::finalize()
 {
   if (_pool.size() > 0)
   {
@@ -227,7 +227,7 @@ void MemoryPool<Mem::CUDA>::convert(DT1_ * dest, const DT2_ * src, const Index c
 #endif
 }
 
-void MemoryPool<Mem::CUDA>::synchronise()
+void MemoryPool<Mem::CUDA>::synchronize()
 {
   cudaDeviceSynchronize();
 }

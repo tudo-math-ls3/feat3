@@ -921,10 +921,10 @@ namespace FEAT
       /**
        * \brief Extracts a patch from the root mesh as a new mesh node
        *
-       * This function also computes the communication neighbour ranks.
+       * This function also computes the communication neighbor ranks.
        *
        * \param[out] comm_ranks
-       * The communication neighbour ranks vector for this process.
+       * The communication neighbor ranks vector for this process.
        *
        * \param[in] elems_at_rank
        * The elements-at-rank graph representing the partitioning
@@ -954,7 +954,7 @@ namespace FEAT
         // transpose the partitioning graph here, as we will need it multiple times
         const Adjacency::Graph ranks_at_elem(Adjacency::RenderType::transpose, elems_at_rank);
 
-        // Step 1: compute neighbour ranks
+        // Step 1: compute neighbor ranks
         {
           // get vertices-at-element
           const auto& verts_at_elem = base_root_mesh->template get_index_set<MeshType::shape_dim, 0>();
@@ -999,7 +999,7 @@ namespace FEAT
           // build ranks-at-rank (via vertices) graph
           Adjacency::Graph ranks_at_rank(Adjacency::RenderType::injectify, verts_at_rank, ranks_at_vert);
 
-          // build comm neighbour ranks vector
+          // build comm neighbor ranks vector
           for(auto it = ranks_at_rank.image_begin(Index(rank)); it != ranks_at_rank.image_end(Index(rank)); ++it)
           {
             if(int(*it) != rank)

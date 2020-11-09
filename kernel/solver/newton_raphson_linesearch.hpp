@@ -165,7 +165,7 @@ namespace FEAT
           /// <vec_pn, vec_grad>. We want to find the minimum of the functional value along vec_pn
           DataType df(0);
 
-          // Perform initialisations and checks
+          // Perform initializations and checks
           Status st = this->_startup(alpha, fval, df, vec_sol, vec_dir);
           //  Because of the Newton-Raphson update x[k+1] = x[k] + alpha[k+1] d and alpha[k+1] = alpha[k] - < g[k], d > / < d, H[k] d >,
           // || d ||_2 does not matter and the relative update is invariant

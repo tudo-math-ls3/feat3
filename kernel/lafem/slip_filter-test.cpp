@@ -74,7 +74,7 @@ class SlipFilterVectorTest
       tmp(0) = tmp(0)*DT_(Math::pow(-DT_(0.5), DT_(i)));
       tmp(BlockSize_-1) = -DT_(i);
 
-      //tmp.normalise();
+      //tmp.normalize();
 
       my_filter.add(j,tmp);
     }

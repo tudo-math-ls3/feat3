@@ -36,22 +36,22 @@ namespace FEAT
      *   \f[\mathbf{K}(v,u,\psi) := \int_\Omega v\cdot \nabla u \psi\f]
      * - <b>K'</b> is the Frechet derivative of the convective operator:
      *   \f[\mathbf{K'}(v,u,\psi) := \int_\Omega \nabla v u \psi\f]
-     * - \b S is the Samarskij-style streamline-diffusion stabilisation operator:
+     * - \b S is the Samarskij-style streamline-diffusion stabilization operator:
      *   \f[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\f]
      *   where
      *   \f[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\f]
      *
-     * <b>Notes on Streamline Diffusion Stabilisation:</b>\n
-     * The implementation of the streamline diffusion stabilisation is based on Turek's CFD book (see \cite TurekCFD,
-     * pages 119 -- 123), however, in the formula above, the local stabilisation parameter \f$\delta_T\f$ is not pre-
+     * <b>Notes on Streamline Diffusion Stabilization:</b>\n
+     * The implementation of the streamline diffusion stabilization is based on Turek's CFD book (see \cite TurekCFD,
+     * pages 119 -- 123), however, in the formula above, the local stabilization parameter \f$\delta_T\f$ is not pre-
      * multiplied by the global parameter \f$\delta^*\f$, compare eq. (3.75) in the book, as we use delta as a scaling
      * parameter for the whole operator \b S in the definition of the full operator \b N, see above.
-     * To enable streamline diffusion stabilisation, you have to perform several tasks:
-     * -# Set the global stabilisation parameter #sd_delta, which corresponds to the delta* parameter in the CFD book.
+     * To enable streamline diffusion stabilization, you have to perform several tasks:
+     * -# Set the global stabilization parameter #sd_delta, which corresponds to the delta* parameter in the CFD book.
      *    According to the book (and previous FEAT versions), the value should be in range [0.1, 2], but according
      *    to my personal experience, even smaller values may be a good choice (e.g. 0.02).
      * -# Set the viscosity parameter #sd_nu, which is usually set equal to nu. The only reason for this extra parameter
-     *    is so that you can use this assembler class to assemble the stabilisation without necessarily also assembling
+     *    is so that you can use this assembler class to assemble the stabilization without necessarily also assembling
      *    the diffusion operator, which is what would happen if you set nu to a non-zero value.
      * -# Set the (maximum) velocity norm #sd_v_norm of the convection field, which corresponds to \f$\|v\|_\Omega\f$ and
      *    is required for the computation of the local delta_T parameters. You can do this by either specifying the
@@ -82,7 +82,7 @@ namespace FEAT
       /// scaling parameter for Frechet derivative of convective operator <b>K'</b>
       DataType_ frechet_beta;
 
-      /// scaling parameter for streamline diffusion stabilisation operator \b S
+      /// scaling parameter for streamline diffusion stabilization operator \b S
       DataType_ sd_delta;
 
       /// viscosity parameter nu_S for streamline diffusion (usually equal to nu)
@@ -225,7 +225,7 @@ namespace FEAT
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch number of local dofs
@@ -557,7 +557,7 @@ namespace FEAT
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch number of local dofs
@@ -813,7 +813,7 @@ namespace FEAT
           // prepare space evaluator
           space_eval.prepare(trafo_eval);
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch number of local dofs

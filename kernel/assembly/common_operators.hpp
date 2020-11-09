@@ -187,7 +187,7 @@ namespace FEAT
       /**
        * \brief Laplace-Beltrami operator implementation
        *
-       * This class implements the Laplace-Beltrami operator, which represents a generalisation
+       * This class implements the Laplace-Beltrami operator, which represents a generalization
        * the standard Laplace operator that can also be defined on manifolds.
        *
        * The discrete Laplace-Beltrami operator is defines as follows:

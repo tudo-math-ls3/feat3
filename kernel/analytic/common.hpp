@@ -1285,7 +1285,7 @@ namespace FEAT
 
       /// \cond internal
       /**
-       * \brief Regularised Heaviside static function
+       * \brief Regularized Heaviside static function
        *
        * This class implements the StaticFunction interface representing the function
        * \f[
@@ -1451,7 +1451,7 @@ namespace FEAT
       /// \endcond
 
       /**
-       * \brief Regularised Heaviside static function
+       * \brief Regularized Heaviside static function
        *
        * This class implements the AnalyticFunction interface representing the function
        * \f[
@@ -1626,7 +1626,7 @@ namespace FEAT
        *    u(x,y) = (x - 2)^4 + (x - 2 y)^2
        *  \f]
        *  This function has a global miminum in \f$ x_0 = (2, 1)^T, u(x_0) = 0 \f$ and is frequently used for
-       *  testing optimisation algorithms because the hessian at the minimal point is singular.
+       *  testing optimization algorithms because the hessian at the minimal point is singular.
        *
        * \author Jordi Paul
        */
@@ -1770,7 +1770,7 @@ namespace FEAT
        *    u(x,y) = (x - 2)^4 + (x - 2 y)^2
        *  \f]
        *  This function has a global miminum in \f$ x_0 = (2, 1)^T, u(x_0) = 0 \f$ and is frequently used for
-       *  testing optimisation algorithms because the hessian at the minimal point is singular.
+       *  testing optimization algorithms because the hessian at the minimal point is singular.
        *
        * \author Jordi Paul
        */
@@ -1796,7 +1796,7 @@ namespace FEAT
        *  \f}
        *  with \f$ \forall i = 0, \dots, 3: u(x_i) = 0 \f$.
        *
-       *  It is often used for testing optimisation algorithms because of the nonconvexity and existence of a local
+       *  It is often used for testing optimization algorithms because of the nonconvexity and existence of a local
        *  maximum in \f$ x_4 \approx ( -0.270845, -0.93039)^T \f$ and several saddle points.
        *
        * \author Jordi Paul
@@ -1867,7 +1867,7 @@ namespace FEAT
        *  \f}
        *  with \f$ \forall i = 0, \dots, 3: u(x_i) = 0 \f$.
        *
-       *  It is often used for testing optimisation algorithms because of the nonconvexity and existence of a local
+       *  It is often used for testing optimization algorithms because of the nonconvexity and existence of a local
        *  maximum in \f$ x_4 \approx ( -0.270845, -0.93039)^T \f$ and several saddle points.
        *
        * \author Jordi Paul
@@ -1933,7 +1933,7 @@ namespace FEAT
        * \f]
        *
        * The function has a global minimum in \f$ x_0 = (1, 1)^T\f$ and a "steep valley" along the parabola
-       * \f$ y = x^2 \f$. This is a great challenge to descend-based optimisation algorithms like steepest descent or
+       * \f$ y = x^2 \f$. This is a great challenge to descend-based optimization algorithms like steepest descent or
        * nonlinear CG and the reason it is frequently used as a target function to test such algorithms.
        *
        * \author Jordi Paul
@@ -1971,7 +1971,7 @@ namespace FEAT
         /**
          * \brief Default Constructor
          *
-         * This constructor initialises a parabolic profile along the segment (0,0)-(0,1)
+         * This constructor initializes a parabolic profile along the segment (0,0)-(0,1)
          * with maximum value 1.
          */
         ParProfileBase() :
@@ -2170,7 +2170,7 @@ namespace FEAT
             _ve[1] = DataType(function._y1 - function._y0);
             _vn[0] =  _ve[1];
             _vn[1] = -_ve[0];
-            _vn.normalise();
+            _vn.normalize();
             _den = DataType(1) / Tiny::dot(_ve, _ve);
             _vmax = DataType(function._vmax);
           }
@@ -3070,10 +3070,10 @@ namespace FEAT
 
 
       /**
-       * \brief Sphere-Normalised Sine-Bubble Function
+       * \brief Sphere-Normalized Sine-Bubble Function
        *
        * This function represents the 3D sine-bubble function, whose input
-       * point has been normalised, i.e.:
+       * point has been normalized, i.e.:
        *
        * \f[u(x,y,z) = \sin\bigg(\frac{\pi x}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
           \sin\bigg(\frac{\pi y}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot

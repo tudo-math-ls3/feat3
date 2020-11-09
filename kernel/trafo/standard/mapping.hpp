@@ -150,7 +150,7 @@ namespace FEAT
           FaceEvaluator trafo_eval(*this);
           trafo_eval.prepare(k);
 
-          // This will be the coordinates of the Lagrange points on the reference cell the face is parametrised over
+          // This will be the coordinates of the Lagrange points on the reference cell the face is parametrized over
           Tiny::Matrix<CoordType, num_coeff_facet, ShapeType::dimension - 1> xloc(CoordType(0));
           for(int i(0); i < num_coeff_facet; ++i)
           {
@@ -169,14 +169,14 @@ namespace FEAT
           {
             tau.format();
 
-            // Compute the tangential vectors at the Lagrange points: They are the gradients wrt. the parametrisation
+            // Compute the tangential vectors at the Lagrange points: They are the gradients wrt. the parametrization
             // of the transformation evaluated in the Lagrange points
             trafo_eval.calc_jac_mat(jac_mat, xloc[i]);
 
             // Now write the cross product of the tangentials into nu[i]
             nu[i] = Tiny::orthogonal(jac_mat);
-            // Normalise nu
-            nu[i].normalise();
+            // Normalize nu
+            nu[i].normalize();
           }
 
           return nu;

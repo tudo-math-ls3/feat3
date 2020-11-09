@@ -16,7 +16,7 @@ namespace FEAT
   namespace Solver
   {
     /**
-     * \brief Class holding additional information about certain AnalyticFunction used for optimisation tests
+     * \brief Class holding additional information about certain AnalyticFunction used for optimization tests
      *
      * \tparam DT_
      * Floating point precision
@@ -25,13 +25,13 @@ namespace FEAT
      * The class of the AnalyticFunction
      *
      * \note This generic class template is only for documentation purposes. All relevant data is to be contained in
-     * specialisations in Function_.
+     * specializations in Function_.
      */
     template<typename DT_, typename Function_>
 #ifndef DOXYGEN
-    struct OptimisationTestTraits;
+    struct OptimizationTestTraits;
 #else
-    struct OptimisationTestTraits
+    struct OptimizationTestTraits
     {
       /// The AnalyticFunction i.e. from FEAT::Analytic::Common
       typedef Function_ FunctionType;
@@ -100,7 +100,7 @@ namespace FEAT
 
     /// \cond internal
     template<typename DT_>
-    struct OptimisationTestTraits<DT_, Analytic::Common::BazaraaShettyFunction>
+    struct OptimizationTestTraits<DT_, Analytic::Common::BazaraaShettyFunction>
     {
       public:
         typedef Analytic::Common::BazaraaShettyFunction FunctionType;
@@ -140,7 +140,7 @@ namespace FEAT
     };
 
     template<typename DT_>
-    struct OptimisationTestTraits<DT_, Analytic::Common::GoldsteinPriceFunction>
+    struct OptimizationTestTraits<DT_, Analytic::Common::GoldsteinPriceFunction>
     {
       public:
         typedef Analytic::Common::GoldsteinPriceFunction FunctionType;
@@ -198,7 +198,7 @@ namespace FEAT
     };
 
     template<typename DT_>
-    struct OptimisationTestTraits<DT_, Analytic::Common::HimmelblauFunction>
+    struct OptimizationTestTraits<DT_, Analytic::Common::HimmelblauFunction>
     {
       public:
         typedef Analytic::Common::HimmelblauFunction FunctionType;
@@ -252,7 +252,7 @@ namespace FEAT
     };
 
     template<typename DT_>
-    struct OptimisationTestTraits<DT_, Analytic::Common::RosenbrockFunction>
+    struct OptimizationTestTraits<DT_, Analytic::Common::RosenbrockFunction>
     {
       public:
         typedef Analytic::Common::RosenbrockFunction FunctionType;

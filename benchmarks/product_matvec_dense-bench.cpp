@@ -87,7 +87,7 @@ void run()
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<Mem::CUDA, Algo::CUDA, double>();
   run<Mem::CUDA, Algo::CUDA, float>();
@@ -98,5 +98,5 @@ int main(int argc, char ** argv)
 #endif
   run<Mem::Main, Algo::Generic, double>();
   run<Mem::Main, Algo::Generic, float>();
-  Runtime::finalise();
+  Runtime::finalize();
 }

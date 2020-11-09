@@ -357,7 +357,7 @@ namespace FEAT
       /**
         * \brief StandardTargetRefiner implementation for Simplex<3> shape: Vertex indices
         *
-        * \note This class is only necessary to resolve the ambiguity of the previous specialisations.
+        * \note This class is only necessary to resolve the ambiguity of the previous specializations.
         *
         * \author Constantin Christof
         */
@@ -668,7 +668,7 @@ namespace FEAT
       /**
         * \brief StandardTargetRefiner implementation for Hypercube<3> shape: Vertex indices
         *
-        * \note This class is only necessary to resolve the ambiguity of the previous specialisations.
+        * \note This class is only necessary to resolve the ambiguity of the previous specializations.
         *
         * \author Peter Zajac
         */

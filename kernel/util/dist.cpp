@@ -102,9 +102,9 @@ namespace FEAT
     }
 #endif // FEAT_OVERRIDE_MPI_OPS
 
-    bool initialise(int& argc, char**& argv)
+    bool initialize(int& argc, char**& argv)
     {
-      // initialise MPI runtime first
+      // initialize MPI runtime first
 #ifdef FEAT_MPI_THREAD_MULTIPLE
       int required = MPI_THREAD_MULTIPLE;
       int provided = MPI_THREAD_SINGLE;
@@ -140,7 +140,7 @@ namespace FEAT
       return true;
     }
 
-    void finalise()
+    void finalize()
     {
 
 #ifdef FEAT_OVERRIDE_MPI_OPS
@@ -158,7 +158,7 @@ namespace FEAT
       MPI_Type_free(&dt_half.dt);
 #endif // FEAT_HAVE_HALFMATH
 
-      // finalise MPI
+      // finalize MPI
       MPI_Finalize();
     }
 
@@ -188,11 +188,11 @@ namespace FEAT
     const Datatype dt_unsigned_int32     (MPI_UINT32_T,           sizeof(std::uint32_t));
     const Datatype dt_unsigned_int64     (MPI_UINT64_T,           sizeof(std::uint64_t));
 #ifdef FEAT_HAVE_QUADMATH
-    // This needs to initialised by Dist::initialise() !
+    // This needs to initialized by Dist::initialize() !
     const Datatype dt__float128          (0,                      sizeof(__float128));
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-    // This needs to initialised by Dist::initialise() !
+    // This needs to initialized by Dist::initialize() !
     const Datatype dt__half              (0,                      sizeof(half_float::half));
 #endif
 
@@ -818,13 +818,13 @@ namespace FEAT
     /* ######################################################################################### */
     /* ######################################################################################### */
 
-    bool initialise(int& /*argc*/, char**& /*argv*/)
+    bool initialize(int& /*argc*/, char**& /*argv*/)
     {
       // nothing to do here
       return true;
     }
 
-    void finalise()
+    void finalize()
     {
       // nothing to do here
     }

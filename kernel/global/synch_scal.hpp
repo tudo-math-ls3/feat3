@@ -65,10 +65,10 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] x
-       * The value to be synchronised.
+       * The value to be synchronized.
        *
        * \param[in] comm
-       * The communicator to be used for synchronisation.
+       * The communicator to be used for synchronization.
        *
        * \param[in] op
        * The reduction operation to be applied.
@@ -168,13 +168,13 @@ namespace FEAT
     }; // class SynchScalarTicket
 
     /**
-     * \brief Synchronises a scalar value by applying a reduction operation
+     * \brief Synchronizes a scalar value by applying a reduction operation
      *
      * \param[in] x
-     * The value to be synchronised.
+     * The value to be synchronized.
      *
      * \param[in] comm
-     * The communicator to be used for synchronisation.
+     * The communicator to be used for synchronization.
      *
      * \param[in] op
      * The reduction operation to be applied.
@@ -183,7 +183,7 @@ namespace FEAT
      * Specifies whether to apply the square-root onto the reduction result.
      *
      * \returns
-     * The synchronised value.
+     * The synchronized value.
      */
     template<typename DT_>
     DT_ synch_scalar(DT_ x, const Dist::Comm& comm, const Dist::Operation& op, bool sqrt = false)

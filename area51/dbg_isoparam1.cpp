@@ -226,8 +226,8 @@ namespace DbgIsoParam
       {
         trafo_eval(trafo_data, cubature_rule.get_point(k));
         img_point = trafo_data.img_point;
-        // normalise in XY plane
-        img_point.template size_cast<2>().normalise();
+        // normalize in XY plane
+        img_point.template size_cast<2>().normalize();
         img_point -= trafo_data.img_point;
         //err += img_point.norm_euclid_sqr();
         err += img_point.norm_euclid();
@@ -363,7 +363,7 @@ namespace DbgIsoParam
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   DbgIsoParam::run(argc, argv);
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

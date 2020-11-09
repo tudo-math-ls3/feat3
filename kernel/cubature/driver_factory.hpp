@@ -49,7 +49,7 @@ namespace FEAT
     class DriverFactory DOXY({});
 
     /**
-     * \brief DriverFactory specialisation for non-variadic drivers.
+     * \brief DriverFactory specialization for non-variadic drivers.
      *
      * \author Peter Zajac
      */
@@ -137,7 +137,7 @@ namespace FEAT
     }; // class DriverFactory<...,false>
 
     /**
-     * \brief DriverFactory specialisation for variadic drivers.
+     * \brief DriverFactory specialization for variadic drivers.
      *
      * \author Peter Zajac
      */

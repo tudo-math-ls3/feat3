@@ -18,7 +18,7 @@ namespace FEAT
      * \brief (Preconditioned) reordered BiCGStab solver implementation
      *
      * This class implements a reordered BiCGStab solver, which hides
-     * the global synchronisation behind preconditioner calls.
+     * the global synchronization behind preconditioner calls.
      *
      * \tparam Matrix_
      * The matrix class to be used by the solver.

@@ -1543,7 +1543,7 @@ namespace FEAT
           const Index num_quads = index_set_q_v.get_num_entities();
 
           // Each coarse mesh quad generates four fine mesh quads (q_i) upon refinement, with
-          // each one connecting one of the coarse mesh vertices (v_i), its two neighbour fine
+          // each one connecting one of the coarse mesh vertices (v_i), its two neighbor fine
           // mesh vertices generated from edge refinement (e_i) and the vertex generated from
           // quad refinement (x):
           //
@@ -2770,13 +2770,13 @@ namespace FEAT
         typename Shape_,
         int cell_dim_,
         int face_dim_,
-        // The following "dummy" argument is necessary for partial specialisation;
+        // The following "dummy" argument is necessary for partial specialization;
         // shape_dim_ *must* coincide with Shape_::dimension !!!
         int shape_dim_ = Shape_::dimension>
       struct IndexRefineShapeWrapper
       {
         static_assert(shape_dim_ == Shape_::dimension, "invalid shape dimension");
-        // the case shape_dim_ = cell_dim_ is specialised below
+        // the case shape_dim_ = cell_dim_ is specialized below
         static_assert(shape_dim_ > cell_dim_, "invalid cell dimension");
         static_assert(cell_dim_ > face_dim_, "invalid face dimension");
         static_assert(face_dim_ >= 0, "invalid face_dimension");
@@ -2865,7 +2865,7 @@ namespace FEAT
         int face_dim_ = cell_dim_ - 1>
       struct IndexRefineFaceWrapper
       {
-        // the case face_dim_ = 0 is handled by the partial specialisation below
+        // the case face_dim_ = 0 is handled by the partial specialization below
         static_assert(face_dim_ > 0, "invalid face dimension");
         static_assert(cell_dim_ > face_dim_, "invalid cell dimension");
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
@@ -2948,7 +2948,7 @@ namespace FEAT
         int cell_dim_ = Shape_::dimension>
       struct IndexRefineWrapper
       {
-        // the case cell_dim_ = 1 is handled by the partial specialisation below
+        // the case cell_dim_ = 1 is handled by the partial specialization below
         static_assert(cell_dim_ > 1, "invalid cell dimension");
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
 

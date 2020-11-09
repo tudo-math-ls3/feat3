@@ -188,7 +188,7 @@ namespace DbgRecursiveParti
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
 #ifdef DEBUG
   DbgRecursiveParti::main(argc, argv);
 #else
@@ -202,5 +202,5 @@ int main(int argc, char** argv)
     FEAT::Runtime::abort();
   }
 #endif
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

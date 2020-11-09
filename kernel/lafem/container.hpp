@@ -72,11 +72,11 @@ namespace FEAT
     /// \endcond
 
     /**
-     * \brief Config class for serialise parameter
+     * \brief Config class for serialize parameter
      *
      * Data survey:
-     * elements_compression LAFEM::SerialiseMode, The compression mode for the elements array. Refer to CompressionModes for details.
-     * indices_compression LAFEM::SerialiseMode, The compression mode for the indices array
+     * elements_compression LAFEM::SerializeMode, The compression mode for the elements array. Refer to CompressionModes for details.
+     * indices_compression LAFEM::SerializeMode, The compression mode for the indices array
      * tolerance FEAT::Real, The max error that should be occur while compressing with zfp.
      * \note tolerance should be unset(meaning -1.) if elements_compression != CompressionModes::elements_zfp
      *          and strictly greater 0 if elements_compression == CompressionModes::elements_zfp.
@@ -484,16 +484,16 @@ namespace FEAT
       }
 
       /**
-       * \brief Calculation of the serialised size with optional compression of complete container entity.
+       * \brief Calculation of the serialized size with optional compression of complete container entity.
        *
-       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
        *
-       * \return An unsigned int containing the size of serialised container.
+       * \return An unsigned int containing the size of serialized container.
        *
-       * Calculate the size of the serialised container entity.
+       * Calculate the size of the serialized container entity.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::uint64_t _serialised_size(const LAFEM::SerialConfig& config = LAFEM::SerialConfig()) const
+      std::uint64_t _serialized_size(const LAFEM::SerialConfig& config = LAFEM::SerialConfig()) const
       {
         Container<Mem::Main, DT2_, IT2_> tc(0);
         tc.assign(*this);
@@ -538,10 +538,10 @@ namespace FEAT
 
       /**
        *
-       * \brief Serialisation of complete container entity(with options of lossless and lossy compression of data arrays).
+       * \brief Serialization of complete container entity(with options of lossless and lossy compression of data arrays).
        *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
-       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \param[in] mode FileMode enum, describing the actual container specialization.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
        * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
        *
        * \returns A std::vector, containing the byte array.
@@ -576,7 +576,7 @@ namespace FEAT
        */
 
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> _serialise(FileMode mode, const SerialConfig& config = SerialConfig()) const
+      std::vector<char> _serialize(FileMode mode, const SerialConfig& config = SerialConfig()) const
       {
         std::uint64_t raw_size = 0u;
         FEAT::Real tolerance = config.get_tolerance();
@@ -598,7 +598,7 @@ namespace FEAT
         Container<Mem::Main, DT2_, IT2_> tc(0);
         tc.assign(*this);
 
-        std::uint64_t gsize = this->template _serialised_size<DT2_, IT2_>(config);
+        std::uint64_t gsize = this->template _serialized_size<DT2_, IT2_>(config);
 
         std::vector<char> result((size_t(gsize)));
         char * array(result.data());
@@ -730,35 +730,35 @@ namespace FEAT
 
       /**
        *
-       * \brief Serialisation of complete container entity(with options of lossless and lossy compression of data arrays).
+       * \brief Serialization of complete container entity(with options of lossless and lossy compression of data arrays).
        *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
+       * \param[in] mode FileMode enum, describing the actual container specialization.
        * \param[in] file The output stream to write data into.
-       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
        * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
        *
        * Serialize a complete container entity into a single binary file with compression enabled.
        * See \ref FEAT::LAFEM::SerialConfig for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void _serialise(FileMode mode, std::ostream & file, const SerialConfig& config = SerialConfig()) const
+      void _serialize(FileMode mode, std::ostream & file, const SerialConfig& config = SerialConfig()) const
       {
-        auto temp(this->template _serialise<DT2_, IT2_>(mode, config));
+        auto temp(this->template _serialize<DT2_, IT2_>(mode, config));
         file.write(temp.data(), long(temp.size()));
         if (!file.good())
-          XABORTM("Error in _serialise - file ostream is not good anymore!");
+          XABORTM("Error in _serialize - file ostream is not good anymore!");
       }
 
        /**
-       * \brief Deserialisation of complete container entity with possible decompression.
+       * \brief Deserialization of complete container entity with possible decompression.
        *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
+       * \param[in] mode FileMode enum, describing the actual container specialization.
        * \param[in] input A std::vector containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void _deserialise(FileMode mode, std::vector<char> & input)
+      void _deserialize(FileMode mode, std::vector<char> & input)
       {
         this->clear();
         Container<Mem::Main, DT2_, IT2_> tc(0);
@@ -775,9 +775,9 @@ namespace FEAT
 #else
         std::uint64_t magic = (std::uint64_t)static_cast<typename std::underlying_type<FileMode>::type>(mode);
 #endif
-        XASSERTM(magic == uiarray[1], "_deserialise: given FileMode incompatible with given array!");
+        XASSERTM(magic == uiarray[1], "_deserialize: given FileMode incompatible with given array!");
 
-        //ensure that we have the same integral/floating type configuration, that was used when storing the serialised data
+        //ensure that we have the same integral/floating type configuration, that was used when storing the serialized data
         XASSERT(Type::Traits<DT_>::is_int == Type::Helper::extract_intness(uiarray[2]));
         XASSERT(Type::Traits<DT_>::is_float == Type::Helper::extract_floatness(uiarray[2]));
         XASSERT(Type::Traits<DT_>::is_signed == Type::Helper::extract_signedness(uiarray[2]));
@@ -904,15 +904,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Deserialisation of complete container entity with possible decompression.
+       * \brief Deserialization of complete container entity with possible decompression.
        *
-       * \param[in] mode FileMode enum, describing the actual container specialisation.
+       * \param[in] mode FileMode enum, describing the actual container specialization.
        * \param[in] file std::istream, pointing to the input data.
        *
        * Recreate a complete container entity by a single binary file.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void _deserialise(FileMode mode, std::istream & file)
+      void _deserialize(FileMode mode, std::istream & file)
       {
         std::uint64_t tsize;
         file.read((char *)&tsize, (long)(sizeof(std::uint64_t)));
@@ -920,8 +920,8 @@ namespace FEAT
         file.seekg(-(long)sizeof(std::uint64_t), file.cur);
         file.read(temp.data(), (long)(tsize));
         if (!file.good())
-          XABORTM("Error in _deserialise - file istream is not good anymore!");
-        this->template _deserialise<DT2_, IT2_>(mode, temp);
+          XABORTM("Error in _deserialize - file istream is not good anymore!");
+        this->template _deserialize<DT2_, IT2_>(mode, temp);
       }
 
     public:
@@ -1147,19 +1147,19 @@ namespace FEAT
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
       std::uint64_t get_checkpoint_size(LAFEM::SerialConfig& config)
       {
-        return this->template _serialised_size<>(config);
+        return this->template _serialized_size<>(config);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::restore_from_checkpoint_data(std::vector<char>&)
       void restore_from_checkpoint_data(std::vector<char> & data)
       {
-        this->template _deserialise<>(FileMode::fm_binary, data);
+        this->template _deserialize<>(FileMode::fm_binary, data);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
       std::uint64_t set_checkpoint_data(std::vector<char>& data, LAFEM::SerialConfig& config)
       {
-        auto buffer = this->template _serialise<>(FileMode::fm_binary, config);
+        auto buffer = this->template _serialize<>(FileMode::fm_binary, config);
         data.insert(std::end(data), std::begin(buffer), std::end(buffer));
         return std::uint64_t(buffer.size());
       }

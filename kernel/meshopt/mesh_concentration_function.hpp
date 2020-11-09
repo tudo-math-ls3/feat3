@@ -55,7 +55,7 @@ namespace FEAT
 #ifndef DOXYGEN
     struct AlignmentPenalty;
 #else
-    // Note: The following block is only visible for Doxygen. The implementation has to be provided by specialisations
+    // Note: The following block is only visible for Doxygen. The implementation has to be provided by specializations
     // in ShapeType_
     struct AlignmentPenalty
     {
@@ -97,7 +97,7 @@ namespace FEAT
       /**
        * \brief Computes the constraint (violation) on every cell of a given mesh
        *
-       * This is mainly for visualisation and debugging purposes, as it computes the contribution of every cell to the
+       * This is mainly for visualization and debugging purposes, as it computes the contribution of every cell to the
        * global constraint violation.
        *
        * \tparam Mesh_
@@ -575,7 +575,7 @@ namespace FEAT
      * Our transformation.
      *
      * \tparam RefCellTrafo_
-     * Mesh optimisation reference cell transformation.
+     * Mesh optimization reference cell transformation.
      *
      * This class implements the virtual interface all derived classes have to implement. A mesh concentration
      * function calculates some concentration for each cell and is then used by Meshopt::HyperelasticityFunctional
@@ -814,7 +814,7 @@ namespace FEAT
      * Our transformation.
      *
      * \tparam RefCellTrafo_
-     * Mesh optimisation reference cell transformation.
+     * Mesh optimization reference cell transformation.
      *
      * \note To avoid virtual functions, this class explicitly knows which type of elemental function it has.
      *
@@ -884,7 +884,7 @@ namespace FEAT
         VectorType _grad_sum_det;
         /// Gradient of the local optimal scales h wrt. the vertex coordinates.
         // Each entry in the DenseVectorBlocked represents one cell. Each cell's block contains
-        // world_dim*(number of local vertices) entries. Has to be serialised like this because there is no
+        // world_dim*(number of local vertices) entries. Has to be serialized like this because there is no
         // DenseVector that saves a Tiny::Matrix
         GradHType _grad_h;
 
@@ -1270,7 +1270,7 @@ namespace FEAT
      * Our transformation.
      *
      * \tparam RefCellTrafo_
-     * Mesh optimisation reference cell transformation.
+     * Mesh optimization reference cell transformation.
      *
      * \note To avoid virtual functions, this class explicitly knows which type of elemental function it has.
      *
@@ -1408,7 +1408,7 @@ namespace FEAT
             }
             this->_dist(i, my_dist);
 
-            // Because we added distance function gradient vectors, we have to normalise again if possible
+            // Because we added distance function gradient vectors, we have to normalize again if possible
             CoordType my_norm(my_dist_vec.norm_euclid());
             if(my_norm > Math::eps<CoordType>())
               my_dist_vec *= (CoordType(1)/my_norm);
@@ -1523,7 +1523,7 @@ namespace FEAT
      * Our transformation.
      *
      * \tparam RefCellTrafo_
-     * Mesh optimisation reference cell transformation.
+     * Mesh optimization reference cell transformation.
      *
      */
     template<typename Trafo_, typename RefCellTrafo_>

@@ -366,14 +366,14 @@ This is quite similar to the <em>build-id</em> concept of the \c configure scrip
 
 The list of all supported (and currently disabled) features is:
 - <c>dbg</c>: generate a debug binary (mutually exclusive with <c>opt</c>)
-- <c>opt</c>: generate an optimised binary (mutually exclusive with <c>dbg</c>)
+- <c>opt</c>: generate an optimized binary (mutually exclusive with <c>dbg</c>)
 - <c>mpi</c>: build with MPI support (requires MS-MPI to be installed)
 - <c>cuda</c> build with Nvidia CUDA support (requires CUDA to be installed)
 - <c>omp</c>: build with OpenMP support (currently not available)
 - <c>mkl</c>: build with Intel MKL support (currently not available)
 
 So, for example the configuration <c>dbg</c> represents a simple debug build without any additional features such as
-MPI or CUDA, whereas <c>opt-mpi</c> represents an optimised build including MPI support.
+MPI or CUDA, whereas <c>opt-mpi</c> represents an optimized build including MPI support.
 
 The filename of a compiled application binary is then concatenated of the project name, the build configuration and
 the target platform. This enables you to compile and use various build configurations for different target platforms

@@ -136,7 +136,7 @@ namespace Tutorial07
   // function for the pressure. In this case, we require several (different) vector types,
   // which we have to define here.
 
-  // For vector fields, there is a specialised vector class available, namely the DenseVectorBlocked.
+  // For vector fields, there is a specialized vector class available, namely the DenseVectorBlocked.
   // In addition to the usual Memory-Data-Index type triplet, which we have already used before,
   // we also have to specify the dimension of the vector field as the fourth template parameter.
   typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim> VectorVeloType;
@@ -232,7 +232,7 @@ namespace Tutorial07
     MeshPartType boundary(boundary_factory);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Trafo and Finite Element Space initialisation
+    // Trafo and Finite Element Space initialization
 
     std::cout << "Creating Trafo and Spaces..." << std::endl;
 
@@ -428,7 +428,7 @@ namespace Tutorial07
     // the Vanka, which is represented by the "Solver::VankaType" enumeration. In total, there are
     // eight different Vanka variants available and (unfortunately) it requires some background
     // knowledge and experience to choose a suitable variant for a given problem. In our case, namely
-    // a Stokes system with a Q2/P1dc discretisation, the "blocked full multiplicative" variant will
+    // a Stokes system with a Q2/P1dc discretization, the "blocked full multiplicative" variant will
     // do just fine, as long as we apply some under-relaxation of, say, 0.8:
     auto vanka = Solver::new_vanka(
       matrix,                             // the system matrix
@@ -457,7 +457,7 @@ namespace Tutorial07
     // Also, reduce the required tolerance to 10^{-5} to speed things up a bit:
     solver->set_tol_rel(1E-5);
 
-    // Okay, our solver is set up, so initialise it now:
+    // Okay, our solver is set up, so initialize it now:
     solver->init();
 
     // Solve our linear system:
@@ -531,8 +531,8 @@ namespace Tutorial07
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialise the FEAT runtime environment:
-  Runtime::initialise(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
+  Runtime::initialize(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #07: Stokes" << std::endl;
@@ -570,7 +570,7 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial07::main(level);
 
-  // And finally, finalise our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
+  // And finally, finalize our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
   // so we can simply return this as the result of our main function to indicate a successful run.
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

@@ -40,9 +40,9 @@ namespace FEAT
     {
       /// fixed coarse grid correction damping
       Fixed,
-      /// Energy-Minimisation
+      /// Energy-Minimization
       MinEnergy,
-      /// Defect-Minimisation
+      /// Defect-Minimization
       MinDefect
     };
 
@@ -488,7 +488,7 @@ namespace FEAT
           _push_solver(level->get_smoother_post().get());
           _push_solver(level->get_smoother_peak().get());
 
-          // initialise all unique solvers in forward order
+          // initialize all unique solvers in forward order
           for(auto it = unique_solvers.begin(); it != unique_solvers.end(); ++it)
             (*it)->init_symbolic();
 
@@ -519,7 +519,7 @@ namespace FEAT
 
         void init_numeric()
         {
-          // initialise all unique solvers in forward order
+          // initialize all unique solvers in forward order
           for(auto it = unique_solvers.begin(); it != unique_solvers.end(); ++it)
             (*it)->init_numeric();
         }
@@ -731,9 +731,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic initialisation method
+       * \brief Symbolic initialization method
        *
-       * This method is called to perform symbolic initialisation of the sub-solvers
+       * This method is called to perform symbolic initialization of the sub-solvers
        * in the multigrid hierarchy.
        */
       void init_symbolic()
@@ -741,7 +741,7 @@ namespace FEAT
         XASSERTM(!_have_init_numeric, "cannot call init_symbolic(): init_numeric() has already been called");
         XASSERTM(!_have_init_symbolic, "cannot call init_symbolic(): init_symbolic() has already been called");
 
-        // initialise all levels in forward order
+        // initialize all levels in forward order
         for(auto it = _levels.begin(); it != _levels.end(); ++it)
           it->init_symbolic();
 
@@ -749,9 +749,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic finalisation method
+       * \brief Symbolic finalization method
        *
-       * This method is called to release any data allocated in the symbolic initialisation step
+       * This method is called to release any data allocated in the symbolic initialization step
        * of the sub-solvers in the multigrid hierarchy.
        */
       void done_symbolic()
@@ -767,18 +767,18 @@ namespace FEAT
       }
 
       /**
-       * \brief Numeric initialisation method
+       * \brief Numeric initialization method
        *
-       * This method is called to perform numeric initialisation of the sub-solvers
+       * This method is called to perform numeric initialization of the sub-solvers
        * in the multigrid hierarchy.\n
-       * Before this function can be called, the symbolic initialisation must be performed.
+       * Before this function can be called, the symbolic initialization must be performed.
        */
       void init_numeric()
       {
         XASSERTM(!_have_init_numeric, "cannot call init_numeric(): init_numeric() has already been called");
         XASSERTM(_have_init_symbolic, "cannot call init_numeric(): init_symbolic() has not been called yet");
 
-        // initialise all levels in forward order
+        // initialize all levels in forward order
         for(auto it = _levels.begin(); it != _levels.end(); ++it)
           it->init_numeric();
 
@@ -786,9 +786,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Numeric finalisation method
+       * \brief Numeric finalization method
        *
-       * This method is called to release any data allocated in the numeric initialisation step
+       * This method is called to release any data allocated in the numeric initialization step
        * of the sub-solvers in the multigrid hierarchy.
        */
       void done_numeric()
@@ -803,9 +803,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Initialisation method
+       * \brief Initialization method
        *
-       * This function performs both the symbolic and numeric initialisation, i.e. it simply performs
+       * This function performs both the symbolic and numeric initialization, i.e. it simply performs
          \verbatim
          this->init_symbolic();
          this->init_numeric();
@@ -818,9 +818,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Finalisation method
+       * \brief Finalization method
        *
-       * This function performs both the symbolic and numeric finalisation, i.e. it simply performs
+       * This function performs both the symbolic and numeric finalization, i.e. it simply performs
          \verbatim
          this->done_numeric();
          this->done_symbolic();
@@ -833,7 +833,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Specifies whether the symbolic initialisation was performed.
+       * \brief Specifies whether the symbolic initialization was performed.
        *
        * \returns
        * \c true between a call of init_symbolic() and done_symbolic(), otherwise \c false.
@@ -844,7 +844,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Specifies whether the symbolic initialisation was performed.
+       * \brief Specifies whether the symbolic initialization was performed.
        *
        * \returns
        * \c true between a call of init_symbolic() and done_symbolic(), otherwise \c false.
@@ -1165,11 +1165,11 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic initialisation function.
+       * \brief Symbolic initialization function.
        *
        * \attention
-       * This function does \b not perform the actual symbolic initialisation
-       * of the multigrid hierarchy. You have to perform the symbolic initialisation
+       * This function does \b not perform the actual symbolic initialization
+       * of the multigrid hierarchy. You have to perform the symbolic initialization
        * explicitly by calling the init_symbolic function of the corresponding
        * MultiGridHierarchy object \b before initialising the solver tree!
        */
@@ -1177,7 +1177,7 @@ namespace FEAT
       {
         BaseClass::init_symbolic();
 
-        // ensure that the hierarchy was initialised
+        // ensure that the hierarchy was initialized
         XASSERTM(_hierarchy->have_symbolic(), "init_symbolic() of multigrid hierarchy was not called yet");
 
         // get the virtual hierarchy size
@@ -1199,11 +1199,11 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic finalisation function.
+       * \brief Symbolic finalization function.
        *
        * \attention
-       * This function does \b not perform the actual symbolic finalisation
-       * of the multigrid hierarchy. You have to perform the symbolic finalisation
+       * This function does \b not perform the actual symbolic finalization
+       * of the multigrid hierarchy. You have to perform the symbolic finalization
        * explicitly by calling the done_symbolic function of the corresponding
        * MultiGridHierarchy object \b after finalising the solver tree!
        */
@@ -1224,11 +1224,11 @@ namespace FEAT
       }
 
       /**
-       * \brief Numeric initialisation function.
+       * \brief Numeric initialization function.
        *
        * \attention
-       * This function does \b not perform the actual numeric initialisation
-       * of the multigrid hierarchy. You have to perform the numeric initialisation
+       * This function does \b not perform the actual numeric initialization
+       * of the multigrid hierarchy. You have to perform the numeric initialization
        * explicitly by calling the init_numeric function of the corresponding
        * MultiGridHierarchy object \b before initialising the solver tree!
        */
@@ -1236,16 +1236,16 @@ namespace FEAT
       {
         BaseClass::init_numeric();
 
-        // ensure that the hierarchy was initialised
+        // ensure that the hierarchy was initialized
         XASSERTM(_hierarchy->have_numeric(), "init_numeric() of multigrid hierarchy was not called yet");
       }
 
       /**
-       * \brief Numeric finalisation function.
+       * \brief Numeric finalization function.
        *
        * \attention
-       * This function does \b not perform the actual numeric finalisation
-       * of the multigrid hierarchy. You have to perform the numeric finalisation
+       * This function does \b not perform the actual numeric finalization
+       * of the multigrid hierarchy. You have to perform the numeric finalization
        * explicitly by calling the done_numeric function of the corresponding
        * MultiGridHierarchy object \b after finalising the solver tree!
        */
@@ -1893,7 +1893,7 @@ namespace FEAT
           // apply correction filter
           system_filter_f.filter_cor(lvl_f.vec_cor);
 
-          // initialise omega for (adaptive) coarse grid correction
+          // initialize omega for (adaptive) coarse grid correction
           DataType omega_cgc = DataType(1);
 
           // use some sort of adaptive cgc?

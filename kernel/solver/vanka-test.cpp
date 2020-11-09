@@ -180,7 +180,7 @@ public:
       // create vanka
       auto vanka = Solver::new_vanka(matrix, filter, vtype, omega, 10);
 
-      // initialise and solve
+      // initialize and solve
       vanka->init();
       stamp1.stamp();
       Solver::solve(*vanka, vec_sol, vec_rhs, matrix, filter);
@@ -317,7 +317,7 @@ public:
       // create vanka
       auto vanka = Solver::new_vanka(matrix, filter, vtype, omega, 10);
 
-      // initialise and solve
+      // initialize and solve
       vanka->init();
       stamp1.stamp();
       Solver::solve(*vanka, vec_sol, vec_rhs, matrix, filter);

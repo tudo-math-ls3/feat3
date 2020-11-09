@@ -30,7 +30,7 @@ namespace FEAT
     template<typename Shape_>
     class DunavantDriver DOXY({});
 
-    // Simplex<2> specialisation
+    // Simplex<2> specialization
     template<>
     class DunavantDriver<Shape::Simplex<2> > :
       public SymmetricSimplexDriver<Shape::Simplex<2> >

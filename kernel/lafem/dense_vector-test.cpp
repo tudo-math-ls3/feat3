@@ -191,16 +191,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class DenseVectorSerialiseTest
+class DenseVectorSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-  DenseVectorSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorSerialiseTest")
+  DenseVectorSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseVectorSerializeTest")
   {
   }
 
-  virtual ~DenseVectorSerialiseTest()
+  virtual ~DenseVectorSerializeTest()
   {
   }
 
@@ -239,18 +239,18 @@ public:
     }
 
     {
-      auto op = k.serialise(LAFEM::SerialConfig(false,false));
+      auto op = k.serialize(LAFEM::SerialConfig(false,false));
       DenseVector<Mem_, DT_, IT_> o(op);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(o(i), k(i), DT_(1e-5));
 #ifdef FEAT_HAVE_ZLIB
-      auto zb = k.serialise(LAFEM::SerialConfig(true,false));
+      auto zb = k.serialize(LAFEM::SerialConfig(true,false));
       DenseVector<Mem_, DT_, IT_> zlib(zb);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), k(i), DT_(1e-5));
 #endif
 #ifdef FEAT_HAVE_ZFP
-      auto zp = k.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-5)));
+      auto zp = k.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-5)));
       DenseVector<Mem_, DT_, IT_> zfp(zp);
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), k(i), DT_(1e-5));
@@ -259,15 +259,15 @@ public:
   }
 };
 
-DenseVectorSerialiseTest<Mem::Main, float, unsigned int> cpu_dense_vector_serialise_test_float_uint;
-DenseVectorSerialiseTest<Mem::Main, double, unsigned int> cpu_dense_vector_serialise_test_double_uint;
-DenseVectorSerialiseTest<Mem::Main, float, unsigned long> cpu_dense_vector_serialise_test_float_ulong;
-DenseVectorSerialiseTest<Mem::Main, double, unsigned long> cpu_dense_vector_serialise_test_double_ulong;
+DenseVectorSerializeTest<Mem::Main, float, unsigned int> cpu_dense_vector_serialize_test_float_uint;
+DenseVectorSerializeTest<Mem::Main, double, unsigned int> cpu_dense_vector_serialize_test_double_uint;
+DenseVectorSerializeTest<Mem::Main, float, unsigned long> cpu_dense_vector_serialize_test_float_ulong;
+DenseVectorSerializeTest<Mem::Main, double, unsigned long> cpu_dense_vector_serialize_test_double_ulong;
 #ifdef FEAT_HAVE_CUDA
-DenseVectorSerialiseTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_serialise_test_float_uint;
-DenseVectorSerialiseTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_serialise_test_double_uint;
-DenseVectorSerialiseTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_serialise_test_float_ulong;
-DenseVectorSerialiseTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_serialise_test_double_ulong;
+DenseVectorSerializeTest<Mem::CUDA, float, unsigned int> cuda_dense_vector_serialize_test_float_uint;
+DenseVectorSerializeTest<Mem::CUDA, double, unsigned int> cuda_dense_vector_serialize_test_double_uint;
+DenseVectorSerializeTest<Mem::CUDA, float, unsigned long> cuda_dense_vector_serialize_test_float_ulong;
+DenseVectorSerializeTest<Mem::CUDA, double, unsigned long> cuda_dense_vector_serialize_test_double_ulong;
 #endif
 
 template<

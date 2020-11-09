@@ -62,10 +62,10 @@ namespace FEAT
 
       public:
         /// Setup memory pools
-        static void initialise(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
+        static void initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
 
         /// Shutdown memory pool and clean up allocated memory pools
-        static void finalise();
+        static void finalize();
 
         /// allocate new memory
         template <typename DT_>
@@ -105,7 +105,7 @@ namespace FEAT
         template <typename DT1_, typename DT2_>
         static void convert(DT1_ * dest, const DT2_ * src, const Index count);
 
-        static void synchronise();
+        static void synchronize();
 
         static void reset_device();
 
@@ -150,12 +150,12 @@ namespace FEAT
       public:
 
         /// Setup memory pools
-        static void initialise()
+        static void initialize()
         {
         }
 
         /// Shutdown memory pool and clean up allocated memory pools
-        static void finalise()
+        static void finalize()
         {
           if (_pool.size() > 0 || _pinned_pool.size() > 0)
           {
@@ -346,7 +346,7 @@ namespace FEAT
           }
         }
 
-        static void synchronise()
+        static void synchronize()
         {
         }
 

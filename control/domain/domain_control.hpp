@@ -37,7 +37,7 @@ namespace FEAT
        * In the most basic case, a domain layer consists of two important parts:
        * - A Dist::Comm communicator which represents the set of all MPI processes
        *   that participate in the decomposition of a domain.
-       * - A set of ranks that represent the neighbours of this process within
+       * - A set of ranks that represent the neighbors of this process within
        *   the communicator.
        *
        * In a simple parallel application, there exists just a single domain layer,
@@ -64,8 +64,8 @@ namespace FEAT
         int _layer_index;
         /// the communicator for this layer
         Dist::Comm _comm;
-        /// the ranks of the neighbour processes in this layer
-        std::vector<int> _neighbour_ranks;
+        /// the ranks of the neighbor processes in this layer
+        std::vector<int> _neighbor_ranks;
 
         /// the sibling communicator
         Dist::Comm _sibling_comm;
@@ -76,7 +76,7 @@ namespace FEAT
         explicit DomainLayer(Dist::Comm&& comm_, int lyr_idx) :
           _layer_index(lyr_idx),
           _comm(std::forward<Dist::Comm>(comm_)),
-          _neighbour_ranks(),
+          _neighbor_ranks(),
           _sibling_comm(),
           _parent_rank(-1)
         {
@@ -85,7 +85,7 @@ namespace FEAT
         DomainLayer(DomainLayer&& other) :
           _layer_index(other._layer_index),
           _comm(std::forward<Dist::Comm>(other._comm)),
-          _neighbour_ranks(std::forward<std::vector<int>>(other._neighbour_ranks)),
+          _neighbor_ranks(std::forward<std::vector<int>>(other._neighbor_ranks)),
           _sibling_comm(std::forward<Dist::Comm>(other._sibling_comm)),
           _parent_rank(other._parent_rank)
         {
@@ -103,7 +103,7 @@ namespace FEAT
 
         std::size_t bytes() const
         {
-          return _neighbour_ranks.size() * sizeof(int);
+          return _neighbor_ranks.size() * sizeof(int);
         }
 
         const Dist::Comm& comm() const
@@ -151,29 +151,29 @@ namespace FEAT
           return Index(_sibling_comm.size());
         }
 
-        Index neighbour_count() const
+        Index neighbor_count() const
         {
-          return Index(_neighbour_ranks.size());
+          return Index(_neighbor_ranks.size());
         }
 
-        void push_neighbour(int neighbour_rank_)
+        void push_neighbor(int neighbor_rank_)
         {
-          _neighbour_ranks.push_back(neighbour_rank_);
+          _neighbor_ranks.push_back(neighbor_rank_);
         }
 
-        int neighbour_rank(Index i) const
+        int neighbor_rank(Index i) const
         {
-          return _neighbour_ranks.at(std::size_t(i));
+          return _neighbor_ranks.at(std::size_t(i));
         }
 
-        void set_neighbour_ranks(const std::vector<int>& neighbours)
+        void set_neighbor_ranks(const std::vector<int>& neighbors)
         {
-          _neighbour_ranks = neighbours;
+          _neighbor_ranks = neighbors;
         }
 
-        const std::vector<int>& get_neighbour_ranks() const
+        const std::vector<int>& get_neighbor_ranks() const
         {
-          return _neighbour_ranks;
+          return _neighbor_ranks;
         }
       }; // class DomainLayer
 

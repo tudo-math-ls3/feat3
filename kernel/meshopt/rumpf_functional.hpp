@@ -41,7 +41,7 @@ namespace FEAT
         DataType _fac_rec_det;
         /// Factor for the cof part in the mesh quality functional
         DataType _fac_cof;
-        /// Regularisation parameter for the 1/det part in the mesh quality functional
+        /// Regularization parameter for the 1/det part in the mesh quality functional
         DataType _fac_reg;
 
         /** \brief Constructor
@@ -61,7 +61,7 @@ namespace FEAT
          * Factor for the Rumpf functional
          *
          * \param[in] fac_reg_
-         * Regularisation factor for the Rumpf functional
+         * Regularization factor for the Rumpf functional
          *
          */
         explicit RumpfFunctionalBase(
@@ -122,7 +122,7 @@ namespace FEAT
      * \tparam TrafoType_
      * The transformation mapping reference cells to the mesh
      *
-     * The actual implementation has to be supplied by the specialisations in TrafoType_.
+     * The actual implementation has to be supplied by the specializations in TrafoType_.
      *
      * A RumpfFunctional computes the cell local contribution to the local functional value and its gradient.
      * The basic archetype is of the form
@@ -169,7 +169,7 @@ namespace FEAT
      *
      * Note that the test function \f$ \eta \f$ might not be the standard FE basis functions as defined by the FE
      * space used (call those \f$ \hat{\eta} \f$). They might be with regard to a different reference cell, so a
-     * transformation is involved, which is realised by passing the [c] material tensor [/c] \f$ M \f$ (which can be
+     * transformation is involved, which is realized by passing the [c] material tensor [/c] \f$ M \f$ (which can be
      * identified with a matrix in this case) to corresponding functions and using the relation
      * \f[
      *   \nabla \eta = M^T \nabla \hat{\eta},
@@ -242,7 +242,7 @@ namespace FEAT
        * Factor for the Rumpf functional
        *
        * \param[in] fac_reg_
-       * Regularisation factor for the Rumpf functional
+       * Regularization factor for the Rumpf functional
        *
        * \param[in] exponent_det_
        * The exponent for the det term, called \f$ p_d \f$ above.
@@ -328,7 +328,7 @@ namespace FEAT
        * \param[out] fval_det
        * Contribution of \f$ \mathrm{det}(\nabla R_K)\f$.
        *
-       * \note: This is for debugging and visualisation purposes and does not compute the local gradient.
+       * \note: This is for debugging and visualization purposes and does not compute the local gradient.
        *
        */
       void eval_fval_cellwise( DataType& DOXY(fval), const TgradR& DOXY(mat_tensor),

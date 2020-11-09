@@ -434,7 +434,7 @@ namespace PoissonDirichlet
     //solver->set_tol_rel(1E-8);
     //solver->set_max_iter(1000);
 
-    // initialise
+    // initialize
     multigrid_hierarchy->init();
     solver->init();
 
@@ -696,7 +696,7 @@ namespace PoissonDirichlet
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     PoissonDirichlet::main(argc, argv);
@@ -711,5 +711,5 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

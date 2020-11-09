@@ -315,7 +315,7 @@ namespace DbgIsoParam
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   DbgIsoParam::run(argc, argv);
-  return Runtime::finalise();
+  return Runtime::finalize();
 }

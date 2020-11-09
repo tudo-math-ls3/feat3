@@ -101,7 +101,7 @@ The easiest way to create a new stand-alone copy (aka 'clone') of an existing LA
 \code{.cpp}
 LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create source vector
 LAFEM::DenseVector<Mem::Main, Index, double> vector_dst;      // create empty destination vector
-vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialize vector_src in some other manner)
 vector_dst = vector_src.clone();                              // create clone of source vector as destination vector
 \endcode
 
@@ -126,7 +126,7 @@ you can use it to perform a device-to-host or host-to-device copy between two in
 Index n = 10u;                                               // vector size
 LAFEM::DenseVector<Mem::Main, Index, double> vector_main(n); // vector in main memory
 LAFEM::DenseVector<Mem::CUDA, Index, double> vector_cuda(n); // vector in cuda memory
-vector_main.format(1.0);                                     // set all values to 1.0 (or initialise vector_main in some other manner)
+vector_main.format(1.0);                                     // set all values to 1.0 (or initialize vector_main in some other manner)
 vector_cuda.copy(vector_main);                               // copy main vector to cuda vector
 \endcode
 
@@ -137,13 +137,13 @@ as a function argument (in analogy to the copy function), e.g.
 \code{.cpp}
 LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create source vector
 LAFEM::DenseVector<Mem::Main, Index, double> vector_dst;      // create empty destination vector
-vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialize vector_src in some other manner)
 vector_dst.clone(vector_src);                                 // create destination vector as clone of source
 \endcode
 as well as a second overload, which returns the new container as a return value, e.g.
 \code{.cpp}
 LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create source vector
-vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialize vector_src in some other manner)
 auto vector_dst = vector_src.clone();                         // create clone of source vector as destination vector
 \endcode
 In addition to this functionality, both \b clone() overloads of some LAFEM containers support various <em>clone modes</em>,
@@ -157,12 +157,12 @@ This member function is used in one of the following scenarios:
  - A LAFEM container has to be converted to a different (compatible) container class template, e.g. one wants to convert
    a LAFEM::SparseMatrixBanded object into a corresponding LAFEM::SparseMatrixCSR object.
 
-In both scenarios, the source and destination objects must be created, although the destination object may be uninitialised.
+In both scenarios, the source and destination objects must be created, although the destination object may be uninitialized.
 
 \code{.cpp}
 LAFEM::DenseVector<Mem::Main, Index, double> vector_src(10u); // create double-precision source vector
 LAFEM::DenseVector<Mem::Main,   int, float > vector_dst;      // create empty single-precision destination vector
-vector_src.format(1.0);                                       // set all values to 1.0 (or initialise vector_src in some other manner)
+vector_src.format(1.0);                                       // set all values to 1.0 (or initialize vector_src in some other manner)
 vector_dst.convert(vector_src);                               // create destination vector as converted source vector
 \endcode
 */

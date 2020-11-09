@@ -19,7 +19,7 @@ namespace FEAT
      * \brief Wrapper class defining an operator based on a scalar AnalyticFunction
      *
      * \tparam Mem_
-     * Memory type the optimiser has to work in
+     * Memory type the optimizer has to work in
      *
      * \tparam DT_
      * Floating point precision

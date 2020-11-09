@@ -446,8 +446,8 @@ namespace DFG95
     static constexpr std::size_t mg_coarse = 8u;        // multigrid coarse grid solve time
     static constexpr std::size_t mg_transfer = 9u;      // multigrid grid transfer time
     static constexpr std::size_t stokes_solve = 10u;    // stokes solve time
-    static constexpr std::size_t vanka_init_sym = 11u;  // vanka symbolic factorisation time
-    static constexpr std::size_t vanka_init_num = 12u;  // vanka numeric factorisation time
+    static constexpr std::size_t vanka_init_sym = 11u;  // vanka symbolic factorization time
+    static constexpr std::size_t vanka_init_num = 12u;  // vanka numeric factorization time
     static constexpr std::size_t vanka_apply = 13u;     // vanka apply time
     static constexpr std::size_t vtk_write = 14u;       // VTK output time
     static constexpr std::size_t checkpoint = 15u;      // checkpoint write time
@@ -604,14 +604,14 @@ namespace DFG95
       s += format_subtime("Nonlinear Solver Total", times[Times::nonlin_total]);
       s += format_subtime("Nonlinear Defect Assembly", times[Times::nonlin_asm_def]);
       s += format_subtime("Nonlinear Matrix Assembly", times[Times::nonlin_asm_mat]);
-      s += format_subtime("Nonlinear Precond Initialise", times[Times::linsol_init]);
+      s += format_subtime("Nonlinear Precond Initialize", times[Times::linsol_init]);
       s += format_subtime("Nonlinear Precond Apply", times[Times::linsol_apply]);
       s += format_subtime("Multigrid Defect Compute", times[Times::mg_defect]);
       s += format_subtime("Multigrid Smooth Apply", times[Times::mg_smooth]);
       s += format_subtime("Multigrid Coarse Solve", times[Times::mg_coarse]);
       s += format_subtime_mm("Multigrid Transfer Apply", times[Times::mg_transfer], times_min[Times::mg_transfer], times_max[Times::mg_transfer]);
-      s += format_subtime_mm("Vanka Symbolic Initialise", times[Times::vanka_init_sym], times_min[Times::vanka_init_sym], times_max[Times::vanka_init_sym]);
-      s += format_subtime_mm("Vanka Numeric Initialise", times[Times::vanka_init_num], times_min[Times::vanka_init_num], times_max[Times::vanka_init_num]);
+      s += format_subtime_mm("Vanka Symbolic Initialize", times[Times::vanka_init_sym], times_min[Times::vanka_init_sym], times_max[Times::vanka_init_sym]);
+      s += format_subtime_mm("Vanka Numeric Initialize", times[Times::vanka_init_num], times_min[Times::vanka_init_num], times_max[Times::vanka_init_num]);
       s += format_subtime_mm("Vanka Local Apply", times[Times::vanka_apply], times_min[Times::vanka_apply], times_max[Times::vanka_apply]);
       s += format_subtime("VTK Write", times[Times::vtk_write]);
       s += format_subtime("Checkpointing", times[Times::checkpoint]);
@@ -921,7 +921,7 @@ namespace DFG95
       velo_eval.prepare(trafo_eval);
       pres_eval.prepare(trafo_eval);
 
-      // initialise dof-mapping
+      // initialize dof-mapping
       velo_dof_mapping.prepare(cell);
       pres_dof_mapping.prepare(cell);
 

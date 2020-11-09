@@ -12,7 +12,7 @@
 
 using namespace FEAT;
 
-// static member initialisation
+// static member initialization
 Index Statistics::_flops = Index(0);
 KahanAccumulation Statistics::_time_reduction;
 KahanAccumulation Statistics::_time_blas2;

@@ -23,15 +23,15 @@ namespace FEAT
     namespace Meshopt
     {
       /**
-       * \brief Factory class for specialised preconditioners
+       * \brief Factory class for specialized preconditioners
        */
       struct MeshoptPrecondFactory
       {
         /**
-         * \brief Creates a preconditioner for nonlinear mesh optimisation problems
+         * \brief Creates a preconditioner for nonlinear mesh optimization problems
          *
          * \tparam MeshoptCtrl_
-         * The type of the control object for mesh optimisation
+         * The type of the control object for mesh optimization
          *
          * \tparam DomCtrl_
          * The type of the control object for the domain.
@@ -43,7 +43,7 @@ namespace FEAT
          * The filter type for the preconditioner.
          *
          * \param[in] my_ctrl
-         * The mesh optimisation control object.
+         * The mesh optimization control object.
          *
          * \param[in] dom_ctrl
          * The domain control object.
@@ -114,7 +114,7 @@ namespace FEAT
             }
             else if(precon_p.first != "none")
             {
-              XABORTM("Unsupport nonlinear optimiser precon: "+precon_p.first);
+              XABORTM("Unsupport nonlinear optimizer precon: "+precon_p.first);
             }
           }
           else

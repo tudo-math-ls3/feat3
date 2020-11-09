@@ -44,11 +44,11 @@ namespace FEAT
       typedef LAFEM::MatrixMirrorBuffer<Mem::Main, typename MT_::DataType, typename MT_::IndexType> BufferMatrixType;
 
     protected:
-      bool _initialised;
+      bool _initialized;
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       /// our communicator
       const Dist::Comm& _comm;
-      /// the neighbour ranks
+      /// the neighbor ranks
       std::vector<int> _ranks;
       /// the matrix mirrors
       std::vector<MatrixMirrorType> _mirrors;
@@ -66,18 +66,18 @@ namespace FEAT
        * The communicator
        *
        * \param[in] ranks
-       * The neighbour ranks within the communicator
+       * The neighbor ranks within the communicator
        *
        * \param[in] mirrors_row
-       * The row vector mirrors to be used for synchronisation
+       * The row vector mirrors to be used for synchronization
        *
        * \param[in] mirrors_col
-       * The column vector mirrors to be used for synchronisation
+       * The column vector mirrors to be used for synchronization
        */
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       SynchMatrix(const Dist::Comm& comm, const std::vector<int>& ranks,
         const std::vector<VMT_>& mirrors_row, const std::vector<VMT_>& mirrors_col) :
-        _initialised(false),
+        _initialized(false),
         _comm(comm),
         _ranks(ranks),
         _send_reqs(ranks.size()),
@@ -104,7 +104,7 @@ namespace FEAT
       }
 #else // non-MPI version
       SynchMatrix(const Dist::Comm&, const std::vector<int>& ranks, const std::vector<VMT_>&, const std::vector<VMT_>&) :
-        _initialised(false)
+        _initialized(false)
       {
         XASSERT(ranks.empty());
       }
@@ -116,16 +116,16 @@ namespace FEAT
       SynchMatrix & operator=(const SynchMatrix &) = delete;
 
       /**
-       * \brief Initialises the internal buffers for synchronisation
+       * \brief Initializes the internal buffers for synchronization
        *
        * \param[in] matrix
-       * The matrix to be used as a template for the buffers. The structure must be initialised,
+       * The matrix to be used as a template for the buffers. The structure must be initialized,
        * but the numerical content of the matrix is ignored.
        */
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       void init(const MT_& matrix)
       {
-        XASSERTM(!_initialised, "SynchMatrix object is already initialised");
+        XASSERTM(!_initialized, "SynchMatrix object is already initialized");
 
         const std::size_t n = _ranks.size();
 
@@ -208,13 +208,13 @@ namespace FEAT
         _recv_reqs.wait_all();
         _send_reqs.wait_all();
 
-        _initialised = true;
+        _initialized = true;
       }
 #else // non-MPI version
       void init(const MT_&)
       {
-        XASSERTM(!_initialised, "SynchMatrix object is already initialised");
-        _initialised = true;
+        XASSERTM(!_initialized, "SynchMatrix object is already initialized");
+        _initialized = true;
       }
 #endif // FEAT_HAVE_MPI
 
@@ -227,7 +227,7 @@ namespace FEAT
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       void exec(MT_& matrix)
       {
-        XASSERTM(_initialised, "SynchMatrix object has not been initialised");
+        XASSERTM(_initialized, "SynchMatrix object has not been initialized");
 
         const std::size_t n = _ranks.size();
 
@@ -265,28 +265,28 @@ namespace FEAT
 #else // non-MPI version
       void exec(MT_&)
       {
-        XASSERTM(_initialised, "SynchMatrix object has not been initialised");
+        XASSERTM(_initialized, "SynchMatrix object has not been initialized");
       }
 #endif // FEAT_HAVE_MPI
     }; // class SynchMatrix
 
     /**
-     * \brief Synchronises a type-0 matrix
+     * \brief Synchronizes a type-0 matrix
      *
      * \param[inout] target
-     * The type-0 matrix to be synchronised
+     * The type-0 matrix to be synchronized
      *
      * \param[in] comm
      * The communicator
      *
      * \param[in] ranks
-     * The neighbour ranks within the communicator
+     * The neighbor ranks within the communicator
      *
      * \param[in] mirrors_row
-     * The row vector mirrors to be used for synchronisation
+     * The row vector mirrors to be used for synchronization
      *
      * \param[in] mirrors_col
-     * The column vector mirrors to be used for synchronisation
+     * The column vector mirrors to be used for synchronization
      */
     template<typename MT_, typename VMT_>
     void synch_matrix(MT_& target, const Dist::Comm& comm, const std::vector<int>& ranks,
@@ -303,7 +303,7 @@ namespace FEAT
     public:
       using VMT_ = typename SVMT_::SubMirrorType;
       using SMT_ = LAFEM::PowerDiagMatrix<MT_, blocks_>;
-      bool _initialised;
+      bool _initialized;
 
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       std::vector<std::shared_ptr<SynchMatrix<MT_, VMT_>>> synch_matrix_list;
@@ -314,7 +314,7 @@ namespace FEAT
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       SynchMatrix(const Dist::Comm& comm, const std::vector<int>& ranks,
         const std::vector<SVMT_>& mirrors_row, const std::vector<SVMT_>& mirrors_col) :
-        _initialised(false),
+        _initialized(false),
         synch_matrix_list(blocks_),
         mirrors_row_split(blocks_),
         mirrors_col_split(blocks_)
@@ -336,7 +336,7 @@ namespace FEAT
       }
 #else // non-MPI version
       SynchMatrix(const Dist::Comm&, const std::vector<int>& ranks, const std::vector<SVMT_>&, const std::vector<SVMT_>&) :
-        _initialised(false)
+        _initialized(false)
       {
         XASSERT(ranks.empty());
       }
@@ -345,27 +345,27 @@ namespace FEAT
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       void init(const SMT_& matrix)
       {
-        XASSERTM(!_initialised, "SynchMatrix object is already initialised");
+        XASSERTM(!_initialized, "SynchMatrix object is already initialized");
 
         for (int block(0) ; block < blocks_ ; ++block)
         {
           synch_matrix_list.at((size_t)block)->init(matrix.get(block, block));
         }
 
-        _initialised = true;
+        _initialized = true;
       }
 #else // non-MPI version
       void init(const SMT_&)
       {
-        XASSERTM(!_initialised, "SynchMatrix object is already initialised");
-        _initialised = true;
+        XASSERTM(!_initialized, "SynchMatrix object is already initialized");
+        _initialized = true;
       }
 #endif // FEAT_HAVE_MPI
 
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       void exec(SMT_& matrix)
       {
-        XASSERTM(_initialised, "SynchMatrix object has not been initialised");
+        XASSERTM(_initialized, "SynchMatrix object has not been initialized");
 
         for (int block(0) ; block < blocks_ ; ++block)
         {
@@ -375,7 +375,7 @@ namespace FEAT
 #else // non-MPI version
       void exec(SMT_&)
       {
-        XASSERTM(_initialised, "SynchMatrix object has not been initialised");
+        XASSERTM(_initialized, "SynchMatrix object has not been initialized");
       }
 #endif // FEAT_HAVE_MPI
     };

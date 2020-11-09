@@ -347,7 +347,7 @@ namespace FEAT
           // format local vector
           local_vector.format();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // gather local vector data
@@ -501,7 +501,7 @@ namespace FEAT
           // format local vector
           local_vector.format();
 
-          // initialise dof-mapping
+          // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // gather local vector data

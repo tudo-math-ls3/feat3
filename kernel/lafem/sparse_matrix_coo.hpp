@@ -606,7 +606,7 @@ namespace FEAT
       explicit SparseMatrixCOO(std::vector<char> input) :
         Container<Mem_, DT_, IT_>(0)
       {
-        deserialise<DT2_, IT2_>(input);
+        deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -1037,32 +1037,32 @@ namespace FEAT
 
 
       /**
-       * \brief Deserialisation of complete container entity.
+       * \brief Deserialization of complete container entity.
        *
        * \param[in] input A std::vector, containing the byte array.
        *
        * Recreate a complete container entity by a single binary array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void deserialise(std::vector<char> input)
+      void deserialize(std::vector<char> input)
       {
-        this->template _deserialise<DT2_, IT2_>(FileMode::fm_coo, input);
+        this->template _deserialize<DT2_, IT2_>(FileMode::fm_coo, input);
       }
 
       /**
-       * \brief Serialisation of complete container entity.
+       * \brief Serialization of complete container entity.
        *
-       * \param[in] config LAFEM::SerialConfig, a struct describing the serialise configuration.
+       * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
        * \note the corresponding configure flags 'zlib' and/or 'zfp' need to be added in the build-id at the configure call.
        *
        * Serialize a complete container entity into a single binary array.
        *
-       * See \ref FEAT::LAFEM::Container::_serialise for details.
+       * See \ref FEAT::LAFEM::Container::_serialize for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialise(const LAFEM::SerialConfig& config = SerialConfig())
+      std::vector<char> serialize(const LAFEM::SerialConfig& config = SerialConfig())
       {
-        return this->template _serialise<DT2_, IT2_>(FileMode::fm_coo, config);
+        return this->template _serialize<DT2_, IT2_>(FileMode::fm_coo, config);
       }
 
       /**
@@ -1221,7 +1221,7 @@ namespace FEAT
           }
           case FileMode::fm_coo:
           case FileMode::fm_binary:
-            this->template _deserialise<double, std::uint64_t>(FileMode::fm_coo, file);
+            this->template _deserialize<double, std::uint64_t>(FileMode::fm_coo, file);
             break;
           default:
             XABORTM("Filemode not supported!");
@@ -1278,7 +1278,7 @@ namespace FEAT
             if (! std::is_same<DT_, double>::value)
               std::cout<<"Warning: You are writing out a coo matrix that is not double precision!"<<std::endl;
 
-            this->template _serialise<double, std::uint64_t>(FileMode::fm_coo, file);
+            this->template _serialize<double, std::uint64_t>(FileMode::fm_coo, file);
             break;
           default:
             XABORTM("Filemode not supported!");

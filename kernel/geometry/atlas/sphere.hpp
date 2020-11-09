@@ -157,7 +157,7 @@ namespace FEAT
           CoordType my_dist(_radius - (point - _midpoint).norm_euclid());
 
           grad_dist = (point - projected);
-          grad_dist.normalise();
+          grad_dist.normalize();
 
           return Math::abs(my_dist);
         }
@@ -177,7 +177,7 @@ namespace FEAT
           CoordType my_dist(_radius - (point - _midpoint).norm_euclid());
 
           grad_dist = (point - projected);
-          grad_dist.normalise();
+          grad_dist.normalize();
           grad_dist *= Math::signum(my_dist);
 
           return my_dist;

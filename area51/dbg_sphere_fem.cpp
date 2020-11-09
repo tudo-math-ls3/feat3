@@ -76,7 +76,7 @@ namespace DbgSphereFem
       auto& vtx = mesh.get_vertex_set();
       for(Index i(0); i < vtx.get_num_vertices(); ++i)
       {
-        vtx[i].normalise();
+        vtx[i].normalize();
       }
     }
 
@@ -237,7 +237,7 @@ namespace DbgSphereFem
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   DbgSphereFem::main(argc, argv);
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

@@ -33,7 +33,7 @@ namespace FEAT
         static constexpr bool is_implicit = true;
         /// This is a world_dim dimensional object
         static constexpr int world_dim = 3;
-        /// If there was a parametrisation, it would be the object's shape dim
+        /// If there was a parametrization, it would be the object's shape dim
         static constexpr int param_dim = 2;
       }; // struct SurfaceMeshTraits
 
@@ -66,9 +66,9 @@ namespace FEAT
 
       private:
         /// Marker for edges
-        // For computing point projections, we need to know if an edge was already traversed by adding the neighbour
+        // For computing point projections, we need to know if an edge was already traversed by adding the neighbor
         // across said edge to the search stack. If the surface is concave, it might happen that triangle A says
-        // "go to my neighbour, B", and then B says "go to my neighbour, A". It's then clear that the wanted point
+        // "go to my neighbor, B", and then B says "go to my neighbor, A". It's then clear that the wanted point
         // lies on the edge between A and B.
         bool* _edge_marker;
         /// Marker for triangles
@@ -265,7 +265,7 @@ namespace FEAT
             grad_distance.format(CoordType(0));
           else
           {
-            grad_distance.normalise();
+            grad_distance.normalize();
             WorldPoint nu(get_normal_on_tria(best_facet, coeffs));
             signed_distance *= Math::signum(Tiny::dot(nu, grad_distance));
           }
@@ -311,7 +311,7 @@ namespace FEAT
           }
 
           WorldPoint nu(Tiny::orthogonal(coords_transpose));
-          nu.normalise();
+          nu.normalize();
 
           return nu;
         }
@@ -326,7 +326,7 @@ namespace FEAT
          * The meshpart identifying the boundary of the mesh that is to be projected
          *
          * The MeshPart has to contain facets and a topology for them. To keep the search as local as possible,
-         * the MeshPart is traversed facet-wise and after finishing the current facet, its neighbours are added to
+         * the MeshPart is traversed facet-wise and after finishing the current facet, its neighbors are added to
          * the search stack.
          *
          */
@@ -357,16 +357,16 @@ namespace FEAT
           const auto& idx_mp(meshpart.template get_index_set<SurfaceMeshType::shape_dim, 0>());
           // Subfacet at facet information for the meshpart. i.e. if Mesh is a Hypercube<3> mesh, the boundary is a
           // Hypercube<2> mesh, the facets are quads and THEIR subfacets are edges, so this is edge@quad
-          // Needed for computing neighbours.
+          // Needed for computing neighbors.
           const auto& facet_idx_mp(meshpart.template get_index_set
             <SurfaceMeshType::shape_dim, SurfaceMeshType::shape_dim-1>());
 
-          // Neighbour information for all facets in the MeshPart. Needed for adding facets to the search stack
+          // Neighbor information for all facets in the MeshPart. Needed for adding facets to the search stack
           // so we can exploit local information
           typename MeshPart<Mesh_>::template IndexSet<SurfaceMeshType::shape_dim, SurfaceMeshType::shape_dim-1>::Type
             neigh_mp(meshpart.get_num_entities(SurfaceMeshType::shape_dim));
 
-          Geometry::Intern::FacetNeighbours::compute(neigh_mp, facet_idx_mp);
+          Geometry::Intern::FacetNeighbors::compute(neigh_mp, facet_idx_mp);
 
           // The mesh's vertex set, since we modify the coordinates by projection
           auto& vtx(mesh.get_vertex_set());
@@ -391,7 +391,7 @@ namespace FEAT
           for(Index i(0); i < num_facets; ++i)
             guesses[i] = Index(0);
 
-          // The search stack for all facets. We add neighbours to it to keep the search as local as possible
+          // The search stack for all facets. We add neighbors to it to keep the search as local as possible
           std::deque<Index> facet_stack;
           facet_stack.push_front(0);
 
@@ -459,7 +459,7 @@ namespace FEAT
               } // vert_todo[i_mp]
             } // vertices in current facet
 
-            // Now add all neighbours that are still on the todo list to the search stack
+            // Now add all neighbors that are still on the todo list to the search stack
             for(int l(0); l < neigh_mp.num_indices; ++l)
             {
               Index k(neigh_mp(current_facet, l));
@@ -467,11 +467,11 @@ namespace FEAT
               {
                 facet_todo[k] = false;
                 facet_stack.push_back(k);
-                // The last vertex was found in facet_sm, and since k is a neighbour of current, it cannot be too
+                // The last vertex was found in facet_sm, and since k is a neighbor of current, it cannot be too
                 // far off
                 guesses[k] = facet_sm;
               }
-            } // adding neighbours
+            } // adding neighbors
 
           } // search stack
 
@@ -544,9 +544,9 @@ namespace FEAT
          * \param[in] mesh
          * The (surface) mesh we are looking for x in.
          *
-         * For every subfacet, we need to know if it was already traversed by adding the neighbour across said
+         * For every subfacet, we need to know if it was already traversed by adding the neighbor across said
          * facet to the search stack. If the surface is concave, it might happen that facet A says "go to my
-         * neighbour, B", and then B says "go to my neighbour, A". It's then clear that the wanted point lies on
+         * neighbor, B", and then B says "go to my neighbor, A". It's then clear that the wanted point lies on
          * the facet between A and B (c.f. determine_success()).
          *
          * \see determine_success
@@ -558,9 +558,9 @@ namespace FEAT
           const Tiny::Vector<CoordType, world_dim, sx_>& x, Index guess, CoordType acceptable_distance,
           const SurfaceMeshType* mesh, bool find_best_approx) const
         {
-          // For every subfacet, we need to know if it was already traversed by adding the neighbour across said
+          // For every subfacet, we need to know if it was already traversed by adding the neighbor across said
           // facet to the search stack. If the surface is concave, it might happen that facet A says "go to my
-          // neighbour, B", and then B says "go to my neighbour, A". It's then clear that the wanted point lies on
+          // neighbor, B", and then B says "go to my neighbor, A". It's then clear that the wanted point lies on
           // the facet between A and B.
 
           // Clear traversed information
@@ -584,7 +584,7 @@ namespace FEAT
           // The mesh's vertex set so we can get at the coordinates
           const auto& vtx(mesh->get_vertex_set());
 
-          const auto& neigh(mesh->get_neighbours());
+          const auto& neigh(mesh->get_neighbors());
 
           // This will contain all vertices making up a cell in the mesh. Since the mesh is of shape
           // Simplex<shape_dim>, there are shape_dim+1 vertices.
@@ -627,7 +627,7 @@ namespace FEAT
             CoordType ortho_dist = compute_bary_and_dist(bary, current_coeffs);
 
             // From all this, we can now determine if there is an orthogonal projection of x onto this facet. For
-            // this, we need to know the traversed information as well and the neighbour information of the current
+            // this, we need to know the traversed information as well and the neighbor information of the current
             // facet
             bool success = determine_success(ortho_dist, acceptable_distance, bary, facet_idx[current], _edge_marker);
 
@@ -650,27 +650,27 @@ namespace FEAT
               }
             }
 
-            // If we are not done, add all neighbours that have not been searched to the search stack
+            // If we are not done, add all neighbors that have not been searched to the search stack
             for(int l(0); l < SurfaceMeshType::shape_dim+1; ++l)
             {
-              // The neighbour over the l-th facet
+              // The neighbor over the l-th facet
               Index n(neigh(current, l));
-              // Check if the neighbour exists and is still on the to do list
+              // Check if the neighbor exists and is still on the to do list
               if(n != ~ Index(0) && !_cell_marker[n])
               {
                 Index facet(facet_idx(current,l));
-                // If the neighbour is still on the to do list and the facet it lies at is in the traversed list,
+                // If the neighbor is still on the to do list and the facet it lies at is in the traversed list,
                 // this means the barycentric coordinate for the corresponding direction was negative, meaning
-                // that x lies in that direction. So we add that neighbour to the front.
+                // that x lies in that direction. So we add that neighbor to the front.
                 if(_edge_marker[facet])
                   cell_stack.push_front(n);
                 else
                   cell_stack.push_back(n);
 
-                // Since we added the neighbour to the stack, prevent it from being added again later.
+                // Since we added the neighbor to the stack, prevent it from being added again later.
                 _cell_marker[n] = true;
               }
-            } // adding neighbours
+            } // adding neighbors
 
           } // search loop
 
@@ -874,8 +874,8 @@ namespace FEAT
 
           // The last column is the additional direction for our augmented simplex and it is orthogonal to the rest
           Tiny::Vector<DT_, 3> ortho = Tiny::orthogonal(A.template size_cast<3, 2>());
-          // Normalise this so the last coefficient is the signed distance
-          ortho.normalise();
+          // Normalize this so the last coefficient is the signed distance
+          ortho.normalize();
 
           // Set the last column in A
           for(int i(0); i < 3; ++i)

@@ -34,16 +34,16 @@ namespace FEAT
   namespace Dist
   {
     /**
-     * \brief Initialises the distributed communication system.
+     * \brief Initializes the distributed communication system.
      *
      * This function is effectively a wrapper around the \c MPI_Init function.
      *
-     * In addition, this function may perform further setup to initialise
+     * In addition, this function may perform further setup to initialize
      * additional datatypes, operations, etc.:
      *
-     * - If FEAT_HAVE_QUADMATH is defined, this function will initialise the
+     * - If FEAT_HAVE_QUADMATH is defined, this function will initialize the
      *   dt__float128 datatype.
-     * - If FEAT_HAVE_HALFMATH is defined, this function will initialise the
+     * - If FEAT_HAVE_HALFMATH is defined, this function will initialize the
      *   dt__half datatype.
      * - If FEAT_OVERRIDE_MPI_OPS is defined, this function will override
      *   the standard op_sum, op_max and op_min operations by custom
@@ -51,10 +51,10 @@ namespace FEAT
      *
      * \see \cite MPI31 Section 8.7, page 355
      */
-    bool initialise(int& argc, char**& argv);
+    bool initialize(int& argc, char**& argv);
 
     /**
-     * \brief Finalises the distributed communication system.
+     * \brief Finalizes the distributed communication system.
      *
      * This function is effectively a wrapper around the \c MPI_Init function.
      *
@@ -63,7 +63,7 @@ namespace FEAT
      *
      * \see \cite MPI31 Section 8.7, page 357
      */
-    void finalise();
+    void finalize();
 
     /**
      * \brief Communication Datatype class
@@ -1590,7 +1590,7 @@ namespace FEAT
       ///@}
 
       /**
-       * \name Barrier Synchronisation
+       * \name Barrier Synchronization
        */
       ///@{
 
@@ -1610,7 +1610,7 @@ namespace FEAT
        */
       Request ibarrier() const;
 
-      // end of barrier synchronisation group
+      // end of barrier synchronization group
       ///@}
 
       /**

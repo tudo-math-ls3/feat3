@@ -59,7 +59,7 @@ namespace FEAT
         typedef typename BaseClass::CoordType CoordType;
         /// Vector type for world points, aka image points
         typedef typename BaseClass::WorldPoint WorldPoint;
-        /// Vector type for parametrisation points, aka domain points
+        /// Vector type for parametrization points, aka domain points
         typedef typename BaseClass::ParamPoint ParamPoint;
 
       protected:
@@ -69,9 +69,9 @@ namespace FEAT
         CoordType _radius;
         /// Specifies whether the circle mapping has a domain
         bool _have_domain;
-        /// Left parametrisation domain boundary
+        /// Left parametrization domain boundary
         CoordType _trafo_a;
-        /// Right parametrisation domain boundary
+        /// Right parametrization domain boundary
         CoordType _trafo_b;
 
       public:
@@ -183,7 +183,7 @@ namespace FEAT
 
           grad_dist = (projected - point);
           CoordType my_dist(grad_dist.norm_euclid());
-          grad_dist.normalise();
+          grad_dist.normalize();
 
           return my_dist;
         }
@@ -211,7 +211,7 @@ namespace FEAT
             grad_dist = (point - projected)*Math::signum(my_dist);
           }
 
-          grad_dist.normalise();
+          grad_dist.normalize();
 
           return my_dist;
         }

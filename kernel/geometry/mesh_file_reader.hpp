@@ -435,7 +435,7 @@ namespace FEAT
           throw Xml::ContentError(iline, sline, "Multiple topology for dimension " + stringify(_my_dim));
         _have_topology.at(_my_dim-1) = 1;
 
-        // initialise the corresponding topology:
+        // initialize the corresponding topology:
         Intern::TopoParseHelper<Shape_>::init_topo(*this, _topology, int(_my_dim));
       }
 
@@ -544,7 +544,7 @@ namespace FEAT
           throw Xml::ContentError(iline, sline, "Multiple mapping for dimension " + stringify(_my_dim));
         _have_mapping.at(_my_dim) = 1;
 
-        // initialise the corresponding mapping:
+        // initialize the corresponding mapping:
         Intern::MappParseHelper<Shape_>::init_mapp(*this, _mapping, int(_my_dim));
       }
 
@@ -778,7 +778,7 @@ namespace FEAT
         // try to create the mesh
         _mesh = new MeshType(_sizes.data());
 
-        // initialise
+        // initialize
         _have_verts = false;
         _have_topology.resize(std::size_t(Shape_::dimension), 0);
       }
@@ -952,7 +952,7 @@ namespace FEAT
         // try to create the mesh part
         _mesh_part = new MeshPartType(_sizes.data(), _topo_type != TopoType::none);
 
-        // initialise
+        // initialize
         _have_topology.resize(std::size_t(Shape_::dimension), 0);
         _have_mapping.resize(std::size_t(Shape_::dimension+1), 0);
       }
@@ -1771,7 +1771,7 @@ namespace FEAT
      * Type of the mesh the chart is supposed to work with.
      *
      * \tparam world_dim
-     * World dimension of the RootMesh_. This is separate because it is used for explicit specialisation.
+     * World dimension of the RootMesh_. This is separate because it is used for explicit specialization.
      *
      * This class filters which chart(-parser) classes will be instantiated for each world_dim value, because (all?)
      * charts are tied to a certain dimension. This is the generic implementation for values of world_dim which do

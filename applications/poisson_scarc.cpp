@@ -281,7 +281,7 @@ namespace PoissonScaRC
     solver->set_tol_rel(1E-8);
     solver->set_max_iter(100);
 
-    // initialise
+    // initialize
     multigrid_hierarchy_local->init();
     multigrid_hierarchy_global->init();
     solver->init();
@@ -316,8 +316,8 @@ namespace PoissonScaRC
       Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
         (vec_sol.local(), sol_func, the_domain_level.space, cubature);
 
-      // synchronise all local errors
-      errors.synchronise(comm);
+      // synchronize all local errors
+      errors.synchronize(comm);
 
       // print errors
       comm.print("");
@@ -482,7 +482,7 @@ namespace PoissonScaRC
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     PoissonScaRC::main(argc, argv);
@@ -497,5 +497,5 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

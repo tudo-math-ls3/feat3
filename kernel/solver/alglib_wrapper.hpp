@@ -48,7 +48,7 @@ namespace FEAT
      * \brief Wrapper around ALGLIB's lBFGS implementation for minimising an functional's gradient
      *
      * \tparam Functional_
-     * Nonlinear Functional to minimise the gradient of
+     * Nonlinear Functional to minimize the gradient of
      *
      * \tparam Filter_
      * Filter to apply to the functional's gradient
@@ -87,9 +87,9 @@ namespace FEAT
         /// temporary vector
         VectorType _vec_tmp;
 
-        /// Optimisation variable for ALGLIB
+        /// Optimization variable for ALGLIB
         alglib::real_1d_array _functionalt_var;
-        /// This will hold the state of the optimisation problem in ALGLIB
+        /// This will hold the state of the optimization problem in ALGLIB
         alglib::minlbfgsstate _state;
         /// Convergence report etc.
         alglib::minlbfgsreport _report;
@@ -198,7 +198,7 @@ namespace FEAT
           _vec_def = this->_functional.create_vector_r();
           _vec_tmp = this->_functional.create_vector_r();
 
-          // The length of the optimisation variable is the raw length of a temporary vector
+          // The length of the optimization variable is the raw length of a temporary vector
           _functionalt_var.setlength(alglib::ae_int_t(
             Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
 
@@ -375,7 +375,7 @@ namespace FEAT
             return status;
           }
 
-          // Copy initial guess to optimisation state variable
+          // Copy initial guess to optimization state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
@@ -437,7 +437,7 @@ namespace FEAT
          * \brief Internal function for logging/plotting
          *
          * \param[in] x
-         * The state variable of the optimisation problem
+         * The state variable of the optimization problem
          *
          * \param[in] func
          * The functional value
@@ -471,7 +471,7 @@ namespace FEAT
          * \brief Internal function for computing functional value and gradient
          *
          * \param[in] x
-         * The state variable of the optimisation problem
+         * The state variable of the optimization problem
          *
          * \param[out] fval
          * The functional value
@@ -573,7 +573,7 @@ namespace FEAT
      * \brief Wrapper around ALGLIB's mincg implementation for minimising an functional's gradient
      *
      * \tparam Functional_
-     * Nonlinear Functional to minimise the gradient of
+     * Nonlinear Functional to minimize the gradient of
      *
      * \tparam Filter_
      * Filter to apply to the functional's gradient
@@ -622,9 +622,9 @@ namespace FEAT
         /// temporary vector
         VectorType _vec_tmp;
 
-        /// Optimisation variable for ALGLIB
+        /// Optimization variable for ALGLIB
         alglib::real_1d_array _functionalt_var;
-        /// This will hold the state of the optimisation problem in ALGLIB
+        /// This will hold the state of the optimization problem in ALGLIB
         alglib::mincgstate _state;
         /// Convergence report etc.
         alglib::mincgreport _report;
@@ -722,7 +722,7 @@ namespace FEAT
           _vec_def = this->_functional.create_vector_r();
           _vec_tmp = this->_functional.create_vector_r();
 
-          // The length of the optimisation variable is the raw length of a temporary vector
+          // The length of the optimization variable is the raw length of a temporary vector
           _functionalt_var.setlength(alglib::ae_int_t(
             Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
 
@@ -903,7 +903,7 @@ namespace FEAT
           if(status != Status::progress)
             return status;
 
-          // Copy initial guess to optimisation state variable
+          // Copy initial guess to optimization state variable
           auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
@@ -964,7 +964,7 @@ namespace FEAT
          * \brief Internal function for logging/plotting
          *
          * \param[in] x
-         * The state variable of the optimisation problem
+         * The state variable of the optimization problem
          *
          * \param[in] func
          * The functional value
@@ -997,7 +997,7 @@ namespace FEAT
          * \brief Internal function for computing functional value and gradient
          *
          * \param[in] x
-         * The state variable of the optimisation problem
+         * The state variable of the optimization problem
          *
          * \param[out] fval
          * The functional value

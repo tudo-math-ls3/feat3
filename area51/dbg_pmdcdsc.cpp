@@ -228,7 +228,7 @@ namespace PoissonMixed
       solver->set_tol_rel(1E-5);
       solver->set_max_iter(1000);
 
-      // initialise
+      // initialize
       solver->init();
 
       TimeStamp ts;
@@ -255,7 +255,7 @@ namespace PoissonMixed
       solver->set_tol_rel(1E-5);
       solver->set_max_iter(1000);
 
-      // initialise
+      // initialize
       solver->init();
 
       TimeStamp ts;
@@ -289,9 +289,9 @@ namespace PoissonMixed
       Assembly::ScalarErrorInfo<DataType> errors_2 = Assembly::ScalarErrorComputer<max_der>::
         compute(vec_sol_2.local(), sol_func, the_domain_level.space_pres, cubature);
 
-      // synchronise all local errors
-      errors_1.synchronise(comm);
-      errors_2.synchronise(comm);
+      // synchronize all local errors
+      errors_1.synchronize(comm);
+      errors_2.synchronize(comm);
 
       // print errors
       comm.print("");
@@ -317,7 +317,7 @@ namespace PoissonMixed
       solver->set_tol_rel(1E-5);
       solver->set_max_iter(10);
 
-      // initialise
+      // initialize
       solver->init();
 
       auto vec_sol = vec_rhs.clone();
@@ -341,7 +341,7 @@ namespace PoissonMixed
       solver->set_tol_rel(1E-5);
       solver->set_max_iter(10);
 
-      // initialise
+      // initialize
       solver->init();
 
       auto vec_sol = vec_rhs.clone();
@@ -597,10 +597,10 @@ namespace PoissonMixed
 
 int main(int argc, char* argv [])
 {
-  // initialise
-  FEAT::Runtime::initialise(argc, argv);
+  // initialize
+  FEAT::Runtime::initialize(argc, argv);
 
   PoissonMixed::main(argc, argv);
   // okay
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

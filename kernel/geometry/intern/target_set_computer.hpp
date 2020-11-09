@@ -83,7 +83,7 @@ namespace FEAT
             // Count the number of entities that get added
             Index num_entities_current_dim(0);
 
-            // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
+            // Temporary TargetSet initialized with the maximum possible size (= number of entities in the parent mesh,
             // which is the case if the MeshPart contains all entities of the parent mesh)
             TargetSet tmp_target_set(is_parent_below.get_num_entities());
 
@@ -173,7 +173,7 @@ namespace FEAT
               }
             }
 
-            // Temporary TargetSet initialised with the maximum possible size (= number of entities in the parent mesh,
+            // Temporary TargetSet initialized with the maximum possible size (= number of entities in the parent mesh,
             // which is the case if the MeshPart contains all entities of the parent mesh)
             TargetSet tmp_target_set(is_parent_above.get_index_bound());
             // Count the number of entities that get added
@@ -199,7 +199,7 @@ namespace FEAT
       }; // struct TargetSetComputer<Index, Index>
 
       /**
-       * \brief Specialisation as end of template recursion
+       * \brief Specialization as end of template recursion
        */
       template<int end_dim_>
       struct TargetSetComputer<end_dim_, end_dim_>

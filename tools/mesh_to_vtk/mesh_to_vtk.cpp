@@ -526,8 +526,8 @@ int run(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   int ret = run(argc, argv);
-  Runtime::finalise();
+  Runtime::finalize();
   return ret;
 }

@@ -227,7 +227,7 @@ namespace FEAT
           // In 3d, the 2-norm of ortho is the 2d volume of the parallelogram defined by A[0], A[1]. That makes this
           // axis badly scaled if the parallelogram is either very small or very large. So we rescale ortho to unity
           // so the resulting coefficient is just the distance
-          ortho.normalise();
+          ortho.normalize();
 
           // Set the last column in A
           for(int i(0); i < world_dim; ++i)

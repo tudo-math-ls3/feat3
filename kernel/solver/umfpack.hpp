@@ -56,16 +56,16 @@ namespace FEAT
       const MatrixType& _system_matrix;
       /// umfpack control array
       double* _umf_control;
-      /// umfpack symbolic factorisation pointer
+      /// umfpack symbolic factorization pointer
       void* _umf_symbolic;
-      /// umfpack numeric factorisation pointer
+      /// umfpack numeric factorization pointer
       void* _umf_numeric;
 
       /// symbolic peak memory size
       std::size_t _sym_peak_size;
-      /// symbolic factorisation memory size
+      /// symbolic factorization memory size
       std::size_t _sym_mem_size;
-      /// numeric factorisation memory size
+      /// numeric factorization memory size
       std::size_t _num_mem_size;
       /// total peak memory size
       std::size_t _umf_peak_size;
@@ -75,7 +75,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] system_matrix
-       * A reference to the system matrix to be factorised.
+       * A reference to the system matrix to be factorized.
        */
       explicit Umfpack(const MatrixType& system_matrix);
 
@@ -94,7 +94,7 @@ namespace FEAT
       virtual void done_numeric() override;
 
       /**
-       * \brief Solves a linear system with the factorised system matrix.
+       * \brief Solves a linear system with the factorized system matrix.
        *
        * \param[in,out] vec_sol
        * A reference to the solution vector. The vector must be allocated to the correct length, but its
@@ -168,7 +168,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] system_matrix
-       * A reference to the system matrix to be factorised.
+       * A reference to the system matrix to be factorized.
        *
        * \param[in] weight_vector
        * The weight vector to be used as a Lagrange multiplier.
@@ -179,7 +179,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] system_matrix
-       * A reference to the system matrix to be factorised.
+       * A reference to the system matrix to be factorized.
        *
        * \param[in] mean_filter
        * A reference to the mean filter containing the weight vector.
@@ -203,7 +203,7 @@ namespace FEAT
       virtual void done_numeric() override;
 
       /**
-       * \brief Solves a linear system with the factorised system matrix.
+       * \brief Solves a linear system with the factorized system matrix.
        *
        * \param[in,out] vec_sol
        * A reference to the solution vector. The vector must be allocated to the correct length, but its
@@ -313,7 +313,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] system_matrix
-       * A reference to the system matrix to be factorised.
+       * A reference to the system matrix to be factorized.
        *
        * \param[in] weight_vector
        * The weight vector to be used as a Lagrange multiplier.
@@ -330,7 +330,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] system_matrix
-       * A reference to the system matrix to be factorised.
+       * A reference to the system matrix to be factorized.
        *
        * \param[in] mean_filter
        * A reference to the pressure mean filter containing the weight vector.
@@ -444,7 +444,7 @@ namespace FEAT
         _vec_x = _solver_matrix.create_vector_r();
         _vec_b = _solver_matrix.create_vector_r();
 
-        // initialise umfpack
+        // initialize umfpack
         _umfpack.init_symbolic();
       }
 
@@ -529,7 +529,7 @@ namespace FEAT
 
         // okay, solver matrix data assembly completed
 
-        // initialise umfpack
+        // initialize umfpack
         _umfpack.init_numeric();
       }
 
@@ -541,7 +541,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Solves a linear system with the factorised system matrix.
+       * \brief Solves a linear system with the factorized system matrix.
        *
        * \param[in,out] vec_sol
        * A reference to the solution vector. The vector must be allocated to the correct length, but its
@@ -674,7 +674,7 @@ namespace FEAT
         }
       };
 
-      // specialisation for double/Index vectors; no intermediate conversion is necessary here
+      // specialization for double/Index vectors; no intermediate conversion is necessary here
       template<>
       class GenericUmfpackVectorHelper<double, Index>
       {
@@ -769,7 +769,7 @@ namespace FEAT
         // initialiase vector helper
         _vec_helper.init(_umf_vsol);
 
-        // factorise symbolic
+        // factorize symbolic
         _umfpack.init_symbolic();
       }
 
@@ -803,7 +803,7 @@ namespace FEAT
         for(Index i(0); i < _umf_matrix.rows(); ++i)
           mat_main.set_line(i, val + row_ptr[i], col_idx + row_ptr[i], 0);
 
-        // factorise
+        // factorize
         _umfpack.init_numeric();
       }
 

@@ -196,7 +196,7 @@ namespace FEAT
             // evaluate next gradient
             this->_eval_grad_quot(_grad[i+1], v, h *= DataType(0.5));
 
-            // initialise scaling fator
+            // initialize scaling fator
             DataType q = DataType(1);
 
             // perform extrapolation steps except for the last one
@@ -251,7 +251,7 @@ namespace FEAT
             // evaluate next hessian
             this->_eval_hess_quot(_hess[i+1], v, h *= DataType(0.5));
 
-            // initialise scaling fator
+            // initialize scaling fator
             DataType q = DataType(1);
 
             // perform extrapolation steps except for the last one

@@ -283,7 +283,7 @@ namespace FEAT
     /// \endcond
 
     /**
-     * \brief Unit-Cube mesh factory specialisation for simplical meshes
+     * \brief Unit-Cube mesh factory specialization for simplical meshes
      *
      * This class template implements the mesh factory interface which generates a simple 1-cell
      * 1D/2D/3D unit-cube mesh by using the UnitCubeFactories for hypercube meshes and the
@@ -615,7 +615,7 @@ namespace FEAT
 
     /// \cond internal
     /*
-     * \brief Specialisation for Hypercube<2> meshes
+     * \brief Specialization for Hypercube<2> meshes
      **/
     template<typename Coord_>
     class UnitStarCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> > :
@@ -779,7 +779,7 @@ namespace FEAT
 
     /// \cond internal
     /*
-     * \brief Specialisation for simplical meshes
+     * \brief Specialization for simplical meshes
      *
      * This uses the UnitStarCubeFactory for Hypercubes and then the ShapeConvertFactory.
      *

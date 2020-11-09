@@ -74,7 +74,7 @@ void run()
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<Algo::CUDA, DenseVector<Mem::CUDA, float, Index> >();
   run<Algo::CUDA, DenseVector<Mem::CUDA, double, Index> >();
@@ -85,5 +85,5 @@ int main(int argc, char ** argv)
   run<Algo::MKL, DenseVector<Mem::Main, float, Index> >();
   run<Algo::MKL, DenseVector<Mem::Main, double, Index> >();
 #endif
-  Runtime::finalise();
+  Runtime::finalize();
 }

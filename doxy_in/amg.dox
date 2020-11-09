@@ -5,7 +5,7 @@
 
 - parallel coarse grid solver
 - various submethods possible
-- only rudimentary optimisation on numerical and executing performance
+- only rudimentary optimization on numerical and executing performance
 
 \section amg_integration Integrating AMG in your application
 As FEAT3 is initially centered on geometric multigrids and thus asumes an existing grid hierarchy, the application has to inject the algebraically generated levels into the given hierarchy.

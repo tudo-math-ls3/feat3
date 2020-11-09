@@ -30,7 +30,7 @@ namespace FEAT
   namespace Meshopt
   {
     /**
-     * \brief Mesh optimiser based on minimisation of harmonic energy
+     * \brief Mesh optimizer based on minimization of harmonic energy
      *
      * \tparam Mem_
      * Memory architecture for the solver (not the mesh)
@@ -224,7 +224,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs one-time initialisations
+         * \brief Performs one-time initializations
          *
          * This is not done in the constructor for the case that the system matrix gets overwritten by a derived
          * class, so the unused system matrix of THIS class is not assembled symbolically
@@ -369,7 +369,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronization phase
          *
          * \param[out] vol_min
          * Minimum cell volume
@@ -406,7 +406,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Computes a quality indicator concerning the cell sizes, pre synchronisation phase
+         * \brief Computes a quality indicator concerning the cell sizes, pre synchronization phase
          *
          * \param[out] lambda_min
          * Minimum of the optimal cell size lambda over all cells

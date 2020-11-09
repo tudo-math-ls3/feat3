@@ -43,9 +43,9 @@ namespace FEAT
      * be taken when refining the AttributeSets.
      *
      * A MeshPart can supply its own topology, which can be different from the parent's. One important example for
-     * this is a MeshPart that defines the boundary of its parent mesh. If the boundary is parametrised using a
-     * AttributeSet and the boundary is closed, the parametrisation requires the doubling of some mesh entities to
-     * correctly represent the parametrisation variable.
+     * this is a MeshPart that defines the boundary of its parent mesh. If the boundary is parametrized using a
+     * AttributeSet and the boundary is closed, the parametrization requires the doubling of some mesh entities to
+     * correctly represent the parametrization variable.
      *
      * \verbatim
      *
@@ -57,7 +57,7 @@ namespace FEAT
      *
      * \endverbatim
      *
-     * Vertex 0 of the parent mesh has two different parametrisation variables, as it is both the first and the last
+     * Vertex 0 of the parent mesh has two different parametrization variables, as it is both the first and the last
      * vertex of the closed boundary. This can be easily represented by having two vertices in the MeshPart point to
      * the same vertex of the parent mesh.
      *
@@ -546,7 +546,7 @@ namespace FEAT
     }; // class MeshPart<ConformalMesh<Shape_>>
 
     /**
-     * \brief Factory specialisation for MeshPart class template
+     * \brief Factory specialization for MeshPart class template
      *
      * \author Peter Zajac
      */
@@ -817,7 +817,7 @@ namespace FEAT
     namespace Intern
     {
       /**
-       * \brief Specialisation for ConformalMesh
+       * \brief Specialization for ConformalMesh
        */
       template<typename Shape_, int num_coords_, typename Coord_>
       struct TargetSetRefineParentWrapper<ConformalMesh<Shape_, num_coords_, Coord_>>
@@ -857,7 +857,7 @@ namespace FEAT
       }; // // struct TargetSetRefineParentWrapper<ConformalMesh<...>>
 
       /**
-       * \brief Specialisation for StructuredMesh
+       * \brief Specialization for StructuredMesh
        */
       template<int shape_dim_, int num_coords_, typename Coord_>
       struct TargetSetRefineParentWrapper<StructuredMesh<shape_dim_, num_coords_, Coord_>>
@@ -892,9 +892,9 @@ namespace FEAT
           }
         }
 
-        // Specialisation for MeshPart<StructuredMesh<...>>
+        // Specialization for MeshPart<StructuredMesh<...>>
         // Note: The topology of a MeshPart is always "conforming" (ie "unstructured"),
-        // therefore the implementation is identical to the class template specialisation
+        // therefore the implementation is identical to the class template specialization
         // for ConformalMesh above.
         template<typename TargetSetHolderType_, typename IndexSetHolder_>
         static void fill_target_sets(

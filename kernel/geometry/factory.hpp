@@ -17,7 +17,7 @@ namespace FEAT
     /**
      * \brief Mesh Factory class template
      *
-     * See the specialisations of this class template for the actual factory interfaces.
+     * See the specializations of this class template for the actual factory interfaces.
      *
      * \tparam Mesh_
      * The type of the mesh that is to be produced by the factory.
@@ -40,7 +40,7 @@ namespace FEAT
     /**
      * \brief Standard Refinery class template
      *
-     * See the specialisations of this class template for the actual standard-refinery interfaces.
+     * See the specializations of this class template for the actual standard-refinery interfaces.
      *
      * \tparam Mesh_
      * The type of the mesh that is to be refined by the refinery. This may be either a Mesh or

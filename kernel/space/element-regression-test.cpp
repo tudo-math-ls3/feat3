@@ -351,7 +351,7 @@ namespace ElementRegression
       solver.set_tol_rel(sol_tol);
       //solver.set_plot(true);
 
-      // initialise solver
+      // initialize solver
       solver.init();
 
       // apply solver

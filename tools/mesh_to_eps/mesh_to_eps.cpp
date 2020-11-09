@@ -155,7 +155,7 @@ int run(int argc, char* argv[])
   if(args.check("help") > -1)
   {
     display_help();
-    return Runtime::finalise();
+    return Runtime::finalize();
   }
 
   args.support("mesh");
@@ -220,8 +220,8 @@ int run(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialise(argc, argv);
+  Runtime::initialize(argc, argv);
   int ret = run(argc, argv);
-  Runtime::finalise();
+  Runtime::finalize();
   return ret;
 }

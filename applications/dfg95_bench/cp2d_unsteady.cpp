@@ -7,7 +7,7 @@
 // The 2D Nonsteady Navier-Stokes CP-Q2/P1dc Toy-Code Solver (TM)
 // ------------------------------------------------------------
 // This application implements a "simple" parallel non-steady Navier-Stokes solver using
-// the "CP" approach with Q2/P1dc space and Crank-Nicolson time discretisation.
+// the "CP" approach with Q2/P1dc space and Crank-Nicolson time discretization.
 //
 // ---------------
 // !!! WARNING !!!
@@ -67,7 +67,7 @@
 // as the non-linear solver may run amok otherwise...
 //
 //
-// In the following, the options are categorised:
+// In the following, the options are categorized:
 //
 //
 // Domain / Mesh Specification Options
@@ -99,7 +99,7 @@
 //
 // Boundary Condition Specification Options
 // ----------------------------------------
-// This application supports only very limited customisation of boundary conditions, which
+// This application supports only very limited customization of boundary conditions, which
 // is limited to specifying
 //  1) the mesh-part for the parabolic inflow region,
 //  2) the mesh-part for the "do-nothing" outflow region
@@ -121,7 +121,7 @@
 // The '--time-max <T>' option specifies the end of the desired time interval [0,T].
 //
 // The '--time-steps <N>' option specifies the total number of equidistant time-steps
-// for the whole time interval [0,T]. The "mesh width" of the time discretisation is
+// for the whole time interval [0,T]. The "mesh width" of the time discretization is
 // then given by T/N.
 //
 // The '--max-time-steps <N>' sets the maximum number of time-steps to perform.
@@ -147,7 +147,7 @@
 // Linear Solver/Preconditioner Options
 // ------------------------------------
 // This application uses 2 multigrid solvers as linear preconditioners for the DPM:
-//  1) a Richardson-Multigrid for the linearised Burgers system in velocity space (A-solver)
+//  1) a Richardson-Multigrid for the linearized Burgers system in velocity space (A-solver)
 //  2) a PCG-Multigrid for the Poisson problem in pressure space (S-solver)
 //
 // Both multigrids use a damped Jacobi smoother as well as a Jacobi "smoother" as the coarse-grid solver.
@@ -1170,7 +1170,7 @@ namespace NavierStokesCP2D
     solver_a->set_max_iter(cfg.max_iter_a);
     solver_a->set_tol_rel(cfg.tol_rel_a);
 
-    // for the velocity multigrid/solver, we can only perform symbolic initialisation up to now:
+    // for the velocity multigrid/solver, we can only perform symbolic initialization up to now:
     if(cfg.multigrid_a)
     {
       multigrid_hierarchy_velo->init_symbolic();
@@ -1198,7 +1198,7 @@ namespace NavierStokesCP2D
     solver_s->set_max_iter(cfg.max_iter_s);
     solver_s->set_tol_rel(cfg.tol_rel_s);
 
-    // for the pressure multigrid, we can perform full initialisation:
+    // for the pressure multigrid, we can perform full initialization:
     if(cfg.multigrid_s)
     {
       multigrid_hierarchy_pres->init();
@@ -1399,7 +1399,7 @@ namespace NavierStokesCP2D
           std::cout << line;
         }
 
-        // Phase 4: initialise linear solvers
+        // Phase 4: initialize linear solvers
         watch_sol_init.start();
         if(cfg.multigrid_a)
           multigrid_hierarchy_velo->init_numeric();
@@ -1859,7 +1859,7 @@ namespace NavierStokesCP2D
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialise(argc, argv);
+  FEAT::Runtime::initialize(argc, argv);
   try
   {
     NavierStokesCP2D::main(argc, argv);
@@ -1874,5 +1874,5 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalise();
+  return FEAT::Runtime::finalize();
 }

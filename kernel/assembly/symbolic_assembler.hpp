@@ -31,12 +31,12 @@ namespace FEAT
      *   assemble_matrix_std1 and assemble_matrix_std2.
      *
      * - Extended-facet pattern for identical or different test-/trial-spaces on the same mesh.
-     *   This pattern is used for matrices which include operator coupling over neighbour elements,
+     *   This pattern is used for matrices which include operator coupling over neighbor elements,
      *   e.g. for jump-stabilisiation or discontinuous Galerkin methods. The corresponding functions
      *   are assemble_matrix_ext_facet1 and assemble_matrix_ext_facet2.
      *
      * - Extended-node pattern for identical or different test-/trial-spaces on the same mesh.
-     *   This pattern is used for matrices which include operator coupling over neighbour nodes.
+     *   This pattern is used for matrices which include operator coupling over neighbor nodes.
      *   The corresponding functions are assemble_matrix_ext_node1 and assemble_matrix_ext-node2.
      *
      * - Standard pattern for test-/trial-spaces defined on a 2-level-refined mesh pair.
@@ -353,7 +353,7 @@ namespace FEAT
         matrix = MatrixType_(assemble_graph_std2(test_space, trial_space));
       }
 
-      /// specialisation for NullMatrix
+      /// specialization for NullMatrix
       template<typename Mem_, typename DT_, typename IT_, int BH_, int BW_, typename TestSpace_, typename TrialSpace_>
       static void assemble_matrix_std2(
         LAFEM::NullMatrix<Mem_, DT_, IT_, BH_, BW_>& matrix,
@@ -378,7 +378,7 @@ namespace FEAT
         matrix = MatrixType_(assemble_graph_std1(space));
       }
 
-      /// specialisation for NullMatrix
+      /// specialization for NullMatrix
       template<typename Mem_, typename DT_, typename IT_, int BH_, int BW_, typename Space_>
       static void assemble_matrix_std1(
         LAFEM::NullMatrix<Mem_, DT_, IT_, BH_, BW_>& matrix, const Space_& space)

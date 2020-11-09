@@ -379,7 +379,7 @@ namespace FEAT
               }
 
               //finished local c/f splitting
-              //now set c/f points in neighbouring patches
+              //now set c/f points in neighboring patches
               // 1 designates coarse and 0 designates fine
               /// \todo store buffers and use asynch mpi ops
               auto gate = matrix_fine.get_row_gate();
@@ -780,7 +780,7 @@ namespace FEAT
             else
             {
               //row is not in coarse, interpolation via omega weights is necessary
-              //setup neighbourhood sets
+              //setup neighborhood sets
               std::set<Index> c_i;
               for (const auto& depends : depends_on.at(row))
               {
@@ -863,7 +863,7 @@ namespace FEAT
             else
             {
               //row is not in coarse, interpolation via omega weights is necessary
-              //setup neighbourhood sets
+              //setup neighborhood sets
               std::set<Index> c_i;
               for (const auto& depends : depends_on.at(row))
               {
@@ -957,7 +957,7 @@ namespace FEAT
             else
             {
               //row is not in coarse, interpolation via omega weights is necessary
-              //setup neighbourhood sets
+              //setup neighborhood sets
               std::set<Index> c_i;
               for (const auto& depends : depends_on.at(row))
               {

@@ -10,7 +10,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_EXECUTABLE(navier_stokes_screws-app navier_stokes_screws-app)
 TARGET_LINK_LIBRARIES(navier_stokes_screws-app feat)
 
-# With MPI, run the test in both debug and optimised builds
+# With MPI, run the test in both debug and optimized builds
 if (NOT FEAT_DEBUG_MODE)
   if (FEAT_HAVE_MPI)
     ADD_TEST(sleep1 sleep 2)
@@ -27,7 +27,7 @@ if (NOT FEAT_DEBUG_MODE)
     SET_PROPERTY(TEST navier_stokes_screws_app_test_1_mpi_4 PROPERTY LABELS "mpi")
     SET_PROPERTY(TEST navier_stokes_screws_app_test_1_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
-  # Without MPI, run the test only in optimised builds
+  # Without MPI, run the test only in optimized builds
   else (FEAT_HAVE_MPI)
       ADD_TEST(navier_stokes_screws_app_test_1_serial ${CMAKE_CTEST_COMMAND}
         --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

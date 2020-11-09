@@ -37,7 +37,7 @@ namespace FEAT
        * \brief ILU(k) symbolic core
        *
        * This class is responsible for the computation and management
-       * of the symbolic structure of an ILU factorisation.
+       * of the symbolic structure of an ILU factorization.
        *
        * \tparam IT_
        * The index type to be used.
@@ -87,14 +87,14 @@ namespace FEAT
           return _n + get_nnze_l() + get_nnze_u();
         }
 
-        /// Returns the size of the symbolic factorisation in bytes.
+        /// Returns the size of the symbolic factorization in bytes.
         std::size_t bytes_symbolic() const
         {
           return sizeof(IT_) * (_row_ptr_l.size() + _row_ptr_u.size() + _col_idx_l.size() + _col_idx_u.size());
         }
 
         /**
-         * \brief Initialises the ILU(0) structure from a CSR input matrix
+         * \brief Initializes the ILU(0) structure from a CSR input matrix
          *
          * \param[in] n
          * The size of the matrix.
@@ -125,7 +125,7 @@ namespace FEAT
           _col_idx_l.reserve(nzul);
           _col_idx_u.reserve(nzul);
 
-          // initialise row-pointers
+          // initialize row-pointers
           _row_ptr_l.push_back(0);
           _row_ptr_u.push_back(0);
 
@@ -153,7 +153,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Initialises the ILU(0) structure from an ELL input matrix
+         * \brief Initializes the ILU(0) structure from an ELL input matrix
          *
          * \param[in] n
          * The size of the matrix.
@@ -190,7 +190,7 @@ namespace FEAT
           //_col_idx_l.reserve(nzul);
           //_col_idx_u.reserve(nzul);
 
-          // initialise row-pointers
+          // initialize row-pointers
           _row_ptr_l.push_back(0);
           _row_ptr_u.push_back(0);
 
@@ -215,7 +215,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Initialises the ILU(0) structure from a CSR input matrix
+         * \brief Initializes the ILU(0) structure from a CSR input matrix
          *
          * \param[in] matrix
          * The CSR input matrix.
@@ -227,7 +227,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Initialises the ILU(0) structure from a BCSR input matrix
+         * \brief Initializes the ILU(0) structure from a BCSR input matrix
          *
          * \param[in] matrix
          * The BCSR input matrix.
@@ -239,7 +239,7 @@ namespace FEAT
         }
 
         /**
-         * \brief Initialises the ILU(0) structure from a ELL input matrix
+         * \brief Initializes the ILU(0) structure from a ELL input matrix
          *
          * \param[in] matrix
          * The ELL input matrix.
@@ -251,10 +251,10 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs symbolic ILU(p) factorisation
+         * \brief Performs symbolic ILU(p) factorization
          *
-         * This function performs the symbolic factorisation of the ILU(p) sparsity patterns.
-         * This function treats the existing pattern (usually initialised by a call to one of
+         * This function performs the symbolic factorization of the ILU(p) sparsity patterns.
+         * This function treats the existing pattern (usually initialized by a call to one of
          * the #set_struct() functions) as the level-0 pattern and computes the level-p pattern
          * from it.
          *
@@ -264,7 +264,7 @@ namespace FEAT
          * \note
          * This function does nothing if p < 1.
          */
-        void factorise_symbolic(const int p)
+        void factorize_symbolic(const int p)
         {
           if(p < 1)
             return;
@@ -275,7 +275,7 @@ namespace FEAT
           // our temporary level arrays
           std::vector<int> new_lvl_l, new_lvl_u;
 
-          // initialise new row pointers
+          // initialize new row pointers
           new_ptr_l.push_back(IT_(0));
           new_ptr_u.push_back(IT_(0));
 
@@ -413,7 +413,7 @@ namespace FEAT
       /**
        * \brief ILU Core for Scalar Matrices
        *
-       * This class is responsible for the factorisation and management of an ILU(p) factorisation.
+       * This class is responsible for the factorization and management of an ILU(p) factorization.
        *
        * \tparam DT_
        * The data-type to be used.
@@ -443,7 +443,7 @@ namespace FEAT
           _data_d.clear();
         }
 
-        /// Allocates the data arrays for the numeric factorisation
+        /// Allocates the data arrays for the numeric factorization
         void alloc_data()
         {
           // resize data arrays
@@ -452,13 +452,13 @@ namespace FEAT
           _data_u.resize(this->_col_idx_u.size());
         }
 
-        /// Returns the size of the numeric factorisation in bytes
+        /// Returns the size of the numeric factorization in bytes
         std::size_t bytes_numeric() const
         {
           return sizeof(DT_) * (_data_l.size() + _data_u.size() + _data_d.size());
         }
 
-        /// Returns the total size of the factorisation in bytes
+        /// Returns the total size of the factorization in bytes
         std::size_t bytes() const
         {
           return this->bytes_numeric() + this->bytes_symbolic();
@@ -587,12 +587,12 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs the (I+L)*(D+U) numeric factorisation
+         * \brief Performs the (I+L)*(D+U) numeric factorization
          *
-         * This function performs the "classic" (I+L)*(D+U) numeric factorisation of the
+         * This function performs the "classic" (I+L)*(D+U) numeric factorization of the
          * input matrix that has been set by a prior call to one of the #copy_data functions.
          */
-        void factorise_numeric_il_du()
+        void factorize_numeric_il_du()
         {
           // get data arrays
           const IT_* rptr_l = this->_row_ptr_l.data();
@@ -796,7 +796,7 @@ namespace FEAT
       /**
        * \brief ILU Core for Blocked Matrices
        *
-       * This class is responsible for the factorisation and management of an ILU(p) factorisation.
+       * This class is responsible for the factorization and management of an ILU(p) factorization.
        *
        * \tparam DT_
        * The data-type to be used.
@@ -834,7 +834,7 @@ namespace FEAT
           _data_d.clear();
         }
 
-        /// Allocates the data arrays for the numeric factorisation
+        /// Allocates the data arrays for the numeric factorization
         void alloc_data()
         {
           // resize data arrays
@@ -843,13 +843,13 @@ namespace FEAT
           _data_u.resize(this->_col_idx_u.size());
         }
 
-        /// Returns the size of the numeric factorisation in bytes
+        /// Returns the size of the numeric factorization in bytes
         std::size_t bytes_numeric() const
         {
           return sizeof(DT_) * std::size_t(Math::sqr(dim_)) * (_data_l.size() + _data_u.size() + _data_d.size());
         }
 
-        /// Returns the total size of the factorisation in bytes
+        /// Returns the total size of the factorization in bytes
         std::size_t bytes() const
         {
           return this->bytes_numeric() + this->bytes_symbolic();
@@ -911,12 +911,12 @@ namespace FEAT
         }
 
         /**
-         * \brief Performs the (I+L)*(D+U) numeric factorisation
+         * \brief Performs the (I+L)*(D+U) numeric factorization
          *
-         * This function performs the "classic" (I+L)*(D+U) numeric factorisation of the
+         * This function performs the "classic" (I+L)*(D+U) numeric factorization of the
          * input matrix that has been set by a prior call to one of the #copy_data functions.
          */
-        void factorise_numeric_il_du()
+        void factorize_numeric_il_du()
         {
           // get data arrays
           const IT_* rptr_l = this->_row_ptr_l.data();
@@ -1079,9 +1079,9 @@ namespace FEAT
     class ILUPrecond;
 
     /**
-     * \brief ILU(p) specialisation for SparseMatrixCSR/ELL<Mem::Main,...>
+     * \brief ILU(p) specialization for SparseMatrixCSR/ELL<Mem::Main,...>
      *
-     * This specialisation takes care of all scalar matrix containers residing in main memory.
+     * This specialization takes care of all scalar matrix containers residing in main memory.
      *
      * \author Peter Zajac
      */
@@ -1168,8 +1168,8 @@ namespace FEAT
         // set matrix structure
         _ilu.set_struct(_matrix);
 
-        // perform symbolic factorisation
-        _ilu.factorise_symbolic(_p);
+        // perform symbolic factorization
+        _ilu.factorize_symbolic(_p);
 
         // allocate data arrays
         _ilu.alloc_data();
@@ -1183,7 +1183,7 @@ namespace FEAT
       virtual void init_numeric() override
       {
         _ilu.copy_data(_matrix);
-        _ilu.factorise_numeric_il_du();
+        _ilu.factorize_numeric_il_du();
       }
 
       /**
@@ -1218,7 +1218,7 @@ namespace FEAT
     }; // class ILUPrecond<ScalarMatrix_<Mem::Main,...>,...>
 
     /**
-     * \brief ILU(p) specialisation for SparseMatrixBCSR<Mem::Main,...>
+     * \brief ILU(p) specialization for SparseMatrixBCSR<Mem::Main,...>
      *
      * \author Peter Zajac
      */
@@ -1305,8 +1305,8 @@ namespace FEAT
         // set matrix structure
         _ilu.set_struct(_matrix);
 
-        // perform symbolic factorisation
-        _ilu.factorise_symbolic(_p);
+        // perform symbolic factorization
+        _ilu.factorize_symbolic(_p);
 
         // allocate data arrays
         _ilu.alloc_data();
@@ -1320,7 +1320,7 @@ namespace FEAT
       virtual void init_numeric() override
       {
         _ilu.copy_data(_matrix);
-        _ilu.factorise_numeric_il_du();
+        _ilu.factorize_numeric_il_du();
       }
 
       /**
@@ -1730,7 +1730,7 @@ namespace FEAT
       }
     }; // class ILUPrecond<SparseMatrixBCSR<Mem::CUDA,...>,...>
 
-    /// Dummy class for not implemented specialisations
+    /// Dummy class for not implemented specializations
     template<typename Matrix_, typename Filter_>
     class ILUPrecond :
       public SolverBase<typename Matrix_::VectorTypeL>

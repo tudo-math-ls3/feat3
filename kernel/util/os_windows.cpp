@@ -44,7 +44,7 @@ namespace FEAT
     {
       work_set_size = work_set_size_peak = page_file_usage = page_file_usage_peak = 0ull;
 
-      // initialise memory counters structure
+      // initialize memory counters structure
       PROCESS_MEMORY_COUNTERS pmc;
       memset(&pmc, 0, sizeof(PROCESS_MEMORY_COUNTERS));
 
@@ -72,7 +72,7 @@ namespace FEAT
       HANDLE prc = GetCurrentProcess();
       HANDLE thr = GetCurrentThread();
 
-      // initialise line info
+      // initialize line info
       IMAGEHLP_LINE64 img_line;
       img_line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
 
@@ -81,10 +81,10 @@ namespace FEAT
       sim.si.MaxNameLen = 512;
       sim.si.SizeOfStruct = sizeof(SYMBOL_INFO);
 
-      // initialise symbol table
+      // initialize symbol table
       SymInitialize(prc, nullptr, TRUE);
 
-      // initialise the stack frame stuff
+      // initialize the stack frame stuff
       STACKFRAME64 stack_frame;
       memset(&stack_frame, 0, sizeof(stack_frame));
 

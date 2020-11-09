@@ -1149,7 +1149,7 @@ namespace FEAT
      *
      * Third, this algorithm does not physically swap rows during the
      * pivoting step, but simply \e remembers the pivoted positions in
-     * a temporary pivot array \e p, which is initialised to identity.
+     * a temporary pivot array \e p, which is initialized to identity.
      * So in the k-th iteration of the primary elimination loop:
      *
      * - p[k] contains the index of the row which is currently being
@@ -1179,13 +1179,13 @@ namespace FEAT
         return det;
       }
 
-      // initialise identity permutation
+      // initialize identity permutation
       for(IT_ i(0); i < n; ++i)
       {
         p[i] = i;
       }
 
-      // initialise determinant to 1
+      // initialize determinant to 1
       DT_ det = DT_(1);
 
       // primary column elimination loop

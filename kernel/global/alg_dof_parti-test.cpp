@@ -77,39 +77,39 @@ public:
       const int ii = comm.rank() / np;
       const int jj = comm.rank() % np;
 
-      // add mirrors for our vertex neighbours
+      // add mirrors for our vertex neighbors
 
-      // lower-left neighbour?
+      // lower-left neighbor?
       if((ii > 0) && (jj > 0))
         gate.push((ii-1)*np + (jj-1), create_mirror_0(m*m, 0));
 
-      // lower-right neighbour?
+      // lower-right neighbor?
       if((ii > 0) && (jj+1 < np))
         gate.push((ii-1)*np + (jj+1), create_mirror_0(m*m, m-1));
 
-      // upper-left neighbour?
+      // upper-left neighbor?
       if((ii+1 < np) && (jj > 0))
         gate.push((ii+1)*np + (jj-1), create_mirror_0(m*m, m*(m-1)));
 
-      // upper-right neighbour?
+      // upper-right neighbor?
       if((ii+1 < np) && (jj+1 < np))
         gate.push((ii+1)*np + (jj+1), create_mirror_0(m*m, m*m-1));
 
-      // add mirror for our edge neighbours
+      // add mirror for our edge neighbors
 
-      // lower neighbour?
+      // lower neighbor?
       if(ii > 0)
         gate.push((ii-1)*np + jj, create_mirror_1(m*m, m, 0, 1));
 
-      // upper neighbour?
+      // upper neighbor?
       if(ii+1 < np)
         gate.push((ii+1)*np + jj, create_mirror_1(m*m, m, m*(m-1), 1));
 
-      // left neighbour?
+      // left neighbor?
       if(jj > 0)
         gate.push(ii*np + (jj-1), create_mirror_1(m*m, m, 0, m));
 
-      // right neighbour?
+      // right neighbor?
       if(jj+1 < np)
         gate.push(ii*np + (jj+1), create_mirror_1(m*m, m, m-1, m));
     }
@@ -154,7 +154,7 @@ public:
     glob_vec_x.local().format(rng, -1.0, +1.0);
     glob_vec_y.local().format(rng, -1.0, +1.0);
 
-    // synchronise vectors to obtain consistency over all processes
+    // synchronize vectors to obtain consistency over all processes
     glob_vec_x.sync_1();
     glob_vec_y.sync_1();
 
@@ -204,7 +204,7 @@ public:
     // create global matrix
     GlobalMatrixType glob_mat(&gate, &gate);
 
-    // assemble local matrix structure and initialise to random values
+    // assemble local matrix structure and initialize to random values
     LAFEM::PointstarFactoryFE<DataType, IndexType> psf(m);
     glob_mat.local() = psf.matrix_csr();
     glob_mat.local().format(rng, -1.0, +1.0);

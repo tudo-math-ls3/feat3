@@ -82,53 +82,53 @@ public:
     const int ii = comm.rank() / np;
     const int jj = comm.rank() % np;
 
-    // add mirrors for our vertex neighbours
+    // add mirrors for our vertex neighbors
 
-    // lower-left neighbour?
+    // lower-left neighbor?
     if((ii > 0) && (jj > 0))
       gate.push((ii-1)*np + (jj-1), create_mirror_0(m*m, 0));
     else
       bnds.push_back(create_mirror_0(m*m, 0));
 
-    // lower-right neighbour?
+    // lower-right neighbor?
     if((ii > 0) && (jj+1 < np))
       gate.push((ii-1)*np + (jj+1), create_mirror_0(m*m, m-1));
     else
       bnds.push_back(create_mirror_0(m*m, m-1));
 
-    // upper-left neighbour?
+    // upper-left neighbor?
     if((ii+1 < np) && (jj > 0))
       gate.push((ii+1)*np + (jj-1), create_mirror_0(m*m, m*(m-1)));
     else
       bnds.push_back(create_mirror_0(m*m, m*(m-1)));
 
-    // upper-right neighbour?
+    // upper-right neighbor?
     if((ii+1 < np) && (jj+1 < np))
       gate.push((ii+1)*np + (jj+1), create_mirror_0(m*m, m*m-1));
     else
       bnds.push_back(create_mirror_0(m*m, m*m-1));
 
-    // add mirror for our edge neighbours
+    // add mirror for our edge neighbors
 
-    // lower neighbour?
+    // lower neighbor?
     if(ii > 0)
       gate.push((ii-1)*np + jj, create_mirror_1(m*m, m, 0, 1));
     else
       bnds.push_back(create_mirror_1(m*m, m, 0, 1));
 
-    // upper neighbour?
+    // upper neighbor?
     if(ii+1 < np)
       gate.push((ii+1)*np + jj, create_mirror_1(m*m, m, m*(m-1), 1));
     else
       bnds.push_back(create_mirror_1(m*m, m, m*(m-1), 1));
 
-    // left neighbour?
+    // left neighbor?
     if(jj > 0)
       gate.push(ii*np + (jj-1), create_mirror_1(m*m, m, 0, m));
     else
       bnds.push_back(create_mirror_1(m*m, m, 0, m));
 
-    // right neighbour?
+    // right neighbor?
     if(jj+1 < np)
       gate.push(ii*np + (jj+1), create_mirror_1(m*m, m, m-1, m));
     else
@@ -177,7 +177,7 @@ public:
     // create global matrix
     GlobalMatrixType matrix(&gate, &gate);
 
-    // assemble local matrix structure and initialise to random values
+    // assemble local matrix structure and initialize to random values
     LAFEM::PointstarFactoryFE<DataType, IndexType> psf((Index)m);
     matrix.local() = psf.matrix_csr_neumann();
 

@@ -154,7 +154,7 @@ namespace FEAT
      * \brief Singular Matrix exception
      *
      * This exception may be thrown by a solver object if it detects that
-     * the matrix to be factorised is singular.
+     * the matrix to be factorized is singular.
      */
     class SingularMatrixException :
       public SolverException
@@ -222,46 +222,46 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic initialisation method
+       * \brief Symbolic initialization method
        *
-       * This method is called to perform symbolic initialisation of the solver.
+       * This method is called to perform symbolic initialization of the solver.
        */
       virtual void init_symbolic()
       {
       }
 
       /**
-       * \brief Numeric initialisation method
+       * \brief Numeric initialization method
        *
-       * This method is called to perform numeric initialisation of the solver.\n
-       * Before this function can be called, the symbolic initialisation must be performed.
+       * This method is called to perform numeric initialization of the solver.\n
+       * Before this function can be called, the symbolic initialization must be performed.
        */
       virtual void init_numeric()
       {
       }
 
       /**
-       * \brief Numeric finalisation method
+       * \brief Numeric finalization method
        *
-       * This method is called to release any data allocated in the numeric initialisation step.
+       * This method is called to release any data allocated in the numeric initialization step.
        */
       virtual void done_numeric()
       {
       }
 
       /**
-       * \brief Symbolic finalisation method
+       * \brief Symbolic finalization method
        *
-       * This method is called to release any data allocated in the symbolic initialisation step.
+       * This method is called to release any data allocated in the symbolic initialization step.
        */
       virtual void done_symbolic()
       {
       }
 
       /**
-       * \brief Initialisation method
+       * \brief Initialization method
        *
-       * This function performs both the symbolic and numeric initialisation, i.e. it simply performs
+       * This function performs both the symbolic and numeric initialization, i.e. it simply performs
          \verbatim
          this->init_symbolic();
          this->init_numeric();
@@ -274,9 +274,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Finalisation method
+       * \brief Finalization method
        *
-       * This function performs both the symbolic and numeric finalisation, i.e. it simply performs
+       * This function performs both the symbolic and numeric finalization, i.e. it simply performs
          \verbatim
          this->done_numeric();
          this->done_symbolic();

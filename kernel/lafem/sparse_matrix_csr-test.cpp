@@ -251,16 +251,16 @@ template<
   typename Mem_,
   typename DT_,
   typename IT_>
-class SparseMatrixCSRSerialiseTest
+class SparseMatrixCSRSerializeTest
   : public FullTaggedTest<Mem_, DT_, IT_>
 {
 public:
-   SparseMatrixCSRSerialiseTest()
-    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRSerialiseTest")
+   SparseMatrixCSRSerializeTest()
+    : FullTaggedTest<Mem_, DT_, IT_>("SparseMatrixCSRSerializeTest")
   {
   }
 
-  virtual ~SparseMatrixCSRSerialiseTest()
+  virtual ~SparseMatrixCSRSerializeTest()
   {
   }
 
@@ -297,16 +297,16 @@ public:
     SparseMatrixCSR<Mem::Main, DT_, IT_> j2(FileMode::fm_mtx, ts2);
     TEST_CHECK_EQUAL(j2, f);
 
-    auto kp = f.serialise(LAFEM::SerialConfig(false, false));
+    auto kp = f.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixCSR<Mem_, DT_, IT_> k(kp);
     TEST_CHECK_EQUAL(k, f);
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = f.serialise(LAFEM::SerialConfig(true, false));
+    auto zl = f.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixCSR<Mem_, DT_, IT_> zlib(zl);
     TEST_CHECK_EQUAL(zlib, f);
 #endif
 #ifdef FEAT_HAVE_ZFP
-    auto zf = f.serialise(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+    auto zf = f.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixCSR<Mem_, DT_, IT_> zfp(zf);
     for(Index row(0) ; row < f.rows() ; ++row)
     {
@@ -318,15 +318,15 @@ public:
 #endif
   }
 };
-SparseMatrixCSRSerialiseTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_serialise_test_float_ulong;
-SparseMatrixCSRSerialiseTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_serialise_test_double_ulong;
-SparseMatrixCSRSerialiseTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_serialise_test_float_uint;
-SparseMatrixCSRSerialiseTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_serialise_test_double_uint;
+SparseMatrixCSRSerializeTest<Mem::Main, float, unsigned long> cpu_sparse_matrix_csr_serialize_test_float_ulong;
+SparseMatrixCSRSerializeTest<Mem::Main, double, unsigned long> cpu_sparse_matrix_csr_serialize_test_double_ulong;
+SparseMatrixCSRSerializeTest<Mem::Main, float, unsigned int> cpu_sparse_matrix_csr_serialize_test_float_uint;
+SparseMatrixCSRSerializeTest<Mem::Main, double, unsigned int> cpu_sparse_matrix_csr_serialize_test_double_uint;
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRSerialiseTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_csr_serialise_test_float_ulong;
-SparseMatrixCSRSerialiseTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_csr_serialise_test_double_ulong;
-SparseMatrixCSRSerialiseTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_csr_serialise_test_float_uint;
-SparseMatrixCSRSerialiseTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_csr_serialise_test_double_uint;
+SparseMatrixCSRSerializeTest<Mem::CUDA, float, unsigned long> cuda_sparse_matrix_csr_serialize_test_float_ulong;
+SparseMatrixCSRSerializeTest<Mem::CUDA, double, unsigned long> cuda_sparse_matrix_csr_serialize_test_double_ulong;
+SparseMatrixCSRSerializeTest<Mem::CUDA, float, unsigned int> cuda_sparse_matrix_csr_serialize_test_float_uint;
+SparseMatrixCSRSerializeTest<Mem::CUDA, double, unsigned int> cuda_sparse_matrix_csr_serialize_test_double_uint;
 #endif
 
 template<
@@ -1283,23 +1283,23 @@ public:
 #ifdef FEAT_HAVE_ZFP
     LAFEM::SerialConfig config(false, false);
     config.set_tolerance(FEAT::Real(1e-2));
-    std::vector<char> uncompressed = a.serialise(config);
+    std::vector<char> uncompressed = a.serialize(config);
     config.set_elements_compression(LAFEM::CompressionModes::elements_zlib);
-    std::vector<char> elements_compressed_zlib = a.serialise(config);
+    std::vector<char> elements_compressed_zlib = a.serialize(config);
     config.set_elements_compression(LAFEM::CompressionModes::elements_zfp);
-    std::vector<char> elements_compressed_zfp = a.serialise(config);
+    std::vector<char> elements_compressed_zfp = a.serialize(config);
     config.set_indices_compression(LAFEM::CompressionModes::indices_zlib);
-    std::vector<char> elements_indices_compressed_zfp = a.serialise(config);
+    std::vector<char> elements_indices_compressed_zfp = a.serialize(config);
     config.set_elements_compression(LAFEM::CompressionModes::elements_zlib);
-    std::vector<char> elements_indices_compressed_zlib = a.serialise(config);
+    std::vector<char> elements_indices_compressed_zlib = a.serialize(config);
     config.set_elements_compression(LAFEM::CompressionModes::elements_off);
-    std::vector<char> indices_compressed_zlib = a.serialise(config);
+    std::vector<char> indices_compressed_zlib = a.serialize(config);
     config.set_elements_compression(LAFEM::CompressionModes::elements_zfp);
     config.set_indices_compression(LAFEM::CompressionModes::indices_off);
     config.set_tolerance(FEAT::Real(1e-4));
-    std::vector<char> elements_compressed_zfp_e4 = a.serialise(config);
+    std::vector<char> elements_compressed_zfp_e4 = a.serialize(config);
     config.set_tolerance(FEAT::Real(1e-6));
-    std::vector<char> elements_compressed_zfp_e6 = a.serialise(config);
+    std::vector<char> elements_compressed_zfp_e6 = a.serialize(config);
 
     XASSERTM(uncompressed.size() > elements_compressed_zlib.size(), "ele zlib is not smaller than uncomp");
     XASSERTM(elements_compressed_zlib.size() > elements_compressed_zfp.size(), "ele zfp is not smaleer than ele zlib");
