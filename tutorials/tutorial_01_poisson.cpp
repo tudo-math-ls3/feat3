@@ -69,6 +69,7 @@
 // FEAT-Space includes
 #include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
 #include <kernel/space/lagrange2/element.hpp>              // the Lagrange-2 Element (aka "Q2")
+#include <kernel/space/lagrange3/element.hpp>              // the Lagrange-3 Element (aka "Q3")
 
 // FEAT-Cubature includes
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
@@ -161,6 +162,9 @@ namespace Tutorial01
 
   // Or you could also use the Lagrange-2 element (aka "Q2" or "P2") instead:
   //typedef Space::Lagrange2::Element<TrafoType> SpaceType;
+
+  // Or you could also use the Lagrange-3 element (aka "Q3" or "P3") instead:
+  //typedef Space::Lagrange3::Element<TrafoType> SpaceType;
 
 
   // Before we continue, let us recapitulate what we have defined so far:
@@ -452,6 +456,9 @@ namespace Tutorial01
     // PCG is an iterative solver, so we want to enable plotting of the convergence process,
     // as otherwise our solver would not print anything to the console:
     solver->set_plot_mode(Solver::PlotMode::iter);
+
+    // Set the maximum number of iterations to 1000:
+    solver->set_max_iter(1000);
 
     // Next, we need to initialise the solver. During this call, the solver and all of its
     // sub-solvers and preconditioners allocate required temporary vectors, perform factorisation
