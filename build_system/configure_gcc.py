@@ -28,6 +28,10 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   if (major == 4 and minor >= 9) or major > 4:
     cxxflags += " -fdiagnostics-color=always"
 
+#array-bounds is error prone in v5
+  if major == 5:
+    cxxflags += " -Wno-array-bounds"
+
   if major >= 5:
     cxxflags += " -Wswitch-bool -Wsizeof-array-argument -Wbool-compare -Wsuggest-override -Wnon-virtual-dtor -Wdelete-non-virtual-dtor"
     #cxxflags += " -Wsuggest-final-types -Wsuggest-final-methods"
