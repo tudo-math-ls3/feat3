@@ -142,7 +142,7 @@ class NLCGTest:
       TestTraitsType::get_minimal_points(min_points);
 
       // Check the distance between solution and minimal points
-      DT_ min_dist(Math::Limits<DT_>::max());
+      DT_ min_dist(Math::huge<DT_>());
 
       const auto& jt = min_points.end();
       auto it = min_points.begin();
@@ -187,13 +187,13 @@ class NLCGTest:
 
 // The first three are for comparison with ALGLIBMinCG
 NLCGTest<Mem::Main, float, Index, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f(float(0.6),Index(14), Index(39),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_hb_f(float(0.6),Index(14), Index(80),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::RosenbrockFunction>
 nlcg_sw_rb_d(double(0.8),Index(40), Index(118),"MQCLinesearch","none", NLCGDirectionUpdate::DYHSHybrid);
 
 NLCGTest<Mem::Main, double, Index, Analytic::Common::BazaraaShettyFunction>
-nlcg_sw_bs_d(double(0.33),Index(64), Index(240),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
+nlcg_sw_bs_d(double(0.31),Index(64), Index(240),"MQCLinesearch","none", NLCGDirectionUpdate::DaiYuan);
 
 // This is the weird Hager-Zhang update
 NLCGTest<Mem::Main, double, Index, Analytic::Common::HimmelblauFunction>
