@@ -1009,6 +1009,7 @@ namespace FEAT
 
           // get number of common local dofs
           const int num_local_dofs = common_map.get_num_local_dofs();
+          XASSERT(num_local_dofs <= max_common_dofs);
 
           // compute facet trafos
           Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_1, face_vec_1, cell_facet_1);
