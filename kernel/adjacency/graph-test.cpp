@@ -700,6 +700,26 @@ public:
     check_graph(graph, 9, 14, 56, ecv_i_ptr, ecv_i_idx);
   }
 
+  void test_serialize() const
+  {
+    Index g_ptr[6] = {0, 4, 7, 11, 14, 17};
+    Index g_idx[17] =
+    {
+      0, 2, 3, 5,
+      2, 4, 6,
+      0, 1, 2, 5,
+      1, 3, 6,
+      0, 3, 4
+    };
+    Graph g(5, 7, 17, g_ptr, g_idx);
+
+    std::vector<char> buffer = g.serialize();
+
+    Graph f(buffer);
+
+    check_graph(g, f);
+  }
+
   virtual void run() const override
   {
     // perform basic
@@ -716,6 +736,9 @@ public:
 
     // test color constructor
     test_constr_color();
+
+    // test serialization
+    test_serialize();
   }
 
 } graph_test;

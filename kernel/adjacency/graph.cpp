@@ -167,6 +167,50 @@ namespace FEAT
       }
     }
 
+    Graph::Graph(const std::vector<char>& buffer) :
+      _num_nodes_domain(0),
+      _num_nodes_image(0),
+      _num_indices_image(0),
+      _domain_ptr(nullptr),
+      _image_idx(nullptr),
+      _shared(false)
+    {
+      // 40 bytes required by header only
+      XASSERTM(buffer.size() >= std::size_t(40u), "invalid buffer size");
+
+      typedef std::uint64_t u64;
+      const u64* v = reinterpret_cast<const u64*>(buffer.data());
+
+      // check magic
+      XASSERTM(v[0] == Graph::magic, "invalid magic number");
+
+      // check buffer size
+      XASSERTM(v[1] == u64(buffer.size()), "invalid buffer size");
+
+      this->_num_nodes_domain  = Index(v[2]);
+      this->_num_nodes_image   = Index(v[3]);
+      this->_num_indices_image = Index(v[4]);
+
+      const u64* x = &v[5];
+
+      // allocate and copy domain pointer array
+      if(this->_num_nodes_domain > Index(0))
+      {
+        this->_domain_ptr = new Index[this->_num_nodes_domain+1u];
+        for(Index i(0); i <= this->_num_nodes_domain; ++i)
+          this->_domain_ptr[i] = Index(x[i]);
+        x += std::streamoff(this->_num_nodes_domain+1u);
+      }
+
+      // allocate and copy image index array
+      if(this->_num_indices_image > Index(0))
+      {
+        this->_image_idx =  new Index[this->_num_indices_image];
+        for(Index i(0); i < this->_num_indices_image; ++i)
+          this->_image_idx[i] = Index(x[i]);
+      }
+    }
+
     // destructor
     Graph::~Graph()
     {
@@ -200,6 +244,43 @@ namespace FEAT
         // let the STL do the sorting work
         std::sort(&_image_idx[_domain_ptr[i]], &_image_idx[_domain_ptr[i+1]]);
       }
+    }
+
+    std::vector<char> Graph::serialize() const
+    {
+      // compute buffer size
+      typedef std::uint64_t u64;
+      u64 s = u64(_num_nodes_domain > 0u ? 6u : 5u) + u64(_num_nodes_domain) + u64(_num_indices_image);
+
+      // allocate buffer
+      std::vector<char> buffer(s * 8u);
+      u64* v = reinterpret_cast<u64*>(buffer.data());
+
+      // create header
+      v[0] = Graph::magic;
+      v[1] = s * u64(8); // buffer size
+      v[2] = u64(this->_num_nodes_domain);
+      v[3] = u64(this->_num_nodes_image);
+      v[4] = u64(this->_num_indices_image);
+
+      // empty graph?
+      if(this->_num_nodes_domain <= Index(0))
+        return buffer;
+
+      XASSERT(this->_domain_ptr != nullptr);
+
+      // copy domain pointer
+      u64* x = &v[5];
+      for(Index i(0); i <= this->_num_nodes_domain; ++i)
+        x[i] = u64(this->_domain_ptr[i]);
+
+      // copy image indices
+      x += std::streamoff(this->_num_nodes_domain+1u);
+      for(Index i(0); i < this->_num_indices_image; ++i)
+        x[i] = u64(this->_image_idx[i]);
+
+      // okay
+      return buffer;
     }
   } // namespace Adjacency
 } // namespace FEAT

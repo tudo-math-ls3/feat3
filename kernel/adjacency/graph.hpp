@@ -41,6 +41,9 @@ namespace FEAT
        */
       typedef const Index* ImageIterator;
 
+      // magic number for Graph serialization
+      static constexpr std::uint64_t magic = 0x5052474A44413346ull; // "F3ADJGRP"
+
     protected:
       /// total number of domain nodes
       Index _num_nodes_domain;
@@ -295,6 +298,17 @@ namespace FEAT
        */
       explicit Graph(const Graph& other, const Permutation& domain_perm, const Permutation& image_perm);
 
+      /**
+       * \brief Deserialization CTOR
+       *
+       * This constructor creates the graph from a buffer that has been created by using
+       * the serialize function.
+       *
+       * \param[in] buffer
+       * The serialization buffer to create the graph from.
+       */
+      explicit Graph(const std::vector<char>& buffer);
+
       /// virtual destructor
       virtual ~Graph();
 
@@ -401,6 +415,11 @@ namespace FEAT
        * \brief Sorts the image indices to non-descending order.
        */
       void sort_indices();
+
+      /**
+       * \brief Serializes the graph into a buffer.
+       */
+      std::vector<char> serialize() const;
 
       /* *************************************************** */
       /*  R E N D E R   F U N C T I O N   T E M P L A T E S  */
