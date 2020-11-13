@@ -502,7 +502,7 @@ namespace DFG95
     {
     }
 
-    String format(int prec = fp_num_digs) const
+    String format(int prec = fp_num_digs+5) const
     {
       String s;
       const char pc = '.';

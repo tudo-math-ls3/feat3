@@ -1028,7 +1028,7 @@ namespace DFG95
     statistics.sync(comm);
 
     comm.print(String("\n") + String(80, '=') + "\n");
-    comm.print(summary.format(20));
+    comm.print(summary.format());
     comm.print(statistics.format());
 
     // print multigrid timings
