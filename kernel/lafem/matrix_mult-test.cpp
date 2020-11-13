@@ -10,6 +10,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/util/random.hpp>
+#include <kernel/lafem/sparse_matrix_factory.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -166,3 +167,85 @@ MatrixMultTest<float, unsigned int> matrix_mult_test_float_uint;
 MatrixMultTest<double, unsigned int> matrix_mult_test_double_uint;
 MatrixMultTest<float, unsigned long> matrix_mult_test_float_ulong;
 MatrixMultTest<double, unsigned long> matrix_mult_test_double_ulong;
+
+template<typename DT_, typename IT_>
+class MatrixMultTest2
+  : public FullTaggedTest<Mem::Main, DT_, IT_>
+{
+  typedef SparseMatrixCSR<Mem::Main, DT_, IT_> MatrixType;
+  typedef DenseVector<Mem::Main, DT_, IT_> VectorType;
+
+public:
+  MatrixMultTest2()
+    : FullTaggedTest<Mem::Main, DT_, IT_>("MatrixMultTest")
+  {
+  }
+
+  virtual ~MatrixMultTest2()
+  {
+  }
+  virtual void run() const override
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
+
+    // create matrix D
+    SparseMatrixFactory<DT_, IT_> factory_D(IT_(7), IT_(8));
+    factory_D.add(IT_(0), IT_(5), DT_(2));
+    factory_D.add(IT_(1), IT_(0), DT_(7));
+    factory_D.add(IT_(2), IT_(3), DT_(5));
+    factory_D.add(IT_(3), IT_(1), DT_(13));
+    factory_D.add(IT_(4), IT_(0), DT_(4));
+    factory_D.add(IT_(5), IT_(2), DT_(10));
+    factory_D.add(IT_(5), IT_(6), DT_(3));
+    factory_D.add(IT_(6), IT_(7), DT_(3));
+
+    MatrixType d(factory_D.make_csr());
+
+
+    //create Matrix B
+    SparseMatrixFactory<DT_, IT_> factory_B(IT_(8), IT_(3));
+    factory_B.add(IT_(0), IT_(0), DT_(1));
+    factory_B.add(IT_(1), IT_(2), DT_(1));
+    factory_B.add(IT_(2), IT_(0), DT_(7));
+    factory_B.add(IT_(3), IT_(1), DT_(2));
+    factory_B.add(IT_(4), IT_(0), DT_(9));
+    factory_B.add(IT_(6), IT_(1), DT_(5));
+    factory_B.add(IT_(6), IT_(2), DT_(7));
+    factory_B.add(IT_(7), IT_(0), DT_(3));
+    MatrixType b(factory_B.make_csr());
+
+
+   //create Matrix structure for X=D*B
+    Adjacency::Graph graph_db(Adjacency::RenderType::injectify_sorted, d, b);
+    MatrixType x(graph_db);
+
+    // calculate X=D*B
+    x.add_mat_mat_product(d, b);
+
+    //initialize reference Vectors
+    DT_ val_ref[8] = { DT_(7),DT_(10),DT_(13),DT_(4), DT_(70), DT_(15), DT_(21), DT_(9) };
+    IT_ col_ind_ref[8] = { IT_(0),IT_(1),IT_(2),IT_(0),IT_(0),IT_(1),IT_(2),IT_(0) };
+    IT_ row_ptr_ref[8] = { IT_(0),IT_(0),IT_(1),IT_(2),IT_(3),IT_(4),IT_(7),IT_(8) };
+
+
+    // pointer on the arrays of the CSR matrix x
+    IT_* row_ptr = x.row_ptr();
+    IT_* col_ind = x.col_ind();
+    DT_* val = x.val();
+
+    // check if X is correct
+    for (IT_ i(0); i < 8; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(val_ref[i], val[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(col_ind_ref[i],col_ind[i], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(row_ptr_ref[i], row_ptr[i], tol);
+    }
+
+
+  }
+};
+
+MatrixMultTest2<float, unsigned int> matrix_mult_test2_float_uint;
+MatrixMultTest2<double, unsigned int> matrix_mult_test2_double_uint;
+MatrixMultTest2<float, unsigned long> matrix_mult_test2_float_ulong;
+MatrixMultTest2<double, unsigned long> matrix_mult_test2_double_ulong;
