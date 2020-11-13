@@ -83,10 +83,23 @@ namespace DbgRecursiveParti
     comm.print("Desired Levels: " + domain.format_desired_levels());
     comm.print("Chosen  Levels: " + domain.format_chosen_levels());
 
+    if(args.check("save") >= 0)
+    {
+      String name("dbg-recursive-parti.bin");
+      args.parse("serial", name);
+      comm.print("Writing serialization file '" + name + "'...");
+      std::vector<char> buffer = domain.serialize_partitioning();
+      if(comm.rank() == 0)
+      {
+        std::ofstream ofs(name, std::ios_base::binary);
+        ofs.write(buffer.data(), std::streamsize(buffer.size()));
+      }
+    }
+
     // write VTKs
     if(args.check("vtk") >= 0)
     {
-      String name("dbg-recurse-parti");
+      String name("dbg-recursive-parti");
       args.parse("vtk", name);
       comm.print("Writing VTK files '" + name + ".*.vtu'...");
       for(Index lvl(0); lvl < domain.size_physical(); ++lvl)
@@ -119,6 +132,7 @@ namespace DbgRecursiveParti
     args.support("mesh");
     args.support("level");
     args.support("vtk");
+    args.support("save");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();

@@ -66,6 +66,10 @@
 // If specified, the nonlinear system in each time step will be solved using a simple
 // Picard iteration instead of the Newton iteration.
 //
+// --plot-mg-iter
+// If specified, the convergence plot of the multigrid solver in each nonlinear solver iteration
+// is printed.
+//
 // --min-nl-iter <N>
 // Specifies the minimum number of nonlinear (Newton/Picard) solver iterations per time step.
 // Defaults to 1.
@@ -100,7 +104,7 @@
 // If given, specifies the relative tolerance for the multigrid solver.
 // If not given, then the tolerance for the multigrid solver is chosen in an adaptive
 // manner depending on the two previous nonlinear solver defects, which is the default case.
-// The adaptive tolerance is chosen in each nonlinear iteration by analysing the nonlinear
+// The adaptive tolerance is chosen in each nonlinear iteration by analyzing the nonlinear
 // defect improvement in the previous nonlinear (Newton/Picard) solver iteration in the
 // following manner: Let def_{j} and def_{j-1} denote the two previous nonlinear defect norms,
 // then the next nonlinear defect norm def_{j+1} should approximately fulfill the equation
@@ -123,13 +127,16 @@
 // This section describes miscellaneous parameters that do not fit into any other section and
 // which do not deserve a custom section of their own.
 //
-// --vtk <filename> [<stepping>]
-// Specifies that the application should write a VTK visualization output file every <stepping>
-// time steps. The stepping parameter is optional and defaults to 1.
+// --vtk <filename>
+// Specifies that the application should write a VTK visualization output file.
+//
+// --save-sol <filename>
+// Specifies that the application should write the final solution (and the partitioning) to
+// a binary output file.
 //
 // --ext-stats
 // If given, specifies that the application should output extensive statistics at the end of the
-// program run, including detailed MPI timinigs.
+// program run, including detailed MPI timings.
 //
 // --test-mode
 // If given, specifies that the application should run in test-mode rather than its normal mode.
@@ -146,7 +153,7 @@
 namespace DFG95
 {
   template<typename DomainLevel_>
-  void run(SimpleArgParser& args, Control::Domain::DomainControl<DomainLevel_>& domain)
+  void run(SimpleArgParser& args, Control::Domain::PartiDomainControl<DomainLevel_>& domain)
   {
     // get our main communicator
     const Dist::Comm& comm = domain.comm();
@@ -178,6 +185,7 @@ namespace DFG95
     const bool adapt_tol = (args.check("mg-tol-rel") < 0);
     const bool testmode = (args.check("test-mode") >= 0);
     const bool ext_stats = (args.check("ext-stats") >= 0);
+    const bool plot_mg_iter = (args.check("plot-mg-iter") >= 0);
 
     // viscosity parameter
     const DataType nu = parse(args, "nu", DataType(1e-3));
@@ -592,8 +600,6 @@ namespace DFG95
     Solver::Status stokes_status = Solver::solve(*solver, vec_sol, vec_def, matrix, filter);
     watch_stokes_solve.stop();
 
-    solver->set_plot_mode(Solver::PlotMode::none);
-
     statistics.counts[Counts::linsol_iter] = solver->get_num_iter();
 
     // release solvers
@@ -616,6 +622,9 @@ namespace DFG95
     if(navier)
     {
       comm.print("\nSolving Navier-Stokes system...");
+
+      if(!plot_mg_iter)
+        solver->set_plot_mode(Solver::PlotMode::none);
 
       // setup burgers assembler for matrix
       Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
@@ -781,7 +790,7 @@ namespace DFG95
           }
           else
           {
-            // In the case if Picard itertion, we only expect linear convergence,
+            // In the case if Picard iteration, we only expect linear convergence,
             // which (in analogy to Newton) leads us to the following estimate:
             //
             //      def_{j+1} \approx def_{j} * (def_{j} / def_{j+1})
@@ -961,6 +970,33 @@ namespace DFG95
       vi.synchronize(comm);
 
       summary.velo_info = vi;
+    }
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+
+    if(args.check("save-sol") >= 0)
+    {
+      String save_name;
+      if(args.parse("save-sol", save_name) < 1)
+      {
+        save_name = String("dfg95-cc") + stringify(dim) + "d-bench1";
+        save_name += "-lvl" + stringify(the_domain_level.get_level_index());
+        save_name += "-n" + stringify(comm.size()) + ".sol";
+      }
+
+      comm.print("Writing Solution to '" + save_name + "'");
+
+      // serialize the partitioning
+      std::vector<char> buf_pdc = domain.serialize_partitioning();
+
+      // serialize solution vector
+      BinaryStream bs_sol;
+      vec_sol.local().write_out(LAFEM::FileMode::fm_binary, bs_sol);
+
+      // write to combined output file
+      DistFileIO::write_combined(buf_pdc, bs_sol.container(), save_name, comm);
     }
 
     /* ***************************************************************************************** */
@@ -1172,6 +1208,7 @@ namespace DFG95
     args.support("max-nl-iter");
     args.support("min-mg-iter");
     args.support("max-mg-iter");
+    args.support("plot-mg-iter");
     args.support("smooth-steps");
     args.support("smooth-damp");
     args.support("mg-tol-rel");
@@ -1184,6 +1221,7 @@ namespace DFG95
     args.support("test-mode");
     args.support("ext-stats");
     args.support("no-umfpack");
+    args.support("save-sol");
     //args.support("isoparam");
 
     // check for unsupported options

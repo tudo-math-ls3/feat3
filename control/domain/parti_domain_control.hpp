@@ -737,6 +737,101 @@ namespace FEAT
           return s;
         }
 
+        /**
+         * \brief Serializes the partitioning information into a binary buffer.
+         */
+        std::vector<char> serialize_partitioning() const
+        {
+          BinaryStream bs;
+          typedef std::uint64_t u64;
+
+          // serialization magic number: "F3PaDoCo"
+          const std::uint64_t magic = 0x6F436F4461503346;
+
+          XASSERT(this->_num_global_layers >= this->_ancestry.size());
+
+          if(this->_comm.rank() == 0)
+          {
+            // dump magic
+            bs.write((const char*)&magic, 8u);
+
+            // write finest level
+            const u64 lev = u64(this->_virt_levels.front()->get_level_index());
+            bs.write((const char*)&lev, 8u);
+
+            // serialize ancestry/layers
+            const u64 na = u64(this->_ancestry.size());
+            bs.write((const char*)&na, 8u);
+
+            // write number of ranks per layer in reverse order
+            for(auto it = this->_ancestry.rbegin(); it != this->_ancestry.rend(); ++it)
+            {
+              // write ranks
+              const u64 np = u64(it->num_procs);
+              const u64 pl = u64(it->parti_level);
+              bs.write((const char*)&np, 8u);
+              bs.write((const char*)&pl, 8u);
+            }
+          }
+
+          // loop over all ancestry graphs
+          for(auto it = this->_ancestry.rbegin(); it != this->_ancestry.rend(); ++it)
+          {
+            if(it == this->_ancestry.rbegin())
+            {
+              std::vector<char> buf = it->parti_graph.serialize();
+              bs.write(buf.data(), std::streamsize(buf.size()));
+              continue;
+            }
+
+            // get layer index
+            if(it->layer_p < 0)
+              continue;
+
+            // get parent layer communicator
+            const std::size_t ilp = std::size_t(it->layer_p);
+            XASSERT(ilp < this->_layers.size());
+            const Dist::Comm& comm_p = this->_layers.at(ilp)->comm();
+
+            // serialize graph
+            std::vector<char> buf = it->parti_graph.serialize();
+
+            // choose maximum size
+            u64 buf_size = buf.size();
+
+            // gather individual buffer sizes on rank 0
+            std::vector<u64> all_sizes;
+            if(comm_p.rank() == 0)
+              all_sizes.resize(std::size_t(comm_p.size()));
+            comm_p.gather(&buf_size, 1u, all_sizes.data(), 1u, 0);
+
+            // allreduce maximum size
+            comm_p.allreduce(&buf_size, &buf_size, std::size_t(1), Dist::op_max);
+
+            // adjust buffer size
+            if(buf_size > u64(buf.size()))
+              buf.resize(buf_size);
+
+            // on rank 0, allocate common buffer
+            std::vector<char> com_buf;
+            if(comm_p.rank() == 0)
+              com_buf.resize(std::size_t(buf_size * u64(comm_p.size())));
+
+            // gather all buffers on rank 0
+            comm_p.gather(buf.data(), buf_size, com_buf.data(), buf_size, 0);
+
+            // write each individual buffer
+            if(comm_p.rank() == 0)
+            {
+              char* x = com_buf.data();
+              for(u64 k(0); k < u64(comm_p.size()); ++k)
+                bs.write(&x[k*buf_size], std::streamsize(all_sizes[k]));
+            }
+          }
+
+          return bs.container();
+        }
+
       protected:
         /**
          * \brief Creates the ancestry for a single layer (or a single process)
