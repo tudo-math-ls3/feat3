@@ -188,7 +188,7 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
 
-    // create matrix D
+    // create CSR matrix D of dimension (7x8)
     SparseMatrixFactory<DT_, IT_> factory_D(IT_(7), IT_(8));
     factory_D.add(IT_(0), IT_(5), DT_(2));
     factory_D.add(IT_(1), IT_(0), DT_(7));
@@ -202,7 +202,7 @@ public:
     MatrixType d(factory_D.make_csr());
 
 
-    //create Matrix B
+    //create CSR matrix B of dimension (8x3)
     SparseMatrixFactory<DT_, IT_> factory_B(IT_(8), IT_(3));
     factory_B.add(IT_(0), IT_(0), DT_(1));
     factory_B.add(IT_(1), IT_(2), DT_(1));
@@ -215,7 +215,7 @@ public:
     MatrixType b(factory_B.make_csr());
 
 
-   //create Matrix structure for X=D*B
+   //create matrix adjacency structure for X=D*B
     Adjacency::Graph graph_db(Adjacency::RenderType::injectify_sorted, d, b);
     MatrixType x(graph_db);
 
@@ -223,9 +223,9 @@ public:
     x.add_mat_mat_product(d, b);
 
     //initialize reference Vectors
-    DT_ val_ref[8] = { DT_(7),DT_(10),DT_(13),DT_(4), DT_(70), DT_(15), DT_(21), DT_(9) };
-    IT_ col_ind_ref[8] = { IT_(0),IT_(1),IT_(2),IT_(0),IT_(0),IT_(1),IT_(2),IT_(0) };
-    IT_ row_ptr_ref[8] = { IT_(0),IT_(0),IT_(1),IT_(2),IT_(3),IT_(4),IT_(7),IT_(8) };
+    const DT_ val_ref[8] = { DT_(7),DT_(10),DT_(13),DT_(4), DT_(70), DT_(15), DT_(21), DT_(9) };
+    const IT_ col_ind_ref[8] = { IT_(0),IT_(1),IT_(2),IT_(0),IT_(0),IT_(1),IT_(2),IT_(0) };
+    const IT_ row_ptr_ref[8] = { IT_(0),IT_(0),IT_(1),IT_(2),IT_(3),IT_(4),IT_(7),IT_(8) };
 
 
     // pointer on the arrays of the CSR matrix x
@@ -233,7 +233,7 @@ public:
     IT_* col_ind = x.col_ind();
     DT_* val = x.val();
 
-    // check if X is correct
+    // check if x is implemented correct
     for (IT_ i(0); i < 8; ++i)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(val_ref[i], val[i], tol);
