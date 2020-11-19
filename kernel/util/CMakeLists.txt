@@ -43,9 +43,7 @@ if (FEAT_HAVE_MKL AND FEAT_HAVE_OMP)
     TARGET_LINK_LIBRARIES(kernel-util -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_intel_thread.a -Wl,--end-group -lpthread -lm -ldl)
   else()
     message(WARNING "compiler ${CMAKE_CXX_COMPILER_ID} not know in mkl library selection, using serial mkl library!")
-    TARGET_LINK_LIBRARIES(kernel-util
-       -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl
-    )
+    TARGET_LINK_LIBRARIES(kernel-util -Wl,--start-group libmkl_intel_ilp64.a libmkl_core.a libmkl_sequential.a -Wl,--end-group -lpthread -lm -ldl)
   endif ((${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU"))
 
   if (NOT FEAT_HAVE_MPI OR NOT "${MPI_CXX_LIBRARIES}" MATCHES ".*libpthread.*")
