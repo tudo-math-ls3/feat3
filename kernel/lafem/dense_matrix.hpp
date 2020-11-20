@@ -480,8 +480,7 @@ namespace FEAT
             {
               for(IT_ col(0) ; col < columns() ; ++col)
               {
-                if(temp(row, col) != DT_(0))
-                  file << row + 1 << " " << col + 1 << " " << std::scientific << temp(row, col) << std::endl;
+                file << row + 1 << " " << col + 1 << " " << std::scientific << temp(row, col) << std::endl;
               }
             }
             break;
