@@ -442,3 +442,64 @@ DenseMatrixMultiplyTest<Mem::CUDA, double, unsigned int> cuda_dense_matrix_multi
 DenseMatrixMultiplyTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_multiply_test_float_ulong(1e-1);
 DenseMatrixMultiplyTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_multiply_test_double_ulong(1e-6);
 #endif
+
+
+template<
+  typename Mem_,
+  typename DT_,
+  typename IT_>
+class DenseMatrixTranposeTest
+  : public FullTaggedTest<Mem_, DT_, IT_>
+{
+public:
+   double _eps;
+
+  explicit DenseMatrixTranposeTest(double eps)
+    : FullTaggedTest<Mem_, DT_, IT_>("DenseMatrixTranposeTest"),
+    _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixTranposeTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < 100 ; size*=2)
+    {
+      DenseMatrix<Mem::Main, DT_, IT_> x_local(size, size+2, DT_(0));
+      DenseMatrix<Mem::Main, DT_, IT_> result_local;
+      DenseMatrix<Mem_, DT_, IT_> x;
+      DenseMatrix<Mem_, DT_, IT_> result;
+
+      for (Index i(0) ; i < x_local.size() ; ++i)
+      {
+        x_local.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+      }
+      x.convert(x_local);
+
+      result.transpose(x);
+      result_local.convert(result);
+
+      for (Index i(0) ; i < result.rows() ; ++i)
+      {
+        for (Index j(0) ; j < result.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL(result_local(i, j), x_local(j, i));
+        }
+      }
+    }
+  }
+};
+
+DenseMatrixTranposeTest<Mem::Main, float, unsigned long> dense_matrix_transpose_test_float_ulong(1e-3);
+DenseMatrixTranposeTest<Mem::Main, double, unsigned long> dense_matrix_transpose_test_double_ulong(1e-6);
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixTranposeTest<Mem::Main, __float128, unsigned int> dense_matrix_transpose_test_float128_uint(1e-6);
+DenseMatrixTranposeTest<Mem::Main, __float128, unsigned long> dense_matrix_transpose_test_float128_ulong(1e-6);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixTranposeTest<Mem::CUDA, float, unsigned long> cuda_dense_matrix_transpose_test_float_ulong(1e-1);
+DenseMatrixTranposeTest<Mem::CUDA, double, unsigned long> cuda_dense_matrix_transpose_test_double_ulong(1e-6);
+#endif

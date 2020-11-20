@@ -18,6 +18,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/product_matmat.hpp>
+#include <kernel/lafem/arch/transpose.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 
@@ -713,6 +714,31 @@ namespace FEAT
         result.invert();
         return result;
       }
+
+      /**
+       * \brief Calculate \f$this^\top \f$
+       *
+       * \return The transposed matrix
+       */
+      DenseMatrix transpose() const
+      {
+        DenseMatrix x_t;
+        x_t.transpose(*this);
+        return x_t;
+      }
+
+      /**
+       * \brief Calculate \f$this \leftarrow x^\top \f$
+       *
+       * \param[in] x The matrix to be transposed.
+       */
+      void transpose(const DenseMatrix & x)
+      {
+        DenseMatrix r(x.columns(), x.rows());
+        Arch::Transpose<Mem_>::value(r.elements(), x.elements(), x.rows(), x.columns());
+        this->assign(r);
+      }
+
       ///@}
 
       /// \cond internal

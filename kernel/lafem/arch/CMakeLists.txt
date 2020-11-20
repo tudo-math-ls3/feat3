@@ -30,6 +30,7 @@ if (FEAT_EICKT)
     scale_generic-eickt.cpp
     scale_row_col_generic-eickt.cpp
     slip_filter_generic-eickt.cpp
+    transpose_generic-eickt.cpp
     unit_filter_generic-eickt.cpp
     unit_filter_blocked_generic-eickt.cpp
     )
@@ -45,8 +46,9 @@ if (FEAT_HAVE_MKL)
     min_abs_index_mkl.cpp
     norm_mkl.cpp
     product_matmat_mkl.cpp
-    unit_filter_mkl.cpp
     scale_mkl.cpp
+    transpose_mkl.cpp
+    unit_filter_mkl.cpp
   )
 endif(FEAT_HAVE_MKL)
 
@@ -74,6 +76,7 @@ if (FEAT_HAVE_CUDA)
     scale.cu
     scale_row_col.cu
     slip_filter.cu
+    transpose.cu
     unit_filter.cu
     unit_filter_blocked.cu
     STATIC
