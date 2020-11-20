@@ -237,8 +237,8 @@ public:
     for (IT_ i(0); i < 8; ++i)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(val_ref[i], val[i], tol);
-      TEST_CHECK_EQUAL_WITHIN_EPS(col_ind_ref[i],col_ind[i], tol);
-      TEST_CHECK_EQUAL_WITHIN_EPS(row_ptr_ref[i], row_ptr[i], tol);
+      TEST_CHECK_EQUAL(col_ind_ref[i],col_ind[i]);
+      TEST_CHECK_EQUAL(row_ptr_ref[i], row_ptr[i]);
     }
 
 
