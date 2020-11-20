@@ -42,6 +42,7 @@ class ThirdpartyPackage(object):
       if not os.path.isfile(target_filename):
         print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
         download(self.url,target_filename)
+        print("Download finished, so unpacking the sources now...")
       else:
         print(target_filename + " found, so unpacking the sources now...")
       self.unpack()

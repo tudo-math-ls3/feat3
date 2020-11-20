@@ -10,10 +10,11 @@ import os
 class SuiteSparse(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.names = ["umfpack"]
-    self.dirname = "SuiteSparse"
-    self.filename = "SuiteSparse-5.2.0.tar.gz"
-    self.url = "http://faculty.cse.tamu.edu/davis/SuiteSparse/" + self.filename
+    self.version = "5.8.1"
+    self.names = ["umfpack","suitesparse"]
+    self.dirname = "SuiteSparse-" + self.version
+    self.filename = "SuiteSparse-" + self.version + ".tar.gz"
+    self.url = "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v" + self.version + ".tar.gz"
     self.cmake_flags = " -DFEAT_HAVE_UMFPACK:BOOL=ON"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname

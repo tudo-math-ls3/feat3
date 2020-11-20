@@ -31,9 +31,9 @@ endif (FEAT_COTIRE)
 TARGET_LINK_LIBRARIES(kernel-solver kernel-lafem kernel-util kernel-adjacency)
 
 if (FEAT_HAVE_UMFPACK)
-  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/SuiteSparse_config/")
-  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/AMD/Include/")
-  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse/UMFPACK/Include/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse-5.8.1/SuiteSparse_config/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse-5.8.1/AMD/Include/")
+  SET_PROPERTY(TARGET kernel-solver APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/SuiteSparse-5.8.1/UMFPACK/Include/")
 endif (FEAT_HAVE_UMFPACK)
 
 if (FEAT_HAVE_HYPRE)
