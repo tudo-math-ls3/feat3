@@ -14,6 +14,6 @@ class FParser(ThirdpartyPackage):
     self.dirname = "deathhandler"
     self.filename = "DeathHandler.zip"
     self.url = "https://github.com/vmarkovtsev/DeathHandler/archive/master.zip"
-    self.cmake_flags = " -DFEAT_HAVE_DEATH_HANDLER:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_DEATH_HANDLER:BOOL=ON -DFEAT_DIRNAME_DEATHHANDLER:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = os.path.join(trunk_dirname, self.dirname)

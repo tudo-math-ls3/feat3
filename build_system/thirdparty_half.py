@@ -10,10 +10,11 @@ import os
 class HALF(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
+    self.version = "2.1.0"
     self.names = ["half"]
-    self.dirname = "half"
-    self.filename = "half-2.1.0.zip"
-    self.url = "http://downloads.sourceforge.net/project/half/half/2.1.0/half-2.1.0.zip?r=http%3A%2F%2Fhalf.sourceforge.net%2Findex.html&ts=1581415216&use_mirror=netcologne"
-    self.cmake_flags = " -DFEAT_HAVE_HALFMATH:BOOL=ON"
+    self.dirname = "half-" + self.version
+    self.filename = "half-" + self.version + ".zip"
+    self.url = "http://downloads.sourceforge.net/project/half/half/" + self.version + "/" + self.filename
+    self.cmake_flags = " -DFEAT_HAVE_HALFMATH:BOOL=ON -DFEAT_DIRNAME_HALF:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = os.path.join(trunk_dirname, self.dirname)

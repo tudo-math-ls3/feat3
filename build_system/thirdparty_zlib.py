@@ -10,10 +10,11 @@ import os
 class ZLIB(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
+    self.version = "1.2.11"
     self.names = ["zlib"]
-    self.dirname = "zlib"
-    self.filename = "zlib-1.2.11.tar.gz"
+    self.dirname = "zlib-" + self.version
+    self.filename = "zlib-" + self.version + ".tar.gz"
     self.url = "http://www.zlib.net/" + self.filename
-    self.cmake_flags = " -DFEAT_HAVE_ZLIB:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_ZLIB:BOOL=ON -DFEAT_DIRNAME_ZLIB:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = trunk_dirname

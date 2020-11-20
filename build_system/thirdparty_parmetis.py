@@ -10,10 +10,11 @@ import os
 class PARMETIS(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
+    self.version = "4.0.3"
     self.names = ["parmetis", "metis"]
-    self.dirname = "parmetis"
-    self.filename = "parmetis-4.0.3.tar.gz"
+    self.dirname = "parmetis-" + self.version
+    self.filename = "parmetis-" + self.version + ".tar.gz"
     self.url = "http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/" + self.filename
-    self.cmake_flags = " -DFEAT_HAVE_PARMETIS:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_PARMETIS:BOOL=ON -DFEAT_DIRNAME_PARMETIS:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = trunk_dirname

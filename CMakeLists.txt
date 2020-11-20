@@ -115,49 +115,49 @@ endif (FEAT_VALGRIND)
 # include directories of third-party libraries
 
 if (FEAT_HAVE_ALGLIB)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/alglib/cpp/src/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ALGLIB}/cpp/src")
 endif(FEAT_HAVE_ALGLIB)
-
-if (FEAT_HAVE_FPARSER)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/fparser/")
-endif(FEAT_HAVE_FPARSER)
-
-if (FEAT_HAVE_FLOATX)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/floatx/FloatX-develop/src")
-endif(FEAT_HAVE_FLOATX)
-
-if (FEAT_HAVE_HALFMATH)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/half/include/")
-endif(FEAT_HAVE_HALFMATH)
-
-if (FEAT_HAVE_PARMETIS)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/include/")
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/parmetis/parmetis-4.0.3/metis/include/")
-endif (FEAT_HAVE_PARMETIS)
-
-if (FEAT_HAVE_TRIANGLE)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/triangle/")
-endif(FEAT_HAVE_TRIANGLE)
-
-if (FEAT_HAVE_ZLIB)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/zlib/zlib-1.2.11/")
-endif(FEAT_HAVE_ZLIB)
 
 if (FEAT_HAVE_CGAL)
   #set(Boost_USE_STATIC_LIBS ON)
   find_package(Boost REQUIRED COMPONENTS thread)
   INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/cgal/CGAL-4.14/include")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_CGAL}/include")
 endif(FEAT_HAVE_CGAL)
 
 if (FEAT_HAVE_DEATH_HANDLER)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/deathhandler/DeathHandler-master/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_DEATHHANDLER}/DeathHandler-master")
 endif(FEAT_HAVE_DEATH_HANDLER)
 
+if (FEAT_HAVE_FLOATX)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FLOATX}/FloatX-develop/src")
+endif(FEAT_HAVE_FLOATX)
+
+if (FEAT_HAVE_FPARSER)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FPARSER}/")
+endif(FEAT_HAVE_FPARSER)
+
+if (FEAT_HAVE_HALFMATH)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HALF}/include")
+endif(FEAT_HAVE_HALFMATH)
+
+if (FEAT_HAVE_PARMETIS)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/include")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/metis/include")
+endif (FEAT_HAVE_PARMETIS)
+
+if (FEAT_HAVE_TRIANGLE)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_TRIANGLE}")
+endif(FEAT_HAVE_TRIANGLE)
+
 if (FEAT_HAVE_ZFP)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/zfp/zfp-0.5.5/include/")
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZFP}/include/")
 endif(FEAT_HAVE_ZFP)
+
+if (FEAT_HAVE_ZLIB)
+  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZLIB}/")
+endif(FEAT_HAVE_ZLIB)
 
 # our custom target to build (but not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)

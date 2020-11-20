@@ -14,6 +14,6 @@ class FParser(ThirdpartyPackage):
     self.dirname = "floatx"
     self.filename = "FloatX-develop.zip"
     self.url = "https://codeload.github.com/oprecomp/FloatX/zip/develop"
-    self.cmake_flags = " -DFEAT_HAVE_FLOATX:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_FLOATX:BOOL=ON -DFEAT_DIRNAME_FLOATX:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname

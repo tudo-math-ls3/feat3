@@ -2,7 +2,7 @@
 # Copyright (C) 2010 - 2020 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
-__author__ = "Jordi Paul"
+__author__ = "Jordi Paul, Peter Zajac"
 __date__   = "April 2014"
 
 import os
@@ -34,9 +34,9 @@ class ThirdpartyPackage(object):
   # How to add a third party package to the build process
   def add(self):
     # Directory where the package is expected
-    target_filename = self.trunk_dirname+os.sep+self.filename
+    target_filename = os.path.join(self.trunk_dirname, self.filename)
     # This is the folder where the third party package is assumed to be. Not to be confused with self.target_dirname
-    expected_dirname = self.trunk_dirname+os.sep+self.dirname
+    expected_dirname = os.path.join(self.trunk_dirname, self.dirname)
     if not os.path.isdir(expected_dirname):
       print (self.names[0] +" enabled, but could not find a directory with name " + expected_dirname + ", checking for file...")
       if not os.path.isfile(target_filename):
@@ -50,7 +50,7 @@ class ThirdpartyPackage(object):
 
   # unpacks the TAR/GZ/ZIP source archive
   def unpack(self):
-    target_filename = self.trunk_dirname+os.sep+self.filename
+    target_filename = os.path.join(self.trunk_dirname, self.filename)
 
     if(self.filename.endswith(".zip")):
       import zipfile

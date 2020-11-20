@@ -15,7 +15,7 @@ class HYPRE(ThirdpartyPackage):
     self.dirname = "hypre-" + self.version
     self.filename = "hypre-" + self.version + ".tar.gz"
     self.url = "https://github.com/hypre-space/hypre/archive/v" + self.version + ".tar.gz"
-    self.cmake_flags = " -DFEAT_HAVE_HYPRE:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_HYPRE:BOOL=ON -DFEAT_DIRNAME_HYPRE:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname
 

@@ -15,6 +15,6 @@ class SuiteSparse(ThirdpartyPackage):
     self.dirname = "SuiteSparse-" + self.version
     self.filename = "SuiteSparse-" + self.version + ".tar.gz"
     self.url = "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v" + self.version + ".tar.gz"
-    self.cmake_flags = " -DFEAT_HAVE_UMFPACK:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_UMFPACK:BOOL=ON -DFEAT_DIRNAME_SUITESPARSE:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname

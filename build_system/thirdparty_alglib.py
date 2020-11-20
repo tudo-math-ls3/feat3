@@ -10,10 +10,11 @@ import os
 class ALGLIB(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
+    self.version = "3.16.0"
     self.names = ["alglib"]
-    self.dirname = "alglib"
-    self.filename = "alglib-3.16.0.cpp.gpl.zip"
+    self.dirname = "alglib-" + self.version
+    self.filename = "alglib-" + self.version + ".cpp.gpl.zip"
     self.url = "http://www.alglib.net/translator/re/" + self.filename
-    self.cmake_flags = " -DFEAT_HAVE_ALGLIB:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_ALGLIB:BOOL=ON -DFEAT_DIRNAME_ALGLIB:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = os.path.join(trunk_dirname, self.dirname)

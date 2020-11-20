@@ -13,6 +13,6 @@ class Triangle(ThirdpartyPackage):
     self.dirname = "triangle"
     self.filename = "triangle.zip"
     self.url = "http://www.netlib.org/voronoi/triangle.zip"
-    self.cmake_flags = " -DFEAT_HAVE_TRIANGLE:BOOL=ON"
+    self.cmake_flags = " -DFEAT_HAVE_TRIANGLE:BOOL=ON -DFEAT_DIRNAME_TRIANGLE:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
-    self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.target_dirname = os.path.join(trunk_dirname, self.dirname)
