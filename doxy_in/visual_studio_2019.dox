@@ -217,13 +217,13 @@ thirdparty
 \endverbatim
 
 \subsection win_vs16_thirdparty_zfp zfp
-<c>zlib</c> is a library that offers functions for lossy compression and decompression of floating point arrays.
+<c>zfp</c> is a library that offers functions for lossy compression and decompression of floating point arrays.
 - Lastest tested Version: 0.5.5 (from 2019-05-05)
 - Download Link: https://computing.llnl.gov/projects/floating-point-compression
 
 <b>Instructions:</b>
 -# Download the TAR-Archive and unpack its contents into the directory <c>thirdparty</c>.
--# Rename the sub-directory from <c>zlib-0.5.5</c> (or whatever version you have downloaded) to <c>zfp</c>.
+-# Rename the sub-directory from <c>zfp-0.5.5</c> (or whatever version you have downloaded) to <c>zfp</c>.
 -# Execute the Python script <c>vc_patch_zfp.py</c> in the <c>thirdparty</c> directory.\n
    <b>Note:</b> Without this patch, ZFP will not link due to mismatching linker binding settings.
 -# The <c>thirdparty</c> directory should now have the following sub-directory structure:
