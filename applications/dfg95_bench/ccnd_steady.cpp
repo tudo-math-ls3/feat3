@@ -567,6 +567,7 @@ namespace DFG95
     solver->set_min_iter(min_mg_iter);
     solver->set_max_iter(max_mg_iter);
     solver->set_tol_rel(mg_tol_rel);
+    solver->set_min_stag_iter(Index(3));
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -875,6 +876,9 @@ namespace DFG95
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
+    StopWatch watch_sol_analysis;
+    watch_sol_analysis.start();
+
     // compute drag & lift coefficients by line integration using the trace assembler
     {
       BenchBodyForceAccumulator<DataType> body_force_accum(defo, nu, v_max);
@@ -972,12 +976,18 @@ namespace DFG95
       summary.velo_info = vi;
     }
 
+    watch_sol_analysis.stop();
+    statistics.times[Times::sol_analysis] = watch_sol_analysis.elapsed();
+
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
     if(args.check("save-sol") >= 0)
     {
+      StopWatch watch_checkpoint;
+      watch_checkpoint.start();
+
       String save_name;
       if(args.parse("save-sol", save_name) < 1)
       {
@@ -986,7 +996,7 @@ namespace DFG95
         save_name += "-n" + stringify(comm.size()) + ".sol";
       }
 
-      comm.print("Writing Solution to '" + save_name + "'");
+      comm.print("\nWriting Solution to '" + save_name + "'");
 
       // serialize the partitioning
       std::vector<char> buf_pdc = domain.serialize_partitioning();
@@ -997,6 +1007,9 @@ namespace DFG95
 
       // write to combined output file
       DistFileIO::write_combined(buf_pdc, bs_sol.container(), save_name, comm);
+
+      watch_checkpoint.stop();
+      statistics.times[Times::checkpoint] = watch_checkpoint.elapsed();
     }
 
     /* ***************************************************************************************** */
@@ -1005,6 +1018,9 @@ namespace DFG95
     //*
     if(args.check("vtk") >= 0)
     {
+      StopWatch watch_vtk;
+      watch_vtk.start();
+
       // build VTK name
       String vtk_name, vtk_name2;
       int npars = args.parse("vtk", vtk_name, vtk_name2);
@@ -1014,6 +1030,8 @@ namespace DFG95
         vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
         vtk_name += "-n" + stringify(comm.size());
       }
+
+      comm.print("\nWriting VTK output to '" + vtk_name + ".pvtu'");
 
       {
         // Create a VTK exporter for our mesh
@@ -1037,6 +1055,8 @@ namespace DFG95
       // write refined VTK?
       if(npars > 1)
       {
+        comm.print("Writing refined VTK output to '" + vtk_name2 + ".pvtu'");
+
         // refine mesh
         Geometry::StandardRefinery<MeshType> refinery(the_domain_level.get_mesh());
         MeshType mesh(refinery);
@@ -1050,6 +1070,9 @@ namespace DFG95
         // finally, write the VTK file
         exporter.write(vtk_name2, comm);
       }
+
+      watch_vtk.stop();
+      statistics.times[Times::vtk_write] = watch_vtk.elapsed();
     }
 
     watch_total_run.stop();
