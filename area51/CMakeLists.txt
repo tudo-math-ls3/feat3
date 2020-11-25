@@ -29,9 +29,6 @@ TARGET_LINK_LIBRARIES(dbg-cubature feat)
 ADD_EXECUTABLE(dbg-dist-file-io dbg_dist_file_io.cpp)
 TARGET_LINK_LIBRARIES(dbg-dist-file-io feat)
 
-ADD_EXECUTABLE(dbg-graph-render dbg_graph_render.cpp)
-TARGET_LINK_LIBRARIES(dbg-graph-render feat)
-
 ADD_EXECUTABLE(dbg-isoparam-1 dbg_isoparam1.cpp)
 TARGET_LINK_LIBRARIES(dbg-isoparam-1 feat)
 
