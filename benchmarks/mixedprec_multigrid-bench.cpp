@@ -77,6 +77,14 @@ namespace MixedPrecMultiGridBench
   // Note: 'float' as backend is bugged
   typedef flx::floatx<5, 10, double> f_hp;
   template<> struct Typo<f_hp> {static const char* name() {return "hp";} };
+
+  // bfloat16
+  typedef flx::floatx<8, 7, double> f_bp;
+  template<> struct Typo<f_bp> {static const char* name() {return "bp";} };
+
+  // tensor float 32 (actually 19 bits)
+  typedef flx::floatx<8, 10, double> f_tp;
+  template<> struct Typo<f_tp> {static const char* name() {return "tp";} };
 #endif
 
   // use long long int for sizes
@@ -220,11 +228,12 @@ namespace MixedPrecMultiGridBench
 
   // reduction for floatx type is not omp standard conform
 #ifdef FEAT_HAVE_FLOATX
-  f_hp norm2(const std::vector<f_hp>& v)
+  template<int e_, int s_, typename DT_>
+  flx::floatx<e_, s_, DT_> norm2(const std::vector<flx::floatx<e_, s_, DT_>>& v)
   {
     const llint n = llint(v.size());
-    const f_hp* x = v.data();
-    f_hp r = f_hp(0);
+    const flx::floatx<e_, s_, DT_>* x = v.data();
+    flx::floatx<e_, s_, DT_> r = flx::floatx<e_, s_, DT_>(0);
 
     for(llint i = 0; i < n; ++i)
       r += x[i]*x[i];
@@ -405,8 +414,25 @@ namespace MixedPrecMultiGridBench
     // compute RHS norm for relative defect computation
     const OFP_ rhs_norm = norm2(finest.vec_rhs);
 
+    // norm of previous defect
+    OFP_ def_prev = rhs_norm;
+
+    // variable for final error/defect
+    OFP_ final_def = OFP_(0);
+    OFP_ final_err = OFP_(0);
+
     // total runtime stamp
     StopWatch watch_total, watch_inner, watch_smooth, watch_error, watch_transfer;
+
+    // print header line
+    {
+      const auto nps = stringify_fp_sci(OFP_(0)).size();
+      std::cout << std::endl;
+      std::cout << "Iter  " << String("Abs. Defect").pad_back(nps);
+      std::cout << "   " << String("Rel. Defect").pad_back(nps);
+      std::cout << "   " << String("Reduce").pad_back(7);
+      std::cout << "   " << "H0-Error" << std::endl;
+    }
 
     // outer multigrid richardson loop
     watch_total.start();
@@ -422,9 +448,15 @@ namespace MixedPrecMultiGridBench
       calc_def(finest.vec_def, finest.vec_rhs, finest.vec_sol);
       const OFP_ def_norm = norm2(finest.vec_def);
 
+      // save error and defect
+      final_err = OFP_(sol_error);
+      final_def = def_norm;
+
       // plot
-      std::cout << stringify(iter).pad_front(3) + "    : " << stringify_fp_sci(def_norm) << " / "
-        << stringify_fp_sci(def_norm/rhs_norm) << " / " << stringify_fp_sci(sol_error) << std::endl;
+      std::cout << stringify(iter).pad_front(4) + ": " << stringify_fp_sci(def_norm);
+      std::cout << " / " << stringify_fp_sci(def_norm/rhs_norm);
+      std::cout << " / " << stringify_fp_fix(def_norm/def_prev, 4, 6);
+      std::cout << " / " << stringify_fp_sci(sol_error) << std::endl;
 
       // maximum iterations?
       if(iter >= max_iter)
@@ -435,6 +467,13 @@ namespace MixedPrecMultiGridBench
       {
         std::cout << std::endl << ">>> ERROR: solver diverged!" << std::endl;
         return;
+      }
+
+      // check for stagnation
+      if((iter >= 3) && (def_norm >= OFP_(0.95)*def_prev))
+      {
+        std::cout << std::endl << ">>> Solver stagnated!" << std::endl;
+        break;
       }
 
       // initialize multigrid vectors
@@ -533,9 +572,16 @@ namespace MixedPrecMultiGridBench
       copy(finest.vec_cor, levels.back().vec_sol);
       // update solution
       axpy(finest.vec_sol, finest.vec_cor);
+
+      // store previous norm
+      def_prev = def_norm;
     } // outer loop
 
     watch_total.stop();
+
+    std::cout << std::endl;
+    std::cout << "Final Defect: " << stringify_fp_sci(final_def) << std::endl;
+    std::cout << "Final Error.: " << stringify_fp_sci(final_err) << std::endl;
 
     // print timing summary
     std::cout << std::endl << "Timing Statistics" << std::endl;
@@ -615,9 +661,18 @@ namespace MixedPrecMultiGridBench
 #endif
     if(precs == "sp sp") run<f_dp, f_sp, f_sp>(level, max_iter, num_inner, num_smooth, omega); else
 #ifdef FEAT_HAVE_FLOATX
+    // half prec
     if(precs == "dp hp") run<f_dp, f_dp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else
     if(precs == "sp hp") run<f_dp, f_sp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else
     if(precs == "hp hp") run<f_dp, f_hp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
+    // bfloat16
+    if(precs == "dp bp") run<f_dp, f_dp, f_bp>(level, max_iter, num_inner, num_smooth, omega); else
+    if(precs == "sp bp") run<f_dp, f_sp, f_bp>(level, max_iter, num_inner, num_smooth, omega); else
+    if(precs == "bp bp") run<f_dp, f_bp, f_bp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
+    // tensorfloat 32
+    if(precs == "dp tp") run<f_dp, f_dp, f_tp>(level, max_iter, num_inner, num_smooth, omega); else
+    if(precs == "sp tp") run<f_dp, f_sp, f_tp>(level, max_iter, num_inner, num_smooth, omega); else
+    if(precs == "tp tp") run<f_dp, f_tp, f_tp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
 #endif
     {
       std::cout << "ERROR: unsupported precision combo " << precs << std::endl;
