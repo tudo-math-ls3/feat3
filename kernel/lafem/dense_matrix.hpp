@@ -51,12 +51,12 @@ namespace FEAT
     private:
       Index & _rows()
       {
-        return _rows();
+        return this->_scalar_index.at(1);
       }
 
       Index & _columns()
       {
-        return _columns();
+        return this->_scalar_index.at(2);
       }
 
     public:
@@ -731,6 +731,8 @@ namespace FEAT
        * \brief Calculate \f$this \leftarrow x^\top \f$
        *
        * \param[in] x The matrix to be transposed.
+       *
+       * \warning This obviously flips the row- and column count of the matrix
        */
       void transpose(const DenseMatrix & x)
       {
@@ -744,6 +746,20 @@ namespace FEAT
           Arch::Transpose<Mem_>::value(r.elements(), x.elements(), x.rows(), x.columns());
           this->assign(r);
         }
+      }
+
+      /**
+       * \brief Calculate \f$this^\top \f$ inplace
+       *
+       * \warning This obviously flips the row- and column count of the matrix
+       */
+      void transpose_inplace()
+      {
+        Arch::Transpose<Mem_>::value(this->elements(), this->elements(), this->rows(), this->columns());
+
+        Index t(this->rows());
+        this->_rows() = this->columns();
+        this->_columns() = t;
       }
 
       ///@}

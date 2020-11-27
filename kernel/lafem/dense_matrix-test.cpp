@@ -489,6 +489,20 @@ public:
           TEST_CHECK_EQUAL(result_local(i, j), x_local(j, i));
         }
       }
+
+      if (typeid(Mem_) != typeid(Mem::CUDA))
+      {
+        result.transpose_inplace();
+        result_local.convert(result);
+
+        for (Index i(0) ; i < result.rows() ; ++i)
+        {
+          for (Index j(0) ; j < result.columns() ; ++j)
+          {
+            TEST_CHECK_EQUAL(result_local(i, j), x_local(i, j));
+          }
+        }
+      }
     }
   }
 };
