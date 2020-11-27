@@ -734,9 +734,16 @@ namespace FEAT
        */
       void transpose(const DenseMatrix & x)
       {
-        DenseMatrix r(x.columns(), x.rows());
-        Arch::Transpose<Mem_>::value(r.elements(), x.elements(), x.rows(), x.columns());
-        this->assign(r);
+        if (rows() == x.columns() && columns() == x.rows())
+        {
+          Arch::Transpose<Mem_>::value(this->elements(), x.elements(), x.rows(), x.columns());
+        }
+        else
+        {
+          DenseMatrix r(x.columns(), x.rows());
+          Arch::Transpose<Mem_>::value(r.elements(), x.elements(), x.rows(), x.columns());
+          this->assign(r);
+        }
       }
 
       ///@}

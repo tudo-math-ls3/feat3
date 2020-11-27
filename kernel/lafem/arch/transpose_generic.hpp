@@ -21,6 +21,10 @@ namespace FEAT
       template <typename DT_>
       void Transpose<Mem::Main>::value_generic(DT_ * r, const DT_ * const x, const Index rows_x, const Index columns_x)
       {
+        if (r == x)
+        {
+          std::memcpy(r, x, rows_x * columns_x * sizeof(DT_));
+        }
         for (Index i(0) ; i < rows_x ; ++i)
         {
           for (Index j(0) ; j < columns_x ; ++j)

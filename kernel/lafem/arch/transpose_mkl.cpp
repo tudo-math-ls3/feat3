@@ -17,12 +17,24 @@ using namespace FEAT::LAFEM::Arch;
 
 void Transpose<Mem::Main>::value_mkl(float * r, const float * const x, const Index rows_x, const Index columns_x)
 {
-  std::memcpy(r, x, rows_x * columns_x * sizeof(float));
-  mkl_simatcopy('R', 'T', rows_x, columns_x, float(1), r, columns_x, rows_x);
+  if (r != x)
+  {
+    mkl_somatcopy('R', 'T', rows_x, columns_x, float(1), x, columns_x, r, rows_x);
+  }
+  else
+  {
+    mkl_simatcopy('R', 'T', rows_x, columns_x, float(1), r, columns_x, rows_x);
+  }
 }
 
 void Transpose<Mem::Main>::value_mkl(double * r, const double * const x, const Index rows_x, const Index columns_x)
 {
-  std::memcpy(r, x, rows_x * columns_x * sizeof(double));
-  mkl_dimatcopy('R', 'T', rows_x, columns_x, double(1), r, columns_x, rows_x);
+  if (r != x)
+  {
+    mkl_domatcopy('R', 'T', rows_x, columns_x, double(1), x, columns_x, r, rows_x);
+  }
+  else
+  {
+    mkl_dimatcopy('R', 'T', rows_x, columns_x, double(1), r, columns_x, rows_x);
+  }
 }
