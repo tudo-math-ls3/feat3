@@ -121,6 +121,7 @@
 
   <!-- FEAT pre-processor define list -->
   <ItemGroup Label="FEAT Defines">
+    <FeatDef Include="FEAT_INDEX_ULL" />
     <FeatDef Condition="'$(DebugMode)'=='true'"
       Include="DEBUG" />
     <FeatDef Condition="'$(SerialMode)'=='false'"
