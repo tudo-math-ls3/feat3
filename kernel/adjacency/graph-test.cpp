@@ -60,7 +60,7 @@ public:
 
   void test_f(Graph& f) const
   {
-    // fetch the graph's arrays
+    // fetch the graph's vectors
     Index* f_pp = f.get_domain_ptr();
     Index* f_di = f.get_image_idx();
 
@@ -109,7 +109,7 @@ public:
 
   void test_fg(Graph& fg) const
   {
-    // fetch the graph's arrays
+    // fetch the graph's vectors
     Index* fg_pp = fg.get_domain_ptr();
     Index* fg_di = fg.get_image_idx();
 
@@ -158,7 +158,7 @@ public:
 
   void test_gf(Graph& gf) const
   {
-    // fetch the graph's arrays
+    // fetch the graph's vectors
     Index* gf_pp = gf.get_domain_ptr();
     Index* gf_di = gf.get_image_idx();
 
@@ -236,6 +236,35 @@ public:
     test_gf(gf);
   }
 
+  void test_constructor_vector() const
+  { //create Graph for matrix structure
+    //      0  1  2  3  4
+    //   +---------------
+    // 0 |  0  .  1  .  2
+    // 1 |  .  .  3  4  .
+    // 2 |  5  6  7  .  .
+    // 3 |  8  .  .  9 10
+    // 4 |  . 11  .  . 12
+    // 5 | 13  . 14  .  .
+    // 6 |  . 15  . 16  .
+    const std::vector<Index> f_ptr= { 0, 3, 5, 8, 11, 13, 15, 17 };
+    const std::vector<Index> f_idx =
+    {
+      0, 2, 4,
+      2, 3,
+      0, 1, 2,
+      0, 3, 4,
+      1, 4,
+      0, 2,
+      1, 3
+    };
+
+    //Use "Copy-Vector" Constructor
+    Graph f(5, f_ptr, f_idx);
+    //test f
+    test_f(f);
+  }
+
   void test_constr_perm() const
   {
     // test the construction with a domain- and an image-permutation
@@ -278,7 +307,7 @@ public:
     // construct graph
     Graph f(g, prm_domain, prm_image);
 
-    // fetch the graph's arrays
+    // fetch the graph's vectors
     Index* domain_ptr = f.get_domain_ptr();
     Index* image_ptr = f.get_image_idx();
 
@@ -330,7 +359,7 @@ public:
     // construct graph
     Graph fcol(col.create_partition_graph());
 
-    // fetch the graph's arrays
+    // fetch the graph's vectors
     Index* domain_ptr = fcol.get_domain_ptr();
     Index* image_ptr = fcol.get_image_idx();
 
@@ -419,7 +448,7 @@ public:
     TEST_CHECK_EQUAL(g.get_num_nodes_image(), num_img);
     TEST_CHECK_EQUAL(g.get_num_indices(), num_idx);
 
-    // get arrays
+    // get vectors
     const Index* g_dom_ptr = g.get_domain_ptr();
     const Index* g_img_idx = g.get_image_idx();
 
@@ -445,7 +474,7 @@ public:
     const Index num_dom = g.get_num_nodes_domain();
     const Index num_idx = g.get_num_indices();
 
-    // get arrays
+    // get vectors
     const Index* g_dom_ptr = g.get_domain_ptr();
     const Index* g_img_idx = g.get_image_idx();
     const Index* f_dom_ptr = f.get_domain_ptr();
@@ -724,6 +753,9 @@ public:
   {
     // perform basic
     test_basic();
+
+    //test "Copy-Vector" Constructor
+    test_constructor_vector();
 
     // test sorting
     test_sort();

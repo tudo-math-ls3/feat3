@@ -11,6 +11,9 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/random.hpp>
 
+//includes, system
+#include<vector>
+
 namespace FEAT
 {
   namespace Adjacency
@@ -23,6 +26,8 @@ namespace FEAT
     class Permutation
     {
     public:
+      using IndexVector = std::vector < Index>;
+
       /// Construction type enumeration
       enum ConstrType
       {
@@ -41,19 +46,16 @@ namespace FEAT
       };
 
     private:
-      /// the size of the permutation
-      Index _num_entries;
-      /// the permute-position array
-      Index* _perm_pos;
-      /// the swap-position array
-      Index* _swap_pos;
+      /// the permute-position vector
+      IndexVector _perm_pos;
+      /// the swap-position vector
+      IndexVector _swap_pos;
 
     public:
       /// default CTOR
       Permutation() :
-        _num_entries(0),
-        _perm_pos(nullptr),
-        _swap_pos(nullptr)
+        _perm_pos(),
+        _swap_pos()
       {
       }
 
@@ -69,8 +71,8 @@ namespace FEAT
        *   The permutation array has to be set up after the object is created.\n
        *   The input array \p v is ignored.
        * - \c type_identity \n Create an identity permutation.\n The input array \p v is ignored.
-       * - \c type_perm \n Interpret the input array as a permute-position array.
-       * - \c type_swap \n Interpret the input array as a swap-position array.
+       * - \c type_perm \n Interpret the input vector as a permute-position vector.
+       * - \c type_swap \n Interpret the input vector as a swap-position vector.
        * - \c type_inv_perm \n Interpret the input array as an inverse permute-position array.
        * - \c type_inv_swap \n Interpret the input array as an inverse swap-position array.
        *
@@ -113,8 +115,8 @@ namespace FEAT
        */
       Permutation clone() const
       {
-        if(_perm_pos != nullptr)
-          return Permutation(_num_entries, type_perm, _perm_pos);
+        if(!_perm_pos.empty())
+          return Permutation(this->size(), type_perm, _perm_pos.data());
         else
           return Permutation();
       }
@@ -126,8 +128,8 @@ namespace FEAT
        */
       Permutation inverse() const
       {
-        if(_perm_pos != nullptr)
-          return Permutation(_num_entries, type_inv_perm, _perm_pos);
+        if(!_perm_pos.empty())
+          return Permutation(this->size(), type_inv_perm, _perm_pos.data());
         else
           return Permutation();
       }
@@ -135,43 +137,44 @@ namespace FEAT
       /// returns the size of the permutation
       Index size() const
       {
-        return _num_entries;
+        XASSERTM(_perm_pos.size()==_swap_pos.size(), "perm_pos and swap_pos have different sizes");
+        return Index(_perm_pos.size());
       }
 
       /// returns the permute-position array
       Index* get_perm_pos()
       {
-        return _perm_pos;
+        return _perm_pos.data();
       }
 
       /** \copydoc get_perm_pos() */
       const Index* get_perm_pos() const
       {
-        return _perm_pos;
+        return _perm_pos.data();
       }
 
       /// returns the swap-position array
       Index* get_swap_pos()
       {
-        return _swap_pos;
+        return _swap_pos.data();
       }
 
       /** \copydoc get_swap_pos */
       const Index* get_swap_pos() const
       {
-        return _swap_pos;
+        return _swap_pos.data();
       }
 
-      /// Computes the swap-position array from the permuation-position array.
+      /// Computes the swap-position vector from the permuation-position vector.
       void calc_swap_from_perm();
 
-      /// Computes the permuation-position array from the swap-position array.
+      /// Computes the permuation-position vector from the swap-position vector.
       void calc_perm_from_swap();
 
       /**
-       * \brief In-Situ permutation operator
+       * \brief Applies In-Situ permutation
        *
-       * This operator applies the permutation in-situ.
+       * This member function applies the permutation in-situ.
        *
        * \param[in,out] x
        * The array that is to be permuted.
@@ -179,20 +182,20 @@ namespace FEAT
        * \param[in] invert
        * Specifies whether to apply the forward (\p false) or inverse (\p true) permutation.
        *
-       * \warning The operator does not check, whether the referenced array x is large enough!
+       * \warning The function does not check, whether the referenced array x is large enough!
        */
       template<typename Tx_>
-      void operator()(Tx_* x, bool invert = false) const
+      void apply(Tx_* x, bool invert = false) const
       {
         XASSERT(x != nullptr);
 
         if(!invert)
         {
           // apply in-situ swapping
-          for(Index i(0); i+1 < _num_entries; ++i)
+          for(Index i(0); i+1 < this->size(); ++i)
           {
             Index j(_swap_pos[i]);
-            ASSERTM((j >= i) && (j < _num_entries), "invalid swap position");
+            ASSERTM((j >= i) && (j < this->size()), "invalid swap position");
             if(j > i)
             {
               Tx_ t(x[i]);
@@ -204,10 +207,10 @@ namespace FEAT
         else
         {
           // apply inverse in-situ swapping
-          for(Index i(_num_entries-1); i > 0; --i)
+          for(Index i(this->size() -1); i > 0; --i)
           {
             Index j(_swap_pos[i-1]);
-            ASSERTM((j >= i-1) && (j < _num_entries), "invalid swap position");
+            ASSERTM((j >= i-1) && (j < this->size()), "invalid swap position");
             if(j > i-1)
             {
               Tx_ t(x[i-1]);
@@ -219,9 +222,9 @@ namespace FEAT
       }
 
       /**
-       * \brief Permutation operator
+       * \brief Applies permutation
        *
-       * This operator applies the permutation on an array.
+       * This function applies the permutation on an array.
        *
        * \param[out] y
        * The array that shall receive the permuted array.
@@ -232,23 +235,24 @@ namespace FEAT
        * \param[in] invert
        * Specifies whether to apply the forward (\p false) or inverse (\p true) permutation.
        *
-       * \warning The operator does not check, whether the referenced arrays x and y are large enough!
+       * \warning The function does not check, whether the referenced arrays x and y are large enough!
        */
       template<typename Ty_, typename Tx_>
-      void operator()(Ty_* y, const Tx_* x, bool invert = false) const
+     // void operator()(Ty_* y, const Tx_* x, bool invert = false) const
+      void apply(Ty_* y, const Tx_* x, bool invert = false) const
       {
         XASSERT(y != nullptr);
         XASSERT(x != nullptr);
         if(!invert)
         {
-          for(Index i(0); i < _num_entries; ++i)
+          for(Index i(0); i < this->size(); ++i)
           {
             y[i] = Ty_(x[_perm_pos[i]]);
           }
         }
         else
         {
-          for(Index i(0); i < _num_entries; ++i)
+          for(Index i(0); i < this->size(); ++i)
           {
             y[_perm_pos[i]] = Ty_(x[i]);
           }

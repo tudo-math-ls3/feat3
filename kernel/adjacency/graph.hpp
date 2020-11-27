@@ -20,6 +20,7 @@ namespace FEAT
 {
   namespace Adjacency
   {
+
     // forward declaration
     class Permutation;
 
@@ -32,63 +33,54 @@ namespace FEAT
      */
     class Graph
     {
-    public:
+     public:
+      using IndexVector = std::vector < Index>;
+
       /**
        * \brief ImageIterator for Graph class
        *
        * For the purpose of the Adjactor interface implementation a <c>const Index</c>-pointer is the optimal choice
        * for the image node iterator.
        */
-      typedef const Index* ImageIterator;
+      typedef IndexVector::const_iterator ImageIterator;
 
       // magic number for Graph serialization
       static constexpr std::uint64_t magic = 0x5052474A44413346ull; // "F3ADJGRP"
 
     protected:
-      /// total number of domain nodes
-      Index _num_nodes_domain;
       /// total number of image nodes
       Index _num_nodes_image;
-      /// total number of image node indices
-      Index _num_indices_image;
 
       /**
-       * \brief Domain pointer array
+       * \brief Domain pointer Vector
        *
        * Dimension: #_num_nodes_domain+1
        */
-      Index* _domain_ptr;
+      IndexVector _domain_ptr;
 
       /**
-       * \brief Image node index array
+       * \brief Image node index Vector
        *
        * Dimension: #_num_indices_image
        */
-      Index* _image_idx;
+      IndexVector _image_idx;
 
-      /**
-       * \brief Specifies whether the graph's arrays are shared or not
-       *
-       * This member specifies whether the Graph object will delete the #_domain_ptr and #_image_idx
-       * arrays within the destructor.
-       */
-      bool _shared;
 
     public:
 
       /**
        * \brief Default constructor.
        *
-       * This constructor creates a new empty graph, but does not allocate any arrays.
+       * This constructor creates a new empty graph, but does not allocate any vectors.
        */
       Graph();
 
       /**
        * \brief Allocation Constructor.
        *
-       * This constructor creates a new graph and allocates the Graph's arrays to the corresponding lengths.
+       * This constructor creates a new graph and allocates the Graph's vectors to the corresponding lengths.
        *
-       * \note This constructor does not initialize the allocated arrays -- they have to be initialized by the user
+       * \note This constructor does not initialize the allocated vectors -- they have to be initialized by the user
        * after construction.
        *
        * \param[in] num_nodes_domain
@@ -104,40 +96,6 @@ namespace FEAT
         Index num_nodes_domain,
         Index num_nodes_image,
         Index num_indices_image);
-
-      /**
-       * \brief "Using-Arrays" Constructor
-       *
-       * This constructor creates a new graph using the arrays given to this constructor.
-       *
-       * \param[in] num_nodes_domain
-       * The total number of domain nodes for the graph.
-       *
-       * \param[in] num_nodes_image
-       * The total number of image nodes for the graph.
-       *
-       * \param[in] num_indices_image
-       * The total number of image node indices for the graph.
-       *
-       * \param[in] domain_ptr
-       * The domain pointer array for the graph. Must not be \c nullptr.
-       *
-       * \param[in] image_idx
-       * The image node index array for the graph. Must not be \c nullptr.
-       *
-       * \param[in] shared
-       * Specifies whether the graph's arrays are shared or not.
-       *  - If set to \c false then the graph will deallocate all arrays passed to this constructor
-       *    upon destruction.
-       *  - If set to \c true then the caller remains responsible for the deallocation of the arrays.
-       */
-      explicit Graph(
-        Index num_nodes_domain,
-        Index num_nodes_image,
-        Index num_indices_image,
-        Index* domain_ptr,
-        Index* image_idx,
-        bool shared);
 
       /**
        * \brief "Copy-Arrays" Constructor
@@ -159,12 +117,34 @@ namespace FEAT
        * \param[in] image_idx
        * The image node index array for the graph. Must not be \c nullptr.
        */
+
       explicit Graph(
         Index num_nodes_domain,
         Index num_nodes_image,
         Index num_indices_image,
         const Index* domain_ptr,
         const Index* image_idx);
+
+      /**
+       * \brief "Copy-Vector" Constructor
+       *
+       * This constructor creates a new graph using copies of the vectors passed to this function.
+       *
+       * \param[in] num_nodes_image
+       * The total number of image nodes for the graph.
+       *
+       * \param[in] domain_ptr
+       * The domain pointer vector for the graph. Must not be \c nullptr.
+       *
+       * \param[in] image_idx
+       * The image node index vector for the graph. Must not be \c nullptr.
+       */
+
+      explicit Graph(
+        Index num_nodes_image,
+        const IndexVector& domain_ptr,
+        const IndexVector& image_idx);
+
 
       /**
        * \brief Render constructor
@@ -179,13 +159,12 @@ namespace FEAT
        */
       template<typename Adjactor_>
       explicit Graph(RenderType render_type, const Adjactor_& adjactor) :
-        _num_nodes_domain(0),
         _num_nodes_image(0),
-        _num_indices_image(0),
-        _domain_ptr(nullptr),
-        _image_idx(nullptr),
-        _shared(false)
+        _domain_ptr(),
+        _image_idx()
+
       {
+
         switch(render_type)
         {
         case RenderType::as_is:
@@ -235,13 +214,12 @@ namespace FEAT
        */
       template<typename Adjactor1_, typename Adjactor2_>
       explicit Graph(RenderType render_type, const Adjactor1_& adjactor1, const Adjactor2_& adjactor2) :
-        _num_nodes_domain(0),
         _num_nodes_image(0),
-        _num_indices_image(0),
-        _domain_ptr(nullptr),
-        _image_idx(nullptr),
-        _shared(false)
+        _domain_ptr(),
+       _image_idx()
       {
+
+
         switch(render_type)
         {
         case RenderType::as_is:
@@ -319,8 +297,8 @@ namespace FEAT
        */
       Graph clone() const
       {
-        if(_domain_ptr != nullptr)
-          return Graph(_num_nodes_domain, _num_nodes_image, _num_indices_image, _domain_ptr, _image_idx);
+        if(!_domain_ptr.empty())
+          return Graph(_num_nodes_image, _domain_ptr, _image_idx);
         else
           return Graph();
       }
@@ -341,7 +319,7 @@ namespace FEAT
        */
       Index degree(Index domain_node) const
       {
-        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
+        ASSERTM(domain_node < get_num_nodes_domain(), "Domain node index out of range");
         return _domain_ptr[domain_node+1] - _domain_ptr[domain_node];
       }
 
@@ -367,13 +345,13 @@ namespace FEAT
        */
       Index* get_domain_ptr()
       {
-        return _domain_ptr;
+        return _domain_ptr.data();
       }
 
       /** \copydoc get_domain_ptr() */
       const Index* get_domain_ptr() const
       {
-        return _domain_ptr;
+        return _domain_ptr.data();
       }
 
       /**
@@ -382,13 +360,13 @@ namespace FEAT
        */
       Index* get_image_idx()
       {
-        return _image_idx;
+        return _image_idx.data();
       }
 
       /** \copydoc get_image_idx() */
       const Index* get_image_idx() const
       {
-        return _image_idx;
+        return _image_idx.data();
       }
 
       /**
@@ -398,18 +376,10 @@ namespace FEAT
        */
       Index get_num_indices() const
       {
-        return _num_indices_image;
+        return Index(_image_idx.size());
       }
 
-      /**
-       * \brief Specifies whether the graph's arrays are shared or not.
-       *
-       * \returns \c true, if the graph's arrays are shared, otherwise \c false.
-       */
-      bool is_shared() const
-      {
-        return _shared;
-      }
+
 
       /**
        * \brief Sorts the image indices to non-descending order.
@@ -434,29 +404,29 @@ namespace FEAT
         typedef typename Adjactor_::ImageIterator AImIt;
 
         // get counts
-        _num_nodes_domain = adj.get_num_nodes_domain();
+        //_num_nodes_domain = adj.get_num_nodes_domain();
         _num_nodes_image = adj.get_num_nodes_image();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate pointer array
-        _domain_ptr = new Index[_num_nodes_domain+1];
+        // allocate pointer vector
+        _domain_ptr = IndexVector(adj.get_num_nodes_domain() +1);
 
-        // count number of adjacencies and build pointer array
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // count number of adjacencies and build pointer vector
+        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = _num_indices_image;
+          _domain_ptr[i] = num_indices_image;
           AImIt cur(adj.image_begin(i));
           AImIt end(adj.image_end(i));
           for(; cur != end; ++cur)
           {
-            ++_num_indices_image;
+            ++num_indices_image;
           }
         }
-        _domain_ptr[_num_nodes_domain] = _num_indices_image;
+        _domain_ptr[adj.get_num_nodes_domain()] = num_indices_image;
 
-        // allocate and build index array
-        _image_idx = new Index[_num_indices_image];
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // allocate and build index vector
+        _image_idx = IndexVector(num_indices_image);
+        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
         {
           Index* idx = &_image_idx[_domain_ptr[i]];
           AImIt cur(adj.image_begin(i));
@@ -473,37 +443,36 @@ namespace FEAT
       void _render_injectify(const Adjactor_& adj)
       {
         // get counts
-        _num_nodes_domain = adj.get_num_nodes_domain();
         _num_nodes_image = adj.get_num_nodes_image();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate pointer array
-        _domain_ptr = new Index[_num_nodes_domain + 1];
+        // allocate pointer vector
+        _domain_ptr = IndexVector(adj.get_num_nodes_domain() + 1);
 
         // allocate auxiliary mask vector
-        std::vector<char> vidx_mask(_num_nodes_image, 0);
+        std::vector<char> vidx_mask(adj.get_num_nodes_image(),0);
         char* idx_mask = vidx_mask.data();
 
-        // count number of adjacencies and build pointer array
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // count number of adjacencies and build pointer vector
+        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = _num_indices_image;
+          _domain_ptr[i] = num_indices_image;
           for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
           {
             if(idx_mask[*it] == 0)
             {
-              ++_num_indices_image;
+              ++num_indices_image;
               idx_mask[*it] = 1;
             }
           }
           for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
             idx_mask[*it] = 0;
         }
-        _domain_ptr[_num_nodes_domain] = _num_indices_image;
+        _domain_ptr[adj.get_num_nodes_domain()] = num_indices_image;
 
-        // allocate and build index array
-        _image_idx = new Index[_num_indices_image];
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // allocate and build index vector
+        _image_idx = IndexVector(num_indices_image);
+        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
         {
           Index k = _domain_ptr[i];
           for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
@@ -527,19 +496,14 @@ namespace FEAT
         typedef typename Adjactor_::ImageIterator AImIt;
 
         // get counts
-        _num_nodes_domain = adj.get_num_nodes_image();
         _num_nodes_image = adj.get_num_nodes_domain();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate and format pointer array
-        _domain_ptr = new Index[_num_nodes_domain + 1];
-        for(Index i(0); i <= _num_nodes_domain; ++i)
-        {
-          _domain_ptr[i] = 0;
-        }
+        // allocate and format pointer vector
+        _domain_ptr = IndexVector(adj.get_num_nodes_image() + 1,Index(0));
 
         // count number of adjacencies
-        for(Index j(0); j < _num_nodes_image; ++j)
+        for(Index j(0); j < adj.get_num_nodes_domain(); ++j)
         {
           AImIt cur(adj.image_begin(j));
           AImIt end(adj.image_end(j));
@@ -549,23 +513,24 @@ namespace FEAT
           }
         }
 
-        // build pointer array
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // build pointer vector
+        for(Index i(0); i < adj.get_num_nodes_image(); ++i)
         {
           _domain_ptr[i+1] += _domain_ptr[i];
         }
-        _num_indices_image = _domain_ptr[_num_nodes_domain];
+        num_indices_image = _domain_ptr[adj.get_num_nodes_image()];
 
-        // allocate and build index array
-        _image_idx = new Index[_num_indices_image];
-        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        // allocate and build index vector
+        _image_idx = IndexVector(num_indices_image);
+        std::vector<Index*> vimg_ptr(adj.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        Index* image_idx = _image_idx.data();
+        for(Index i(0); i < adj.get_num_nodes_image(); ++i)
         {
-          image_ptr[i] = &_image_idx[_domain_ptr[i]];
+          image_ptr[i] = &image_idx[_domain_ptr[i]];
         }
 
-        for(Index j(0); j < _num_nodes_image; ++j)
+        for(Index j(0); j < adj.get_num_nodes_domain(); ++j)
         {
           AImIt cur(adj.image_begin(j));
           AImIt end(adj.image_end(j));
@@ -583,29 +548,23 @@ namespace FEAT
       void _render_injectify_transpose(const Adjactor_& adj)
       {
         // get counts
-        _num_nodes_domain = adj.get_num_nodes_image();
         _num_nodes_image = adj.get_num_nodes_domain();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate pointer array
-        _domain_ptr = new Index[_num_nodes_domain + 1];
-        for(Index i(0); i <= _num_nodes_domain; ++i)
-        {
-          _domain_ptr[i] = 0;
-        }
-
+        // allocate pointer vector
+        _domain_ptr =IndexVector(adj.get_num_nodes_image() + 1,0);
         // allocate auxiliary mask vector
-        std::vector<char> vidx_mask(_num_nodes_domain, 0);
+        std::vector<char> vidx_mask(adj.get_num_nodes_image(), 0);
         char* idx_mask = vidx_mask.data();
 
         // loop over all image nodes
-        for(Index j(0); j < _num_nodes_image; ++j)
+        for(Index j(0); j < adj.get_num_nodes_domain(); ++j)
         {
           for(auto it = adj.image_begin(j); it != adj.image_end(j); ++it)
           {
             if(idx_mask[*it] == 0)
             {
-              ++_num_indices_image;
+              ++num_indices_image;
               ++_domain_ptr[(*it)+1];
               idx_mask[*it] = 1;
             }
@@ -614,19 +573,19 @@ namespace FEAT
             idx_mask[*it] = 0;
         }
 
-        _image_idx = new Index[_num_indices_image];
-        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        _image_idx = IndexVector(num_indices_image);
+        std::vector<Index*> vimg_ptr(adj.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
-
-        // build pointer arrays
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        Index* image_idx = _image_idx.data();
+        // build pointer vectors
+        for(Index i(0); i <adj.get_num_nodes_image(); ++i)
         {
           _domain_ptr[i+1] += _domain_ptr[i];
-          image_ptr[i] = &_image_idx[_domain_ptr[i]];
+          image_ptr[i] = &image_idx[_domain_ptr[i]];
         }
 
-        // build image index array
-        for(Index j(0); j < _num_nodes_image; ++j)
+        // build image index vector
+        for(Index j(0); j < adj.get_num_nodes_domain(); ++j)
         {
           for(auto it = adj.image_begin(j); it != adj.image_end(j); ++it)
           {
@@ -658,17 +617,16 @@ namespace FEAT
         typedef typename Adjactor2_::ImageIterator AImIt2;
 
         // get counts
-        _num_nodes_domain = adj1.get_num_nodes_domain();
         _num_nodes_image = adj2.get_num_nodes_image();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate pointer array
-        _domain_ptr = new Index[_num_nodes_domain + 1];
+        // allocate pointer vector
+        _domain_ptr = IndexVector(adj1.get_num_nodes_domain() + 1);
 
-        // count number of adjacencies and build pointer array
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // count number of adjacencies and build pointer vector
+        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = _num_indices_image;
+          _domain_ptr[i] = num_indices_image;
           AImIt1 cur1(adj1.image_begin(i));
           AImIt1 end1(adj1.image_end(i));
           for(; cur1 != end1; ++cur1)
@@ -677,15 +635,15 @@ namespace FEAT
             AImIt2 end2(adj2.image_end(*cur1));
             for(; cur2 != end2; ++cur2)
             {
-              ++_num_indices_image;
+              ++num_indices_image;
             }
           }
         }
-        _domain_ptr[_num_nodes_domain] = _num_indices_image;
+        _domain_ptr[adj1.get_num_nodes_domain()] = num_indices_image;
 
-        // allocate and build index array
-        _image_idx = new Index[_num_indices_image];
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // allocate and build index vector
+        _image_idx =IndexVector(num_indices_image);
+        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
         {
           Index* idx = &_image_idx[_domain_ptr[i]];
           AImIt1 cur1(adj1.image_begin(i));
@@ -714,28 +672,27 @@ namespace FEAT
         XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
-        _num_nodes_domain = adj1.get_num_nodes_domain();
         _num_nodes_image = adj2.get_num_nodes_image();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate pointer array
-        _domain_ptr = new Index[_num_nodes_domain + 1];
+        // allocate pointer vector
+        _domain_ptr =IndexVector(adj1.get_num_nodes_domain() + 1);
 
         // allocate auxiliary mask vector
-        std::vector<char> vidx_mask(_num_nodes_image, 0);
+        std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
         char* idx_mask = vidx_mask.data();
 
-        // count number of adjacencies and build pointer array
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // count number of adjacencies and build pointer vector
+        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = _num_indices_image;
+          _domain_ptr[i] = num_indices_image;
           for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
           {
             for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
             {
               if(idx_mask[*jt] == 0)
               {
-                ++_num_indices_image;
+                ++num_indices_image;
                 idx_mask[*jt] = 1;
               }
             }
@@ -745,11 +702,11 @@ namespace FEAT
             for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
               idx_mask[*jt] = 0;
         }
-        _domain_ptr[_num_nodes_domain] = _num_indices_image;
+        _domain_ptr[adj1.get_num_nodes_domain()] = num_indices_image;
 
-        // allocate and build index array
-        _image_idx = new Index[_num_indices_image];
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // allocate and build index vector
+        _image_idx = IndexVector(num_indices_image);
+        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
         {
           Index k = _domain_ptr[i];
           for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
@@ -786,19 +743,14 @@ namespace FEAT
         typedef typename Adjactor2_::ImageIterator AImIt2;
 
         // get counts
-        _num_nodes_domain = adj2.get_num_nodes_image();
         _num_nodes_image = adj1.get_num_nodes_domain();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate and format pointer array
-        _domain_ptr = new Index[_num_nodes_domain + 1];
-        for(Index i(0); i <= _num_nodes_domain; ++i)
-        {
-          _domain_ptr[i] = 0;
-        }
+        // allocate and format pointer vector
+        _domain_ptr =IndexVector(adj2.get_num_nodes_image() + 1,Index(0));
 
         // count number of adjacencies
-        for(Index j(0); j < _num_nodes_image; ++j)
+        for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
         {
           AImIt1 cur1(adj1.image_begin(j));
           AImIt1 end1(adj1.image_end(j));
@@ -813,24 +765,25 @@ namespace FEAT
           }
         }
 
-        // build pointer array
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // build pointer vector
+        for(Index i(0); i < adj2.get_num_nodes_image(); ++i)
         {
           _domain_ptr[i+1] += _domain_ptr[i];
         }
-        _num_indices_image = _domain_ptr[_num_nodes_domain];
+        num_indices_image = _domain_ptr[adj2.get_num_nodes_image()];
 
-        // allocate and build index array
-        _image_idx = new Index[_num_indices_image];
-        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        // allocate and build index vector
+        _image_idx =IndexVector(num_indices_image);
+        std::vector<Index*> vimg_ptr(adj2.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
+        Index* image_idx = _image_idx.data();
 
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        for(Index i(0); i < adj2.get_num_nodes_image(); ++i)
         {
-          image_ptr[i] = &_image_idx[_domain_ptr[i]];
+          image_ptr[i] = &image_idx[_domain_ptr[i]];
         }
 
-        for(Index j(0); j < _num_nodes_image; ++j)
+        for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
         {
           AImIt1 cur1(adj1.image_begin(j));
           AImIt1 end1(adj1.image_end(j));
@@ -860,23 +813,19 @@ namespace FEAT
         XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
-        _num_nodes_domain = adj2.get_num_nodes_image();
         _num_nodes_image = adj1.get_num_nodes_domain();
-        _num_indices_image = 0;
+        Index num_indices_image = 0;
 
-        // allocate pointer array
-        _domain_ptr = new Index[_num_nodes_domain+1];
-        for(Index i(0); i <= _num_nodes_domain; ++i)
-        {
-          _domain_ptr[i] = 0;
-        }
+        // allocate pointer vector
+
+        _domain_ptr = IndexVector(adj2.get_num_nodes_image() +1,Index(0));
 
         // allocate auxiliary mask vector
-        std::vector<char> vidx_mask(_num_nodes_domain, 0);
+        std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
         char* idx_mask = vidx_mask.data();
 
         // loop over all image nodes
-        for(Index j(0); j < _num_nodes_image; ++j)
+        for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
         {
           for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
           {
@@ -884,7 +833,7 @@ namespace FEAT
             {
               if(idx_mask[*jt] == 0)
               {
-                ++_num_indices_image;
+                ++num_indices_image;
                 ++_domain_ptr[(*jt)+1];
                 idx_mask[*jt] = 1;
               }
@@ -896,19 +845,20 @@ namespace FEAT
               idx_mask[*jt] = 0;
         }
 
-        _image_idx = new Index[_num_indices_image];
-        std::vector<Index*> vimg_ptr(_num_nodes_domain, nullptr);
+        _image_idx = IndexVector(num_indices_image);
+        std::vector<Index*> vimg_ptr(adj2.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
+        Index* image_idx = _image_idx.data();
 
-        // build pointer arrays
-        for(Index i(0); i < _num_nodes_domain; ++i)
+        // build pointer vector
+        for(Index i(0); i < adj2.get_num_nodes_image(); ++i)
         {
           _domain_ptr[i+1] += _domain_ptr[i];
-          image_ptr[i] = &_image_idx[_domain_ptr[i]];
+          image_ptr[i] = &image_idx[_domain_ptr[i]];
         }
 
-        // build image index array
-        for(Index j(0); j < _num_nodes_image; ++j)
+        // build image index vector
+        for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
         {
           for(auto it = adj1.image_begin(j); it != adj1.image_end(j); ++it)
           {
@@ -935,30 +885,35 @@ namespace FEAT
       /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
       /* ******************************************************************* */
     public:
-      /** \copydoc Adjactor::get_num_nodes_domain() */
+
+
       inline Index get_num_nodes_domain() const
       {
-        return _num_nodes_domain;
+        return (_domain_ptr.empty() ? Index(0) : Index(_domain_ptr.size() - 1));
+
       }
 
-      /** \copydoc Adjactor::get_num_nodes_image() */
+
       inline Index get_num_nodes_image() const
       {
         return _num_nodes_image;
       }
 
+
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
-        return &_image_idx[_domain_ptr[domain_node]];
+        ASSERTM(domain_node +1 < _domain_ptr.size(), "Domain node index out of range");
+
+        return _image_idx.begin() + IndexVector::difference_type(_domain_ptr[domain_node]);
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        ASSERTM(domain_node < _num_nodes_domain, "Domain node index out of range");
-        return &_image_idx[_domain_ptr[domain_node+1]];
+        ASSERTM(domain_node +1< _domain_ptr.size(), "Domain node index out of range");
+
+        return _image_idx.begin() + IndexVector::difference_type(_domain_ptr[domain_node + Index(1)]);
       }
     }; // class Graph
   } // namespace Adjacency

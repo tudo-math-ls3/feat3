@@ -19,9 +19,8 @@ namespace FEAT
   {
     // Default constructor.
     Coloring::Coloring() :
-      _num_nodes(0),
       _num_colors(0),
-      _coloring(nullptr)
+      _coloring()
     {
     }
 
@@ -30,11 +29,9 @@ namespace FEAT
       Index num_nodes,
       Index num_colors)
        :
-      _num_nodes(num_nodes),
-      _num_colors(num_colors),
-      _coloring(nullptr)
+      _num_colors(num_colors)
     {
-      _coloring = new Index[_num_nodes];
+      _coloring = IndexVector(num_nodes);
     }
 
     // Array Constructor
@@ -42,35 +39,45 @@ namespace FEAT
       Index num_nodes,
       Index* coloring)
     {
-      _num_nodes = num_nodes;
 
       std::unordered_set<Index> colors;
-      for (Index i(0) ; i < _num_nodes ; ++i)
+      for (Index i(0) ; i < num_nodes ; ++i)
       {
         colors.insert(coloring[i]);
       }
       _num_colors = Index(colors.size());
       colors.clear();
 
-      _coloring = new Index[_num_nodes];
-      for(Index i(0); i< _num_nodes; i++)
+      _coloring =IndexVector(num_nodes);
+      for(Index i(0); i< num_nodes; i++)
       {
         _coloring[i] = coloring[i];
       }
-    }
 
+    }
+    //Vector Constructor
+
+    Coloring::Coloring(
+      Index num_colors,
+      const IndexVector& coloring) :
+      _num_colors(num_colors),
+      _coloring(coloring)
+    {
+    }
     // Creation out of a given Graph
-    Coloring::Coloring(const Graph& graph)
+    Coloring::Coloring(const Graph& graph) :
+      Coloring()
     {
       // get the graph's data
       Index num_nodes_domain = graph.get_num_nodes_domain();
       const Index* domain_ptr = graph.get_domain_ptr();
       const Index* image_idx = graph.get_image_idx();
 
-      _num_nodes = num_nodes_domain;
+      if(num_nodes_domain == Index(0))
+        return;
 
-      // allocate the coloring array
-      _coloring = new Index[_num_nodes];
+      // allocate the coloring vector
+      _coloring = IndexVector(num_nodes_domain);
 
       // highest possible number of colors
       Index mnc = graph.degree() + 1;
@@ -93,7 +100,7 @@ namespace FEAT
       // loop over all nodes
       for(Index i(0); i < num_nodes_domain; ++i)
       {
-        // reset the auxiliary array
+        // reset the auxiliary vector
         for(Index j(0); j < mnc; ++j)
         {
           col_aux[j] = 0;
@@ -150,17 +157,19 @@ namespace FEAT
     }
 
     // Creation out of a given Graph with a prescribed order
-    Coloring::Coloring(const Graph& graph, const Index* order)
+    Coloring::Coloring(const Graph& graph, const Index* order) :
+      Coloring()
     {
       // get the graph's data
       Index num_nodes_domain = graph.get_num_nodes_domain();
       const Index* domain_ptr = graph.get_domain_ptr();
       const Index* image_idx = graph.get_image_idx();
 
-      _num_nodes = num_nodes_domain;
+      if(num_nodes_domain == Index(0))
+        return;
 
-      // allocate the coloring array
-      _coloring = new Index[_num_nodes];
+      // allocate the coloring vector
+      _coloring = IndexVector(num_nodes_domain);
 
       // highest possible number of colors
       Index mnc = graph.degree() + 1;
@@ -253,12 +262,11 @@ namespace FEAT
 
     // move ctor
     Coloring::Coloring(Coloring&& other) :
-      _num_nodes(other._num_nodes),
       _num_colors(other._num_colors),
-      _coloring(other._coloring)
+      _coloring(std::forward<IndexVector>(other._coloring))
     {
-      other._num_nodes = other._num_colors = Index(0);
-      other._coloring = nullptr;
+      other._num_colors = Index(0);
+      other._coloring.clear();
     }
 
     // move-assign operator
@@ -268,36 +276,29 @@ namespace FEAT
       if(this == &other)
         return *this;
 
-      if(_coloring != nullptr)
-        delete [] _coloring;
-
-      _num_nodes = other._num_nodes;
       _num_colors = other._num_colors;
-      _coloring = other._coloring;
+      _coloring = std::forward<IndexVector>(other._coloring);
 
-      other._num_nodes = other._num_colors = Index(0);
-      other._coloring = nullptr;
+      other._num_colors = Index(0);
+      other._coloring.clear();
 
       return *this;
     }
 
     // virtual destructor
     Coloring::~Coloring()
-    {
-      if(_coloring != nullptr)
-        delete [] _coloring;
-    }
+    {}
 
     Graph Coloring::create_partition_graph() const
     {
       // allocate a new graph
       Graph graph(get_max_color() + 1, get_num_nodes(), get_num_nodes());
 
-      // create domain array
+      // create domain vector
       Index* domain_ptr = graph.get_domain_ptr();
       domain_ptr[0] = Index(0);
 
-      // create image array
+      // create image vector
       Index* image_idx = graph.get_image_idx();
 
       // index counter
@@ -307,7 +308,7 @@ namespace FEAT
       for(Index i(0); i < _num_colors; ++i)
       {
         // loop over all nodes
-        for(Index j(0); j < _num_nodes; ++j)
+        for(Index j(0); j < _coloring.size(); ++j)
         {
           // if node j has the color i
           if(i == _coloring[j])

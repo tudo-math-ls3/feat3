@@ -1141,7 +1141,7 @@ namespace FEAT
 
         DenseVector<Mem::Main, DT_, IT_> local;
         local.convert(*this);
-        perm(local.elements());
+        perm.apply(local.elements());
         this->assign(local);
       }
 

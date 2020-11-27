@@ -11,6 +11,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAT
 {
   namespace Adjacency
@@ -28,29 +31,28 @@ namespace FEAT
     class Coloring
     {
     protected:
-      /// total number of nodes
-      Index _num_nodes;
+      using IndexVector = std::vector < Index>;
 
       /// total number of colors used
       Index _num_colors;
 
       /**
-       * \brief coloring array
+       * \brief coloring vector
        *
        * Dimension: #_num_nodes
-       * The coloring array is defined as the second row of the following chart:
+       * The coloring vector is defined as the second row of the following chart:
        *    node number :         0                   1           ...         num_nodes-1
        *    color number: color of node 0    color of node 1    ...  color of node num_nodes-1
        *
        */
-      Index* _coloring;
+      IndexVector _coloring;
 
     public:
 
       /**
        * \brief Default constructor.
        *
-       * This constructor creates a new empty coloring object, but does not allocate any arrays.
+       * This constructor creates a new empty coloring object, but does not allocate any vectors.
        */
       Coloring();
 
@@ -58,9 +60,9 @@ namespace FEAT
        * \brief Allocation Constructor.
        *
        * This constructor creates a new coloring object and allocates
-       * a coloring array of length num_nodes.
+       * a coloring vector of length num_nodes.
        *
-       * \note This constructor does not initialize the allocated array -- it has to be initialized by the user
+       * \note This constructor does not initialize the allocated vector -- it has to be initialized by the user
        * after construction.
        *
        * \param[in] num_nodes
@@ -89,6 +91,22 @@ namespace FEAT
       Coloring(
         Index num_nodes,
         Index* coloring);
+
+      /**
+      * \brief Vector Constructor.
+      *
+      * This constructor creates a new coloring object from a given vector.
+      *
+      * \param[in] num_colors
+      * The total number of colors.
+      *
+      * \param[in] coloring
+      * The coloring vector
+      *
+      */
+      Coloring(
+        Index num_colors,
+        const IndexVector& coloring);
 
       /**
        * \brief Creation out of a given Graph
@@ -130,8 +148,9 @@ namespace FEAT
        */
       Coloring clone() const
       {
-        if(_coloring != nullptr)
-          return Coloring(_num_nodes, _coloring);
+        if (!_coloring.empty())
+          //return Coloring(Index(_coloring.size()), _coloring.data());
+          return Coloring(_num_colors, _coloring);
         else
           return Coloring();
       }
@@ -150,13 +169,13 @@ namespace FEAT
        */
       Index* get_coloring()
       {
-        return _coloring;
+        return _coloring.data();
       }
 
       /** \copydoc get_coloring() */
       const Index* get_coloring() const
       {
-        return _coloring;
+        return _coloring.data();
       }
 
       /**
@@ -166,7 +185,7 @@ namespace FEAT
        */
       Index get_num_nodes() const
       {
-        return _num_nodes;
+        return Index(_coloring.size());
       }
 
       /**

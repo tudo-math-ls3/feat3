@@ -38,29 +38,32 @@ namespace FEAT
         typename Space_::DofMappingType dof_map(space);
 
         // fetch the number of cells and dofs
-        const Index num_cells(space.get_mesh().get_num_entities(Space_::shape_dim));
-        const Index num_dofs(space.get_num_dofs());
-
-        // allocate the domain-pointer
-        Index* dom_ptr = new Index[num_cells+1];
+        const Index num_cells(space.get_mesh().get_num_entities(Space_::shape_dim)); //num_cells
+        const Index num_dofs(space.get_num_dofs()); //num_dofs
 
         // loop over all cells and build the domain pointer array
-        dom_ptr[0] = Index(0);
+
+        Index num_indices_image(0);
         for(Index i(0); i < num_cells; ++i)
         {
           dof_map.prepare(i);
-          dom_ptr[i+1] = dom_ptr[i] + Index(dof_map.get_num_local_dofs());
+          num_indices_image += Index(dof_map.get_num_local_dofs());
           dof_map.finish();
         }
+        // create an adjacency graph
+        Adjacency::Graph graph (num_cells, num_dofs, num_indices_image) ;
+        Index* dom_ptr = graph.get_domain_ptr();
+        Index* img_idx = graph.get_image_idx();
 
-        // allocate the index array
-        Index* img_idx = new Index[dom_ptr[num_cells]];
+        //build the domain pointer array
+        //loop over all cells and build the image index array
+        dom_ptr[0] = Index(0);
 
-        // loop over all cells and build the image index array
         for(Index i(0); i < num_cells; ++i)
         {
           Index l(dom_ptr[i]);
           dof_map.prepare(i);
+          dom_ptr[i + 1] = l + Index(dof_map.get_num_local_dofs());
           for(int j(0); j < dof_map.get_num_local_dofs(); ++j, ++l)
           {
             img_idx[l] = dof_map.get_index(j);
@@ -69,7 +72,7 @@ namespace FEAT
         }
 
         // create an adjacency graph
-        return Adjacency::Graph(num_cells, num_dofs, dom_ptr[num_cells], dom_ptr, img_idx, false);
+        return graph;
       }
     }; // class DofMappingRenderer
   } // namespace Space

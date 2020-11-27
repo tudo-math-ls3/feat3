@@ -1083,7 +1083,7 @@ namespace FEAT
 
         DenseVectorBlocked<Mem::Main, DT_, IT_, BlockSize_> local;
         local.convert(*this);
-        perm(local.template elements<Perspective::native>());
+        perm.apply(local.template elements<Perspective::native>());
         this->assign(local);
       }
 

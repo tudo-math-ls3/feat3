@@ -77,10 +77,10 @@ public:
     copy(ws, v);
 
     // apply inverse permutation
-    prm_rnd(wp, v, true);
+    prm_rnd.apply(wp, v, true);
 
     // appyl inverse swapping
-    prm_rnd(ws, true);
+    prm_rnd.apply(ws, true);
 
     // test for id
     return is_id(wp) && is_id(ws);
@@ -93,10 +93,10 @@ public:
     copy(ws, v);
 
     // apply forward permutation
-    prm_inv(wp, v);
+    prm_inv.apply(wp, v);
 
     // appyl forward swapping
-    prm_inv(ws);
+    prm_inv.apply(ws);
 
     // test for id
     return is_id(wp) && is_id(ws);
@@ -107,7 +107,7 @@ public:
     // create an rng
     Random rng;
 
-#define N 10
+    static constexpr Index N = 10;
     // create a random permutation
     Permutation prm_rnd0(N, rng);
     Permutation prm_rnd(N, rng);
@@ -118,10 +118,10 @@ public:
     make_id(vs);
 
     // apply permutation operator
-    prm_rnd(vp, vs);
+    prm_rnd.apply(vp, vs);
 
     // apply swapping operator
-    prm_rnd(vs);
+    prm_rnd.apply(vs);
 
     // make sure they're equal
     TEST_CHECK(is_equal(vp,vs));
@@ -140,6 +140,6 @@ public:
     // create inverse random permutation by inverse swap array
     Permutation prm_inv3(N, Permutation::type_inv_swap, prm_rnd.get_swap_pos());
     test_fwd(prm_inv3, vs);
-#undef N
+
   }
 } permutation_test;

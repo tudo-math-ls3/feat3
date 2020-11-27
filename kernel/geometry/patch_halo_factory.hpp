@@ -73,14 +73,14 @@ namespace FEAT
         bool _has_face_rank(const Index base_face, const Index halo_rank, const Adjacency::Graph& ranks_at_elem)
         {
           // loop over all elements adjacent to that face and
-          const Index *ib = _elem_at_face.image_begin(base_face);
-          const Index *ie = _elem_at_face.image_end(base_face);
-          for(const Index* ii(ib); ii != ie; ++ii)
+          auto ib = _elem_at_face.image_begin(base_face);
+          auto ie = _elem_at_face.image_end(base_face);
+          for(auto ii(ib); ii != ie; ++ii)
           {
             // now loop over all ranks of this element
-            const Index* jb = ranks_at_elem.image_begin(*ii);
-            const Index* je = ranks_at_elem.image_end(*ii);
-            for(const Index* jj(jb); jj != je; ++jj)
+            auto jb = ranks_at_elem.image_begin(*ii);
+            auto je = ranks_at_elem.image_end(*ii);
+            for(auto jj(jb); jj != je; ++jj)
             {
               // check rank
               if(*jj == halo_rank)
@@ -116,9 +116,9 @@ namespace FEAT
             const Index base_elem = _target_face[elem];
 
             // now loop over all ranks of this element
-            const Index* jb = ranks_at_elem.image_begin(base_elem);
-            const Index* je = ranks_at_elem.image_end(base_elem);
-            for(const Index* jj(jb); jj != je; ++jj)
+            auto jb = ranks_at_elem.image_begin(base_elem);
+            auto je = ranks_at_elem.image_end(base_elem);
+            for(auto jj(jb); jj != je; ++jj)
             {
               // check rank
               if(*jj == halo_rank)

@@ -12,20 +12,19 @@ namespace FEAT
   namespace Adjacency
   {
     Permutation::Permutation(Index num_entries, ConstrType constr_type, const Index* v) :
-      _num_entries(num_entries),
-      _perm_pos(new Index[num_entries]),
-      _swap_pos(new Index[num_entries])
+      _perm_pos(num_entries),
+      _swap_pos(num_entries)
     {
       XASSERTM(num_entries > 0, "cannot create empty permutation");
       switch(constr_type)
       {
       case type_none:
-        // leave arrays uninitialized
+        // leave vectors uninitialized
         return;
 
       case type_identity:
         // initialize identity permutation
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < num_entries; ++i)
         {
           _perm_pos[i] = _swap_pos[i] = i;
         }
@@ -43,7 +42,7 @@ namespace FEAT
       {
       case type_perm:
         // construct from permutation array
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < num_entries; ++i)
         {
           _perm_pos[i] = v[i];
         }
@@ -52,7 +51,7 @@ namespace FEAT
 
       case type_inv_perm:
         // construct from inverse permutation array
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < num_entries; ++i)
         {
           _perm_pos[v[i]] = i;
         }
@@ -61,7 +60,7 @@ namespace FEAT
 
       case type_swap:
         // construct from swap array
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < num_entries; ++i)
         {
           _swap_pos[i] = v[i];
         }
@@ -71,12 +70,12 @@ namespace FEAT
       case type_inv_swap:
         // construct from inverse swap array;
         // initialize identity permutation
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < num_entries; ++i)
         {
           _perm_pos[i] = i;
         }
         // apply swapping in reverse manner
-        for(Index i(_num_entries-1); i > 0; --i)
+        for(Index i(num_entries-1); i > 0; --i)
         {
           Index t(_perm_pos[i-1]);
           _perm_pos[i-1] = _perm_pos[v[i-1]];
@@ -92,27 +91,22 @@ namespace FEAT
     }
 
     Permutation::Permutation(Index num_entries, Random& random) :
-      _num_entries(num_entries),
-      _perm_pos(new Index[num_entries]),
-      _swap_pos(new Index[num_entries])
+      _perm_pos(num_entries),
+      _swap_pos(num_entries)
     {
       XASSERTM(num_entries > 0, "cannot create empty random permutation");
-      for(Index i(0); i+1 < _num_entries; ++i)
+      for(Index i(0); i+1 < num_entries; ++i)
       {
-        _swap_pos[i] = random(i, _num_entries-1);
+        _swap_pos[i] = random(i, num_entries-1);
       }
-      _swap_pos[_num_entries-1] = _num_entries-1;
+      _swap_pos[num_entries-1] = num_entries-1;
       calc_perm_from_swap();
     }
 
     Permutation::Permutation(Permutation&& other) :
-      _num_entries(other._num_entries),
-      _perm_pos(other._perm_pos),
-      _swap_pos(other._swap_pos)
-    {
-      other._num_entries = Index(0);
-      other._perm_pos = other._swap_pos = nullptr;
-    }
+      _perm_pos(std::forward<IndexVector>(other._perm_pos)),
+      _swap_pos(std::forward<IndexVector>(other._swap_pos))
+    {}
 
     Permutation& Permutation::operator=(Permutation&& other)
     {
@@ -120,36 +114,18 @@ namespace FEAT
       if(this == &other)
         return *this;
 
-      if(_perm_pos != nullptr)
-        delete [] _perm_pos;
-      if(_swap_pos != nullptr)
-        delete [] _swap_pos;
-
-      _num_entries = other._num_entries;
-      _perm_pos = other._perm_pos;
-      _swap_pos = other._swap_pos;
-
-      other._num_entries = Index(0);
-      other._perm_pos = other._swap_pos = nullptr;
+      _perm_pos = std::forward<IndexVector>(other._perm_pos);
+      _swap_pos = std::forward<IndexVector>(other._swap_pos);
 
       return *this;
     }
 
     Permutation::~Permutation()
-    {
-      if(_swap_pos != nullptr)
-      {
-        delete [] _swap_pos;
-      }
-      if(_perm_pos != nullptr)
-      {
-        delete [] _perm_pos;
-      }
-    }
+    {}
 
     void Permutation::calc_swap_from_perm()
     {
-      for(Index i(0); i < _num_entries; ++i)
+      for(Index i(0); i < this->size(); ++i)
       {
         // fetch the permutation position and trace it through the swap array
         Index j(_perm_pos[i]);
@@ -164,13 +140,13 @@ namespace FEAT
     void Permutation::calc_perm_from_swap()
     {
       // initialize identity permuation
-      for(Index i(0); i < _num_entries; ++i)
+      for(Index i(0); i < this->size(); ++i)
       {
         _perm_pos[i] = i;
       }
 
       // apply swapping to permutation
-      operator()(_perm_pos);
+      this->apply(_perm_pos.data());
     }
   } // namespace Adjacency
 } // namespace FEAT

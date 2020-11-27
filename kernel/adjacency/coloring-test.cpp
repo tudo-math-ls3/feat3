@@ -19,7 +19,7 @@ using namespace FEAT::Adjacency;
  * \author Constantin Christof
  */
 
-  class ColoringTest
+class ColoringTest
   : public TaggedTest<Archs::None, Archs::None>
 {
 public:
