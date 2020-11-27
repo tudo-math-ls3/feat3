@@ -55,20 +55,20 @@ doc/*
 thirdparty/*.gz
 thirdparty/*.tgz
 thirdparty/*.zip
-thirdparty/alglib
-thirdparty/cgal
-thirdparty/fparser
-thirdparty/floatx
-thirdparty/half
-thirdparty/hypre
-thirdparty/parmetis
-thirdparty/SuiteSparse
-thirdparty/triangle
-thirdparty/zfp
-thirdparty/zlib
+thirdparty/alglib-*/
+thirdparty/CGAL-*/
+thirdparty/deathhandler/
+thirdparty/fparser-*/
+thirdparty/floatx/
+thirdparty/half-*/
+thirdparty/hypre-*/
+thirdparty/parmetis-*/
+thirdparty/SuiteSparse-*/
+thirdparty/triangle/
+thirdparty/zfp-*/
+thirdparty/zlib-*/
 
 # Ignore Visual Studio symlinks
-build_system/vc14/kernel/
 build_system/vc16/kernel/
 
 # Ignore Visual Studio user/filter files
@@ -91,4 +91,4 @@ ipch
 *.lnk
 
 # Ignore Visual Studio user-configfiles
-config-vc14.xml
+config-vc16.xml
