@@ -1875,21 +1875,86 @@ namespace FEAT
       }
 
 
-      /// \copydoc extract_diag()
-      void extract_diag(VectorTypeL & diag) const
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \param[in] diag_indices
+       * A vector containing the indices of the diagonal entries
+       *
+       * \param[out] diag
+       * The vector containing the diagonal entry values
+       */
+      void extract_diag(VectorTypeL & diag, DenseVector<Mem_, IT_, IT_> & diag_indices) const
       {
         XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
         XASSERTM(rows() == columns(), "matrix is not square!");
 
-        Arch::Diagonal<Mem_>::template csrb<DataType, IndexType, BlockHeight, BlockWidth>(diag.template elements<Perspective::pod>(), val<Perspective::pod>(), col_ind(), row_ptr(), rows());
+        for (Index row(0); row < rows(); row++)
+        {
+          const Index index = MemoryPool<Mem_>::get_element(diag_indices.elements(), row);
+          typename VectorTypeL::ValueType t(0);
+          if (index != used_elements())
+          {
+            ValueType m;
+            MemoryPool<Mem_>::download((DT_*)&m, this->template val<LAFEM::Perspective::pod>() + (index * BlockHeight_ * BlockWidth_), BlockHeight_ * BlockWidth_);
+            for (int i(0) ; i < BlockHeight_ ; ++i)
+            {
+              t[i] = m[i][i];
+            }
+          }
+          diag(row, t);
+        }
       }
 
-      /// extract main diagonal vector from matrix
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \param[out] diag
+       * The vector containing the diagonal entry values
+       */
+      void extract_diag(VectorTypeL & diag) const
+      {
+        auto diag_indices = extract_diag_indices();
+        extract_diag(diag, diag_indices);
+      }
+
+
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \returns The vector containing the diagonal entry values
+       */
       VectorTypeL extract_diag() const
       {
         VectorTypeL diag = create_vector_l();
         extract_diag(diag);
         return diag;
+      }
+
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \param[out] diag_indices
+       * A vector containing the indices of the diagonal entries
+       */
+      void extract_diag_indices(DenseVector<Mem_, IT_, IT_> & diag_indices) const
+      {
+        XASSERTM(diag_indices.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(rows() == columns(), "matrix is not square!");
+
+        Arch::Diagonal<Mem_>::csr(diag_indices.elements(), col_ind(), row_ptr(), rows());
+      }
+
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \returns A vector containing the indices of the diagonal entries
+       */
+      DenseVector<Mem_, IT_, IT_> extract_diag_indices() const
+      {
+        DenseVector<Mem_, IT_, IT_> diag_indices(this->template rows<LAFEM::Perspective::native>());
+        extract_diag_indices(diag_indices);
+        return diag_indices;
       }
 
       /// Permutate matrix rows and columns according to the given Permutations

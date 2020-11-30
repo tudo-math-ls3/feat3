@@ -1401,6 +1401,7 @@ namespace FEAT
         return this->_scalar_index.at(3);
       }
 
+
       /**
        * \brief Retrieve column indices array.
        *
@@ -1463,6 +1464,7 @@ namespace FEAT
 
         return this->_indices.at(1);
       }
+
 
       /**
        * \brief Retrieve maximum bandwidth among all rows.
@@ -2408,21 +2410,76 @@ namespace FEAT
         return lump;
       }
 
-      /// \copydoc extract_diag()
-      void extract_diag(VectorTypeL & diag) const
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \param[in] diag_indices
+       * A vector containing the indices of the diagonal entries
+       *
+       * \param[out] diag
+       * The vector containing the diagonal entry values
+       */
+      void extract_diag(VectorTypeL & diag, DenseVector<Mem_, IT_, IT_> & diag_indices) const
       {
         XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(diag_indices.size() == rows(), "diag_indices size does not match matrix row count!");
         XASSERTM(rows() == columns(), "matrix is not square!");
 
-        Arch::Diagonal<Mem_>::csr(diag.elements(), val(), col_ind(), row_ptr(), rows());
+        for (Index row(0); row < rows(); row++)
+        {
+          const Index index = MemoryPool<Mem_>::get_element(diag_indices.elements(), row);
+          diag(row, index != used_elements() ? MemoryPool<Mem_>::get_element(this->val(), index) : DT_(0));
+        }
       }
 
-      /// extract main diagonal vector from matrix
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \param[out] diag
+       * The vector containing the diagonal entry values
+       */
+      void extract_diag(VectorTypeL & diag) const
+      {
+        auto dia_indices = extract_diag_indices();
+        extract_diag(diag, dia_indices);
+      }
+
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \returns The vector containing the diagonal entry values
+       */
       VectorTypeL extract_diag() const
       {
         VectorTypeL diag = create_vector_l();
         extract_diag(diag);
         return diag;
+      }
+
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \param[out] diag_indices
+       * A vector containing the indices of the diagonal entries
+       */
+      void extract_diag_indices(DenseVector<Mem_, IT_, IT_> & diag_indices) const
+      {
+        XASSERTM(diag_indices.size() == rows(), "diag size does not match matrix row count!");
+        XASSERTM(rows() == columns(), "matrix is not square!");
+
+        Arch::Diagonal<Mem_>::csr(diag_indices.elements(), col_ind(), row_ptr(), rows());
+      }
+
+      /**
+       * \brief extract main diagonal vector from matrix
+       *
+       * \returns A vector containing the indices of the diagonal entries
+       */
+      DenseVector<Mem_, IT_, IT_> extract_diag_indices() const
+      {
+        DenseVector<Mem_, IT_, IT_> diag_indices(rows());
+        extract_diag_indices(diag_indices);
+        return diag_indices;
       }
 
       /// Permutate matrix rows and columns according to the given Permutations

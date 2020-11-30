@@ -24,23 +24,23 @@ namespace FEAT
       template <>
       struct Diagonal<Mem::Main>
       {
-        template <typename DT_, typename IT_>
-        static void csr(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
+        template <typename IT_>
+        static void csr(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
         {
-          csr_generic(diag, val, col_ind, row_ptr, rows);
+          csr_generic(diag, col_ind, row_ptr, rows);
         }
 
-        template <typename DT_, typename IT_>
-        static void csr_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+        template <typename IT_>
+        static void csr_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
-        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
+        template <typename IT_>
+        static void csrb(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
         {
-          csrb_generic<DT_, IT_, BlockHeight_, BlockWidth_>(diag, val, col_ind, row_ptr, rows);
+          csrb_generic<IT_>(diag, col_ind, row_ptr, rows);
         }
 
-        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb_generic(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+        template <typename IT_>
+        static void csrb_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
         template <typename DT_ , typename IT_>
         static void ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,
@@ -56,8 +56,11 @@ namespace FEAT
       };
 
 #ifdef FEAT_EICKT
-      extern template void Diagonal<Mem::Main>::csr_generic(float *, const float * const, const Index * const, const Index * const, const Index);
-      extern template void Diagonal<Mem::Main>::csr_generic(double *, const double * const, const Index * const, const Index * const, const Index);
+      extern template void Diagonal<Mem::Main>::csr_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
+      extern template void Diagonal<Mem::Main>::csr_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
+
+      extern template void Diagonal<Mem::Main>::csrb_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
+      extern template void Diagonal<Mem::Main>::csrb_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
 
       extern template void Diagonal<Mem::Main>::ell_generic(float *, const float * const, const Index * const,
         const Index * const, const Index * const, Index, const Index);
@@ -68,11 +71,11 @@ namespace FEAT
       template <>
       struct Diagonal<Mem::CUDA>
       {
-        template <typename DT_, typename IT_>
-        static void csr(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+        template <typename IT_>
+        static void csr(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
-        template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-        static void csrb(DT_ * diag, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
+        template <typename IT_>
+        static void csrb(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows);
 
         template <typename DT_, typename IT_>
         static void ell(DT_ * diag, const DT_ * const val, const IT_ * const col_ind,

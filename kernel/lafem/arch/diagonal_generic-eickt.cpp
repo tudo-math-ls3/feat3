@@ -12,8 +12,11 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-template void Diagonal<Mem::Main>::csr_generic(float *, const float * const, const Index * const, const Index * const, const Index);
-template void Diagonal<Mem::Main>::csr_generic(double *, const double * const, const Index * const, const Index * const, const Index);
+template void Diagonal<Mem::Main>::csr_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
+template void Diagonal<Mem::Main>::csr_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
+
+template void Diagonal<Mem::Main>::csrb_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
+template void Diagonal<Mem::Main>::csrb_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
 
 template void Diagonal<Mem::Main>::ell_generic(float *, const float * const, const Index * const,
   const Index * const, const Index * const, const Index, const Index);
