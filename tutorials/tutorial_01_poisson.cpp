@@ -15,11 +15,9 @@
 //
 // The analytical solution u is given as
 //
-//         u(x,y) = sin(pi*x) * sin(pi*y)
+// u(x,y) = (exp(-(2x - 1)^2) - exp(-1))*(exp(-(2y - 1)^2) - exp(-1)) / (1 - exp(-1))^2
 //
-// and its corresponding force (right-hand-side) f is
-//
-//         f(x,y) = 2 * pi^2 * u(x,y)
+// and its corresponding force (right-hand-side) f.
 //
 //
 // The purpose of this tutorial is to demonstrate the basic program flow of a simple
@@ -75,7 +73,7 @@
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 
 // FEAT-Analytic includes
-#include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
+#include <kernel/analytic/common.hpp>                      // for ExpBubbleFunction
 
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
@@ -370,21 +368,19 @@ namespace Tutorial01
     // We use the opportunity to explain how to prescribe systems with analytically-known solutions.
 
     // In this tutorial, we first choose a reference solution for our PDE and then assemble the
-    // corresponding right-hand-side for our Poisson problem. We choose the "sine-bubble" function,
+    // corresponding right-hand-side for our Poisson problem. We choose the "exp-bubble" function,
     // which is pre-defined as a 'common function' in the "analytic/common.hpp" header,
-    // so we can use it here. The SineBubbleFunction is implemented for 1D, 2D and 3D, so we
+    // so we can use it here. The ExpBubbleFunction is implemented for 1D, 2D and 3D, so we
     // need to specify the desired dimension, which we can obtain from the ShapeType definition:
-    Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
+    Analytic::Common::ExpBubbleFunction<ShapeType::dimension> sol_function;
 
-    // Next, we need a linear functional that can be applied onto test functions for our
-    // right-hand-side vector. The sine-bubble is an eigenfunction of the Laplace operator,
-    // so the corresponding right-hand-side function is the solution multiplied by 2*pi^2.
-    // We could exploit this by simply using our solution function for the right-hand-side
-    // assembly and passing the constant factor as a multiplier for our assembly method,
-    // but we will instead use the pre-defined LaplaceFunctional wrapper, which will
-    // compute the right-hand-side force for any given solution function based on its
-    // second derivatives. The LaplaceFunctional requires the type of the solution function
-    // as its one and only template parameter, so we use the decltype specifier here, which
+    // Next, we have to define a functional for the right hand side of our PDE. Normally, one
+    // would define the right-hand-side function 'f' explicitly here, but since this is a simple
+    // benchmark problem we already know the analytical solution, so we can define the right-hand-
+    // side functional from it automatically. For this, we use the pre-defined LaplaceFunctional
+    // wrapper, which computes the right-hand-side force for any given solution function based on
+    // its second derivatives. The LaplaceFunctional requires the type of the solution function
+    // as its one and only template parameter, so we use the 'decltype' specifier here, which
     // returns the class type of its argument, so that we do not have to write that out again:
     Assembly::Common::LaplaceFunctional<decltype(sol_function)> force_functional(sol_function);
 
@@ -492,7 +488,7 @@ namespace Tutorial01
     //   = 1 will compute both the H0- and H1-errors
     //   = 2 will compute the H0-, H1- and H2-errors
 
-    // We have already created the 'sine_bubble' object representing our analytical solution for
+    // We have already created the 'sol_function' object representing our analytical solution for
     // the assembly of the right-hand-side vector, so we may reuse it for the computation now:
 
     Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute(
