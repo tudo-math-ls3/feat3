@@ -51,7 +51,7 @@ namespace FEAT
         LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> vec_w(space.get_num_dofs(), DataType_(0));
 
         // create a constant 1-function and its corresponding force functional
-        Analytic::Common::ConstantFunction<Space_::world_dim> one_func(Real(1));
+        Analytic::Common::ConstantFunction<Space_::world_dim, DataType_> one_func(DataType_(1));
         Assembly::Common::ForceFunctional<decltype(one_func)> one_force(one_func);
 
         // interpolate 1-function into vector v
@@ -77,12 +77,16 @@ namespace FEAT
        * \param[in] cubature_factory
        * A cubature factory for integration.
        *
+       * \param[in] sol_mean
+       * The desired integral mean of the solution vector. Defaults to 0.
+       *
        * \warning This function does not work for global mean filters!
        */
       template<typename MemType_, typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
       static void assemble(
         LAFEM::MeanFilter<MemType_, DataType_, IndexType_>& filter,
-        const Space_& space, const CubatureFactory_& cubature_factory)
+        const Space_& space, const CubatureFactory_& cubature_factory,
+        const DataType_ sol_mean = DataType_(0))
       {
         // allocate primal and dual vectors
         LAFEM::DenseVector<MemType_, DataType_, IndexType_> vec_prim, vec_dual;
@@ -91,7 +95,8 @@ namespace FEAT
         assemble(vec_prim, vec_dual, space, cubature_factory);
 
         // create the filter
-        filter = LAFEM::MeanFilter<MemType_, DataType_, IndexType_>(std::move(vec_prim), std::move(vec_dual));
+        filter = LAFEM::MeanFilter<MemType_, DataType_, IndexType_>
+          (std::move(vec_prim), std::move(vec_dual), sol_mean);
       }
     }; // class MeanFilterAssembler
   } // namespace Assembly

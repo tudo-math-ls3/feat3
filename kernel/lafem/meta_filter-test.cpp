@@ -62,7 +62,7 @@ public:
       fw[i] = DataType(i+1);
 
     // create a mean-filter
-    MeanFilter<Mem::Main, DataType, IndexType> mean_filter(std::move(mfv), std::move(mfw), DataType(((m+1)*(m+2))/2));
+    MeanFilter<Mem::Main, DataType, IndexType> mean_filter(std::move(mfv), std::move(mfw), DataType(0), DataType(((m+1)*(m+2))/2));
 
     // create a power-filer
     PowerFilter2 power_filter;

@@ -47,10 +47,16 @@ namespace FEAT
       VectorType _vec_dual;
       /// weight volume
       DataType _volume;
+      /// desired solution vector mean
+      DataType _sol_mean;
 
     public:
       // default CTOR
-      MeanFilter()
+      MeanFilter() :
+        _vec_prim(),
+        _vec_dual(),
+        _volume(),
+        _sol_mean()
       {
       }
 
@@ -59,11 +65,16 @@ namespace FEAT
        *
        * \param[in] vec_prim, vec_dual
        * The primal-dual weighting vector pair for the mean filter.
+       *
+       * \param[in] sol_mean
+       * The desired integral mean of the solution vector. Defaults to 0.
        */
-      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual) :
+      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual,
+        DataType sol_mean = DataType(0)) :
         _vec_prim(std::forward<VectorType>(vec_prim)),
         _vec_dual(std::forward<VectorType>(vec_dual)),
-        _volume(_vec_prim.dot(_vec_dual))
+        _volume(_vec_prim.dot(_vec_dual)),
+        _sol_mean(sol_mean)
       {
         XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
       }
@@ -74,13 +85,17 @@ namespace FEAT
        * \param[in] vec_prim, vec_dual
        * The primal-dual weighting vector pair for the mean filter.
        *
+       * \param[in] sol_mean
+       * The desired integral mean of the solution vector.
+       *
        * \param[in] volume
        * The domain volume. This is simply the dot-product of the two vectors.
        */
-      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual, DataType volume) :
+      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual, DataType sol_mean, DataType volume) :
         _vec_prim(std::forward<VectorType>(vec_prim)),
         _vec_dual(std::forward<VectorType>(vec_dual)),
-        _volume(volume)
+        _volume(volume),
+        _sol_mean(sol_mean)
       {
         XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
       }
@@ -89,7 +104,8 @@ namespace FEAT
       MeanFilter(MeanFilter && other) :
         _vec_prim(std::move(other._vec_prim)),
         _vec_dual(std::move(other._vec_dual)),
-        _volume(other._volume)
+        _volume(other._volume),
+        _sol_mean(other._sol_mean)
       {
       }
 
@@ -98,9 +114,10 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _vec_prim = std::move(other._vec_prim);
-          _vec_dual = std::move(other._vec_dual);
+          _vec_prim = std::forward<VectorType>(other._vec_prim);
+          _vec_dual = std::forward<VectorType>(other._vec_dual);
           _volume = other._volume;
+          _sol_mean = other._sol_mean;
         }
         return *this;
       }
@@ -116,7 +133,7 @@ namespace FEAT
        */
       MeanFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _volume);
+        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _volume, _sol_mean);
       }
 
       /**
@@ -128,8 +145,8 @@ namespace FEAT
         _vec_prim.clone(other.get_vec_prim(), clone_mode);
         _vec_dual.clone(other.get_vec_dual(), clone_mode);
         _volume = other._volume;
+        _sol_mean = other._sol_mean;
       }
-
 
       /// Conversion method
       template<typename Mem2_, typename DT2_, typename IT2_>
@@ -138,6 +155,7 @@ namespace FEAT
         _vec_prim.convert(other.get_vec_prim());
         _vec_dual.convert(other.get_vec_dual());
         _volume = DataType(other.get_volume());
+        _sol_mean = DataType(other.get_sol_mean());
       }
 
       /// \cond internal
@@ -165,6 +183,11 @@ namespace FEAT
       {
         return _volume;
       }
+
+      DataType get_sol_mean() const
+      {
+        return _sol_mean;
+      }
       /// \endcond
 
       /**
@@ -175,10 +198,9 @@ namespace FEAT
        */
       void filter_rhs(VectorType& vector) const
       {
-        // compute dual integral
-        DataType integ = vector.dot(_vec_prim);
-        // subtract mean
-        vector.axpy(_vec_dual, vector, -integ / _volume);
+        // subtract to dual integral mean zero
+        if(!_vec_prim.empty())
+          vector.axpy(_vec_dual, vector, -vector.dot(_vec_prim) / _volume);
       }
 
       /**
@@ -189,10 +211,16 @@ namespace FEAT
        */
       void filter_sol(VectorType& vector) const
       {
-        // compute primal integral
-        DataType integ = vector.dot(_vec_dual);
-        // subtract mean
-        vector.axpy(_vec_prim, vector, -integ / _volume);
+        // given: v=vec_prim, w=vec_dual, vol=v*w, input: x
+        // note that int(v) = v*w and int(x) = x*w
+        // we want:
+        //      1/vol * int (x + alpha*v) = sol_mean
+        // <==>     int(x) + alpha*int(v) = sol_mean*vol
+        // <==>           x*w + alpha*v*w = sol_mean*v*w
+        // <==>                 alpha*v*w = sol_mean*v*w - x*w
+        // <==>                     alpha = sol_mean - (x*w/v*w)
+        if(!_vec_prim.empty())
+          vector.axpy(_vec_prim, vector, _sol_mean - vector.dot(_vec_dual) / _volume);
       }
 
       /**
@@ -215,8 +243,9 @@ namespace FEAT
        */
       void filter_cor(VectorType& vector) const
       {
-        // same as sol
-        filter_sol(vector);
+        // subtract to primal integral mean zero
+        if(!_vec_prim.empty())
+          vector.axpy(_vec_prim, vector, -vector.dot(_vec_dual) / _volume);
       }
 
       /**
