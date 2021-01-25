@@ -11,6 +11,7 @@
 #include <kernel/analytic/function.hpp>
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/util/dist.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 
 namespace FEAT
 {
@@ -59,7 +60,7 @@ namespace FEAT
             value -= lvad[i] * space_data.phi[i].value;
 
           // return result
-          return Math::sqr(value);
+          return Math::abs(value);
         }
       };
 
@@ -208,6 +209,10 @@ namespace FEAT
       bool have_h1;
       /// Specifies whether the H2-error was computed.
       bool have_h2;
+      /// Specifies whether the L1-error was computed.
+      bool have_l1;
+      /// Specifies whether the Lmax-error was computed.
+      bool have_lmax;
 
       /// The computed H0-error.
       DataType_ norm_h0;
@@ -216,14 +221,23 @@ namespace FEAT
       /// The computed H2-error.
       DataType_ norm_h2;
 
+      /// The computed L1-error.
+      DataType_ norm_l1;
+      /// The computed Lmax-error.
+      DataType_ norm_lmax;
+
       /// standard constructor
       ScalarErrorInfo() :
         have_h0(false),
         have_h1(false),
         have_h2(false),
+        have_l1(false),
+        have_lmax(false),
         norm_h0(DataType_(0)),
         norm_h1(DataType_(0)),
-        norm_h2(DataType_(0))
+        norm_h2(DataType_(0)),
+        norm_l1(DataType_(0)),
+        norm_lmax(DataType_(0))
       {
       }
 
@@ -233,9 +247,13 @@ namespace FEAT
         have_h0(other.have_h0),
         have_h1(other.have_h1),
         have_h2(other.have_h2),
+        have_l1(other.have_l1),
+        have_lmax(other.have_lmax),
         norm_h0(DataType_(other.norm_h0)),
         norm_h1(DataType_(other.norm_h1)),
-        norm_h2(DataType_(other.norm_h2))
+        norm_h2(DataType_(other.norm_h2)),
+        norm_l1(DataType_(other.norm_l1)),
+        norm_lmax(DataType_(other.norm_lmax))
       {
       }
 
@@ -246,9 +264,13 @@ namespace FEAT
         have_h0 = other.have_h0;
         have_h1 = other.have_h1;
         have_h2 = other.have_h2;
+        have_l1 = other.have_l1;
+        have_lmax = other.have_lmax;
         norm_h0 = DataType_(other.norm_h0);
         norm_h1 = DataType_(other.norm_h1);
         norm_h2 = DataType_(other.norm_h2);
+        norm_l1 = DataType_(other.norm_l1);
+        norm_lmax = DataType_(other.norm_lmax);
       }
 
       /**
@@ -262,18 +284,25 @@ namespace FEAT
        */
       void synchronize(const Dist::Comm& comm)
       {
-        DataType_ verr[3] =
+        DataType_ verr[4] =
         {
           have_h0 ? Math::sqr(norm_h0) : DataType_(0),
           have_h1 ? Math::sqr(norm_h1) : DataType_(0),
-          have_h2 ? Math::sqr(norm_h2) : DataType_(0)
+          have_h2 ? Math::sqr(norm_h2) : DataType_(0),
+          have_l1 ? norm_l1 : DataType_(0)
         };
 
-        comm.allreduce(verr, verr, std::size_t(3), Dist::op_sum);
+        comm.allreduce(verr, verr, std::size_t(4), Dist::op_sum);
 
         if(have_h0) norm_h0 = Math::sqrt(verr[0]);
         if(have_h1) norm_h1 = Math::sqrt(verr[1]);
         if(have_h2) norm_h2 = Math::sqrt(verr[2]);
+        if(have_l1) norm_l1 = verr[3];
+
+        if(have_lmax)
+        {
+          comm.allreduce(&norm_lmax, &norm_lmax, std::size_t(1), Dist::op_max);
+        }
       }
 
       /**
@@ -457,6 +486,8 @@ namespace FEAT
         result.have_h0 = (max_norm_ >= 0);
         result.have_h1 = (max_norm_ >= 1);
         result.have_h2 = (max_norm_ >= 2);
+        result.have_l1 = (max_norm_ >= 0);
+        result.have_lmax = (max_norm_ >= 0);
 
         // H0/H1/H2 helpers
         typedef Intern::SecHelperH0<(max_norm_ >= 0), AsmTraits, AnalyticEvalTraits> SecH0;
@@ -497,10 +528,15 @@ namespace FEAT
             space_eval(space_data, trafo_data);
 
             // compute integration weight
-            DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
+            const DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
+
+            // get absolute point error
+            const DataType abs_err = SecH0::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
 
             // update results
-            result.norm_h0 += omega * SecH0::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
+            result.norm_lmax = Math::max(result.norm_lmax, abs_err);
+            result.norm_l1 += omega * abs_err;
+            result.norm_h0 += omega * abs_err * abs_err;
             result.norm_h1 += omega * SecH1::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
             result.norm_h2 += omega * SecH2::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
 
@@ -568,10 +604,10 @@ namespace FEAT
           for(int i(0); i < num_loc_dofs; ++i)
             value.axpy(-space_data.phi[i].value, lvad[i]);
 
-          // compute norm of each component
+          // compute absolute norm of each component
           ResultType result;
           for(int k(0); k < AnaTraits_::image_dim; ++k)
-            result[k] = Math::sqr(value[k]);
+            result[k] = Math::abs(value[k]);
 
           return result;
         }
@@ -699,6 +735,10 @@ namespace FEAT
       bool have_h1;
       /// Specifies whether the H2-error was computed.
       bool have_h2;
+      /// Specifies whether the L1-error was computed.
+      bool have_l1;
+      /// Specifies whether the Lmax-error was computed.
+      bool have_lmax;
 
       /// The computed H0-error.
       DataType_ norm_h0;
@@ -706,6 +746,11 @@ namespace FEAT
       DataType_ norm_h1;
       /// The computed H2-error.
       DataType_ norm_h2;
+
+      /// The computed L1-error.
+      DataType_ norm_l1;
+      /// The computed Lmax-error.
+      DataType_ norm_lmax;
 
       /**
        * \brief Vector field components H0-errors
@@ -728,18 +773,37 @@ namespace FEAT
        */
       Tiny::Vector<DataType_, dim_> norm_h2_comp;
 
+      /**
+       * \brief Vector field components L1-errors
+       *
+       * This entry contains the L1-errors of all components of the vector field.
+       */
+      Tiny::Vector<DataType_, dim_> norm_l1_comp;
+
+      /**
+       * \brief Vector field components Lmax-errors
+       *
+       * This entry contains the Lmax-errors of all components of the vector field.
+       */
+      Tiny::Vector<DataType_, dim_> norm_lmax_comp;
 
       /// standard constructor
       VectorErrorInfo() :
         have_h0(false),
         have_h1(false),
         have_h2(false),
+        have_l1(false),
+        have_lmax(false),
         norm_h0(DataType_(0)),
         norm_h1(DataType_(0)),
         norm_h2(DataType_(0)),
+        norm_l1(DataType_(0)),
+        norm_lmax(DataType_(0)),
         norm_h0_comp(DataType_(0)),
         norm_h1_comp(DataType_(0)),
-        norm_h2_comp(DataType_(0))
+        norm_h2_comp(DataType_(0)),
+        norm_l1_comp(DataType_(0)),
+        norm_lmax_comp(DataType_(0))
       {
       }
 
@@ -749,12 +813,18 @@ namespace FEAT
         have_h0(other.have_h0),
         have_h1(other.have_h1),
         have_h2(other.have_h2),
+        have_l1(other.have_l1),
+        have_lmax(other.have_lmax),
         norm_h0(DataType_(other.norm_h0)),
         norm_h1(DataType_(other.norm_h1)),
         norm_h2(DataType_(other.norm_h2)),
+        norm_l1(DataType_(other.norm_l1)),
+        norm_lmax(DataType_(other.norm_lmax)),
         norm_h0_comp(other.norm_h0_comp),
         norm_h1_comp(other.norm_h1_comp),
-        norm_h2_comp(other.norm_h2_comp)
+        norm_h2_comp(other.norm_h2_comp),
+        norm_l1_comp(other.norm_l1_comp),
+        norm_lmax_comp(other.norm_lmax_comp)
       {
       }
 
@@ -765,12 +835,18 @@ namespace FEAT
         have_h0 = other.have_h0;
         have_h1 = other.have_h1;
         have_h2 = other.have_h2;
+        have_l1 = other.have_l1;
+        have_lmax = other.have_lmax;
         norm_h0 = DataType_(other.norm_h0);
         norm_h1 = DataType_(other.norm_h1);
         norm_h2 = DataType_(other.norm_h2);
+        norm_l1 = DataType_(other.norm_l1);
+        norm_lmax = DataType_(other.norm_lmax);
         norm_h0_comp = other.norm_h0_comp;
         norm_h1_comp = other.norm_h1_comp;
         norm_h2_comp = other.norm_h2_comp;
+        norm_l1_comp = other.norm_l1_comp;
+        norm_lmax_comp = other.norm_lmax_comp;
       }
 
       /**
@@ -784,38 +860,56 @@ namespace FEAT
        */
       void synchronize(const Dist::Comm& comm)
       {
-        DataType_ verr[3+3*dim_] =
+        DataType_ verr[4+4*dim_] =
         {
           have_h0 ? Math::sqr(norm_h0) : DataType_(0),
           have_h1 ? Math::sqr(norm_h1) : DataType_(0),
-          have_h2 ? Math::sqr(norm_h2) : DataType_(0)
+          have_h2 ? Math::sqr(norm_h2) : DataType_(0),
+          have_l1 ? norm_l1 : DataType_(0)
         };
         for(int i(0); i < dim_; ++i)
         {
-          verr[3+0*dim_+i] = (have_h0 ? Math::sqr(norm_h0_comp[i]) : DataType_(0));
-          verr[3+1*dim_+i] = (have_h0 ? Math::sqr(norm_h1_comp[i]) : DataType_(0));
-          verr[3+2*dim_+i] = (have_h0 ? Math::sqr(norm_h2_comp[i]) : DataType_(0));
+          verr[4+0*dim_+i] = (have_h0 ? Math::sqr(norm_h0_comp[i]) : DataType_(0));
+          verr[4+1*dim_+i] = (have_h0 ? Math::sqr(norm_h1_comp[i]) : DataType_(0));
+          verr[4+2*dim_+i] = (have_h0 ? Math::sqr(norm_h2_comp[i]) : DataType_(0));
+          verr[4+3*dim_+i] = (have_l1 ? norm_l1_comp[i] : DataType_(0));
         }
 
-        comm.allreduce(verr, verr, std::size_t(3*dim+3), Dist::op_sum);
+        comm.allreduce(verr, verr, std::size_t(4*dim+4), Dist::op_sum);
 
         if(have_h0)
         {
           norm_h0 = Math::sqrt(verr[0]);
           for(int i(0); i < dim_; ++i)
-            norm_h0_comp[i] = Math::sqrt(verr[3+i]);
+            norm_h0_comp[i] = Math::sqrt(verr[4+i]);
         }
         if(have_h1)
         {
           norm_h1 = Math::sqrt(verr[1]);
           for(int i(0); i < dim_; ++i)
-            norm_h1_comp[i] = Math::sqrt(verr[3+dim_+i]);
+            norm_h1_comp[i] = Math::sqrt(verr[4+dim_+i]);
         }
         if(have_h2)
         {
           norm_h2 = Math::sqrt(verr[2]);
           for(int i(0); i < dim_; ++i)
-            norm_h2_comp[i] = Math::sqrt(verr[3+2*dim_+i]);
+            norm_h2_comp[i] = Math::sqrt(verr[4+2*dim_+i]);
+        }
+        if(have_l1)
+        {
+          norm_l1 = verr[3];
+          for(int i(0); i < dim_; ++i)
+            norm_l1_comp[i] = verr[4+3*dim_+i];
+        }
+        if(have_lmax)
+        {
+          DataType_ vmax[1+dim_] = { norm_lmax };
+          for(int i(0); i < dim_; ++i)
+            vmax[i+1] = norm_lmax_comp[i];
+          comm.allreduce(vmax, vmax, std::size_t(dim+1), Dist::op_max);
+          norm_lmax = vmax[0];
+          for(int i(0); i < dim_; ++i)
+            norm_lmax_comp[i] = vmax[i+1];
         }
       }
 
@@ -1033,6 +1127,8 @@ namespace FEAT
         info.have_h0 = (max_norm_ >= 0);
         info.have_h1 = (max_norm_ >= 1);
         info.have_h2 = (max_norm_ >= 2);
+        info.have_l1 = (max_norm_ >= 0);
+        info.have_lmax = (max_norm_ >= 0);
 
         // H0/H1/H2 helpers
         typedef Intern::VecHelperH0<(max_norm_ >= 0), AsmTraits, AnalyticEvalTraits> VecH0;
@@ -1073,10 +1169,20 @@ namespace FEAT
             space_eval(space_data, trafo_data);
 
             // compute integration weight
-            DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
+            const DataType omega = trafo_data.jac_det * cubature_rule.get_weight(k);
 
-            // update results
-            info.norm_h0_comp.axpy(omega, VecH0::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs));
+            // get absolute point error
+            auto abs_err = VecH0::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs);
+
+            // update H0/L1/Lmax results
+            for(int i(0); i < dim; ++i)
+            {
+              info.norm_lmax_comp[i] = Math::max(info.norm_lmax_comp[i], abs_err[i]);
+              info.norm_l1_comp[i] += omega * abs_err[i];
+              info.norm_h0_comp[i] += omega * Math::sqr(abs_err[i]);
+            }
+
+            // update H1/H2 results
             info.norm_h1_comp.axpy(omega, VecH1::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs));
             info.norm_h2_comp.axpy(omega, VecH2::eval(func_eval, trafo_data, space_data, lvad, num_loc_dofs));
 
@@ -1096,6 +1202,8 @@ namespace FEAT
           info.norm_h0 += info.norm_h0_comp[i];
           info.norm_h1 += info.norm_h1_comp[i];
           info.norm_h2 += info.norm_h2_comp[i];
+          info.norm_l1 += info.norm_l1_comp[i];
+          info.norm_lmax = Math::max(info.norm_lmax, info.norm_lmax_comp[i]);
           info.norm_h0_comp[i] = Math::sqrt(info.norm_h0_comp[i]);
           info.norm_h1_comp[i] = Math::sqrt(info.norm_h1_comp[i]);
           info.norm_h2_comp[i] = Math::sqrt(info.norm_h2_comp[i]);
