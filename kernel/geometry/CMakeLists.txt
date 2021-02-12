@@ -41,6 +41,7 @@ SET (test_list
   standard_refinery-test-struct-quad
   standard_refinery-test-struct-hexa
   struct_index_mapping-test
+  parsed_hit_test_factory-test
 )
 
 # create all tests
