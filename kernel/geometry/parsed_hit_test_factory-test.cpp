@@ -45,8 +45,6 @@ public:
 
     // some parameters for this special test
     Index level(6);
-   // double radius(0.3);
-   // Tiny::Vector<double, 2> mid_point(0.5);
 
     // create a meshfactory
     MeshFactoryType mesh_factory(level);

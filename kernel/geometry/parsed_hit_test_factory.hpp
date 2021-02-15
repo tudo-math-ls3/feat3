@@ -4,8 +4,8 @@
 // see the file 'copyright.txt' in the top level directory for details.
 #pragma once
 
-#ifndef KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP //#?# Is this necesarry?
-#define KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP 1 //#?# Is this necesarry?
+#ifndef KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP
+#define KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP 1
 
 
 // includes, FEAT
@@ -14,6 +14,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/analytic/parsed_function.hpp>
+//other includes
 #include<vector>
 
 
@@ -25,7 +26,22 @@
 namespace FEAT
 {
   namespace Geometry
-  {
+  {/**
+     * \brief Parsed-Hit-Test Factory class template
+     *
+     * This class template can be used to create a MeshPart for a particular mesh,
+     * which consists of all entities that are inside the region characterised by a
+     * function formula string.
+     *
+     * \tparam Mesh_
+     * The type of the mesh for which the cell sub-set is to be computed.
+     *
+     * \int dim_
+     * Dimension of the function formula.
+     *
+     * \author Gesa Pottbrock
+     */
+
     template<typename Mesh_, int dim_>
     class ParsedHitTestFactory :
       public Factory< MeshPart<Mesh_> >
@@ -39,13 +55,23 @@ namespace FEAT
       typedef MeshPart<Mesh_> MeshType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
-      //typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
     protected:
       class ParsedHitFunction
       {
       public:
-      mutable::FunctionParser _parser;
-
+        //mutable is mandatory! It cancels the const in ParsedHitTestFactory.
+        mutable::FunctionParser _parser;
+        /**
+        * \brief Creates a ParsedHitFunction
+        *
+        *This class creates a fparser Object from the given formula.
+        *The ParsedHitFunction Object is a member of ParsedHitTestFactory.
+        *
+        * \param[in] formula
+        * A string reference that represents the function formula.
+        *
+        */
         explicit ParsedHitFunction(const String& formula)
         {
           // add variables to our parser
@@ -64,7 +90,7 @@ namespace FEAT
             if (ret < int(formula.size()))
             {
               // ret contains the index of the first invalid character in the input string
-                // append an additional line to mark the faulty character
+              // append an additional line to mark the faulty character
               msg.append("\n>>>");
               msg.append(String(std::size_t(ret + 2), '-'));
               msg.append("^");
@@ -77,7 +103,6 @@ namespace FEAT
           _parser.Optimize();
 
         }
-        //bool operator()(const PointType& point)
         bool operator()(const PointType& point) const
         {
           //convert DataType to double
@@ -110,7 +135,9 @@ namespace FEAT
           default: // ???
             throw ParseError("Error in ParsedScalarFunction evaluation: unknown error");
           }
-          return val>=0;
+          //Returns true, if point is in the "inner" part of the Mesh
+          //Otherwise returns false
+          return (val>=0.0);
         }
       };
       //Member Variables of ParsedHitTestFactory
@@ -123,7 +150,11 @@ namespace FEAT
 
     public:
       /**
-        * \brief Creates the factory.
+        * \brief Creates the ParsedHitTestFactory.
+        *
+        *The formula dictates the Meshpart.
+        *Every point, for which the formula equals >= is in a "inner" point weighted with 1.
+        *Otherwise the point will be weighted zero.
         *
         * \param[in] formula for hit function
         * A string of the hit function.
