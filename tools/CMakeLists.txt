@@ -75,3 +75,8 @@ if (FEAT_HAVE_CUDA)
   SET_PROPERTY(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CUDA_INCLUDE_DIRS}")
   TARGET_LINK_LIBRARIES (cuda-device-info)
 endif(FEAT_HAVE_CUDA)
+
+if (FEAT_HAVE_FPARSER)
+  ADD_EXECUTABLE(mesh-parsed-hit-test-vtk mesh_parsed_hit_test_vtk/mesh_parsed_hit_test_vtk.cpp)
+  TARGET_LINK_LIBRARIES(mesh-parsed-hit-test-vtk feat)
+endif(FEAT_HAVE_FPARSER)
