@@ -62,17 +62,23 @@ namespace FEAT
       public:
         //mutable is mandatory! It cancels the const in ParsedHitTestFactory.
         mutable::FunctionParser _parser;
+
+        ParsedHitFunction() :
+          _parser()
+        {
+          _parser.AddConstant("pi", Math::pi<double>());
+        }
+
         /**
-        * \brief Creates a ParsedHitFunction
-        *
-        *This class creates a fparser Object from the given formula.
-        *The ParsedHitFunction Object is a member of ParsedHitTestFactory.
-        *
-        * \param[in] formula
-        * A string reference that represents the function formula.
-        *
-        */
-        explicit ParsedHitFunction(const String& formula)
+         * \brief Creates a ParsedHitFunction
+         *
+         * This class creates a fparser Object from the given formula.
+         * The ParsedHitFunction Object is a member of ParsedHitTestFactory.
+         *
+         * \param[in] formula
+         * A string reference that represents the function formula.
+         */
+        void parse(const String& formula)
         {
           // add variables to our parser
           String vars("x");
@@ -101,8 +107,8 @@ namespace FEAT
 
           // optimize the parsed function
           _parser.Optimize();
-
         }
+
         bool operator()(const PointType& point) const
         {
           //convert DataType to double
@@ -142,34 +148,44 @@ namespace FEAT
       };
       //Member Variables of ParsedHitTestFactory
       ///class for parsed_hit_fuction
-      const ParsedHitFunction _hit_func;
+      ParsedHitFunction _hit_func;
       /// reference to the input mesh
       const Mesh_& _mesh;
       /// internal data storing the indices
       std::vector<std::vector<Index>> _target_data;
 
     public:
-      /**
-        * \brief Creates the ParsedHitTestFactory.
-        *
-        *The formula dictates the Meshpart.
-        *Every point, for which the formula equals >= is in a "inner" point weighted with 1.
-        *Otherwise the point will be weighted zero.
-        *
-        * \param[in] formula for hit function
-        * A string of the hit function.
-        *
-        * \param[in] mesh
-        * A reference to the mesh for which the cell sub-set is to be computed.
-        */
-      explicit ParsedHitTestFactory(const Mesh_& mesh, const String& formula) :
-        _hit_func(formula),
+      explicit ParsedHitTestFactory(const Mesh_& mesh) :
         _mesh(mesh),
         _target_data(std::size_t(_mesh.shape_dim + 1))
       {
-        // call wrapper
+      }
+
+      /**
+       * \brief Creates the ParsedHitTestFactory.
+       *
+       * The formula dictates the Meshpart.
+       * Every point, for which the formula equals >= is in a "inner" point weighted with 1.
+       * Otherwise the point will be weighted zero.
+       *
+       * \param[in] formula for hit function
+       * A string of the hit function.
+       *
+       * \param[in] mesh
+       * A reference to the mesh for which the cell sub-set is to be computed.
+       */
+      explicit ParsedHitTestFactory(const Mesh_& mesh, const String& formula) :
+        _hit_func(),
+        _mesh(mesh),
+        _target_data(std::size_t(_mesh.shape_dim + 1))
+      {
+        parse(formula);
+      }
+
+      void parse(const String& formula)
+      {
+        _hit_func.parse(formula);
         Intern::HitTestCompute<const ParsedHitFunction, Mesh_, ShapeType>::wrap(_target_data, _mesh, _hit_func);
-        //Includes functions: apply, wrap, get_midpoint
       }
 
       /// \copydoc Factory::get_num_entities()

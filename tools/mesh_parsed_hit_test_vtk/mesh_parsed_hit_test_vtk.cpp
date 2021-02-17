@@ -18,10 +18,12 @@
 using namespace FEAT;
 using namespace FEAT::Geometry;
 
+#ifdef FEAT_HAVE_FPARSER
+
 static void display_help()
 {
   std::cout << std::endl;
-  std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << std::endl;
+  std::cout << "mesh-parsed-hit-test-vtk: Converts a mesh from FEAT format to VTK format" << std::endl;
   std::cout << std::endl;
   std::cout << "Mandatory arguments:" << std::endl;
   std::cout << "--------------------" << std::endl;
@@ -121,9 +123,35 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     Mesh_& mesh = *node->get_mesh();
 
     //Parse function formula
-    String formula(""); //#?# runtime::abord()?
+    String formula;
     if (!(args.parse("function", formula) == 1))
+    {
       std::cerr << "ERROR: The given formula could not get parsed into fparser!" << std::endl;
+      return 1;
+    }
+
+    // create mesh part
+    Geometry::ParsedHitTestFactory<Mesh_, world_dim> hit_test(mesh);
+#ifndef DEBUG
+    try
+#endif
+    {
+      hit_test.parse(formula);
+    }
+#ifndef DEBUG
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: " << exc.what() << std::endl;
+      return 1;
+    }
+    catch(...)
+    {
+      std::cerr << "ERROR: unknown exception" << std::endl;
+      return 1;
+    }
+#endif
+
+    MeshPart<Mesh_> mesh_part(hit_test);
 
     // create a trafo for our mesh
     Trafo::Standard::Mapping<Mesh_> trafo(mesh);
@@ -132,13 +160,6 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     FEAT::String vtkname = filename + "." + stringify(lvl);
     std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
     Geometry::ExportVTK<Mesh_> exporter(mesh);
-
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // create mesh part
-    Geometry::ParsedHitTestFactory<Mesh_, world_dim> hit_test(mesh, formula); // #?#
-    MeshPart<Mesh_> mesh_part(hit_test);
-
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     // get the vertex target set
     TargetSet& trg = mesh_part.template get_target_set<0>();
@@ -260,3 +281,13 @@ int main(int argc, char* argv[])
   Runtime::finalize();
   return ret;
 }
+
+#else
+
+int main(int argc, char* argv[])
+{
+  std::cout << "ERROR: You need to configure FEAT with the 'fparser' library to use this tool." << std::endl;
+  return 1;
+}
+
+#endif // FEAT_HAVE_FPARSER
