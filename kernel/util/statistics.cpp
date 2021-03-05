@@ -773,22 +773,22 @@ String Statistics::get_formatted_solver_internals(String target)
       stringify(t_local[2]) + "\n";
   result += String("mpi exec blas2:").pad_back(27) + "max: " + stringify(t_max[3]) + ", min: " + stringify(t_min[3]) + ", local: " +
       stringify(t_local[3]) + "\n";
-  result += String("mpi exec blas3:").pad_back(27) + "max: " + stringify(t_max[3]) + ", min: " + stringify(t_min[3]) + ", local: " +
-      stringify(t_local[3]) + "\n";
-  result += String("mpi exec collective:").pad_back(27) + "max: " + stringify(t_max[4]) + ", min: " + stringify(t_min[4]) + ", local: " +
+  result += String("mpi exec blas3:").pad_back(27) + "max: " + stringify(t_max[4]) + ", min: " + stringify(t_min[4]) + ", local: " +
       stringify(t_local[4]) + "\n";
-  result += String("mpi wait reduction:").pad_back(27) + "max: " + stringify(t_max[5]) + ", min: " + stringify(t_min[5]) + ", local: " +
+  result += String("mpi exec collective:").pad_back(27) + "max: " + stringify(t_max[5]) + ", min: " + stringify(t_min[5]) + ", local: " +
       stringify(t_local[5]) + "\n";
-  result += String("mpi wait blas2:").pad_back(27) + "max: " + stringify(t_max[6]) + ", min: " + stringify(t_min[6]) + ", local: " +
+  result += String("mpi wait reduction:").pad_back(27) + "max: " + stringify(t_max[6]) + ", min: " + stringify(t_min[6]) + ", local: " +
       stringify(t_local[6]) + "\n";
-  result += String("mpi wait blas3:").pad_back(27) + "max: " + stringify(t_max[6]) + ", min: " + stringify(t_min[6]) + ", local: " +
-      stringify(t_local[6]) + "\n";
-  result += String("mpi wait collective:").pad_back(27) + "max: " + stringify(t_max[7]) + ", min: " + stringify(t_min[7]) + ", local: " +
+  result += String("mpi wait blas2:").pad_back(27) + "max: " + stringify(t_max[7]) + ", min: " + stringify(t_min[7]) + ", local: " +
       stringify(t_local[7]) + "\n";
-  result += String("schwarz toe:").pad_back(27) + "max: " + stringify(t_max[8]) + ", min: " + stringify(t_min[8]) + ", local: " +
+  result += String("mpi wait blas3:").pad_back(27) + "max: " + stringify(t_max[8]) + ", min: " + stringify(t_min[8]) + ", local: " +
       stringify(t_local[8]) + "\n";
-  result += String("schwarz iters:").pad_back(27) + "max: " + stringify(Index(t_max[9])) + ", min: " + stringify(Index(t_min[9])) + ", local: " +
-      stringify(Index(t_local[9])) + "\n";
+  result += String("mpi wait collective:").pad_back(27) + "max: " + stringify(t_max[9]) + ", min: " + stringify(t_min[9]) + ", local: " +
+      stringify(t_local[9]) + "\n";
+  result += String("schwarz toe:").pad_back(27) + "max: " + stringify(t_max[10]) + ", min: " + stringify(t_min[10]) + ", local: " +
+      stringify(t_local[10]) + "\n";
+  result += String("schwarz iters:").pad_back(27) + "max: " + stringify(Index(t_max[11])) + ", min: " + stringify(Index(t_min[11])) + ", local: " +
+      stringify(Index(t_local[11])) + "\n";
 
   offset = 12;
   for (Index i(0) ; i < levels ; ++i)
