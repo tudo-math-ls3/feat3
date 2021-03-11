@@ -108,7 +108,7 @@ namespace DbgSphereFem
       if(ilvl == 0)
       {
         std::cout << "Creating: 0";
-        Geometry::UnitSphereFactory<MeshType> factory;
+        Geometry::RefinedUnitSphereFactory<MeshType> factory(0);
         levels.push_back(std::make_shared<Level>(factory));
       }
       else

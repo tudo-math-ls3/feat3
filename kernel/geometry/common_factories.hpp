@@ -237,49 +237,47 @@ namespace FEAT
 
     /// \cond internal
     template<>
-      class UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >:
-      public Factory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
+    class UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >:
+    public Factory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
+    {
+    public:
+      typedef Shape::Hypercube<2> ShapeType;
+      /// mesh part type
+      typedef MeshPart<ConformalMesh<ShapeType>> MeshType;
+      /// target set holder type
+      typedef MeshType::TargetSetHolderType TargetSetHolderType;
+
+    public:
+      virtual Index get_num_entities(int dim) override
       {
-        public:
-          typedef Shape::Hypercube<2> ShapeType;
-          /// mesh part type
-          typedef MeshPart<ConformalMesh<ShapeType>> MeshType;
-          /// target set holder type
-          typedef MeshType::TargetSetHolderType TargetSetHolderType;
+        switch(dim)
+        {
+          case 0:
+            return 4;
+          case 1:
+            return 4;
+          default:
+            return 0;
+        }
+      }
 
-        public:
-          virtual Index get_num_entities(int dim) override
-          {
-            switch(dim)
-            {
-              case 0:
-                return 4;
-              case 1:
-                return 4;
-              default:
-                return 0;
-            }
-          }
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
+      {
+        // set vertex indices
+        TargetSet& vi(target_set_holder.get_target_set<0>());
+        vi[0] = 0;
+        vi[1] = 1;
+        vi[2] = 2;
+        vi[3] = 3;
 
-          virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
-          {
-            // set vertex indices
-            TargetSet& vi(target_set_holder.get_target_set<0>());
-            vi[0] = 0;
-            vi[1] = 1;
-            vi[2] = 2;
-            vi[3] = 3;
-
-            // set edge indices
-            TargetSet& ei(target_set_holder.get_target_set<1>());
-            ei[0] = 0;
-            ei[1] = 1;
-            ei[2] = 2;
-            ei[3] = 3;
-          }
-
-      }; //UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
-
+        // set edge indices
+        TargetSet& ei(target_set_holder.get_target_set<1>());
+        ei[0] = 0;
+        ei[1] = 1;
+        ei[2] = 2;
+        ei[3] = 3;
+      }
+    }; //UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
     /// \endcond
 
     /**
@@ -1210,6 +1208,9 @@ namespace FEAT
         }
       }
     }; // class UnitSphereFactory<ConformalMesh<Shape::Hypercube<2>, ...>>
+
+    template<typename MeshType_>
+    using RefinedUnitSphereFactory = RefineFactory<MeshType_, Geometry::UnitSphereFactory>;
   } // namespace Geometry
 } // namespace FEAT
 
