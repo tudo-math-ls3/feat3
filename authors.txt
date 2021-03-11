@@ -5,15 +5,15 @@ to the main development code branch of FEAT3:
 2018 - 2019,   Mirco Arndt
 2012 - 2013,   Constantin Christof
 2016 - 2017,   Daniel Donner
-2018 - 2020,   Jonas Duennebacke
-2019 - 2020,   Maximilian Esser
+2018 - 2021,   Jonas Duennebacke
+2019 - 2021,   Maximilian Esser
 2010 - 2016,   Markus Geveler
 2010 - 2012,   Dominik Goeddeke
 2013 - 2017,   Christoph Lohmann
 2014 - 2017,   Jordi Paul
 2019 - 2020,   Heiko Poelstra
-2020 - 2020,   Gesa Pottbrock
-2010 - 2020,   Dirk Ribbrock
+2020 - 2021,   Gesa Pottbrock
+2010 - 2021,   Dirk Ribbrock
 2014 - 2015,   Malte Schirwon
 2018 - 2019,   Kristina Sax
        2016,   David Schneider
@@ -21,7 +21,7 @@ to the main development code branch of FEAT3:
 2013 - 2014,   Stefan Wahlers
        2020,   Lisa-Marie Walter
 2010 - 2011,   Hilmar Wobker
-2010 - 2020,   Peter Zajac
+2010 - 2021,   Peter Zajac
 
 
 Note: The list is sorted alphabetically by surnames.
