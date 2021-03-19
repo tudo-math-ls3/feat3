@@ -1293,7 +1293,7 @@ namespace FETI{
 
     //Calculate lambda through a CG-Method, we stop if the 2-norm of the relativ projected residual is below our tol
     //after this, lambda will no longer be a valid LocalVectorType as we move it
-    void solve(const FETIGate& gate, const LocalSystem& system, const Projector& project, const bool verbose = false,
+    bool solve(const FETIGate& gate, const LocalSystem& system, const Projector& project, const bool verbose = false,
                   const bool want_test = false)
     {
       StopWatch watch_proj;
@@ -1364,11 +1364,12 @@ namespace FETI{
         {
           if(verbose)
             _comm->print("Finished on " + stringify(k) + "-th iteration!");
-          if(want_test)
+          IndexType max_i = 7;
+          if(want_test && k >= max_i)
           {
-            IndexType max_i = 7;
-            XASSERTM(k < max_i, "Test failed: Expected less then " + stringify(max_i)
+            _comm->print("Test FAILED: Expected less then " + stringify(max_i)
                                  + " Iterations, needed " + stringify(k) + " Iterations.");
+            return false;
           }
           break;
         }
@@ -1380,6 +1381,7 @@ namespace FETI{
       _comm->print("CG... Time for projection: " + stringify(t_max) + " s");
       _comm->allreduce(&t_solv, &t_max, std::size_t(1), Dist::op_max);
       _comm->print("CG... Time for solving, includes inter neighbour comm: " + stringify(t_max) + " s");
+      return true;
     }
 
     //This initialises s_0 = h_opt
@@ -1509,6 +1511,7 @@ namespace FETI{
     bool CG_plot = (args.check("CGplot") >= 0);
     bool verbose = (args.check("verbose") >= 0);
     bool want_test = (args.check("test") >= 0);
+    bool test_passed = true;
 
     // Our mesh refinement level
     Index level(3);
@@ -1606,7 +1609,7 @@ namespace FETI{
       if(want_test)
       {
         //End the test as successful, small hack, because test functions only with multiple of 4...
-        comm.print("Test started with " + stringify(comm.size()) + " processes, ending test prematurely!");
+        comm.print("Test PASSED: Test started with " + stringify(comm.size()) + " processes, ending test prematurely!");
         return;
       }
       // We pass std::cerr as the first parameter to the 'print' function here:
@@ -2016,7 +2019,7 @@ namespace FETI{
     comm.print("Time to init CG: " + stringify(t_max) + " s");
 
     watch.start();
-    CG.solve(gate, local_sys, project, CG_plot, want_test);
+    test_passed = CG.solve(gate, local_sys, project, CG_plot, want_test);
     watch.stop();
 
     //calculate alpha, as CG holds all necessary values, this also will be handled by the CG class
@@ -2047,10 +2050,18 @@ namespace FETI{
     {
       DataType max_h0 = 2e-3;
       DataType max_h1 = 2e-1;
-      XASSERTM(errors.norm_h0 < max_h0, "Test failed: H0-Norm " + stringify(errors.norm_h0) + " should be less than "
+      if(errors.norm_h0 >= max_h0)
+      {
+        comm.print("Test FAILED: H0-Norm " + stringify(errors.norm_h0) + " should be less than "
                                       + stringify(max_h0));
-      XASSERTM(errors.norm_h1 < max_h1, "Test failed: H1-Norm " + stringify(errors.norm_h0) + " should be less than "
+        test_passed = false;
+      }
+      if(errors.norm_h1 >= max_h1)
+      {
+        comm.print("Test failed: H1-Norm " + stringify(errors.norm_h1) + " should be less than "
                                       + stringify(max_h1));
+        test_passed = false;
+      }
     }
 
     // And let's print the errors to the console; we need to use the "format_string" function here,
@@ -2065,11 +2076,12 @@ namespace FETI{
     filter.filter_rhs(vec_rhs_buff);
     vec_rhs_buff.axpy(vec_rhs_buff, vec_rhs, -1.);
     DataType global_res_dot = vec_rhs_buff.norm2();
-    if(want_test)
+    DataType max_glob = 4e-9;
+    if(want_test && global_res_dot >= max_glob)
     {
-      DataType max_glob = 4e-9;
-      XASSERTM(global_res_dot < max_glob, "Test failed: global residual " + stringify(global_res_dot) + " should be less then "
+      comm.print("Test FAILED: global residual " + stringify(global_res_dot) + " should be less then "
                                        + stringify(max_glob));
+      test_passed = false;
     }
     comm.print("The 2 Norm of the residual is: " + stringify(global_res_dot));
 
@@ -2107,6 +2119,8 @@ namespace FETI{
     if(!want_vtk)
     {
       comm.print("Finished!");
+      if(want_test && test_passed)
+        comm.print("Test PASSED");
       return;
     }
     // Build the VTK filename; we also append the number of processes to the filename:
@@ -2130,6 +2144,8 @@ namespace FETI{
 
     // That's all, folks.
     comm.print("Finished!");
+    if(want_test && test_passed)
+        comm.print("Test PASSED");
 
     return;
 

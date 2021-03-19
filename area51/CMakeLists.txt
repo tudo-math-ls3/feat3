@@ -72,13 +72,33 @@ ADD_EXECUTABLE(dbg-vanka dbg_vanka.cpp)
 TARGET_LINK_LIBRARIES(dbg-vanka feat)
 
 if(FEAT_HAVE_UMFPACK)
-   ADD_EXECUTABLE(FETI_seq_usquare FETI_seq_usquare.cpp)
-   TARGET_LINK_LIBRARIES(FETI_seq_usquare feat)
+   ADD_EXECUTABLE(feti-seq-usquare feti_seq_usquare.cpp)
+   TARGET_LINK_LIBRARIES(feti-seq-usquare feat)
    if(FEAT_HAVE_MPI)
-      ADD_EXECUTABLE(FETI_para_usquare FETI_para_usquare.cpp)
-      TARGET_LINK_LIBRARIES(FETI_para_usquare feat)
+      ADD_EXECUTABLE(feti-para-usquare feti_para_usquare.cpp)
+      TARGET_LINK_LIBRARIES(feti-para-usquare feat)
 
-      ADD_EXECUTABLE(FETI_multigrid_usquare FETI_multigrid_usquare.cpp)
-      TARGET_LINK_LIBRARIES(FETI_multigrid_usquare feat)
+      ADD_EXECUTABLE(feti-multigrid-usquare feti_multigrid_usquare.cpp)
+      TARGET_LINK_LIBRARIES(feti-multigrid-usquare feat)
    endif(FEAT_HAVE_MPI)
+endif(FEAT_HAVE_UMFPACK)
+
+######################### feti_multigrid_usquare
+if(FEAT_HAVE_UMFPACK)
+if (FEAT_HAVE_MPI)
+  ADD_TEST(sleep304 sleep 2)
+  SET_PROPERTY(TEST sleep304 PROPERTY LABELS "mpi,sleep")
+
+  ADD_TEST(feti-multigrid-mpi-16 ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target feti-multigrid-usquare
+    --build-nocmake
+    --build-noclean
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 16
+    ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/area51/feti-multigrid-usquare --test ${MPIEXEC_POSTFLAGS})
+  SET_PROPERTY(TEST feti-multigrid-mpi-16 PROPERTY LABELS "mpi")
+  SET_PROPERTY(TEST feti-multigrid-mpi-16 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+endif(FEAT_HAVE_MPI)
 endif(FEAT_HAVE_UMFPACK)
