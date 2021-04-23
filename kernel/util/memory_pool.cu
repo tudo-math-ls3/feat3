@@ -87,7 +87,7 @@ void MemoryPool<Mem::CUDA>::finalize()
   if (cudaSuccess != cudaDeviceSynchronize())
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
   if (cudaSuccess != cudaDeviceReset())
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceReset failed!");
 
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
