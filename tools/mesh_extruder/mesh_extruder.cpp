@@ -179,7 +179,7 @@ namespace MeshExtruderTool
         print_help(args);
         FEAT::Runtime::abort();
       }
-      for(Index i(0); i < slices; ++i)
+      for(Index i(0); i <= slices; ++i)
         z_list.push_back(z_min + (z_max-z_min)*CoordType(i)/CoordType(slices));
     }
 

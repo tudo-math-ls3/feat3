@@ -112,7 +112,7 @@ for i in range(1,8):
 f.write(" -->\n")
 # write chart
 f.write("  <Chart name=\"bnd\">\n")
-f.write("    <Spline dim=\"2\" size=\"5\" type=\"closed\">\n")
+f.write("    <Bezier dim=\"2\" size=\"5\" type=\"closed\">\n")
 f.write("      <Points>\n")
 f.write("        0 %g %g\n" % (x0, y0))
 f.write("        0 %g %g\n" % (x1, y0))
@@ -127,7 +127,7 @@ f.write("        2\n")
 f.write("        3\n")
 f.write("        4\n")
 f.write("      </Params>\n")
-f.write("    </Spline>\n")
+f.write("    </Bezier>\n")
 f.write("  </Chart>\n")
 # write mesh
 f.write("  <Mesh type=\"conformal:hypercube:2:2\" size=\"%i %i %i\">\n" % (nv, ne, nq))

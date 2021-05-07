@@ -1506,6 +1506,34 @@ namespace FEAT
       }
 
       /**
+       * \brief Adds a single mesh file to the list of streams to be parsed.
+       *
+       * \param[in] comm
+       * The communicator to be used for parallel file I/O.
+       *
+       * \param[in] filename
+       * The mesh filename that is to be parsed.
+       */
+      void add_mesh_file(const Dist::Comm& comm, const String& filename)
+      {
+        std::deque<String> filenames;
+        filenames.push_back(filename);
+        add_mesh_files(comm, filenames);
+      }
+
+      /**
+       * \brief Adds a single mesh file to the list of streams to be parsed.
+       *
+       * \param[in] filename
+       * The mesh filename that is to be parsed.
+       */
+      void add_mesh_file(const String& filename)
+      {
+        Dist::Comm comm = Dist::Comm::world();
+        add_mesh_file(comm, filename);
+      }
+
+      /**
        * \brief Returns the mesh-type string from the root markup node.
        *
        * \note
