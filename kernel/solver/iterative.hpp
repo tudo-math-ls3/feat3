@@ -596,6 +596,8 @@ namespace FEAT
        * \param[in] vec_rhs
        * The vector that represents the right-hand-side of the linear system to be solved.
        *
+       * \attention vec_sol and vec_rhs must \b not refer to the same vector object!
+       *
        * \returns
        * A Status code that represents the status of the solution step.
        */

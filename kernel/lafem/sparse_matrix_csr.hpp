@@ -1874,6 +1874,8 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
+       * \attention r and x must \b not refer to the same vector object!
+       *
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] transposed Should the product use the transposed matrix?
@@ -1912,6 +1914,8 @@ namespace FEAT
       /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
+       * \attention r and x must \b not refer to the same vector object!
+       *
        * \param[out] r The block vector that receives the result.
        * \param[in] x The block vector to be multiplied by this matrix.
        *
@@ -1945,6 +1949,9 @@ namespace FEAT
 
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
+       *
+       * \attention r and x must \b not refer to the same vector object!
+       * \note r and y are allowed to refer to the same vector object.
        *
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
@@ -1993,6 +2000,9 @@ namespace FEAT
 
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
+       *
+       * \attention r and x must \b not refer to the same vector object!
+       * \note r and y are allowed to refer to the same vector object.
        *
        * \param[out] r The block vector that receives the result.
        * \param[in] x The block vector to be multiplied by this matrix.

@@ -311,6 +311,8 @@ namespace FEAT
        * \param[in] vec_def
        * The vector that represents the right-hand-side of the linear system to be solved.
        *
+       * \attention vec_cor and vec_def must \b not refer to the same vector object!
+       *
        * \returns
        * A Status code that represents the status of the solution step.
        */
@@ -334,6 +336,8 @@ namespace FEAT
      *
      * \param[in] filter
      * The filter of the linear system.
+     *
+     * \attention vec_sol and vec_rhs must \b not refer to the same vector object!
      *
      * \returns
      * A status code representing the status of the solving step.
