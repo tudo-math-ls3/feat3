@@ -1,5 +1,7 @@
 /** \page ini_format INI Data File Format
 
+\tableofcontents{html,latex}
+
 The data format used by the parser of the FEAT::PropertyMap class is a custom extension of the well-known INI format.
 INI files are simple ASCII text files whose contents are basically made up from \e properties and \e sections.
 \see http://en.wikipedia.org/wiki/INI_file

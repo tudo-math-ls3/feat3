@@ -1,5 +1,8 @@
-/** \page parsed_function  Syntax overview, arithmetic operations and supported functions of ParsedFunction
-This page describes the general syntax of ParsedFunction. You can also find a list of arithmetic operations and supported functions.
+/** \page parsed_function Syntax overview of ParsedScalar/VectorFunction
+
+\tableofcontents{html,latex}
+
+This page describes the general syntax of Analytic::ParsedScalarFunction and Analytic::ParsedVectorFunction. You can also find a list of arithmetic operations and supported functions.
 
 The Original Website: http://warp.povusers.org/FunctionParser/fparser.html#literals
 
