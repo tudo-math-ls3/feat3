@@ -129,11 +129,11 @@ namespace FEAT
 
       /**
        * \brief Creates a clone of itself
-       * \warning _volume will always be a deep copy
+       * \warning _volume and _sol_mean will always be a deep copy
        */
       MeanFilter clone(CloneMode clone_mode = CloneMode::Deep) const
       {
-        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _volume, _sol_mean);
+        return MeanFilter(_vec_prim.clone(clone_mode), _vec_dual.clone(clone_mode), _sol_mean, _volume);
       }
 
       /**
