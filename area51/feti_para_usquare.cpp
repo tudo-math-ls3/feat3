@@ -1818,18 +1818,9 @@ namespace FETI{
 
 }//namespace FETI
 
-
-
 int main(int argc, char* argv[])
 {
   Runtime::initialize(argc, argv);
-
   FETI::main(argc, argv);
-
-
-
-
-
-
   return Runtime::finalize();
 }

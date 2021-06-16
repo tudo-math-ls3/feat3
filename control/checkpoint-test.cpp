@@ -537,6 +537,7 @@ public:
 
   }
 };
+
 CheckpointTupleVectorTest<Mem::Main, float, unsigned int> checkpoint_tuple_vector_test_float_uint;
 CheckpointTupleVectorTest<Mem::Main, float, unsigned long> checkpoint_tuple_vector_test_float_ulong;
 CheckpointTupleVectorTest<Mem::Main, double, unsigned int> checkpoint_tuple_vector_test_double_uint;

@@ -42,6 +42,7 @@
 
 // FEAT-LAFEM includes
 #include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
+
 // we need to have cgal to be able to include it
 #ifdef FEAT_HAVE_CGAL
 #include <kernel/geometry/cgal.hpp>
@@ -500,11 +501,14 @@ int main(int argc, char* argv[])
   // Finalize the runtime
   return Runtime::finalize();
 }
-#else
+
+#else // not defined(FEAT_HAVE_CGAL)
+
 int main(/*int argc, char* argv[]*/)
 {
   // Print a welcome message
   std::cerr << "Not Compiled with CGAL. Cannot run without CGAL" << std::endl;
   return 1;
 }
+
 #endif  // FEAT_HAVE_CGAL

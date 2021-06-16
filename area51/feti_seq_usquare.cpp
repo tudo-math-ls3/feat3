@@ -1526,7 +1526,5 @@ int main(int argc, char* argv[])
 
   error_analysis(domain_num, lvl, h0_error, h1_error, rate_h0, rate_h1 );
 
-
-
   return Runtime::finalize();
 }

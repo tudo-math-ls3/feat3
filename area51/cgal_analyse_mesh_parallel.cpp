@@ -53,6 +53,7 @@
 // We use a hack somewhere: For lagrange1, the number of DOF
 // and the number of vertices in the mesh is identical!
 #include <kernel/space/lagrange1/element.hpp>
+
 // We need to have cgal to be able to include it
 #ifdef FEAT_HAVE_CGAL
 #include <kernel/geometry/cgal.hpp>
@@ -439,10 +440,12 @@ int main(int argc, char* argv [])
   return FEAT::Runtime::finalize();
 }
 
-#else
+#else // not defined(FEAT_HAVE_CGAL)
+
 int main(/*int argc, char* argv []*/)
 {
   std::cerr << "ERROR: Not compiled with CGAL!" << std::endl;
   return 1;
 }
-#endif  // FEAT_HAVE_CGAL
+
+#endif // FEAT_HAVE_CGAL
