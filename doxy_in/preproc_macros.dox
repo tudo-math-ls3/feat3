@@ -319,6 +319,18 @@ FEAT_RESTORE_WARNINGS
 \subsection ppm_feat_git_sha1 FEAT_GIT_SHA1
 This macro contains the git sha1 checksum of the current HEAD in FEAT_SOURCE_DIR, at the time configure was executed.
 
+<hr>
+\subsection ppm_feat_f128c FEAT_F128C(x)
+This functional macro can be used to define 128-bit floating point constants if FEAT is configured to link against the
+quadmath library. The exact definition of this macro is as follows:
+\code{.cpp}
+#ifdef FEAT_HAVE_QUADMATH
+#  define FEAT_F128C(x) x##Q
+#else
+#  define FEAT_F128C(x) x
+#endif
+\endcode
+
 <hr><hr>
 \section preproc_sec_build_system Build-System Macros
 This section enlists the macros defined directly by the buildsystem, specifying the current build mode.

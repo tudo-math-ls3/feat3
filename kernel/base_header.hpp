@@ -84,6 +84,13 @@
 #endif
 #endif
 
+// If we use the quadmath library, we can use this macro to define 128-bit floating point constants.
+#ifdef FEAT_HAVE_QUADMATH
+#  define FEAT_F128C(x) x##Q
+#else
+#  define FEAT_F128C(x) x
+#endif
+
 ///\endcond
 // end of block hidden from doxygen
 
