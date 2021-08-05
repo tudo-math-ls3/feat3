@@ -359,6 +359,86 @@ namespace FEAT
       }
 
       /**
+       * \brief Unmaps a given image point.
+       *
+       * This function "unmaps" a point given in real world coordinates, i.e. this
+       * function determines the set of cells that intersect with the given point
+       * and also computes the corresponding domain points for each of these cells.
+       *
+       * This function performs several steps:
+       * - First, for each of the candidate cells, this function tries to unmap
+       *   the given point onto the cell to obtain the domain point coordinates
+       *   by using a Newton iteration provided bythe #unmap_point_by_newton() function.
+       * - Finally, this function checks whether the unmapped point is on the
+       *   reference cell by using the #test_domain_point() function.
+       *
+       * \attention
+       * This function may throw an InverseMappingError if the given input point
+       * \p img_point could not be unmapped for a candidate cell, unless
+       * \p ignore_failures was set to \c true. This usually indicates that
+       * the mesh has quite ill-formed cell shapes, which cause the Newton
+       * iteration to diverge -- especially, if the point to be tested is
+       * not on the candidate cell, but outside of it.
+       *
+       * \Note You should be sure that at least on cell in the given Cell array does indeed contain
+       *       the inquiered point. Else you the more costly overload function above
+       *
+       * \param[in] img_point
+       * The image point that is to be unmapped.
+       *
+       * \param[in] cell_array
+       * An array of indices containing the possible canditates which contain the imgage point.
+       *
+       * \param[in] ignore_failures
+       * Specifies whether to ignore cells on which the Newton iteration broke down.
+       * If set to \c false, an InverseMappingError will be thrown if Newton fails
+       * to converge, otherwise the corresponding cell will be skipped.
+       *
+       * \returns
+       * An InverseMappingData object that contains the set of cells and
+       * domain points, which are mapped onto the given \p img_point.
+       */
+      InvMapDataType unmap_point(const ImagePointType& img_point, const std::vector<Index> cells, bool ignore_failures = false) const
+      {
+        // store image point
+        InvMapDataType inv_data;
+        inv_data.img_point = img_point;
+
+        if(cells.empty())
+          return inv_data;
+
+        // loop over all candidate cells
+        for(Index cell : cells)
+        {
+          // try to unmap the point by newton
+          DomainPointType dom_point;
+          if(!this->unmap_point_by_newton(dom_point, img_point, cell))
+          {
+            // point unmapping failed!
+            if(ignore_failures)
+              continue;
+
+            // throw an inverse mapping error
+            throw InverseMappingError(dom_point, cell);
+          }
+
+          // check if the domain point is on the reference element
+          if(!this->test_domain_point(dom_point))
+          {
+            // nope ==> skip point
+            continue;
+          }
+
+          // okay
+          inv_data.cells.push_back(cell);
+          inv_data.dom_points.push_back(dom_point);
+        }
+
+        // found at least one cell?
+        return inv_data;
+      }
+
+      /**
        * \brief Determines a set of candidate cells by a bounding-box test.
        *
        * This function determines a set of "candidate" cells which may intersect

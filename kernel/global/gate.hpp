@@ -70,6 +70,30 @@ namespace FEAT
       {
       }
 
+      Gate(Gate && other) :
+        _comm(other._comm),
+        _ranks(std::forward<std::vector<int>>(other._ranks)),
+        _mirrors(std::forward<std::vector<Mirror_>>(other._mirrors)),
+        _freqs(std::forward<LocalVector_>(other._freqs))
+      {
+      }
+
+      Gate & operator=(Gate && other)
+      {
+        if(this == &other)
+        {
+          return *this;
+        }
+
+        _comm = other._comm;
+        _ranks = std::forward<std::vector<int>>(other._ranks);
+        _mirrors = std::forward<std::vector<Mirror_>>(other._mirros);
+        _freqs = std::forward<LocalVector_>(other._freqs);
+
+        return *this;
+      }
+
+
       virtual ~Gate()
       {
       }

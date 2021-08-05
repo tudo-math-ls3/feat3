@@ -974,6 +974,112 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(0), tol);
   }
 
+  void test_constant_vector_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create a value vector
+    Tiny::Vector<DT_, 2> values;
+    for(int i(0); i < 2; ++i)
+      values[i] = DT_(i) + DT_(0.731);
+
+    // create constant function object
+    Analytic::Common::ConstantVectorFunction<2,DT_> func(4);
+    //create constant
+    Analytic::Common::ConstantVectorFunction<2,DT_> func2(values);
+
+    // evaluate function value in point (1,1)
+    Tiny::Vector<DT_, 2> val = Analytic::eval_value_x(func, DT_(1), DT_(1));
+    Tiny::Vector<DT_, 2> val2 = Analytic::eval_value_x(func2, DT_(1), DT_(1));
+    for(int i(0); i < 2; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(val[i], DT_(4), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(val2[i], DT_(i) + DT_(0.731), tol);
+    }
+
+    // evaluate gradient in point (1,1)
+    Tiny::Matrix<DT_, 2, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(1));
+    Tiny::Matrix<DT_, 2, 2> grad2 = Analytic::eval_gradient_x(func2, DT_(1), DT_(1));
+
+    for(int i(0); i < 2; ++i)
+    {
+      for(int j(0); j < 2; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(grad(i,j), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(grad2(i,j), DT_(0), tol);
+      }
+    }
+
+    // evaluate hessian in point (1,1)
+    Tiny::Tensor3<DT_, 2, 2, 2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(1));
+    Tiny::Tensor3<DT_, 2, 2, 2> hess2 = Analytic::eval_hessian_x(func2, DT_(1), DT_(1));
+
+    for(int i(0); i < 2; ++i)
+    {
+      for(int j(0); j < 2; ++j)
+      {
+        for(int k(0); k < 2; ++k)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(hess(i,j,k), DT_(0), tol);
+          TEST_CHECK_EQUAL_WITHIN_EPS(hess2(i,j,k), DT_(0), tol);
+        }
+      }
+    }
+  }
+
+  void test_constant_vector_function_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create a value vector
+    Tiny::Vector<DT_, 3> values;
+    for(int i(0); i < 3; ++i)
+      values[i] = DT_(i) + DT_(0.731);
+
+    // create constant function object
+    Analytic::Common::ConstantVectorFunction<3,DT_> func(4);
+    //create constant
+    Analytic::Common::ConstantVectorFunction<3,DT_> func2(values);
+
+    // evaluate function value in point (1,1)
+    Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, DT_(1), DT_(1), DT_(1));
+    Tiny::Vector<DT_, 3> val2 = Analytic::eval_value_x(func2, DT_(1), DT_(1), DT_(1));
+    for(int i(0); i < 3; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(val[i], DT_(4), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(val2[i], DT_(i) + DT_(0.731), tol);
+    }
+
+    // evaluate gradient in point (1,1)
+    Tiny::Matrix<DT_, 3, 3> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(1), DT_(1));
+    Tiny::Matrix<DT_, 3, 3> grad2 = Analytic::eval_gradient_x(func2, DT_(1), DT_(1), DT_(1));
+
+    for(int i(0); i < 3; ++i)
+    {
+      for(int j(0); j < 3; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(grad(i,j), DT_(0), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(grad2(i,j), DT_(0), tol);
+      }
+    }
+
+    // evaluate hessian in point (1,1)
+    Tiny::Tensor3<DT_, 3, 3, 3> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(1), DT_(1));
+    Tiny::Tensor3<DT_, 3, 3, 3> hess2 = Analytic::eval_hessian_x(func2, DT_(1), DT_(1), DT_(1));
+
+    for(int i(0); i < 3; ++i)
+    {
+      for(int j(0); j < 3; ++j)
+      {
+        for(int k(0); k < 3; ++k)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(hess(i,j,k), DT_(0), tol);
+          TEST_CHECK_EQUAL_WITHIN_EPS(hess2(i,j,k), DT_(0), tol);
+        }
+      }
+    }
+  }
+
   void test_xy_plane_rotation() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
@@ -1539,6 +1645,8 @@ public:
     test_rosenbrock_function();
     test_constant_function_1d();
     test_constant_function_2d();
+    test_constant_vector_function_2d();
+    test_constant_vector_function_3d();
     test_xy_plane_rotation();
     test_yz_plane_parabolic_2d();
     test_yz_plane_parabolic_3d();

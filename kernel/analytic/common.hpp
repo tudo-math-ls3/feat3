@@ -754,6 +754,90 @@ namespace FEAT
       }; // class ConstantFunction
 
       /**
+       * \brief Constant vector valued Analytic function
+       *
+       * This class implements the AnalyticFunction interface representing a constant vector valued function.
+       *
+       * This class supports function values, gradient and hessians for all dimensions.
+       *
+       * \author Maximilian Esser
+       */
+      template<int dim_, typename DataType_ = Real>
+      class ConstantVectorFunction :
+        public Analytic::Function
+      {
+      public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Vector<domain_dim> ImageType;
+
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// Function that is being evaluated
+          const ValueType _value_vec;
+
+        public:
+          /// Constructor
+          explicit Evaluator(const ConstantVectorFunction& function) :
+            _value_vec(function._value_vector)
+          {
+          }
+
+          ValueType value(const PointType& DOXY(point))
+          {
+            return _value_vec;
+          }
+
+          GradientType gradient(const PointType& DOXY(point))
+          {
+            return GradientType::null();
+          }
+
+          HessianType hessian(const PointType& DOXY(point))
+          {
+            return HessianType::null();
+          }
+        }; // class ConstantVectorFunction::Evaluator<...>
+
+      private:
+        /// Tiny Vector representing the values of the constant function
+        Tiny::Vector<DataType_, domain_dim> _value_vector;
+
+      public:
+        /// Constructor, value defaults to 0
+        /// This constructor sets all values to the same given value
+        explicit ConstantVectorFunction(DataType_ value = DataType_(0)) :
+          _value_vector(Tiny::Vector<DataType_, domain_dim>(value))
+        {
+        }
+
+        /// This constructor sets _value_vec to the given Tiny::Vector vec
+        explicit ConstantVectorFunction(Tiny::Vector<DataType_, domain_dim> vec) :
+          _value_vector(vec)
+        {
+        }
+      }; // class ConstantVectorFunction
+
+      /**
        * \brief Analytic distance function
        *
        * This class implements the AnalyticFunction interface representing the distance function

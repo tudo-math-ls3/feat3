@@ -44,10 +44,10 @@ public:
     // Note:
     // The tolerances need to be large, as we are checking analytic
     // function values against discrete function values!
-    test_fe_eval(3, 1E-3, 1E-2);
+    test_fe_eval(3, 1E-3, 1E-2, 2E-1);
   }
 
-  void test_fe_eval(Index level, DataType val_tol, DataType grad_tol) const
+  void test_fe_eval(Index level, DataType val_tol, DataType grad_tol, DataType hess_tol) const
   {
     typedef Shape::Hypercube<dim> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType, dim, DataType> MeshType;
@@ -77,6 +77,7 @@ public:
     typedef typename ScalarEvalTraits::PointType PointType;
     typedef typename ScalarEvalTraits::ValueType ScalarValueType;
     typedef typename VectorEvalTraits::ValueType VectorValueType;
+    typedef typename VectorEvalTraits::GradientType GradientValueType;
 
     typename ScalarFuncType::template Evaluator<ScalarEvalTraits> scalar_func_eval(scalar_func);
     typename VectorFuncType::template Evaluator<VectorEvalTraits> vector_func_eval(vector_func);
@@ -107,32 +108,40 @@ public:
       // evaluate both functions
       auto scalar_eval_data = Assembly::DiscreteEvaluator::eval_fe_function(inv_point, scalar_vec, space);
       auto vector_eval_data = Assembly::DiscreteEvaluator::eval_fe_function(inv_point, blocked_vec, space);
+      //also evaluate the vector_valued function in its gradient
+      auto matrix_eval_data = Assembly::DiscreteEvaluator::eval_fe_gradient_function(inv_point, blocked_vec, space);
 
       // ensure that the data structures are not empty
       TEST_CHECK(!scalar_eval_data.empty());
       TEST_CHECK(!vector_eval_data.empty());
+      TEST_CHECK(!matrix_eval_data.empty());
 
       // compute mean values
       ScalarValueType scalar_value_fe = scalar_eval_data.mean_value();
       VectorValueType vector_value_fe = vector_eval_data.mean_value();
+      GradientValueType matrix_value_fe = matrix_eval_data.mean_value();
 
       // evaluate the analytic functions
       ScalarValueType scalar_value_ana = scalar_func_eval.value(point);
       VectorValueType vector_value_ana = vector_func_eval.value(point);
+      GradientValueType matrix_value_ana = vector_func_eval.gradient(point);
 
       // compute differences
       ScalarValueType scalar_diff = scalar_value_fe - scalar_value_ana;
       VectorValueType vector_diff = vector_value_fe - vector_value_ana;
+      GradientValueType matrix_diff = matrix_value_fe - matrix_value_ana;
 
       // compute errors
       DataType scalar_err = Math::abs(scalar_diff);
       DataType vector_err = vector_diff.norm_euclid();
+      DataType matrix_err = matrix_diff.norm_frobenius();
 
-      //std::cout << point << " > " << scalar_err << " | " << vector_err << std::endl;
+//       std::cout << point << " > " << scalar_err << " | " << vector_err << " | " << matrix_err << std::endl;
 
       // check errors against tolerances
       TEST_CHECK(scalar_err < val_tol);
       TEST_CHECK(vector_err < grad_tol);
+      TEST_CHECK(matrix_err < hess_tol);
     }
   }
 }; // class DiscreteEvaluatorTest<...>

@@ -221,7 +221,7 @@ namespace FEAT
        */
       template<typename DT_, typename IT_>
       static void interpolate(LAFEM::DenseVector<Mem::Main, DT_, IT_>& to_coeffs,
-      LAFEM::DenseVector<Mem::Main, DT_, IT_>& from_coeffs,
+      const LAFEM::DenseVector<Mem::Main, DT_, IT_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
@@ -254,7 +254,7 @@ namespace FEAT
        */
       template<typename DT_, typename IT_>
       static void interpolate(LAFEM::DenseVector<Mem::CUDA, DT_, IT_>& to_coeffs,
-      LAFEM::DenseVector<Mem::CUDA, DT_, IT_>& from_coeffs,
+      const LAFEM::DenseVector<Mem::CUDA, DT_, IT_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
@@ -293,7 +293,7 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, int blocksize_>
       static void interpolate(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& to_coeffs,
-      LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& from_coeffs,
+      const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
@@ -324,7 +324,7 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, int blocksize_>
       static void interpolate(LAFEM::DenseVectorBlocked<Mem::CUDA, DT_, IT_, blocksize_>& to_coeffs,
-      LAFEM::DenseVectorBlocked<Mem::CUDA, DT_, IT_, blocksize_>& from_coeffs,
+      const LAFEM::DenseVectorBlocked<Mem::CUDA, DT_, IT_, blocksize_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
@@ -338,7 +338,153 @@ namespace FEAT
 
         to_coeffs.convert(to_coeffs_main);
       }
-    };
+    }; //FEInterpolator Lagrange1 to Lagrange2
+
+    /**
+     * \brief Interpolator class from Lagrange2 to Lagrange1
+     *
+     * \tparam Trafo_
+     * The transformation type.
+     *
+     * \author Maximilian Esser
+     */
+    template<typename Trafo_>
+    struct FEInterpolator<Space::Lagrange1::Element<Trafo_>, Space::Lagrange2::Element<Trafo_>>
+    {
+      /// Our trafo
+      typedef Trafo_ TrafoType;
+      /// We map to Lagrange1
+      typedef Space::Lagrange1::Element<Trafo_> ToSpace;
+      /// We map from Lagrange2
+      typedef Space::Lagrange2::Element<Trafo_> FromSpace;
+
+      /**
+       * \brief Interpolates a scalar Lagrange1 to Lagrange2 FE function
+       *
+       * \tparam DT_
+       * Floating point precision of the DoF vector
+       *
+       * \tparam IT_
+       * Index type of the DoF vector
+       *
+       * \param[out] to_coeffs
+       * The coefficient vector of the Lagrange2 FE function
+       *
+       * \param[in] from_coeffs
+       * The coefficient vector of the Lagrange1 FE function
+       *
+       * \param[in] to_space
+       * The space we map to, needed for the DofMapping and DofAssignment
+       *
+       * \param[in] from_space
+       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
+       * DofMapping and DofAssignment
+       */
+      template<typename DT_, typename IT_>
+      static void interpolate(LAFEM::DenseVector<Mem::Main, DT_, IT_>& to_coeffs,
+      const LAFEM::DenseVector<Mem::Main, DT_, IT_>& from_coeffs,
+      const ToSpace& DOXY(to_space),
+      const FromSpace& DOXY(from_space))
+      {
+        //sanity check for the vector sizes
+        XASSERTM(to_coeffs.size() < from_coeffs.size(), "Coefficient vectors do not match!\n To_coeffs size is ");
+        //due to the two level ordering of Lagrange1 and Lagrange2 elements it is always sufficient to just truncate our vector
+        for(Index i(0); i < to_coeffs.size(); ++i)
+        {
+          to_coeffs(i, from_coeffs(i));
+        }
+        //And we are done
+      }
+
+      /**
+       * \brief Interpolates a vector Lagrange1 to Lagrange2 FE function
+       *
+       * \tparam DT_
+       * Floating point precision of the DoF vector
+       *
+       * \tparam IT_
+       * Index type of the DoF vector
+       *
+       * \param[out] to_coeffs
+       * The coefficient vector of the Lagrange2 FE function
+       *
+       * \param[in] from_coeffs
+       * The coefficient vector of the Lagrange1 FE function
+       *
+       * \param[in] to_space
+       * The space we map to, needed for the DofMapping and DofAssignment
+       *
+       * \param[in] from_space
+       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
+       * DofMapping and DofAssignment
+       */
+      template<typename DT_, typename IT_, int blocksize_>
+      static void interpolate(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& to_coeffs,
+      const LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& from_coeffs,
+      const ToSpace& DOXY(to_space),
+      const FromSpace& DOXY(from_space))
+      {
+        //sanity check for the vector sizes
+        XASSERTM(to_coeffs.size() < from_coeffs.size(), "Coefficient vectors do not match!\n To_coeffs size is ");
+        //due to the two level ordering of Lagrange1 and Lagrange2 elements it is always sufficient to only truncate our vector
+        for(Index i(0); i < to_coeffs.size(); ++i)
+        {
+          to_coeffs(i, from_coeffs(i));
+        }
+        //And we are done
+      }
+
+    }; //FEInterpolator Lagrange2 to Lagrange1
+
+    /**
+     * \brief Interpolator class for trivial interpolator between same class
+     *
+     * \tparam Space_
+     * The Space_ of both input and output.
+     *
+     * \author Maximilian Esser
+     */
+    template<typename Space_>
+    struct FEInterpolator<Space_, Space_>
+    {
+      typedef Space_ ToSpace;
+
+      typedef Space_ FromSpace;
+
+      /**
+       * \brief Interpolates a scalar/vector FE function on the same space by just copying the vector
+       *
+       * \warning This implementation is only due to consistency and should be avoided
+       *
+       * \tparam DT_
+       * Floating point precision of the DoF vector
+       *
+       * \tparam IT_
+       * Index type of the DoF vector
+       *
+       * \param[out] to_coeffs
+       * The coefficient vector of the Lagrange2 FE function
+       *
+       * \param[in] from_coeffs
+       * The coefficient vector of the Lagrange1 FE function
+       *
+       * \param[in] to_space
+       * The space we map to, needed for the DofMapping and DofAssignment
+       *
+       * \param[in] from_space
+       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
+       * DofMapping and DofAssignment
+       */
+      template<typename Vector_>
+      static void interpolate(Vector_& to_coeffs,
+      const Vector_& from_coeffs,
+      const ToSpace& DOXY(to_space),
+      const FromSpace& DOXY(from_space))
+      {
+        to_coeffs.copy(from_coeffs, true);
+      }
+
+    }; //FEInterpolator same space
 
   } // namespace Assembly
 } // namespace FEAT
