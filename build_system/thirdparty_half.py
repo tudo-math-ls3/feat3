@@ -10,7 +10,7 @@ import os
 class HALF(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.version = "2.1.0"
+    self.version = "2.2.0"
     self.names = ["half"]
     self.dirname = "half-" + self.version
     self.filename = "half-" + self.version + ".zip"
