@@ -2,13 +2,10 @@
 mesh_files =  unit-square-tria.xml moving-circle-chart.xml
 meshopt_config_file = ./meshopt_config.ini
 solver_config_file = ./solver_config.ini
-mesh_optimiser = HyperelasticityDefault
+mesh_optimizer = HyperelasticityDefault
 delta_t = 1e-2
 t_end = 1e0
 
 [DomainControlSettings]
 lvl_min = 2
 lvl_max = 4
-#parti-type = metis naive
-#parti-name = default
-#parti-rank-elems = 4

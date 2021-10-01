@@ -13,7 +13,10 @@
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
 
-#include <kernel/solver/solver_factory.hpp>
+#include <kernel/solver/qpenalty.hpp>
+#include <kernel/solver/nlcg.hpp>
+#include <kernel/solver/mqc_linesearch.hpp>
+#include <kernel/solver/secant_linesearch.hpp>
 
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
 
@@ -125,6 +128,8 @@ namespace FEAT
           PropertyMap& solver_config;
           /// Name of the solver configuration from solver_config we want
           const String solver_name;
+          /// The linesearch method for NLCG
+          std::shared_ptr<Solver::Linesearch<typename SystemLevelType::GlobalFunctional, typename SystemLevelType::GlobalSystemFilter>> linesearch;
           /// The solver
           //std::shared_ptr<Solver::NLOptLS
           //<
@@ -180,66 +185,63 @@ namespace FEAT
             precond(nullptr),
             meshopt_lvl(meshopt_lvl_),
             meshopt_lvl_pos(~size_t(1))
+          {
+            XASSERT(meshopt_lvl >= -1);
+
+            // If the input level was set to -1, take the max level of the domain control
+            if(meshopt_lvl == -1)
             {
-              XASSERT(meshopt_lvl >= -1);
-
-              // If the input level was set to -1, take the max level of the domain control
-              if(meshopt_lvl == -1)
-              {
-                meshopt_lvl = dom_ctrl.max_level_index();
-              }
-
-              XASSERT(meshopt_lvl <= dom_ctrl.max_level_index());
-
-              // Now find the position of the mesh optimization level in the domain levels
-              for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
-              {
-                if(dom_ctrl.at(i)->get_level_index() == meshopt_lvl)
-                {
-                  meshopt_lvl_pos  = i;
-                }
-              }
-
-              XASSERT(meshopt_lvl_pos < dom_ctrl.size_physical());
-
-              for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
-              {
-                _system_levels.push_back( new SystemLevelType(
-                  dom_ctrl.at(i)->get_level_index(),
-                  dom_ctrl.at(i)->get_mesh_node(),
-                  dom_ctrl.at(i)->trafo,
-                  dirichlet_list, slip_list,
-                  std::forward<Args_>(args)...));
-              }
-
-              for(Index i(0); i < get_num_levels(); ++i)
-              {
-                _system_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer());
-                // Call the operator's init() on the current level. This needs the gates, so it cannot be called
-                // earlier
-                _system_levels.at(i)->global_functional.init();
-              }
-
-              for(Index i(0); (i+1) < get_num_levels(); ++i)
-              {
-                _system_levels.at(i)->assemble_system_transfer(*_system_levels.at(i+1));
-              }
-
-              auto* solver_section = solver_config.query_section(solver_name);
-              if(solver_section == nullptr)
-              {
-                XABORTM("Could not find section for solver "+solver_name);
-              }
-
-              precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);
-
-              solver = Solver::SolverFactory::create_nonlinear_optimizer
-                (_system_levels.at(meshopt_lvl_pos)->global_functional,
-                _system_levels.at(meshopt_lvl_pos)->filter_sys, &solver_config, solver_name, precond);
-              solver->init();
-              solver->set_plot_name(solver->name()+" (meshopt-Hyper)");
-
+              meshopt_lvl = dom_ctrl.max_level_index();
             }
+
+            XASSERT(meshopt_lvl <= dom_ctrl.max_level_index());
+
+            // Now find the position of the mesh optimization level in the domain levels
+            for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
+            {
+              if(dom_ctrl.at(i)->get_level_index() == meshopt_lvl)
+              {
+                meshopt_lvl_pos  = i;
+              }
+            }
+
+            XASSERT(meshopt_lvl_pos < dom_ctrl.size_physical());
+
+            for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
+            {
+              _system_levels.push_back( new SystemLevelType(
+                dom_ctrl.at(i)->get_level_index(),
+                dom_ctrl.at(i)->get_mesh_node(),
+                dom_ctrl.at(i)->trafo,
+                dirichlet_list, slip_list,
+                std::forward<Args_>(args)...));
+            }
+
+            for(Index i(0); i < get_num_levels(); ++i)
+            {
+              _system_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer());
+              // Call the operator's init() on the current level. This needs the gates, so it cannot be called
+              // earlier
+              _system_levels.at(i)->global_functional.init();
+            }
+
+            for(Index i(0); (i+1) < get_num_levels(); ++i)
+            {
+              _system_levels.at(i)->assemble_system_transfer(*_system_levels.at(i+1));
+            }
+
+            auto* solver_section = solver_config.query_section(solver_name);
+            if(solver_section == nullptr)
+            {
+              XABORTM("Could not find section for solver "+solver_name);
+            }
+
+            // create our preconditioner
+            precond = MeshoptPrecondFactory::create_nlopt_precond(*this, dom_ctrl, solver_section);
+
+            // create the actual nonlinear optimizer
+            _create_nonlinear_optimizer();
+          }
 
           /// Explicitly delete the default constructor
           HyperelasticityFunctionalControl(const HyperelasticityFunctionalControl&) = delete;
@@ -545,7 +547,131 @@ namespace FEAT
             }
 
           }
+      protected:
+        void _create_linesearch(const String& section_name)
+        {
+          // Get the section where our solver is configured
+          auto section = solver_config.query_section(section_name);
+          if(section == nullptr)
+          {
+            XABORTM("could not find section "+section_name+" in PropertyMap!");
+          }
 
+          // Get the required type String
+          auto solver_p = section->query("type");
+          if (!solver_p.second)
+          {
+            XABORTM("No type key found in PropertyMap section with name " + section_name + "!");
+          }
+          String solver_type(solver_p.first);
+
+          // \todo: NewtonRaphsonLinesearch requires the operator to compute hessians, which has to be caught at
+          // runtime
+          /*if(solver_type == "NewtonRaphsonLinesearch")
+            {
+            result = Solver::new_newton_raphson_linesearch(
+              derefer<VectorTypeR>(system_levels.at(back_level)->op_sys, nullptr),
+              derefer<VectorTypeR>(system_levels.at(back_level)->filter_sys, nullptr));
+              }
+              else */
+          if(solver_type == "SecantLinesearch")
+          {
+            linesearch = Solver::new_secant_linesearch(section_name, section,
+              _system_levels.at(meshopt_lvl_pos)->global_functional,
+              _system_levels.at(meshopt_lvl_pos)->filter_sys);
+          }
+          else if(solver_type == "MQCLinesearch")
+          {
+            linesearch = Solver::new_mqc_linesearch(section_name, section,
+              _system_levels.at(meshopt_lvl_pos)->global_functional,
+              _system_levels.at(meshopt_lvl_pos)->filter_sys);
+          }
+          else
+          {
+            XABORTM("Unknown linesearch type " + section_name + "!");
+          }
+        }
+
+        void _create_nonlinear_optimizer()
+        {
+           // query our solver section
+          PropertyMap* solver_section = solver_config.query_section(solver_name);
+          String solver_type = "none";
+          String nlcg_section_name = solver_name;
+
+          // Get the String identifying the solver type
+          auto solver_p = solver_section->query("type");
+          if (!solver_p.second)
+          {
+            XABORTM("no type key found in property map: " + solver_name + "!");
+          }
+          solver_type = solver_p.first;
+
+          // there are only 2 allowed solver types: 'QPenalty' or 'NLCG'
+          // QPenalty might be used as an outer solver around NLCG, so let's check for this
+
+          const bool is_qpenalty = (solver_type == "QPenalty");
+          PropertyMap* qpenalty_section = nullptr;
+          if(is_qpenalty)
+          {
+            // ok, use QPenalty on the outside, so get its inner solver
+            qpenalty_section = solver_section;
+
+            // Create inner solver first
+            auto inner_solver_p = solver_section->query("inner_solver");
+            // Safety catches for recursions
+            XASSERTM(inner_solver_p.second, "QPenalty solver section is missing mandatory inner_solver key.");
+            XASSERTM(inner_solver_p.first != "QPenalty", "QPenalty cannot be the inner solver for QPenalty.");
+
+            // now replace our solver_section pointer by the inner solver, which must be NLCG now
+            nlcg_section_name = inner_solver_p.first;
+            solver_section = solver_config.query_section(inner_solver_p.first);
+            auto solver_type_p = solver_section->query("type");
+            if (!solver_type_p.second)
+            {
+              XABORTM("no type key found in property map: " + inner_solver_p.first + "!");
+            }
+            solver_type = solver_type_p.first;
+          }
+
+          // now the solver type must be 'NLCG'
+          if(solver_type != "NLCG")
+          {
+            XABORTM("Solver type key "+stringify(solver_type)+" unknown.");
+          }
+
+          // okay, let's create an NLCG
+          String linesearch_name("");
+          auto linesearch_p = solver_section->query("linesearch");
+          if(linesearch_p.second)
+          {
+            linesearch_name = linesearch_p.first;
+          }
+          else
+          {
+            XABORTM("NLCG config section is missing the mandatory linesearch key!");
+          }
+
+          // create the linesearch
+          _create_linesearch(linesearch_name);
+
+          // create the actual NLCG solver
+          solver = Solver::new_nlcg(nlcg_section_name, solver_section,
+            _system_levels.at(meshopt_lvl_pos)->global_functional,
+            _system_levels.at(meshopt_lvl_pos)->filter_sys,
+            linesearch, precond);
+
+          // if we wanted a QPenalty in the first place, create it around the NLCG now
+          if(is_qpenalty)
+          {
+            solver = Solver::new_qpenalty(
+              solver_name, qpenalty_section, _system_levels.at(meshopt_lvl_pos)->global_functional, solver);
+          }
+
+          // finally, initialize it
+          solver->init();
+          solver->set_plot_name(solver->name() + " (meshopt-Hyper)");
+        }
       }; // class HyperelasticityFunctionalControl
     } // namespace Meshopt
   } // namespace Control

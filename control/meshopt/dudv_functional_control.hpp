@@ -21,8 +21,10 @@
 #include <kernel/global/nonlinear_functional.hpp>
 #include <kernel/global/vector.hpp>
 #include <kernel/meshopt/dudv_functional.hpp>
-#include <kernel/solver/matrix_stock.hpp>
-#include <kernel/solver/solver_factory.hpp>
+#include <kernel/solver/multigrid.hpp>
+#include <kernel/solver/pcg.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
 
 #include <control/domain/domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
@@ -109,13 +111,12 @@ namespace FEAT
           /// For every level of refinement, we have one system level
           std::deque<SystemLevelType*> _system_levels;
 
-          /// The MatrixStock to be passed to the SolverFactory
-          Solver::MatrixStock
-          <
+          /// The multigrid hierarchy for our solver
+          std::shared_ptr<Solver::MultiGridHierarchy<
             GlobalSystemMatrix,
             GlobalSystemFilter,
             typename SystemLevelType::GlobalSystemTransfer
-          > _mst;
+          >> _multigrid_hierarchy;
 
         public:
           /// Solver configuration
@@ -165,86 +166,68 @@ namespace FEAT
             bool fixed_reference_domain_):
             BaseClass(dom_ctrl, dirichlet_list, slip_list),
             _system_levels(),
-            _mst(dom_ctrl.size_virtual()),
             solver_config(solver_config_),
             solver_name(solver_name_),
             solver(nullptr),
             fixed_reference_domain(fixed_reference_domain_),
             meshopt_lvl(meshopt_lvl_),
             meshopt_lvl_pos(~size_t(0))
+          {
+            XASSERT(meshopt_lvl >= -1);
+
+            // If the input level was set to -1, take the max level of the domain control
+            if(meshopt_lvl == -1)
             {
-              XASSERT(meshopt_lvl >= -1);
-
-              // If the input level was set to -1, take the max level of the domain control
-              if(meshopt_lvl == -1)
-              {
-                meshopt_lvl = dom_ctrl.max_level_index();
-              }
-
-              XASSERT(meshopt_lvl<= dom_ctrl.max_level_index());
-
-              // Now find the position of the coarsest mesh optimization level in the domain levels
-              for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
-              {
-                if(dom_ctrl.at(i)->get_level_index() == meshopt_lvl)
-                {
-                  meshopt_lvl_pos  = i;
-                  break;
-                }
-              }
-
-              XASSERT(meshopt_lvl_pos < dom_ctrl.size_physical());
-
-              for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
-              {
-                _system_levels.push_back( new SystemLevelType(
-                  dom_ctrl.at(i)->get_level_index(),
-                  dom_ctrl.at(i)->get_mesh_node(),
-                  dom_ctrl.at(i)->trafo,
-                  dirichlet_list, slip_list));
-
-                // This assembles the system matrix numerically
-                _system_levels.at(i)->local_functional.init();
-              }
-
-              // Now that _system_levels has the correct size, we can use get_num_levels()
-              for(Index i(0); i < get_num_levels(); ++i)
-              {
-                _system_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer());
-              }
-
-              // Assemble the transfer matrices on all levels except for the coarsest
-              for(Index i(0); i+1 < get_num_levels(); ++i)
-              {
-                _system_levels.at(i)->assemble_system_transfer(*_system_levels.at(i+1));
-              }
-
-              // Now we need to assemble the filters on all levels before any shallow copies are made. This is done
-              // by calling prepare()
-              typename SystemLevelType::GlobalSystemVectorR vec_buf;
-              vec_buf.local().convert(_system_levels.front()->coords_buffer.local());
-              prepare(vec_buf);
-
-              for(Index i(0); i < get_num_levels(); ++i)
-              {
-                _mst.systems.push_back(_system_levels.at(i)->matrix_sys.clone(LAFEM::CloneMode::Shallow));
-                _mst.gates_row.push_back(&(_system_levels.at(i)->gate_sys));
-                _mst.gates_col.push_back(&(_system_levels.at(i)->gate_sys));
-                _mst.filters.push_back(_system_levels.at(i)->filter_sys.clone(LAFEM::CloneMode::Shallow));
-                _mst.muxers.push_back(&(_system_levels.at(i)->coarse_muxer_sys));
-                _mst.transfers.push_back(_system_levels.at(i)->transfer_sys.clone(LAFEM::CloneMode::Shallow));
-              }
-
-              // Create our solver
-              solver = Solver::SolverFactory::create_scalar_solver(
-                _mst, &solver_config, solver_name, meshopt_lvl_pos);
-
-              // Now initialize the multigrid hierarchy in the MatrixStock
-              _mst.hierarchy_init();
-
-              // After this, we can initialize the solver
-              solver->init();
+              meshopt_lvl = dom_ctrl.max_level_index();
             }
+
+            XASSERT(meshopt_lvl<= dom_ctrl.max_level_index());
+
+            // Now find the position of the coarsest mesh optimization level in the domain levels
+            for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
+            {
+              if(dom_ctrl.at(i)->get_level_index() == meshopt_lvl)
+              {
+                meshopt_lvl_pos  = i;
+                break;
+              }
+            }
+
+            XASSERT(meshopt_lvl_pos < dom_ctrl.size_physical());
+
+            for(size_t i(0); i < dom_ctrl.size_physical(); ++i)
+            {
+              _system_levels.push_back( new SystemLevelType(
+                dom_ctrl.at(i)->get_level_index(),
+                dom_ctrl.at(i)->get_mesh_node(),
+                dom_ctrl.at(i)->trafo,
+                dirichlet_list, slip_list));
+
+              // This assembles the system matrix numerically
+              _system_levels.at(i)->local_functional.init();
+            }
+
+            // Now that _system_levels has the correct size, we can use get_num_levels()
+            for(Index i(0); i < get_num_levels(); ++i)
+            {
+              _system_levels.at(i)->assemble_gates(dom_ctrl.at(i).layer());
+            }
+
+            // Assemble the transfer matrices on all levels except for the coarsest
+            for(Index i(0); i+1 < get_num_levels(); ++i)
+            {
+              _system_levels.at(i)->assemble_system_transfer(*_system_levels.at(i+1));
+            }
+
+            // Now we need to assemble the filters on all levels before any shallow copies are made. This is done
+            // by calling prepare()
+            typename SystemLevelType::GlobalSystemVectorR vec_buf;
+            vec_buf.local().convert(_system_levels.front()->coords_buffer.local());
+            prepare(vec_buf);
+
+            // create the solver
+            this->_create_solver();
+          }
 
           /// Explicitly delete empty default constructor
           DuDvFunctionalControl() = delete;
@@ -263,7 +246,7 @@ namespace FEAT
             }
 
             solver->done();
-            _mst.hierarchy_done();
+            _multigrid_hierarchy->done();
           }
 
           /// \copydoc BaseClass::name()
@@ -494,8 +477,8 @@ namespace FEAT
             GlobalSystemFilter& filter_sys = _system_levels.at(meshopt_lvl_pos)->filter_sys;
 
             // Update the containers in the MatrixStock
-            _mst.hierarchy_done_numeric();
-            _mst.hierarchy_init_numeric();
+            _multigrid_hierarchy->done_numeric();
+            _multigrid_hierarchy->init_numeric();
 
             return Solver::solve(*solver, vec_sol, vec_rhs, mat_sys, filter_sys);
           }
@@ -513,7 +496,7 @@ namespace FEAT
             GlobalSystemVectorR vec_rhs = the_system_level.assemble_rhs_vector();
             GlobalSystemVectorL vec_sol = the_system_level.assemble_sol_vector();
 
-            // Let it be knownst to Statitics that it was Us who called the solver
+            // Let it be known to Statistics that it was Us who called the solver
             FEAT::Statistics::expression_target = name();
 
             // solve
@@ -585,8 +568,68 @@ namespace FEAT
             }
 
           } // void optimize()
-      };
 
+      protected:
+        void _create_solver()
+        {
+          // first of all, let's fetch all the subsections for the DuDv solver
+          auto* sec_linsol = solver_config.query_section(this->solver_name);
+          auto* sec_mg_coarse = solver_config.query_section("DuDvMGCoarseSolver");
+          auto* sec_mg_smooth = solver_config.query_section("DuDvMGSmoother");
+          XASSERTM(sec_linsol    != nullptr, "mandatory DuDv solver config section is missing");
+          XASSERTM(sec_mg_coarse != nullptr, "mandatory solver section [DuDvMGCoarseSolver] is missing");
+          XASSERTM(sec_mg_smooth != nullptr, "mandatory solver section [DuDvMGSmoother] is missing");
+
+          // our multigrid smoother is a simple Jacobi-smoother, so parse the damping parameter
+          // as well as the number of smoothing steps
+          Index smooth_steps = 4;
+          auto smooth_steps_p = sec_mg_smooth->get_entry("steps");
+          XASSERTM(smooth_steps_p.second, "DuDvMGSmoother.steps parameter is missing");
+          smooth_steps_p.first.parse(smooth_steps);
+
+          DT_ smooth_omega = DT_(0.5);
+          auto smooth_damp_p = sec_mg_smooth->get_entry("omega");
+          XASSERTM(smooth_damp_p.second, "DuDvMGSmoother.omega parameter is missing");
+          smooth_damp_p.first.parse(smooth_omega);
+
+          // now let's build the multigrid hierarchy
+          _multigrid_hierarchy = std::make_shared<Solver::MultiGridHierarchy<GlobalSystemMatrix,
+            GlobalSystemFilter, typename SystemLevelType::GlobalSystemTransfer>>(this->_dom_ctrl.size_virtual());
+
+          // create smoothers for all levels except the coarsest one
+          for(Index i(0); (i+1) < get_num_levels(); ++i)
+          {
+            const auto& lvl = *(_system_levels.at(i));
+            auto jacobi = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys);
+            auto smooth = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_omega, jacobi);
+            smooth->set_min_iter(smooth_steps);
+            smooth->set_max_iter(smooth_steps);
+            _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smooth, smooth, smooth);
+          }
+
+          // now let's create the coarse grid solver; this is always a PCG-Jacobi, which is configured
+          // by the [DuDvMGCoarseSolver] section
+          {
+            const auto& lvl = *_system_levels.back();
+            auto jacobi = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys);
+            auto cg_pcg = Solver::new_pcg("DuDvMGCoarseSolver", sec_mg_coarse, lvl.matrix_sys, lvl.filter_sys, jacobi);
+            _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cg_pcg);
+          }
+
+          // now, let's create the actual multigrid solver object
+          auto multigrid = Solver::new_multigrid(_multigrid_hierarchy, Solver::MultiGridCycle::V);
+
+          // get the finest level
+          const auto& lvl = *_system_levels.front();
+
+          // finally, create the outer solver, which is always a PCG solver
+          solver = Solver::new_pcg("DuDvLinearSolver", sec_linsol, lvl.matrix_sys, lvl.filter_sys, multigrid);
+
+          // initialize the hierarchy and the solver
+          _multigrid_hierarchy->init();
+          solver->init();
+        }
+      };
     } // namespace Meshopt
   } // namespace Control
 } // namespace FEAT

@@ -790,8 +790,23 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = DuDvPrecon" << std::endl;
     iss << "dirichlet_boundaries = bnd:o" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "linear_solver = PCG-MG" << std::endl;
+    iss << "linear_solver = DuDvLinearSolver" << std::endl;
 
+    iss << "[DuDvLinearSolver]" << std::endl;
+    iss << "max_iter = 3" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+    iss << "plot_mode = summary" << std::endl;
+
+    iss << "[DuDvMGSmoother]" << std::endl;
+    iss << "steps = 4" << std::endl;
+    iss << "omega = 0.5" << std::endl;
+
+    iss << "[DuDvMGCoarseSolver]" << std::endl;
+    iss << "max_iter = 10" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+
+    // the rest of this code was used by the old SolverFactory; it is not used anymore
+    /*
     iss << "[PCG-JAC]" << std::endl;
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 10" << std::endl;
@@ -831,7 +846,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = hierarchy" << std::endl;
     iss << "smoother = rich" << std::endl;
     iss << "coarse = PCG-JAC" << std::endl;
-
+    */
   }
   else if(test_number == 2)
   {
@@ -845,12 +860,35 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "direction_update = DYHSHybrid" << std::endl;
     iss << "keep_iterates = 0" << std::endl;
 
+    iss << "[MQCLinesearch]" << std::endl;
+    iss << "type = MQCLinesearch" << std::endl;
+    iss << "plot_mode = none" << std::endl;
+    iss << "max_iter = 20" << std::endl;
+    iss << "tol_decrease = 1e-3" << std::endl;
+    iss << "tol_curvature = 0.3" << std::endl;
+    iss << "keep_iterates = 0" << std::endl;
+
     iss << "[DuDvPrecon]" << std::endl;
     iss << "type = DuDvPrecon" << std::endl;
-    iss << "slip_boundaries = bnd:o" << std::endl;
+    iss << "dirichlet_boundaries = bnd:o" << std::endl;
     iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "linear_solver = PCG-MG" << std::endl;
+    iss << "linear_solver = DuDvLinearSolver" << std::endl;
 
+    iss << "[DuDvLinearSolver]" << std::endl;
+    iss << "max_iter = 10" << std::endl;
+    iss << "tol_rel = 1e-3" << std::endl;
+    iss << "plot_mode = summary" << std::endl;
+
+    iss << "[DuDvMGSmoother]" << std::endl;
+    iss << "steps = 4" << std::endl;
+    iss << "omega = 0.5" << std::endl;
+
+    iss << "[DuDvMGCoarseSolver]" << std::endl;
+    iss << "max_iter = 100" << std::endl;
+    iss << "tol_rel = 1e-8" << std::endl;
+
+    // the rest of this code was used by the old SolverFactory; it is not used anymore
+    /*
     iss << "[PCG-JAC]" << std::endl;
     iss << "type = pcg" << std::endl;
     iss << "max_iter = 100" << std::endl;
@@ -903,7 +941,7 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
     iss << "type = hierarchy" << std::endl;
     iss << "smoother = rich" << std::endl;
     iss << "coarse = PCG-JAC" << std::endl;
-
+    */
   }
   else
   {

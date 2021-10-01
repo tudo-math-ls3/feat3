@@ -2,7 +2,7 @@
 mesh_files =  unit-axe-tria.xml
 meshopt_config_file = ./meshopt_config.ini
 solver_config_file = ./solver_config.ini
-mesh_optimiser = DuDvDefault
+mesh_optimizer = DuDvDefault
 delta_t = 1e-3
 t_end = 5e-1
 

@@ -676,7 +676,6 @@ namespace FEAT
         static std::shared_ptr<Solver::Linesearch<Functional_, Filter_>> create_linesearch(
           Functional_& functional, Filter_& filter, PropertyMap* base, const String& section_name)
         {
-
           // This is the type for the state vector used in the functional
           typedef typename Functional_::VectorTypeR VectorTypeR;
 

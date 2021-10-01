@@ -1,14 +1,11 @@
 [ApplicationSettings]
 mesh_files = ./unit-circle-tria.xml
 meshopt_config_file = ./meshopt_config.ini
-mesh_optimiser = HyperelasticityDefault
+mesh_optimizer = HyperelasticityDefault
 solver_config_file = ./solver_config.ini
 
 [DomainControlSettings]
 lvl_min = 1
-lvl_max = 7
+lvl_max = 6
 refinement_adapt_mode = none
 finest_adapt_mode = chart
-#parti-type = metis naive
-#parti-name = default
-#parti-rank-elems = 4

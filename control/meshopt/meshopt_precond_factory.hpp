@@ -75,15 +75,15 @@ namespace FEAT
             if(precon_section == nullptr)
               XABORTM("precon_section "+precon_p.first+" not found!");
 
-            auto precon_type_p = precon_section->query("type");
+            /*auto precon_type_p = precon_section->query("type");
             if(!precon_type_p.second)
               XABORTM("Section "+precon_p.first+" does not have a type key!");
 
-            if(precon_type_p.first == "DuDvPrecon")
+            if(precon_type_p.first == "DuDvPrecon")*/
             {
               auto precon_solver_p = precon_section->query("linear_solver");
               if(!precon_solver_p.second)
-                XABORTM("precon_section "+precon_type_p.first+" has no linear_solver key!");
+                XABORTM("precon_section has no linear_solver key!");
 
               auto dirichlet_list_p = precon_section->query("dirichlet_boundaries");
               std::deque<String> precon_dirichlet_list = dirichlet_list_p.first.split_by_whitespaces();
@@ -112,10 +112,10 @@ namespace FEAT
                 (dom_ctrl, level, precon_dirichlet_list, precon_slip_list,
                 precon_solver_p.first, solver_config, fixed_reference_domain);
             }
-            else if(precon_p.first != "none")
+            /*else if(precon_p.first != "none")
             {
               XABORTM("Unsupport nonlinear optimizer precon: "+precon_p.first);
-            }
+            }*/
           }
           else
           {

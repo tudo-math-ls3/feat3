@@ -24,6 +24,8 @@
 #include <kernel/util/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/stop_watch.hpp>
+#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/scale_precond.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/meshopt/meshopt_control.hpp>
@@ -353,7 +355,7 @@ struct NavierStokesScrewsApp
   typedef ExtrudedPartiDomainControl<ExtrudedDomainLevelType, DomCtrl, extrude> ExtrudedDomCtrl;
 
 
-  /// This is how far the inner screw's centre deviates from the outer screw's
+  /// This is how far the inner screw's center deviates from the outer screw's
   static constexpr DataType excentricity_inner = DataType(0.2833);
 
   /**
@@ -1089,24 +1091,39 @@ struct NavierStokesScrewsApp
     comm.print("Setting up Velocity Multigrid...");
 
     watch_sol_init.start();
-    Solver::MatrixStock<
+    auto multigrid_hierarchy_velo = std::make_shared<Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalMatrixBlockA,
       typename SystemLevelType::GlobalVeloFilter,
-      typename SystemLevelType::GlobalVeloTransfer> matrix_stock_velo(extruded_dom_ctrl.size_virtual());
-    for (auto & system_level: system_levels)
+      typename SystemLevelType::GlobalVeloTransfer>>(extruded_dom_ctrl.size_virtual());
+
+    // Loop over all levels except the coarse-most one
+    for(Index i(0); (i+1) < dom_ctrl.size_physical(); ++i)
     {
-      matrix_stock_velo.systems.push_back(system_level->matrix_a.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_velo.gates_row.push_back(&system_level->gate_velo);
-      matrix_stock_velo.gates_col.push_back(&system_level->gate_velo);
-      matrix_stock_velo.filters.push_back(system_level->filter_velo.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_velo.muxers.push_back(&system_level->coarse_muxer_velo);
-      matrix_stock_velo.transfers.push_back(system_level->transfer_velo.clone(LAFEM::CloneMode::Shallow));
+      auto& lvl = *system_levels.at(i);
+
+      // create a FGMRES-jacobi smoother
+      auto jacobi =  Solver::new_jacobi_precond(lvl.matrix_a, lvl.filter_velo);
+      auto smoother = Solver::new_fgmres(lvl.matrix_a, lvl.filter_velo, 32, 0.0, jacobi);
+      smoother->set_max_iter(32);
+      multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo, smoother, smoother, smoother);
     }
 
-    auto tsolver_a = Solver::SolverFactory::create_scalar_solver(matrix_stock_velo, &solver_config, "linsolver_a");
-    Solver::PreconditionedIterativeSolver<typename decltype(tsolver_a)::element_type::VectorType>* solver_a =
-      (Solver::PreconditionedIterativeSolver<typename decltype(tsolver_a)::element_type::VectorType>*) &(*tsolver_a);
-    matrix_stock_velo.hierarchy_init_symbolic();
+    // push the coarse grid solver
+    {
+      auto& lvl = *system_levels.back();
+      auto scale = Solver::new_scale_precond(lvl.filter_velo, 0.7);
+      multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, scale);
+    }
+
+    // creat the multigrid solver
+    auto multigrid_velo = Solver::new_multigrid(multigrid_hierarchy_velo, Solver::MultiGridCycle::F);
+
+    // create the outer surrounding FGMRES solver
+    auto solver_a = Solver::new_fgmres("linsolver_a", solver_config.query_section("linsolver_a"),
+      system_levels.front()->matrix_a, system_levels.front()->filter_velo, multigrid_velo);
+
+    // initialize
+    multigrid_hierarchy_velo->init_symbolic();
     solver_a->init_symbolic();
     solver_a->set_plot_name(solver_a->name()+" (V-Bur)");
 
@@ -1114,40 +1131,55 @@ struct NavierStokesScrewsApp
 
     comm.print("Setting up Pressure Multigrid...");
 
-    Solver::MatrixStock<
+    auto multigrid_hierarchy_pres = std::make_shared<Solver::MultiGridHierarchy<
       typename SystemLevelType::GlobalSchurMatrix,
       typename SystemLevelType::GlobalPresFilter,
-      typename SystemLevelType::GlobalPresTransfer> matrix_stock_pres(extruded_dom_ctrl.size_virtual());
-    for (auto & system_level: system_levels)
+      typename SystemLevelType::GlobalPresTransfer>>(extruded_dom_ctrl.size_virtual());
+
+    // Loop over all levels except the coarse-most one
+    for(Index i(0); (i+1) < dom_ctrl.size_physical(); ++i)
     {
-      matrix_stock_pres.systems.push_back(system_level->matrix_s.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_pres.gates_row.push_back(&system_level->gate_pres);
-      matrix_stock_pres.gates_col.push_back(&system_level->gate_pres);
-      matrix_stock_pres.filters.push_back(system_level->filter_pres.clone(LAFEM::CloneMode::Shallow));
-      matrix_stock_pres.muxers.push_back(&system_level->coarse_muxer_pres);
-      matrix_stock_pres.transfers.push_back(system_level->transfer_pres.clone(LAFEM::CloneMode::Shallow));
+      auto& lvl = *system_levels.at(i);
+
+      // create a FGMRES-jacobi smoother
+      auto jacobi =  Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres);
+      auto smoother = Solver::new_richardson(lvl.matrix_s, lvl.filter_pres, 0.4, jacobi);
+      smoother->set_min_iter(8);
+      smoother->set_max_iter(8);
+      multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, lvl.transfer_pres, smoother, smoother, smoother);
     }
 
-    auto tsolver_s = Solver::SolverFactory::create_scalar_solver(matrix_stock_pres, &solver_config, "linsolver_s");
-    Solver::PreconditionedIterativeSolver<typename decltype(tsolver_s)::element_type::VectorType>* solver_s =
-      (Solver::PreconditionedIterativeSolver<typename decltype(tsolver_s)::element_type::VectorType>*) &(*tsolver_s);
-    matrix_stock_pres.hierarchy_init_symbolic();
+    // push the coarse grid solver
+    {
+      auto& lvl = *system_levels.back();
+      auto jacobi =  Solver::new_jacobi_precond(lvl.matrix_s, lvl.filter_pres);
+      auto cgsolver = Solver::new_pcg(lvl.matrix_s, lvl.filter_pres, jacobi);
+      cgsolver->set_tol_rel(1E-8);
+      cgsolver->set_max_iter(1000);
+      multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, cgsolver);
+    }
+
+    // create the multigrid solver
+    auto multigrid_pres = Solver::new_multigrid(multigrid_hierarchy_pres, Solver::MultiGridCycle::V);
+
+    // create the outer surrounding PCG solver
+    auto solver_s = Solver::new_pcg("linsolver_s", solver_config.query_section("linsolver_s"),
+      system_levels.front()->matrix_s, system_levels.front()->filter_pres, multigrid_pres);
+
+    // initialize
+    multigrid_hierarchy_pres->init_symbolic();
     solver_s->init_symbolic();
     solver_s->set_plot_name(solver_s->name()+" (P-Lap)");
 
-    Solver::MatrixStock<
-      typename SystemLevelType::GlobalSchurMatrix,
-      MassPFilter,
-      typename SystemLevelType::GlobalPresTransfer> ms_mass_p(std::size_t(1));
-    MassPFilter mass_p_filter;
-    ms_mass_p.systems.push_back(matrix_m_p.clone(LAFEM::CloneMode::Shallow));
-    ms_mass_p.gates_row.push_back(&the_system_level.gate_pres);
-    ms_mass_p.gates_col.push_back(&the_system_level.gate_pres);
-    ms_mass_p.filters.push_back(mass_p_filter.clone(LAFEM::CloneMode::Shallow));
 
-    auto tsolver_m_p = Solver::SolverFactory::create_scalar_solver(ms_mass_p, &solver_config, "solver_m_p");
-    Solver::PreconditionedIterativeSolver<typename decltype(tsolver_m_p)::element_type::VectorType>* solver_m_p =
-      (Solver::PreconditionedIterativeSolver<typename decltype(tsolver_m_p)::element_type::VectorType>*) &(*tsolver_m_p);
+    MassPFilter mass_p_filter;
+    auto solver_m_p = Solver::new_pcg(matrix_m_p, mass_p_filter, Solver::new_jacobi_precond(matrix_m_p, mass_p_filter));
+    solver_m_p->set_max_iter(100);
+    solver_m_p->set_tol_rel(1e-8);
+    solver_m_p->set_tol_abs(1e-4);
+    solver_m_p->set_plot_mode(Solver::PlotMode::summary);
+
+    // initialize
     solver_m_p->init_symbolic();
     solver_m_p->set_plot_name(solver_s->name()+" (P-Mass)");
     watch_sol_init.stop();
@@ -1777,7 +1809,7 @@ struct NavierStokesScrewsApp
 
         // Phase 3: initialize linear solvers
         watch_sol_init.start();
-        matrix_stock_velo.hierarchy_init_numeric();
+        multigrid_hierarchy_velo->init_numeric();
         solver_a->init_numeric();
         watch_sol_init.stop();
 
@@ -1789,7 +1821,7 @@ struct NavierStokesScrewsApp
 
         // release the solver
         solver_a->done_numeric();
-        matrix_stock_velo.hierarchy_done_numeric();
+        multigrid_hierarchy_velo->done_numeric();
 
         // check the solver's output
         if(!Solver::status_success(status_a))
@@ -1821,7 +1853,7 @@ struct NavierStokesScrewsApp
 
         // initialize pressure poisson solver
         watch_sol_init.start();
-        matrix_stock_pres.hierarchy_init_numeric();
+        multigrid_hierarchy_pres->init_numeric();
         solver_s->init_numeric();
         watch_sol_init.stop();
 
@@ -1833,7 +1865,7 @@ struct NavierStokesScrewsApp
 
         // release pressure poisson solver
         solver_s->done_numeric();
-        matrix_stock_pres.hierarchy_done_numeric();
+        multigrid_hierarchy_pres->done_numeric();
 
         // check solver output
         if(!Solver::status_success(status_s))
@@ -1863,7 +1895,6 @@ struct NavierStokesScrewsApp
 
         // Update the pressure mass matrix and initialize the solver
         watch_sol_init.start();
-        ms_mass_p.refresh();
         solver_m_p->init_numeric();
         watch_sol_init.stop();
 
@@ -1890,7 +1921,7 @@ struct NavierStokesScrewsApp
         {
           comm.print("");
           // compute local errors
-          Assembly::VectorErrorInfo<DataType> error_v = Assembly::VectorErrorComputer<1>::compute(
+          Assembly::VectorErrorInfo<DataType,2> error_v = Assembly::VectorErrorComputer<1>::compute(
             vec_sol_v.at(0).local(), velo_sol, the_domain_level.space_velo, cubature);
 
           Assembly::ScalarErrorInfo<DataType> error_p = Assembly::ScalarErrorComputer<0>::compute(
@@ -2172,13 +2203,12 @@ struct NavierStokesScrewsApp
 #endif
 
     solver_a->done_symbolic();
-    matrix_stock_velo.hierarchy_done_symbolic();
+    multigrid_hierarchy_velo->done_symbolic();
 
     solver_s->done_symbolic();
-    matrix_stock_pres.hierarchy_done_symbolic();
+    multigrid_hierarchy_pres->done_symbolic();
 
     solver_m_p->done_symbolic();
-    ms_mass_p.hierarchy_done_symbolic();
 
     //// Write final vtk output
     //if(write_vtk)
@@ -2650,7 +2680,6 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "max_iter = 1000" << std::endl;
   iss << "tol_rel = 1e-8" << std::endl;
   iss << "precon = jac" << std::endl;
-
 }
 
 static void read_test_mesh_file_names(std::deque<String>& mesh_files)

@@ -13,7 +13,6 @@ type = fgmres
 max_iter = 100
 tol_rel = 1e-8
 precon = mgv_a
-precon_variant = left
 krylov_dim = 7
 plot_mode = all
 
@@ -81,22 +80,6 @@ type = fgmres
 krylov_dim = 25
 precon = jac
 max_iter = 1000
-
-[ALGLIBMinLBFGS]
-type = ALGLIBMinLBFGS
-plot_mode = summary
-max_iter = 10000
-tol_rel = 1e-8
-lbfgs_dim = 7
-keep_iterates = 0
-
-[ALGLIBMinCG]
-type = ALGLIBMinCG
-plot_mode = summary
-tol_rel = 1e-8
-max_iter = 10000
-direction_update = DYHSHybrid
-keep_iterates = 0
 
 [NLCG]
 type = NLCG

@@ -137,7 +137,7 @@ namespace FEAT
           }
 
           auto solver_p = dudv_config_section->query("solver_config");
-          XASSERTM(solver_p.second, "DuDv config section is missing solver entry!");
+          XASSERTM(solver_p.second, "DuDv config section is missing solver_config entry!");
 
           bool fixed_reference_domain(false);
           auto fixed_reference_domain_p = dudv_config_section->query("fixed_reference_domain");

@@ -941,7 +941,7 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
     iss << "dirichlet_boundaries = bnd:o" << std::endl;
 
     iss << "[DuDvDefaultParameters]" << std::endl;
-    iss << "solver_config = PCG-MG" << std::endl;
+    iss << "solver_config = DuDvLinearSolver" << std::endl;
   }
   else if(test_number == 2)
   {
@@ -991,6 +991,31 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "type = DuDvPrecon" << std::endl;
   iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
   iss << "fixed_reference_domain = 1" << std::endl;
+  iss << "linear_solver = DuDvLinearSolver" << std::endl;
+
+  iss << "[DuDvLinearSolver]" << std::endl;
+  //iss << "type = pcg" << std::endl;
+  iss << "max_iter = 10" << std::endl;
+  iss << "tol_rel = 1e-8" << std::endl;
+  //iss << "precon = MG1" << std::endl;
+  iss << "plot_mode = summary" << std::endl;
+
+  iss << "[DuDvMGSmoother]" << std::endl;
+  iss << "steps = 4" << std::endl;
+  iss << "omega = 0.5" << std::endl;
+
+  iss << "[DuDvMGCoarseSolver]" << std::endl;
+  //iss << "type = pcg" << std::endl;
+  iss << "max_iter = 50" << std::endl;
+  iss << "tol_rel = 1e-8" << std::endl;
+  //iss << "precon = jac" << std::endl;
+
+  // the rest of this code was used by the old SolverFactory; it is not used anymore
+  /*
+  iss << "[DuDvPrecon]" << std::endl;
+  iss << "type = DuDvPrecon" << std::endl;
+  iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
+  iss << "fixed_reference_domain = 1" << std::endl;
   iss << "linear_solver = PCG-MG" << std::endl;
 
   iss << "[PCG-JAC]" << std::endl;
@@ -1027,7 +1052,7 @@ static void read_test_solver_config(std::stringstream& iss)
   iss << "type = hierarchy" << std::endl;
   iss << "smoother = rich" << std::endl;
   iss << "coarse = PCG-JAC" << std::endl;
-
+  */
 }
 
 static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int test_number)

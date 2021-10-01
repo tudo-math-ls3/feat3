@@ -11,7 +11,7 @@ dirichlet_boundaries = bnd:o
 meshopt_lvl = -1
 
 [DuDvDefaultParameters]
-solver_config = PCG-MG
+solver_config = DuDvFullSolver
 fixed_reference_domain = 1
 
 [HyperelasticityDefaultParameters]
