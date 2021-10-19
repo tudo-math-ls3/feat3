@@ -197,6 +197,16 @@ namespace FEAT
       }
     }
 
+    void Graph::permute_indices(const Adjacency::Permutation& inv_perm)
+    {
+      XASSERTM(!_image_idx.empty(), "image index vector is missing");
+      XASSERT(Index(_image_idx.size()) == inv_perm.size());
+
+      // map all indices
+      for(Index& idx : _image_idx)
+        idx = inv_perm.map(idx);
+    }
+
     std::vector<char> Graph::serialize() const
     {
       // compute buffer size

@@ -605,6 +605,21 @@ namespace FEAT
       /// mesh chart type
       typedef typename BaseClass::MeshChartType MeshChartType;
 
+    protected:
+      void _clone(const MeshPartNode& other)
+      {
+        XASSERT(this->_mesh == nullptr);
+        XASSERT(this->_mesh_part_nodes.empty());
+
+        if(other._mesh != nullptr)
+          this->set_mesh(new MeshType(other._mesh->clone()));
+
+        for(auto it = other._mesh_part_nodes.begin(); it != other._mesh_part_nodes.end(); ++it)
+        {
+          this->add_mesh_part_node(it->first, it->second.node->clone_new(), it->second.chart_name, it->second.chart);
+        }
+      }
+
     public:
       /**
        * \brief Constructor.
@@ -620,6 +635,18 @@ namespace FEAT
       /// virtual destructor
       virtual ~MeshPartNode()
       {
+      }
+
+      /**
+       * \brief Creates an independent clone of this object on the heap.
+       *
+       * \returns A heap pointer to the newly created clone opject.
+       */
+      MeshPartNode* clone_new() const
+      {
+        MeshPartNode* node = new MeshPartNode(nullptr);
+        node->_clone(*this);
+        return node;
       }
 
       /**
@@ -719,6 +746,30 @@ namespace FEAT
       /// a map of our patch mesh-parts
       std::map<int, MeshPartType*> _patches;
 
+
+      void _clone(const RootMeshNode& other)
+      {
+        XASSERT(this->_mesh == nullptr);
+        XASSERT(this->_mesh_part_nodes.empty());
+
+        if(other._mesh != nullptr)
+          this->set_mesh(new MeshType(other._mesh->clone()));
+
+        for(auto it = other._mesh_part_nodes.begin(); it != other._mesh_part_nodes.end(); ++it)
+        {
+          this->add_mesh_part_node(it->first, it->second.node->clone_new(), it->second.chart_name, it->second.chart);
+        }
+
+        this->_atlas = other._atlas;
+
+        for(auto it = other._halos.begin(); it != other._halos.end(); ++it)
+          this->add_halo(it->first, new MeshPartType(it->second->clone()));
+
+        for(auto it = other._patches.begin(); it != other._patches.end(); ++it)
+          this->add_patch(it->first, new MeshPartType(it->second->clone()));
+      }
+
+
     public:
       /**
        * \brief Constructor.
@@ -751,9 +802,34 @@ namespace FEAT
           delete x.second;
       }
 
+      /// \returns A pointer to the underlying mesh atlas; may return \c nullptr.
       const MeshAtlasType* get_atlas() const
       {
         return _atlas;
+      }
+
+      /**
+       * \brief Creates an independent clone of this root mesh node on the heap.
+       *
+       * \returns A pointer to a new clone of this root mesh node.
+       */
+      RootMeshNode* clone_new() const
+      {
+        RootMeshNode* node = new RootMeshNode(nullptr, nullptr);
+        node->_clone(*this);
+        return node;
+      }
+
+      /**
+       * \brief Creates an independent clone of this root mesh node on the heap.
+       *
+       * \returns A shared pointer to a new clone of this root mesh node.
+       */
+      std::shared_ptr<RootMeshNode> clone_shared() const
+      {
+        std::shared_ptr<RootMeshNode> node = std::make_shared<RootMeshNode>(nullptr, nullptr);
+        node->_clone(*this);
+        return node;
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -767,23 +843,43 @@ namespace FEAT
         return s;
       }
 
+      /**
+       * \brief Adds a halo mesh part to this mesh node.
+       *
+       * \param[in] rank
+       * The rank of the neighbor this halo belongs to.
+       *
+       * \param[in] halo_part
+       * A pointer to the halo mesh part for the neighbor.
+       */
       void add_halo(int rank, MeshPartType* halo_part)
       {
         XASSERT(halo_part != nullptr);
         _halos.emplace(rank, halo_part);
       }
 
+      /**
+       * \brief Returns a halo meshpart for a given neighbor.
+       *
+       * \param[in] rank
+       * The rank of the neighbor for which the halo is to be returned.
+       *
+       * \returns A pointer to the halo mesh part for the neighbor or \c nullptr,
+       * if no halo for this neighbor rank exists.
+       */
       const MeshPartType* get_halo(int rank) const
       {
         auto it = _halos.find(rank);
         return (it != _halos.end() ? it->second : nullptr);
       }
 
+      /// \returns A reference to the internal neighbor-halo map.
       const std::map<int, MeshPartType*>& get_halo_map() const
       {
         return this->_halos;
       }
 
+      /// Deletes all halo meshparts from this mesh node.
       void clear_halos()
       {
         for(auto& x : _halos)
@@ -819,23 +915,43 @@ namespace FEAT
         _halos = std::move(new_halos);
       }
 
+      /**
+       * \brief Adds a patch mesh part to this mesh node.
+       *
+       * \param[in] rank
+       * The rank of the child this patch belongs to.
+       *
+       * \param[in] patch_part
+       * A pointer to the patch mesh part for the child.
+       */
       void add_patch(int rank, MeshPartType* patch_part)
       {
         XASSERT(patch_part != nullptr);
         _patches.emplace(rank, patch_part);
       }
 
+      /**
+       * \brief Returns a patch meshpart for a given child.
+       *
+       * \param[in] rank
+       * The rank of the child for which the patch is to be returned.
+       *
+       * \returns A pointer to the patch mesh part for the child or \c nullptr,
+       * if no patch for this child rank exists.
+       */
       const MeshPartType* get_patch(int rank) const
       {
         auto it = _patches.find(rank);
         return (it != _patches.end() ? it->second : nullptr);
       }
 
+      /// \returns A reference to the internal child-patch map.
       const std::map<int, MeshPartType*>& get_patch_map() const
       {
         return this->_patches;
       }
 
+      /// Deletes all halo meshparts from this mesh node.
       void clear_patches()
       {
         for(auto& x : _patches)
@@ -916,6 +1032,20 @@ namespace FEAT
 
         // okay
         return fine_node;
+      }
+
+      /**
+       * \brief Refines this node and its sub-tree.
+       *
+       * \param[in] adapt_mode
+       * Mode for adaption, defaults to chart.
+       *
+       * \returns
+       * A shared pointer to a RootMeshNode containing the refined mesh tree.
+       */
+      std::shared_ptr<RootMeshNode> refine_shared(AdaptMode adapt_mode = AdaptMode::chart) const
+      {
+        return std::shared_ptr<RootMeshNode>(this->refine(adapt_mode));
       }
 
       /**
@@ -1120,6 +1250,15 @@ namespace FEAT
         return extract_patch(comm_ranks, partition.get_patches(), rank);
       }
 
+      /**
+       * \brief Creates a patch meshpart for a child and adds it to the patch map.
+       *
+       * \param[in] elems_at_rank
+       * The adjacency graph that describes which elements belong to each child rank.
+       *
+       * \param[in] rank
+       * The child rank for which the patch meshpart is to be created.
+       */
       void create_patch_meshpart(const Adjacency::Graph& elems_at_rank, const int rank)
       {
         // create a factory for our partition
@@ -1135,6 +1274,48 @@ namespace FEAT
       }
 
       /**
+       * \brief Creates a mesh permutation
+       *
+       * This function creates a permutation based on one of the standards permutation strategies
+       * and also permutes the mesh parts, halos and patches stored in this mesh node.
+       *
+       * \see ConformalMesh::create_permutation()
+       *
+       * \note
+       * If you want to use a custom permutation other than one of the standard permutation
+       * strategies then use set_permutation() instead.
+       */
+      void create_permutation(PermutationStrategy strategy)
+      {
+        XASSERTM(this->_mesh != nullptr, "mesh node has no mesh yet and therefore cannot be permuted!");
+
+        // permute the mesh, which creates the actual permutation
+        this->_mesh->create_permutation(strategy);
+
+        // permute mesh parts, halos and patches
+        this->_apply_mesh_perm_to_parts();
+      }
+
+      /**
+       * \brief Creates a mesh permutation
+       *
+       * This function creates a permutation based on one of the standards permutation strategies
+       * and also permutes the mesh parts, halos and patches stored in this mesh node.
+       *
+       * \see ConformalMesh::set_permutation()
+       */
+      void set_permutation(MeshPermutation<typename MeshType::ShapeType>&& mesh_perm)
+      {
+        XASSERTM(this->_mesh != nullptr, "mesh node has no mesh yet and therefore cannot be permuted!");
+
+        // permute the mesh, which creates the actual permutation
+        this->_mesh->set_permutation(std::forward<MeshPermutation<typename MeshType::ShapeType>>(mesh_perm));
+
+        // permute mesh parts, halos and patches
+        this->_apply_mesh_perm_to_parts();
+      }
+
+      /**
        * \brief Returns the name of the class.
        * \returns
        * The name of the class as a String.
@@ -1142,6 +1323,40 @@ namespace FEAT
       static String name()
       {
         return "RootMeshNode<...>";
+      }
+
+    protected:
+      /// helper function: applies the mesh permutation to all mesh parts, halos and patches
+      void _apply_mesh_perm_to_parts()
+      {
+        // do we have a permutation to apply?
+        if(!this->_mesh->is_permuted())
+          return;
+
+        // get the inverse permutations array
+        const auto& mesh_perm = this->_mesh->get_mesh_permutation();
+
+        // permute all mesh part nodes
+        for(auto it = this->_mesh_part_nodes.begin(); it != this->_mesh_part_nodes.end(); ++it)
+        {
+          MeshPartType* mpart = it->second.node->get_mesh();
+          if(mpart != nullptr)
+            mpart->permute(mesh_perm);
+        }
+
+        // permute all halos
+        for(auto it = _halos.begin(); it != _halos.end(); ++it)
+        {
+          if(it->second != nullptr)
+            it->second->permute(mesh_perm);
+        }
+
+        // permute all patches
+        for(auto it = _patches.begin(); it != _patches.end(); ++it)
+        {
+          if(it->second != nullptr)
+            it->second->permute(mesh_perm);
+        }
       }
     }; // class RootMeshNode
 

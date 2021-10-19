@@ -9,6 +9,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 set(benchmarks
   axpy-bench
   block_product_matvec-bench
+  meshperm_assembly-bench
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
   product_matmat-bench

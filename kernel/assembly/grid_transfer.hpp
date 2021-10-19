@@ -12,6 +12,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/intern/coarse_fine_cell_mapping.hpp>
+#include <kernel/geometry/mesh_permutation.hpp>
 
 namespace FEAT
 {
@@ -146,8 +147,15 @@ namespace FEAT
         int pivot[FineSpaceEvaluator::max_local_dofs];
 
         // helper struct to calculate fine mesh cell index
-        const Geometry::Intern::CoarseFineCellMapping<typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
-            cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
+        const Geometry::Intern::CoarseFineCellMapping<
+          typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
+          cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
+
+        // get fine mesh element inverse permutation
+        const Adjacency::Permutation& coarse_perm =
+          coarse_trafo.get_mesh().get_mesh_permutation().get_perm();
+        const Adjacency::Permutation& fine_perm =
+          fine_trafo.get_mesh().get_mesh_permutation().get_inv_perm();
 
         // loop over all coarse mesh cells
         for(Index ccell(0); ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
@@ -164,11 +172,17 @@ namespace FEAT
           // prepare coarse mesh dof-mapping
           coarse_dof_mapping.prepare(ccell);
 
+          // get coarse cell index with respect to 2-level ordering
+          const Index ccell_2lvl = (coarse_perm.empty() ? ccell : coarse_perm.map(ccell));
+
           // loop over all child cells
           for(Index child(0); child < cfmapping.get_num_children(); ++child)
           {
-            // calculate fine mesh cell index
-            const Index fcell = cfmapping.calc_fcell(ccell, child);
+            // calculate fine mesh cell index with respect to 2 level ordering
+            const Index fcell_2lvl = cfmapping.calc_fcell(ccell_2lvl, child);
+
+            // get fine cell index with respect to potential permutation
+            const Index fcell = (fine_perm.empty() ? fcell_2lvl : fine_perm.map(fcell_2lvl));
 
             // prepare fine trafo evaluator
             fine_trafo_eval.prepare(fcell);
@@ -441,8 +455,15 @@ namespace FEAT
         int pivot[CoarseSpaceEvaluator::max_local_dofs];
 
         // helper struct to calculate fine mesh cell index
-        const Geometry::Intern::CoarseFineCellMapping<typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
-            cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
+        const Geometry::Intern::CoarseFineCellMapping<
+          typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
+          cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
+
+        // get fine mesh element inverse permutation
+        const Adjacency::Permutation& coarse_perm =
+          coarse_trafo.get_mesh().get_mesh_permutation().get_perm();
+        const Adjacency::Permutation& fine_perm =
+          fine_trafo.get_mesh().get_mesh_permutation().get_inv_perm();
 
         // loop over all coarse mesh cells
         for(Index ccell(0); ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
@@ -482,11 +503,17 @@ namespace FEAT
           // invert coarse mesh mass matrix
           Math::invert_matrix(coarse_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
 
+          // get coarse cell index with respect to 2-level ordering
+          const Index ccell_2lvl = (coarse_perm.empty() ? ccell : coarse_perm.map(ccell));
+
           // loop over all child cells
           for(Index child(0); child < cfmapping.get_num_children(); ++child)
           {
-            // calculate fine mesh cell index
-            const Index fcell = cfmapping.calc_fcell(ccell, child);
+            // calculate fine mesh cell index with respect to 2 level ordering
+            const Index fcell_2lvl = cfmapping.calc_fcell(ccell_2lvl, child);
+
+            // get fine cell index with respect to potential permutation
+            const Index fcell = (fine_perm.empty() ? fcell_2lvl : fine_perm.map(fcell_2lvl));
 
             // prepare fine trafo evaluator
             fine_trafo_eval.prepare(fcell);

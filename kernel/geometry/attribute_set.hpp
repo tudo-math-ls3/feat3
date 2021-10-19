@@ -93,6 +93,20 @@ namespace FEAT
         {
         }
 
+        void clone(const AttributeSet& other)
+        {
+          this->_num_values = other._num_values;
+          this->_dimension = other._dimension;
+          this->_values = other._values;
+        }
+
+        AttributeSet clone() const
+        {
+          AttributeSet ats(this->_num_values, this->_dimension);
+          ats._values = this->_values;
+          return ats;
+        }
+
         /// \returns The size of dynamically allocated memory in bytes.
         std::size_t bytes() const
         {

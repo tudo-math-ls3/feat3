@@ -141,6 +141,12 @@ namespace FEAT
         return Index(_perm_pos.size());
       }
 
+      /// Checks whether the permutation is empty.
+      bool empty() const
+      {
+        return _perm_pos.empty();
+      }
+
       /// returns the permute-position array
       Index* get_perm_pos()
       {
@@ -163,6 +169,12 @@ namespace FEAT
       const Index* get_swap_pos() const
       {
         return _swap_pos.data();
+      }
+
+      template<typename IT_>
+      IT_ map(IT_ i) const
+      {
+        return IT_(_perm_pos.at(std::size_t(i)));
       }
 
       /// Computes the swap-position vector from the permuation-position vector.

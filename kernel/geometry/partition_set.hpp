@@ -10,6 +10,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/permutation.hpp>
 #include <kernel/util/string.hpp>
 
 #include <deque>
@@ -161,6 +162,17 @@ namespace FEAT
       const Adjacency::Graph& get_patches() const
       {
         return _patches;
+      }
+
+      /**
+       * \brief Permutes the element indices.
+       *
+       * \param[in] inv_perm
+       * The inverse element permutation to be applied.
+       */
+      void permute(const Adjacency::Permutation& inv_perm)
+      {
+        _patches.permute_indices(inv_perm);
       }
     }; // class Partition
 

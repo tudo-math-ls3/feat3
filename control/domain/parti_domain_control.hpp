@@ -136,6 +136,8 @@ namespace FEAT
         bool _was_created;
         /// the adapt mode for refinement
         Geometry::AdaptMode _adapt_mode;
+        /// the permutation strategy for the mesh permutation
+        Geometry::PermutationStrategy _permutation_strategy;
         /// the extern partition sets
         Geometry::PartitionSet _parti_set;
 
@@ -185,6 +187,7 @@ namespace FEAT
           BaseClass(comm_),
           _was_created(false),
           _adapt_mode(Geometry::AdaptMode::chart),
+          _permutation_strategy(Geometry::PermutationStrategy::none),
           _allow_parti_extern(true),
           _allow_parti_2level(true),
           _allow_parti_metis(false),
@@ -366,9 +369,26 @@ namespace FEAT
          * \returns
          * The adapt-mode that is used.
          */
-        Geometry::AdaptMode get_adapt_mode()
+        Geometry::AdaptMode get_adapt_mode() const
         {
           return _adapt_mode;
+        }
+
+        /**
+         * \brief Sets the permutation strategy for mesh permutation.
+         *
+         * \param[in] strategy
+         * The mesh permutation strategy to be used.
+         */
+        void set_permutation_strategy(Geometry::PermutationStrategy strategy)
+        {
+          _permutation_strategy = strategy;
+        }
+
+        /// \returns The permutation strategy used for mesh permutation.
+        Geometry::PermutationStrategy get_permutation_strategy() const
+        {
+          return _permutation_strategy;
         }
 
         /**
@@ -694,14 +714,33 @@ namespace FEAT
           // cleanup
           _parti_set.clear();
 
-          // finally, compile virtual levels
+          // compile virtual levels
           this->compile_virtual_levels();
+
+          // finally, apply mesh permutation
+          this->create_mesh_permutations();
 
           // collect partition statistics
           FEAT::Statistics::toe_partition = stamp_create.elapsed_now();
 
           // domain created
           _was_created = true;
+        }
+
+        /**
+         * \brief Creates the mesh permutations based on the chosen permutation strategy.
+         */
+        void create_mesh_permutations()
+        {
+          // nothing to do?
+          if(_permutation_strategy == Geometry::PermutationStrategy::none)
+            return;
+
+          // loop over all levels and permute
+          for(std::size_t i(0); i < this->size_physical(); ++i)
+          {
+            this->at(i)->get_mesh_node()->create_permutation(this->_permutation_strategy);
+          }
         }
 
         /**

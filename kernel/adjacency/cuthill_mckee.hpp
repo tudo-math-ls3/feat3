@@ -11,6 +11,9 @@
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/adjacency/graph.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAT
 {
   namespace Adjacency
@@ -83,9 +86,36 @@ namespace FEAT
          */
         sort_desc = 2
       };
+      /**
+       * \brief Cuthill-McKee permutation computation function
+       *
+       * This function creates a Cuthill-McKee permutation of the given graph.
+       *
+       * \param[in] graph
+       * The graph, the permutation is calculated for.
+       *
+       * \param[in] reverse
+       * This bool determines, if the reverse Cuthill-McKee permutation should be calculated.
+       * If \c true, then the reversed permutation is used.
+       *
+       * \param[in] root_type
+       * This parameter determines the way, the root nodes are chosen.
+       *
+       * \param[in] sort_type
+       * This parameter determines, which sorting is used in each level of the Cuthill-McKee algorithm.
+       *
+       * \returns
+       * The Cuthill-McKee permutation.
+       */
+      static Permutation compute(
+        std::vector<Index>& layers,
+        const Graph& graph,
+        bool reverse = false,
+        CuthillMcKee::RootType root_type = root_default,
+        CuthillMcKee::SortType sort_type = sort_default);
 
       /**
-       * \brief Cuthill-McKee permutation computation functon
+       * \brief Cuthill-McKee permutation computation function
        *
        * This function creates a Cuthill-McKee permutation of the given graph.
        *

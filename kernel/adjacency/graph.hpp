@@ -379,12 +379,18 @@ namespace FEAT
         return Index(_image_idx.size());
       }
 
-
-
       /**
        * \brief Sorts the image indices to non-descending order.
        */
       void sort_indices();
+
+      /**
+       * \brief Permutes the image indices.
+       *
+       * \param[in] inv_perm
+       * The inverse image indices permutation.
+       */
+      void permute_indices(const Adjacency::Permutation& inv_perm);
 
       /**
        * \brief Serializes the graph into a buffer.

@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/shape.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 // includes, system
 #include <vector>
@@ -29,6 +30,12 @@ namespace FEAT
     protected:
       /// Index vector. _indices[i] = j means that entity i represents entity j in the parent
       std::vector<Index> _indices;
+
+      /// internal clone constructor
+      explicit TargetSet(const std::vector<Index>& idx) :
+        _indices(idx)
+      {
+      }
 
     public:
       /// standard constructor
@@ -69,6 +76,12 @@ namespace FEAT
       /// virtual destructor
       virtual ~TargetSet()
       {
+      }
+
+      /// \returns An independent clone of this target set object.
+      TargetSet clone() const
+      {
+        return TargetSet(this->_indices);
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -117,6 +130,15 @@ namespace FEAT
       {
         ASSERT(i < get_num_entities());
         return _indices[i];
+      }
+
+      void permute_map(const Adjacency::Permutation& inv_perm)
+      {
+        if(!inv_perm.empty())
+        {
+          for(std::size_t i(0); i < _indices.size(); ++i)
+            _indices.at(i) = inv_perm.map(_indices.at(i));
+        }
       }
     }; // class TargetSet
 
@@ -172,6 +194,19 @@ namespace FEAT
         return *this;
       }
 
+      void clone(const TargetSetHolder& other)
+      {
+        BaseClass::clone(other);
+        this->_target_set = other._target_set.clone();
+      }
+
+      TargetSetHolder clone() const
+      {
+        TargetSetHolder tsh;
+        tsh.clone(*this);
+        return tsh;
+      }
+
       virtual ~TargetSetHolder()
       {
       }
@@ -207,6 +242,13 @@ namespace FEAT
           return _target_set.get_num_entities();
         }
         return BaseClass::get_num_entities(dim);
+      }
+
+      template<std::size_t np_>
+      void permute_map(const std::array<Adjacency::Permutation, np_>& inv_perms)
+      {
+        BaseClass::permute_map(inv_perms);
+        _target_set.permute_map(inv_perms.at(shape_dim));
       }
 
       static String name()
@@ -256,6 +298,18 @@ namespace FEAT
       {
       }
 
+      void clone(const TargetSetHolder& other)
+      {
+        this->_target_set = other._target_set.clone();
+      }
+
+      TargetSetHolder clone() const
+      {
+        TargetSetHolder tsh;
+        tsh.clone(*this);
+        return tsh;
+      }
+
       std::size_t bytes() const
       {
         return _target_set.bytes();
@@ -279,6 +333,12 @@ namespace FEAT
       {
         XASSERTM(dim == 0, "invalid dimension parameter");
         return _target_set.get_num_entities();
+      }
+
+      template<std::size_t np_>
+      void permute_map(const std::array<Adjacency::Permutation, np_>& inv_perms)
+      {
+        _target_set.permute_map(inv_perms.at(0));
       }
 
       static String name()

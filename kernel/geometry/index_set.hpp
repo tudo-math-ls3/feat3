@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/shape.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 // includes, system
 #include <array>
@@ -57,6 +58,12 @@ namespace FEAT
         ASSERT(i < num_indices);
         return indices[i];
       }
+
+      void permute_map(const Adjacency::Permutation& inv_perm)
+      {
+        for(int i(0); i < num_indices; ++i)
+          indices[i] = inv_perm.map(indices[i]);
+      }
     }; // struct IndexTuple
 
     /**
@@ -94,6 +101,12 @@ namespace FEAT
 
       /// index vector array
       std::vector<IndexTupleType> _indices;
+
+      /// internal clone constructor
+      explicit IndexSet(Index idx_bnd, const std::vector<IndexTupleType>& idx) :
+        _index_bound(idx_bnd), _indices(idx)
+      {
+      }
 
     public:
       /**
@@ -137,6 +150,12 @@ namespace FEAT
       /// virtual destructor
       virtual ~IndexSet()
       {
+      }
+
+      /// \returns An independent clone of this target set object.
+      IndexSet clone() const
+      {
+        return IndexSet(this->_index_bound, this->_indices);
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -264,6 +283,37 @@ namespace FEAT
       }
 
       /**
+       * \brief Permutes this index set in-situ.
+       *
+       * \perm[in] perm
+       * The permutation of the shape indices.
+       *
+       * \param[in] inv_perm_face
+       * The inverse permutation of the face indices.
+       */
+      void permute(const Adjacency::Permutation& perm, const Adjacency::Permutation& inv_perm_face)
+      {
+        if(_indices.empty())
+          return;
+
+        // first, permute the actual index tuples by the forward permutation
+        if(!perm.empty())
+        {
+          XASSERT(perm.size() == get_num_entities());
+          perm.apply(_indices.data());
+        }
+
+        // now, permute all indices by the inverse face permutation
+        if(!inv_perm_face.empty())
+        {
+          XASSERT(inv_perm_face.size() == get_index_bound());
+          const Index n = Index(_indices.size());
+          for(Index i(0); i < n; ++i)
+            _indices.at(i).permute_map(inv_perm_face);
+        }
+      }
+
+      /**
        * \brief Returns the name of the class.
        * \returns
        * The name of the class as a String.
@@ -360,6 +410,19 @@ namespace FEAT
       {
       }
 
+      void clone(const IndexSetWrapper& other)
+      {
+        BaseClass::clone(other);
+        this->_index_set = other._index_set.clone();
+      }
+
+      IndexSetWrapper clone() const
+      {
+        IndexSetWrapper isw;
+        isw.clone(*this);
+        return isw;
+      }
+
       template<int face_dim__>
       IndexSet<Shape::FaceTraits<Shape_, face_dim__>::count>& get_index_set()
       {
@@ -374,6 +437,14 @@ namespace FEAT
         static_assert(face_dim__ >= 0, "invalid face dimension");
         static_assert(face_dim__ < Shape_::dimension, "invalid face dimension");
         return IndexSetWrapper<Shape_, face_dim__>::_index_set;
+      }
+
+      template<std::size_t np_>
+      void permute(const Adjacency::Permutation& shape_perm,
+        const std::array<Adjacency::Permutation, np_>& inv_perm)
+      {
+        BaseClass::permute(shape_perm, inv_perm);
+        _index_set.permute(shape_perm, inv_perm.at(face_dim_));
       }
 
       static String name()
@@ -430,6 +501,18 @@ namespace FEAT
       {
       }
 
+      void clone(const IndexSetWrapper& other)
+      {
+        this->_index_set = other._index_set.clone();
+      }
+
+      IndexSetWrapper clone() const
+      {
+        IndexSetWrapper isw;
+        isw.clone(*this);
+        return isw;
+      }
+
       template<int face_dim__>
       IndexSet<Shape::FaceTraits<Shape_, face_dim__>::count>& get_index_set()
       {
@@ -442,6 +525,13 @@ namespace FEAT
       {
         static_assert(face_dim__ == 0, "invalid face dimension");
         return IndexSetWrapper<Shape_, face_dim__>::_index_set;
+      }
+
+      template<std::size_t np_>
+      void permute(const Adjacency::Permutation& shape_perm,
+        const std::array<Adjacency::Permutation, np_>& inv_perm)
+      {
+        _index_set.permute(shape_perm, inv_perm.at(0));
       }
 
       static String name()
@@ -550,6 +640,19 @@ namespace FEAT
       {
       }
 
+      void clone(const IndexSetHolder& other)
+      {
+        BaseClass::clone(other);
+        this->_index_set_wrapper.clone(other._index_set_wrapper);
+      }
+
+      IndexSetHolder clone() const
+      {
+        IndexSetHolder ish;
+        ish.clone(*this);
+        return ish;
+      }
+
       template<int shape_dim_>
       IndexSetWrapper<typename Shape::FaceTraits<Shape_, shape_dim_>::ShapeType>& get_index_set_wrapper()
       {
@@ -606,6 +709,14 @@ namespace FEAT
         return get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
+      template<std::size_t np_>
+      void permute(const std::array<Adjacency::Permutation, np_>& perms,
+        const std::array<Adjacency::Permutation, np_>& inv_perms)
+      {
+        BaseClass::permute(perms, inv_perms);
+        _index_set_wrapper.permute(perms.at(Shape_::dimension), inv_perms);
+      }
+
       static String name()
       {
         return "IndexSetHolder<" + Shape_::name() + ">";
@@ -639,6 +750,21 @@ namespace FEAT
       }
 
       virtual ~IndexSetHolder()
+      {
+      }
+
+      void clone(const IndexSetHolder&)
+      {
+      }
+
+      IndexSetHolder clone() const
+      {
+        return IndexSetHolder();
+      }
+
+      template<std::size_t np_>
+      void permute(const std::array<Adjacency::Permutation, np_>&,
+        const std::array<Adjacency::Permutation, np_>&)
       {
       }
 
@@ -792,12 +918,21 @@ namespace FEAT
        *
        */
       template<typename IndexSetHolderType_>
-      static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
+      static void set_num_entities(const IndexSetHolderType_& ish, Index* num_entities)
       {
         // The number of entities of dimension dim_ is the length of the vertex\@shape[dim_] IndexSet
         num_entities[dim_] = ish.template get_index_set<dim_,0>().get_num_entities();
         // Recurse down
         NumEntitiesExtractor<dim_-1>::set_num_entities(ish, num_entities);
+      }
+
+      template<typename IndexSetHolderType_>
+      static void set_num_entities_with_numverts(const IndexSetHolderType_& ish, Index* num_entities)
+      {
+        // The number of entities of dimension dim_ is the length of the vertex\@shape[dim_] IndexSet
+        num_entities[dim_] = ish.template get_index_set<dim_,0>().get_num_entities();
+        // Recurse down
+        NumEntitiesExtractor<dim_-1>::set_num_entities_with_numverts(ish, num_entities);
       }
     };
 
@@ -811,8 +946,15 @@ namespace FEAT
     struct NumEntitiesExtractor<1>
     {
       template<typename IndexSetHolderType_>
-      static void set_num_entities(IndexSetHolderType_& ish, Index* num_entities)
+      static void set_num_entities(const IndexSetHolderType_& ish, Index* num_entities)
       {
+        num_entities[1] = ish.template get_index_set<1,0>().get_num_entities();
+      }
+
+      template<typename IndexSetHolderType_>
+      static void set_num_entities_with_numverts(const IndexSetHolderType_& ish, Index* num_entities)
+      {
+        num_entities[0] = ish.template get_index_set<1,0>().get_index_bound();
         num_entities[1] = ish.template get_index_set<1,0>().get_num_entities();
       }
     };

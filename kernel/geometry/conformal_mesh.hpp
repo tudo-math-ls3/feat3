@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/mesh_permutation.hpp>
 #include <kernel/geometry/intern/facet_neighbors.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
@@ -60,8 +61,11 @@ namespace FEAT
       /// world dimension
       static constexpr int world_dim = VertexSetType::num_coords;
 
-      /// the mesh is structured
+      /// this mesh is not structured
       static constexpr bool is_structured = false;
+
+      /// mesh permutation type
+      typedef MeshPermutation<ShapeType> MeshPermutationType;
 
       /**
        * \brief Index set type class template
@@ -93,6 +97,7 @@ namespace FEAT
           > Type;
       }; // struct IndexSet<...>
 
+      /// index set type for storing neighbor adjacency information
       typedef typename IndexSet<shape_dim, shape_dim-1>::Type NeighborSetType;
 
     protected:
@@ -108,9 +113,8 @@ namespace FEAT
       /// Information about cells sharing a facet
       NeighborSetType _neighbors;
 
-    private:
-      /// \brief Copy assignment operator declared but not implemented
-      ConformalMesh& operator=(const ConformalMesh&);
+      /// mesh permutation (if permuted)
+      MeshPermutationType _permutation;
 
     public:
       /**
@@ -119,13 +123,12 @@ namespace FEAT
        * \param[in] num_entities
        * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
        * Must not be \c nullptr.
-       *
-       * Up until now, every application has just one mesh ("root"), but this might change.
        */
       explicit ConformalMesh(const Index num_entities[]) :
         _vertex_set(num_entities[0]),
         _index_set_holder(num_entities),
-        _neighbors(num_entities[shape_dim])
+        _neighbors(num_entities[shape_dim]),
+        _permutation()
       {
         for(int i(0); i <= shape_dim; ++i)
         {
@@ -139,13 +142,12 @@ namespace FEAT
        *
        * \param[in] factory
        * The factory that is to be used to create the mesh.
-       *
-       * Up until now, every application has just one mesh ("root"), but this might change.
        */
       explicit ConformalMesh(Factory<ConformalMesh>& factory) :
         _vertex_set(factory.get_num_entities(0)),
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
-        _neighbors(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim])
+        _neighbors(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities[shape_dim]),
+        _permutation()
       {
         // Compute entity counts
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
@@ -163,14 +165,14 @@ namespace FEAT
         // Fill neighbor information. This needs facet at cell information, so it needs to be called after
         // fill_index_sets() etc.
         fill_neighbors();
-
       }
 
       /// move constructor
       ConformalMesh(ConformalMesh&& other) :
         _vertex_set(std::forward<VertexSetType>(other._vertex_set)),
         _index_set_holder(std::forward<IndexSetHolderType>(other._index_set_holder)),
-        _neighbors(std::forward<NeighborSetType>(other._neighbors))
+        _neighbors(std::forward<NeighborSetType>(other._neighbors)),
+        _permutation(std::forward<MeshPermutationType>(other._permutation))
       {
         for(int i(0); i <= shape_dim; ++i)
         {
@@ -188,6 +190,8 @@ namespace FEAT
         _vertex_set = std::forward<VertexSetType>(other._vertex_set);
         _index_set_holder = std::forward<IndexSetHolderType>(other._index_set_holder);
         _neighbors = std::forward<NeighborSetType>(other._neighbors);
+        _permutation = std::forward<MeshPermutationType>(other._permutation);
+
         for(int i(0); i <= shape_dim; ++i)
         {
           _num_entities[i] = other.get_num_entities(i);
@@ -196,15 +200,48 @@ namespace FEAT
         return *this;
       }
 
+      /// delete copy constructor
+      ConformalMesh(const ConformalMesh&) = delete;
+
+      /// delete copy-assign operator
+      ConformalMesh& operator=(const ConformalMesh&) = delete;
+
       /// virtual destructor
       virtual ~ConformalMesh()
       {
       }
 
+      /**
+       * \brief Clones another conformal mesh object into \c this object.
+       *
+       * \param[in] other
+       * A reference to the source object that is to be cloned into \c this object.
+       */
+      void clone(const ConformalMesh& other)
+      {
+        for(int i(0); i <= shape_dim; ++i)
+          this->_num_entities[i] = other._num_entities[i];
+        this->_vertex_set = other._vertex_set.clone();
+        this->_index_set_holder.clone(other._index_set_holder);
+        this->_neighbors = other._neighbors.clone();
+        this->_permutation.clone(other._permutation);
+      }
+
+      /// \returns An independent clone of  \c this mesh object.
+      ConformalMesh clone() const
+      {
+        ConformalMesh mesh(this->_num_entities);
+        mesh._vertex_set = this->_vertex_set.clone();
+        mesh._index_set_holder.clone(this->_index_set_holder);
+        mesh._neighbors = this->_neighbors.clone();
+        mesh._permutation.clone(this->_permutation);
+        return mesh;
+      }
+
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
-        return _vertex_set.bytes() + _index_set_holder.bytes() + _neighbors.bytes();
+        return _vertex_set.bytes() + _index_set_holder.bytes() + _neighbors.bytes() + _permutation.bytes();
       }
 
       /**
@@ -241,6 +278,197 @@ namespace FEAT
         return _num_entities[shape_dim];
       }
 
+      /**
+       * \brief Checks whether the mesh is permuted.
+       *
+       * \returns \c true if the mesh is permuted, otherwise \c false.
+       */
+      bool is_permuted() const
+      {
+        return !this->_permutation.empty();
+      }
+
+      /**
+       * \brief Returns a reference to the underlying mesh permutation object.
+       */
+      const MeshPermutationType& get_mesh_permutation() const
+      {
+        return this->_permutation;
+      }
+
+      /**
+       * \brief Creates a mesh permutation based on one of the standard permutation strategies.
+       *
+       * This function creates a new mesh permutation and also applies that permutation to the
+       * vertex set and all the index sets stored in this mesh object.
+       *
+       * \param[in] strategy
+       * The permutation strategy to use, see #MeshPermutation for more details.
+       *
+       * \note
+       * If you want to use a custom permutation other than one of the standard permutation
+       * strategies then use set_permutation() instead.
+       *
+       * \attention
+       * A mesh can only be permuted once and therefore this function will fire an assertion if
+       * the mesh is already permuted.
+       */
+      void create_permutation(PermutationStrategy strategy)
+      {
+        // make sure that we don't already have a permutation
+        XASSERTM(this->_permutation.empty(), "mesh is already permuted!");
+
+        // create the permutation
+        this->_permutation.create(strategy, this->_index_set_holder, this->_vertex_set);
+
+        // permute vertex set
+        this->_vertex_set.permute(this->_permutation.get_perm(0));
+
+        // permute index sets
+        this->_index_set_holder.permute(this->_permutation.get_perms(), this->_permutation.get_inv_perms());
+      }
+
+      /**
+       * \brief Sets a custom mesh permutation for this mesh.
+       *
+       * This function can be used to apply a mesh permutation that is created using some other
+       * approach than the predefined standard permutation strategies.
+       *
+       * This function also applies that permutation to the  vertex set and all the index sets
+       * stored in this mesh object.
+       *
+       * \param[in] mesh_perm
+       * The mesh permutation to use.
+       *
+       * \attention
+       * A mesh can only be permuted once and therefore this function will fire an assertion if
+       * the mesh is already permuted.
+       */
+      void set_permutation(MeshPermutationType&& mesh_perm)
+      {
+        // make sure that we don't already have a permutation
+        XASSERTM(this->_permutation.empty(), "mesh is already permuted!");
+
+        // check the dimensions
+        XASSERTM(mesh_perm.validate_sizes(this->_num_entities) == 0, "mesh permutation has invalid size!");
+
+        // save the permutation
+        this->_permutation = std::forward<MeshPermutationType>(mesh_perm);
+
+        // permute vertex set
+        this->_vertex_set.permute(this->_permutation.get_perm(0));
+
+        // permute index sets
+        this->_index_set_holder.permute(this->_permutation.get_perms(), this->_permutation.get_inv_perms());
+      }
+
+      /**
+       * \brief Validates the element coloring.
+       *
+       * An element coloring is valid, if any pair of two different elements, which share at least
+       * one common vertex, have different colors.
+       *
+       * \returns \c true, if the element coloring is either valid or empty, otherwise \c false.
+       */
+      bool validate_element_coloring() const
+      {
+        // no coloring?
+        const std::vector<Index>& coloring = this->get_mesh_permutation().get_element_coloring();
+        if(coloring.empty())
+          return true;
+
+        // get vertices-at-element index set
+        const auto& verts_at_elem = this->template get_index_set<shape_dim, 0>();
+
+        // render transpose
+        Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+
+        // loop over all color blocks
+        for(std::size_t icol(0); icol+1u < coloring.size(); ++icol)
+        {
+          // get the bounds of our current color block
+          const Index iel_beg = coloring[icol];
+          const Index iel_end = coloring[icol+1u];
+
+          // loop over all elements in the current color block
+          for(Index iel(iel_beg); iel < iel_end; ++iel)
+          {
+            // loop over all vertices adjacent to this element
+            for(int ivt(0); ivt < verts_at_elem.num_indices; ++ivt)
+            {
+              // loop over all elements adjacent to this vertex
+              const Index ivtx = verts_at_elem(iel, ivt);
+              for(auto it = elems_at_vert.image_begin(ivtx); it != elems_at_vert.image_end(ivtx); ++it)
+              {
+                // two adjacent element must not be in the same color block
+                if((iel_beg <= *it) && (*it < iel_end) && (*it != iel))
+                  return false; // invalid coloring
+              }
+            }
+          }
+        } // next color block
+
+        // ok, coloring is valid
+        return true;
+      }
+
+      /**
+       * \brief Validates the element layering.
+       *
+       * An element layering is valid, if any pair of two different elements, which share at least
+       * one common vertex, have different colors.
+       *
+       * \returns \c true, if the element layering is either valid or empty, otherwise \c false.
+       */
+      bool validate_element_layering() const
+      {
+        // no layering?
+        const std::vector<Index>& layering = this->get_mesh_permutation().get_element_layering();
+        if(layering.empty())
+          return true;
+
+        // get vertices-at-element index set
+        const auto& verts_at_elem = this->template get_index_set<shape_dim, 0>();
+
+        // render transpose
+        Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+
+        // loop over all layers
+        for(std::size_t ilay(0); ilay+1u < layering.size(); ++ilay)
+        {
+          // get the bounds of our current layer
+          const Index iel_beg = layering[ilay];
+          const Index iel_end = layering[ilay+1u];
+
+          // get the lower bound for valid neighbors of our current layer = beginning of previous layer
+          const Index iel_lower = layering[Math::max(ilay, std::size_t(1)) - 1u];
+
+          // get the upper bound for valid neighbors of our current layer = end of next layer
+          const Index iel_upper = layering[Math::min(ilay+2u, layering.size()-1u)];
+
+          // loop over all elements in the current layer
+          for(Index iel(iel_beg); iel < iel_end; ++iel)
+          {
+            // loop over all vertices adjacent to this element
+            for(int ivt(0); ivt < verts_at_elem.num_indices; ++ivt)
+            {
+              // loop over all elements adjacent to this vertex
+              const Index ivtx = verts_at_elem(iel, ivt);
+              for(auto it = elems_at_vert.image_begin(ivtx); it != elems_at_vert.image_end(ivtx); ++it)
+              {
+                // adjacent element outside of adjacent layers?
+                if(!((iel_lower <= *it) && (*it < iel_upper)))
+                  return false; // invalid layer
+              }
+            }
+          }
+        } // next color block
+
+        // ok, layering is valid
+        return true;
+      }
+
+      /// Fills the neighbor index set
       void fill_neighbors()
       {
         // Facet at cell index set
@@ -252,7 +480,6 @@ namespace FEAT
           _neighbors = std::move(typename IndexSet<shape_dim, shape_dim-1>::Type(get_num_entities(shape_dim)));
 
         Intern::FacetNeighbors::compute(_neighbors, facet_idx);
-
       }
 
       /// \returns A reference to the facet neighbor relations

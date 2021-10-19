@@ -106,7 +106,7 @@ namespace FEAT
           col_aux[j] = 0;
         }
 
-        // loop over all adjancies of the i-th node
+        // loop over all adjacencies of the i-th node
         lower_bound = domain_ptr[i];
         upper_bound = domain_ptr[i+1];
         for(Index j(lower_bound); j < upper_bound; ++j)
@@ -210,7 +210,7 @@ namespace FEAT
           col_aux[j] = 0;
         }
 
-        // loop over all adjancies of the i-th node
+        // loop over all adjacencies of the i-th node
         lower_bound = domain_ptr[i];
         upper_bound = domain_ptr[i+1];
         for(Index j(lower_bound); j < upper_bound; ++j)

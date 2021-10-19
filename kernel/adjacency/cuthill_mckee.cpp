@@ -8,9 +8,6 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/util/assertion.hpp>
 
-// includes, system
-#include <vector>
-
 namespace FEAT
 {
   namespace Adjacency
@@ -21,6 +18,19 @@ namespace FEAT
       CuthillMcKee::RootType root_type,
       CuthillMcKee::SortType sort_type)
     {
+      std::vector<Index> layers;
+      return compute(layers, graph, reverse, root_type, sort_type);
+    }
+
+    Permutation CuthillMcKee::compute(
+      std::vector<Index>& layers,
+      const Graph& graph,
+      bool reverse,
+      CuthillMcKee::RootType root_type,
+      CuthillMcKee::SortType sort_type)
+    {
+      layers.reserve(graph.get_num_nodes_domain() + Index(1));
+
       // get the number of nodes
       Index num_nodes = graph.get_num_nodes_domain();
 
@@ -42,6 +52,9 @@ namespace FEAT
       Index lvl1 = 0;
       Index lvl2 = 0;
       Index lvl3 = 0;
+
+      // push first layer start
+      layers.push_back(lvl1);
 
       // create permutation
       Permutation perm(graph.get_num_nodes_domain());
@@ -113,14 +126,17 @@ namespace FEAT
         lvl3 = lvl1;
 
         // add the root into the permutation array
-        Index lvl_root = lvl1;
+        const Index lvl_root = lvl1;
         permutation[lvl1 - 1] = root;
         node_mask[root] = 1;
 
-        // loop through the adjancy levels of the root
+        // push the root into the next layer
+        const Index lay_root_pos = Index(layers.size());
+        layers.push_back(lvl1);
+
+        // loop through the adjacency levels of the root
         while(lvl2 < num_nodes)
         {
-
           // loop through all nodes in the current level
           for(Index i(lvl1 - 1); i < lvl2 ; ++i)
           {
@@ -206,6 +222,9 @@ namespace FEAT
             XABORTM("Invalid run_type parameter!");
           }
 
+          // push next layer
+          layers.push_back(lvl3);
+
           // get to the next adjacency level
           lvl1 = lvl2+1;
           lvl2 = lvl3;
@@ -217,15 +236,34 @@ namespace FEAT
         {
           for(Index ind(lvl_root - 1), jnd(lvl2 - 1); ind < jnd; ++ind, --jnd)
           {
-            Index n = permutation[ind];
-            permutation[ind] = permutation[jnd];
-            permutation[jnd] = n;
+            std::swap(permutation[ind], permutation[jnd]);
+          }
+
+          // reverse layers
+          const Index lay_back = Index(layers.size()) - 1u;
+          for(Index k(lay_back); k >= lay_root_pos; --k)
+          {
+            // compute layer sizes from offsets
+            layers.at(k) -= layers.at(k-1u);
+          }
+          for(Index k(lay_root_pos), l(lay_back); k < l; ++k, --l)
+          {
+            // reverse layer sizes
+            std::swap(layers.at(k), layers.at(l));
+          }
+          for(Index k(lay_root_pos); k <= lay_back; ++k)
+          {
+            // compute layer offsets from sizes
+            layers.at(k) += layers.at(k-1u);
           }
         }
 
       } //while(lvl2 < num_nodes) (the separability loop)
 
-      // compute swap array
+      // push the final layer terminator
+      layers.push_back(num_nodes);
+
+     // compute swap array
       perm.calc_swap_from_perm();
 
       // return permutation

@@ -307,7 +307,7 @@ namespace FEAT
        * The trial-space defined on the coarse mesh.
        *
        * \attention
-       * This function silenty assumes that \p fine_space is defined on the
+       * This function silently assumes that \p fine_space is defined on the
        * mesh that was obtained by applying the standard 2-level refinement
        * algorithm on the underlying mesh of \p coarse_space.
        *
@@ -319,22 +319,65 @@ namespace FEAT
         const FineTestSpace_& fine_space,
         const CoarseTrialSpace_& coarse_space)
       {
-        // create an refinement adjactor
-        Geometry::Intern::CoarseFineCellMapping<typename FineTestSpace_::MeshType, typename CoarseTrialSpace_::MeshType>
-            refine_adjactor(fine_space.get_trafo().get_mesh(), coarse_space.get_trafo().get_mesh());
-
         // create test- and trial-dof-mappers
         Adjacency::Graph test_dof_mapping(Space::DofMappingRenderer::render(fine_space));
         Adjacency::Graph trial_dof_mapping(Space::DofMappingRenderer::render(coarse_space));
 
-        // render transposed test-dof-mapping
-        Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, refine_adjactor, test_dof_mapping);
+        // create an refinement adjactor
+        Geometry::Intern::CoarseFineCellMapping<typename FineTestSpace_::MeshType, typename CoarseTrialSpace_::MeshType>
+            refine_adjactor(fine_space.get_trafo().get_mesh(), coarse_space.get_trafo().get_mesh());
 
-        // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
+        // get coarse and fine mesh permutations
+        const Adjacency::Permutation& coarse_perm =
+          coarse_space.get_trafo().get_mesh().get_mesh_permutation().get_perm();
+        const Adjacency::Permutation& fine_inv_perm =
+          fine_space.get_trafo().get_mesh().get_mesh_permutation().get_inv_perm();
+        if(!coarse_perm.empty() || !fine_inv_perm.empty())
+        {
+          // render refinement adjactor
+          Adjacency::Graph refine_graph(Adjacency::RenderType::as_is, refine_adjactor);
 
-        // return the graph
-        return dof_adjactor;
+          // permute refinement graph indices
+          Adjacency::Graph permuted_graph;
+          if(coarse_perm.empty())
+          {
+            // no coarse permutation, only fine mesh permuted
+            permuted_graph = std::move(refine_graph);
+            permuted_graph.permute_indices(fine_inv_perm);
+          }
+          else if(fine_inv_perm.empty())
+          {
+            // no fine permutation, only coarse mesh permuted
+            // create a dummy identity permutation for the fine mesh
+            Adjacency::Permutation id_perm(refine_graph.get_num_nodes_image(), Adjacency::Permutation::type_identity);
+            permuted_graph = Adjacency::Graph(refine_graph, coarse_perm, id_perm);
+          }
+          else
+          {
+            // both coarse and fine permutations exist
+            permuted_graph = Adjacency::Graph(refine_graph, coarse_perm, fine_inv_perm);
+          }
+
+          // render transposed test-dof-mapping
+          Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, permuted_graph, test_dof_mapping);
+
+          // render composite test-dof-mapping/trial-dof-support graph
+          Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
+
+          // return the graph
+          return dof_adjactor;
+        }
+        else // no permutation
+        {
+          // render transposed test-dof-mapping
+          Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, refine_adjactor, test_dof_mapping);
+
+          // render composite test-dof-mapping/trial-dof-support graph
+          Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
+
+          // return the graph
+          return dof_adjactor;
+        }
       }
 
       /**
@@ -398,7 +441,7 @@ namespace FEAT
        */
       template<typename MatrixType_, typename TestSpace_, typename TrialSpace_>
       static void assemble_matrix_ext_facet2(MatrixType_ & matrix,
-                                             const TestSpace_& test_space, const TrialSpace_& trial_space)
+        const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         matrix = MatrixType_(assemble_graph_ext_facet2(test_space, trial_space));
       }

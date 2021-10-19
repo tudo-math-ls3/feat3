@@ -10,6 +10,7 @@
 // includes, FEAT
 #include <kernel/shape.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 // includes, system
 #include <vector>
@@ -79,7 +80,19 @@ namespace FEAT
 
       /// \endcond
 
+      /// internal clone constructor
+      explicit VertexSet(const std::vector<VertexType>& vtx) :
+        _vertices(vtx)
+      {
+      }
+
     public:
+      /// standard constructor
+      VertexSet() :
+        _vertices()
+      {
+      }
+
       /**
        * \brief Constructor.
        *
@@ -110,6 +123,12 @@ namespace FEAT
       /// virtual destructor
       virtual ~VertexSet()
       {
+      }
+
+      /// \returns An independent clone of this vertex set object.
+      VertexSet clone() const
+      {
+        return VertexSet(this->_vertices);
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -188,6 +207,24 @@ namespace FEAT
         for(auto& v : _vertices)
         {
           v.set_mat_vec_mult(rot, v - origin) += offset;
+        }
+      }
+
+      /**
+       * \brief Applies a permutation onto this vertex set.
+       *
+       * \param[in] perm
+       * The permutation that is to be applied.
+       *
+       * \param[in] invert
+       * Specifies whether to apply the inverse permutation instead of the forward one.
+       */
+      void permute(const Adjacency::Permutation& perm, bool invert = false)
+      {
+        if(!perm.empty() && !_vertices.empty())
+        {
+          XASSERT(Index(_vertices.size()) == perm.size());
+          perm.apply(_vertices.data(), invert);
         }
       }
 

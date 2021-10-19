@@ -267,6 +267,47 @@ namespace FEAT
           }
         }
 
+        void clone(const MeshPart& other)
+        {
+          for(int d(0); d <= shape_dim; ++d)
+            this->_num_entities[d] = other._num_entities[d];
+          if(other._index_set_holder != nullptr)
+          {
+            if(this->_index_set_holder == nullptr)
+              this->_index_set_holder->clone(*other._index_set_holder);
+            else
+              this->_index_set_holder = new IndexSetHolderType(other._index_set_holder->clone());
+          }
+          else if(this->_index_set_holder != nullptr)
+          {
+            delete this->_index_set_holder;
+            this->_index_set_holder = nullptr;
+          }
+          this->_target_set_holder.clone(other._target_set_holder);
+          {
+            AttributeSetReverseIterator it(_mesh_attributes.rbegin());
+            AttributeSetReverseIterator jt(_mesh_attributes.rend());
+            for(; it != jt; ++it)
+            {
+              if(it->second != nullptr)
+                delete it->second;
+            }
+          }
+          for(auto it = other._mesh_attributes.begin(); it != other._mesh_attributes.end(); ++it)
+            this->add_attribute(new AttributeSetType(it->second->clone()), it->first);
+        }
+
+        MeshPart clone() const
+        {
+          MeshPart mp(this->_num_entities, this->_index_set_holder != nullptr);
+          if(this->_index_set_holder != nullptr)
+            mp._index_set_holder->clone(*this->_index_set_holder);
+          mp._target_set_holder.clone(this->_target_set_holder);
+          for(auto it = this->_mesh_attributes.begin(); it != this->_mesh_attributes.end(); ++it)
+            mp.add_attribute(new AttributeSetType(it->second->clone()), it->first);
+          return mp;
+        }
+
         /// \returns The size of dynamically allocated memory in bytes.
         std::size_t bytes() const
         {
@@ -467,6 +508,17 @@ namespace FEAT
         static String name()
         {
           return "MeshPart<...>";
+        }
+
+        /**
+         * \brief Applies a mesh permutation onto this mesh part's target sets.
+         *
+         * \param[in] mesh_perm
+         * The mesh permutation that is to be applied.
+         */
+        void permute(const MeshPermutation<ShapeType>& mesh_perm)
+        {
+          this->_target_set_holder.permute_map(mesh_perm.get_inv_perms());
         }
 
         /**
