@@ -452,10 +452,9 @@ namespace Tutorial08
     // Okay, so let's refine the mesh-node up to the desired level:
     for(Index lvl(0); lvl < level; ++lvl)
     {
-      // Refining the mesh-node is really easy: we just have to call the 'refine' function
-      // of the mesh-node. Since we are using shared-pointers here, we have to encapsulate
-      // the 'naked' pointer returned by the function in a shared_ptr:
-      mesh_node = std::shared_ptr<RootMeshNodeType>(mesh_node->refine());
+      // Refining the mesh-node is really easy: we just have to call the 'refine_shared' function
+      // of the mesh-node, which gives us a shared_ptr of the refined mesh node.
+      mesh_node = mesh_node->refine_shared();
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

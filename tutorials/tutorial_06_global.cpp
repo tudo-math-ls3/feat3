@@ -365,7 +365,8 @@ namespace Tutorial06
 
       for(; lvl < level; ++lvl)
       {
-        root_mesh_node = std::shared_ptr<RootMeshNodeType>(root_mesh_node->refine());
+        // refine_shared() gives us a shared_ptr of the refined mesh node
+        root_mesh_node = root_mesh_node->refine_shared();
       }
     }
 
