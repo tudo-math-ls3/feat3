@@ -12,6 +12,7 @@
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/bernstein2/element.hpp>
 #include <kernel/space/lagrange3/element.hpp>
 #include <kernel/space/p2bubble/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
@@ -94,6 +95,8 @@ int main(int, char**)
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_quad_lagrange-1.vtk");
     // Lagrange-2
     dump_basis< Space::Lagrange2::Element<TrafoType> >("2d_quad_lagrange-2.vtk");
+    //Bernstein-2
+    dump_basis< Space::Bernstein2::Element<TrafoType> >("2d_quad_bernstein-2.vtk");
     // Lagrange-3
     dump_basis< Space::Lagrange3::Element<TrafoType> >("2d_quad_lagrange-3.vtk");
     // Rannacher-Turek
@@ -103,7 +106,6 @@ int main(int, char**)
     // Hermite-3
     dump_basis< Space::Hermite3::Element<TrafoType> >("2d_quad_hermite-3.vtk");
   }
-
   // 3D Hexa Elements
   {
     typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
