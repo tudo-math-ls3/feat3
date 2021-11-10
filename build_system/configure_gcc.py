@@ -20,7 +20,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     sys.exit(1)
 
   cmake_flags = ""
-  cxxflags = "-std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wlogical-op -Wdouble-promotion -Wformat=2 -Wnonnull"
+  cxxflags = "-std=c++11 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2 -Wnonnull"
 
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
