@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 2.8)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
-ADD_EXECUTABLE(navier_stokes_ppnd navier_stokes_ppnd)
+ADD_EXECUTABLE(navier_stokes_ppnd navier_stokes_ppnd.cpp)
 TARGET_LINK_LIBRARIES(navier_stokes_ppnd feat)
 if(MPI_C_COMPILE_FLAGS)
   set_target_properties(navier_stokes_ppnd PROPERTIES

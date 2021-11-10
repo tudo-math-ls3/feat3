@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 2.8)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
-ADD_EXECUTABLE(navier_stokes_screws-app navier_stokes_screws-app)
+ADD_EXECUTABLE(navier_stokes_screws-app navier_stokes_screws-app.cpp)
 TARGET_LINK_LIBRARIES(navier_stokes_screws-app feat)
 
 # With MPI, run the test in both debug and optimized builds

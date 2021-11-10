@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 3.9)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
-ADD_EXECUTABLE(meshopt_refinement-app meshopt_refinement-app)
+ADD_EXECUTABLE(meshopt_refinement-app meshopt_refinement-app.cpp)
 TARGET_LINK_LIBRARIES(meshopt_refinement-app feat)
 
 if (FEAT_HAVE_MPI)

@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 3.9)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # applications to build
-ADD_EXECUTABLE(meshopt_boundary-app meshopt_boundary-app)
+ADD_EXECUTABLE(meshopt_boundary-app meshopt_boundary-app.cpp)
 TARGET_LINK_LIBRARIES(meshopt_boundary-app feat)
 
 if (FEAT_HAVE_MPI)
