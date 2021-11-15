@@ -136,6 +136,18 @@ namespace FEAT
       {
         return SparseMatrixBWrappedCSR(BaseClass::clone(mode));
       }
+
+      /// \returns A base-class reference to the actual CSR matrix object
+      LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>& unwrap()
+      {
+        return *this;
+      }
+
+      /// \returns A const base-class reference to the actual CSR matrix object
+      const LAFEM::SparseMatrixCSR<Mem_, DT_, IT_>& unwrap() const
+      {
+        return *this;
+      }
     };
   } // namespace LAFEM
 } // namespace FEAT
