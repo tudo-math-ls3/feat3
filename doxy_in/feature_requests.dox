@@ -13,4 +13,9 @@ To use a Multi-Grid solver you create a mesh-hierarchy. If you now change the co
 on the finest mesh, the coordinates should change on all coarser levels of which this vertex is still part of.
 
 \author Malte Schuh
+
+\section documentation_type0_type1_sync Document the differences betweeen a type-0-Vector and a type-1-Vector. Also explain the effect of the sync_X-function on the shared
+vector-entries: Do they get added, one overrides the other or do the get averaged?
+
+\author Malte Schuh
 **/
