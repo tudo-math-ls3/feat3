@@ -45,7 +45,7 @@ using namespace FEAT::Solver;
  * Some part of the solver configuration can be done on the command line (solvertype, direction update,
  * preconditioner), while other options must be specified at compile time (the linesearch, memory architecture and
  * floating point precision). The solver by default logs all iterates and produces a vtk output of the domain of
- * interest and a polyline of all iterates so one can study the convergence behaviour of the solver.
+ * interest and a polyline of all iterates so one can study the convergence behavior of the solver.
  *
  * This can easily be extended to use nonlinear operators from other sources, but the whole plotting procedures
  * require that we optimize a scalar function in two or three variables.

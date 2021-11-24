@@ -17,7 +17,7 @@
 // See the section 'The Problem Definition' at the end of this comment block for details.
 //
 // The purpose of this tutorial is to demonstrate the usage of two parser classes,
-// which can be used to define the behaviour and underlying problem of this application
+// which can be used to define the behavior and underlying problem of this application
 // up to a certain extend. These two classes are:
 //
 // 1. The 'SimpleArgParser' class:
@@ -56,7 +56,7 @@
 // when passing them as arguments to the program call from the command line, because
 // the command line interpreter (bash, csh, cmd) may 'swallow' some characters (e.g.
 // the circumflex ^ which acts as the power operator) or may misinterpret them as
-// internal operators otherwise, thus resulting in potentially erroneous behaviour.
+// internal operators otherwise, thus resulting in potentially erroneous behavior.
 // In short: Type
 //                    ./tutorial-04-parser --u "2*x+y*2^3" --g "4-x"
 // instead of
@@ -339,7 +339,7 @@ namespace Tutorial04
       std::cout << "that you enclose the function formulae in quotation marks as shown in" << std::endl;
       std::cout << "example above. If not quoted, your command line interpreter (e.g. bash," << std::endl;
       std::cout << "csh, cmd) may misinterpret special characters, thus possibly leading to" << std::endl;
-      std::cout << "incorrect program behaviour." << std::endl;
+      std::cout << "incorrect program behavior." << std::endl;
 
 #endif // FEAT_HAVE_FPARSER
 

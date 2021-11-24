@@ -95,7 +95,7 @@ namespace FEAT
      * A String containing the value of the entry.
      *
      * \param[in] replace
-     * Specifies the behaviour when an entry with the same key already exists in the section:
+     * Specifies the behavior when an entry with the same key already exists in the section:
      *  - If \p replace = \c true, then the old value of the entry is replaced by the \p value parameter passed
      *    to this function.
      *  - If \p replace = \c false, then the old value of the entry is kept and this function returns \c false.
@@ -363,7 +363,7 @@ namespace FEAT
      * The section to be merged into \c this.
      *
      * \param[in] replace
-     * Specifies the behaviour when conflicting key-value pairs are encountered. See add_entry() for more details.
+     * Specifies the behavior when conflicting key-value pairs are encountered. See add_entry() for more details.
      */
     void merge(const PropertyMap& section, bool replace = true);
 
@@ -374,7 +374,7 @@ namespace FEAT
      * The name of the file to be parsed.
      *
      * \param[in] replace
-     * Specifies the behaviour when an entry with the same key already exists:
+     * Specifies the behavior when an entry with the same key already exists:
      *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
      *  - If \p replace = \c false, then the old value of the entry is kept.
      *
@@ -393,7 +393,7 @@ namespace FEAT
      * The name of the file to be parsed.
      *
      * \param[in] replace
-     * Specifies the behaviour when an entry with the same key already exists:
+     * Specifies the behavior when an entry with the same key already exists:
      *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
      *  - If \p replace = \c false, then the old value of the entry is kept.
      *
@@ -408,7 +408,7 @@ namespace FEAT
      * A reference to an input stream to be parsed.
      *
      * \param[in] replace
-     * Specifies the behaviour when an entry with the same key already exists:
+     * Specifies the behavior when an entry with the same key already exists:
      *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
      *  - If \p replace = \c false, then the old value of the entry is kept.
      */

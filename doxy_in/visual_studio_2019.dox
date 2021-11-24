@@ -288,7 +288,7 @@ there is no "configure" script that will generate all required projects and solu
 Instead, you need to generate VS project and solution files for each desired application, tutorial or kernel test
 separately by using a Python script named <c>vc16-gen.py</c>, which is located in the root directory of FEAT.
 
-The usage and the behaviour of the script depends on whether the desired target is a kernel test or any other sort of
+The usage and the behavior of the script depends on whether the desired target is a kernel test or any other sort of
 application (this includes tutorials and tools). The usage of the tool is also described in the following sub-sections.
 
 \subsection win_vs16_buildsys_vc_symlink Creating Kernel Symlink

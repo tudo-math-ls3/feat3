@@ -16,7 +16,7 @@
 # as the analysis results are written to individual output files, whose filenames are prefixed by the <outprefix> given
 # as the first command line argument to this script.
 #
-# Typically, one want to analyse the convergence behaviour of several simulation runs which only differ on the mesh
+# Typically, one want to analyse the convergence behavior of several simulation runs which only differ on the mesh
 # refinement level and/or time-step size. Assuming appropriate naming of the log files, the call
 #
 # > bench3plots.py k=400_levels lvl=3_k=400.log lvl=4_k=400.log lvl=5_k=400.log lvl=6_k=400.log

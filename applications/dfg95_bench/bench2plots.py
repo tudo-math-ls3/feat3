@@ -19,7 +19,7 @@
 # Usually, the total simulation time is the range [0, 30] and a cycle is chosen from either the range [20,30] or even
 # from [25,30], which is specified by setting T_min to 20 or 25, respectively.
 #
-# Typically, one want to analyse the convergence behaviour of several simulation runs which only differ on the mesh
+# Typically, one want to analyse the convergence behavior of several simulation runs which only differ on the mesh
 # refinement level and/or time-step size. Assuming appropriate naming of the log files, the call
 #
 # > bench2plots.py 20 k=400_levels lvl=3_k=400.log lvl=4_k=400.log lvl=5_k=400.log lvl=6_k=400.log

@@ -145,7 +145,7 @@ namespace FEAT
       static void compute_grad_sum_det(VectorType& grad_, const VectorType& coords_, const MeshType& mesh_);
 
       /**
-       * \brief Computes the local matrix describing the material behaviour
+       * \brief Computes the local matrix describing the material behavior
        *
        * \param[in] x
        * The coordinates of the local cell.
@@ -292,7 +292,7 @@ namespace FEAT
         } // compute_grad_sum_det
 
       /**
-       * \brief Computes the local matrix describing the material behaviour
+       * \brief Computes the local matrix describing the material behavior
        */
         static MatTensorType compute_mat_tensor(const Tx& DOXY(x), const DataType_& h)
         {
@@ -467,7 +467,7 @@ namespace FEAT
         } // compute_grad_sum_det
 
       /**
-       * \brief Computes the local matrix describing the material behaviour
+       * \brief Computes the local matrix describing the material behavior
        */
         static MatTensorType compute_mat_tensor(const Tx& DOXY(x), const DataType_& h)
         {
@@ -612,7 +612,7 @@ namespace FEAT
         } // compute_grad_sum_det
 
       /**
-       * \brief Computes the local matrix describing the material behaviour
+       * \brief Computes the local matrix describing the material behavior
        */
         static MatTensorType compute_mat_tensor(const Tx& DOXY(x), const DataType_& h)
         {
@@ -772,7 +772,7 @@ namespace FEAT
         } // compute_grad_sum_det
 
       /**
-       * \brief Computes the local matrix describing the material behaviour
+       * \brief Computes the local matrix describing the material behavior
        */
         static MatTensorType compute_mat_tensor(const Tx& DOXY(x), const DataType_& h)
         {

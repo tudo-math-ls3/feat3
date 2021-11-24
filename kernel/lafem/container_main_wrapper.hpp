@@ -24,7 +24,7 @@ namespace FEAT
      *  \brief This class simplifies operations in main memory on LAFEM containers, regardless of their actual memory type.
      *  Data will be transferred to main memory, if necessary, and copied back after the wrapper object is destroyed.
      *
-     *  \note Modifications to the original container made during the lifetime of the wrapper object will result in undefined behaviour.
+     *  \note Modifications to the original container made during the lifetime of the wrapper object will result in undefined behavior.
      */
     template <typename CT_>
     class ContainerMainWrapper

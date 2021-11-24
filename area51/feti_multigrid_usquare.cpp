@@ -1453,7 +1453,7 @@ namespace FETI{
     args.support("CGmaxiter", "<n>\n The maximum iteration step for the Cg-method.\n"
                               "Defaults to 1000");
     args.support("test", "\nStarts in test mode, which disables failing due to insufficient number of process,"
-      " while running a predefined problem to compare it to an expected behaviour.\n");
+      " while running a predefined problem to compare it to an expected behavior.\n");
 
     // We will keep track of whether the caller needs help, which is the case when an
     // invalid option has been supplied or '--help' was given as a command line argument.

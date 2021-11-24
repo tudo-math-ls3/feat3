@@ -49,7 +49,7 @@ namespace FEAT
    * This function implements the actual assertion that is called by the ASSERT, ASSERTM,
    * XASSERT and XASSERTM macros.
    *
-   * The behaviour of this function is as follows:
+   * The behavior of this function is as follows:
    * - If \p expr evaluates to \c true, then this function does nothing.
    * - If \p expr evaluates to \c false, then this function prints an informative error message
    *   to stderr and calls Runtime::abort to terminate the process.

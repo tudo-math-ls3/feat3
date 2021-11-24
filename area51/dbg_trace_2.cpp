@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
   Index level(3);
 
   // Now let's see if we have command line parameters: This tutorial supports passing
-  // the refinement level as a command line parameter, to investigate the behaviour of the L2/H1
+  // the refinement level as a command line parameter, to investigate the behavior of the L2/H1
   // errors of the discrete solution.
   if(argc > 1)
   {
