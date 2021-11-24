@@ -366,7 +366,7 @@ namespace AnalyseMeshCGAL
     // The 'true' parameter for the following function call specifies that we want to query only
     // the names of the mesh-parts that were parsed from the mesh-file and that we are NOT
     // interested in any additional mesh-parts that the management code had to create for internal
-    // use (mesh-parts for "internal use" are characterised by a leading underscore in their name).
+    // use (mesh-parts for "internal use" are characterized by a leading underscore in their name).
     std::deque<String> meshpart_names = mesh_node->get_mesh_part_names(true);
     std::cout << "Mesh Parts: " << stringify_join(meshpart_names, " ") << std::endl;
 

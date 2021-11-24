@@ -988,7 +988,7 @@ namespace FETI{
     LocalMatrixType BR_columns;
     //Q is only non empty if we are on 0 rank
     LocalMatrixType Q_matrix;
-    std::shared_ptr<RegUmf> Q_factorised = nullptr;
+    std::shared_ptr<RegUmf> Q_factorized = nullptr;
     mutable LocalVectorType right_side;
     mutable LocalVectorType right_side_buffer;
 
@@ -1053,7 +1053,7 @@ namespace FETI{
       //apply Q on right_side on rank 0
       if(_comm->rank() == 0)
       {
-        Q_factorised->apply(right_side, right_side_buffer);
+        Q_factorized->apply(right_side, right_side_buffer);
       }
       //now broadcast right_side to all processes
       _comm->bcast(right_side.elements(), right_side.size(), 0);
@@ -1107,8 +1107,8 @@ namespace FETI{
         //initialize some more
         if(verbose)
           _comm->print("Factorize Q_matrix...");
-        //factorise the Q_matrix
-        Q_factorised = std::make_shared<RegUmf>(Q_matrix);
+        //factorize the Q_matrix
+        Q_factorized = std::make_shared<RegUmf>(Q_matrix);
       }
       //as we possibly need right side on all ranks, init them on all processes
       if(verbose)

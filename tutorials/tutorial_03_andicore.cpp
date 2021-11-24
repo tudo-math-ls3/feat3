@@ -501,7 +501,7 @@ namespace Tutorial03
     vec_rhs.format();
 
     // The next task is the assembly of the right-hand-side vector.
-    // As our functional is parameterised in the solution function, we first need to create an
+    // As our functional is parameterized in the solution function, we first need to create an
     // object representing that solution function. We choose the standard sine-bubble:
     Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
 

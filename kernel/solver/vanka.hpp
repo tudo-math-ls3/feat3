@@ -975,7 +975,7 @@ namespace FEAT
      * These variants work in an additive way, i.e. they ignore the 'progess' made in the
      * current iteration, just as the (scalar) Jacobi-iterations do.
      *
-     * Moreover, each of the above variants is parameterised in a relaxation/damping parameter
+     * Moreover, each of the above variants is parameterized in a relaxation/damping parameter
      * \e omega, which can be specified in the constructor. For multiplicative variants, \e omega
      * is a relaxation parameter (as in SOR), whereas for additive variants \e omega is a damping
      * parameter (as in damped Jacobi).

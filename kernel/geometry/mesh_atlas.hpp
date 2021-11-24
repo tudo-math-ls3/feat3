@@ -24,7 +24,7 @@ namespace FEAT
      * \brief Mesh Atlas class template
      *
      * \tparam Mesh_
-     * The type of the mesh that is to be parameterised by this atlas, i.e. ConformalMesh
+     * The type of the mesh that is to be parameterized by this atlas, i.e. ConformalMesh
      *
      * \author Peter Zajac
      */

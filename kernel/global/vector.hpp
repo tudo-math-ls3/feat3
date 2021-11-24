@@ -223,7 +223,7 @@ namespace FEAT
        *    Math::sqrt(this->sum(x*x))
        *
        * \param[in] x
-       * The value that is to be summarised over all processes.
+       * The value that is to be summarized over all processes.
        *
        * \returns
        * The reduced 2-norm of all \p x.

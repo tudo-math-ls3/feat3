@@ -31,12 +31,12 @@ namespace FEAT
       /**
        * \brief Sphere chart class template.
        *
-       * This class represents a 3D sphere characterised by a midpoint and a radius.
+       * This class represents a 3D sphere characterized by a midpoint and a radius.
        *
        * This chart implements only the implicit chart interface.
        *
        * \tparam Mesh_
-       * The type of the mesh to be parameterised by this chart.
+       * The type of the mesh to be parameterized by this chart.
        *
        * \author Peter Zajac
        */

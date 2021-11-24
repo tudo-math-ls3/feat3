@@ -819,7 +819,7 @@ namespace FETI{
   class Projector
   {
   private:
-    std::shared_ptr<RegUmf> Q_factorised = nullptr;
+    std::shared_ptr<RegUmf> Q_factorized = nullptr;
     LocalMatrixType Q_matrix;
     LocalVectorType right_side;
     LocalVectorType right_side_buffer;
@@ -884,7 +884,7 @@ namespace FETI{
       right_side = Q_matrix.create_vector_l();
       right_side_buffer.format();
       right_side.format();
-      Q_factorised = std::make_shared<RegUmf>(Q_matrix);
+      Q_factorized = std::make_shared<RegUmf>(Q_matrix);
     }
     Projector(const Projector&) = delete;
     Projector & operator=(const Projector&) = delete;
@@ -901,7 +901,7 @@ namespace FETI{
         else
           right_side_buffer(i, 0.);
       }
-      Q_factorised->apply(right_side, right_side_buffer);
+      Q_factorized->apply(right_side, right_side_buffer);
       //now apply each BR to right_side
       for(auto it = domain_vec.begin() ; it != domain_vec.end() ; ++it)
       {
@@ -947,7 +947,7 @@ namespace FETI{
         }
         right_side_buffer(loc_index, scalar);
       }
-      Q_factorised->apply(right_side, right_side_buffer);
+      Q_factorized->apply(right_side, right_side_buffer);
 
      //now distribute right side to each domain... as we distributed BR beforehand, this can be applied locally
      for(auto it = domain_vec.begin(); it != domain_vec.end() ; ++it)
@@ -998,7 +998,7 @@ namespace FETI{
         }
         right_side_buffer(loc_index, scalar);
       }
-      Q_factorised->apply(right_side, right_side_buffer);
+      Q_factorized->apply(right_side, right_side_buffer);
 
      //now distribute right side to each domain... as we distributed BR beforehand, this can be applied locally
      for(auto it = domain_vec.begin(); it != domain_vec.end() ; ++it)
@@ -1048,7 +1048,7 @@ namespace FETI{
         }
         right_side_buffer(loc_index, scalar);
       }
-      Q_factorised->apply(right_side, right_side_buffer);
+      Q_factorized->apply(right_side, right_side_buffer);
 
 
       return std::move(right_side); //std::move needed because right_side is a permanent object....

@@ -1,5 +1,5 @@
 /** \page preproc_macros Preprocessor Macros
-This page summarises the preprocessor macros defined by the build-system, the compiler detection or the user.
+This page summarizes the preprocessor macros defined by the build-system, the compiler detection or the user.
 
 \tableofcontents
 

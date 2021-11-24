@@ -30,7 +30,7 @@ namespace FEAT
      * \brief Parsed-Hit-Test Factory class template
      *
      * This class template can be used to create a MeshPart for a particular mesh,
-     * which consists of all entities that are inside the region characterised by a
+     * which consists of all entities that are inside the region characterized by a
      * function formula string.
      *
      * \tparam Mesh_

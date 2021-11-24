@@ -1141,7 +1141,7 @@ namespace FEAT
           {
             Index count = Index(0);
 
-            // loop over all graphs and summarise degrees
+            // loop over all graphs and summarize degrees
             for(std::size_t igraph(0); igraph < num_graphs; ++igraph)
             {
               count += macro_dofs.at(igraph).degree(imacro) * block_sizes.at(igraph);

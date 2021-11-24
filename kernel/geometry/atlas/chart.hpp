@@ -25,7 +25,7 @@ namespace FEAT
        * \brief Chart base-class
        *
        * \tparam Mesh_
-       * The type of the mesh that is to be parameterised.
+       * The type of the mesh that is to be parameterized.
        *
        * \author Peter Zajac
        */
@@ -341,7 +341,7 @@ namespace FEAT
        * The derived class.
        *
        * \tparam Mesh_
-       * The mesh class to be parameterised by this chart class.
+       * The mesh class to be parameterized by this chart class.
        *
        * \tparam Traits_
        * A traits class that specifies the chart's properties.

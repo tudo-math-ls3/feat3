@@ -31,7 +31,7 @@ namespace FEAT
       /**
        * \brief Circle chart class template.
        *
-       * This class represents a 2D circle characterised by a midpoint, a radius and a 1D interval
+       * This class represents a 2D circle characterized by a midpoint, a radius and a 1D interval
        * for the parameter space.
        *
        * This chart implements both the implicit and explicit chart interfaces.
@@ -39,12 +39,12 @@ namespace FEAT
        * The parameter domain [a,b] is mapped onto the circle, where both interval endpoints
        * are mapped onto the east point on the circle, i.e. the point with the X/Y-coordinates
        * [mid_x + radius, mid_y]. If the parameter interval is oriented positive, i.e. if it
-       * holds that a < b, then the circle is parameterised in counter-clock-wise orientation.
+       * holds that a < b, then the circle is parameterized in counter-clock-wise orientation.
        * If the parameter interval is oriented negative, i.e. if it holds that b < a, then
-       * the circle is parameterised in clock-wise orientation.
+       * the circle is parameterized in clock-wise orientation.
        *
        * \tparam Mesh_
-       * The type of the mesh to be parameterised by this chart.
+       * The type of the mesh to be parameterized by this chart.
        *
        * \author Peter Zajac
        */

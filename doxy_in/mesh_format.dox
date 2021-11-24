@@ -195,14 +195,14 @@ the left and right domain interval borders, then the parameterization of the cir
 \f[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\f]
 
 \subsubsection meshfile_chart_circle_examples 2D Circle Chart Examples
-A (unparameterised) circle of radius 0.2 around the midpoint (0.5, 1.0) named "myCircle" would be defined by:
+A (unparameterized) circle of radius 0.2 around the midpoint (0.5, 1.0) named "myCircle" would be defined by:
 \code{.xml}
 <Chart name="myCircle">
   <Circle radius="0.2" midpoint="0.5 1.0" />
 </Chart>
 \endcode
 
-A circle of radius 1 around the midpoint (0.7, 0.2) parameterised by the interval [0, 2]:
+A circle of radius 1 around the midpoint (0.7, 0.2) parameterized by the interval [0, 2]:
 \code{.xml}
 <Chart name="myCircle">
   <Circle radius="1" midpoint="0.7 0.2" domain="0 2" />
@@ -251,7 +251,7 @@ coincide.
 Each \c Bezier chart must contain a child node named <c>Points</c> which encapsulates the coordinates of the
 vertex and control points, see \ref meshfile_chart_bezier_points for details.
 
-Furthermore, a \c Bezier chart may also be parameterised. In this case, the spline needs an additional child node
+Furthermore, a \c Bezier chart may also be parameterized. In this case, the spline needs an additional child node
 named \c Params, which encapsulates the 1D parameters for the vertex points of the Spline, see
 \ref meshfile_chart_bezier_params for details.
 
@@ -274,7 +274,7 @@ A Bezier curve without any inner control points is a simple line segment.
 The first vertex point of a Bezier spline must \b not be preceeded by any control points.
 
 \subsubsection meshfile_chart_bezier_params Bezier Parameters
-A \c Bezier chart may also be explicitly parameterised. In this case, the \c Bezier node contains a child node named
+A \c Bezier chart may also be explicitly parameterized. In this case, the \c Bezier node contains a child node named
 \c Params, which contain the 1D parameter values of the vertex points.
 
 \subsubsection meshfile_chart_bezier_examples 2D Bezier Chart Examples
@@ -291,7 +291,7 @@ A Bezier spline representing a simple line segment from (0.1, 0.5) to (0.7, 0.2)
 \endcode
 
 A (closed) Bezier spline representing the polyline forming the boundary of the unit-square [0,1] x [0,1], equidistantly
-parameterised over the 1D domain [0,4]:
+parameterized over the 1D domain [0,4]:
 \code{.xml}
 <Chart name="square">
   <Bezier dim="2" size="5" type="closed">
@@ -329,7 +329,7 @@ vertex point has no control points:
 \endcode
 
 A cubic Bezier spline with three vertex points (0, -0.5), (1, -0.2), (2, -0.5) and two (inner) control points
-for each of the two segments, equidistantly parameterised over the 1D domain [0,1]:
+for each of the two segments, equidistantly parameterized over the 1D domain [0,1]:
 \code{.xml}
 <Chart name="nozzle:b">
   <Bezier dim="2" size="3" type="open">
@@ -648,7 +648,7 @@ used for the \ref meshfile_mesh_examples_2d_unit_square_quad root mesh to repres
 \endcode
 
 \subsubsection meshfile_meshpart_example_unit_circle 2D Unit-Circle Boundary Mesh-Part
-The following example mesh-part represents the parameterised boundary mesh-part of the
+The following example mesh-part represents the parameterized boundary mesh-part of the
 \ref meshfile_mesh_examples_2d_unit_circle_tria root mesh.
 This mesh-part contains four vertices, where the first one is stored duplicated for the parameterization, thus the
 total number of vertex indices is 5. The mesh-part contains all four boundary edges of the mesh.

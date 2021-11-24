@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
     std::cout << "Further information:" << std::endl;
     std::cout << "--------------------" << std::endl;
     std::cout << "There are two types of cubature rules: variadic and non-variadic ones." << std::endl;
-    std::cout << "A variaric cubature rule is parameterised in the number of desired cubature" << std::endl;
+    std::cout << "A variaric cubature rule is parameterized in the number of desired cubature" << std::endl;
     std::cout << "points. In this case the point-count parameter is appended by a colon to the" << std::endl;
     std::cout << "cubature rule name; e.g. 'gauss-legendre:3', identifies the 3-point" << std::endl;
     std::cout << "Gauss-Legendre rule." << std::endl;

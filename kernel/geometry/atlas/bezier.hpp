@@ -37,7 +37,7 @@ namespace FEAT
        * This chart implements both the implicit and explicit chart interfaces.
        *
        * \tparam Mesh_
-       * The type of the mesh to be parameterised by this chart.
+       * The type of the mesh to be parameterized by this chart.
        *
        * \author Peter Zajac
        */
