@@ -1636,7 +1636,7 @@ namespace FEAT
         /// Floating point precision
         typedef DT_ DataType;
 
-        /// Does this utilise the derivative of the input wrt. some other DoF?
+        /// Does this utilize the derivative of the input wrt. some other DoF?
         const bool use_derivative;
 
         /**
@@ -1736,7 +1736,7 @@ namespace FEAT
       public:
         /// Floating point precision
         typedef DT_ DataType;
-        /// Does this utilise the derivative of the input wrt. some other DoF?
+        /// Does this utilize the derivative of the input wrt. some other DoF?
         const bool use_derivative;
 
       private:

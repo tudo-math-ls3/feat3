@@ -27,7 +27,7 @@ from build_system.feat_util import get_output
 from build_system.thirdparty_package import *
 from build_system.is_subdirectory import *
 
-#TODO help, ? und guess nicht in sys.argv[0] suchen
+# TODO help, ? und guess nicht in sys.argv[0] suchen
 
 # output help screen
 if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
@@ -123,10 +123,10 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
 
-#get path to feat source trunk
+# get path to feat source trunk
 trunk_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
-#clear all related
+# clear all related
 os.environ["CXXFLAGS"] = ""
 os.environ["CXX"] = ""
 os.environ["LD"] = ""
@@ -138,7 +138,7 @@ os.environ["MPICH_CXX"] = ""
 os.environ["MPICH_CC"] = ""
 
 extra_options = []
-#separate extra options from build id
+# separate extra options from build id
 for i in range(1, len(sys.argv)):
   if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
     extra_options.append(sys.argv[i])
@@ -165,24 +165,24 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
 
 # use provided build id
 else:
-  #add every parameter to the build id that is no extra_option
+  # add every parameter to the build id that is no extra_option
   buildid_string = ""
   for i in range(1, len(sys.argv)):
     if not (len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--"):
       buildid_string += sys.argv[i] + "-"
 
 buildid_string = buildid_string.strip("-")
-#generate handy build id array of tokens
+# generate handy build id array of tokens
 buildid = buildid_string.split("-")
-#list of buildid tokens, remove token when used, results in list of unused tokens
+# list of buildid tokens, remove token when used, results in list of unused tokens
 unused_tokens = copy.deepcopy(buildid)
 
-#initialise variables
+# initialize variables
 cxxflags = ""
 ldflags = ""
 cmake_flags = "-DBUILD_ID:STRING=" + buildid_string
 
-#choose makefile generator. missing entry defaults to unix makefiles
+# choose makefile generator. missing entry defaults to unix makefiles
 if "ninja" in buildid:
   remove_string(unused_tokens, "ninja")
   generator = "Ninja"
@@ -224,7 +224,7 @@ if "mpi" in buildid:
   remove_string(unused_tokens, "mpi")
   cmake_flags += " -DFEAT_HAVE_MPI:BOOL=TRUE"
 
-#evaluate extra options
+# evaluate extra options
 cputype = ""
 system_host_compiler = ""
 cuda_host_compiler = ""
@@ -358,7 +358,7 @@ if not cputype:
   cputype = detect_cpu()
 cmake_flags += " -DFEAT_CPU_TYPE:STRING=" + cputype
 
-#compiler selection
+# compiler selection
 if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   if not compiler_cxx:
     compiler_cxx="g++"
@@ -458,7 +458,7 @@ else:
   print (buildid_string)
   sys.exit(1)
 
-#additional options
+# additional options
 if "ccache" in buildid:
   if not is_found("ccache"):
     print ("Error: Choosen compiler frontend binary ccache not found!")
@@ -528,7 +528,7 @@ if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
   cmake_flags += " -DFEAT_COTIRE:BOOL=ON"
 
-#prevent parmetis without mpi enabled (needed by parmetis)
+# prevent parmetis without mpi enabled (needed by parmetis)
 if "mpi" not in buildid and ("parmetis" in buildid or "metis" in buildid):
   print("Error: Using parmetis without mpi is not allowed!")
   sys.exit()
@@ -538,7 +538,7 @@ if ("mpi" not in buildid) and ("superlu" in buildid):
   print("Error: SuperLU can only be used in combination with MPI!")
   sys.exit()
 
-#give cmake on macOS a hint to the openmp lib
+# give cmake on macOS a hint to the openmp lib
 if platform.system() == "Darwin":
   ldflags += " -L/usr/local/opt/libomp/lib" #-lomp
   cxxflags += " -I/usr/local/opt/libomp/include"
@@ -575,7 +575,7 @@ for i in clean:
   if os.path.exists(i):
     shutil.rmtree(i)
 
-#export compiler/linker flags
+# export compiler/linker flags
 os.environ["CXXFLAGS"] = cxxflags
 if "lto" in buildid:
   remove_string(unused_tokens, "lto")
@@ -585,7 +585,7 @@ if "lto" in buildid:
   ldflags += cxxflags
 os.environ["LDFLAGS"] = ldflags
 os.environ["CFLAGS"] = "-O3"
-#set system host compiler in cflags to pass cmake's c compiler check
+# set system host compiler in cflags to pass cmake's c compiler check
 if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if system_host_compiler:
     os.environ["CFLAGS"] = "-O3  -gcc-name=" + system_host_compiler
@@ -596,7 +596,7 @@ print("cmake version: " + cmake_version)
 if int(cmake_version[:1]) < 3:
   cmake_flags += " -Wno-dev"
 
-#print out choosen configuration
+# print out choosen configuration
 print ("============== configure_feat ===========")
 print ("Build-ID: " + buildid_string)
 if len(unused_tokens) == 0:
@@ -629,7 +629,7 @@ print ("Generator: " + generator)
 print ("")
 print ("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname))
 print ("")
-#start actual configuration
+# start actual configuration
 print ("============== CMAKE =====================")
 sys.stdout.flush()
 sys.stderr.flush()

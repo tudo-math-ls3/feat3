@@ -127,7 +127,7 @@ namespace FEAT
      * systems including the integral mean constraint or any other constraint that can be expressed
      * as a scalar Lagrange multiplier to the original system matrix.
      *
-     * As Umfpack is a direct solver, it cannot directly utilise the MeanFilter class, which is used
+     * As Umfpack is a direct solver, it cannot directly utilize the MeanFilter class, which is used
      * by iterative solvers to enforce the integral mean constraint. Therefore, this class implements
      * an algorithm, which extends the original system matrix by a Lagrange multiplier vector and
      * applied the Umfpack solver onto this extended linear system.

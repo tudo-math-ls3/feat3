@@ -287,7 +287,7 @@ namespace FETI{
         *neighbour_halo     // the halo mesh-part that the mirror is to be assembled on
       );
 
-      //first we initialise the residuum, s and Fs with the size of the mirror:
+      //first we initialize the residuum, s and Fs with the size of the mirror:
       residuum.push_back(LocalVectorType(neighbour_mirror.num_indices(), 0.));
       residuum_copy.push_back(LocalVectorType(neighbour_mirror.num_indices(), 0.));
       residuum_opt.push_back(LocalVectorType(neighbour_mirror.num_indices(), 0.));
@@ -312,7 +312,7 @@ namespace FETI{
 
       // continue with next neighbour rank
     }
-    //initialise mirror_dofs with the right size
+    //initialize mirror_dofs with the right size
     gate_ranks_size = gate_ranks.size();
     mirror_dofs = std::vector<IndexType>(gate_ranks_size+1);
     //first we save the maxsize on our own knowlegde
@@ -349,7 +349,7 @@ namespace FETI{
     // And assemble the numerical matrix content:
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_local, laplace_operator, *space_backup, cubature_factory);
 
-    // Initialise the right-hand-side vector entries to zero.
+    // Initialize the right-hand-side vector entries to zero.
     vec_rhs_local.format();
     vec_sol_local.format();
 
@@ -603,7 +603,7 @@ namespace FETI{
       //now add both with regard to the gate sign, would be nice, if the if else case could be evaluated at compile time...
       for(IndexType i(0); i < this->gate_ranks_size; ++i)
       {
-        XASSERTM(this->gate_signs[i] != 0, "Gate signs are not correctly initialised!");
+        XASSERTM(this->gate_signs[i] != 0, "Gate signs are not correctly initialized!");
         if(this->gate_signs[i]*sign > 0)
         {
           output[i].axpy(dom_buffer_2[i], dom_buffer_1[i], -1.);
@@ -633,7 +633,7 @@ namespace FETI{
       this->matrix_local.apply(output_vec, this->vec_rhs_buffer);
     }
 
-    //This initialises s_0 = h_opt
+    //This initializes s_0 = h_opt
     void init_s_vector()
     {
       XASSERTM(this->s_vector.size() == this->w_opt.size(), "Sizes do not match!");
@@ -1328,10 +1328,10 @@ namespace FETI{
     }
 
 
-    // Initialise the Projector class
+    // Initialize the Projector class
      Projector project(domain_vec, neighbour_maxsize);
 
-     //initialise the starting lambda
+     //initialize the starting lambda
      project.assemble_lambda_0(domain_vec);
      test_lambda(domain_vec, tol);
 

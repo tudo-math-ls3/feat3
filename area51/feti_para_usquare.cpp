@@ -210,7 +210,7 @@ namespace FETI{
     // And assemble the numerical matrix content:
     Assembly::BilinearOperatorAssembler::assemble_matrix1(_matrix_local, operat, space, cubature_factory);
 
-    // Initialise the right-hand-side vector entries to zero.
+    // Initialize the right-hand-side vector entries to zero.
     _vec_rhs.format();
     _vec_sol.format();
     _R_vector.format(1.);
@@ -520,7 +520,7 @@ namespace FETI{
       // process all pending receives
       for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
       {
-        XASSERTM(_gate_signs.at(idx) != 0, "Gate signs are not correctly initialised!");
+        XASSERTM(_gate_signs.at(idx) != 0, "Gate signs are not correctly initialized!");
 
         //process recv_bufs depending on gate_signs
         if(_gate_signs[idx]*sign > 0)
@@ -538,8 +538,8 @@ namespace FETI{
       send_reqs.wait_all();
     }
 
-    //This function initialises the starting residual in res by using vec_sol_buffer as a buffer
-    void initialise_starting_residual(std::vector<LocalVectorType>& res, LocalVectorType& vec_sol_buffer,
+    //This function initializes the starting residual in res by using vec_sol_buffer as a buffer
+    void initialize_starting_residual(std::vector<LocalVectorType>& res, LocalVectorType& vec_sol_buffer,
                                       const LocalSystem& system)
     const
     {
@@ -876,7 +876,7 @@ namespace FETI{
       right_side_buffer.format();
       right_side.format();
       if(verbose)
-        _comm->print("Q_matrix succesfully gathered and initialised!");
+        _comm->print("Q_matrix succesfully gathered and initialized!");
 
     }
 
@@ -1019,7 +1019,7 @@ namespace FETI{
       test_vector(lambda, gate);
 
       //assemble starting residual(as this only needs exchange between neighbors, Gate will handle this)
-      gate.initialise_starting_residual(residual, vec_sol_buffer, system);
+      gate.initialize_starting_residual(residual, vec_sol_buffer, system);
       //test if residual is fine
       test_vector(residual, gate);
 
@@ -1028,7 +1028,7 @@ namespace FETI{
       {
         residual_copy.at(i).copy(residual.at(i));
       }
-//       _comm->print("Residuum initialised!");
+//       _comm->print("Residuum initialized!");
 
       //generate starting Fs = BK^-1B^T * lam
       gate.calc_sol(Fs_vector, lambda, system, vec_sol_buffer, vec_rhs_buffer);
@@ -1144,7 +1144,7 @@ namespace FETI{
       _comm->print("CG... Time for solving, includes inter neighbour comm: " + stringify(t_max) + " s");
     }
 
-    //This initialises s_0 = h_opt
+    //This initializes s_0 = h_opt
     void init_s_vector()
     {
       XASSERTM(this->s_vector.size() == this->rescond_opt.size(), "Sizes do not match!");
@@ -1635,7 +1635,7 @@ namespace FETI{
     watch.stop();
 
 
-    //now we can initialise the local system:
+    //now we can initialize the local system:
     if(verbose)
       comm.print("Assembling local matrix and prefactoring...");
     watch.start();
@@ -1662,7 +1662,7 @@ namespace FETI{
     vec_rhs.sync_0();
 
 
-    //now initialise the Projector, this will assemble the local BR_columns matrix
+    //now initialize the Projector, this will assemble the local BR_columns matrix
     if(verbose)
       comm.print("Assembling projection...");
     watch.start();

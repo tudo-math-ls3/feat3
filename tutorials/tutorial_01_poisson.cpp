@@ -254,7 +254,7 @@ namespace Tutorial01
     // Furthermore, we require a mesh-part that represents the boundary of the mesh for the
     // assembly of Dirichlet boundary conditions later on. Again, this would typically come
     // from an external file or a mesh generator, but we stick to a more simple solution.
-    // We will utilise the "BoundaryFactory", which will create a boundary mesh-part for a
+    // We will utilize the "BoundaryFactory", which will create a boundary mesh-part for a
     // given mesh. Note that this BoundaryFactory class works for any given input mesh and
     // not only for meshes created by the RefinedUnitCubeFactory.
 

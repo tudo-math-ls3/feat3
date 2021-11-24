@@ -247,7 +247,7 @@ namespace FETI{
 
     LocalSolver(std::deque<std::shared_ptr<Level>>& levels)
     {
-//       //for testing purposes, we will initialise an umfpack solver for the finest level to compare the
+//       //for testing purposes, we will initialize an umfpack solver for the finest level to compare the
 //       //"real" solution against he solution of our multigrid
 //       Level& test_level = *levels.front();
 //       bool _floating = true;
@@ -448,7 +448,7 @@ namespace FETI{
       _R_vector = _matrix_local.create_vector_l();
 
 
-      // Initialise the right-hand-side vector entries to zero.
+      // Initialize the right-hand-side vector entries to zero.
       _vec_rhs.format();
       _vec_sol.format();
       _R_vector.format(1.);
@@ -469,7 +469,7 @@ namespace FETI{
       _levels.front()->filter_chain.at<0>().filter_rhs(_vec_rhs);
 
 
-      //initialise our local solver
+      //initialize our local solver
       _local_solver = std::make_shared<LocalSolver>(_levels);
 
     }
@@ -761,7 +761,7 @@ namespace FETI{
       // process all pending receives
       for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
       {
-        XASSERTM(_gate_signs.at(idx) != 0, "Gate signs are not correctly initialised!");
+        XASSERTM(_gate_signs.at(idx) != 0, "Gate signs are not correctly initialized!");
 
         //process recv_bufs depending on gate_signs
         if(_gate_signs[idx]*sign > 0)
@@ -779,8 +779,8 @@ namespace FETI{
       send_reqs.wait_all();
     }
 
-    //This function initialises the starting residual in res by using vec_sol_buffer as a buffer
-    void initialise_starting_residual(std::vector<LocalVectorType>& res, LocalVectorType& vec_sol_buffer,
+    //This function initializes the starting residual in res by using vec_sol_buffer as a buffer
+    void initialize_starting_residual(std::vector<LocalVectorType>& res, LocalVectorType& vec_sol_buffer,
                                       const LocalSystem& system)
     const
     {
@@ -1118,7 +1118,7 @@ namespace FETI{
       right_side_buffer.format();
       right_side.format();
       if(verbose)
-        _comm->print("Q_matrix succesfully gathered and initialised!");
+        _comm->print("Q_matrix succesfully gathered and initialized!");
 
     }
 
@@ -1257,14 +1257,14 @@ namespace FETI{
       gate.extract_all(lambda, tmp);
 
       //assemble starting residual(as this only needs exchange between neighbors, Gate will handle this)
-      gate.initialise_starting_residual(residual, vec_sol_buffer, system);
+      gate.initialize_starting_residual(residual, vec_sol_buffer, system);
 
       //make a copy of residual for later
       for(IndexType i(0); i < vec_size; ++i)
       {
         residual_copy.at(i).copy(residual.at(i));
       }
-//       _comm->print("Residuum initialised!");
+//       _comm->print("Residuum initialized!");
 
       //generate starting Fs = BK^-1B^T * lam
       gate.calc_sol(Fs_vector, lambda, system, vec_sol_buffer, vec_rhs_buffer);
@@ -1384,7 +1384,7 @@ namespace FETI{
       return true;
     }
 
-    //This initialises s_0 = h_opt
+    //This initializes s_0 = h_opt
     void init_s_vector()
     {
       XASSERTM(this->s_vector.size() == this->rescond_opt.size(), "Sizes do not match!");
@@ -1696,7 +1696,7 @@ namespace FETI{
     // refinement level of the mesh-node that it has generated. We want to print that out:
     comm.print("\nBase Mesh Level: " + stringify(lvl));
 
-    //As we want to use a multigrid, we will initalise the mesh, space and trafo for each level,
+    //As we want to use a multigrid, we will initalize the mesh, space and trafo for each level,
     //for this we will create a deque of the class Level, which later will be moved to the LocalSystem
     std::deque<std::shared_ptr<Level>> levels;
 
@@ -1966,7 +1966,7 @@ namespace FETI{
     comm.print("Time to init gate: " + stringify(t_max) + " s");
 
 
-    //now we can initialise the local system by moving our levels deque, after this, we only want to access levels trough local_sys:
+    //now we can initialize the local system by moving our levels deque, after this, we only want to access levels trough local_sys:
     watch.start();
     ts_1.stamp();
     LocalSystem local_sys(std::move(levels), cubature_factory, force_functional, is_floating);
@@ -1991,7 +1991,7 @@ namespace FETI{
     vec_rhs.sync_0();
 
 
-    //now initialise the Projector, this will assemble the local BR_columns matrix
+    //now initialize the Projector, this will assemble the local BR_columns matrix
     if(verbose)
       comm.print("Assembling projection...");
     watch.start();

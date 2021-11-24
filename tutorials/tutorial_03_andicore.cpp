@@ -505,7 +505,7 @@ namespace Tutorial03
     // object representing that solution function. We choose the standard sine-bubble:
     Analytic::Common::SineBubbleFunction<ShapeType::dimension> sol_function;
 
-    // Now, we utilise our custom AndicoreFunctional to obtain a functional that combines
+    // Now, we utilize our custom AndicoreFunctional to obtain a functional that combines
     // the desired analytical solution with our andicore PDE operator:
     AndicoreFunctional<decltype(sol_function)> force_functional(andicore_data, sol_function);
 
