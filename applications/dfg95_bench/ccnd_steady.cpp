@@ -255,10 +255,10 @@ namespace DFG95
     }
 
     // cubature for assembly
-    GaussCubatureFactory<3> cubature;
+    Cubature::DynamicFactory cubature("gauss-legendre:3");
 
     // cubature for post-processing
-    GaussCubatureFactory<5> cubature_postproc;
+    Cubature::DynamicFactory cubature_postproc("gauss-legendre:5");
 
     /* ***************************************************************************************** */
 
@@ -1041,7 +1041,7 @@ namespace DFG95
         exporter.add_vertex_vector("v", vec_sol.local().template at<0>());
 
         // project pressure
-        GaussCubatureFactory<2> cub;
+        Cubature::DynamicFactory cub("gauss-legendre:2");
         LAFEM::DenseVector<Mem::Main, DataType, Index> vtx_p;
         Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
