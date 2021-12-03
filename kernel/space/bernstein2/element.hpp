@@ -22,8 +22,8 @@ namespace FEAT
     /**
      * \brief Bernstein-2 Element namespace
      *
-     * This namespace encapsulates all classes related to the implementation of the standard third-order
-     * H1-conforming Finite Element spaces widely known as P2 and Q2, resp.
+     * This namespace encapsulates all classes related to the implementation of the Bernstein Basis spanned by
+     * the Bernstein polynomials of second degree on [-1,1]
      */
     namespace Bernstein2
     {
@@ -33,7 +33,7 @@ namespace FEAT
        * \tparam Trafo_
        * The transformation that is to be used by this space.
        *
-       * \author Peter Zajac
+       * \author Peter Zajac and Gesa Pottbrock
        */
       template<typename Trafo_>
       class Element :

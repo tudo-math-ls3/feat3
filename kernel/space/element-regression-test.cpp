@@ -33,6 +33,7 @@
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/lagrange3/element.hpp>
 #include <kernel/space/p2bubble/element.hpp>
+#include <kernel/space/bernstein2/element.hpp>
 
 namespace ElementRegression
 {
@@ -639,6 +640,23 @@ namespace ElementRegression
   // **********************************************************************************************
   // **********************************************************************************************
   // **********************************************************************************************
+  // Bernstein-2 element
+
+  // Interpolation Hypercube<1>
+  ElementRegressionInterpol<Shape::Hypercube<1>, Space::Bernstein2::Element, true, true, true>
+    int_hy1_bernstein2_lvl4(4, 3.183976160740e-05 ,3.238620869330e-03 ,3.967908904287e-01);
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Bernstein2::Element, true, true, true>
+    int_hy2_bernstein2_lvl3(3, 2.544135788933e-04 ,1.305146529310e-02 ,8.022016682010e-01);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::Bernstein2::Element, true, true, true>
+    int_hy3_bernstein2_lvl2(2, 1.723851355986e-03, 4.484011007357e-02 ,1.382386151958e+00);
+
+  // **********************************************************************************************
+  // **********************************************************************************************
+  // **********************************************************************************************
   // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // Interpolation Simplex<2>
@@ -816,6 +834,23 @@ namespace ElementRegression
   // **********************************************************************************************
   // **********************************************************************************************
   // **********************************************************************************************
+  // Bernstein-2 element
+
+  // L2-Projection Hypercube<1>
+  ElementRegressionL2<Shape::Hypercube<1>, Space::Bernstein2::Element, true, true, true>
+    l2_hy1_bernstein2_lvl4(4, 2.918342684669e-005, 3.411668271045e-003, 4.000134360015e-001);
+
+  // L2-Projection Hypercube<2>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::Bernstein2::Element, true, true, true>
+    l2_hy2_bernstein2_lvl3(3, 2.149226355212e-004, 1.420342358641e-002, 8.128053861467e-001);
+
+  // L2-Projection Hypercube<3>
+  ElementRegressionL2<Shape::Hypercube<3>, Space::Bernstein2::Element, true, true, true>
+    l2_hy3_bernstein2_lvl2(2, 1.211653471543e-003, 4.968583665489e-002, 1.402115404765e+000);
+
+  // **********************************************************************************************
+  // **********************************************************************************************
+  // **********************************************************************************************
   // Crouzeix-Raviart / Ranancher-Turek element (aka Q1~)
 
   // L2-Projection Simplex<2>
@@ -944,6 +979,24 @@ namespace ElementRegression
 
   ElementRegressionH1<Shape::Simplex<3>, Space::Lagrange3::Element, true, true, false>
     h1_sx3_lagrange3_lvl1(1, 8.477232986348e-04, 2.701830481642e-02);
+
+  // **********************************************************************************************
+ // **********************************************************************************************
+ // **********************************************************************************************
+ // Bernstein-2 element
+
+ // H1-Projection Hypercube<1>
+  ElementRegressionH1<Shape::Hypercube<1>, Space::Bernstein2::Element, true, true, true>
+    h1_hy1_bernstein2_lvl4(4, 3.183068629008e-005, 3.238329097007e-003, 3.967568427665e-001);
+
+  // H1-Projection Hypercube<2>
+  ElementRegressionH1<Shape::Hypercube<2>, Space::Bernstein2::Element, true, true, true>
+    h1_hy2_bernstein2_lvl3(3, 2.511253226626e-004, 1.302093337879e-002, 8.012538477278e-001);
+
+  // H1-Projection Hypercube<3>
+  ElementRegressionH1<Shape::Hypercube<3>, Space::Bernstein2::Element, true, true, true>
+    h1_hy3_bernstein2_lvl1(2, 1.675103396311e-003, 4.471054331889e-002, 1.379478609799e+000);
+
 
   // **********************************************************************************************
   // **********************************************************************************************
