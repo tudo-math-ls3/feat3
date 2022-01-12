@@ -71,13 +71,13 @@ namespace FEAT
        * The DoF vector type
        *
        * \param[in, out] to_coeffs
-       * The Lagrange2 DoF vector to be filled
+       * The \transient Lagrange2 DoF vector to be filled
        *
        * \param[in] from_coeffs
-       * The Lagrange1 DoF vector representing the FE function we interpolate
+       * The \transient Lagrange1 DoF vector representing the FE function we interpolate
        *
        * \param[in] to_space
-       * The Lagrange2 space, needed for DoF mappings
+       * The \transient Lagrange2 space, needed for DoF mappings
        *
        * \note This explicitly uses that the DoF for shape dim 0 are numbered like the mesh's vertices. Without this,
        * it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation.
@@ -150,13 +150,13 @@ namespace FEAT
        * The DoF vector type
        *
        * \param[in, out] to_coeffs
-       * The Lagrange2 DoF vector to be filled
+       * The \transient Lagrange2 DoF vector to be filled
        *
        * \param[in] from_coeffs
-       * The Lagrange1 DoF vector representing the FE function we interpolate
+       * The \transient Lagrange1 DoF vector representing the FE function we interpolate
        *
        * \param[in] to_space
-       * The Lagrange2 space, needed for DoF mappings
+       * The \transient Lagrange2 space, needed for DoF mappings
        *
        * \note This explicitly uses that the DoF for shape dim 0 are numbered like the mesh's vertices. Without this,
        * it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation.
@@ -207,17 +207,17 @@ namespace FEAT
        * Index type of the DoF vector
        *
        * \param[out] to_coeffs
-       * The coefficient vector of the Lagrange2 FE function
+       * The \transient coefficient vector of the Lagrange2 FE function
        *
        * \param[in] from_coeffs
-       * The coefficient vector of the Lagrange1 FE function
+       * The \transient coefficient vector of the Lagrange1 FE function
        *
        * \param[in] to_space
-       * The space we map to, needed for the DofMapping and DofAssignment
+       * The \transient space we map to, needed for the DofMapping and DofAssignment
        *
        * \param[in] from_space
-       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
-       * DofMapping and DofAssignment
+       * The \transient space we map from, unused here because we use the IndexSet of the
+       * corresponding mesh instead of the DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_>
       static void interpolate(LAFEM::DenseVector<Mem::Main, DT_, IT_>& to_coeffs,
@@ -238,17 +238,17 @@ namespace FEAT
        * Index type of the DoF vector
        *
        * \param[out] to_coeffs
-       * The coefficient vector of the Lagrange2 FE function
+       * The \transient coefficient vector of the Lagrange2 FE function
        *
        * \param[in] from_coeffs
-       * The coefficient vector of the Lagrange1 FE function
+       * The \transient coefficient vector of the Lagrange1 FE function
        *
        * \param[in] to_space
-       * The space we map to, needed for the DofMapping and DofAssignment
+       * The \transient space we map to, needed for the DofMapping and DofAssignment
        *
        * \param[in] from_space
-       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
-       * DofMapping and DofAssignment
+       * The \transient space we map from, unused here because we use the IndexSet of the
+       * corresponding mesh instead of the DofMapping and DofAssignment
        *
        * This is the Mem::CUDA version that converts the coefficient vectors to Mem::Main for the interpolator.
        */
@@ -279,17 +279,17 @@ namespace FEAT
        * Index type of the DoF vector
        *
        * \param[out] to_coeffs
-       * The coefficient vector of the Lagrange2 FE function
+       * The \transient coefficient vector of the Lagrange2 FE function
        *
        * \param[in] from_coeffs
-       * The coefficient vector of the Lagrange1 FE function
+       * The \transient coefficient vector of the Lagrange1 FE function
        *
        * \param[in] to_space
-       * The space we map to, needed for the DofMapping and DofAssignment
+       * The \transient space we map to, needed for the DofMapping and DofAssignment
        *
        * \param[in] from_space
-       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
-       * DofMapping and DofAssignment
+       * The \transient space we map from, unused here because we use the IndexSet of the
+       * corresponding mesh instead of the DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_, int blocksize_>
       static void interpolate(LAFEM::DenseVectorBlocked<Mem::Main, DT_, IT_, blocksize_>& to_coeffs,
@@ -310,17 +310,17 @@ namespace FEAT
        * Index type of the DoF vector
        *
        * \param[out] to_coeffs
-       * The coefficient vector of the Lagrange2 FE function
+       * The \transient coefficient vector of the Lagrange2 FE function
        *
        * \param[in] from_coeffs
-       * The coefficient vector of the Lagrange1 FE function
+       * The \transient coefficient vector of the Lagrange1 FE function
        *
        * \param[in] to_space
-       * The space we map to, needed for the DofMapping and DofAssignment
+       * The \transient space we map to, needed for the DofMapping and DofAssignment
        *
        * \param[in] from_space
-       * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
-       * DofMapping and DofAssignment
+       * The \transient space we map from, unused here because we use the IndexSet of the
+       * corresponding mesh instead of the DofMapping and DofAssignment
        */
       template<typename DT_, typename IT_, int blocksize_>
       static void interpolate(LAFEM::DenseVectorBlocked<Mem::CUDA, DT_, IT_, blocksize_>& to_coeffs,

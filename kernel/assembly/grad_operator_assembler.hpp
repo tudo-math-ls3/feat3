@@ -51,13 +51,13 @@ namespace FEAT
        * For creating the cubature rule
        *
        * \param[out] matrix_g
-       * The matrix we assemble into, gets overwritten
+       * The \transient matrix we assemble into, gets overwritten
        *
        * \param[in] test_space
-       * The space for \f$ \phi \f$
+       * The \transient space for \f$ \phi \f$
        *
        * \param[in] trial_space
-       * The space for \f$ \psi \f$
+       * The \transient space for \f$ \psi \f$
        *
        * \param[in] cubature_factory
        * Creates the cubature rule we want to use
@@ -232,16 +232,16 @@ namespace FEAT
        * For creating the cubature rule
        *
        * \param[in, out] vec_asm
-       * The vector we assemble onto
+       * The \transient vector we assemble onto
        *
        * \param[in] vec_in
-       * The vector we apply the bilinear form to
+       * The \transient vector we apply the bilinear form to
        *
        * \param[in] test_space
-       * The space for \f$ \phi \f$
+       * The \transient space for \f$ \phi \f$
        *
        * \param[in] trial_space
-       * The space for \f$ \psi \f$
+       * The \transient space for \f$ \psi \f$
        *
        * \param[in] cubature_factory
        * Creates the cubature rule we want to use

@@ -182,17 +182,17 @@ namespace FEAT
        * The name of the variable for the VTK file.
        *
        * \param[in] space
-       * A reference to the finite element space.
+       * A \transient reference to the finite element space.
        *
        * \param[in] v
-       * The blocked coefficient vector of the finite element function.
+       * The \transient blocked coefficient vector of the finite element function.
        */
       template<typename Space_, typename VectorType_>
       void write_values_blocked(String name, const Space_& space, const VectorType_& v)
       {
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(SpaceEval::can_value != 0, "space cannot evalute basis function values!");
+        static_assert(SpaceEval::can_value != 0, "space cannot evaluate basis function values!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceTags::value> SpaceConfigTraits;
         typedef typename SpaceConfigTraits::EvalDataType SpaceData;
@@ -263,10 +263,10 @@ namespace FEAT
        * The name of the variable for the VTK file.
        *
        * \param[in] space
-       * A reference to the finite element space.
+       * A \transient reference to the finite element space.
        *
        * \param[in] data
-       * An array representing the coefficient vector of the finite element function.
+       * An \transient array representing the coefficient vector of the finite element function.
        */
       template<typename Space_, typename T_>
       void write_values(String name, const Space_& space, const T_* data)
@@ -274,7 +274,7 @@ namespace FEAT
         XASSERT(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(*(SpaceEval::eval_caps & SpaceTags::value), "space cannot evalute basis function values!");
+        static_assert(*(SpaceEval::eval_caps & SpaceTags::value), "space cannot evaluate basis function values!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceTags::value> SpaceConfigTraits;
         typedef typename SpaceConfigTraits::EvalDataType SpaceData;
@@ -341,10 +341,10 @@ namespace FEAT
        * The name of the variable for the VTK file.
        *
        * \param[in] space
-       * A reference to the finite element space.
+       * A \transient reference to the finite element space.
        *
        * \param[in] data
-       * An array representing the coefficient vector of the finite element function.
+       * An \transient array representing the coefficient vector of the finite element function.
        */
       template<typename Space_, typename T_>
       void write_gradients(String name, const Space_& space, const T_* data)
@@ -352,7 +352,7 @@ namespace FEAT
         XASSERT(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(*(SpaceEval::eval_caps & SpaceTags::grad), "space cannot evalute basis function gradients!");
+        static_assert(*(SpaceEval::eval_caps & SpaceTags::grad), "space cannot evaluate basis function gradients!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceTags::grad> SpaceConfigTraits;
         typedef typename SpaceConfigTraits::EvalDataType SpaceData;
@@ -427,10 +427,10 @@ namespace FEAT
        * The name of the variable for the VTK file.
        *
        * \param[in] space
-       * A reference to the finite element space.
+       * A \transient reference to the finite element space.
        *
        * \param[in] data
-       * An array representing the coefficient vector of the finite element function.
+       * An \transient array representing the coefficient vector of the finite element function.
        */
       template<typename Space_, typename T_>
       void write_hessians(String name, const Space_& space, const T_* data)
@@ -438,7 +438,7 @@ namespace FEAT
         XASSERT(data != nullptr);
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(*(SpaceEval::eval_caps & SpaceTags::hess), "space cannot evalute basis function hessians!");
+        static_assert(*(SpaceEval::eval_caps & SpaceTags::hess), "space cannot evaluate basis function hessians!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceTags::hess> SpaceConfigTraits;
         typedef typename SpaceConfigTraits::EvalDataType SpaceData;

@@ -78,13 +78,13 @@ namespace FEAT
      \endcode
    *
    * Moreover, one may use the #check() member function to check whether an option was given or not.
-   * - The call <code>args.check("solver")</code> will return -1, indicating the the option
+   * - The call <code>args.check("solver")</code> will return -1, indicating the option
    *   <c>solver</c> was not given in the command line.
    * - The call <code>args.check("quiet")</code> will return 0, indicating that the option
    *   <c>quiet</c> was given with no parameters.
-   * - The call <code>args.check("level")</code> will return 1, incicating that the option
+   * - The call <code>args.check("level")</code> will return 1, indicating that the option
    *   <c>level</c> was given with one additional parameter.
-   * - The call <code>args.check("precon")</code> will return 2, incicating that the option
+   * - The call <code>args.check("precon")</code> will return 2, indicating that the option
    *   <c>precon</c> was given with two additional parameters.
    *
    * Furthermore, the #parse() member function can be used to parse the parameters of a particular option.
@@ -101,7 +101,7 @@ namespace FEAT
      int quietness(0);
      args.parse("quiet", quietness);
      \endcode
-   * will return 0 indicating that the <c>quiet</c> option does not have any parseable parameters.
+   * will return 0 indicating that the <c>quiet</c> option does not have any parsable parameters.
    *
    * Moreover, the <c>parse</c> call in
      \code{.cpp}
@@ -155,7 +155,7 @@ namespace FEAT
      * \brief Constructor
      *
      * \param[in] argc
-     * The number of arguments passed to the applicaton.
+     * The number of arguments passed to the application.
      *
      * \param[in] argv
      * The array of all command line arguments passed to the application.
@@ -173,7 +173,7 @@ namespace FEAT
     /**
      * \brief Returns the total number of arguments passed in the constructor.
      *
-     * \returns The number of arguments passed in the constructor, including the command name (first argrument).
+     * \returns The number of arguments passed in the constructor, including the command name (first argument).
      */
     int num_args() const
     {
@@ -341,6 +341,10 @@ namespace FEAT
      * \returns
      * A const pointer to the pair of argument index and parameter deque or \c nullptr,
      * if the option was not given.
+     *
+     * \note
+     * The returned pointer (if not null) points to an internal buffer of the SimpleArgParser and
+     * therefore the returned object <b>must not</b> be deleted by the caller.
      */
     const std::pair<int, std::deque<String> >* query(const String& option) const
     {

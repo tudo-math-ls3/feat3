@@ -78,11 +78,17 @@ namespace FEAT
       const Function_& _function;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] function
+       * A \resident reference to the function whose gradient is to be wrapped.
+       */
       explicit Gradient(const Function_& function) :
         _function(function)
       {
       }
-    };
+    }; // class Gradient<...>
 
     /**
      * \brief Analytic Function Divergence wrapper
@@ -156,11 +162,17 @@ namespace FEAT
       const Function_& _function;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] function
+       * A \resident reference to the function whose divergence is to be wrapped.
+       */
       explicit Divergence(const Function_& function) :
         _function(function)
       {
       }
-    };
+    }; // class Divergence<...>
 
     /**
      * \brief Analytic Function Curl wrapper
@@ -267,11 +279,17 @@ namespace FEAT
       const Function_& _function;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] function
+       * A \resident reference to the function whose curl is to be wrapped.
+       */
       explicit Curl(const Function_& function) :
         _function(function)
       {
       }
-    };
+    }; // class Curl<...>
 
     /**
      * \brief Analytic Scalar Function Curl wrapper
@@ -357,11 +375,17 @@ namespace FEAT
       const Function_& _function;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] function
+       * A \resident reference to the function whose scalar is to be wrapped.
+       */
       explicit ScalarCurl(const Function_& function) :
         _function(function)
       {
       }
-    };
+    }; // class ScalarCurl<...>
   } // namespace Analytic
 } // namespace FEAT
 

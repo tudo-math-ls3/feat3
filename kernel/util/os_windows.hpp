@@ -47,7 +47,7 @@ namespace FEAT
      *
      * \see https://msdn.microsoft.com/en-us/library/windows/desktop/aa965225.aspx
      *
-     * \note This function is used by the Util::get_memory_usage() function.
+     * \note This function is used by the MemoryUsage class.
      *
      * \author Peter Zajac
      */

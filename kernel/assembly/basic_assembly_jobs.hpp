@@ -93,13 +93,13 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[inout] vector_
-       * A reference to the vector that is to be assembled.
+       * A \resident reference to the vector that is to be assembled.
        *
        * \param[in] space_
-       * A reference to the finite element space to be used for the assembly
+       * A \resident reference to the finite element space to be used for the assembly
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory that is used for the cubature rule.
+       * A \transient reference to the cubature factory that is used for the cubature rule.
        *
        * \param[in] alpha_
        * A scaling factor for the assembly.
@@ -126,7 +126,7 @@ namespace FEAT
        * This function must be implemented in the derived CRTP class!
        *
        * \param[in] tau
-       * The trafo evaluation data for the current cubature point.
+       * The \transient trafo evaluation data for the current cubature point.
        */
       void set_point(typename AsmTraits::TrafoEvalData& tau);
 
@@ -134,13 +134,13 @@ namespace FEAT
        * \brief Evaluates the linearform for a test-basis function
        *
        * \param[inout] val
-       * A reference to the value that is to be updated
+       * A \transient reference to the value that is to be updated
        *
        * \param[in] weight
        * The current cubature weight
        *
        * \param[in] psi
-       * The evaluation data of the current test basis function.
+       * The \transient evaluation data of the current test basis function.
        */
       void eval(ValueType& val, const DataType& weight, const typename AsmTraits::SpaceBasisData& psi);
 #endif // DOXYGEN
@@ -308,13 +308,13 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[inout] matrix_
-       * A reference to the matrix that is to be assembled.
+       * A \resident reference to the matrix that is to be assembled.
        *
        * \param[in] space_
-       * A reference to the finite element space to be used for the assembly
+       * A \resident reference to the finite element space to be used for the assembly
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory that is used for the cubature rule.
+       * A \transient reference to the cubature factory that is used for the cubature rule.
        *
        * \param[in] alpha_
        * A scaling factor for the assembly.
@@ -341,7 +341,7 @@ namespace FEAT
        * This function must be implemented in the derived CRTP class!
        *
        * \param[in] tau
-       * The trafo evaluation data for the current cubature point.
+       * The \transient trafo evaluation data for the current cubature point.
        */
       void set_point(typename AsmTraits::TrafoEvalData& tau);
 
@@ -349,16 +349,16 @@ namespace FEAT
        * \brief Evaluates the bilinearform for a test-/trial-basis function pair
        *
        * \param[inout] val
-       * A reference to the value that is to be updated
+       * A \transient reference to the value that is to be updated
        *
        * \param[in] weight
        * The current cubature weight
        *
        * \param[in] phi
-       * The evaluation data of the current trial basis function.
+       * The \transient evaluation data of the current trial basis function.
        *
        * \param[in] psi
-       * The evaluation data of the current test basis function.
+       * The \transient evaluation data of the current test basis function.
        */
       void eval(ValueType& val, const DataType& weight,
         const typename AsmTraits::TrialBasisData& phi, const typename AsmTraits::TestBasisData& psi);
@@ -552,16 +552,16 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[inout] matrix_
-       * A reference to the matrix that is to be assembled.
+       * A \resident reference to the matrix that is to be assembled.
        *
        * \param[in] test_space_
-       * A reference to the finite element test-space to be used for the assembly
+       * A \resident reference to the finite element test-space to be used for the assembly
        *
        * \param[in] trial_space_
-       * A reference to the finite element trial-space to be used for the assembly
+       * A \resident reference to the finite element trial-space to be used for the assembly
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory that is used for the cubature rule.
+       * A \transient reference to the cubature factory that is used for the cubature rule.
        *
        * \param[in] alpha_
        * A scaling factor for the assembly.
@@ -592,7 +592,7 @@ namespace FEAT
        * This function must be implemented in the derived CRTP class!
        *
        * \param[in] tau
-       * The trafo evaluation data for the current cubature point.
+       * The \transient trafo evaluation data for the current cubature point.
        */
       void set_point(typename AsmTraits::TrafoEvalData& tau);
 
@@ -600,16 +600,16 @@ namespace FEAT
        * \brief Evaluates the bilinearform for a test-/trial-basis function pair
        *
        * \param[inout] val
-       * A reference to the value that is to be updated
+       * A \transient reference to the value that is to be updated
        *
        * \param[in] weight
        * The current cubature weight
        *
        * \param[in] phi
-       * The evaluation data of the current trial basis function.
+       * The \transient evaluation data of the current trial basis function.
        *
        * \param[in] psi
-       * The evaluation data of the current test basis function.
+       * The \transient evaluation data of the current test basis function.
        */
       void eval(ValueType& val, const DataType& weight,
         const typename AsmTraits::TrialBasisData& phi, const typename AsmTraits::TestBasisData& psi);
@@ -794,6 +794,24 @@ namespace FEAT
       DataType alpha;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] linear_functional_
+       * A \resident reference to the linear functional that is to be assembled.
+       *
+       * \param[inout] vector_
+       * A \resident reference to the vector that is to be assembled.
+       *
+       * \param[in] space_
+       * A \resident reference to the (test) space to be used for the discretization.
+       *
+       * \param[in] cubature_
+       * The name of the cubature rule that is to be used for integration.
+       *
+       * \param[in] alpha_
+       * The scaling factor for the assembly.
+       */
       explicit LinearFunctionalAssemblyJob(const LinearFunctional_& linear_functional_,
         Vector_& vector_, const Space_& space_, String cubature_, DataType alpha_ = DataType(1)) :
         linear_functional(linear_functional_),
@@ -883,6 +901,24 @@ namespace FEAT
       DataType alpha;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] function_
+       * A \resident reference to the right-hand-side function that is to be assembled as a functional.
+       *
+       * \param[inout] vector_
+       * A \resident reference to the vector that is to be assembled.
+       *
+       * \param[in] space_
+       * A \resident reference to the (test) space to be used for the discretization.
+       *
+       * \param[in] cubature_
+       * The name of the cubature rule that is to be used for integration.
+       *
+       * \param[in] alpha_
+       * The scaling factor for the assembly.
+       */
       explicit ForceFunctionalAssemblyJob(const Function_& function_,
         Vector_& vector_, const Space_& space_, String cubature_, DataType alpha_ = DataType(1)) :
         function(function_),
@@ -978,6 +1014,24 @@ namespace FEAT
       DataType alpha;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] bilinear_operator_
+       * A \resident reference to the bilinear operator that is to be assembled.
+       *
+       * \param[inout] matrix_
+       * A \resident reference to the matrix that is to be assembled.
+       *
+       * \param[in] space_
+       * A \resident reference to the test/trial space to be used for the discretization.
+       *
+       * \param[in] cubature_
+       * The name of the cubature rule that is to be used for integration.
+       *
+       * \param[in] alpha_
+       * The scaling factor for the assembly.
+       */
       explicit BilinearOperatorMatrixAssemblyJob1(const BilinearOperator_& bilinear_operator_,
         Matrix_& matrix_, const Space_& space_, String cubature_, DataType alpha_ = DataType(1)) :
         bilinear_operator(bilinear_operator_),
@@ -1079,6 +1133,27 @@ namespace FEAT
       DataType alpha;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] bilinear_operator_
+       * A \resident reference to the bilinear operator that is to be assembled.
+       *
+       * \param[inout] matrix_
+       * A \resident reference to the matrix that is to be assembled.
+       *
+       * \param[in] test_space_
+       * A \resident reference to the test space to be used for the discretization.
+       *
+       * \param[in] trial_space_
+       * A \resident reference to the trial space to be used for the discretization.
+       *
+       * \param[in] cubature_
+       * The name of the cubature rule that is to be used for integration.
+       *
+       * \param[in] alpha_
+       * The scaling factor for the assembly.
+       */
       explicit BilinearOperatorMatrixAssemblyJob2(const BilinearOperator_& bilinear_operator_,
         Matrix_& matrix_, const TestSpace_& test_space_, const TrialSpace_& trial_space_,
         String cubature_, DataType alpha_ = DataType(1)) :

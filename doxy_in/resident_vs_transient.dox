@@ -1,0 +1,34 @@
+/** \page resident_vs_transient Resident vs Transient Reference / Pointer Parameters
+
+This page discusses the differences, assumptions and implications when using references or pointers
+as arguments for class member functions, operators and constructors.
+
+\note If a pointer or reference parameter of a (class member) function is not explicitly declared
+as transient or resident, then it can be implicitly treated as a transient parameter.
+
+\section res_vs_tran_transient Transient Reference/Pointer Parameters
+A pointer or reference parameter of a (class member) function is called <u><b>transient</b></u>, if
+the object referenced by the pointer or reference is only accessed within the function body (and
+possibly other functions taking this reference/pointer as a transient one), but no reference or
+pointer to the object is kept in the class object after the function call returns.
+
+In other words: transient pointers/references are only used within the called function, but they
+are not stored for later use, so in consequence it is perfectly safe if the pointed/referenced
+object is modified, moved or destroyed after the function call returns.
+
+\section res_vs_tran_resident Resident Reference/Pointer Parameters
+A pointer or reference parameter of a (class member) function is called <u><b>resident</b></u>, if
+a reference or pointer to the referenced object is stored inside a class object for later use after
+the function call returns.
+
+In consequence, the pointed/referenced object has to remain valid after the called function returns
+until the lifetime of the resident object (usually the class object of the member function, unless
+stated otherwise in the function documentation) reaches its end. It is the responsibility of the
+caller to ensure that the pointed/referenced object is not destroyed, moved or otherwise modified.
+
+\attention
+If the object referenced by a resident pointer/reference is modified, moved or destroyed while the
+object that stores the resident pointer/reference is still alive, then this will result in orphaned
+references, which are almost guaranteed to cause crashes or other ill-formed program behaviour.
+
+**/

@@ -59,7 +59,7 @@ namespace FEAT
          * \brief Prepares the evaluator for a given cell
          *
          * \param[in] trafo_eval
-         * A reference to the trafo evaluator containing the cell information.
+         * A \transient reference to the trafo evaluator containing the cell information.
          */
         void prepare(const TrafoEvaluator& DOXY(trafo_eval))
         {
@@ -80,7 +80,7 @@ namespace FEAT
          * This function is called to initialize the evaluator for a new evaluation point.
          *
          * \param[in] tau
-         * The transformation data in the current evaluation point. \see Trafo::EvalData
+         * The \transient transformation data in the current evaluation point. \see Trafo::EvalData
          */
         void set_point(const TrafoData& DOXY(tau))
         {
@@ -95,10 +95,10 @@ namespace FEAT
          * a single point.
          *
          * \param[in] phi
-         * The trial function data in the current evaluation point. \see Space::EvalData
+         * The \transient trial function data in the current evaluation point. \see Space::EvalData
          *
          * \param[in] psi
-         * The test function data in the current evaluation point. \see Space::EvalData
+         * The \transient test function data in the current evaluation point. \see Space::EvalData
          *
          * \returns
          * The value of the bilinear operator.

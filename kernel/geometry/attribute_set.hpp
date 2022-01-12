@@ -25,7 +25,7 @@ namespace FEAT
      * MeshPart. The attributes do not need to be scalar.
      *
      * \tparam DataType_
-     * The datatype for aan attribute value entry.
+     * The datatype for an attribute value entry.
      *
      * \author Peter Zajac
      */

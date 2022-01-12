@@ -399,10 +399,10 @@ namespace FEAT
        * The mesh permutation strategy to be used.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \param[in] vtx
-       * A reference to the vertex set of the conformal mesh.
+       * A \transient reference to the vertex set of the conformal mesh.
        */
       template<int num_coords_, typename Coord_>
       explicit MeshPermutation(
@@ -578,10 +578,10 @@ namespace FEAT
        * The mesh permutation strategy to be used. Must not be PermutationStrategy::other.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \param[in] vtx
-       * A reference to the vertex set of the conformal mesh.
+       * A \transient reference to the vertex set of the conformal mesh.
        */
       template<int num_coords_, typename Coord_>
       void create(PermutationStrategy strategy, const IndexSetHolder<Shape_>& ish, const VertexSet<num_coords_, Coord_>& vtx)
@@ -650,7 +650,7 @@ namespace FEAT
        * \brief Creates random mesh permutation for a conformal mesh.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \note
        * This function creates permutations for the mesh entities for each dimension.
@@ -665,10 +665,10 @@ namespace FEAT
        * \brief Creates random mesh permutation for a conformal mesh.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \param[in] rng
-       * A reference to the pseudo-random number generator to be used.
+       * A \transient reference to the pseudo-random number generator to be used.
        *
        * \note
        * This function creates permutations for the mesh entities for each dimension.
@@ -690,10 +690,10 @@ namespace FEAT
        * \brief Creates a lexicographic mesh permutation for a conformal mesh.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \param[in] vtx
-       * A reference to the vertex set of the conformal mesh.
+       * A \transient reference to the vertex set of the conformal mesh.
        *
        * \note
        * This function creates permutations for the mesh entities for each dimension.
@@ -720,7 +720,7 @@ namespace FEAT
        * \brief Creates a colored mesh permutation for a conformal mesh.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \note
        * This function also creates an element coloring automatically.
@@ -765,7 +765,7 @@ namespace FEAT
        * \brief Creates a (reversed) algebraic Cuthill-McKee mesh permutation for a conformal mesh.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \param[in] reverse
        * Specifies whether the ordering is to be reversed.
@@ -798,10 +798,10 @@ namespace FEAT
        * \brief Creates a (reversed) geometric Cuthill-McKee mesh permutation for a conformal mesh.
        *
        * \param[in] ish
-       * A reference to the index set holder of the conformal mesh.
+       * A \transient reference to the index set holder of the conformal mesh.
        *
        * \param[in] vtx
-       * A reference to the vertex set of the conformal mesh.
+       * A \transient reference to the vertex set of the conformal mesh.
        *
        * \param[in] reverse
        * Specifies whether the ordering is to be reversed.
@@ -996,7 +996,7 @@ namespace FEAT
        * \brief Validates the permutation sizes.
        *
        * \param[in] num_entities
-       * An array of size shape_dim+1 that contains the number of entities for each dimension.
+       * An \transient array of size shape_dim+1 that contains the number of entities for each dimension.
        *
        * \returns
        * - 0, if all permutation sizes are valid, or

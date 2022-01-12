@@ -77,8 +77,8 @@ namespace FEAT
        * - \c type_inv_swap \n Interpret the input array as an inverse swap-position array.
        *
        * \param[in] v
-       * The input array for the initialization. The interpretation of the array's content depends on the
-       * \p constr_type parameter.
+       * The \transient input array for the initialization. The interpretation of the array's
+       * content depends on the \p constr_type parameter.
        */
       explicit Permutation(
         Index num_entries,
@@ -94,7 +94,7 @@ namespace FEAT
        * The size of the permutation to be created.
        *
        * \param[in] random
-       * The random number generator to be used.
+       * The \transient random number generator to be used.
        */
       explicit Permutation(
         Index num_entries,
@@ -124,7 +124,7 @@ namespace FEAT
       /**
        * \brief Computes the inverse permutation.
        *
-       * \returns The inverse permutiation.
+       * \returns The inverse permutation.
        */
       Permutation inverse() const
       {
@@ -177,10 +177,10 @@ namespace FEAT
         return IT_(_perm_pos.at(std::size_t(i)));
       }
 
-      /// Computes the swap-position vector from the permuation-position vector.
+      /// Computes the swap-position vector from the permutation-position vector.
       void calc_swap_from_perm();
 
-      /// Computes the permuation-position vector from the swap-position vector.
+      /// Computes the permutation-position vector from the swap-position vector.
       void calc_perm_from_swap();
 
       /**
@@ -189,7 +189,7 @@ namespace FEAT
        * This member function applies the permutation in-situ.
        *
        * \param[in,out] x
-       * The array that is to be permuted.
+       * The \transient array that is to be permuted.
        *
        * \param[in] invert
        * Specifies whether to apply the forward (\p false) or inverse (\p true) permutation.
@@ -239,10 +239,10 @@ namespace FEAT
        * This function applies the permutation on an array.
        *
        * \param[out] y
-       * The array that shall receive the permuted array.
+       * The \transient array that shall receive the permuted array.
        *
        * \param[in] x
-       * The array that is to be permuted.
+       * The \transient array that is to be permuted.
        *
        * \param[in] invert
        * Specifies whether to apply the forward (\p false) or inverse (\p true) permutation.

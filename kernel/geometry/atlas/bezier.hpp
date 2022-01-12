@@ -83,13 +83,13 @@ namespace FEAT
          * \brief Constructor.
          *
          * \param[in] vtx_ptr
-         * A deque containing the indices of the vertex points in the world point array.
+         * A \transient deque containing the indices of the vertex points in the world point array.
          *
          * \param[in] world
-         * A deque of vertex and control points representing the spline.
+         * A \transient deque of vertex and control points representing the spline.
          *
          * \param[in] param
-         * A deque of parameter points representing the parameter space.
+         * A \transient deque of parameter points representing the parameter space.
          *
          * \param[in] closed
          * Specifies whether the spline is closed.
@@ -629,7 +629,7 @@ namespace FEAT
          * \brief Projects all mesh points identified by a meshpart
          *
          * \param[in,out] mesh
-         * The mesh whose points will be projected
+         * A \transient reference to the mesh whose points will be projected
          *
          * \param[in] meshpart
          * The MeshPart identifying the point to be projected
@@ -983,7 +983,7 @@ namespace FEAT
         {
           // make sure that we do not read more points than expected
           if(_read >= _size)
-            throw Xml::ContentError(iline, sline, "Invalid content; exprected terminator");
+            throw Xml::ContentError(iline, sline, "Invalid content; expected terminator");
 
           typename ChartType::ParamPoint point;
 

@@ -86,13 +86,14 @@ namespace FEAT
          */
         sort_desc = 2
       };
+
       /**
        * \brief Cuthill-McKee permutation computation function
        *
        * This function creates a Cuthill-McKee permutation of the given graph.
        *
        * \param[in] graph
-       * The graph, the permutation is calculated for.
+       * The \transient graph that the permutation is calculated for.
        *
        * \param[in] reverse
        * This bool determines, if the reverse Cuthill-McKee permutation should be calculated.
@@ -120,7 +121,7 @@ namespace FEAT
        * This function creates a Cuthill-McKee permutation of the given graph.
        *
        * \param[in] graph
-       * The graph, the permutation is calculated for.
+       * The \transient graph that the permutation is calculated for.
        *
        * \param[in] reverse
        * This bool determines, if the reverse Cuthill-McKee permutation should be calculated.

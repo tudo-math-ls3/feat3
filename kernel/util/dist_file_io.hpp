@@ -134,7 +134,7 @@ namespace FEAT
      * This function reads a single file on the root rank and broadcasts its contents to all other ranks.
      *
      * \param[out] stream
-     * The string stream that receives the file contents.
+     * A \transient reference to the string stream that receives the file contents.
      *
      * \param[in] filename
      * The name of the file to be read.
@@ -162,7 +162,7 @@ namespace FEAT
      * This function reads a single file on the root rank and broadcasts its contents to all other ranks.
      *
      * \param[out] stream
-     * The binary stream that receives the file contents.
+     * A \transient reference to the binary stream that receives the file contents.
      *
      * \param[in] filename
      * The name of the file to be read.
@@ -190,7 +190,7 @@ namespace FEAT
      * This function reads a sequence of files, where each rank reads a single indexed file.
      *
      * \param[out] stream
-     * The string stream that receives the file contents.
+     * A \transient reference to the string stream that receives the file contents.
      *
      * \param[in] pattern
      * The pattern that is to be used for filename generation.
@@ -216,7 +216,7 @@ namespace FEAT
      * This function reads a sequence of files, where each rank reads a single indexed file.
      *
      * \param[out] stream
-     * The binary stream that receives the file contents.
+     * A \transient reference to the binary stream that receives the file contents.
      *
      * \param[in] pattern
      * The pattern that is to be used for filename generation.
@@ -239,7 +239,7 @@ namespace FEAT
      * \brief Writes a rank-indexed text file sequence.
      *
      * \param[out] stream
-     * The string stream whose contents are to be written to the file.
+     * A \transient reference to the string stream whose contents are to be written to the file.
      *
      * \param[in] pattern
      * The pattern that is to be used for filename generation.
@@ -267,7 +267,7 @@ namespace FEAT
      * This function writes a sequence of files, where each rank writes a single indexed file.
      *
      * \param[out] stream
-     * The binary stream whose contents are to be written to the file.
+     * A \transient reference to the binary stream whose contents are to be written to the file.
      *
      * \param[in] pattern
      * The pattern that is to be used for filename generation.
@@ -295,7 +295,7 @@ namespace FEAT
      * \note This function is effectively a wrapper around \b MPI_File_read_ordered.
      *
      * \param[out] buffer
-     * A pointer to the binary buffer that is to read into. Must not be \c nullptr.
+     * A \transient pointer to the binary buffer that is to read into. Must not be \c nullptr.
      *
      * \param[in] size
      * The size of this process's buffer in bytes. May differ on each process.
@@ -324,7 +324,7 @@ namespace FEAT
      * \note This function is effectively a wrapper around \b MPI_File_write_ordered.
      *
      * \param[in] buffer
-     * A pointer to the binary buffer that is to be written. Must not be \c nullptr.
+     * A \transient pointer to the binary buffer that is to be written. Must not be \c nullptr.
      *
      * \param[in] size
      * The size of this process's buffer in bytes. May differ on each process.
@@ -356,7 +356,7 @@ namespace FEAT
      * \note This function is effectively a wrapper around \b MPI_File_write_ordered.
      *
      * \param[in] stream
-     * The binary stream whose contents are to be written to the file.
+     * A \transient reference to the binary stream whose contents are to be written to the file.
      *
      * \param[in] filename
      * The name of the common output file. Must be the same on all calling processes.
@@ -405,8 +405,8 @@ namespace FEAT
      * \param[in] root_rank
      * Specifies which process should actually read the file. Ignored if compiled without MPI.
      *
-     * \param[in] bcast_shared
-     * Specifies wheter the shared buffer is to be broadcasted to all processes or whether
+     * \param[in] bcast_common
+     * Specifies whether the shared buffer is to be broadcasted to all processes or whether
      * it is only filled on the root process. Ignored if compiled without MPI.
      */
     static void read_combined(std::vector<char>& common, std::vector<char>& buffer,

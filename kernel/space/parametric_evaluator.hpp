@@ -144,10 +144,10 @@ namespace FEAT
        * This function evaluates the basis functions in a point on the reference cell.
        *
        * \param[out] space_ref_data
-       * A reference to the space reference data that is to be computed.
+       * A \transient reference to the space reference data that is to be computed.
        *
        * \param[in] dom_point
-       * A reference to the domain point in which the evaluation shall take place.
+       * A \transient reference to the domain point in which the evaluation shall take place.
        */
       template<SpaceTags space_cfg_>
       void reference_eval(

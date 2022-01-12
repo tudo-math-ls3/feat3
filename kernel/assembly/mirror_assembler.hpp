@@ -141,13 +141,13 @@ namespace FEAT
        * \brief Assembles a VectorMirror from a space and a mesh-part.
        *
        * \param[out] vec_mirror
-       * The vector mirror that is to be assembled.
+       * A \transient reference to the vector mirror that is to be assembled.
        *
        * \param[in] space
-       * A reference to the finite element space to be used.
+       * A \transient reference to the finite element space to be used.
        *
        * \param[in] mesh_part
-       * A reference to the mesh-part that is to be mirrored.
+       * A \transient reference to the mesh-part that is to be mirrored.
        */
       template<
         typename MemType_,

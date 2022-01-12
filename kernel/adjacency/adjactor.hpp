@@ -293,7 +293,7 @@ namespace FEAT
        */
       class ImageIterator
       {
-        // The CompositeAdjactor class needs to be a friend as it calls the protected constuctors.
+        // The CompositeAdjactor class needs to be a friend as it calls the protected constructors.
         friend class CompositeAdjactor<Adj1_, Adj2_>;
 
       private:
@@ -436,7 +436,7 @@ namespace FEAT
       {
         // Ensure that the number of image nodes in the first adjactor is not greater than the number of domain
         // nodes in the second adjactor; otherwise the composite adjactor is ill-formed.
-        XASSERTM(_adj1.get_num_nodes_image() <= _adj2.get_num_nodes_domain(), "Composite Adjuctor is ill-formed");
+        XASSERTM(_adj1.get_num_nodes_image() <= _adj2.get_num_nodes_domain(), "Composite Adjactor is ill-formed");
       }
 
       /** \copydoc Adjactor::get_num_nodes_domain() */

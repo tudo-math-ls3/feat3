@@ -31,13 +31,13 @@ namespace FEAT
        * \brief Projects an analytic function into the vertices.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the vertex interpolation of the analytic function.
+       * A \transient reference to a vector object that shall receive the vertex interpolation of the analytic function.
        *
        * \param[in] function
-       * A reference to the analytic function to be projected
+       * A \transient reference to the analytic function to be projected
        *
        * \param[in] trafo
-       * A reference to the transformation defined on the mesh where to project the function.
+       * A \transient reference to the transformation defined on the mesh where to project the function.
        */
       template<typename VectorOut_, typename Function_, typename Trafo_>
       static void project(VectorOut_& vector, const Function_& function, const Trafo_& trafo)
@@ -99,13 +99,13 @@ namespace FEAT
        * \brief Projects an analytic function into the cells using the barycentre cubature rule.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the vertex interpolation of the analytic function.
+       * A \transient reference to a vector object that shall receive the vertex interpolation of the analytic function.
        *
        * \param[in] function
-       * A reference to the analytic function to be projected
+       * A \transient reference to the analytic function to be projected
        *
        * \param[in] trafo
-       * A reference to the transformation defined on the mesh where to project the function.
+       * A \transient reference to the transformation defined on the mesh where to project the function.
        */
       template<
         typename VectorOut_,
@@ -124,13 +124,13 @@ namespace FEAT
        * \brief Projects an analytic function into the cells.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the vertex interpolation of the analytic function.
+       * A \transient reference to a vector object that shall receive the vertex interpolation of the analytic function.
        *
        * \param[in] function
-       * A reference to the analytic function to be projected
+       * A \transient reference to the analytic function to be projected
        *
        * \param[in] trafo
-       * A reference to the transformation defined on the mesh where to project the function.
+       * A \transient reference to the transformation defined on the mesh where to project the function.
        *
        * \param[in] cubature_factory
        * The cubature factory that is to be used for integration.

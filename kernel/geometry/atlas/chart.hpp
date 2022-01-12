@@ -74,10 +74,10 @@ namespace FEAT
          * \brief Adapts a mesh using this chart.
          *
          * \param[inout] mesh
-         * The mesh that is to be adapted.
+         * A \transient reference to the mesh that is to be adapted.
          *
          * \param[in] meshpart
-         * The mesh part that describes the part to adapt.
+         * A \transient reference to the mesh part that describes the part to adapt.
          */
         virtual void adapt(MeshType& mesh, const PartType& meshpart) const = 0;
 
@@ -85,10 +85,10 @@ namespace FEAT
          * \brief Adapts a mesh part using this chart.
          *
          * \param[inout] mesh
-         * The mesh part that is to be adapted.
+         * A \transient reference to the mesh part that is to be adapted.
          *
          * \param[in] meshpart
-         * The mesh part that describes the part to adapt.
+         * A \transient reference to the mesh part that describes the part to adapt.
          */
         virtual void adapt(PartType& mesh, const PartType& meshpart) const = 0;
 
@@ -422,7 +422,7 @@ namespace FEAT
           // ensure that the mesh world dimension is compatible
           XASSERTM(MeshType::world_dim == world_dim, "Mesh/Chart world dimension mismatch");
 
-          // Try to adapt explicity
+          // Try to adapt explicitly
           if(Intern::ExplicitChartHelper<is_explicit>::adapt(cast(), mesh, part))
             return;
 

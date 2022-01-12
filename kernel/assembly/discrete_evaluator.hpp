@@ -78,7 +78,7 @@ namespace FEAT
        * \brief Computes the mean function value on a distributed domain.
        *
        * \param[in] comm
-       * The communicator that the domain was distributed on.
+       * The \transient communicator that the domain was distributed on.
        *
        * \returns
        * The mean function value.
@@ -109,7 +109,7 @@ namespace FEAT
     }; // class ScalarDiscreteEvalData
 
     /**
-     * \brief Discrete evaluation data for vecotr-valued functions
+     * \brief Discrete evaluation data for vector-valued functions
      *
      * \tparam DT_
      * The datatype that is to be used.
@@ -169,7 +169,7 @@ namespace FEAT
        * \brief Computes the mean function value on a distributed domain.
        *
        * \param[in] comm
-       * The communicator that the domain was distributed on.
+       * The \transient communicator that the domain was distributed on.
        *
        * \returns
        * The mean function value.
@@ -252,14 +252,14 @@ namespace FEAT
        * other overload of this function instead for performance reasons.
        *
        * \param[in] point
-       * The point in real world coordinates in which the finite element function
+       * The \transient point in real world coordinates in which the finite element function
        * is to be evaluated.
        *
        * \param[in] vector
-       * The coefficient vector of the finite-element function.
+       * The \transient coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * The finite-element space corresponding to the vector.
+       * The \transient finite-element space corresponding to the vector.
        *
        * \returns
        * A ScalarDiscreteEvalData object that contains the evaluations results.
@@ -284,14 +284,14 @@ namespace FEAT
        * \brief Evaluates a scalar finite-element function in a given unmapped point.
        *
        * \param[in] inv_map_data
-       * A Trafo::InverseMappingData object that represents the unmapped evaluation point,
+       * A \transient Trafo::InverseMappingData object that represents the unmapped evaluation point,
        * as computed by the Trafo::InverseMapping class.
        *
        * \param[in] vector
-       * The coefficient vector of the finite-element function.
+       * The \transient coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * The finite-element space.
+       * The \transient finite-element space.
        *
        * \returns
        * A ScalarDiscreteEvalData object that contains the evaluations results.
@@ -399,14 +399,14 @@ namespace FEAT
        * other overload of this function instead for performance reasons.
        *
        * \param[in] point
-       * The point in real world coordinates in which the finite element function
+       * The \transient point in real world coordinates in which the finite element function
        * is to be evaluated.
        *
        * \param[in] vector
-       * The coefficient vector of the finite-element function.
+       * The \transient coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * The finite-element space.
+       * The \transient finite-element space.
        *
        * \returns
        * A VectorDiscreteEvalData object that contains the evaluations results.
@@ -431,14 +431,14 @@ namespace FEAT
        * \brief Evaluates a vector-valued finite-element function in a given unmapped point.
        *
        * \param[in] inv_map_data
-       * A Trafo::InverseMappingData object that represents the unmapped evaluation point,
+       * A \transient Trafo::InverseMappingData object that represents the unmapped evaluation point,
        * as computed by the Trafo::InverseMapping class.
        *
        * \param[in] vector
-       * The coefficient vector of the finite-element function.
+       * The \transient coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * The finite-element space.
+       * The \transient finite-element space.
        *
        * \returns
        * A VectorDiscreteEvalData object that contains the evaluations results.

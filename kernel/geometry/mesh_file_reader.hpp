@@ -73,10 +73,10 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in,out] mesh_node
-       * The mesh node that the linker should operate on.
+       * A \resident reference to the mesh node that the linker should operate on.
        *
        * \param[in,out] atlas
-       * The atlas that contains the charts.
+       * A \resident reference to the atlas that contains the charts.
        */
       explicit MeshNodeLinker(RootMeshNode<RootMesh_>& mesh_node, MeshAtlas<RootMesh_>& atlas) :
         _mesh_node(mesh_node),
@@ -91,7 +91,7 @@ namespace FEAT
        * The name of the meshpart that is to be linked to a chart.
        *
        * \param[in] chart
-       * The name of the chart that the meshpart is to be linked to.
+       * A \resident reference to the name of the chart that the meshpart is to be linked to.
        */
       void meshpart_link_to_chart(const String& meshpart, const String& chart)
       {
@@ -141,7 +141,7 @@ namespace FEAT
           _meshpart_to_chart.pop_front();
         }
 
-        // ger the root mesh (if it exists)
+        // get the root mesh (if it exists)
         const RootMesh_* root_mesh = _mesh_node.get_mesh();
 
         // deduct meshpart topologies
@@ -1385,7 +1385,7 @@ namespace FEAT
       int _world_dim;
 
     public:
-      /// default constuctor
+      /// default constructor
       explicit MeshFileReader() :
         _have_root_markup(false),
         _mesh_type_string(),
@@ -1697,17 +1697,17 @@ namespace FEAT
        * \brief Parses the mesh file into a mesh node and a mesh atlas.
        *
        * \param[in,out] linker
-       * A linker that the post-parse tasks are to be added to.
+       * A \transient reference to the linker that the post-parse tasks are to be added to.
        *
        * \param[in,out] root_mesh_node
-       * The root mesh node into which the mesh and the mesh parts are to be added.
+       * A \transient reference to the root mesh node into which the mesh and the mesh parts are to be added.
        *
        * \param[in,out] mesh_atlas
-       * The mesh atlas into which charts are to be added. Is also used to search
+       * A \transient reference to the mesh atlas into which charts are to be added. Is also used to search
        * for charts for mesh parts.
        *
        * \param[in,out] part_set
-       * A pointer to the partition set that partitions are added to.
+       * A \transient pointer to the partition set that partitions are added to.
        * May be \p nullptr, if the partitions are to be ignored.
        */
       template<typename RootMesh_>
@@ -1734,14 +1734,14 @@ namespace FEAT
        * \brief Parses the mesh file into a mesh node and a mesh atlas.
        *
        * \param[in,out] root_mesh_node
-       * The root mesh node into which the mesh and the mesh parts are to be added.
+       * A \transient reference to the root mesh node into which the mesh and the mesh parts are to be added.
        *
        * \param[in,out] mesh_atlas
-       * The mesh atlas into which charts are to be added. Is also used to search
+       * A \transient reference to the mesh atlas into which charts are to be added. Is also used to search
        * for charts for mesh parts.
        *
        * \param[in,out] part_set
-       * A pointer to the partition set that partitions are added to.
+       * A \transient pointer to the partition set that partitions are added to.
        * May be \p nullptr, if the partitions are to be ignored.
        */
       template<typename RootMesh_>
@@ -1764,11 +1764,11 @@ namespace FEAT
        * \brief Parses the mesh file into a mesh node and a mesh atlas.
        *
        * \param[in,out] mesh_atlas
-       * The mesh atlas into which charts are to be added. Is also used to search
+       * A \transient reference to the mesh atlas into which charts are to be added. Is also used to search
        * for charts for mesh parts.
        *
        * \param[in,out] part_set
-       * A pointer to the partition set that partitions are added to.
+       * A \transient pointer to the partition set that partitions are added to.
        * May be \p nullptr, if the partitions are to be ignored.
        *
        * \returns

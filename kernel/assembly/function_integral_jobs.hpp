@@ -441,7 +441,7 @@ namespace FEAT
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronize.
+       * The \transient communicator over which to synchronize.
        */
       void synchronize(const Dist::Comm& comm)
       {
@@ -993,10 +993,10 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] function
-       * A reference to the analytic function that is to be integrated.
+       * A \resident reference to the analytic function that is to be integrated.
        *
        * \param[in] trafo
-       * A reference to the trafo representing the domain over which to integrate.
+       * A \resident reference to the trafo representing the domain over which to integrate.
        *
        * \param[in] cubature
        * The name of the cubature rule to use for integration.
@@ -1176,10 +1176,10 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] vector
-       * A reference to the coefficient vector of the discrete function.
+       * A \resident reference to the coefficient vector of the discrete function.
        *
        * \param[in] space
-       * A reference to the finite element space used for the discretization
+       * A \resident reference to the finite element space used for the discretization
        *
        * \param[in] cubature
        * The name of the cubature rule to use for integration.
@@ -1377,13 +1377,13 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] function
-       * A reference to the analytic function u.
+       * A \resident reference to the analytic function u.
        *
        * \param[in] vector
-       * A reference to the coefficient vector of the discrete function u_h.
+       * A \resident reference to the coefficient vector of the discrete function u_h.
        *
        * \param[in] space
-       * A reference to the finite element space used for the discretization of u_h
+       * A \resident reference to the finite element space used for the discretization of u_h
        *
        * \param[in] cubature
        * The name of the cubature rule to use for integration.

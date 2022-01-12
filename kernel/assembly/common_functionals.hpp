@@ -98,7 +98,7 @@ namespace FEAT
            * This operator evaluates the linear functional for a given test function in a single point.
            *
            * \param[in] psi
-           * The test function data in the current evaluation point. \see Space::EvalData
+           * The \transient test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
            * The value of the linear functional.
@@ -114,7 +114,12 @@ namespace FEAT
         const Function_& _function;
 
       public:
-        /// constructor
+        /**
+         * \brief Constructor
+         *
+         * \param[in] function
+         * A \resident reference to the function that is to be wrapped into a force functional.
+         */
         explicit ForceFunctional(const Function_& function) :
           _function(function)
         {
@@ -201,7 +206,7 @@ namespace FEAT
            * This operator evaluates the linear functional for a given test function in a single point.
            *
            * \param[in] psi
-           * The test function data in the current evaluation point. \see Space::EvalData
+           * The \transient test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
            * The value of the linear functional.
@@ -217,7 +222,12 @@ namespace FEAT
         const Function_& _function;
 
       public:
-        /// constructor
+        /**
+         * \brief Constructor
+         *
+         * \param[in] function
+         * A \resident reference to the function that is to be wrapped into a Laplace functional.
+         */
         explicit LaplaceFunctional(const Function_& function) :
           _function(function)
         {

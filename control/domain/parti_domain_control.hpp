@@ -178,7 +178,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] comm_
-         * The main communicator to be used.
+         * A \resident reference to the main communicator to be used.
          *
          * \param[in] support_multi_layered
          * Specifies whether the controller is allowed to create multi-layered hierarchies.
@@ -275,7 +275,7 @@ namespace FEAT
          * \brief Parses the partitioner options from a PropertyMap
          *
          * \param[in] pmap
-         * Contains the configuration, e.g. read from a file
+         * A \transient reference to the property map that contains the configuration
          *
          * \returns
          * \c true, if the parsing was successful, or \c false,
@@ -407,7 +407,7 @@ namespace FEAT
          * \brief Sets the desired levels for the partitioned hierarchy.
          *
          * \param[in] slvls
-         * A deque of strings containing the desired levels.
+         * A \transient reference to the deque of strings containing the desired levels.
          *
          * Each entry of the deque is supposed to be in the format <c>level:nprocs</c>.
          */
@@ -669,7 +669,7 @@ namespace FEAT
          * \brief Creates a domain control from a MeshFileReader.
          *
          * \param[inout] mesh_reader
-         * The mesh reader from which the domain control is to be created.
+         * A \transient reference to the mesh reader from which the domain control is to be created.
          */
         void create(Geometry::MeshFileReader& mesh_reader)
         {

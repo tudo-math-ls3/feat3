@@ -32,7 +32,7 @@ namespace FEAT
      *
      * - Extended-facet pattern for identical or different test-/trial-spaces on the same mesh.
      *   This pattern is used for matrices which include operator coupling over neighbor elements,
-     *   e.g. for jump-stabilisiation or discontinuous Galerkin methods. The corresponding functions
+     *   e.g. for jump-stabilization or discontinuous Galerkin methods. The corresponding functions
      *   are assemble_matrix_ext_facet1 and assemble_matrix_ext_facet2.
      *
      * - Extended-node pattern for identical or different test-/trial-spaces on the same mesh.
@@ -52,7 +52,7 @@ namespace FEAT
        * \brief Assembles the standard Dof-Adjacency graph for different test- and trial-spaces.
        *
        * \param[in] test_space, trial_space
-       * The test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
+       * The \transient test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
        *
        * \returns
        * The standard Dof-Adjacency graph of the test- and trial-space combination.
@@ -81,7 +81,7 @@ namespace FEAT
        * \brief Assembles the standard Dof-Adjacency graph for identical test- and trial-spaces.
        *
        * \param[in] space
-       * The space representing the test- and trial spaces to be used for the assembly.
+       * The \transient space representing the test- and trial spaces to be used for the assembly.
        *
        * \returns
        * The standard Dof-Adjacency graph of the space.
@@ -106,7 +106,7 @@ namespace FEAT
        * \brief Assembles the extended-facet Dof-Adjacency graph for different test- and trial-spaces.
        *
        * \param[in] test_space, trial_space
-       * The test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
+       * The \transient test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
        *
        * \returns
        * The extended-facet Dof-Adjacency graph of the test- and trial-space combination.
@@ -148,10 +148,10 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles the extented-facet Dof-Adjacency graph for identical test- and trial-spaces.
+       * \brief Assembles the extended-facet Dof-Adjacency graph for identical test- and trial-spaces.
        *
        * \param[in] space
-       * The space representing the test- and trial spaces to be used for the assembly.
+       * The \transient space representing the test- and trial spaces to be used for the assembly.
        *
        * \returns
        * The extended-facet Dof-Adjacency graph of the space.
@@ -189,7 +189,7 @@ namespace FEAT
        * \brief Assembles the extended-node Dof-Adjacency graph for different test- and trial-spaces.
        *
        * \param[in] test_space, trial_space
-       * The test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
+       * The \transient test- and trial-spaces to be used for the assembly. Must be defined on the same mesh.
        *
        * \returns
        * The extended-node Dof-Adjacency graph of the test- and trial-space combination.
@@ -234,7 +234,7 @@ namespace FEAT
        * \brief Assembles the extended-node Dof-Adjacency graph for identical test- and trial-spaces.
        *
        * \param[in] space
-       * The space representing the test- and trial spaces to be used for the assembly.
+       * The \transient space representing the test- and trial spaces to be used for the assembly.
        *
        * \returns
        * The extended-node Dof-Adjacency graph of the space.
@@ -272,7 +272,7 @@ namespace FEAT
        * \brief Assembles the diagonal Dof-Adjacency graph for identical test- and trial-spaces.
        *
        * \param[in] space
-       * The space representing the test- and trial spaces to be used for the assembly.
+       * The \transient space representing the test- and trial spaces to be used for the assembly.
        *
        * \returns
        * The diagonal Dof-Adjacency graph of the space.
@@ -301,10 +301,10 @@ namespace FEAT
        * \brief Assembles the standard Dof-Adjacency graph.
        *
        * \param[in] fine_space
-       * The test-space defined on the refined mesh.
+       * The \transient test-space defined on the refined mesh.
        *
        * \param[in] coarse_space
-       * The trial-space defined on the coarse mesh.
+       * The \transient trial-space defined on the coarse mesh.
        *
        * \attention
        * This function silently assumes that \p fine_space is defined on the
@@ -384,10 +384,10 @@ namespace FEAT
        * \brief Assembles a standard matrix structure from a test-trial-space pair.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] test_space, trial_space
-       * The test- and trial-spaces to be used for the assembly.
+       * The \transient test- and trial-spaces to be used for the assembly.
        */
       template<typename MatrixType_, typename TestSpace_, typename TrialSpace_>
       static void assemble_matrix_std2(MatrixType_ & matrix,
@@ -410,10 +410,10 @@ namespace FEAT
        * \brief Assembles a standard matrix structure from a single space.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] space
-       * The space to be used for the assembly.
+       * The \transient space to be used for the assembly.
        */
       template<typename MatrixType_, typename Space_>
       static void assemble_matrix_std1(MatrixType_ & matrix, const Space_& space)
@@ -434,10 +434,10 @@ namespace FEAT
        * \brief Assembles an extended-facet matrix structure from a test-trial-space pair.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] test_space, trial_space
-       * The test- and trial-spaces to be used for the assembly.
+       * The \transient test- and trial-spaces to be used for the assembly.
        */
       template<typename MatrixType_, typename TestSpace_, typename TrialSpace_>
       static void assemble_matrix_ext_facet2(MatrixType_ & matrix,
@@ -450,10 +450,10 @@ namespace FEAT
        * \brief Assembles an extended-facet matrix structure from a single space.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] space
-       * The space to be used for the assembly.
+       * The \transient space to be used for the assembly.
        */
       template<typename MatrixType_, typename Space_>
       static void assemble_matrix_ext_facet1(MatrixType_ & matrix, const Space_& space)
@@ -465,10 +465,10 @@ namespace FEAT
        * \brief Assembles an extended-node matrix structure from a test-trial-space pair.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] test_space, trial_space
-       * The test- and trial-spaces to be used for the assembly.
+       * The \transient test- and trial-spaces to be used for the assembly.
        */
       template<typename MatrixType_, typename TestSpace_, typename TrialSpace_>
       static void assemble_matrix_ext_node2(MatrixType_ & matrix,
@@ -481,10 +481,10 @@ namespace FEAT
        * \brief Assembles an extended-node matrix structure from a single space.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] space
-       * The space to be used for the assembly.
+       * The \transient space to be used for the assembly.
        */
       template<typename MatrixType_, typename Space_>
       static void assemble_matrix_ext_node1(MatrixType_ & matrix, const Space_& space)
@@ -496,10 +496,10 @@ namespace FEAT
        * \brief Assembles a diagonal matrix structure from a single space.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] space
-       * The space to be used for the assembly.
+       * The \transient space to be used for the assembly.
        */
       template<typename MatrixType_, typename Space_>
       static void assemble_matrix_diag(MatrixType_ & matrix, const Space_& space)
@@ -511,13 +511,13 @@ namespace FEAT
        * \brief Assembles a 2-level matrix structure from a fine-coarse-space pair.
        *
        * \param[out] matrix
-       * A reference to the matrix to be assembled.
+       * A \transient reference to the matrix to be assembled.
        *
        * \param[in] fine_space, coarse_space
-       * The fine and coarse spaces to be used for the assembly.
+       * The \transient fine and coarse spaces to be used for the assembly.
        *
        * \attention
-       * This function silenty assumes that \p fine_space is defined on the
+       * This function silently assumes that \p fine_space is defined on the
        * mesh that was obtained by applying the standard 2-level refinement
        * algorithm on the underlying mesh of \p coarse_space.
        */

@@ -196,7 +196,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] trafo
-       * The trafo mapping that is to be inverted.
+       * The \resident trafo mapping that is to be inverted.
        *
        * \param[in] bbox_tol
        * The bounding box tolerance used for building the cell bounding boxes.
@@ -292,7 +292,7 @@ namespace FEAT
        *   simple bounding box test provided by the #find_candidate_cells() function.
        * - Then, for each of the candidate cells, this function tries to unmap
        *   the given point onto the cell to obtain the domain point coordinates
-       *   by using a Newton iteration provided bythe #unmap_point_by_newton() function.
+       *   by using a Newton iteration provided by the #unmap_point_by_newton() function.
        * - Finally, this function checks whether the unmapped point is on the
        *   reference cell by using the #test_domain_point() function.
        *
@@ -373,7 +373,7 @@ namespace FEAT
        * this particular cell will definitely be selected as a candidate.
        *
        * \param[out] cells
-       * A vector that receives the indices of all found candidate cells.
+       * A \transient vector that receives the indices of all found candidate cells.
        *
        * \param[in] img_point
        * The image point for which the candidates are to be found.

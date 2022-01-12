@@ -156,7 +156,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] trafo
-       * A reference to the transformation which is to be used by this space.
+       * A \resident reference to the transformation which is to be used by this space.
        *
        * \note This constructor is protected so that it can only be called from a derived class.
        */

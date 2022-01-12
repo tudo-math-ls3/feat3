@@ -18,7 +18,7 @@
 namespace FEAT
 {
   /**
-   * \brief A class organising a tree of key-value pairs
+   * \brief A class organizing a tree of key-value pairs
    *
    * \see \ref ini_format
    *
@@ -117,6 +117,10 @@ namespace FEAT
      *
      * \return
      * A pointer to a the \c PropertyMap associated to the name.
+     *
+     * \note
+     * The returned pointer is managed by this object and therefore the object <b>must not</b> be
+     * deleted by the caller!
      */
     PropertyMap* add_section(String name);
 
@@ -186,6 +190,10 @@ namespace FEAT
      *
      * \returns
      * A (const) pointer to the section represented by \p path or \c nullptr if no such section was found.
+     *
+     * \note
+     * The returned pointer (if not null) is managed by this PropertyMap object and
+     * therefore the returned object <b>must not</b> be deleted by the caller.
      */
     PropertyMap* query_section(String sec_path);
 
@@ -224,7 +232,7 @@ namespace FEAT
      *
      * \note
      * This method does not allocate new memory, thus modifications to the returned PropertyMap affect the base
-     * property map and the returned PropertyMap <b>must</b> not be deleted.
+     * property map and the returned PropertyMap <b>must not</b> be deleted.
      */
     PropertyMap* get_sub_section(String name);
 
@@ -244,7 +252,7 @@ namespace FEAT
      * A reference to the object that is to be parsed into.
      *
      * \param[in] rtn_non_exist
-     * The value that this function should return if there exisits no entry for the given key.
+     * The value that this function should return if there exists no entry for the given key.
      *
      * \returns
      * - \c true, if the entry exists and was parsed successfully,

@@ -73,10 +73,10 @@ namespace FEAT
        * \brief Creates the factory.
        *
        * \param[in] hit_func
-       * A reference to the hit-test function characterising the region.
+       * A \resident reference to the hit-test function characterizing the region.
        *
        * \param[in] mesh
-       * A reference to the mesh for which the cell sub-set is to be computed.
+       * A \resident reference to the mesh for which the cell sub-set is to be computed.
        */
       explicit HitTestFactory(const HitFunc_& hit_func, const Mesh_& mesh) :
         _hit_func(hit_func),

@@ -377,7 +377,7 @@ namespace FEAT
      * \brief Pads the front of the string up to a desired length.
      *
      * This function returns a string that is front-padded with a specific character up to a desired minimum length.
-     * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
+     * If the length of \c this already has the desired minimum length, this function returns \c *this.
      *
      * \note This function is virtually the counter-part of #trim_front() and #trunc_front().
      *
@@ -400,7 +400,7 @@ namespace FEAT
      * \brief Pads the back of the string up to a desired length.
      *
      * This function returns a string that is back-padded with a specific character up to a desired minimum length.
-     * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
+     * If the length of \c this already has the desired minimum length, this function returns \c *this.
      *
      * \note This function is virtually the counter-part of #trim_back() and #trunc_back().
      *
@@ -798,7 +798,7 @@ namespace FEAT
      * \brief Parses the string and stores its value in the provided variable.
      *
      * \param[out] t
-     * The parsed value, if the parse succeeded.
+     * A \transient reference to an object that receives the parsed value, if the parse succeeded.
      *
      * \returns
      * \c true, if the parse succeeds, otherwise \c false.
@@ -951,7 +951,7 @@ namespace FEAT
    * The type of the item to be converted.
    *
    * \param[in] item
-   * The item to be converted.
+   * A \transient reference to the item that is to be converted.
    *
    * \returns
    * A String representation of the item.
@@ -1168,7 +1168,7 @@ namespace FEAT
 } // namespace FEAT
 
 // operator<<(__float128) must reside in the std namespace because gcc/icc search the namespace of ostream for a fitting op<< first
-// and would otherwise only find op<< with conversions of __float128 to int/double/long etc, which would lead to ambigue overloads, too.
+// and would otherwise only find op<< with conversions of __float128 to int/double/long etc, which would lead to ambiguous overloads, too.
 #ifndef __CUDACC__
 #ifdef FEAT_HAVE_QUADMATH
 namespace std

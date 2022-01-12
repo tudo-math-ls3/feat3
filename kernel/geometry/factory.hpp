@@ -63,7 +63,7 @@ namespace FEAT
        * \brief Constructor.
        *
        * \param[in] coarse_mesh
-       * The coarse mesh that is to be refined.
+       * A \resident reference to the coarse mesh that is to be refined.
        */
       explicit StandardRefinery(const MeshType& coarse_mesh);
     };

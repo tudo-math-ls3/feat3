@@ -103,7 +103,7 @@ namespace FEAT
        * \brief Prepares the evaluator for a given cell.
        *
        * \param[in] trafo_eval
-       * A reference to the trafo evaluator containing the cell information.
+       * A \transient reference to the trafo evaluator containing the cell information.
        */
       void prepare(const TrafoEvaluator& DOXY(trafo_eval))
       {
@@ -122,10 +122,10 @@ namespace FEAT
        * This operator evaluates the basis functions in a point on a mesh cell.
        *
        * \param[out] space_data
-       * A reference to the space data that is to be computed.
+       * A \transient reference to the space data that is to be computed.
        *
        * \param[in] trafo_data
-       * The trafo evaluation data containing information about the evaluation point.
+       * The \transient trafo evaluation data containing information about the evaluation point.
        */
       template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void operator()(
@@ -166,10 +166,10 @@ namespace FEAT
        * The space and trafo configuration tags. These are determined automatically by the compiler.
        *
        * \param[out] space_data
-       * A reference to an evaluation data structure that shall receive the basis function values.
+       * A \transient reference to an evaluation data structure that shall receive the basis function values.
        *
        * \param[in] trafo_data
-       * The trafo evaluation data containing information about the evaluation point.
+       * The \transient trafo evaluation data containing information about the evaluation point.
        */
       template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void eval_values(
@@ -186,10 +186,10 @@ namespace FEAT
        * The space and trafo configuration tags. These are determined automatically by the compiler.
        *
        * \param[out] space_data
-       * A reference to an evaluation data structure that shall receive the basis function gradients.
+       * A \transient reference to an evaluation data structure that shall receive the basis function gradients.
        *
        * \param[in] trafo_data
-       * The trafo evaluation data containing information about the evaluation point.
+       * The \transient trafo evaluation data containing information about the evaluation point.
        */
       template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void eval_gradients(
@@ -206,10 +206,10 @@ namespace FEAT
        * The space and trafo configuration tags. These are determined automatically by the compiler.
        *
        * \param[out] space_data
-       * A reference to an evaluation data structure that shall receive the basis function hessian matrices.
+       * A \transient reference to an evaluation data structure that shall receive the basis function hessian matrices.
        *
        * \param[in] trafo_data
-       * The trafo evaluation data containing information about the evaluation point.
+       * The \transient trafo evaluation data containing information about the evaluation point.
        */
       template<SpaceTags space_cfg_, TrafoTags trafo_cfg_>
       void eval_hessians(

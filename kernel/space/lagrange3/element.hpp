@@ -107,7 +107,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] trafo
-         * A reference to the transformation which is to be used by this space.
+         * A \resident reference to the transformation which is to be used by this space.
          */
         explicit Element(TrafoType& trafo)
           : BaseClass(trafo)

@@ -157,13 +157,13 @@ namespace FEAT
        * \brief Specifies the mandatory and optional attributes
        *
        * \param[out] attrs
-       * A map of all supported attribute key names. The second component specifies
-       * whether the attribute is mandatory (\c true) or optional (\c false).
+       * A \transient reference to a map of all supported attribute key names. The second
+       * component specifies whether the attribute is mandatory (\c true) or optional (\c false).
        *
        * \returns
        * \c true, if the scanner should check for valid arguments, otherwise \c false.
        */
-      virtual bool attribs(std::map<String,bool>& attrs) const = 0;
+      virtual bool attribs(std::map<String, bool>& attrs) const = 0;
 
       /**
        * \brief Creates this markup parser node
@@ -178,7 +178,7 @@ namespace FEAT
        * The name of the markup.
        *
        * \param[in] attrs
-       * A map of all attributes of the markup.
+       * A \transient reference to a map of all attributes of the markup.
        *
        * \param[in] closed
        * Specifies whether the markup is closed.
@@ -262,7 +262,7 @@ namespace FEAT
     {
     public:
       explicit DummyParser();
-      virtual bool attribs(std::map<String,bool>&) const override;
+      virtual bool attribs(std::map<String, bool>&) const override;
       virtual void create(int, const String&, const String&, const std::map<String, String>&, bool) override;
       virtual void close(int, const String&) override;
       virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String&) override;
@@ -291,7 +291,7 @@ namespace FEAT
 
     public:
       explicit DumpParser(const String& name, bool lines = true, std::size_t indent = 0);
-      virtual bool attribs(std::map<String,bool>&) const override;
+      virtual bool attribs(std::map<String, bool>&) const override;
       virtual void create(int iline, const String&, const String&, const std::map<String, String>& attrs, bool closed) override;
       virtual void close(int iline, const String&) override;
       virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String& name) override;
@@ -369,7 +369,7 @@ namespace FEAT
        * \brief Creates a XML scanner for an input stream
        *
        * \param[in] stream
-       * The input stream that is to be read from.
+       * A \resident reference to the input stream that is to be read from.
        *
        * \param[in] lines_read
        * The number of lines already read from the stream.
@@ -432,7 +432,7 @@ namespace FEAT
       }
 
       /// \returns the attribute map of the current markup line
-      const std::map<String,String>& get_cur_attribs() const
+      const std::map<String, String>& get_cur_attribs() const
       {
         return _cur_attribs;
       }

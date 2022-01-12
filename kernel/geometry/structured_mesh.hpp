@@ -116,7 +116,7 @@ namespace FEAT
           _num_slices[i] = num_slices[i];
         }
 
-        // calculate number of enitites
+        // calculate number of entities
         Intern::StructNumEntitiesWrapper<shape_dim_>::compute(_num_entities, _num_slices);
       }
 
@@ -135,7 +135,7 @@ namespace FEAT
         // store slice count
         Intern::NumSlicesWrapper<shape_dim>::apply(factory, _num_slices);
 
-        // calculate number of enitites
+        // calculate number of entities
         Intern::StructNumEntitiesWrapper<shape_dim_>::compute(_num_entities, _num_slices);
 
         // fill vertex set

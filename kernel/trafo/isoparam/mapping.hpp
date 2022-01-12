@@ -131,7 +131,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] mesh
-         * A reference to the mesh that this trafo mapping is to be defined on.
+         * A \resident reference to the mesh that this trafo mapping is to be defined on.
          */
         explicit Mapping(MeshType& mesh) :
           BaseClass(mesh)
@@ -147,10 +147,10 @@ namespace FEAT
          * \brief Adds a mesh-part and its associated chart to the trafo.
          *
          * \param[in] mesh_part
-         * The mesh-part that is to be added.
+         * The \transient mesh-part that is to be added.
          *
          * \param[in] chart
-         * The chart that the mesh part is associated with.
+         * The \transient chart that the mesh part is associated with.
          */
         void add_meshpart_chart(const Geometry::MeshPart<MeshType>& mesh_part, const Geometry::Atlas::ChartBase<MeshType>& chart)
         {

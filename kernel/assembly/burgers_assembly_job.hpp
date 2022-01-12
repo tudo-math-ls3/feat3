@@ -124,10 +124,10 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] conv_vector
-       * A reference to the convection vector for the convective term.
+       * A \resident reference to the convection vector for the convective term.
        *
        * \param[in] space_
-       * A reference to the space to be assembled on.
+       * A \resident reference to the space to be assembled on.
        *
        * \param[in] cubature
        * The name of the cubature rule to be used for assembly.
@@ -151,7 +151,7 @@ namespace FEAT
        * \brief Sets the convection field norm \f$\|v\|_\Omega\f$ for the local streamline diffusion parameter delta_T.
        *
        * \param[in] convect
-       * The (local) convection field vector.
+       * The \transient (local) convection field vector.
        */
       template<typename IndexType_, int conv_dim_>
       void set_sd_v_norm(const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, conv_dim_>& convect)
@@ -170,7 +170,7 @@ namespace FEAT
        * This function automatically syncs the norm over all processes by using the vector's gate.
        *
        * \param[in] convect
-       * The (global) convection field vector.
+       * The \transient (global) convection field vector.
        */
       template<typename LocalVector_, typename Mirror_>
       void set_sd_v_norm(const Global::Vector<LocalVector_, Mirror_>& convect)
@@ -315,7 +315,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] job_
-       * A reference to the job containing the assembly parameters.
+       * A \resident reference to the job containing the assembly parameters.
        */
       explicit BurgersAssemblyTaskBase(const Job_& job_) :
         job(job_),
@@ -525,7 +525,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] job_
-       * A reference to the job containing the assembly parameters.
+       * A \resident reference to the job containing the assembly parameters.
        */
       explicit BurgersBlockedAssemblyTaskBase(const Job_& job_) :
         BaseClass(job_),
@@ -706,15 +706,15 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in,out] matrix_
-       * A reference to the matrix that is to be assembled.
+       * A \resident reference to the matrix that is to be assembled.
        *
        * \param[in] conv_vector
-       * A reference to the convection field vector.
+       * A \resident reference to the convection field vector.
        *
        * \param[in] space_
-       * A reference to the space that is be used for assembly.
+       * A \resident reference to the space that is be used for assembly.
        *
-       * \param[in] cubature_rule
+       * \param[in] cubature_name
        * The name of the cubature rule to be used for assembly.
        */
       explicit BurgersBlockedMatrixAssemblyJob(Matrix_& matrix_, const ConvVector_& conv_vector,
@@ -801,20 +801,20 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in,out] rhs_vector_
-       * A reference to the RHS vector that is to be assembled.
+       * A \resident reference to the RHS vector that is to be assembled.
        *
        * \param[in] sol_vector_
-       * A reference to the solution vector that the matrix is to be multiplied by.
+       * A \resident reference to the solution vector that the matrix is to be multiplied by.
        * May be the same object as \p conv_vector, but must not be the same as \p rhs_vector_.
        *
        * \param[in] conv_vector
-       * A reference to the convection field vector.
+       * A \resident reference to the convection field vector.
        * May be the same object as \p sol_vector, but must not be the same as \p rhs_vector_.
        *
        * \param[in] space_
-       * A reference to the space that is be used for assembly.
+       * A \resident reference to the space that is be used for assembly.
        *
-       * \param[in] cubature_rule
+       * \param[in] cubature_name
        * The name of the cubature rule to be used for assembly.
        */
       explicit BurgersBlockedVectorAssemblyJob(Vector_& rhs_vector_, const Vector_& sol_vector_,
@@ -943,7 +943,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] job_
-       * A reference to the job containing the assembly parameters.
+       * A \resident reference to the job containing the assembly parameters.
        */
       explicit BurgersScalarAssemblyTaskBase(const Job_& job_) :
         BaseClass(job_),
@@ -1073,15 +1073,15 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in,out] matrix_
-       * A reference to the matrix that is to be assembled.
+       * A \resident reference to the matrix that is to be assembled.
        *
        * \param[in] conv_vector
-       * A reference to the convection field vector.
+       * A \resident reference to the convection field vector.
        *
        * \param[in] space_
        * A reference to the space that is be used for assembly.
        *
-       * \param[in] cubature_rule
+       * \param[in] cubature_name
        * The name of the cubature rule to be used for assembly.
        */
       explicit BurgersScalarMatrixAssemblyJob(Matrix_& matrix_, const ConvVector_& conv_vector,
@@ -1165,20 +1165,20 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in,out] rhs_vector_
-       * A reference to the RHS vector that is to be assembled.
+       * A \resident reference to the RHS vector that is to be assembled.
        * Must not be the same object as \p sol_vector_.
        *
        * \param[in] sol_vector_
-       * A reference to the solution vector that the matrix is to be multiplied by.
+       * A \resident reference to the solution vector that the matrix is to be multiplied by.
        * Must not be the same object as \p rhs_vector_.
        *
        * \param[in] conv_vector
-       * A reference to the convection field vector.
+       * A \resident reference to the convection field vector.
        *
        * \param[in] space_
-       * A reference to the space that is be used for assembly.
+       * A \resident reference to the space that is be used for assembly.
        *
-       * \param[in] cubature_rule
+       * \param[in] cubature_name
        * The name of the cubature rule to be used for assembly.
        */
       explicit BurgersScalarVectorAssemblyJob(Vector_& rhs_vector_, const Vector_& sol_vector_,

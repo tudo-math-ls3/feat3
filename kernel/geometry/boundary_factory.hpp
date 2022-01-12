@@ -51,7 +51,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] mesh_in
-       * The mesh for which the boundary meshpart is to be computed.
+       * A \resident reference to mesh for which the boundary meshpart is to be computed.
        */
       explicit BoundaryFactory(const ParentMeshType& mesh_in) :
         _mesh_in(mesh_in),

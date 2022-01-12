@@ -55,7 +55,7 @@ namespace FEAT
          * Identifier for this patch. Usually this is the MPI rank
          *
          * \param[in] elems_at_rank
-         * The graph representing the elements-at-rank adjacency.
+         * A \transient reference to the graph representing the elements-at-rank adjacency.
          */
         explicit PatchMeshPartFactory(Index my_rank, const Adjacency::Graph& elems_at_rank)
         {
@@ -100,7 +100,7 @@ namespace FEAT
          * \brief Pretends to fill the attribute sets
          *
          * \param[in,out] attribute_set_holder
-         * The attribute set holder whose attribute sets are to be filled.
+         * A \transient reference to the attribute set holder whose attribute sets are to be filled.
          *
          * This MeshPart does not have any attributes.
          */
@@ -114,7 +114,7 @@ namespace FEAT
          * \brief Pretends to fill the index sets (=topology)
          *
          * \param[in,out] index_set_holder
-         * The index set holder whose index sets are to be filled.
+         * A \transient reference to the index set holder whose index sets are to be filled.
          *
          * This MeshPart does not have a topology.
          */
@@ -128,7 +128,7 @@ namespace FEAT
          * \brief Fills the target sets.
          *
          * \param[in,out] target_set_holder
-         * The target set holder whose target sets are to be filled.
+         * A \transient reference to the target set holder whose target sets are to be filled.
          *
          * This fills just the TargetSet corresponding to the cell dimension.
          */

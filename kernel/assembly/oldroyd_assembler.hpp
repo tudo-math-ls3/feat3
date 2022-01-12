@@ -42,16 +42,16 @@ namespace FEAT
        * \brief Assembles the Oldroyd operator onto a stress matrix
        *
        * \param[inout] matrix
-       * The matrix to be assembled.
+       * The \transient matrix to be assembled.
        *
        * \param[in] convect
-       * The velocity field vector \e v.
+       * The \transient velocity field vector \e v.
        *
        * \param[in] space_v
-       * The velocity space.
+       * The \transient velocity space.
        *
        * \param[in] space_s
-       * The stress space.
+       * The \transient stress space.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.

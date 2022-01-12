@@ -75,10 +75,10 @@ namespace FEAT
        * \brief Creates the halo splitter
        *
        * \param[in] base_mesh
-       * The base-mesh whose halos are to be split.
+       * A \resident reference to the base-mesh whose halos are to be split.
        *
        * \param[in] patch_mesh_part
-       * The mesh-part that defines the patch of the partitioned base-mesh.
+       * A \resident reference to the mesh-part that defines the patch of the partitioned base-mesh.
        */
       explicit PatchHaloSplitter(const MeshType& base_mesh, const MeshPartType& patch_mesh_part) :
         _base_mesh(base_mesh),
@@ -103,7 +103,7 @@ namespace FEAT
        * The rank of the neighbor process that is adjacent to this halo wrt the parent partitioning.
        *
        * \param[in] halo
-       * The halo mesh-part that is to be split.
+       * A \transient reference to the halo mesh-part that is to be split.
        *
        * \returns
        * The size of the buffer that is required to store the serialized split halo.

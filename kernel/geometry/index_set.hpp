@@ -91,12 +91,12 @@ namespace FEAT
       /// index tuple type
       typedef IndexTuple<num_indices> IndexTupleType;
 
-      /// ImageIterator type for Adjunctor interface implementation
+      /// ImageIterator type for Adjactor interface implementation
       typedef const Index* ImageIterator;
 
     protected:
       /// index bound;, i.e. number of edges if the IndexSet is to hold the information edges\@cells.
-      /// Necessary for Adjunctor implementation
+      /// Necessary for Adjactor implementation
       Index _index_bound;
 
       /// index vector array
@@ -286,10 +286,10 @@ namespace FEAT
        * \brief Permutes this index set in-situ.
        *
        * \perm[in] perm
-       * The permutation of the shape indices.
+       * A \transient reference to the permutation of the shape indices.
        *
        * \param[in] inv_perm_face
-       * The inverse permutation of the face indices.
+       * A \transient reference to the inverse permutation of the face indices.
        */
       void permute(const Adjacency::Permutation& perm, const Adjacency::Permutation& inv_perm_face)
       {

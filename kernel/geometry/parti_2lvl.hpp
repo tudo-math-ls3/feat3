@@ -90,7 +90,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] mesh
-       * The mesh that is to be partitioned (on some refined level)
+       * A \transient reference to the mesh that is to be partitioned (on some refined level)
        *
        * \param[in] num_ranks
        * The desired number of ranks.

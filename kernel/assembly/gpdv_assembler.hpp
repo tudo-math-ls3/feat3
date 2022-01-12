@@ -37,14 +37,14 @@ namespace FEAT
        * \brief Assembles the B and D matrices
        *
        * \param[in,out] matrix_b, matrix_d
-       * The two matrices to be assembled. If the matrices are empty, their structure is
-       * assembled automatically.
+       * The \transient references to the two matrices to be assembled. If the matrices are empty,
+       * their structures are assembled automatically.
        *
        * \param[in] space_velo
-       * The velocity space.
+       * The \transient velocity space.
        *
        * \param[in] space_pres
-       * The pressure space.
+       * The \transient pressure space.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to be used for integration.
@@ -73,14 +73,14 @@ namespace FEAT
        * \brief Assembles the B and D matrices
        *
        * \param[in,out] matrix_b, matrix_d
-       * The two matrices to be assembled. If the matrices are empty, their structure is
-       * assembled automatically.
+       * The \transient references to the two matrices to be assembled. If the matrices are empty,
+       * their structures are assembled automatically.
        *
        * \param[in] space_velo
-       * The velocity space.
+       * The \transient velocity space.
        *
        * \param[in] space_pres
-       * The pressure space.
+       * The \transient pressure space.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.

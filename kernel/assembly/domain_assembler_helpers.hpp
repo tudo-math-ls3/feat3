@@ -19,14 +19,17 @@ namespace FEAT
     /**
      * \brief Assembles a bilinear operator into a matrix with identical test- and trial-spaces.
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[inout] matrix
-     * The matrix that is to be assembled.
+     * The \transient matrix that is to be assembled.
      *
      * \param[in] bilinear_operator
-     * A reference to the operator implementing the BilinearOperator interface to be assembled.
+     * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
      *
      * \param[in] space
-     * A reference to the finite-element to be used as the test- and trial-space.
+     * A \transient reference to the finite-element to be used as the test- and trial-space.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.
@@ -51,17 +54,20 @@ namespace FEAT
     /**
      * \brief Assembles a bilinear operator into a matrix with different test- and trial-spaces.
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[inout] matrix
-     * The matrix that is to be assembled.
+     * The \transient matrix that is to be assembled.
      *
      * \param[in] bilinear_operator
-     * A reference to the operator implementing the BilinearOperator interface to be assembled.
+     * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
      *
      * \param[in] test_space
-     * A reference to the finite-element test-space to be used.
+     * A \transient reference to the finite-element test-space to be used.
      *
      * \param[in] trial_space
-     * A reference to the finite-element trial-space to be used.
+     * A \transient reference to the finite-element trial-space to be used.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.
@@ -88,14 +94,17 @@ namespace FEAT
     /**
      * \brief Assembles a linear functional into a vector
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[inout] vector
-     * The vector that is to be assembled.
+     * The \transient vector that is to be assembled.
      *
      * \param[in] linear_functional
-     * A reference to the functional implementing the Assembly::LinearFunctional interface to be assembled.
+     * A \transient reference to the functional implementing the Assembly::LinearFunctional interface to be assembled.
      *
      * \param[in] space
-     * A reference to the finite-element to be used as the test-space.
+     * A \transient reference to the finite-element to be used as the test-space.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.
@@ -119,14 +128,17 @@ namespace FEAT
     /**
      * \brief Assembles a force function into a vector
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[inout] vector
-     * The vector that is to be assembled.
+     * The \transient vector that is to be assembled.
      *
      * \param[in] function
-     * A reference to the force function implementing the Analytic::Function interface to be assembled.
+     * A \transient reference to the force function implementing the Analytic::Function interface to be assembled.
      *
      * \param[in] space
-     * A reference to the finite-element to be used as the test-space.
+     * A \transient reference to the finite-element to be used as the test-space.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.
@@ -153,8 +165,11 @@ namespace FEAT
      * \tparam DataType_
      * The (scalar) datatype in which the assembly is to be performed. Must always be given.
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[in] function
-     * A reference to the analytic function that is to be integrated.
+     * A \transient reference to the analytic function that is to be integrated.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.
@@ -175,11 +190,14 @@ namespace FEAT
     /**
      * \brief Assembles the integral of a discrete finite element function
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[in] vector
-     * A reference to the coefficient vector of the finite element function that is to be integrated.
+     * A \transient reference to the coefficient vector of the finite element function that is to be integrated.
      *
      * \param[in] space
-     * A reference to the finite element space that the coefficient vector belongs to.
+     * A \transient reference to the finite element space that the coefficient vector belongs to.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.
@@ -202,14 +220,17 @@ namespace FEAT
     /**
      * \brief Assembles the integral of an (analytic - discrete) error function
      *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
      * \param[in] function
-     * A reference to the analytic function that is to be integrated.
+     * A \transient reference to the analytic function that is to be integrated.
      *
      * \param[in] vector
-     * A reference to the coefficient vector of the finite element function that is to be integrated.
+     * A \transient reference to the coefficient vector of the finite element function that is to be integrated.
      *
      * \param[in] space
-     * A reference to the finite element space that the coefficient vector belongs to.
+     * A \transient reference to the finite element space that the coefficient vector belongs to.
      *
      * \param[in] cubature
      * The name of the cubature rule that is to be used for the assembly.

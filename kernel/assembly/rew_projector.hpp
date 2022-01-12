@@ -44,13 +44,16 @@ namespace FEAT
        * \brief Projects an analytic function into a finite element space.
        *
        * \param[out] vector
-       * A reference to the coefficient vector that is to be assembled.
+       * A \transient reference to the coefficient vector that is to be assembled.
+       * The vector is automatically allocated by this function, so it does not need to be
+       * allocated beforehand.
        *
        * \param[in] function
-       * An object implementing the AnalyticFunction interface capable of computing function values.
+       * A \transient reference to an object implementing the AnalyticFunction interface
+       * capable of computing function values.
        *
        * \param[in] space
-       * A reference to the space to which to project into.
+       * A \transient reference to the space to which to project into.
        *
        * \param[in] cubature_factory
        * A cubature factory to be used for integration.
@@ -231,6 +234,27 @@ namespace FEAT
         // okay
       }
 
+      /**
+       * \brief Projects an analytic function into a finite element space.
+       *
+       * \param[out] vector
+       * A \transient reference to the coefficient vector that is to be assembled.
+       * The vector is automatically allocated by this function, so it does not need to be
+       * allocated beforehand.
+       *
+       * \param[in] function
+       * A \transient reference to an object implementing the AnalyticFunction interface
+       * capable of computing function values.
+       *
+       * \param[in] space
+       * A \transient reference to the space to which to project into.
+       *
+       * \param[in] cubature_factory
+       * A cubature factory to be used for integration.
+       *
+       * \param[in] weight_type
+       * The weighting type to be used.
+       */
       template<
         typename Mem_,
         typename DT_,

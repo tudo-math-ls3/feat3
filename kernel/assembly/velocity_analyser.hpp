@@ -104,7 +104,7 @@ namespace FEAT
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronize.
+       * The \transient communicator over which to synchronize.
        */
       void synchronize(const Dist::Comm& comm)
       {
@@ -223,10 +223,10 @@ namespace FEAT
        * \brief Performs the analysis of a velocity field.
        *
        * \param[in] vector
-       * The vector representing the velocity field to be analyzed.
+       * The \transient vector representing the velocity field to be analyzed.
        *
        * \param[in] space
-       * The finite element space for the velocity.
+       * The \transient finite element space for the velocity.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to be used for integration.
@@ -247,10 +247,10 @@ namespace FEAT
        * \brief Performs the analysis of a velocity field.
        *
        * \param[in] vector
-       * The vector representing the velocity field to be analyzed.
+       * The \transient vector representing the velocity field to be analyzed.
        *
        * \param[in] space
-       * The finite element space for the velocity.
+       * The \transient finite element space for the velocity.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.
@@ -414,10 +414,10 @@ namespace FEAT
        * \brief Performs the analysis of a velocity field.
        *
        * \param[in] vector
-       * The vector representing the velocity field to be analyzed.
+       * The \transient vector representing the velocity field to be analyzed.
        *
        * \param[in] space
-       * The finite element space for the velocity.
+       * The \transient finite element space for the velocity.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to be used for integration.
@@ -438,10 +438,10 @@ namespace FEAT
        * \brief Performs the analysis of a velocity field.
        *
        * \param[in] vector
-       * The vector representing the velocity field to be analyzed.
+       * The \transient vector representing the velocity field to be analyzed.
        *
        * \param[in] space
-       * The finite element space for the velocity.
+       * The \transient finite element space for the velocity.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.

@@ -406,7 +406,7 @@ namespace FEAT
      *
      * This class effectively wraps around the \c MPI_Request handle.
      *
-     * This class is move-constructible and move-assigneable, but objects of this class are non-copyable.
+     * This class is move-constructible and move-assignable, but objects of this class are non-copyable.
      *
      * \warning
      * This class \e intentionally does \b not free the internal MPI request upon destruction!\n
@@ -611,14 +611,14 @@ namespace FEAT
      *
      * This class encapsulates vectors of Request and Status objects, which can be used to manage
      * a (related) set of requests. This class also offers the corresponding wait and test
-     * wrapper functions to check for the completition of a single, multiple or all requests.
+     * wrapper functions to check for the completion of a single, multiple or all requests.
      *
-     * This class is move-constructible and move-assigneable, but objects of this class are non-copyable.
+     * This class is move-constructible and move-assignable, but objects of this class are non-copyable.
      *
-     * <b>Waiting for completition:</b>\n
-     * There are two common scenarios regarding the completition of a request vector:
+     * <b>Waiting for completion:</b>\n
+     * There are two common scenarios regarding the completion of a request vector:
      * - Wait until all requests are fulfilled: this can be easily achieved by calling #wait_all()
-     * - Wait until one request is fulfilled, then do some work that is related to the completition
+     * - Wait until one request is fulfilled, then do some work that is related to the completion
      *   of this particular request, and repeat these two steps until all requests have been processed.
      *
      * The second of the above scenarios can be easily implemented by using a \c for or \c while loop
@@ -1044,7 +1044,7 @@ namespace FEAT
        * The index of the request that is to be tested.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the request,
+       * A \transient reference to the Status object that receives information about the request,
        * if it was fulfilled by this call.
        *
        * \attention
@@ -1076,10 +1076,11 @@ namespace FEAT
        * \brief Tests whether one of the active requests has been fulfilled.
        *
        * \param[out] idx
-       * The index of the previously active request that has been fulfilled by this call.
+       * A \transient reference that receives the index of the previously active request that has
+       * been fulfilled by this call.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the active request
+       * A \transient reference to the Status object that receives information about the active request
        * that has been fulfilled by this call.
        *
        * \attention
@@ -1099,7 +1100,8 @@ namespace FEAT
        * \brief Tests whether one of the active requests has been fulfilled.
        *
        * \param[out] idx
-       * The index of the previously active request that has been fulfilled by this call.
+       * A \transient reference that receives the index of the previously active request that has
+       * been fulfilled by this call.
        *
        * \note
        * If this function returns \c true, the corresponding Status object can be queried by #get_status().
@@ -1122,8 +1124,8 @@ namespace FEAT
        * \brief Tests whether one of the active requests has been fulfilled.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the active request
-       * that has been fulfilled by this call.
+       * A \transient reference to the Status object that receives information about the active
+       * request that has been fulfilled by this call.
        *
        * \attention
        * This function does \b not store the status of a successful test in the internal
@@ -1165,7 +1167,7 @@ namespace FEAT
        * The index of the request that is to be waited for.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the request,
+       * A \transient reference to the Status object that receives information about the request,
        * if it was fulfilled by this call.
        *
        * \attention
@@ -1195,11 +1197,12 @@ namespace FEAT
        * \brief Blocks until one of the active requests has been fulfilled.
        *
        * \param[out] idx
-       * The index of the previously active request that has been fulfilled by this call.
+       * A \transient reference that receives the index of the previously active request that has
+       * been fulfilled by this call.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the active request
-       * that has been fulfilled by this call.
+       * A \transient reference to the Status object that receives information about the active
+       * request that has been fulfilled by this call.
        *
        * \attention
        * This function does \b not store the status of a successful test in the internal
@@ -1221,7 +1224,8 @@ namespace FEAT
        * \brief Blocks until one of the active requests has been fulfilled.
        *
        * \param[out] idx
-       * The index of the previously active request that has been fulfilled by this call.
+       * A \transient reference that receives the index of the previously active request that has
+       * been fulfilled by this call.
        *
        * \note
        * If this function returns \c true, the corresponding Status object can be queried by #get_status().
@@ -1247,8 +1251,8 @@ namespace FEAT
        * \brief Blocks until one of the active requests has been fulfilled.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the active request
-       * that has been fulfilled by this call.
+       * A \transient reference to the Status object that receives information about the active
+       * request that has been fulfilled by this call.
        *
        * \attention
        * This function does \b not store the status of a successful test in the internal
@@ -1561,7 +1565,7 @@ namespace FEAT
        * The number of desired ranks in the sub-communicator. Must be > 0.
        *
        * \param[in] ranks
-       * An array of unique ranks that should be part of the new sub-communicator.
+       * An \transient array of unique ranks that should be part of the new sub-communicator.
        *
        * \returns
        * A new sub-communicator for the set of processes. If this process is not
@@ -1622,7 +1626,7 @@ namespace FEAT
        * \brief Blocking Send
        *
        * \param[in] buffer
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] count
        * The size of the send buffer in datatype objects.
@@ -1646,7 +1650,7 @@ namespace FEAT
        * This function automatically deducts the datatype of the send buffer (if possible).
        *
        * \param[in] buffer
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] count
        * The size of the send buffer in datatype objects.
@@ -1669,7 +1673,7 @@ namespace FEAT
        * \brief Blocking Receive
        *
        * \param[in] buffer
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the receive buffer in datatype objects.
@@ -1684,7 +1688,7 @@ namespace FEAT
        * The tag for the message.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the receive operation.
+       * A \transient reference to the Status object that receives information about the receive operation.
        *
        * \see \cite MPI31 Section 3.2.4, page 28
        */
@@ -1696,7 +1700,7 @@ namespace FEAT
        * This function discards the Status object of the receive operation.
        *
        * \param[in] buffer
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the receive buffer in datatype objects.
@@ -1724,7 +1728,7 @@ namespace FEAT
        * This function automatically deducts the datatype of the receive buffer (if possible).
        *
        * \param[in] buffer
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the receive buffer in datatype objects.
@@ -1736,7 +1740,7 @@ namespace FEAT
        * The tag for the message.
        *
        * \param[out] status
-       * A reference to the Status object that receives information about the receive operation.
+       * A \transient reference to the Status object that receives information about the receive operation.
        *
        * \see \cite MPI31 Section 3.2.4, page 28
        */
@@ -1753,7 +1757,7 @@ namespace FEAT
        * This function discards the Status object of the receive operation.
        *
        * \param[in] buffer
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the receive buffer in datatype objects.
@@ -1785,7 +1789,8 @@ namespace FEAT
        * \brief Nonblocking Send
        *
        * \param[in] buffer
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send buffer in datatype objects.
@@ -1811,7 +1816,8 @@ namespace FEAT
        * This function automatically deducts the datatype of the send buffer (if possible).
        *
        * \param[in] buffer
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send buffer in datatype objects.
@@ -1836,7 +1842,8 @@ namespace FEAT
        * \brief Nonblocking Receive
        *
        * \param[in] buffer
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the receive buffer in datatype objects.
@@ -1862,7 +1869,8 @@ namespace FEAT
        * This function automatically deducts the datatype of the receive buffer (if possible).
        *
        * \param[in] buffer
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the receive buffer in datatype objects.
@@ -1895,7 +1903,7 @@ namespace FEAT
        * \brief Blocking broadcast
        *
        * \param[inout] buffer
-       * The send/receive buffer for the operation.
+       * A \transient pointer to the send/receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -1916,7 +1924,7 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[inout] buffer
-       * The send/receive buffer for the operation.
+       * A \transient pointer to the send/receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -1936,7 +1944,8 @@ namespace FEAT
        * \brief Nonblocking broadcast
        *
        * \param[inout] buffer
-       * The send/receive buffer for the operation.
+       * A \resident pointer to the send/receive buffer for the operation. The pointer to the
+       * buffer is stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -1959,7 +1968,8 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[inout] buffer
-       * The send/receive buffer for the operation.
+       * A \resident pointer to the send/receive buffer for the operation. The pointer to the
+       * buffer is stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -1989,7 +1999,7 @@ namespace FEAT
        * \brief Blocking gather
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
@@ -1998,7 +2008,7 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2019,13 +2029,13 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2045,7 +2055,8 @@ namespace FEAT
        * \brief Nonblocking gather
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
@@ -2054,7 +2065,8 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2077,13 +2089,15 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2105,7 +2119,7 @@ namespace FEAT
        * \brief Blocking scatter
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
@@ -2114,7 +2128,7 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The size of the receive buffer in datatype objects.
@@ -2135,13 +2149,13 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The size of the receive buffer in datatype objects.
@@ -2161,7 +2175,8 @@ namespace FEAT
        * \brief Nonblocking scatter
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
@@ -2170,7 +2185,8 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The size of the receive buffer in datatype objects.
@@ -2193,13 +2209,15 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The size of the receive buffer in datatype objects.
@@ -2221,7 +2239,7 @@ namespace FEAT
        * \brief Blocking gather-to-all
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
@@ -2230,7 +2248,7 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2248,13 +2266,13 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2271,7 +2289,8 @@ namespace FEAT
        * \brief Nonblocking gather-to-all
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
@@ -2280,7 +2299,8 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2300,13 +2320,15 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2329,7 +2351,7 @@ namespace FEAT
        * as the type for the receive counts and displacements for technical reasons!
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
@@ -2338,13 +2360,13 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcounts
-       * The sizes of the receive buffers in datatype objects.
+       * A \transient array holding the sizes of the receive buffers in datatype objects.
        *
        * \param[in] displs
-       * The displacements of the receive buffers in datatype objects.
+       * A \transient array holding the displacements of the receive buffers in datatype objects.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2363,19 +2385,19 @@ namespace FEAT
        * as the type for the receive counts and displacements for technical reasons!
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The size of the send buffer in datatype objects.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcounts
-       * The sizes of the receive buffers in datatype objects.
+       * A \transient array holding the sizes of the receive buffers in datatype objects.
        *
        * \param[in] displs
-       * The displacements of the receive buffers in datatype objects.
+       * A \transient array holding the displacements of the receive buffers in datatype objects.
        *
        * \see \cite MPI31 Section 5.7, page 166
        */
@@ -2389,7 +2411,7 @@ namespace FEAT
        * \brief Blocking All-to-All Scatter/Gather
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
@@ -2398,7 +2420,7 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The size of the receive buffer in datatype objects.
@@ -2416,13 +2438,13 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2439,7 +2461,8 @@ namespace FEAT
        * \brief Nonblocking All-to-All Scatter/Gather
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
@@ -2448,7 +2471,8 @@ namespace FEAT
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2468,13 +2492,15 @@ namespace FEAT
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] sendcount
        * The number of datatype objects send to \e each process.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] recvcount
        * The number of datatype objects received from \e each process.
@@ -2497,25 +2523,25 @@ namespace FEAT
        * as the type for the send/receive counts and displacements for technical reasons!
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcounts
-       * The number of datatype objects send to \e each process.
+       * A \transient array holding the number of datatype objects send to \e each process.
        *
        * \param[in] sdispls
-       * The displacements of the send buffers in datatype objects.
+       * A \transient array holding the displacements of the send buffers in datatype objects.
        *
        * \param[in] sendtype
        * A reference to the Datatype object representing the send buffer contents.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcounts
-       * The number of datatype objects received from \e each process.
+       * A \transient array holding the number of datatype objects received from \e each process.
        *
        * \param[in] rdispls
-       * The displacements of the receive buffers in datatype objects.
+       * A \transient array holding the displacements of the receive buffers in datatype objects.
        *
        * \param[in] recvtype
        * A reference to the Datatype object representing the receive buffer contents.
@@ -2534,22 +2560,22 @@ namespace FEAT
        * as the type for the send/receive counts and displacements for technical reasons!
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient pointer to the send buffer for the operation.
        *
        * \param[in] sendcounts
-       * The number of datatype objects send to \e each process.
+       * A \transient array holding the number of datatype objects send to \e each process.
        *
        * \param[in] sdispls
-       * The displacements of the send buffers in datatype objects.
+       * A \transient array holding the displacements of the send buffers in datatype objects.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient pointer to the receive buffer for the operation.
        *
        * \param[in] recvcounts
-       * The number of datatype objects received from \e each process.
+       * A \transient array holding the number of datatype objects received from \e each process.
        *
        * \param[in] rdispls
-       * The displacements of the receive buffers in datatype objects.
+       * A \transient array holding the displacements of the receive buffers in datatype objects.
        *
        * \see \cite MPI31 Section 5.8, page 170
        */
@@ -2575,10 +2601,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2606,10 +2632,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2636,10 +2662,12 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2669,10 +2697,12 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2701,10 +2731,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2729,10 +2759,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2756,10 +2786,12 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2786,10 +2818,12 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \resident pointer to the receive buffer for the operation. The pointer to the buffer is
+       * stored internally and must remain valid until the returned request is fulfilled.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2815,10 +2849,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2843,10 +2877,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2878,10 +2912,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.
@@ -2906,10 +2940,10 @@ namespace FEAT
        * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
-       * The send buffer for the operation.
+       * A \transient reference to the send buffer for the operation.
        *
        * \param[out] recvbuf
-       * The receive buffer for the operation.
+       * A \transient reference to the receive buffer for the operation.
        *
        * \param[in] count
        * The size of the send/receive buffer in datatype objects.

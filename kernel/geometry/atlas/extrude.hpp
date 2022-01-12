@@ -294,7 +294,7 @@ namespace FEAT
           if(_offset.norm_euclid_sqr() > tol)
             os << " offset=\"" << _offset[0] << " " << _offset[1] << " " << _offset[2] << "\"";
 
-          // check whether our rotation matrix is the identitiy matrix
+          // check whether our rotation matrix is the identity matrix
           if(Math::sqr(_rotation.norm_sub_id_frobenius()) > tol)
           {
             // Now that's tricky: we have to reconstruct the yaw-pitch-roll angles
@@ -406,7 +406,7 @@ namespace FEAT
               if(sori.size() != std::size_t(2))
                 throw Xml::GrammarError(iline, sline, "Invalid Extrude chart origin attribute");
               if(!sori.front().parse(_ori_x) || !sori.back().parse(_ori_y))
-                throw Xml::GrammarError(iline, sline, "'Failed to parse extrude origin attribute");
+                throw Xml::GrammarError(iline, sline, "Failed to parse extrude origin attribute");
 
             }
           }
@@ -420,7 +420,7 @@ namespace FEAT
               if(soff.size() != std::size_t(3))
                 throw Xml::GrammarError(iline, sline, "Invalid Extrude chart offset attribute");
               if(!soff.at(0).parse(_off_x) || !soff.at(1).parse(_off_y) || !soff.at(2).parse(_off_z))
-                throw Xml::GrammarError(iline, sline, "'Failed to parse extrude offset attribute");
+                throw Xml::GrammarError(iline, sline, "Failed to parse extrude offset attribute");
 
             }
           }
@@ -434,7 +434,7 @@ namespace FEAT
               if(sang.size() != std::size_t(3))
                 throw Xml::GrammarError(iline, sline, "Invalid Extrude chart angles attribute");
               if(!sang.at(0).parse(_yaw) || !sang.at(1).parse(_pitch) || !sang.at(2).parse(_roll))
-                throw Xml::GrammarError(iline, sline, "'Failed to parse extrude angles attribute");
+                throw Xml::GrammarError(iline, sline, "Failed to parse extrude angles attribute");
 
               // Note: the angles are specifies in revolutions, but we need radians, so multiply by 2*pi
               const CoordType mult = CoordType(2) * Math::pi<CoordType>();

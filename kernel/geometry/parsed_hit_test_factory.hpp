@@ -7,17 +7,15 @@
 #ifndef KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP
 #define KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP 1
 
-
 // includes, FEAT
 #include <kernel/geometry/hit_test_factory.hpp>
 #include <kernel/analytic/function.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/analytic/parsed_function.hpp>
-//other includes
+
+// includes, system
 #include<vector>
-
-
 
 // The contents of this file require the 'fparser' third-party library.
 #if defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)
@@ -26,7 +24,8 @@
 namespace FEAT
 {
   namespace Geometry
-  {/**
+  {
+    /**
      * \brief Parsed-Hit-Test Factory class template
      *
      * This class template can be used to create a MeshPart for a particular mesh,
@@ -41,7 +40,6 @@ namespace FEAT
      *
      * \author Gesa Pottbrock
      */
-
     template<typename Mesh_, int dim_>
     class ParsedHitTestFactory :
       public Factory< MeshPart<Mesh_> >
@@ -60,7 +58,7 @@ namespace FEAT
       class ParsedHitFunction
       {
       public:
-        //mutable is mandatory! It cancels the const in ParsedHitTestFactory.
+        // mutable is mandatory! It cancels the const in ParsedHitTestFactory.
         mutable::FunctionParser _parser;
 
         ParsedHitFunction() :
@@ -165,14 +163,14 @@ namespace FEAT
        * \brief Creates the ParsedHitTestFactory.
        *
        * The formula dictates the Meshpart.
-       * Every point, for which the formula equals >= is in a "inner" point weighted with 1.
+       * Every point, for which the formula equals >= 0 is in a "inner" point weighted with 1.
        * Otherwise the point will be weighted zero.
+       *
+       * \param[in] mesh
+       * A \resident reference to the mesh for which the mesh part is to be computed.
        *
        * \param[in] formula for hit function
        * A string of the hit function.
-       *
-       * \param[in] mesh
-       * A reference to the mesh for which the cell sub-set is to be computed.
        */
       explicit ParsedHitTestFactory(const Mesh_& mesh, const String& formula) :
         _hit_func(),

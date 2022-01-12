@@ -35,7 +35,7 @@ namespace FEAT
    * This class implements a 64-bit XOR-Shift* pseudo-random number generator with a 64-bit cycle.
    *
    * The intention of this class is to provide a pseudo-random number generator which generates (warning:
-   * paradoxon ahead) a reproducible random number stream independent of the platform and the compiler in use.
+   * paradox ahead) a reproducible random number stream independent of the platform and the compiler in use.
    *
    * \warning This class is (intentionally) not thread-safe -- in a multi-threaded application each thread should
    * use its own random number generator.
@@ -116,7 +116,7 @@ namespace FEAT
      * This function extracts the next random number in the stream.
      * - If the type of the value to be extracted is integral, then the value will be within the full range, i.e.
      *   - for a signed <em>n</em>-bit integer, it will hold <em>-2^(n-1) <= x < 2^(n-1)</em>
-     *   - for an unsigned <em>n</em>-bit integer, it will hol that <em>0 <= x < 2^n</em>
+     *   - for an unsigned <em>n</em>-bit integer, it will hold that <em>0 <= x < 2^n</em>
      * - If the type of the value to be extracted is a floating point type, then the value will be within the
      *   closed interval [0,1].
      *
@@ -124,7 +124,7 @@ namespace FEAT
      * The type of the value to be extracted. Must be either of integral or floating point type.
      *
      * \param[out] x
-     * The reference to a variable receiving the extracted value.
+     * The \transient reference to an object receiving the extracted value.
      *
      * \returns \p *this
      */

@@ -208,7 +208,7 @@ namespace FEAT
          * \brief Mandatory constructor
          *
          * \param[in] function
-         * A const-reference to the function object.
+         * A (potentially \resident) const-reference to the function object.
          */
         explicit Evaluator(const Function& function)
         {

@@ -196,7 +196,7 @@ namespace FEAT
        * \brief Writes a chart into the file.
        *
        * \param[in] chart
-       * The chart to be exported.
+       * A \transient reference to the chart to be exported.
        *
        * \param[in] name
        * The name of the chart.
@@ -217,7 +217,7 @@ namespace FEAT
        * \brief Writes all charts of an atlas into the file
        *
        * \param[in] mesh_atlas
-       * The atlas whose charts are to be exported.
+       * A \transient reference to the atlas whose charts are to be exported.
        */
       template<typename RootMesh_>
       void write_atlas(const MeshAtlas<RootMesh_>& mesh_atlas)
@@ -239,7 +239,7 @@ namespace FEAT
        * \brief Writes a (root) mesh into the file
        *
        * \param[in] mesh
-       * The (root) mesh to be exported.
+       * A \transient reference to the (root) mesh to be exported.
        */
       template<typename Shape_, int num_coords_, typename Coord_>
       void write_mesh(const ConformalMesh<Shape_, num_coords_, Coord_>& mesh)
@@ -263,7 +263,7 @@ namespace FEAT
        * \brief Writes a mesh-part into the file
        *
        * \param[in] meshpart
-       * The mesh-part to be exported.
+       * A \transient reference to the mesh-part to be exported.
        *
        * \param[in] parent_name
        * The name of the parent of the mesh-part.
@@ -311,7 +311,7 @@ namespace FEAT
        * \brief Writes a partition to the file
        *
        * \param[in] partition
-       * The partition to be exported-
+       * A \transient reference to the partition to be exported.
        */
       void write_partition(const Partition& partition)
       {
@@ -344,7 +344,7 @@ namespace FEAT
        * \brief Writes all partitions of a partition set to the file
        *
        * \param[in] part_set
-       * The partition set whose partitions are to be exported.
+       * A \transient reference to the partition set whose partitions are to be exported.
        */
       void write_partition_set(const PartitionSet& part_set)
       {
@@ -356,15 +356,15 @@ namespace FEAT
        * \brief Writes a full domain to the file
        *
        * \param[in] mesh_node
-       * A root mesh node whose mesh and child mesh-parts are to be exported.
+       * A \transient pointer to the root mesh node whose mesh and child mesh-parts are to be exported.
        * May be \c nullptr if no mesh or mesh-parts are to be exported.
        *
        * \param[in] mesh_atlas
-       * An mesh atlas whose charts are to be exported.
+       * A \transient pointer to the mesh atlas whose charts are to be exported.
        * May be \c nullptr if no charts are to be exported.
        *
        * \param[in] part_set
-       * A partition set whose partitions are to be exported.
+       * A \transient pointer to the partition set whose partitions are to be exported.
        * May be \c nullptr if no partitions are to be exported.
        *
        * \param[in] skip_internal_meshparts
@@ -457,7 +457,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Writes an attribte of a mesh part into the file
+       * \brief Writes an attribute of a mesh part into the file
        *
        * \param[in] attr
        * The attribute that is to be exported.

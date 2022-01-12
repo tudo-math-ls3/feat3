@@ -32,10 +32,10 @@ namespace FEAT
        * \brief Assembles an integral mean filter
        *
        * \param[out] vec_prim, vec_dual
-       * The primal and dual vectors for the mean filter.
+       * The \transient references to the primal and dual vectors for the mean filter.
        *
        * \param[in] space
-       * The finite element space for which the filter is to be assembled.
+       * The \transient finite element space for which the filter is to be assembled.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to use for integration
@@ -55,10 +55,10 @@ namespace FEAT
        * \brief Assembles an integral mean filter
        *
        * \param[out] vec_prim, vec_dual
-       * The primal and dual vectors for the mean filter.
+       * The \transient references to the primal and dual vectors for the mean filter.
        *
        * \param[in] space
-       * The finite element space for which the filter is to be assembled.
+       * The \transient finite element space for which the filter is to be assembled.
        *
        * \param[in] cubature_factory
        * A cubature factory for integration.
@@ -92,10 +92,11 @@ namespace FEAT
        * \brief Assembles an integral mean filter
        *
        * \param[out] filter
-       * The filter to be assembled.
+       * A \transient reference to the filter to be assembled. The filter is automatically allocated
+       * by this function, so it does not need to be allocated beforehand.
        *
        * \param[in] space
-       * The finite element space for which the filter is to be assembled.
+       * A \transient reference to the finite element space for which the filter is to be assembled.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to use for integration
@@ -119,10 +120,11 @@ namespace FEAT
        * \brief Assembles an integral mean filter
        *
        * \param[out] filter
-       * The filter to be assembled.
+       * A \transient reference to the filter to be assembled. The filter is automatically allocated
+       * by this function, so it does not need to be allocated beforehand.
        *
        * \param[in] space
-       * The finite element space for which the filter is to be assembled.
+       * A \transient reference to the finite element space for which the filter is to be assembled.
        *
        * \param[in] cubature_factory
        * A cubature factory for integration.

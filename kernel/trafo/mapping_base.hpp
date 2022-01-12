@@ -77,7 +77,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] mesh
-       * A reference to the mesh that this trafo mapping is to be defined on.
+       * A \resident reference to the mesh that this trafo mapping is to be defined on.
        *
        * \note This constructor is protected so that it can only be called from a derived class.
        */

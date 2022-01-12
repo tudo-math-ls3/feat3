@@ -280,7 +280,7 @@ namespace FEAT
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronize.
+       * The \transient communication over which to synchronize.
        */
       void synchronize(const Dist::Comm& comm)
       {
@@ -403,14 +403,14 @@ namespace FEAT
        * of this class.
        *
        * \param[in] vector
-       * The coefficient vector of the FE function.
+       * The \transient coefficient vector of the FE function.
        *
        * \param[in] function
-       * An object implementing the AnalyticFunction interface representing the analytic function to be
-       * tested against.
+       * A \transient reference to an object implementing the AnalyticFunction interface
+       * representing the analytic function to be tested against.
        *
        * \param[in] space
-       * The Finite-Element space that the coefficient vector belongs to.
+       * The \transient Finite-Element space that the coefficient vector belongs to.
        *
        * \param[in] cubature_factory
        * A reference to the cubature factory to be used for integration.
@@ -856,7 +856,7 @@ namespace FEAT
        * parallel simulation to obtain the information for the global mesh.
        *
        * \param[in] comm
-       * The communication over which to synchronize.
+       * The \transient communication over which to synchronize.
        */
       void synchronize(const Dist::Comm& comm)
       {
@@ -1034,14 +1034,14 @@ namespace FEAT
        * of this class.
        *
        * \param[in] vector
-       * The coefficient vector of the FE function.
+       * The \transient coefficient vector of the FE function.
        *
        * \param[in] function
-       * An object implementing the AnalyticFunction interface representing the analytic function to be
-       * tested against.
+       * A \transient reference to an object implementing the AnalyticFunction interface
+       * representing the analytic function to be tested against.
        *
        * \param[in] space
-       * The Finite-Element space that the coefficient vector belongs to.
+       * The \transient Finite-Element space that the coefficient vector belongs to.
        *
        * \param[in] cubature_factory
        * A reference to the cubature factory to be used for integration.

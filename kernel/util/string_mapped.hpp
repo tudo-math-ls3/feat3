@@ -43,10 +43,10 @@ namespace FEAT
      * \brief Constructor
      *
      * \param[in] value
-     * A reference to the value to be looked up.
+     * A \resident reference to the value to be looked up.
      *
      * \param[in] value_map
-     * A const reference to the value map to be used for lookup.
+     * A \resident const reference to the value map to be used for lookup.
      */
     explicit StringMapped(ValueType_& value, const std::map<String, ValueType_>& value_map) :
       _value(value),

@@ -259,7 +259,7 @@ namespace FEAT
          * own task object.
          *
          * \param[in] job
-         * A reference to the encapsulating job class object.
+         * A \resident reference to the encapsulating job class object.
          *
          * \attention
          * This constructor is silently assumed to be thread-safe, i.e. no thread may try to write
@@ -489,7 +489,7 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] job
-         * A reference to the assembly job.
+         * A \resident reference to the assembly job.
          *
          * \param[in] id
          * The id of this worker thread.
@@ -501,6 +501,27 @@ namespace FEAT
          *
          * \param[in] strategy
          * The chosen threading strategy
+         *
+         * \param[inout] thread_stats
+         * A \resident reference to the thread's statistics object.
+         *
+         * \param[inout] thread_mutex
+         * A \resident reference to the common thread mutex.
+         *
+         * \param[inout] thread_fences
+         * A \resident reference to the thread fence vector.
+         *
+         * \param[in] element_indices
+         * A \resident reference to the element indices vector.
+         *
+         * \param[in] color_elements
+         * A \resident reference to the color elements vector.
+         *
+         * \param[in] layer_elements
+         * A \resident reference to the layer elements vector.
+         *
+         * \param[in] thread_layers
+         * A \resident reference to the thread layers vector.
          */
         explicit Worker(Job_& job, std::size_t id, std::size_t num_workers,
           ThreadingStrategy strategy,
@@ -590,6 +611,9 @@ namespace FEAT
          * \brief Assembly worker implementation for single-threaded strategy
          *
          * This member function implements the actual assembly for the single-threaded strategy.
+         *
+         * \param[in] task
+         * A unique pointer to the task that is to be executed.
          */
         bool _work_single(std::unique_ptr<TaskType> task)
         {
@@ -638,6 +662,9 @@ namespace FEAT
          *
          * This member function implements the actual no-scatter assembly, which does not perform
          * any synchronization to avoid race conditions except for the optional mutexed combine.
+         *
+         * \param[in] task
+         * A unique pointer to the task that is to be executed.
          */
         bool _work_no_scatter(std::unique_ptr<TaskType> task)
         {
@@ -692,6 +719,9 @@ namespace FEAT
          * \brief Assembly worker implementation for layered (+sorted) strategy
          *
          * This member function implements the actual assembly for the layered threading strategy.
+         *
+         * \param[in] task
+         * A unique pointer to the task that is to be executed.
          */
         bool _work_layered(std::unique_ptr<TaskType> task)
         {
@@ -814,6 +844,9 @@ namespace FEAT
          * \brief Assembly worker implementation for colored strategy
          *
          * This member function implements the actual assembly for the colored threading strategy.
+         *
+         * \param[in] task
+         * A unique pointer to the task that is to be executed.
          */
         bool _work_colored(std::unique_ptr<TaskType> task)
         {
@@ -949,7 +982,7 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] trafo
-       * The transformation that defines the assembly domain.
+       * A \resident reference to the transformation that defines the assembly domain.
        */
       explicit DomainAssembler(const TrafoType& trafo) :
         _trafo(trafo),
@@ -1023,7 +1056,7 @@ namespace FEAT
        * \brief Adds all elements of a mesh-part to the assembler.
        *
        * \param[in] mesh_part
-       * The mesh part whose elements are to be added.
+       * A \transient reference to the mesh part whose elements are to be added.
        *
        * \note
        * If an element in the mesh-part has already been added to the assembler by calling this
@@ -1164,7 +1197,8 @@ namespace FEAT
        * \brief Executes a domain assembly job (in parallel) by (multiple) worker threads.
        *
        * \param[inout] job
-       * The job that is to be assembled. See Assembly::DomainAssemblyJob for details.
+       * A \transient reference to the job that is to be assembled.
+       * See Assembly::DomainAssemblyJob for details.
        */
       template<typename Job_>
       void assemble(Job_& job)
@@ -1271,7 +1305,8 @@ namespace FEAT
        * single-threaded even if the assembler has been configured to work with multiple threads.
        *
        * \param[inout] job
-       * The job that is to be assembled. See Assembly::DomainAssemblyJob for details.
+       * A \transient reference to the job that is to be assembled.
+       * See Assembly::DomainAssemblyJob for details.
        */
       template<typename Job_>
       void assemble_master(Job_& job)

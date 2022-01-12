@@ -129,13 +129,15 @@ namespace FEAT
        * \brief Interpolates a scalar function.
        *
        * \param[out] vector
-       * A vector that shall receive the interpolation coefficients.
+       * A \transient reference to the vector that shall receive the interpolation coefficients.
+       * The vector is automatically allocated to the correct size, so it does not need to be
+       * allocated before calling this function.
        *
        * \param[in] function
-       * An object implementing the Analytic::Function interface.
+       * A \transient reference to the function object implementing the Analytic::Function interface.
        *
        * \param[in] space
-       * The Finite-Element space into which the function is to be projected.
+       * A \transient reference to the Finite-Element space into which the function is to be projected.
        */
       template<
         typename Mem_,
@@ -169,13 +171,15 @@ namespace FEAT
        * \brief Interpolates a vector field.
        *
        * \param[out] vector
-       * A vector that shall receive the interpolation coefficients.
+       * A \transient reference to the vector that shall receive the interpolation coefficients.
+       * The vector is automatically allocated to the correct size, so it does not need to be
+       * allocated before calling this function.
        *
        * \param[in] function
-       * An object implementing the Analytic::Function interface.
+       * A \transient reference to the function object implementing the Analytic::Function interface.
        *
        * \param[in] space
-       * The Finite-Element space into which the function is to be projected.
+       * A \transient reference to the Finite-Element space into which the function is to be projected.
        */
       template<
         typename Mem_,

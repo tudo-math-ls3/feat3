@@ -191,7 +191,7 @@ namespace FEAT
        * \brief Parses an index set into the tree.
        *
        * \param[in] index_set
-       * The index set that is to be parsed.
+       * A \transient reference to the index set that is to be parsed.
        */
       template<typename IndexSet_>
       void parse(const IndexSet_& index_set)

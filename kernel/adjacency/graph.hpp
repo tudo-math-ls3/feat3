@@ -112,12 +112,11 @@ namespace FEAT
        * The total number of image node indices for the graph.
        *
        * \param[in] domain_ptr
-       * The domain pointer array for the graph. Must not be \c nullptr.
+       * The \transient domain pointer array for the graph. Must not be \c nullptr.
        *
        * \param[in] image_idx
-       * The image node index array for the graph. Must not be \c nullptr.
+       * The \transient image node index array for the graph. Must not be \c nullptr.
        */
-
       explicit Graph(
         Index num_nodes_domain,
         Index num_nodes_image,
@@ -134,17 +133,15 @@ namespace FEAT
        * The total number of image nodes for the graph.
        *
        * \param[in] domain_ptr
-       * The domain pointer vector for the graph. Must not be \c nullptr.
+       * The \transient domain pointer vector for the graph. Must not be \c nullptr.
        *
        * \param[in] image_idx
-       * The image node index vector for the graph. Must not be \c nullptr.
+       * The \transient image node index vector for the graph. Must not be \c nullptr.
        */
-
       explicit Graph(
         Index num_nodes_image,
         const IndexVector& domain_ptr,
         const IndexVector& image_idx);
-
 
       /**
        * \brief Render constructor
@@ -162,9 +159,7 @@ namespace FEAT
         _num_nodes_image(0),
         _domain_ptr(),
         _image_idx()
-
       {
-
         switch(render_type)
         {
         case RenderType::as_is:
@@ -207,10 +202,10 @@ namespace FEAT
        * The render type. See #RenderType for details.
        *
        * \param[in] adjactor1
-       * A reference to the first adjactor in the composition that is to be rendered.
+       * A \transient reference to the first adjactor in the composition that is to be rendered.
        *
        * \param[in] adjactor2
-       * A reference to the second adjactor in the composition that is to be rendered.
+       * A \transient reference to the second adjactor in the composition that is to be rendered.
        */
       template<typename Adjactor1_, typename Adjactor2_>
       explicit Graph(RenderType render_type, const Adjactor1_& adjactor1, const Adjactor2_& adjactor2) :
@@ -218,8 +213,6 @@ namespace FEAT
         _domain_ptr(),
        _image_idx()
       {
-
-
         switch(render_type)
         {
         case RenderType::as_is:
@@ -266,13 +259,13 @@ namespace FEAT
        * of the graph that is passed to this function.
        *
        * \param[in] other
-       * The graph that has to be permuted.
+       * The \transient graph that has to be permuted.
        *
        * \param[in] domain_perm
-       * The permutation of the domain set.
+       * The \transient permutation of the domain set.
        *
        * \param[in] image_perm
-       * The permutation of the image set.
+       * The \transient permutation of the image set.
        */
       explicit Graph(const Graph& other, const Permutation& domain_perm, const Permutation& image_perm);
 
@@ -283,7 +276,7 @@ namespace FEAT
        * the serialize function.
        *
        * \param[in] buffer
-       * The serialization buffer to create the graph from.
+       * The \transient serialization buffer to create the graph from.
        */
       explicit Graph(const std::vector<char>& buffer);
 
@@ -391,7 +384,7 @@ namespace FEAT
        * \brief Permutes the image indices.
        *
        * \param[in] inv_perm
-       * The inverse image indices permutation.
+       * The \transient inverse image indices permutation.
        */
       void permute_indices(const Adjacency::Permutation& inv_perm);
 

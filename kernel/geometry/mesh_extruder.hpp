@@ -134,7 +134,7 @@ namespace FEAT
        * \brief Creates the mesh extruder object
        *
        * \param[in] z_list
-       * A list of z-coordinates in ascending order.
+       * A \transient reference to the list of z-coordinates in ascending order.
        *
        * \param[in] zmin_part_name, zmax_part_name
        * The names of the mesh-parts which are to be generated for the boundary
@@ -227,10 +227,10 @@ namespace FEAT
        * The type of the quadrilateral sub-chart that is to be tested.
        *
        * \param[out] hexa_chart
-       * A pointer to the hexa chart.
+       * A \transient reference to the pointer to the hexa chart.
        *
        * \param[in] quad_chart
-       * The chart that is to be extruded.
+       * A \transient reference to the chart that is to be extruded.
        *
        * \returns
        * \c true, if the chart was extruded, otherwise \c false.
@@ -243,7 +243,7 @@ namespace FEAT
         if(sub_chart == nullptr)
           return false;
 
-        // success; create the extured hexa chart
+        // success; create the extruded hexa chart
         auto* the_chart = new Atlas::Extrude<HexaMesh, SubChart_>(new SubChart_(*sub_chart));
         hexa_chart = the_chart;
 
@@ -258,7 +258,7 @@ namespace FEAT
        * \brief Extrudes and returns a quadrilateral mesh chart.
        *
        * \param[in] quad_chart
-       * The chart that is to be extruded.
+       * A \transient reference to the chart that is to be extruded.
        *
        * \returns
        * The extruded hexahedral chart.
@@ -293,10 +293,10 @@ namespace FEAT
        * and inserts the extruded charts into the hexahedral mesh atlas.
        *
        * \param[in,out] hexa_atlas
-       * The hexahedral mesh atlas that receives the extruded charts.
+       * A \transient reference to the hexahedral mesh atlas that receives the extruded charts.
        *
        * \param[in] quad_atlas
-       * The quadrilateral mesh atlas whose charts are to be extruded.
+       * A \transient reference to the quadrilateral mesh atlas whose charts are to be extruded.
        */
       void extrude_atlas(HexaAtlas& hexa_atlas, const QuadAtlas& quad_atlas) const
       {
@@ -320,11 +320,11 @@ namespace FEAT
        * \brief Extrudes a quadrilateral vertex set.
        *
        * \param[in,out] hexa_vtx
-       * The hexahedral mesh vertex set that receives the extruded vertex set.
+       * A \transient reference to the hexahedral mesh vertex set that receives the extruded vertex set.
        * Is assumed to be allocated to the correct size.
        *
        * \param[in] quad_vtx
-       * The quadrilateral mesh vertex set that is to be extruded.
+       * A \transient reference to the quadrilateral mesh vertex set that is to be extruded.
        */
       void extrude_vertex_set(HexaVertexSet& hexa_vtx, const QuadVertexSet& quad_vtx) const
       {
@@ -368,10 +368,10 @@ namespace FEAT
        * \brief Extrudes a quadrilateral topology (aka "index set holder").
        *
        * \param[in,out] hexa_topo
-       * The hexahedral topology to be computed. Must be allocated to the correct dimensions.
+       * A \transient reference to the hexahedral topology to be computed. Must be allocated to the correct dimensions.
        *
        * \param[in] quad_topo
-       * The quadrilateral topology to be extruded.
+       * A \transient reference to the quadrilateral topology to be extruded.
        */
       void extrude_topology(HexaTopology& hexa_topo, const QuadTopology& quad_topo) const
       {
@@ -498,13 +498,13 @@ namespace FEAT
        * \brief Extrudes a quadrilateral mapping (aka "target set holder")
        *
        * \param[in,out] hexa_mapp
-       * The hexahedral mapping to be computed. Is assumed to be allocated to the correct dimensions.
+       * A \transient reference to the hexahedral mapping to be computed. Is assumed to be allocated to the correct dimensions.
        *
        * \param[in] quad_mapp
-       * The quadrilateral mapping to be extruded.
+       * A \transient reference to the quadrilateral mapping to be extruded.
        *
        * \param[in] quad_parent
-       * The quadrilateral parent mesh.
+       * A \transient reference to the quadrilateral parent mesh.
        */
       void extrude_mapping(HexaTrgSetHolder& hexa_mapp, const QuadTrgSetHolder& quad_mapp, const QuadMesh& quad_parent) const
       {
@@ -625,10 +625,10 @@ namespace FEAT
        * \brief Extrudes a quadrilateral mesh attribute.
        *
        * \param[out] hexa_attrib
-       * The hexahedral mesh attribute to be computed.
+       * A \transient reference to the hexahedral mesh attribute to be computed.
        *
        * \param[in] quad_attrib
-       * The quadrilateral mesh attribute to be extruded.
+       * A \transient reference to the quadrilateral mesh attribute to be extruded.
        */
       void extrude_attribute(HexaAttrib*& hexa_attrib, const QuadAttrib& quad_attrib) const
       {
@@ -661,6 +661,15 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Extrudes a quadrilateral mesh partitioning.
+       *
+       * \param[out] hexa_parti
+       * A \transient reference to the hexahedral mesh partitioning to be computed.
+       *
+       * \param[in] quad_parti
+       * A \transient reference to the quadrilateral mesh partitioning to be extruded.
+       */
       void extrude_partition(Partition& hexa_parti, const Partition& quad_parti) const
       {
         const Adjacency::Graph& quad_graph = quad_parti.get_patches();
@@ -698,6 +707,15 @@ namespace FEAT
           quad_parti.get_priority(), quad_parti.get_level());
       }
 
+      /**
+       * \brief Extrudes a quadrilateral mesh partition set.
+       *
+       * \param[out] hexa_part_set
+       * A \transient reference to the hexahedral mesh partition set to be computed.
+       *
+       * \param[in] quad_part_set
+       * A \transient reference to the quadrilateral mesh partition set to be extruded.
+       */
       void extrude_partition_set(PartitionSet& hexa_part_set, const PartitionSet& quad_part_set) const
       {
         const auto& quad_parts = quad_part_set.get_partitions();
@@ -718,14 +736,20 @@ namespace FEAT
        * This function does \b not extrude the atlas of the root node.
        *
        * \param[in,out] hexa_root_node
-       * The hexahedral root mesh node that is to be created.
+       * A \transient reference to the hexahedral root mesh node that is to be created.
        *
        * \param[in] quad_root_node
-       * The quadrilateral root mesh node that is to be extruded.
+       * A \transient reference to the quadrilateral root mesh node that is to be extruded.
        *
        * \param[in] hexa_atlas
-       * The hexahedral atlas that has already been extruded from the corresponding quadrilateral atlas.
+       * A \resident hexahedral atlas that has already been extruded from the corresponding quadrilateral atlas.
        * May be \c nullptr if there are no charts associated with the quadrilateral root mesh node.
+       *
+       * \attention
+       * Although the hexa_atlas reference itself is not stored in the hexa_root_node object, the
+       * mesh-part nodes inside the hexa_root_node may (and usually will) reference the chart objects
+       * stored inside the atlas. In consequence, destroying the hexa_atlas before hexa_root_node
+       * may (and usually will) result in orphaned references!
        */
       void extrude_root_node(HexaRootNode& hexa_root_node, const QuadRootNode& quad_root_node, const HexaAtlas* hexa_atlas) const
       {
@@ -808,10 +832,10 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] mesh_extruder
-       * The object that defines the mesh extrusion.
+       * A \resident reference to the object that defines the mesh extrusion.
        *
        * \param[in] quad_mesh
-       * The quadrilateral mesh that is to be extruded.
+       * A \resident reference to the quadrilateral mesh that is to be extruded.
        */
       explicit MeshExtruderFactory(const MeshExtruderType& mesh_extruder, const QuadMesh& quad_mesh) :
         _mesh_extruder(mesh_extruder),
@@ -880,13 +904,13 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] mesh_extruder
-       * The object that defines the mesh extrusion.
+       * A \resident reference to the object that defines the mesh extrusion.
        *
        * \param[in] quad_part
-       * The quadrilateral mesh-part that is to be extruded.
+       * A \resident reference to the quadrilateral mesh-part that is to be extruded.
        *
        * \param[in] quad_parent
-       * The quadrilateral parent mesh of the to-be-extruded mesh part.
+       * A \resident reference to the quadrilateral parent mesh of the to-be-extruded mesh part.
        */
       explicit MeshPartExtruderFactory(const MeshExtruderType& mesh_extruder, const QuadPart& quad_part, const QuadMesh& quad_parent) :
         _mesh_extruder(mesh_extruder),

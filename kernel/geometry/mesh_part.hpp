@@ -196,7 +196,7 @@ namespace FEAT
          * \brief Factory constructor
          *
          * \param[in] factory
-         * The factory that is to be used to create the mesh.
+         * A \transient reference to the factory that is to be used to create the mesh part.
          */
         explicit MeshPart(Factory<MeshPart>& factory) :
           _index_set_holder(nullptr),
@@ -267,6 +267,12 @@ namespace FEAT
           }
         }
 
+        /**
+         * \brief Clones another mesh part object into \c this object.
+         *
+         * \param[in] other
+         * A \transient reference to the source object that is to be cloned into \c this object.
+         */
         void clone(const MeshPart& other)
         {
           for(int d(0); d <= shape_dim; ++d)
@@ -297,6 +303,7 @@ namespace FEAT
             this->add_attribute(new AttributeSetType(it->second->clone()), it->first);
         }
 
+        /// \returns An independent clone of \c this mesh part object.
         MeshPart clone() const
         {
           MeshPart mp(this->_num_entities, this->_index_set_holder != nullptr);
@@ -356,7 +363,6 @@ namespace FEAT
          * \returns A pointer to the Attribute of shape dimension dim if present.
          *
          * \warning Will return nullptr if no Attribute with the given identifier is found
-         *
          */
         AttributeSetType* find_attribute(const String& identifier)
         {
@@ -395,7 +401,7 @@ namespace FEAT
          * \brief Copies one attribute to this MeshPart's AttributeHolder
          *
          * \param[in] attribute
-         * Attribute to be added.
+         * A \resident pointer to the Attribute to be added.
          *
          * \param[in] identifier
          * Identifier for the map.
@@ -403,7 +409,6 @@ namespace FEAT
          * \returns
          * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
          * present, or false otherwise.
-         *
          */
         virtual bool add_attribute(AttributeSetType* attribute, const String& identifier)
         {
@@ -514,7 +519,7 @@ namespace FEAT
          * \brief Applies a mesh permutation onto this mesh part's target sets.
          *
          * \param[in] mesh_perm
-         * The mesh permutation that is to be applied.
+         * A \transient reference to the mesh permutation that is to be applied.
          */
         void permute(const MeshPermutation<ShapeType>& mesh_perm)
         {
@@ -531,11 +536,10 @@ namespace FEAT
          * Dimension to generate parent information for.
          *
          * \param[in] parent_ish
-         * Topology of the parent this MeshPart refers to.
+         * A \transient reference to the topology of the parent this MeshPart refers to.
          *
-         * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
-         * preprocessing only.
-         *
+         * \warning This will in general change the implied topology of the MeshPart and is meant
+         * to be used in mesh preprocessing only.
          */
         template<int end_dim_, int current_dim_ = ShapeType::dimension>
         void deduct_target_sets_from_bottom(const ParentIndexSetHolderType& parent_ish)
@@ -557,11 +561,10 @@ namespace FEAT
          * Dimension to generate parent information for.
          *
          * \param[in] parent_ish
-         * Topology of the parent this MeshPart refers to.
+         * A \transient reference to the topology of the parent this MeshPart refers to.
          *
-         * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
-         * preprocessing only.
-         *
+         * \warning This will in general change the implied topology of the MeshPart and is meant
+         * to be used in mesh preprocessing only.
          */
         template<int end_dim_, int current_dim_ = 0>
         void deduct_target_sets_from_top(const ParentIndexSetHolderType& parent_ish)
@@ -577,11 +580,10 @@ namespace FEAT
          * \brief Fills the mesh topology from parent information
          *
          * \param[in] parent_ish
-         * IndexSetHolder of the parent this MeshPart refers to.
+         * A \transient reference to the IndexSetHolder of the parent this MeshPart refers to.
          *
-         * \warning This will in general change the implied topology of the MeshPart and meant to be used in mesh
-         * preprocessing only.
-         *
+         * \warning This will in general change the implied topology of the MeshPart and is meant
+         * to be used in mesh preprocessing only.
          */
         void deduct_topology(const ParentIndexSetHolderType& parent_ish)
         {
@@ -640,7 +642,7 @@ namespace FEAT
          * \brief Fills the attribute sets.
          *
          * \param[in,out] attribute_set_holder
-         * The attribute set holder whose attribute sets are to be filled.
+         * A \transient reference to the attribute set holder whose attribute sets are to be filled.
          */
         virtual void fill_attribute_sets(AttributeSetContainer& attribute_set_holder) = 0;
 
@@ -648,7 +650,7 @@ namespace FEAT
          * \brief Fills the index sets.
          *
          * \param[in,out] index_set_holder
-         * The index set holder whose index sets are to be filled.
+         * A \transient reference to the index set holder whose index sets are to be filled.
          */
         virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) = 0;
 
@@ -656,7 +658,7 @@ namespace FEAT
          * \brief Fills the target sets.
          *
          * \param[in,out] target_set_holder
-         * The target set holder whose target sets are to be filled.
+         * A \transient reference to the target set holder whose target sets are to be filled.
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
 
@@ -717,10 +719,10 @@ namespace FEAT
          * root mesh (and not on another meshpart).
          *
          * \param[in] coarse_meshpart
-         * A reference to the coarse mesh that is to be refined.
+         * A \resident reference to the coarse mesh that is to be refined.
          *
          * \param[in] parent_mesh
-         * A reference to the coarse parent mesh.
+         * A \resident reference to the coarse parent mesh.
          */
         explicit StandardRefinery(const MeshType& coarse_meshpart, const ParentMesh_& parent_mesh) :
           _coarse_meshpart(coarse_meshpart),
@@ -744,10 +746,10 @@ namespace FEAT
          * another meshpart (and not on the root mesh).
          *
          * \param[in] coarse_meshpart
-         * A reference to the coarse mesh that is to be refined.
+         * A \resident reference to the coarse mesh that is to be refined.
          *
          * \param[in] parent_meshpart
-         * A reference to the coarse parent mesh part.
+         * A \resident reference to the coarse parent mesh part.
          */
         explicit StandardRefinery(const MeshType& coarse_meshpart, const MeshPart<ParentMesh_>& parent_meshpart) :
           _coarse_meshpart(coarse_meshpart),
@@ -787,8 +789,7 @@ namespace FEAT
          * \brief Fills attribute sets where applicable
          *
          * \param[in,out] attribute_container
-         * Container for the attribute sets being added to
-         *
+         * A \transient reference to the container for the attribute sets being added to
          */
         virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
         {
@@ -819,7 +820,7 @@ namespace FEAT
          * \brief Fills the index sets.
          *
          * \param[in,out] index_set_holder
-         * The index set holder whose index sets are to be filled.
+         * A \transient reference to the index set holder whose index sets are to be filled.
          */
         virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
         {
@@ -840,7 +841,7 @@ namespace FEAT
          * \brief Fills the target sets.
          *
          * \param[in,out] target_set_holder
-         * The target set holder whose target sets are to be filled.
+         * A \transient reference to the target set holder whose target sets are to be filled.
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {

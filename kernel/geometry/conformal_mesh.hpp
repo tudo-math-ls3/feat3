@@ -88,13 +88,13 @@ namespace FEAT
         /// index set type
         typedef FEAT::Geometry::IndexSet
         <
-            Shape::FaceTraits
-            <
-              typename Shape::FaceTraits< ShapeType, cell_dim_> ::ShapeType,
-              face_dim_
-            >
-            ::count
-          > Type;
+          Shape::FaceTraits
+          <
+            typename Shape::FaceTraits< ShapeType, cell_dim_> ::ShapeType,
+            face_dim_
+          >
+          ::count
+        > Type;
       }; // struct IndexSet<...>
 
       /// index set type for storing neighbor adjacency information
@@ -141,7 +141,7 @@ namespace FEAT
        * \brief Factory constructor
        *
        * \param[in] factory
-       * The factory that is to be used to create the mesh.
+       * A \transient reference to the factory that is to be used to create the mesh.
        */
       explicit ConformalMesh(Factory<ConformalMesh>& factory) :
         _vertex_set(factory.get_num_entities(0)),
@@ -215,7 +215,7 @@ namespace FEAT
        * \brief Clones another conformal mesh object into \c this object.
        *
        * \param[in] other
-       * A reference to the source object that is to be cloned into \c this object.
+       * A \transient reference to the source object that is to be cloned into \c this object.
        */
       void clone(const ConformalMesh& other)
       {
@@ -227,7 +227,7 @@ namespace FEAT
         this->_permutation.clone(other._permutation);
       }
 
-      /// \returns An independent clone of  \c this mesh object.
+      /// \returns An independent clone of \c this mesh object.
       ConformalMesh clone() const
       {
         ConformalMesh mesh(this->_num_entities);
@@ -706,7 +706,7 @@ namespace FEAT
        * \brief Constructor.
        *
        * \param[in] coarse_mesh
-       * A reference to the coarse mesh that is to be refined.
+       * A \resident reference to the coarse mesh that is to be refined.
        */
       explicit StandardRefinery(const MeshType& coarse_mesh) :
         _coarse_mesh(coarse_mesh)
@@ -745,7 +745,7 @@ namespace FEAT
        * \brief Fills the vertex set of the refined mesh.
        *
        * \param[in,out] vertex_set
-       * The vertex set whose coordinates are to be filled.
+       * A \transient reference to the vertex set whose coordinates are to be filled.
        */
       virtual void fill_vertex_set(VertexSetType& vertex_set) override
       {
@@ -758,7 +758,7 @@ namespace FEAT
        * \brief Fills the index sets of the refined mesh.
        *
        * \param[in,out] index_set_holder
-       * The index set holder whose index sets are to be filled.
+       * A \transient reference to the index set holder whose index sets are to be filled.
        */
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
       {

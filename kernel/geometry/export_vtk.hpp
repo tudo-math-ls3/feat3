@@ -146,7 +146,8 @@ namespace FEAT
        * \brief Constructor
        *
        * \param[in] mesh
-       * A reference to the mesh that is to be exported. Must remain unchanged for the lifetime of this exporter.
+       * A \resident reference to the mesh that is to be exported.
+       * Must remain unchanged for the lifetime of this exporter.
        *
        * \param[in] var_prec
        * Specifies the precision of the variable entries. If set to 0, the runtime's default precision is used.
@@ -183,7 +184,7 @@ namespace FEAT
        * The name of the variable to be exported.
        *
        * \param[in] data
-       * An array of floating point values. Its length is assumed to correspond to the number of
+       * An \transient array of floating point values. Its length is assumed to correspond to the number of
        * vertices of the mesh. Must not be \p nullptr.
        *
        * \note
@@ -211,8 +212,8 @@ namespace FEAT
        * The name of the variable to be exported.
        *
        * \param[in] x, y, z
-       * The three arrays of floating point values. Their lengths are assumed to correspond to the number of
-       * vertices of the mesh. The first array \p x must not be \p nullptr.
+       * The three \transient arrays of floating point values. Their lengths are assumed to correspond
+       * to the number of vertices of the mesh. The first array \p x must not be \p nullptr.
        *
        * \note
        * This function creates a (deep) copy of the three data arrays, so the data arrays
@@ -266,7 +267,7 @@ namespace FEAT
        * The name of the variable to be exported.
        *
        * \param[in] v
-       * The vector containing the field values in the mesh vertices.
+       * A \transient reference to the vector containing the field values in the mesh vertices.
        *
        * \note
        * This function creates a (deep) copy of the vector data.
@@ -295,7 +296,7 @@ namespace FEAT
        * The name of the variable to be exported.
        *
        * \param[in] data
-       * An array of floating point values. Its length is assumed to correspond to the number of
+       * An \transient array of floating point values. Its length is assumed to correspond to the number of
        * cells of the mesh. Must not be \p nullptr.
        *
        * \note
@@ -323,8 +324,8 @@ namespace FEAT
        * The name of the variable to be exported.
        *
        * \param[in] x, y, z
-       * The three arrays of floating point values. Their lengths are assumed to correspond to the number of
-       * cells of the mesh. The first array \p x must not be \p nullptr.
+       * The three \transient arrays of floating point values. Their lengths are assumed to correspond
+       * to the number of cells of the mesh. The first array \p x must not be \p nullptr.
        *
        * \note
        * This function creates a (deep) copy of the three data arrays, so the data arrays
@@ -378,7 +379,7 @@ namespace FEAT
        * The name of the variable to be exported.
        *
        * \param[in] v
-       * The vector containing the field values in the mesh cell.
+       * A \transient reference to the vector containing the field values in the mesh cell.
        *
        * \note
        * This function creates a (deep) copy of the vector data.

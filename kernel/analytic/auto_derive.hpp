@@ -453,7 +453,7 @@ namespace FEAT
        * evaluation of function gradients (first-order derivatives).
        *
        * \param[in] initial_h
-       * The initial h for the difference quotent. Must be > 0; default = 1E-2.
+       * The initial h for the difference quotient. Must be > 0; default = 1E-2.
        *
        * \param[in] max_steps
        * The maximum number of Richardson extrapolation steps to be performed.
@@ -474,7 +474,7 @@ namespace FEAT
        * evaluation of function hessians (second-order derivatives).
        *
        * \param[in] initial_h
-       * The initial h for the difference quotent. Must be > 0; default = 1E-2.
+       * The initial h for the difference quotient. Must be > 0; default = 1E-2.
        *
        * \param[in] max_steps
        * The maximum number of Richardson extrapolation steps to be performed.

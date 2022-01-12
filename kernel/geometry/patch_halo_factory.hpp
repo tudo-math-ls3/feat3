@@ -222,6 +222,7 @@ namespace FEAT
     /**
      * \brief Factory for creating halo mesh-parts between neighbor patches on a base-mesh.
      *
+     * \attention
      * Note to self:
      * Do *NOT* switch this class from "ranks-at-elem" version back to "elems-at-rank" version,
      * because then the complexity of the PatchHaloBuild::build() function will have quadratic

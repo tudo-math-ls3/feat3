@@ -90,7 +90,7 @@ namespace FEAT
      * <b>Note to Implementers:</b>\n
      * The <c>FunctionParser</c> class, which is defined by the 'fparser' library, is actually
      * just a typedef for the template class instance <c>FunctionParserBase<double></c>. This
-     * may lead the reader to the (erroneous) conclusion, that one might easily templatise this
+     * may lead the reader to the (erroneous) conclusion, that one might easily templatize this
      * ParsedFunction class in the datatype, thus adding support for other interesting floating
      * point types like the <c>__float128</c> type of GCC's libquadmath. Unfortunately, most of
      * the auxiliary function templates implemented in the depths of the 'fparser' library are
@@ -183,7 +183,7 @@ namespace FEAT
       /**
        * \brief Adds an extra variable to the parser.
        *
-       * The value of the extra variable can be changed lateron by using the #set_variable function.
+       * The value of the extra variable can be changed later on by using the #set_variable function.
        *
        * \param[in] name
        * The name of the variable. Must not be 'x', 'y' or 'z'.
@@ -438,7 +438,7 @@ namespace FEAT
       /**
        * \brief Adds an extra variable to the parser.
        *
-       * The value of the extra variable can be changed lateron by using the #set_variable function.
+       * The value of the extra variable can be changed later on by using the #set_variable function.
        *
        * \param[in] name
        * The name of the variable. Must not be 'x', 'y' or 'z'.

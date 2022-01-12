@@ -28,13 +28,13 @@ namespace FEAT
        * \brief Assembles a linear functional into a vector.
        *
        * \param[in,out] vector
-       * The vector that is to be assembled.
+       * A \transient reference to the vector that is to be assembled.
        *
        * \param[in] functional
-       * A reference to the linear functional implementing the LinearFunctional interface to be assembled.
+       * A \transient reference to the linear functional implementing the LinearFunctional interface to be assembled.
        *
        * \param[in] space
-       * A reference to the finite-element (test) space to be used.
+       * A \transient reference to the finite-element (test) space to be used.
        *
        * \param[in] cubature_factory
        * A reference to the cubature factory to be used for integration.

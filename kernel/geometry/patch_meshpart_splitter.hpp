@@ -94,10 +94,10 @@ namespace FEAT
          * \brief Constructor
          *
          * \param[in] base_mesh
-         * The (global) BaseMesh
+         * A \resident reference to the (global) BaseMesh
          *
          * \param[in] patch_mesh_part
-         * The MeshPart identifying the Patch
+         * A \resident reference to the MeshPart identifying the Patch
          */
         explicit PatchMeshPartSplitter(const MeshType& base_mesh, const MeshPartType& patch_mesh_part) :
           _base_mesh(base_mesh),
@@ -119,7 +119,7 @@ namespace FEAT
          * \brief Assembles information from a MeshPart referring to the BaseMesh
          *
          * \param[in] mesh_part
-         * BaseMesh MeshPart
+         * A \transient reference to the basemesh patch meshpart
          *
          * \returns
          * true if there is a nonempty cut between mesh_part and the PatchMeshPart.
@@ -154,7 +154,7 @@ namespace FEAT
          * \brief Fills the attribute sets.
          *
          * \param[in,out] attribute_container
-         * The attribute set holder whose attribute sets are to be filled.
+         * A \transient reference to the attribute set holder whose attribute sets are to be filled.
          */
         virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
         {
@@ -165,7 +165,7 @@ namespace FEAT
          * \brief Fills the index sets.
          *
          * \param[in,out] index_set_holder
-         * The index set holder whose index sets are to be filled.
+         * A \transient reference to the index set holder whose index sets are to be filled.
          */
         virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
         {
@@ -192,7 +192,7 @@ namespace FEAT
          * \brief Fills the target sets.
          *
          * \param[in,out] target_set_holder
-         * The target set holder whose target sets are to be filled.
+         * A \transient reference to the target set holder whose target sets are to be filled.
          */
         virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
         {
@@ -234,8 +234,7 @@ namespace FEAT
          * \brief Standard constructor
          *
          * \param[in] target_set
-         * The TargetSet mapping Patch MeshPart entities to BaseMesh entities
-         *
+         * A \transient reference to the TargetSet mapping Patch MeshPart entities to BaseMesh entities
          */
         explicit PatchPartMap(const TargetSet& target_set) :
           _idx_map(),
@@ -255,7 +254,7 @@ namespace FEAT
          * \brief Creates mapping information from a BaseMesh MeshPart to a Patch MeshPart boundary MeshPart
          *
          * \param[in] target_in
-         * Target set of the BaseMesh MeshPart
+         * A \transient reference to the Target set of the BaseMesh MeshPart
          *
          * \returns
          * true if there is a nonempty cut between the entities referenced by target_in and the PatchMeshPart.
@@ -300,11 +299,10 @@ namespace FEAT
          * Type of the attribute contained in the passed sets.
          *
          * \param[out] attribute_container_out
-         * The attribute set to fill
+         * A \transient reference to the attribute set to fill
          *
          * \param[in] attribute_container_in
-         * AttributeSet of the BaseMesh MeshPart to copy to the PatchMeshPart's MeshPart
-         *
+         * A \transient reference to the AttributeSet of the BaseMesh MeshPart to copy to the PatchMeshPart's MeshPart
          */
         template<typename Attribute_>
         void fill_attribute_set(
@@ -329,14 +327,13 @@ namespace FEAT
             // Push the new attribute to set_out
             XASSERTM(attribute_container_out.insert(std::make_pair(it->first, new_attribute)).second, "Error inserting new AttributeSet");
           }
-
         }
 
         /**
          * \brief Fills the PatchMeshPart MeshPart's TargetSet
          *
          * \param[in] target_out
-         * TargetSet mapping the PatchMeshPart MeshPart's entities to the PatchMeshPart
+         * A \transient reference to the TargetSet mapping the PatchMeshPart MeshPart's entities to the PatchMeshPart
          */
         void fill_target_set(TargetSet& target_out) const
         {
@@ -363,17 +360,16 @@ namespace FEAT
          * Type of the vertex-at-shape IndexSet to be filled.
          *
          * \param[out] index_set_out
-         * The vertex-at-shape IndexSet of the MeshPart referring to the PatchMeshPart. Already has to have the
-         * correct size.
+         * A \transient reference to the vertex-at-shape IndexSet of the MeshPart referring to the PatchMeshPart.
+         * Already has to have the correct size.
          *
          * \param[in] index_set_in
-         * This is the vertex-at-shape IndexSet of the MeshPart referring to the BaseMesh.
+         * A \transient reference to the vertex-at-shape IndexSet of the MeshPart referring to the BaseMesh.
          *
          * \param[in] vertex_map
-         * The mapping of BaseMesh Meshpart vertices to PatchMeshPart MeshPart vertices. This is the _io_map of the
-         * PatchPartMap to dimension-0 entries, but this class has no information about it, so it need to be fetched
-         * and passed from the outside.
-         *
+         * A \transient reference to the mapping of BaseMesh Meshpart vertices to PatchMeshPart MeshPart vertices.
+         * This is the _io_map of the PatchPartMap to dimension-0 entries, but this class has no information about it,
+         * so it need to be fetched and passed from the outside.
          */
         template<typename IndexSetType_>
         void fill_index_set(IndexSetType_& index_set_out, const IndexSetType_& index_set_in,
@@ -446,7 +442,7 @@ namespace FEAT
          * \brief Standard constructor
          *
          * \param[in] tsh
-         * The TargetSetHolder of the PatchMeshPart
+         * A \transient reference to the TargetSetHolder of the PatchMeshPart
          */
         explicit PatchPartMapHolder(const TargetSetHolder<Shape_>& tsh) :
           BaseClass(tsh),
@@ -459,11 +455,11 @@ namespace FEAT
          * \brief Assembles information from a BaseMesh MeshPart
          *
          * \param[in] tsh
-         * The TargetSetHolder of the MeshPart referring to the BaseMesh.
+         * A \transient reference to the TargetSetHolder of the MeshPart referring to the BaseMesh.
          *
          * \param[in] ish
-         * The IndexSetHolder of the MeshPart referring to the BaseMesh. This is nullptr if it does not have a
-         * topology.
+         * A \transient pointer to the IndexSetHolder of the MeshPart referring to the BaseMesh.
+         * This is nullptr if it does not have a topology.
          *
          * \returns true if this class or its BaseClass added any information
          */
@@ -513,10 +509,10 @@ namespace FEAT
          * Type of the AttributeSetContainer_.
          *
          * \param[out] attribute_container_out
-         * AttributeSetContainer of the PatchMeshPart's MeshPart to be filled
+         * A \transient reference to the AttributeSetContainer of the PatchMeshPart's MeshPart to be filled
          *
          * \param[in] attribute_container_in
-         * AttributeSetContainer of the BaseMesh's MeshPart to restrict to the PatchMeshPart's MeshPart.
+         * A \transient reference to the AttributeSetContainer of the BaseMesh's MeshPart to restrict to the PatchMeshPart's MeshPart.
          */
         template<typename AttributeSetContainer_>
         void fill_attribute_sets(
@@ -531,7 +527,7 @@ namespace FEAT
          * \brief Factory interface: Fills the TargetSetHolder
          *
          * \param[in] tsh
-         * The PatchMeshPart MeshPart's TargetSetHolder
+         * A \transient reference to the PatchMeshPart MeshPart's TargetSetHolder
          */
         void fill_target_sets(TargetSetHolder<Shape_>& tsh) const
         {
@@ -546,10 +542,10 @@ namespace FEAT
          * The type of the IndexSetHolder
          *
          * \param[in] ish
-         * The PatchMeshPart MeshPart's IndexSetHolder
+         * A \transient reference to the PatchMeshPart MeshPart's IndexSetHolder
          *
          * \param[in] ish_in
-         * The PatchMeshPart's IndexSetHolder
+         * A \transient reference to the PatchMeshPart's IndexSetHolder
          *
          * Note that it has to be checked beforehand if the IndexSetHolder(s) are nullptr.
          */

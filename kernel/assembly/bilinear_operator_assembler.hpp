@@ -30,19 +30,19 @@ namespace FEAT
        * This function is the version for different test- and trial-spaces.
        *
        * \param[in,out] matrix
-       * The matrix that is to be assembled.
+       * The \transient matrix that is to be assembled.
        *
        * \param[in] operat
-       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
        *
        * \param[in] test_space
-       * A reference to the finite-element test-space to be used.
+       * A \transient reference to the finite-element test-space to be used.
        *
        * \param[in] trial_space
-       * A reference to the finite-element trial-space to be used.
+       * A \transient reference to the finite-element trial-space to be used.
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
+       * A \transient reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
@@ -196,16 +196,16 @@ namespace FEAT
        * This function is the version for identical test- and trial-spaces.
        *
        * \param[in,out] matrix
-       * The matrix that is to be assembled.
+       * The \transient matrix that is to be assembled.
        *
        * \param[in] operat
-       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
        *
        * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
+       * A \transient reference to the finite-element to be used as the test- and trial-space.
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
+       * A \transient reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
@@ -348,16 +348,16 @@ namespace FEAT
        * of some *Matrix*Blocked type with appropriate block size.
        *
        * \param[in] operat
-       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
        *
        * \param[in] test_space
-       * A reference to the finite-element test-space to be used.
+       * A \transient reference to the finite-element test-space to be used.
        *
        * \param[in] trial_space
-       * A reference to the finite-element trial-space to be used.
+       * A \transient reference to the finite-element trial-space to be used.
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
+       * A \transient reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
@@ -526,17 +526,18 @@ namespace FEAT
        * This function is the version for identical test- and trial-spaces.
        *
        * \param[in,out] matrix
-       * The matrix that is to be assembled. This has to be compatible with the operator's block structure, i.e. to be
-       * of some *Matrix*Blocked type with appropriate block size.
+       * The \transient matrix that is to be assembled. This has to be compatible with the
+       * operator's block structure, i.e. to be of some *Matrix*Blocked type with appropriate
+       * block size.
        *
        * \param[in] operat
-       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
        *
        * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
+       * A \transient reference to the finite-element to be used as the test- and trial-space.
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
+       * A \transient reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
@@ -695,19 +696,19 @@ namespace FEAT
        * needed only a few times and one does not want to save the matrix.
        *
        * \param[out] ret
-       * The return vector.
+       * The \transient return vector.
        *
        * \param[in] coeff_vector
-       * The coefficient vector for the FE function.
+       * The \transient coefficient vector for the FE function.
        *
        * \param[in] operat
-       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
        *
        * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
+       * A \transient reference to the finite-element to be used as the test- and trial-space.
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
+       * A \transient reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
@@ -728,131 +729,132 @@ namespace FEAT
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
+      {
+        XASSERTM(ret.size()==space.get_num_dofs(), "Return vector size does not match FE space dimension");
+        XASSERTM(coeff_vector.size()==space.get_num_dofs(), "Coefficient vector size does not match FE space dimension");
+        ret.format();
+
+        // Coefficient vector type
+        typedef Vector_ VectorType;
+        // operator type
+        typedef Operator_ OperatorType;
+        // space type
+        typedef Space_ SpaceType;
+
+        // assembly traits
+        typedef AsmTraits1
+        <
+          typename VectorType::DataType,
+          SpaceType,
+          OperatorType::trafo_config,
+          OperatorType::test_config | OperatorType::trial_config
+        > AsmTraits;
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create a operator evaluator
+        typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // create local vector data
+        typename AsmTraits::LocalVectorType coeff_loc;
+        typename AsmTraits::LocalVectorType ret_loc;
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create vector scatter axpy for adding to the global return vector
+        typename VectorType::ScatterAxpy scatter_axpy(ret);
+        // create vector gather axpy for picking the local values from the global vector
+        typename VectorType::GatherAxpy gather_axpy(coeff_vector);
+
+        // loop over all cells of the mesh
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          XASSERTM(ret.size()==space.get_num_dofs(), "Return vector size does not match FE space dimension");
-          XASSERTM(coeff_vector.size()==space.get_num_dofs(), "Coefficient vector size does not match FE space dimension");
-          ret.format();
+          // format local vectors
+          coeff_loc.format();
+          ret_loc.format();
 
-          // Coefficient vector type
-          typedef Vector_ VectorType;
-          // operator type
-          typedef Operator_ OperatorType;
-          // space type
-          typedef Space_ SpaceType;
+          // initialize dof-mapping
+          dof_mapping.prepare(cell);
 
-          // assembly traits
-          typedef AsmTraits1
-          <
-            typename VectorType::DataType,
-            SpaceType,
-            OperatorType::trafo_config,
-            OperatorType::test_config | OperatorType::trial_config
-          > AsmTraits;
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
 
-          // fetch the trafo
-          const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+          // incorporate local vector
+          gather_axpy(coeff_loc, dof_mapping);
 
-          // create a trafo evaluator
-          typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
 
-          // create a space evaluator and evaluation data
-          typename AsmTraits::SpaceEvaluator space_eval(space);
+          // prepare operator evaluator
+          oper_eval.prepare(trafo_eval);
 
-          // create a dof-mapping
-          typename AsmTraits::DofMapping dof_mapping(space);
+          // fetch number of local dofs
+          int num_loc_dofs = space_eval.get_num_local_dofs();
 
-          // create a operator evaluator
-          typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
-
-          // create trafo evaluation data
-          typename AsmTraits::TrafoEvalData trafo_data;
-
-          // create space evaluation data
-          typename AsmTraits::SpaceEvalData space_data;
-
-          // create local vector data
-          typename AsmTraits::LocalVectorType coeff_loc;
-          typename AsmTraits::LocalVectorType ret_loc;
-
-          // create cubature rule
-          typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-          // create vector scatter axpy for adding to the global return vector
-          typename VectorType::ScatterAxpy scatter_axpy(ret);
-          // create vector gather axpy for picking the local values from the global vector
-          typename VectorType::GatherAxpy gather_axpy(coeff_vector);
-
-          // loop over all cells of the mesh
-          for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
-            // format local vectors
-            coeff_loc.format();
-            ret_loc.format();
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
 
-            // initialize dof-mapping
-            dof_mapping.prepare(cell);
+            // compute basis function data
+            space_eval(space_data, trafo_data);
 
-            // prepare trafo evaluator
-            trafo_eval.prepare(cell);
+            // prepare bilinear operator
+            oper_eval.set_point(trafo_data);
 
-            // incorporate local vector
-            gather_axpy(coeff_loc, dof_mapping);
-
-            // prepare space evaluator
-            space_eval.prepare(trafo_eval);
-
-            // prepare operator evaluator
-            oper_eval.prepare(trafo_eval);
-
-            // fetch number of local dofs
-            int num_loc_dofs = space_eval.get_num_local_dofs();
-
-            // loop over all quadrature points and integrate
-            for(int k(0); k < cubature_rule.get_num_points(); ++k)
+            // test function loop
+            for(int i(0); i < num_loc_dofs; ++i)
             {
-              // compute trafo data
-              trafo_eval(trafo_data, cubature_rule.get_point(k));
-
-              // compute basis function data
-              space_eval(space_data, trafo_data);
-
-              // prepare bilinear operator
-              oper_eval.set_point(trafo_data);
-
-              // test function loop
-              for(int i(0); i < num_loc_dofs; ++i)
+              // trial function loop
+              for(int j(0); j < num_loc_dofs; ++j)
               {
-                // trial function loop
-                for(int j(0); j < num_loc_dofs; ++j)
-                {
-                  // Integrate the FE function
-                  ret_loc(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                    oper_eval(space_data.phi[j], space_data.phi[i]) * coeff_loc(j);
-                  // continue with next test function
-                }
-                // continue with next trial function
+                // Integrate the FE function
+                ret_loc(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+                  oper_eval(space_data.phi[j], space_data.phi[i]) * coeff_loc(j);
+                // continue with next test function
               }
-              // continue with next cubature point
+              // continue with next trial function
             }
-
-            // finish operator evaluator
-            oper_eval.finish();
-
-            // finish evaluators
-            space_eval.finish();
-            trafo_eval.finish();
-
-            // incorporate local vector
-            scatter_axpy(ret_loc, dof_mapping, alpha);
-
-            // finish dof mapping
-            dof_mapping.finish();
-
-            // continue with next cell
+            // continue with next cubature point
           }
 
-          // okay, that's it
+          // finish operator evaluator
+          oper_eval.finish();
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+
+          // incorporate local vector
+          scatter_axpy(ret_loc, dof_mapping, alpha);
+
+          // finish dof mapping
+          dof_mapping.finish();
+
+          // continue with next cell
         }
+
+        // okay, that's it
+      }
+
       /**
        * \brief Applies the bilinear operator to an FE function
        *
@@ -861,22 +863,22 @@ namespace FEAT
        * needed only a few times and one does not want to save the matrix.
        *
        * \param[out] ret
-       * The return vector.
+       * The \transient return vector.
        *
        * \param[in] coeff_vector
-       * The coefficient vector for the FE function.
+       * The \transient coefficient vector for the FE function.
        *
        * \param[in] operat
-       * A reference to the operator implementing the BilinearOperator interface to be assembled.
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
        *
        * \param[in] test_space
-       * A reference to the finite-element test-space to be used.
+       * A \transient reference to the finite-element test-space to be used.
        *
        * \param[in] trial_space
-       * A reference to the finite-element trial-space to be used.
+       * A \transient reference to the finite-element trial-space to be used.
        *
        * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
+       * A \transient reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
@@ -899,142 +901,142 @@ namespace FEAT
         const TrialSpace_& trial_space,
         const CubatureFactory_& cubature_factory,
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
+      {
+        XASSERTM(ret.size()==test_space.get_num_dofs(), "Return vector size does not match FE space dimension");
+        XASSERTM(coeff_vector.size()==trial_space.get_num_dofs(), "Coefficient vector size does not match FE space dimension");
+        ret.format();
+
+        // Coefficient vector type
+        typedef Vector_ VectorType;
+        // operator type
+        typedef Operator_ OperatorType;
+        // test-space type
+        typedef TestSpace_ TestSpaceType;
+        // trial-space type
+        typedef TrialSpace_ TrialSpaceType;
+
+        // assembly traits
+        typedef AsmTraits2
+        <
+          typename VectorType::DataType,
+          TestSpaceType,
+          TrialSpaceType,
+          OperatorType::trafo_config,
+          OperatorType::test_config,
+          OperatorType::trial_config
+        > AsmTraits;
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = test_space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create space evaluators
+        typename AsmTraits::TestEvaluator test_eval(test_space);
+        typename AsmTraits::TrialEvaluator trial_eval(trial_space);
+
+        // create dof-mappings
+        typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
+        typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
+
+        // create a operator evaluator
+        typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::TestEvalData test_data;
+        typename AsmTraits::TrialEvalData trial_data;
+
+        // create local vector data
+        typename AsmTraits::LocalTrialVectorType coeff_loc;
+        typename AsmTraits::LocalTestVectorType ret_loc;
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create vector scatter axpy for adding to the global return vector
+        typename VectorType::ScatterAxpy scatter_axpy(ret);
+        // create vector gather axpy for picking the local values from the global vector
+        typename VectorType::GatherAxpy gather_axpy(coeff_vector);
+
+        // loop over all cells of the mesh
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          XASSERTM(ret.size()==test_space.get_num_dofs(), "Return vector size does not match FE space dimension");
-          XASSERTM(coeff_vector.size()==trial_space.get_num_dofs(), "Coefficient vector size does not match FE space dimension");
-          ret.format();
+          // format local vectors
+          coeff_loc.format();
+          ret_loc.format();
 
-          // Coefficient vector type
-          typedef Vector_ VectorType;
-          // operator type
-          typedef Operator_ OperatorType;
-          // test-space type
-          typedef TestSpace_ TestSpaceType;
-          // trial-space type
-          typedef TrialSpace_ TrialSpaceType;
+          // initialize dof-mappings
+          test_dof_mapping.prepare(cell);
+          trial_dof_mapping.prepare(cell);
 
-          // assembly traits
-          typedef AsmTraits2
-          <
-            typename VectorType::DataType,
-            TestSpaceType,
-            TrialSpaceType,
-            OperatorType::trafo_config,
-            OperatorType::test_config,
-            OperatorType::trial_config
-          > AsmTraits;
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+          // prepare space evaluator
+          test_eval.prepare(trafo_eval);
+          trial_eval.prepare(trafo_eval);
 
-          // fetch the trafo
-          const typename AsmTraits::TrafoType& trafo = test_space.get_trafo();
+          // incorporate local vector
+          gather_axpy(coeff_loc, trial_dof_mapping);
 
-          // create a trafo evaluator
-          typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+          // prepare operator evaluator
+          oper_eval.prepare(trafo_eval);
 
-          // create space evaluators
-          typename AsmTraits::TestEvaluator test_eval(test_space);
-          typename AsmTraits::TrialEvaluator trial_eval(trial_space);
+          // fetch number of local dofs
+          int num_loc_test_dofs = test_eval.get_num_local_dofs();
+          int num_loc_trial_dofs = trial_eval.get_num_local_dofs();
 
-          // create dof-mappings
-          typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
-          typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
-
-          // create a operator evaluator
-          typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
-
-          // create trafo evaluation data
-          typename AsmTraits::TrafoEvalData trafo_data;
-
-          // create space evaluation data
-          typename AsmTraits::TestEvalData test_data;
-          typename AsmTraits::TrialEvalData trial_data;
-
-          // create local vector data
-          typename AsmTraits::LocalTrialVectorType coeff_loc;
-          typename AsmTraits::LocalTestVectorType ret_loc;
-
-          // create cubature rule
-          typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-          // create vector scatter axpy for adding to the global return vector
-          typename VectorType::ScatterAxpy scatter_axpy(ret);
-          // create vector gather axpy for picking the local values from the global vector
-          typename VectorType::GatherAxpy gather_axpy(coeff_vector);
-
-          // loop over all cells of the mesh
-          for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
           {
-            // format local vectors
-            coeff_loc.format();
-            ret_loc.format();
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
 
-            // initialize dof-mappings
-            test_dof_mapping.prepare(cell);
-            trial_dof_mapping.prepare(cell);
+            // compute basis function data
+            test_eval(test_data, trafo_data);
+            trial_eval(trial_data, trafo_data);
 
-            // prepare trafo evaluator
-            trafo_eval.prepare(cell);
-            // prepare space evaluator
-            test_eval.prepare(trafo_eval);
-            trial_eval.prepare(trafo_eval);
+            // prepare bilinear operator
+            oper_eval.set_point(trafo_data);
 
-            // incorporate local vector
-            gather_axpy(coeff_loc, trial_dof_mapping);
-
-            // prepare operator evaluator
-            oper_eval.prepare(trafo_eval);
-
-            // fetch number of local dofs
-            int num_loc_test_dofs = test_eval.get_num_local_dofs();
-            int num_loc_trial_dofs = trial_eval.get_num_local_dofs();
-
-            // loop over all quadrature points and integrate
-            for(int k(0); k < cubature_rule.get_num_points(); ++k)
+            // test function loop
+            for(int i(0); i < num_loc_test_dofs; ++i)
             {
-              // compute trafo data
-              trafo_eval(trafo_data, cubature_rule.get_point(k));
-
-              // compute basis function data
-              test_eval(test_data, trafo_data);
-              trial_eval(trial_data, trafo_data);
-
-              // prepare bilinear operator
-              oper_eval.set_point(trafo_data);
-
-              // test function loop
-              for(int i(0); i < num_loc_test_dofs; ++i)
+              // trial function loop
+              for(int j(0); j < num_loc_trial_dofs; ++j)
               {
-                // trial function loop
-                for(int j(0); j < num_loc_trial_dofs; ++j)
-                {
-                  // Integrate the FE function
-                  ret_loc(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                    oper_eval(trial_data.phi[j], test_data.phi[i]) * coeff_loc(j);
-                  // continue with next trial function
-                }
-                // continue with next test function
+                // Integrate the FE function
+                ret_loc(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+                  oper_eval(trial_data.phi[j], test_data.phi[i]) * coeff_loc(j);
+                // continue with next trial function
               }
-              // continue with next cubature point
+              // continue with next test function
             }
-
-            // finish operator evaluator
-            oper_eval.finish();
-
-            // finish evaluators
-            test_eval.finish();
-            trial_eval.finish();
-            trafo_eval.finish();
-
-            // incorporate local vector
-            scatter_axpy(ret_loc, test_dof_mapping, alpha);
-
-            // finish dof mappings
-            test_dof_mapping.finish();
-            trial_dof_mapping.finish();
-
-            // continue with next cell
+            // continue with next cubature point
           }
-          // okay, that's it
+
+          // finish operator evaluator
+          oper_eval.finish();
+
+          // finish evaluators
+          test_eval.finish();
+          trial_eval.finish();
+          trafo_eval.finish();
+
+          // incorporate local vector
+          scatter_axpy(ret_loc, test_dof_mapping, alpha);
+
+          // finish dof mappings
+          test_dof_mapping.finish();
+          trial_dof_mapping.finish();
+
+          // continue with next cell
         }
+        // okay, that's it
+      }
     }; // class BilinearOperatorAssembler<...>
   } // namespace Assembly
 } // namespace FEAT

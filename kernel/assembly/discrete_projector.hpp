@@ -31,13 +31,13 @@ namespace FEAT
        * \brief Projects a discrete function into the vertices.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the vertex interpolation of the discrete function.
+       * A \transient reference to a vector object that shall receive the vertex interpolation of the discrete function.
        *
        * \param[in] coeff
-       * A reference to the coefficient vector of the finite-element function.
+       * A \transient reference to the coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * A reference to the finite-element space.
+       * A \transient reference to the finite-element space.
        */
       template<
         typename VectorOut_,
@@ -198,13 +198,13 @@ namespace FEAT
        * \brief Projects a discrete function into the cells using the barycentre cubature rule.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the cell interpolation of the discrete function.
+       * A \transient reference to a vector object that shall receive the cell interpolation of the discrete function.
        *
        * \param[in] coeff
-       * A reference to the coefficient vector of the finite-element function.
+       * A \transient reference to the coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * A reference to the finite-element space.
+       * A \transient reference to the finite-element space.
        */
       template<
         typename VectorOut_,
@@ -223,16 +223,16 @@ namespace FEAT
        * \brief Projects a discrete function into the cells.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the cell interpolation of the discrete function.
+       * A \transient reference to a vector object that shall receive the cell interpolation of the discrete function.
        *
        * \param[in] coeff
-       * A reference to the coefficient vector of the finite-element function.
+       * A \transient reference to the coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * A reference to the finite-element space.
+       * A \transient reference to the finite-element space.
        *
        * \param[in] cubature_factory
-       * The cubature factory that is to be used for integration.
+       * The \transient cubature factory that is to be used for integration.
        */
       template<
         typename VectorOut_,
@@ -252,16 +252,16 @@ namespace FEAT
        * \brief Projects a discrete function into the cells.
        *
        * \param[out] vector
-       * A reference to a vector object that shall receive the cell interpolation of the discrete function.
+       * A \transient reference to a vector object that shall receive the cell interpolation of the discrete function.
        *
        * \param[in] coeff
-       * A reference to the coefficient vector of the finite-element function.
+       * A \transient reference to the coefficient vector of the finite-element function.
        *
        * \param[in] space
-       * A reference to the finite-element space.
+       * A \transient reference to the finite-element space.
        *
        * \param[in] cubature_factory
-       * The cubature factory that is to be used for integration.
+       * The \transient cubature factory that is to be used for integration.
        */
       template<typename VectorOut_, typename VectorIn_, typename Space_>
       static void project(

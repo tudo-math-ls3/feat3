@@ -149,11 +149,10 @@ namespace FEAT
          * \brief Constructor
          *
          * \param node_
-         * MeshPartNode for this container.
+         * A \resident pointer to MeshPartNode for this container.
          *
          * \param chart_
-         * Chart for this container.
-         *
+         * A \resident pointer to Chart for this container.
          */
         explicit MeshPartNodeBin(MeshPartNodeType* node_, String chart_name_, const MeshChartType* chart_) :
           node(node_),
@@ -278,10 +277,13 @@ namespace FEAT
        * The name of the child node.
        *
        * \param[in] mesh_part_node
-       * A pointer to the mesh_part node to be added.
+       * A \resident pointer to the mesh_part node to be added.
+       *
+       * \param[in] chart_name
+       * The name of the chart that the mesh-part is to be linked to.
        *
        * \param[in] chart
-       * A pointer to the chart that the subnode is to be associated with. May be \c nullptr.
+       * A \resident pointer to the chart that the subnode is to be associated with. May be \c nullptr.
        *
        * \returns
        * \p mesh_part_node if the insertion was successful, otherwise \c nullptr.
@@ -310,10 +312,13 @@ namespace FEAT
        * The name of the child node.
        *
        * \param[in] mesh_part
-       * A pointer to the mesh_part to be added.
+       * A \resident pointer to the mesh_part to be added.
+       *
+       * \param[in] chart_name
+       * The name of the chart that the mesh-part is to be linked to.
        *
        * \param[in] chart
-       * A pointer to the chart that the subnode is to be associated with. May be \c nullptr.
+       * A \resident pointer to the chart that the subnode is to be associated with. May be \c nullptr.
        *
        * \returns
        * A pointer to the newly created mesh-part node if the insertion was successful, otherwise \c nullptr.
@@ -341,7 +346,7 @@ namespace FEAT
        * The name of the mesh part that the chart is to be assigned to.
        *
        * \param[in] chart
-       * The chart that is to be assigned. May also be \c nullptr.
+       * A \resident pointer to the chart that is to be assigned. May also be \c nullptr.
        *
        * \returns
        * \c true if the chart was assigned successfully or \c false if no mesh part
@@ -437,7 +442,7 @@ namespace FEAT
        * \brief Renames a set of mesh-parts.
        *
        * \param[in] renames
-       * A map of oldname-newname pairs.
+       * A \transient map of oldname-newname pairs.
        */
       void rename_mesh_parts(const std::map<String,String>& renames)
       {
@@ -625,7 +630,7 @@ namespace FEAT
        * \brief Constructor.
        *
        * \param[in] mesh_part
-       * A pointer to the MeshPart for this node.
+       * A \resident pointer to the MeshPart for this node.
        */
       explicit MeshPartNode(MeshPartType* mesh_part) :
         BaseClass(mesh_part)
@@ -640,7 +645,7 @@ namespace FEAT
       /**
        * \brief Creates an independent clone of this object on the heap.
        *
-       * \returns A heap pointer to the newly created clone opject.
+       * \returns A heap pointer to the newly created clone object.
        */
       MeshPartNode* clone_new() const
       {
@@ -653,7 +658,7 @@ namespace FEAT
        * \brief Refines this node and its sub-tree.
        *
        * \param[in] parent
-       * A reference to the parent mesh/cell subset of this node's cell subset.
+       * A \transient reference to the parent mesh/cell subset of this node's cell subset.
        *
        * \returns
        * A pointer to a MeshPartNode containing the refined cell subset tree.
@@ -698,7 +703,7 @@ namespace FEAT
        * for the user to call this function.
        *
        * \param[in,out] refined_node
-       * A reference to the node generated from refinement of this node.
+       * A \transient reference to the node generated from refinement of this node.
        */
       void refine_mesh_parts(MeshPartNode& refined_node) const
       {
@@ -775,10 +780,10 @@ namespace FEAT
        * \brief Constructor.
        *
        * \param[in] mesh
-       * A pointer to the mesh for this node.
+       * A \resident pointer to the mesh for this node.
        *
        * \param[in] atlas
-       * A pointer to the atlas for this mesh tree.
+       * A \resident pointer to the atlas for this mesh tree.
        */
       explicit RootMeshNode(MeshType* mesh, MeshAtlasType* atlas = nullptr) :
         BaseClass(mesh),
@@ -850,7 +855,7 @@ namespace FEAT
        * The rank of the neighbor this halo belongs to.
        *
        * \param[in] halo_part
-       * A pointer to the halo mesh part for the neighbor.
+       * A \resident pointer to the halo mesh part for the neighbor.
        */
       void add_halo(int rank, MeshPartType* halo_part)
       {
@@ -922,7 +927,7 @@ namespace FEAT
        * The rank of the child this patch belongs to.
        *
        * \param[in] patch_part
-       * A pointer to the patch mesh part for the child.
+       * A \resident pointer to the patch mesh part for the child.
        */
       void add_patch(int rank, MeshPartType* patch_part)
       {
@@ -1054,10 +1059,10 @@ namespace FEAT
        * This function also computes the communication neighbor ranks.
        *
        * \param[out] comm_ranks
-       * The communication neighbor ranks vector for this process.
+       * A \transient reference to the communication neighbor ranks vector for this process.
        *
        * \param[in] elems_at_rank
-       * The elements-at-rank graph representing the partitioning
+       * A \transient reference to the elements-at-rank graph representing the partitioning
        * from which the patch is to be extracted.
        *
        * \param[in] rank
@@ -1231,10 +1236,10 @@ namespace FEAT
        * This function also computes the communication ranks.
        *
        * \param[out] comm_ranks
-       * The communication ranks vector for this rank.
+       * A \transient reference to the communication ranks vector for this rank.
        *
        * \param[in] partition
-       * The partition from which the patch is to be extracted.
+       * A \transient reference to the partition from which the patch is to be extracted.
        *
        * \param[in] rank
        * The rank of the patch to be created.
@@ -1254,7 +1259,7 @@ namespace FEAT
        * \brief Creates a patch meshpart for a child and adds it to the patch map.
        *
        * \param[in] elems_at_rank
-       * The adjacency graph that describes which elements belong to each child rank.
+       * A \transient reference to the adjacency graph that describes which elements belong to each child rank.
        *
        * \param[in] rank
        * The child rank for which the patch meshpart is to be created.

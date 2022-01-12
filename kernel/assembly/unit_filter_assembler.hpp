@@ -75,7 +75,7 @@ namespace FEAT
        * \brief Adds the dofs on a mesh-part to the dof-set.
        *
        * \param[in] mesh_part
-       * A reference to a mesh part object.
+       * A \transient reference to a mesh part object.
        */
       void add_mesh_part(const Geometry::MeshPart<MeshType>& mesh_part)
       {
@@ -88,11 +88,11 @@ namespace FEAT
        * This function assembles a unit-filter implementing the homogeneous Dirichlet boundary conditions.
        *
        * \param[in,out] filter
-       * A reference to the unit-filter where the entries are to be added.
+       * A \transient reference to the unit-filter where the entries are to be added.
        * The filter will be allocated with the correct size if it is empty.
        *
        * \param[in] space
-       * The finite-element space for which the filter is to be assembled.
+       * The \transient finite-element space for which the filter is to be assembled.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
@@ -134,13 +134,13 @@ namespace FEAT
        * the vector vector_. In general, this vector will be a representation of an FE function.
        *
        * \param[in,out] filter
-       * A reference to the unit-filter where the entries are to be added.
+       * A \transient reference to the unit-filter where the entries are to be added.
        *
        * \param[in] space
-       * The finite-element space for which the filter is to be assembled.
+       * The \transient finite-element space for which the filter is to be assembled.
        *
        * \param[in] vector_
-       * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
+       * A \transient LAFEM::DenseVector containing (among other stuff) the entries to be added.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This means a slight overhead in the case that MemType_ == Mem::Main.
@@ -185,13 +185,13 @@ namespace FEAT
        * a function.
        *
        * \param[in,out] filter
-       * A reference to the unit-filter where the entries are to be added.
+       * A \transient reference to the unit-filter where the entries are to be added.
        *
        * \param[in] space
-       * The finite-element space for which the filter is to be assembled.
+       * The \transient finite-element space for which the filter is to be assembled.
        *
        * \param[in] function
-       * An object implementing the Analytic::Function interface representing the scalar boundary value
+       * An \transient object implementing the Analytic::Function interface representing the scalar boundary value
        * function.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
@@ -245,10 +245,10 @@ namespace FEAT
        * This function assembles a blocked unit filter implementing the homogeneous Dirichlet boundary conditions.
        *
        * \param[in,out] filter
-       * A reference to the blocked unit filter where the entries are to be added.
+       * A \transient reference to the blocked unit filter where the entries are to be added.
        *
        * \param[in] space
-       * The finite-element space for which the filter is to be assembled.
+       * The \transient finite-element space for which the filter is to be assembled.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.
@@ -292,13 +292,13 @@ namespace FEAT
        * This function assembles a blocked unit filter implementing the inhomogeneous Dirichlet boundary conditions.
        *
        * \param[in,out] filter
-       * A reference to the blocked unit filter where the entries are to be added.
+       * A \transient reference to the blocked unit filter where the entries are to be added.
        *
        * \param[in] space
-       * The finite-element space for which the filter is to be assembled.
+       * The \transient finite-element space for which the filter is to be assembled.
        *
        * \param[in] function
-       * An object implementing the Analytic::Function interface representing the vector-valued boundary value
+       * An \transient object implementing the Analytic::Function interface representing the vector-valued boundary value
        * function.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
@@ -353,13 +353,13 @@ namespace FEAT
        * given by the vector vector_. In general, this vector will be a representation of an FE function.
        *
        * \param[in,out] filter
-       * A reference to the unit-filter where the entries are to be added.
+       * A \transient reference to the unit-filter where the entries are to be added.
        *
        * \param[in] vector_
-       * A LAFEM::DenseVector containing (among other stuff) the entries to be added.
+       * A \transient LAFEM::DenseVector containing (among other stuff) the entries to be added.
        *
        * \param[in] space
-       * The finite-element space for which the filter is to be assembled.
+       * The \transient finite-element space for which the filter is to be assembled.
        *
        * \note Because the ()-operators are very inefficient for Mem::CUDA, a buffer filter is assembled in Mem::Main
        * and then cloned to the real filter. This is is slight overhead in the case that MemType_ == Mem::Main.

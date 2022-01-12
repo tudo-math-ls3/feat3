@@ -85,8 +85,7 @@ namespace FEAT
        * The total number of nodes.
        *
        * \param[in] coloring
-       * The coloring array
-       *
+       * The \transient coloring array
        */
       Coloring(
         Index num_nodes,
@@ -101,8 +100,7 @@ namespace FEAT
       * The total number of colors.
       *
       * \param[in] coloring
-      * The coloring vector
-      *
+      * The \transient coloring vector
       */
       Coloring(
         Index num_colors,
@@ -115,6 +113,7 @@ namespace FEAT
        * satisfies the condition that adjacent nodes do not have the same color.
        *
        * \param[in] graph
+       * The \transient graph to create the coloring from.
        */
       explicit Coloring(const Graph& graph);
 
@@ -126,6 +125,7 @@ namespace FEAT
        * proceeds through the nodes as given by the parameter order.
        *
        * \param[in] graph
+       * The \transient graph to create the coloring from.
        *
        * \param[in] order
        * Permutation array that describes how the algorithm is supposed to proceed through the nodes.

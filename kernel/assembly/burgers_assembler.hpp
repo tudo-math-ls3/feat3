@@ -108,16 +108,16 @@ namespace FEAT
        * \brief Assembles the Burgers operator into a matrix.
        *
        * \param[in,out] matrix
-       * The matrix to be assembled.
+       * The \transient matrix to be assembled.
        *
        * \param[in] convect
-       * The transport vector for the convection.
+       * The \transient transport vector for the convection.
        *
        * \param[in] space
-       * The velocity space.
+       * The \transient velocity space.
        *
        * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
+       * The \transient cubature factory to be used for integration.
        *
        * \param[in] scale
        * A scaling factor for the matrix to be assembled.
@@ -443,16 +443,16 @@ namespace FEAT
        * \brief Assembles the Burgers operator into a scalar matrix.
        *
        * \param[in,out] matrix
-       * The scalar matrix to be assembled.
+       * The \transient scalar matrix to be assembled.
        *
        * \param[in] convect
-       * The transport vector for the convection.
+       * The \transient transport vector for the convection.
        *
        * \param[in] space
-       * The velocity space.
+       * The \transient velocity space.
        *
        * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
+       * The \transient cubature factory to be used for integration.
        *
        * \param[in] scale
        * A scaling factor for the matrix to be assembled.
@@ -709,22 +709,22 @@ namespace FEAT
        * \brief Assembles the Burgers operator into a vector.
        *
        * \param[in,out] vector
-       * The vector to be assembled.
+       * The \transient vector to be assembled.
        *
        * \param[in] convect
-       * The transport vector for the convection.
+       * The \transient transport vector for the convection.
        *
        * \param[in] primal
-       * The primal vector, usually a solution vector.
+       * The \transient primal vector, usually a solution vector.
        *
        * \param[in] space
-       * The velocity space.
+       * The \transient velocity space.
        *
        * \param[in] cubature_factory
-       * The cubature factory to be used for integration.
+       * The \transient cubature factory to be used for integration.
        *
        * \param[in] scale
-       * A scaling factor the the vector to be assembled.
+       * A scaling factor the vector to be assembled.
        */
       template<typename Space_, typename CubatureFactory_>
       void assemble_vector(
@@ -959,7 +959,7 @@ namespace FEAT
        * \brief Sets the convection field norm \f$\|v\|_\Omega\f$ for the local streamline diffusion parameter delta_T.
        *
        * \param[in] convect
-       * The (local) convection field vector.
+       * The \transient (local) convection field vector.
        */
       void set_sd_v_norm(const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, dim_>& convect)
       {
@@ -977,7 +977,7 @@ namespace FEAT
        * This function automatically syncs the norm over all processes by using the vector's gate.
        *
        * \param[in] convect
-       * The (global) convection field vector.
+       * The \transient  (global) convection field vector.
        */
       template<typename LocalVector_, typename Mirror_>
       void set_sd_v_norm(const Global::Vector<LocalVector_, Mirror_>& convect)

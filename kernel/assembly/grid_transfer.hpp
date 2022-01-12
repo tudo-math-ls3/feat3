@@ -37,16 +37,16 @@ namespace FEAT
        * of the vector and matrix containers, resp.
        *
        * \param[in,out] matrix
-       * A reference to the prolongation matrix that is to be assembled.
+       * A \transient reference to the prolongation matrix that is to be assembled.
        *
        * \param[in,out] vector
-       * A reference to the weight vector for the prolongation matrix.
+       * A \transient reference to the weight vector for the prolongation matrix.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        */
       template<
         typename Matrix_,
@@ -73,16 +73,16 @@ namespace FEAT
        * of the vector and matrix containers, resp.
        *
        * \param[in,out] matrix
-       * A reference to the prolongation matrix that is to be assembled.
+       * A \transient reference to the prolongation matrix that is to be assembled.
        *
        * \param[in,out] vector
-       * A reference to the weight vector for the prolongation matrix.
+       * A \transient reference to the weight vector for the prolongation matrix.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.
@@ -335,13 +335,13 @@ namespace FEAT
        * Use this function only in serial simulations!
        *
        * \param[in,out] matrix
-       * A reference to the prolongation matrix that is to be assembled.
+       * A \transient reference to the prolongation matrix that is to be assembled.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to be used for integration.
@@ -370,13 +370,13 @@ namespace FEAT
        * Use this function only in serial simulations!
        *
        * \param[in,out] matrix
-       * A reference to the prolongation matrix that is to be assembled.
+       * A \transient reference to the prolongation matrix that is to be assembled.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.
@@ -413,16 +413,16 @@ namespace FEAT
        * of the vector and matrix containers, resp.
        *
        * \param[in,out] matrix
-       * A reference to the truncation matrix that is to be assembled.
+       * A \transient reference to the truncation matrix that is to be assembled.
        *
        * \param[in,out] vector
-       * A reference to the weight vector for the reduction matrix.
+       * A \transient reference to the weight vector for the reduction matrix.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to be used for integration.
@@ -452,16 +452,16 @@ namespace FEAT
        * of the vector and matrix containers, resp.
        *
        * \param[in,out] matrix
-       * A reference to the truncation matrix that is to be assembled.
+       * A \transient reference to the truncation matrix that is to be assembled.
        *
        * \param[in,out] vector
-       * A reference to the weight vector for the reduction matrix.
+       * A \transient reference to the weight vector for the reduction matrix.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.
@@ -714,13 +714,13 @@ namespace FEAT
        * Use this function only in serial simulations!
        *
        * \param[in,out] matrix
-       * A reference to the truncation matrix that is to be assembled.
+       * A \transient reference to the truncation matrix that is to be assembled.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_name
        * The name of the cubature rule to be used for integration.
@@ -749,13 +749,13 @@ namespace FEAT
        * Use this function only in serial simulations!
        *
        * \param[in,out] matrix
-       * A reference to the truncation matrix that is to be assembled.
+       * A \transient reference to the truncation matrix that is to be assembled.
        *
        * \param[in] fine_space
-       * A reference to the fine-mesh test-space to be used.
+       * A \transient reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
-       * A reference to the coarse-mesh trial-space to be used.
+       * A \transient reference to the coarse-mesh trial-space to be used.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.

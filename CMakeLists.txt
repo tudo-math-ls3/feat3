@@ -169,7 +169,10 @@ if (${CMAKE_VERSION} VERSION_GREATER "3.8.99")
     set(DOXYGEN_ABBREVIATE_BRIEF "The $name class" "The $name widget" "The $name file" is provides specifies contains represents a an the)
     set(DOXYGEN_ALIASES
       [["compilerhack=\xrefitem compilerhacks \"Compiler Hack\" \"Compiler Hacks\""]]
-      [["platformswitch=\xrefitem platformswitches \"Platform dependend code branching\" \"Platform depenendend code branches\""]])
+      [["platformswitch=\xrefitem platformswitches \"Platform dependend code branching\" \"Platform depenendend code branches\""]]
+      [["resident=\ref res_vs_tran_resident \"resident\""]]
+      [["transient=\ref res_vs_tran_transient \"transient\""]])
+
     set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
     set(DOXYGEN_COLLABORATION_GRAPH NO)
     set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/data/*" "*/thirdparty/*" "*/tools/*" "*/tutorials/*" "*-test*.cpp")
