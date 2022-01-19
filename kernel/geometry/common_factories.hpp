@@ -34,205 +34,204 @@ namespace FEAT
     class UnitCubeFactory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> > :
       public Factory< ConformalMesh<Shape::Hypercube<1>, 1, Coord_> >
     {
-      public:
-        /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<1>, 1, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+    public:
+      /// mesh type
+      typedef ConformalMesh<Shape::Hypercube<1>, 1, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      public:
-        UnitCubeFactory()
-        {
-        }
+    public:
+      UnitCubeFactory()
+      {
+      }
 
-        virtual Index get_num_entities(int dim) override
-        {
-          return Index(2 - dim);
-        }
+      virtual Index get_num_entities(int dim) override
+      {
+        return Index(2 - dim);
+      }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
-        {
-          vertex_set[0][0] = Coord_(0);
-          vertex_set[1][0] = Coord_(1);
-        }
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        vertex_set[0][0] = Coord_(0);
+        vertex_set[1][0] = Coord_(1);
+      }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
-        {
-          IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
-          v_e[0][0] = 0;
-          v_e[0][1] = 1;
-        }
-
-    };
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
+        v_e[0][0] = 0;
+        v_e[0][1] = 1;
+      }
+    }; // class UnitCubeFactory<ConformalMesh<Hypercube<1>,...>>
 
     template<typename Coord_>
     class UnitCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> > :
       public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
     {
-      public:
-        /// shape type
-        typedef Shape::Hypercube<2> ShapeType;
-        /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+    public:
+      /// shape type
+      typedef Shape::Hypercube<2> ShapeType;
+      /// mesh type
+      typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      public:
-        UnitCubeFactory()
+    public:
+      UnitCubeFactory()
+      {
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        switch(dim)
         {
+          case 0:
+            return 4u;
+          case 1:
+            return 4u;
+          case 2:
+            return 1u;
+          default:
+            return 0u;
         }
+      }
 
-        virtual Index get_num_entities(int dim) override
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        for(Index i(0); i < 4u; ++i)
         {
-          switch(dim)
+          for(int j(0); j < 2; ++j)
           {
-            case 0:
-              return 4u;
-            case 1:
-              return 4u;
-            case 2:
-              return 1u;
-            default:
-              return 0u;
+            vertex_set[i][j] = Coord_((i >> j) & 0x1);
           }
         }
+      }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        _fill_sub_index_set<1,0>(index_set_holder);
+        _fill_cell_index_set<0>(index_set_holder);
+        _fill_cell_index_set<1>(index_set_holder);
+      }
+
+    private:
+      template<int cell_dim_, int face_dim_>
+      static void _fill_sub_index_set(IndexSetHolderType& index_set_holder)
+      {
+        typedef typename Intern::FaceIndexMapping<ShapeType, cell_dim_, face_dim_> FimType;
+        typename IndexSetHolderType::template IndexSet<cell_dim_, face_dim_>::Type&
+          idx(index_set_holder.template get_index_set<cell_dim_, face_dim_>());
+
+        for(int i(0); i < Shape::FaceTraits<ShapeType, cell_dim_>::count; ++i)
         {
-          for(Index i(0); i < 4u; ++i)
+          for(int j(0); j < idx.num_indices; ++j)
           {
-            for(int j(0); j < 2; ++j)
-            {
-              vertex_set[i][j] = Coord_((i >> j) & 0x1);
-            }
+            idx[Index(i)][j] = Index(FimType::map(i, j));
           }
         }
+      }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      template<int face_dim_>
+      static void _fill_cell_index_set(IndexSetHolderType& index_set_holder)
+      {
+        typename IndexSetHolderType::template IndexSet<2, face_dim_>::Type&
+          idx(index_set_holder.template get_index_set<2, face_dim_>());
+        for(int j(0); j < idx.num_indices; ++j)
         {
-          _fill_sub_index_set<1,0>(index_set_holder);
-          _fill_cell_index_set<0>(index_set_holder);
-          _fill_cell_index_set<1>(index_set_holder);
+          idx[0][j] = Index(j);
         }
-
-      private:
-        template<int cell_dim_, int face_dim_>
-          static void _fill_sub_index_set(IndexSetHolderType& index_set_holder)
-          {
-            typedef typename Intern::FaceIndexMapping<ShapeType, cell_dim_, face_dim_> FimType;
-            typename IndexSetHolderType::template IndexSet<cell_dim_, face_dim_>::Type&
-              idx(index_set_holder.template get_index_set<cell_dim_, face_dim_>());
-
-            for(int i(0); i < Shape::FaceTraits<ShapeType, cell_dim_>::count; ++i)
-            {
-              for(int j(0); j < idx.num_indices; ++j)
-              {
-                idx[Index(i)][j] = Index(FimType::map(i, j));
-              }
-            }
-          }
-
-        template<int face_dim_>
-          static void _fill_cell_index_set(IndexSetHolderType& index_set_holder)
-          {
-            typename IndexSetHolderType::template IndexSet<2, face_dim_>::Type&
-              idx(index_set_holder.template get_index_set<2, face_dim_>());
-            for(int j(0); j < idx.num_indices; ++j)
-            {
-              idx[0][j] = Index(j);
-            }
-          }
-    };
+      }
+    }; // class UnitCubeFactory<ConformalMesh<Hypercube<2>,...>>
 
     template<typename Coord_>
     class UnitCubeFactory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> > :
       public Factory< ConformalMesh<Shape::Hypercube<3>, 3, Coord_> >
     {
-      public:
-        /// shape type
-        typedef Shape::Hypercube<3> ShapeType;
-        /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+    public:
+      /// shape type
+      typedef Shape::Hypercube<3> ShapeType;
+      /// mesh type
+      typedef ConformalMesh<Shape::Hypercube<3>, 3, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      public:
-        UnitCubeFactory()
+    public:
+      UnitCubeFactory()
+      {
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        switch(dim)
         {
+          case 0:
+            return 8u;
+          case 1:
+            return 12u;
+          case 2:
+            return 6u;
+          case 3:
+            return 1u;
+          default:
+            return 0u;
         }
+      }
 
-        virtual Index get_num_entities(int dim) override
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        for(Index i(0); i < 8u; ++i)
         {
-          switch(dim)
+          for(int j(0); j < 3; ++j)
           {
-            case 0:
-              return 8u;
-            case 1:
-              return 12u;
-            case 2:
-              return 6u;
-            case 3:
-              return 1u;
-            default:
-              return 0u;
+            vertex_set[i][j] = Coord_((i >> j) & 0x1);
           }
         }
+      }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        _fill_sub_index_set<1,0>(index_set_holder);
+        _fill_sub_index_set<2,0>(index_set_holder);
+        _fill_sub_index_set<2,1>(index_set_holder);
+        _fill_cell_index_set<0>(index_set_holder);
+        _fill_cell_index_set<1>(index_set_holder);
+        _fill_cell_index_set<2>(index_set_holder);
+      }
+
+    private:
+      template<int cell_dim_, int face_dim_>
+      static void _fill_sub_index_set(IndexSetHolderType& index_set_holder)
+      {
+        typedef typename Intern::FaceIndexMapping<ShapeType, cell_dim_, face_dim_> FimType;
+        typename IndexSetHolderType::template IndexSet<cell_dim_, face_dim_>::Type&
+          idx(index_set_holder.template get_index_set<cell_dim_, face_dim_>());
+
+        for(int i(0); i < Shape::FaceTraits<ShapeType, cell_dim_>::count; ++i)
         {
-          for(Index i(0); i < 8u; ++i)
+          for(int j(0); j < idx.num_indices; ++j)
           {
-            for(int j(0); j < 3; ++j)
-            {
-              vertex_set[i][j] = Coord_((i >> j) & 0x1);
-            }
+            idx[Index(i)][j] = Index(FimType::map(i, j));
           }
         }
+      }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      template<int face_dim_>
+      static void _fill_cell_index_set(IndexSetHolderType& index_set_holder)
+      {
+        typename IndexSetHolderType::template IndexSet<3, face_dim_>::Type&
+          idx(index_set_holder.template get_index_set<3, face_dim_>());
+        for(int j(0); j < idx.num_indices; ++j)
         {
-          _fill_sub_index_set<1,0>(index_set_holder);
-          _fill_sub_index_set<2,0>(index_set_holder);
-          _fill_sub_index_set<2,1>(index_set_holder);
-          _fill_cell_index_set<0>(index_set_holder);
-          _fill_cell_index_set<1>(index_set_holder);
-          _fill_cell_index_set<2>(index_set_holder);
+          idx[Index(0)][j] = Index(j);
         }
-
-      private:
-        template<int cell_dim_, int face_dim_>
-          static void _fill_sub_index_set(IndexSetHolderType& index_set_holder)
-          {
-            typedef typename Intern::FaceIndexMapping<ShapeType, cell_dim_, face_dim_> FimType;
-            typename IndexSetHolderType::template IndexSet<cell_dim_, face_dim_>::Type&
-              idx(index_set_holder.template get_index_set<cell_dim_, face_dim_>());
-
-            for(int i(0); i < Shape::FaceTraits<ShapeType, cell_dim_>::count; ++i)
-            {
-              for(int j(0); j < idx.num_indices; ++j)
-              {
-                idx[Index(i)][j] = Index(FimType::map(i, j));
-              }
-            }
-          }
-
-        template<int face_dim_>
-          static void _fill_cell_index_set(IndexSetHolderType& index_set_holder)
-          {
-            typename IndexSetHolderType::template IndexSet<3, face_dim_>::Type&
-              idx(index_set_holder.template get_index_set<3, face_dim_>());
-            for(int j(0); j < idx.num_indices; ++j)
-            {
-              idx[Index(0)][j] = Index(j);
-            }
-          }
-    };
+      }
+    }; // class UnitCubeFactory<ConformalMesh<Hypercube<3>,...>>
     /// \endcond
 
     /// \cond internal
@@ -293,55 +292,54 @@ namespace FEAT
     class UnitCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> > :
       public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
     {
-      public:
-        /// mesh type
-        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
-      private:
-        /// shape convert factory type
-        typedef ShapeConvertFactory<MeshType> FactoryType;
-        /// mesh type to convert from
-        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, Coord_> GeneratorMeshType;
+    public:
+      /// mesh type
+      typedef ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      public:
-        UnitCubeFactory() :
-          _generator_mesh(nullptr),
-          _factory(nullptr)
-        {
-          UnitCubeFactory<GeneratorMeshType> cube_factory;
-          _generator_mesh = new GeneratorMeshType(cube_factory);
-          _factory = new FactoryType(*_generator_mesh);
-        }
+    private:
+      /// shape convert factory type
+      typedef ShapeConvertFactory<MeshType> FactoryType;
+      /// mesh type to convert from
+      typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, Coord_> GeneratorMeshType;
 
-        virtual ~UnitCubeFactory()
-        {
-          delete _generator_mesh;
-          delete _factory;
-        }
+      GeneratorMeshType* _generator_mesh;
+      FactoryType* _factory;
 
-        virtual Index get_num_entities(int dim) override
-        {
-          return _factory->get_num_entities(dim);
-        }
+    public:
+      UnitCubeFactory() :
+        _generator_mesh(nullptr),
+        _factory(nullptr)
+      {
+        UnitCubeFactory<GeneratorMeshType> cube_factory;
+        _generator_mesh = new GeneratorMeshType(cube_factory);
+        _factory = new FactoryType(*_generator_mesh);
+      }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
-        {
-          _factory->fill_vertex_set(vertex_set);
-        }
+      virtual ~UnitCubeFactory()
+      {
+        delete _generator_mesh;
+        delete _factory;
+      }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
-        {
-          _factory->fill_index_sets(index_set_holder);
-        }
+      virtual Index get_num_entities(int dim) override
+      {
+        return _factory->get_num_entities(dim);
+      }
 
-      private:
-        GeneratorMeshType* _generator_mesh;
-        FactoryType* _factory;
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        _factory->fill_vertex_set(vertex_set);
+      }
 
-    };
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        _factory->fill_index_sets(index_set_holder);
+      }
+    }; // class UnitCubeFactory<ConformalMesh<Simplex<dim_>,...>>
     /// \endcond
 
 
@@ -415,155 +413,155 @@ namespace FEAT
     class RefineFactory< ConformalMesh<Shape_, num_coords_, Coord_>, Factory_ > :
       public Factory< ConformalMesh<Shape_, num_coords_, Coord_> >
     {
-      public:
-        typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
-        typedef typename MeshType::VertexSetType VertexSetType;
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+    public:
+      typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
+      typedef typename MeshType::VertexSetType VertexSetType;
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      private:
-        typedef Factory<MeshType> MeshFactory;
-        typedef Factory_<MeshType> MyFactoryType;
-        typedef StandardRefinery<MeshType> Refinery;
+    private:
+      typedef Factory<MeshType> MeshFactory;
+      typedef Factory_<MeshType> MyFactoryType;
+      typedef StandardRefinery<MeshType> Refinery;
 
-        MeshType* _coarse_mesh;
-        MeshFactory* _factory;
+      MeshType* _coarse_mesh;
+      MeshFactory* _factory;
 
-      public:
-        template<typename... Arguments>
-        explicit RefineFactory(Index num_refines, Arguments&&... args) :
-          _coarse_mesh(nullptr),
-          _factory(nullptr)
+    public:
+      template<typename... Arguments>
+      explicit RefineFactory(Index num_refines, Arguments&&... args) :
+        _coarse_mesh(nullptr),
+        _factory(nullptr)
+      {
+        if(num_refines <= 0)
         {
-          if(num_refines <= 0)
-          {
-            _factory = new MyFactoryType(std::forward<Arguments>(args)...);
-            return;
-          }
+          _factory = new MyFactoryType(std::forward<Arguments>(args)...);
+          return;
+        }
 
-          // create coarse mesh
-          MyFactoryType my_factory(std::forward<Arguments>(args)...);
-          _coarse_mesh = new MeshType(my_factory);
+        // create coarse mesh
+        MyFactoryType my_factory(std::forward<Arguments>(args)...);
+        _coarse_mesh = new MeshType(my_factory);
 
-          // create refinery
+        // create refinery
+        _factory = new Refinery(*_coarse_mesh);
+
+        // refine n-1 times;
+        for(Index i(1); i < num_refines; ++i)
+        {
+          // backup old mesh
+          MeshType* mesh_old = _coarse_mesh;
+          // refine mesh
+          _coarse_mesh = new MeshType(*_factory);
+          // delete old factory
+          delete _factory;
+          // delete old coarse mesh
+          delete mesh_old;
+          // create new factory
           _factory = new Refinery(*_coarse_mesh);
-
-          // refine n-1 times;
-          for(Index i(1); i < num_refines; ++i)
-          {
-            // backup old mesh
-            MeshType* mesh_old = _coarse_mesh;
-            // refine mesh
-            _coarse_mesh = new MeshType(*_factory);
-            // delete old factory
-            delete _factory;
-            // delete old coarse mesh
-            delete mesh_old;
-            // create new factory
-            _factory = new Refinery(*_coarse_mesh);
-          }
         }
+      }
 
-        virtual ~RefineFactory()
+      virtual ~RefineFactory()
+      {
+        if(_factory != nullptr)
         {
-          if(_factory != nullptr)
-          {
-            delete _factory;
-          }
-          if(_coarse_mesh != nullptr)
-          {
-            delete _coarse_mesh;
-          }
+          delete _factory;
         }
-
-        virtual Index get_num_entities(int dim) override
+        if(_coarse_mesh != nullptr)
         {
-          return _factory->get_num_entities(dim);
+          delete _coarse_mesh;
         }
+      }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
-        {
-          _factory->fill_vertex_set(vertex_set);
-        }
+      virtual Index get_num_entities(int dim) override
+      {
+        return _factory->get_num_entities(dim);
+      }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
-        {
-          _factory->fill_index_sets(index_set_holder);
-        }
-    };
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        _factory->fill_vertex_set(vertex_set);
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        _factory->fill_index_sets(index_set_holder);
+      }
+    }; // class RefineFactory<ConformalMesh<...>, ...>
 
     template<int shape_dim_, int num_coords_, typename Coord_, template<typename> class Factory_>
     class RefineFactory< StructuredMesh<shape_dim_, num_coords_, Coord_>, Factory_ > :
       public Factory< StructuredMesh<shape_dim_, num_coords_, Coord_> >
     {
-      public:
-        typedef StructuredMesh<shape_dim_, num_coords_, Coord_> MeshType;
-        typedef typename MeshType::VertexSetType VertexSetType;
+    public:
+      typedef StructuredMesh<shape_dim_, num_coords_, Coord_> MeshType;
+      typedef typename MeshType::VertexSetType VertexSetType;
 
-      private:
-        typedef Factory<MeshType> MeshFactory;
-        typedef Factory_<MeshType> MyFactoryType;
-        typedef StandardRefinery<MeshType> Refinery;
+    private:
+      typedef Factory<MeshType> MeshFactory;
+      typedef Factory_<MeshType> MyFactoryType;
+      typedef StandardRefinery<MeshType> Refinery;
 
-        MeshType* _coarse_mesh;
-        MeshFactory* _factory;
+      MeshType* _coarse_mesh;
+      MeshFactory* _factory;
 
-      public:
-        template<typename... Arguments>
-        explicit RefineFactory(Index num_refines, Arguments&&... args) :
-          _coarse_mesh(nullptr),
-          _factory(nullptr)
+    public:
+      template<typename... Arguments>
+      explicit RefineFactory(Index num_refines, Arguments&&... args) :
+        _coarse_mesh(nullptr),
+        _factory(nullptr)
+      {
+        if(num_refines <= 0)
         {
-          if(num_refines <= 0)
-          {
-            _factory = new MyFactoryType(std::forward<Arguments>(args)...);
-            return;
-          }
+          _factory = new MyFactoryType(std::forward<Arguments>(args)...);
+          return;
+        }
 
-          // create coarse mesh
-          MyFactoryType my_factory(std::forward<Arguments>(args)...);
-          _coarse_mesh = new MeshType(my_factory);
+        // create coarse mesh
+        MyFactoryType my_factory(std::forward<Arguments>(args)...);
+        _coarse_mesh = new MeshType(my_factory);
 
-          // create refinery
+        // create refinery
+        _factory = new Refinery(*_coarse_mesh);
+
+        // refine n-1 times;
+        for(Index i(1); i < num_refines; ++i)
+        {
+          // backup old mesh
+          MeshType* mesh_old = _coarse_mesh;
+          // refine mesh
+          _coarse_mesh = new MeshType(*_factory);
+          // delete old factory
+          delete _factory;
+          // delete old coarse mesh
+          delete mesh_old;
+          // create new factory
           _factory = new Refinery(*_coarse_mesh);
-
-          // refine n-1 times;
-          for(Index i(1); i < num_refines; ++i)
-          {
-            // backup old mesh
-            MeshType* mesh_old = _coarse_mesh;
-            // refine mesh
-            _coarse_mesh = new MeshType(*_factory);
-            // delete old factory
-            delete _factory;
-            // delete old coarse mesh
-            delete mesh_old;
-            // create new factory
-            _factory = new Refinery(*_coarse_mesh);
-          }
         }
+      }
 
-        virtual ~RefineFactory()
+      virtual ~RefineFactory()
+      {
+        if(_factory != nullptr)
         {
-          if(_factory != nullptr)
-          {
-            delete _factory;
-          }
-          if(_coarse_mesh != nullptr)
-          {
-            delete _coarse_mesh;
-          }
+          delete _factory;
         }
-
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
+        if(_coarse_mesh != nullptr)
         {
-          _factory->fill_vertex_set(vertex_set);
+          delete _coarse_mesh;
         }
+      }
 
-        virtual Index get_num_slices(int dir) override
-        {
-          return _factory->get_num_slices(dir);
-        }
-    };
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        _factory->fill_vertex_set(vertex_set);
+      }
+
+      virtual Index get_num_slices(int dir) override
+      {
+        return _factory->get_num_slices(dir);
+      }
+    }; // class RefineFactory<StructuredMesh<...>, ...>
     /// \endcond
 
     template<typename MeshType_>
@@ -614,165 +612,164 @@ namespace FEAT
     /// \cond internal
     /*
      * \brief Specialization for Hypercube<2> meshes
-     **/
+     */
     template<typename Coord_>
     class UnitStarCubeFactory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> > :
-    public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
+      public Factory< ConformalMesh<Shape::Hypercube<2>, 2, Coord_> >
     {
-      public:
-        /// shape type
-        typedef Shape::Hypercube<2> ShapeType;
-        /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+    public:
+      /// shape type
+      typedef Shape::Hypercube<2> ShapeType;
+      /// mesh type
+      typedef ConformalMesh<Shape::Hypercube<2>, 2, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      public:
-        UnitStarCubeFactory()
+    public:
+      UnitStarCubeFactory()
+      {
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        switch(dim)
         {
+          case 0:
+            return 8u;
+          case 1:
+            return 12u;
+          case 2:
+            return 5u;
+          default:
+            return 0u;
         }
+      }
 
-        virtual Index get_num_entities(int dim) override
-        {
-          switch(dim)
-          {
-            case 0:
-              return 8u;
-            case 1:
-              return 12u;
-            case 2:
-              return 5u;
-            default:
-              return 0u;
-          }
-        }
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        vertex_set[0][0] = Coord_(0);
+        vertex_set[0][1] = Coord_(0);
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
-        {
-          vertex_set[0][0] = Coord_(0);
-          vertex_set[0][1] = Coord_(0);
+        vertex_set[1][0] = Coord_(1);
+        vertex_set[1][1] = Coord_(0);
 
-          vertex_set[1][0] = Coord_(1);
-          vertex_set[1][1] = Coord_(0);
+        vertex_set[2][0] = Coord_(0);
+        vertex_set[2][1] = Coord_(1);
 
-          vertex_set[2][0] = Coord_(0);
-          vertex_set[2][1] = Coord_(1);
+        vertex_set[3][0] = Coord_(1);
+        vertex_set[3][1] = Coord_(1);
 
-          vertex_set[3][0] = Coord_(1);
-          vertex_set[3][1] = Coord_(1);
+        vertex_set[4][0] = Coord_(0.25);
+        vertex_set[4][1] = Coord_(0.25);
 
-          vertex_set[4][0] = Coord_(0.25);
-          vertex_set[4][1] = Coord_(0.25);
+        vertex_set[5][0] = Coord_(0.75);
+        vertex_set[5][1] = Coord_(0.25);
 
-          vertex_set[5][0] = Coord_(0.75);
-          vertex_set[5][1] = Coord_(0.25);
+        vertex_set[6][0] = Coord_(0.25);
+        vertex_set[6][1] = Coord_(0.75);
 
-          vertex_set[6][0] = Coord_(0.25);
-          vertex_set[6][1] = Coord_(0.75);
+        vertex_set[7][0] = Coord_(0.75);
+        vertex_set[7][1] = Coord_(0.75);
 
-          vertex_set[7][0] = Coord_(0.75);
-          vertex_set[7][1] = Coord_(0.75);
+      }
 
-        }
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        IndexSet<4>& v_q = index_set_holder.template get_index_set<2,0>();
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
-        {
-          IndexSet<4>& v_q = index_set_holder.template get_index_set<2,0>();
+        v_q(0,0) = Index(0);
+        v_q(0,1) = Index(1);
+        v_q(0,2) = Index(4);
+        v_q(0,3) = Index(5);
 
-          v_q(0,0) = Index(0);
-          v_q(0,1) = Index(1);
-          v_q(0,2) = Index(4);
-          v_q(0,3) = Index(5);
+        v_q(1,0) = Index(5);
+        v_q(1,1) = Index(1);
+        v_q(1,2) = Index(7);
+        v_q(1,3) = Index(3);
 
-          v_q(1,0) = Index(5);
-          v_q(1,1) = Index(1);
-          v_q(1,2) = Index(7);
-          v_q(1,3) = Index(3);
+        v_q(2,0) = Index(6);
+        v_q(2,1) = Index(7);
+        v_q(2,2) = Index(2);
+        v_q(2,3) = Index(3);
 
-          v_q(2,0) = Index(6);
-          v_q(2,1) = Index(7);
-          v_q(2,2) = Index(2);
-          v_q(2,3) = Index(3);
+        v_q(3,0) = Index(0);
+        v_q(3,1) = Index(4);
+        v_q(3,2) = Index(2);
+        v_q(3,3) = Index(6);
 
-          v_q(3,0) = Index(0);
-          v_q(3,1) = Index(4);
-          v_q(3,2) = Index(2);
-          v_q(3,3) = Index(6);
+        v_q(4,0) = Index(4);
+        v_q(4,1) = Index(5);
+        v_q(4,2) = Index(6);
+        v_q(4,3) = Index(7);
 
-          v_q(4,0) = Index(4);
-          v_q(4,1) = Index(5);
-          v_q(4,2) = Index(6);
-          v_q(4,3) = Index(7);
+        IndexSet<4>& e_q = index_set_holder.template get_index_set<2,1>();
 
-          IndexSet<4>& e_q = index_set_holder.template get_index_set<2,1>();
+        e_q(0,0) = Index(0);
+        e_q(0,1) = Index(4);
+        e_q(0,2) = Index(8);
+        e_q(0,3) = Index(9);
 
-          e_q(0,0) = Index(0);
-          e_q(0,1) = Index(4);
-          e_q(0,2) = Index(8);
-          e_q(0,3) = Index(9);
+        e_q(1,0) = Index(9);
+        e_q(1,1) = Index(10);
+        e_q(1,2) = Index(7);
+        e_q(1,3) = Index(3);
 
-          e_q(1,0) = Index(9);
-          e_q(1,1) = Index(10);
-          e_q(1,2) = Index(7);
-          e_q(1,3) = Index(3);
+        e_q(2,0) = Index(5);
+        e_q(2,1) = Index(1);
+        e_q(2,2) = Index(11);
+        e_q(2,3) = Index(10);
 
-          e_q(2,0) = Index(5);
-          e_q(2,1) = Index(1);
-          e_q(2,2) = Index(11);
-          e_q(2,3) = Index(10);
+        e_q(3,0) = Index(8);
+        e_q(3,1) = Index(11);
+        e_q(3,2) = Index(2);
+        e_q(3,3) = Index(6);
 
-          e_q(3,0) = Index(8);
-          e_q(3,1) = Index(11);
-          e_q(3,2) = Index(2);
-          e_q(3,3) = Index(6);
+        e_q(4,0) = Index(4);
+        e_q(4,1) = Index(5);
+        e_q(4,2) = Index(6);
+        e_q(4,3) = Index(7);
 
-          e_q(4,0) = Index(4);
-          e_q(4,1) = Index(5);
-          e_q(4,2) = Index(6);
-          e_q(4,3) = Index(7);
+        IndexSet<2>& v_e = index_set_holder.template get_index_set<1,0>();
 
-          IndexSet<2>& v_e = index_set_holder.template get_index_set<1,0>();
+        v_e(0,0) = Index(0);
+        v_e(0,1) = Index(1);
 
-          v_e(0,0) = Index(0);
-          v_e(0,1) = Index(1);
+        v_e(1,0) = Index(2);
+        v_e(1,1) = Index(3);
 
-          v_e(1,0) = Index(2);
-          v_e(1,1) = Index(3);
+        v_e(2,0) = Index(0);
+        v_e(2,1) = Index(2);
 
-          v_e(2,0) = Index(0);
-          v_e(2,1) = Index(2);
+        v_e(3,0) = Index(1);
+        v_e(3,1) = Index(3);
 
-          v_e(3,0) = Index(1);
-          v_e(3,1) = Index(3);
+        v_e(4,0) = Index(4);
+        v_e(4,1) = Index(5);
 
-          v_e(4,0) = Index(4);
-          v_e(4,1) = Index(5);
+        v_e(5,0) = Index(6);
+        v_e(5,1) = Index(7);
 
-          v_e(5,0) = Index(6);
-          v_e(5,1) = Index(7);
+        v_e(6,0) = Index(4);
+        v_e(6,1) = Index(6);
 
-          v_e(6,0) = Index(4);
-          v_e(6,1) = Index(6);
+        v_e(7,0) = Index(5);
+        v_e(7,1) = Index(7);
 
-          v_e(7,0) = Index(5);
-          v_e(7,1) = Index(7);
+        v_e(8,0) = Index(0);
+        v_e(8,1) = Index(4);
 
-          v_e(8,0) = Index(0);
-          v_e(8,1) = Index(4);
+        v_e(9,0) = Index(1);
+        v_e(9,1) = Index(5);
 
-          v_e(9,0) = Index(1);
-          v_e(9,1) = Index(5);
+        v_e(10,0) = Index(7);
+        v_e(10,1) = Index(3);
 
-          v_e(10,0) = Index(7);
-          v_e(10,1) = Index(3);
-
-          v_e(11,0) = Index(6);
-          v_e(11,1) = Index(2);
-        }
-
-    };
+        v_e(11,0) = Index(6);
+        v_e(11,1) = Index(2);
+      }
+    }; // class UnitStarCubeFactory<ConformalMesh<...>>
     /// \endcond
 
     /// \cond internal
@@ -781,65 +778,66 @@ namespace FEAT
      *
      * This uses the UnitStarCubeFactory for Hypercubes and then the ShapeConvertFactory.
      *
-     **/
+     */
     template<typename Coord_, int dim_>
     class UnitStarCubeFactory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> > :
-    public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
+      public Factory< ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> >
     {
-      public:
-        /// shape type
-        typedef Shape::Simplex<dim_> ShapeType;
-        /// mesh type
-        typedef ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
-        /// shape convert factory type
-        typedef ShapeConvertFactory<MeshType> FactoryType;
-        /// mesh type to convert from
-        typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, Coord_> GeneratorMeshType;
+    public:
+      /// shape type
+      typedef Shape::Simplex<dim_> ShapeType;
+      /// mesh type
+      typedef ConformalMesh<Shape::Simplex<dim_>, dim_, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+      /// shape convert factory type
+      typedef ShapeConvertFactory<MeshType> FactoryType;
+      /// mesh type to convert from
+      typedef ConformalMesh<Shape::Hypercube<dim_>, dim_, Coord_> GeneratorMeshType;
 
-      private:
-        GeneratorMeshType* _generator_mesh;
-        FactoryType* _factory;
+    private:
+      GeneratorMeshType* _generator_mesh;
+      FactoryType* _factory;
 
-      public:
-        UnitStarCubeFactory() :
-          _generator_mesh(nullptr),
-          _factory(nullptr)
-        {
-          UnitStarCubeFactory<GeneratorMeshType> cube_factory;
-          _generator_mesh = new GeneratorMeshType(cube_factory);
-          _factory = new FactoryType(*_generator_mesh);
-        }
+    public:
+      UnitStarCubeFactory() :
+        _generator_mesh(nullptr),
+        _factory(nullptr)
+      {
+        UnitStarCubeFactory<GeneratorMeshType> cube_factory;
+        _generator_mesh = new GeneratorMeshType(cube_factory);
+        _factory = new FactoryType(*_generator_mesh);
+      }
 
-        virtual ~UnitStarCubeFactory()
-        {
-          delete _generator_mesh;
-          delete _factory;
-        }
+      virtual ~UnitStarCubeFactory()
+      {
+        delete _generator_mesh;
+        delete _factory;
+      }
 
-        virtual Index get_num_entities(int dim) override
-        {
-          return _factory->get_num_entities(dim);
-        }
+      virtual Index get_num_entities(int dim) override
+      {
+        return _factory->get_num_entities(dim);
+      }
 
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
-        {
-          _factory->fill_vertex_set(vertex_set);
-        }
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        _factory->fill_vertex_set(vertex_set);
+      }
 
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
-        {
-          _factory->fill_index_sets(index_set_holder);
-        }
-
-    };
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        _factory->fill_index_sets(index_set_holder);
+      }
+    }; // class UnitStarCubeFactory<ConformalMesh<Simplex<dim_>, ...>>
     /// \endcond
 
     /**
      * \brief Constructs a polyline mesh
+     *
+     * This simply joins all points of a given std::deque together to a polygonal straight line graph.
      *
      * \tparam dim_
      * Dimension of the input points
@@ -848,80 +846,77 @@ namespace FEAT
      * Floating point type for mesh coordinates
      *
      * \author Jordi Paul
-     *
-     * This simply joins all points of a given std::deque together to a polygonal straight line graph.
-     *
      */
     template<int dim_, typename Coord_>
     class PolylineFactory :
-    public Factory< ConformalMesh<Shape::Hypercube<1>, dim_, Coord_> >
+      public Factory< ConformalMesh<Shape::Hypercube<1>, dim_, Coord_> >
     {
-      public:
-        /// mesh type
-        typedef ConformalMesh<Shape::Hypercube<1>, dim_, Coord_> MeshType;
-        /// vertex set type
-        typedef typename MeshType::VertexSetType VertexSetType;
-        /// index holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+    public:
+      /// mesh type
+      typedef ConformalMesh<Shape::Hypercube<1>, dim_, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
-      private:
-        /// Reference to the set of points in the polyline
-        std::deque<Tiny::Vector<Coord_, dim_>>& _points;
+    private:
+      /// Reference to the set of points in the polyline
+      std::deque<Tiny::Vector<Coord_, dim_>>& _points;
 
-      public:
+    public:
 
-        /**
-         * \brief From deque of Tiny::Vectors constructor
-         */
-        explicit PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
-          _points(points_)
+      /**
+        * \brief From deque of Tiny::Vectors constructor
+        */
+      explicit PolylineFactory(std::deque<typename VertexSetType::VertexType>& points_) :
+        _points(points_)
+      {
+        XASSERTM(!points_.empty(), "PolylineFactory constructor called on empty point set!");
+
+      }
+
+      /**
+        * \copydoc Factory::get_num_entities()
+        */
+      virtual Index get_num_entities(int dimension) override
+      {
+        switch(dimension)
         {
-          XASSERTM(!points_.empty(), "PolylineFactory constructor called on empty point set!");
-
+          case 0:
+            return Index(_points.size());
+          case 1:
+            return Index(_points.size())-Index(1);
+          default:
+            return 0;
         }
+      }
 
-        /**
-         * \copydoc Factory::get_num_entities()
-         */
-        virtual Index get_num_entities(int dimension) override
+      /**
+       * \copydoc Factory::fill_vertex_set()
+       */
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        Index i(0);
+        const auto& jt(_points.end());
+        for(auto it(_points.begin()); it != jt; ++i)
         {
-          switch(dimension)
-          {
-            case 0:
-              return Index(_points.size());
-            case 1:
-              return Index(_points.size())-Index(1);
-            default:
-              return 0;
-          }
+          vertex_set[i] = *it;
+          it++;
         }
+      }
 
-        /**
-         * \copydoc Factory::fill_vertex_set()
-         */
-        virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      /**
+       * \copydoc Factory::fill_index_sets()
+       */
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
+        for(Index i(0); i < get_num_entities(1); ++i)
         {
-          Index i(0);
-          const auto& jt(_points.end());
-          for(auto it(_points.begin()); it != jt; ++i)
-          {
-            vertex_set[i] = *it;
-            it++;
-          }
+          v_e[i][0] = i;
+          v_e[i][1] = i + Index(1);
         }
-
-        /**
-         * \copydoc Factory::fill_index_sets()
-         */
-        virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
-        {
-          IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
-          for(Index i(0); i < get_num_entities(1); ++i)
-          {
-            v_e[i][0] = i;
-            v_e[i][1] = i + Index(1);
-          }
-        }
+      }
     };
 
     template<typename Mesh_>

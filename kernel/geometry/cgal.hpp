@@ -27,13 +27,13 @@ namespace FEAT
      */
     class CGALWrapper
     {
-      private:
+    private:
       void * _cgal_data;
 
       /// read in stream in off file format and preprocess search tree for in/out test
       void _parse_off_data(std::istream & file);
 
-      public:
+    public:
       /// Create a new CGALWrapper Instance and open the provided off file.
       CGALWrapper(String filename);
 

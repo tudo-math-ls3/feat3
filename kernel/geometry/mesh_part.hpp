@@ -88,176 +88,209 @@ namespace FEAT
     template<typename MeshType_>
     class MeshPart
     {
-      public:
-        /// parent Mesh type
-        typedef MeshType_ MeshType;
-        /// Shape type
-        typedef typename MeshType::ShapeType ShapeType;
-        /// Topology (aka IndexSetHolder) of parent mesh type
-        typedef typename MeshType::IndexSetHolderType ParentIndexSetHolderType;
-        /// Index set holder type
-        typedef IndexSetHolder<ShapeType> IndexSetHolderType;
-        /// Target set holder type
-        typedef TargetSetHolder<ShapeType> TargetSetHolderType;
-        /// Shape dimension
-        static constexpr int shape_dim = ShapeType::dimension;
+    public:
+      /// parent Mesh type
+      typedef MeshType_ MeshType;
+      /// Shape type
+      typedef typename MeshType::ShapeType ShapeType;
+      /// Topology (aka IndexSetHolder) of parent mesh type
+      typedef typename MeshType::IndexSetHolderType ParentIndexSetHolderType;
+      /// Index set holder type
+      typedef IndexSetHolder<ShapeType> IndexSetHolderType;
+      /// Target set holder type
+      typedef TargetSetHolder<ShapeType> TargetSetHolderType;
+      /// Shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
-        /**
-         * \brief Index set type class template
-         *
-         * This nested class template is used to define the return type of the ConformalMesh::get_index_set()
-         * function template.
-         *
-         * \tparam cell_dim_, face_dim_
-         * The cell and face dimension parameters as passed to the ConformalMesh::get_index_set() function template.
-         */
-        template<int cell_dim_, int face_dim_>
-        struct IndexSet
-        {
-          static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
-          static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
-          static_assert(face_dim_ >= 0, "invalid face dimension");
+      /**
+       * \brief Index set type class template
+       *
+       * This nested class template is used to define the return type of the ConformalMesh::get_index_set()
+       * function template.
+       *
+       * \tparam cell_dim_, face_dim_
+       * The cell and face dimension parameters as passed to the ConformalMesh::get_index_set() function template.
+       */
+      template<int cell_dim_, int face_dim_>
+      struct IndexSet
+      {
+        static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
+        static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
+        static_assert(face_dim_ >= 0, "invalid face dimension");
 
-          /// Index set type
-          typedef FEAT::Geometry::IndexSet
+        /// Index set type
+        typedef FEAT::Geometry::IndexSet
+        <
+          Shape::FaceTraits
           <
-            Shape::FaceTraits
-            <
-              typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType,
-              face_dim_
-            >::count
-          > Type;
-        }; // struct IndexSet<...>
+            typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType,
+            face_dim_
+          >::count
+        > Type;
+      }; // struct IndexSet<...>
 
-        /// Data type for attributes
-        typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
-        /// Type for mesh attributes
-        typedef AttributeSet<AttributeDataType> AttributeSetType;
+      /// Data type for attributes
+      typedef typename MeshType::VertexSetType::CoordType AttributeDataType;
+      /// Type for mesh attributes
+      typedef AttributeSet<AttributeDataType> AttributeSetType;
 
-        /// submesh node bin container type
-        typedef std::map<String, AttributeSetType*> AttributeSetContainer;
-        /// submesh node iterator type
-        typedef typename AttributeSetContainer::iterator AttributeSetIterator;
-        /// submesh node const-iterator type
-        typedef typename AttributeSetContainer::const_iterator AttributeSetConstIterator;
-        /// submesh node reverse-iterator type
-        typedef typename AttributeSetContainer::reverse_iterator AttributeSetReverseIterator;
+      /// submesh node bin container type
+      typedef std::map<String, AttributeSetType*> AttributeSetContainer;
+      /// submesh node iterator type
+      typedef typename AttributeSetContainer::iterator AttributeSetIterator;
+      /// submesh node const-iterator type
+      typedef typename AttributeSetContainer::const_iterator AttributeSetConstIterator;
+      /// submesh node reverse-iterator type
+      typedef typename AttributeSetContainer::reverse_iterator AttributeSetReverseIterator;
 
-        /**
-         * \brief Target set type class template.
-         *
-         * This nested class template is used to define the return type of the MeshPart::get_target_set()
-         * function template.
-         *
-         * \tparam cell_dim_
-         * The cell dimension parameter as passed to the MeshPart::get_target_set() function template.
-         */
-        template<int cell_dim_>
-        struct TargetSet
+      /**
+       * \brief Target set type class template.
+       *
+       * This nested class template is used to define the return type of the MeshPart::get_target_set()
+       * function template.
+       *
+       * \tparam cell_dim_
+       * The cell dimension parameter as passed to the MeshPart::get_target_set() function template.
+       */
+      template<int cell_dim_>
+      struct TargetSet
+      {
+        /// Target set type
+        typedef FEAT::Geometry::TargetSet Type;
+      }; // struct TargetSet<...>
+
+    protected:
+      /// Number of entities for each shape dimension
+      Index _num_entities[shape_dim + 1];
+      /// The index sets of the mesh
+      IndexSetHolderType* _index_set_holder;
+      /// The target sets of the mesh.
+      TargetSetHolderType _target_set_holder;
+      /// The attribute sets of the mesh
+      AttributeSetContainer _mesh_attributes;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] num_entities
+       * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
+       * Must not be \c nullptr.
+       *
+       * \param[in] create_topology
+       * Determines if the MeshPart is to have a mesh topology.
+       */
+      explicit MeshPart(const Index num_entities[], bool create_topology = false) :
+        _index_set_holder(nullptr),
+        _target_set_holder(num_entities),
+        _mesh_attributes()
+      {
+        for(int i(0); i <= shape_dim; ++i)
+          _num_entities[i] = num_entities[i];
+
+        if(create_topology)
+          _index_set_holder = new IndexSetHolderType(num_entities);
+      }
+
+      /**
+       * \brief Factory constructor
+       *
+       * \param[in] factory
+       * A \transient reference to the factory that is to be used to create the mesh part.
+       */
+      explicit MeshPart(Factory<MeshPart>& factory) :
+        _index_set_holder(nullptr),
+        _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
+        _mesh_attributes()
+      {
+        // Compute entity counts
+        Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
+
+        // Fill target sets
+        factory.fill_target_sets(_target_set_holder);
+
+        // Fill index sets
+        factory.fill_index_sets(_index_set_holder);
+
+        // Fill attribute sets
+        factory.fill_attribute_sets(_mesh_attributes);
+      }
+
+      /// move constructor
+      MeshPart(MeshPart&& other) :
+        _index_set_holder(other._index_set_holder),
+        _target_set_holder(std::forward<TargetSetHolderType>(other._target_set_holder)),
+        _mesh_attributes(std::forward<AttributeSetContainer>(other._mesh_attributes))
+      {
+        for(int i(0); i <= shape_dim; ++i)
         {
-          /// Target set type
-          typedef FEAT::Geometry::TargetSet Type;
-        }; // struct TargetSet<...>
-
-      protected:
-        /// Number of entities for each shape dimension
-        Index _num_entities[shape_dim + 1];
-        /// The index sets of the mesh
-        IndexSetHolderType* _index_set_holder;
-        /// The target sets of the mesh.
-        TargetSetHolderType _target_set_holder;
-        /// The attribute sets of the mesh
-        AttributeSetContainer _mesh_attributes;
-
-      public:
-        /**
-         * \brief Constructor
-         *
-         * \param[in] num_entities
-         * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
-         * Must not be \c nullptr.
-         *
-         * \param[in] create_topology
-         * Determines if the MeshPart is to have a mesh topology.
-         */
-        explicit MeshPart(const Index num_entities[], bool create_topology = false) :
-          _index_set_holder(nullptr),
-          _target_set_holder(num_entities),
-          _mesh_attributes()
-        {
-          for(int i(0); i <= shape_dim; ++i)
-            _num_entities[i] = num_entities[i];
-
-          if(create_topology)
-            _index_set_holder = new IndexSetHolderType(num_entities);
+          _num_entities[i] = other._num_entities[i];
         }
+        other._index_set_holder = nullptr;
+      }
 
-        /**
-         * \brief Factory constructor
-         *
-         * \param[in] factory
-         * A \transient reference to the factory that is to be used to create the mesh part.
-         */
-        explicit MeshPart(Factory<MeshPart>& factory) :
-          _index_set_holder(nullptr),
-          _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
-          _mesh_attributes()
-        {
-          // Compute entity counts
-          Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
-
-          // Fill target sets
-          factory.fill_target_sets(_target_set_holder);
-
-          // Fill index sets
-          factory.fill_index_sets(_index_set_holder);
-
-          // Fill attribute sets
-          factory.fill_attribute_sets(_mesh_attributes);
-        }
-
-        /// move constructor
-        MeshPart(MeshPart&& other) :
-          _index_set_holder(other._index_set_holder),
-          _target_set_holder(std::forward<TargetSetHolderType>(other._target_set_holder)),
-          _mesh_attributes(std::forward<AttributeSetContainer>(other._mesh_attributes))
-        {
-          for(int i(0); i <= shape_dim; ++i)
-          {
-            _num_entities[i] = other._num_entities[i];
-          }
-          other._index_set_holder = nullptr;
-        }
-
-        /// move-assignment operator
-        MeshPart& operator=(MeshPart&& other)
-        {
-          // avoid self-move
-          if(this == &other)
-            return *this;
-
-          if(_index_set_holder != nullptr)
-            delete _index_set_holder;
-
-          _index_set_holder = other._index_set_holder;
-          _target_set_holder = std::forward<TargetSetHolderType>(other._target_set_holder);
-          _mesh_attributes = std::forward<AttributeSetContainer>(other._mesh_attributes);
-          for(int i(0); i <= shape_dim; ++i)
-          {
-            _num_entities[i] = other._num_entities[i];
-          }
-          other._index_set_holder = nullptr;
-
+      /// move-assignment operator
+      MeshPart& operator=(MeshPart&& other)
+      {
+        // avoid self-move
+        if(this == &other)
           return *this;
-        }
 
-        /// Virtual destructor
-        virtual ~MeshPart()
+        if(_index_set_holder != nullptr)
+          delete _index_set_holder;
+
+        _index_set_holder = other._index_set_holder;
+        _target_set_holder = std::forward<TargetSetHolderType>(other._target_set_holder);
+        _mesh_attributes = std::forward<AttributeSetContainer>(other._mesh_attributes);
+        for(int i(0); i <= shape_dim; ++i)
         {
-          if(_index_set_holder != nullptr)
-            delete _index_set_holder;
+          _num_entities[i] = other._num_entities[i];
+        }
+        other._index_set_holder = nullptr;
 
-          // Loop over all mesh attributes in reverse order and delete them
+        return *this;
+      }
+
+      /// Virtual destructor
+      virtual ~MeshPart()
+      {
+        if(_index_set_holder != nullptr)
+          delete _index_set_holder;
+
+        // Loop over all mesh attributes in reverse order and delete them
+        AttributeSetReverseIterator it(_mesh_attributes.rbegin());
+        AttributeSetReverseIterator jt(_mesh_attributes.rend());
+        for(; it != jt; ++it)
+        {
+          if(it->second != nullptr)
+            delete it->second;
+        }
+      }
+
+      /**
+       * \brief Clones another mesh part object into \c this object.
+       *
+       * \param[in] other
+       * A \transient reference to the source object that is to be cloned into \c this object.
+       */
+      void clone(const MeshPart& other)
+      {
+        for(int d(0); d <= shape_dim; ++d)
+          this->_num_entities[d] = other._num_entities[d];
+        if(other._index_set_holder != nullptr)
+        {
+          if(this->_index_set_holder == nullptr)
+            this->_index_set_holder->clone(*other._index_set_holder);
+          else
+            this->_index_set_holder = new IndexSetHolderType(other._index_set_holder->clone());
+        }
+        else if(this->_index_set_holder != nullptr)
+        {
+          delete this->_index_set_holder;
+          this->_index_set_holder = nullptr;
+        }
+        this->_target_set_holder.clone(other._target_set_holder);
+        {
           AttributeSetReverseIterator it(_mesh_attributes.rbegin());
           AttributeSetReverseIterator jt(_mesh_attributes.rend());
           for(; it != jt; ++it)
@@ -266,337 +299,303 @@ namespace FEAT
               delete it->second;
           }
         }
+        for(auto it = other._mesh_attributes.begin(); it != other._mesh_attributes.end(); ++it)
+          this->add_attribute(new AttributeSetType(it->second->clone()), it->first);
+      }
 
-        /**
-         * \brief Clones another mesh part object into \c this object.
-         *
-         * \param[in] other
-         * A \transient reference to the source object that is to be cloned into \c this object.
-         */
-        void clone(const MeshPart& other)
+      /// \returns An independent clone of \c this mesh part object.
+      MeshPart clone() const
+      {
+        MeshPart mp(this->_num_entities, this->_index_set_holder != nullptr);
+        if(this->_index_set_holder != nullptr)
+          mp._index_set_holder->clone(*this->_index_set_holder);
+        mp._target_set_holder.clone(this->_target_set_holder);
+        for(auto it = this->_mesh_attributes.begin(); it != this->_mesh_attributes.end(); ++it)
+          mp.add_attribute(new AttributeSetType(it->second->clone()), it->first);
+        return mp;
+      }
+
+      /// \returns The size of dynamically allocated memory in bytes.
+      std::size_t bytes() const
+      {
+        std::size_t my_bytes(0);
+
+        for(const auto& it : _mesh_attributes)
         {
-          for(int d(0); d <= shape_dim; ++d)
-            this->_num_entities[d] = other._num_entities[d];
-          if(other._index_set_holder != nullptr)
-          {
-            if(this->_index_set_holder == nullptr)
-              this->_index_set_holder->clone(*other._index_set_holder);
-            else
-              this->_index_set_holder = new IndexSetHolderType(other._index_set_holder->clone());
-          }
-          else if(this->_index_set_holder != nullptr)
-          {
-            delete this->_index_set_holder;
-            this->_index_set_holder = nullptr;
-          }
-          this->_target_set_holder.clone(other._target_set_holder);
-          {
-            AttributeSetReverseIterator it(_mesh_attributes.rbegin());
-            AttributeSetReverseIterator jt(_mesh_attributes.rend());
-            for(; it != jt; ++it)
-            {
-              if(it->second != nullptr)
-                delete it->second;
-            }
-          }
-          for(auto it = other._mesh_attributes.begin(); it != other._mesh_attributes.end(); ++it)
-            this->add_attribute(new AttributeSetType(it->second->clone()), it->first);
+          if(it.second != nullptr)
+            my_bytes += it.second->bytes();
         }
 
-        /// \returns An independent clone of \c this mesh part object.
-        MeshPart clone() const
+        my_bytes += _target_set_holder.bytes();
+        my_bytes +=(_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
+
+        return my_bytes;
+      }
+
+      /// \brief Checks if this MeshPart has a mesh topology
+      bool has_topology() const
+      {
+        return (_index_set_holder != nullptr);
+      }
+
+      /**
+       * \brief Returns the number of entities.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      Index get_num_entities(int dim) const
+      {
+        XASSERT(dim >= 0);
+        XASSERT(dim <= shape_dim);
+        return _num_entities[dim];
+      }
+
+      /**
+       * \brief Finds an Attribute by its identifier String and returns a pointer to it
+       *
+       * \param[in] identifier
+       * Identifier to match.
+       *
+       * \returns A pointer to the Attribute of shape dimension dim if present.
+       *
+       * \warning Will return nullptr if no Attribute with the given identifier is found
+       */
+      AttributeSetType* find_attribute(const String& identifier)
+      {
+        AttributeSetIterator it(_mesh_attributes.find(identifier));
+        return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
+      }
+
+      /** \copydoc find_attribute() */
+      const AttributeSetType* find_attribute(const String& identifier) const
+      {
+        AttributeSetConstIterator it(_mesh_attributes.find(identifier));
+        return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
+      }
+
+      /**
+       * \brief Returns a const reference to the mesh attributes container
+       *
+       * \returns A const reference to the mesh attributes container
+       */
+      const AttributeSetContainer& get_mesh_attributes() const
+      {
+        return _mesh_attributes;
+      }
+
+      /**
+       * \brief Returns the total number of Attributes in this MeshPart
+       *
+       * \returns The total number of Attributes.
+       */
+      int get_num_attributes() const
+      {
+        return int(_mesh_attributes.size());
+      }
+
+      /**
+       * \brief Copies one attribute to this MeshPart's AttributeHolder
+       *
+       * \param[in] attribute
+       * A \resident pointer to the Attribute to be added.
+       *
+       * \param[in] identifier
+       * Identifier for the map.
+       *
+       * \returns
+       * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
+       * present, or false otherwise.
+       */
+      virtual bool add_attribute(AttributeSetType* attribute, const String& identifier)
+      {
+        if(attribute != nullptr || (attribute->get_num_values() != get_num_entities(0)) )
         {
-          MeshPart mp(this->_num_entities, this->_index_set_holder != nullptr);
-          if(this->_index_set_holder != nullptr)
-            mp._index_set_holder->clone(*this->_index_set_holder);
-          mp._target_set_holder.clone(this->_target_set_holder);
-          for(auto it = this->_mesh_attributes.begin(); it != this->_mesh_attributes.end(); ++it)
-            mp.add_attribute(new AttributeSetType(it->second->clone()), it->first);
-          return mp;
+          return (_mesh_attributes.insert( std::make_pair(identifier, attribute))).second;
         }
 
-        /// \returns The size of dynamically allocated memory in bytes.
-        std::size_t bytes() const
-        {
-          std::size_t my_bytes(0);
+        return false;
+      }
 
-          for(const auto& it : _mesh_attributes)
-          {
-            if(it.second != nullptr)
-              my_bytes += it.second->bytes();
-          }
+      /**
+       * \brief Returns the reference to an index set.
+       *
+       * \tparam cell_dim_
+       * The dimension of the entity whose index set is to be returned.
+       *
+       * \tparam face_dim_
+       * The dimension of the face that the index set refers to.
+       *
+       * \returns
+       * A reference to the index set.
+       */
+      template<int cell_dim_, int face_dim_>
+      typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set()
+      {
+        return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
+      }
 
-          my_bytes += _target_set_holder.bytes();
-          my_bytes +=(_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
+      /** \copydoc get_index_set() */
+      template<int cell_dim_, int face_dim_>
+      const typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set() const
+      {
+        XASSERTM(has_topology(), "Requested index_set of MeshPart without topology!");
+        return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
+      }
 
-          return my_bytes;
-        }
+      /// \cond internal
 
-        /// \brief Checks if this MeshPart has a mesh topology
-        bool has_topology() const
-        {
-          return (_index_set_holder != nullptr);
-        }
+      /// Returns a reference to the index set holder of the mesh.
+      IndexSetHolderType* get_topology()
+      {
+        return _index_set_holder;
+      }
 
-        /**
-         * \brief Returns the number of entities.
-         *
-         * \param[in] dim
-         * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
-         *
-         * \returns
-         * The number of entities of dimension \p dim.
-         */
-        Index get_num_entities(int dim) const
-        {
-          XASSERT(dim >= 0);
-          XASSERT(dim <= shape_dim);
-          return _num_entities[dim];
-        }
+      /// \copydoc get_topology()
+      const IndexSetHolderType* get_topology() const
+      {
+        return _index_set_holder;
+      }
+      /// \endcond
 
-        /**
-         * \brief Finds an Attribute by its identifier String and returns a pointer to it
-         *
-         * \param[in] identifier
-         * Identifier to match.
-         *
-         * \returns A pointer to the Attribute of shape dimension dim if present.
-         *
-         * \warning Will return nullptr if no Attribute with the given identifier is found
-         */
-        AttributeSetType* find_attribute(const String& identifier)
-        {
-          AttributeSetIterator it(_mesh_attributes.find(identifier));
-          return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
-        }
+      /**
+       * \brief Return the reference to a target set.
+       *
+       * \tparam cell_dim_
+       * The dimension of the entity whose target set is to be returned.
+       *
+       * \returns
+       * A reference to the target set.
+       */
+      template<int cell_dim_>
+      typename TargetSet<cell_dim_>::Type& get_target_set()
+      {
+        static_assert(cell_dim_ >= 0, "invalid cell dimension");
+        static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
+        return _target_set_holder.template get_target_set<cell_dim_>();
+      }
 
-        /** \copydoc find_attribute() */
-        const AttributeSetType* find_attribute(const String& identifier) const
-        {
-          AttributeSetConstIterator it(_mesh_attributes.find(identifier));
-          return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
-        }
+      /** \copydoc get_target_set() */
+      template<int cell_dim_>
+      const typename TargetSet<cell_dim_>::Type& get_target_set() const
+      {
+        static_assert(cell_dim_ >= 0, "invalid cell dimension");
+        static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
+        return _target_set_holder.template get_target_set<cell_dim_>();
+      }
 
-        /**
-         * \brief Returns a const reference to the mesh attributes container
-         *
-         * \returns A const reference to the mesh attributes container
-         */
-        const AttributeSetContainer& get_mesh_attributes() const
-        {
-          return _mesh_attributes;
-        }
+      /**
+       * \cond internal
+       *
+       * Returns a reference to the target set holder of the mesh.
+       */
+      TargetSetHolderType& get_target_set_holder()
+      {
+        return _target_set_holder;
+      }
 
-        /**
-         * \brief Returns the total number of Attributes in this MeshPart
-         *
-         * \returns The total number of Attributes.
-         */
-        int get_num_attributes() const
-        {
-          return int(_mesh_attributes.size());
-        }
+      /// \copydoc get_target_set_holder()
+      const TargetSetHolderType& get_target_set_holder() const
+      {
+        return _target_set_holder;
+      }
+      /// \endcond
 
-        /**
-         * \brief Copies one attribute to this MeshPart's AttributeHolder
-         *
-         * \param[in] attribute
-         * A \resident pointer to the Attribute to be added.
-         *
-         * \param[in] identifier
-         * Identifier for the map.
-         *
-         * \returns
-         * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
-         * present, or false otherwise.
-         */
-        virtual bool add_attribute(AttributeSetType* attribute, const String& identifier)
-        {
-          if(attribute != nullptr || (attribute->get_num_values() != get_num_entities(0)) )
-          {
-            return (_mesh_attributes.insert( std::make_pair(identifier, attribute))).second;
-          }
+      /**
+       * \brief Returns the name of the class.
+       *
+       * \returns
+       * The name of the class as a String.
+       */
+      static String name()
+      {
+        return "MeshPart<...>";
+      }
 
-          return false;
-        }
+      /**
+       * \brief Applies a mesh permutation onto this mesh part's target sets.
+       *
+       * \param[in] mesh_perm
+       * A \transient reference to the mesh permutation that is to be applied.
+       */
+      void permute(const MeshPermutation<ShapeType>& mesh_perm)
+      {
+        this->_target_set_holder.permute_map(mesh_perm.get_inv_perms());
+      }
 
-        /**
-         * \brief Returns the reference to an index set.
-         *
-         * \tparam cell_dim_
-         * The dimension of the entity whose index set is to be returned.
-         *
-         * \tparam face_dim_
-         * The dimension of the face that the index set refers to.
-         *
-         * \returns
-         * A reference to the index set.
-         */
-        template<int cell_dim_, int face_dim_>
-        typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set()
-        {
-          return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
-        }
+      /**
+       * \brief Deducts the target sets from bottom to top
+       *
+       * \tparam end_dim_
+       * Dimension to stop at (meaning the lowest dimension).
+       *
+       * \tparam current_dim_
+       * Dimension to generate parent information for.
+       *
+       * \param[in] parent_ish
+       * A \transient reference to the topology of the parent this MeshPart refers to.
+       *
+       * \warning This will in general change the implied topology of the MeshPart and is meant
+       * to be used in mesh preprocessing only.
+       */
+      template<int end_dim_, int current_dim_ = ShapeType::dimension>
+      void deduct_target_sets_from_bottom(const ParentIndexSetHolderType& parent_ish)
+      {
+        Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_ish);
 
-        /** \copydoc get_index_set() */
-        template<int cell_dim_, int face_dim_>
-        const typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set() const
-        {
-          XASSERTM(has_topology(), "Requested index_set of MeshPart without topology!");
-          return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
-        }
+        // Update num_entities information from the possibly modified _target_set_holder
+        for(int i(end_dim_); i <= current_dim_; ++i)
+          _num_entities[i] = _target_set_holder.get_num_entities(i);
+      }
 
-        /// \cond internal
+      /**
+       * \brief Deducts the target sets from top to bottom
+       *
+       * \tparam end_dim_
+       * Dimension to stop at (meaning the highest dimension).
+       *
+       * \tparam current_dim_
+       * Dimension to generate parent information for.
+       *
+       * \param[in] parent_ish
+       * A \transient reference to the topology of the parent this MeshPart refers to.
+       *
+       * \warning This will in general change the implied topology of the MeshPart and is meant
+       * to be used in mesh preprocessing only.
+       */
+      template<int end_dim_, int current_dim_ = 0>
+      void deduct_target_sets_from_top(const ParentIndexSetHolderType& parent_ish)
+      {
+        Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_ish);
 
-        /// Returns a reference to the index set holder of the mesh.
-        IndexSetHolderType* get_topology()
-        {
-          return _index_set_holder;
-        }
+        // Update num_entities information from the possibly modified _target_set_holder
+        for(int i(current_dim_); i <= end_dim_; ++i)
+          _num_entities[i] = _target_set_holder.get_num_entities(i);
+      }
 
-        /// \copydoc get_topology()
-        const IndexSetHolderType* get_topology() const
-        {
-          return _index_set_holder;
-        }
-        /// \endcond
+      /**
+       * \brief Fills the mesh topology from parent information
+       *
+       * \param[in] parent_ish
+       * A \transient reference to the IndexSetHolder of the parent this MeshPart refers to.
+       *
+       * \warning This will in general change the implied topology of the MeshPart and is meant
+       * to be used in mesh preprocessing only.
+       */
+      void deduct_topology(const ParentIndexSetHolderType& parent_ish)
+      {
+        if(_index_set_holder == nullptr)
+          _index_set_holder = new IndexSetHolderType(_num_entities);
 
-        /**
-         * \brief Return the reference to a target set.
-         *
-         * \tparam cell_dim_
-         * The dimension fo the entity whose target set is to be returned.
-         *
-         * \returns
-         * A reference to the target set.
-         */
-        template<int cell_dim_>
-        typename TargetSet<cell_dim_>::Type& get_target_set()
-        {
-          static_assert(cell_dim_ >= 0, "invalid cell dimension");
-          static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
-          return _target_set_holder.template get_target_set<cell_dim_>();
-        }
+        Intern::IndexSetFiller<ShapeType::dimension>::fill_ish(
+          *_index_set_holder, _target_set_holder, parent_ish);
 
-        /** \copydoc get_target_set() */
-        template<int cell_dim_>
-        const typename TargetSet<cell_dim_>::Type& get_target_set() const
-        {
-          static_assert(cell_dim_ >= 0, "invalid cell dimension");
-          static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
-          return _target_set_holder.template get_target_set<cell_dim_>();
-        }
-
-        /**
-         * \cond internal
-         *
-         * Returns a reference to the target set holder of the mesh.
-         */
-        TargetSetHolderType& get_target_set_holder()
-        {
-          return _target_set_holder;
-        }
-
-        /// \copydoc get_target_set_holder()
-        const TargetSetHolderType& get_target_set_holder() const
-        {
-          return _target_set_holder;
-        }
-        /// \endcond
-
-        /**
-         * \brief Returns the name of the class.
-         *
-         * \returns
-         * The name of the class as a String.
-         */
-        static String name()
-        {
-          return "MeshPart<...>";
-        }
-
-        /**
-         * \brief Applies a mesh permutation onto this mesh part's target sets.
-         *
-         * \param[in] mesh_perm
-         * A \transient reference to the mesh permutation that is to be applied.
-         */
-        void permute(const MeshPermutation<ShapeType>& mesh_perm)
-        {
-          this->_target_set_holder.permute_map(mesh_perm.get_inv_perms());
-        }
-
-        /**
-         * \brief Deducts the target sets from bottom to top
-         *
-         * \tparam end_dim_
-         * Dimension to stop at (meaning the lowest dimension).
-         *
-         * \tparam current_dim_
-         * Dimension to generate parent information for.
-         *
-         * \param[in] parent_ish
-         * A \transient reference to the topology of the parent this MeshPart refers to.
-         *
-         * \warning This will in general change the implied topology of the MeshPart and is meant
-         * to be used in mesh preprocessing only.
-         */
-        template<int end_dim_, int current_dim_ = ShapeType::dimension>
-        void deduct_target_sets_from_bottom(const ParentIndexSetHolderType& parent_ish)
-        {
-          Intern::template TargetSetComputer<end_dim_, current_dim_>::bottom_to_top(_target_set_holder, parent_ish);
-
-          // Update num_entities information from the possibly modified _target_set_holder
-          for(int i(end_dim_); i <= current_dim_; ++i)
-            _num_entities[i] = _target_set_holder.get_num_entities(i);
-        }
-
-        /**
-         * \brief Deducts the target sets from top to bottom
-         *
-         * \tparam end_dim_
-         * Dimension to stop at (meaning the highest dimension).
-         *
-         * \tparam current_dim_
-         * Dimension to generate parent information for.
-         *
-         * \param[in] parent_ish
-         * A \transient reference to the topology of the parent this MeshPart refers to.
-         *
-         * \warning This will in general change the implied topology of the MeshPart and is meant
-         * to be used in mesh preprocessing only.
-         */
-        template<int end_dim_, int current_dim_ = 0>
-        void deduct_target_sets_from_top(const ParentIndexSetHolderType& parent_ish)
-        {
-          Intern::template TargetSetComputer<end_dim_, current_dim_>::top_to_bottom(_target_set_holder, parent_ish);
-
-          // Update num_entities information from the possibly modified _target_set_holder
-          for(int i(current_dim_); i <= end_dim_; ++i)
-            _num_entities[i] = _target_set_holder.get_num_entities(i);
-        }
-
-        /**
-         * \brief Fills the mesh topology from parent information
-         *
-         * \param[in] parent_ish
-         * A \transient reference to the IndexSetHolder of the parent this MeshPart refers to.
-         *
-         * \warning This will in general change the implied topology of the MeshPart and is meant
-         * to be used in mesh preprocessing only.
-         */
-        void deduct_topology(const ParentIndexSetHolderType& parent_ish)
-        {
-          if(_index_set_holder == nullptr)
-            _index_set_holder = new IndexSetHolderType(_num_entities);
-
-          Intern::IndexSetFiller<ShapeType::dimension>::fill_ish(
-            *_index_set_holder, _target_set_holder, parent_ish);
-
-          // build redundant index sets
-          RedundantIndexSetBuilder<ShapeType>::compute(*_index_set_holder);
-
-        }
+        // build redundant index sets
+        RedundantIndexSetBuilder<ShapeType>::compute(*_index_set_holder);
+      }
     }; // class MeshPart<ConformalMesh<Shape_>>
 
     /**
@@ -607,61 +606,60 @@ namespace FEAT
     template<typename MeshType_>
     class Factory< MeshPart<MeshType_> >
     {
-      public:
-        /// The shape type of the mesh
-        typedef typename MeshType_::ShapeType ShapeType;
-        /// Mesh typedef
-        typedef MeshPart<MeshType_> MeshPartType;
-        /// Data type for attributes
-        typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
-        /// Mesh attribute holder type
-        typedef typename MeshPartType::AttributeSetContainer AttributeSetContainer;
-        /// index set holder type
-        typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
-        /// target set holder type
-        typedef typename MeshPartType::TargetSetHolderType TargetSetHolderType;
+    public:
+      /// The shape type of the mesh
+      typedef typename MeshType_::ShapeType ShapeType;
+      /// Mesh typedef
+      typedef MeshPart<MeshType_> MeshPartType;
+      /// Data type for attributes
+      typedef typename MeshType_::VertexSetType::CoordType AttributeDataType;
+      /// Mesh attribute holder type
+      typedef typename MeshPartType::AttributeSetContainer AttributeSetContainer;
+      /// index set holder type
+      typedef typename MeshPartType::IndexSetHolderType IndexSetHolderType;
+      /// target set holder type
+      typedef typename MeshPartType::TargetSetHolderType TargetSetHolderType;
 
-      public:
-        /// virtual destructor
-        virtual ~Factory()
-        {
-        }
+    public:
+      /// virtual destructor
+      virtual ~Factory()
+      {
+      }
 
-        /**
-         * \brief Returns the number of entities.
-         *
-         * \param[in] dim
-         * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
-         *
-         * \returns
-         * The number of entities of dimension \p dim.
-         */
-        virtual Index get_num_entities(int dim) = 0;
+      /**
+       * \brief Returns the number of entities.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      virtual Index get_num_entities(int dim) = 0;
 
-        /**
-         * \brief Fills the attribute sets.
-         *
-         * \param[in,out] attribute_set_holder
-         * A \transient reference to the attribute set holder whose attribute sets are to be filled.
-         */
-        virtual void fill_attribute_sets(AttributeSetContainer& attribute_set_holder) = 0;
+      /**
+       * \brief Fills the attribute sets.
+       *
+       * \param[in,out] attribute_set_holder
+       * A \transient reference to the attribute set holder whose attribute sets are to be filled.
+       */
+      virtual void fill_attribute_sets(AttributeSetContainer& attribute_set_holder) = 0;
 
-        /**
-         * \brief Fills the index sets.
-         *
-         * \param[in,out] index_set_holder
-         * A \transient reference to the index set holder whose index sets are to be filled.
-         */
-        virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) = 0;
+      /**
+       * \brief Fills the index sets.
+       *
+       * \param[in,out] index_set_holder
+       * A \transient reference to the index set holder whose index sets are to be filled.
+       */
+      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) = 0;
 
-        /**
-         * \brief Fills the target sets.
-         *
-         * \param[in,out] target_set_holder
-         * A \transient reference to the target set holder whose target sets are to be filled.
-         */
-        virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
-
+      /**
+       * \brief Fills the target sets.
+       *
+       * \param[in,out] target_set_holder
+       * A \transient reference to the target set holder whose target sets are to be filled.
+       */
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
     }; // class Factory<MeshPart<...>>
 
     /// \cond internal
@@ -682,187 +680,187 @@ namespace FEAT
     class StandardRefinery< MeshPart<ParentMesh_> > :
       public Factory< MeshPart<ParentMesh_> >
     {
-      public:
-        /// mesh type
-        typedef MeshPart<ParentMesh_> MeshType;
-        /// shape type
-        typedef typename MeshType::ShapeType ShapeType;
-        /// Attribute set type
-        typedef typename MeshType::AttributeSetType AttributeType;
-        /// index set holder type
-        typedef typename MeshType::AttributeSetContainer AttributeSetContainer;
-        /// index set holder type
-        typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
-        /// target set holder type
-        typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+    public:
+      /// mesh type
+      typedef MeshPart<ParentMesh_> MeshType;
+      /// shape type
+      typedef typename MeshType::ShapeType ShapeType;
+      /// Attribute set type
+      typedef typename MeshType::AttributeSetType AttributeType;
+      /// index set holder type
+      typedef typename MeshType::AttributeSetContainer AttributeSetContainer;
+      /// index set holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+      /// target set holder type
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
-        /// shape dimension
-        static constexpr int shape_dim = ShapeType::dimension;
+      /// shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
 
-      protected:
-        /// coarse mesh reference
-        const MeshType& _coarse_meshpart;
-        /// coarse parent mesh reference
-        const ParentMesh_* _parent_mesh;
-        /// coarse parent mesh-part reference
-        const MeshType* _parent_meshpart;
-        /// number of entities for coarse mesh
-        Index _num_entities_coarse[shape_dim + 1];
-        /// number of entities for fine mesh
-        Index _num_entities_fine[shape_dim + 1];
+    protected:
+      /// coarse mesh reference
+      const MeshType& _coarse_meshpart;
+      /// coarse parent mesh reference
+      const ParentMesh_* _parent_mesh;
+      /// coarse parent mesh-part reference
+      const MeshType* _parent_meshpart;
+      /// number of entities for coarse mesh
+      Index _num_entities_coarse[shape_dim + 1];
+      /// number of entities for fine mesh
+      Index _num_entities_fine[shape_dim + 1];
 
-      public:
-        /**
-         * \brief Constructor.
-         *
-         * Use this constructor if the meshpart, which is to be refined, is defined on the
-         * root mesh (and not on another meshpart).
-         *
-         * \param[in] coarse_meshpart
-         * A \resident reference to the coarse mesh that is to be refined.
-         *
-         * \param[in] parent_mesh
-         * A \resident reference to the coarse parent mesh.
-         */
-        explicit StandardRefinery(const MeshType& coarse_meshpart, const ParentMesh_& parent_mesh) :
-          _coarse_meshpart(coarse_meshpart),
-          _parent_mesh(&parent_mesh),
-          _parent_meshpart(nullptr)
+    public:
+      /**
+       * \brief Constructor.
+       *
+       * Use this constructor if the meshpart, which is to be refined, is defined on the
+       * root mesh (and not on another meshpart).
+       *
+       * \param[in] coarse_meshpart
+       * A \resident reference to the coarse mesh that is to be refined.
+       *
+       * \param[in] parent_mesh
+       * A \resident reference to the coarse parent mesh.
+       */
+      explicit StandardRefinery(const MeshType& coarse_meshpart, const ParentMesh_& parent_mesh) :
+        _coarse_meshpart(coarse_meshpart),
+        _parent_mesh(&parent_mesh),
+        _parent_meshpart(nullptr)
+      {
+        // get number of entities in coarse mesh
+        for(int i(0); i <= shape_dim; ++i)
         {
-          // get number of entities in coarse mesh
-          for(int i(0); i <= shape_dim; ++i)
-          {
-            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_meshpart.get_num_entities(i);
-          }
-
-          // calculate number of entities in fine mesh
-          Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+          _num_entities_fine[i] = _num_entities_coarse[i] = coarse_meshpart.get_num_entities(i);
         }
 
-        /**
-         * \brief Constructor.
-         *
-         * Use this constructor if the meshpart, which is to be refined, is defined on
-         * another meshpart (and not on the root mesh).
-         *
-         * \param[in] coarse_meshpart
-         * A \resident reference to the coarse mesh that is to be refined.
-         *
-         * \param[in] parent_meshpart
-         * A \resident reference to the coarse parent mesh part.
-         */
-        explicit StandardRefinery(const MeshType& coarse_meshpart, const MeshPart<ParentMesh_>& parent_meshpart) :
-          _coarse_meshpart(coarse_meshpart),
-          _parent_mesh(nullptr),
-          _parent_meshpart(&parent_meshpart)
-        {
-          // get number of entities in coarse mesh
-          for(int i(0); i <= shape_dim; ++i)
-          {
-            _num_entities_fine[i] = _num_entities_coarse[i] = coarse_meshpart.get_num_entities(i);
-          }
+        // calculate number of entities in fine mesh
+        Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+      }
 
-          // calculate number of entities in fine mesh
-          Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+      /**
+       * \brief Constructor.
+       *
+       * Use this constructor if the meshpart, which is to be refined, is defined on
+       * another meshpart (and not on the root mesh).
+       *
+       * \param[in] coarse_meshpart
+       * A \resident reference to the coarse mesh that is to be refined.
+       *
+       * \param[in] parent_meshpart
+       * A \resident reference to the coarse parent mesh part.
+       */
+      explicit StandardRefinery(const MeshType& coarse_meshpart, const MeshPart<ParentMesh_>& parent_meshpart) :
+        _coarse_meshpart(coarse_meshpart),
+        _parent_mesh(nullptr),
+        _parent_meshpart(&parent_meshpart)
+      {
+        // get number of entities in coarse mesh
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          _num_entities_fine[i] = _num_entities_coarse[i] = coarse_meshpart.get_num_entities(i);
         }
 
-        /// virtual destructor
-        virtual ~StandardRefinery()
+        // calculate number of entities in fine mesh
+        Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
+      }
+
+      /// virtual destructor
+      virtual ~StandardRefinery()
+      {
+      }
+
+      /**
+       * \brief Returns the number of entities of the refined mesh.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      virtual Index get_num_entities(int dim) override
+      {
+        return _num_entities_fine[dim];
+      }
+
+      /**
+       * \brief Fills attribute sets where applicable
+       *
+       * \param[in,out] attribute_container
+       * A \transient reference to the container for the attribute sets being added to
+       */
+      virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
+      {
+        // Attributes of shape dimension 0 only make sense if we have a mesh topology
+        if(!_coarse_meshpart.has_topology())
+          return;
+
+        // Iterate over the attributes in the coarse mesh
+        typename MeshType::AttributeSetConstIterator it(_coarse_meshpart.get_mesh_attributes().begin());
+        typename MeshType::AttributeSetConstIterator jt(_coarse_meshpart.get_mesh_attributes().end());
+
+        for(; it != jt; ++it)
         {
-        }
+          // Create a new empty attribute of the desired size
+          AttributeType* refined_attribute = new AttributeType(
+            get_num_entities(0), it->second->get_dimension());
 
-        /**
-         * \brief Returns the number of entities of the refined mesh.
-         *
-         * \param[in] dim
-         * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
-         *
-         * \returns
-         * The number of entities of dimension \p dim.
-         */
-        virtual Index get_num_entities(int dim) override
+          // Refine the attribute in the coarse mesh and write the result to the new attribute
+          Intern::StandardAttribRefineWrapper<ShapeType, AttributeType>
+            ::refine(*refined_attribute, *(it->second), *_coarse_meshpart.get_topology());
+
+          // Add the attribute to the corresponding set
+          XASSERTM(attribute_container.insert(std::make_pair(it->first, refined_attribute)).second, "Error refining attribute " + it->first);
+        }
+      }
+
+      /**
+       * \brief Fills the index sets.
+       *
+       * \param[in,out] index_set_holder
+       * A \transient reference to the index set holder whose index sets are to be filled.
+       */
+      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
+      {
+        XASSERT(index_set_holder == nullptr);
+
+        // Only create the topology for the refined mesh if the coarse mesh has a topology
+        if(!_coarse_meshpart.has_topology())
+          return;
+
+        index_set_holder = new IndexSetHolderType(_num_entities_fine);
+
+        // refine indices
+        Intern::IndexRefineWrapper<ShapeType>::refine(
+          *index_set_holder, _num_entities_coarse, *_coarse_meshpart.get_topology());
+      }
+
+      /**
+       * \brief Fills the target sets.
+       *
+       * \param[in,out] target_set_holder
+       * A \transient reference to the target set holder whose target sets are to be filled.
+       */
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
+      {
+        // We have to use a helper class here, because the target set refinement
+        // depends heavily on the underlying mesh type. For this, we first need
+        // to check whether our parent is the root mesh or another mesh-part.
+        if(_parent_mesh != nullptr)
         {
-          return _num_entities_fine[dim];
+          // the parent is the root mesh
+          Intern::TargetSetRefineParentWrapper<ParentMesh_>::fill_target_sets(target_set_holder,
+            _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_mesh);
         }
-
-        /**
-         * \brief Fills attribute sets where applicable
-         *
-         * \param[in,out] attribute_container
-         * A \transient reference to the container for the attribute sets being added to
-         */
-        virtual void fill_attribute_sets(AttributeSetContainer& attribute_container) override
+        else if(_parent_meshpart != nullptr)
         {
-          // Attributes of shape dimension 0 only make sense if we have a mesh topology
-          if(!_coarse_meshpart.has_topology())
-            return;
-
-          // Iterate over the attributes in the coarse mesh
-          typename MeshType::AttributeSetConstIterator it(_coarse_meshpart.get_mesh_attributes().begin());
-          typename MeshType::AttributeSetConstIterator jt(_coarse_meshpart.get_mesh_attributes().end());
-
-          for(; it != jt; ++it)
-          {
-            // Create a new empty attribute of the desired size
-            AttributeType* refined_attribute = new AttributeType(
-              get_num_entities(0), it->second->get_dimension());
-
-            // Refine the attribute in the coarse mesh and write the result to the new attribute
-            Intern::StandardAttribRefineWrapper<ShapeType, AttributeType>
-              ::refine(*refined_attribute, *(it->second), *_coarse_meshpart.get_topology());
-
-            // Add the attribute to the corresponding set
-            XASSERTM(attribute_container.insert(std::make_pair(it->first, refined_attribute)).second, "Error refining attribute " + it->first);
-          }
+          // the parent is a mesh-part
+          Intern::TargetSetRefineParentWrapper<ParentMesh_>::fill_target_sets(target_set_holder,
+            _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_meshpart);
         }
-
-        /**
-         * \brief Fills the index sets.
-         *
-         * \param[in,out] index_set_holder
-         * A \transient reference to the index set holder whose index sets are to be filled.
-         */
-        virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
-        {
-          XASSERT(index_set_holder == nullptr);
-
-          // Only create the topology for the refined mesh if the coarse mesh has a topology
-          if(!_coarse_meshpart.has_topology())
-            return;
-
-          index_set_holder = new IndexSetHolderType(_num_entities_fine);
-
-          // refine indices
-          Intern::IndexRefineWrapper<ShapeType>::refine(
-            *index_set_holder, _num_entities_coarse, *_coarse_meshpart.get_topology());
-        }
-
-        /**
-         * \brief Fills the target sets.
-         *
-         * \param[in,out] target_set_holder
-         * A \transient reference to the target set holder whose target sets are to be filled.
-         */
-        virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
-        {
-          // We have to use a helper class here, because the target set refinement
-          // depends heavily on the underlying mesh type. For this, we first need
-          // to check whether our parent is the root mesh or another mesh-part.
-          if(_parent_mesh != nullptr)
-          {
-            // the parent is the root mesh
-            Intern::TargetSetRefineParentWrapper<ParentMesh_>::fill_target_sets(target_set_holder,
-              _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_mesh);
-          }
-          else if(_parent_meshpart != nullptr)
-          {
-            // the parent is a mesh-part
-            Intern::TargetSetRefineParentWrapper<ParentMesh_>::fill_target_sets(target_set_holder,
-              _coarse_meshpart.get_target_set_holder(), _coarse_meshpart.get_topology(), *_parent_meshpart);
-          }
-          else
-            XABORTM("no parent present");
-        }
+        else
+          XABORTM("no parent present");
+      }
 
     }; // class StandardRefinery<MeshPart<...>,...>
 

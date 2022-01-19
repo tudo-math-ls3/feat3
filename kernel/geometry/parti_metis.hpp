@@ -46,18 +46,18 @@ namespace FEAT
     template<typename Shape_, int num_coords_, typename Coord_>
     class PartiMetis<ConformalMesh<Shape_, num_coords_, Coord_>>
     {
-      private:
-        /// number of elements in input mesh
-        const Index _num_elems;
-        /// number of desired ranks/patches
-        const Index _num_ranks;
-        /// the achieved optimization value
-        idx_t * _objval;
-        /// node to partition mapping
-        idx_t * _part;
+    private:
+      /// number of elements in input mesh
+      const Index _num_elems;
+      /// number of desired ranks/patches
+      const Index _num_ranks;
+      /// the achieved optimization value
+      idx_t * _objval;
+      /// node to partition mapping
+      idx_t * _part;
 
 
-      public:
+    public:
       /// our mesh type
       typedef ConformalMesh<Shape_, num_coords_, Coord_> MeshType;
 
