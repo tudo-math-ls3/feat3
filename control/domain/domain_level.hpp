@@ -27,19 +27,21 @@ namespace FEAT
 
       protected:
         int _level_index;
-        std::shared_ptr<MeshNodeType> _mesh_node;
+        std::unique_ptr<MeshNodeType> _mesh_node;
 
       public:
-        explicit DomainLevel(int _lvl_idx, std::shared_ptr<MeshNodeType> node) :
+        explicit DomainLevel(int _lvl_idx, std::unique_ptr<MeshNodeType> node) :
           _level_index(_lvl_idx),
-          _mesh_node(node)
+          _mesh_node(std::move(node))
         {
-          XASSERT(node != nullptr);
+          // note: we have to check _mesh_node instead of node here,
+          // because the unique_ptr has already been moved...
+          XASSERT(_mesh_node.get() != nullptr);
         }
 
         DomainLevel(DomainLevel&& other) :
           _level_index(_level_index),
-          _mesh_node(other._mesh_node)
+          _mesh_node(std::forward<std::unique_ptr<MeshNodeType>>(other._mesh_node))
         {
         }
 
@@ -55,16 +57,6 @@ namespace FEAT
         int get_level_index() const
         {
           return _level_index;
-        }
-
-        std::shared_ptr<MeshNodeType> get_mesh_node_ptr()
-        {
-          return _mesh_node;
-        }
-
-        const std::shared_ptr<MeshNodeType> get_mesh_node_ptr() const
-        {
-          return _mesh_node;
         }
 
         MeshNodeType* get_mesh_node()
@@ -113,8 +105,8 @@ namespace FEAT
         SpaceType space;
 
       public:
-        explicit SimpleDomainLevel(int lvl_idx, std::shared_ptr<Geometry::RootMeshNode<MeshType>> node) :
-          BaseClass(lvl_idx, node),
+        explicit SimpleDomainLevel(int lvl_idx, std::unique_ptr<Geometry::RootMeshNode<MeshType>> node) :
+          BaseClass(lvl_idx, std::move(node)),
           trafo(BaseClass::get_mesh()),
           space(trafo)
         {
@@ -138,8 +130,8 @@ namespace FEAT
         SpacePresType space_pres;
 
       public:
-        explicit StokesDomainLevel(int lvl_idx, std::shared_ptr<Geometry::RootMeshNode<MeshType>> node) :
-          BaseClass(lvl_idx, node),
+        explicit StokesDomainLevel(int lvl_idx, std::unique_ptr<Geometry::RootMeshNode<MeshType>> node) :
+          BaseClass(lvl_idx, std::move(node)),
           trafo(BaseClass::get_mesh()),
           space_velo(trafo),
           space_pres(trafo)
@@ -166,8 +158,8 @@ namespace FEAT
         SpaceStressType space_stress;
 
       public:
-        explicit Stokes3FieldDomainLevel(int lvl_idx, std::shared_ptr<Geometry::RootMeshNode<MeshType>> node) :
-          BaseClass(lvl_idx, node),
+        explicit Stokes3FieldDomainLevel(int lvl_idx, std::unique_ptr<Geometry::RootMeshNode<MeshType>> node) :
+          BaseClass(lvl_idx, std::move(node)),
           trafo(BaseClass::get_mesh()),
           space_velo(trafo),
           space_pres(trafo),

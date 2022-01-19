@@ -41,7 +41,7 @@ void add_mesh_part(RMESH * rmesh, String & file)
     num_entities[2] = 0;
     num_entities[3] = 0;
 
-    auto mesh_part = new typename RMESH::MeshPartType(num_entities);
+    std::unique_ptr<typename RMESH::MeshPartType> mesh_part(new typename RMESH::MeshPartType(num_entities));
     Index counter(0);
     for (String line ; getline(par_file, line); )
     {
@@ -54,7 +54,7 @@ void add_mesh_part(RMESH * rmesh, String & file)
     mesh_part->deduct_target_sets_from_bottom<0>(rmesh->get_mesh()->get_index_set_holder());
     String part_name = file.lower();
     part_name.replace_all(".par", "");
-    rmesh->add_mesh_part(part_name, mesh_part);
+    rmesh->add_mesh_part(part_name, std::move(mesh_part));
 
     par_file.close();
 }
@@ -124,7 +124,7 @@ int main(int argc, char ** argv)
       words.at(0).parse(num_entities[3]);
     }
 
-    auto cmesh = new CMESH(num_entities);
+    std::unique_ptr<CMESH> cmesh(new CMESH(num_entities));
 
     Index counter(0);
     for (String line ; getline(mesh_tri, line); )
@@ -175,7 +175,7 @@ int main(int argc, char ** argv)
     mesh_tri.close();
 
     cmesh->deduct_topology_from_top();
-    auto rmesh = new Geometry::RootMeshNode<CMESH>(cmesh);
+    std::unique_ptr<Geometry::RootMeshNode<CMESH>> rmesh(new Geometry::RootMeshNode<CMESH>(std::move(cmesh)));
 
     for (auto file : file_list)
     {
@@ -184,16 +184,14 @@ int main(int argc, char ** argv)
         std::cerr<<file<<" has unsupported type in file.prj!"<<std::endl;
         exit(1);
       }
-      add_mesh_part(rmesh, file);
+      add_mesh_part(rmesh.get(), file);
     }
 
     //Geometry::ExportVTK<CMESH> exporter(*(rmesh->get_mesh()));
     //exporter.write("test.vtk");
     std::ofstream mesh_out(output);
     Geometry::MeshFileWriter mesh_writer(mesh_out);
-    mesh_writer.write(rmesh);
-
-    delete rmesh;
+    mesh_writer.write(rmesh.get());
 
     return 0;
 }

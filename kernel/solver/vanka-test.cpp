@@ -355,14 +355,14 @@ public:
     const int level = 2;
 
     // create mesh node
-    std::shared_ptr<MeshNode> mesh_node;
     std::vector<int> ranks;
-    Geometry::UnitCubePatchGenerator<MeshType>::create(0, 1, mesh_node, ranks);
+    std::unique_ptr<MeshNode> mesh_node;
+    Geometry::UnitCubePatchGenerator<MeshType>::create_unique(0, 1, mesh_node, ranks);
 
     // refine a few times
     for(int i = 0; i < level; ++i)
     {
-      mesh_node = std::shared_ptr<MeshNode>(mesh_node->refine());
+      mesh_node = mesh_node->refine_unique();
     }
 
     // test RT/Q0

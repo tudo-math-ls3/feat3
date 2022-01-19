@@ -94,15 +94,13 @@ template
     {
       // Create a single reference cell of the shape type
       Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
-      // Create the mesh
-      MeshType* mesh(new MeshType(mesh_factory));
       // The filters will be empty, but we still need the filter and assembler objects
       std::deque<String> dirichlet_list;
       std::deque<String> slip_list;
       FilterType my_filter;
 
       // Create the root mesh node
-      Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
+      auto rmn = Geometry::RootMeshNode<MeshType>::make_unique(mesh_factory.make_unique());
 
       // Parameters for the cell functional
       DataType fac_norm(1e-1);
@@ -122,7 +120,7 @@ template
 
       // Create the mesh quality functional
       MeshQualityFunctional rumpflpumpfl(
-        rmn, trafo, dirichlet_list, slip_list, cell_functional, Meshopt::ScaleComputation::current_uniform);
+        rmn.get(), trafo, dirichlet_list, slip_list, cell_functional, Meshopt::ScaleComputation::current_uniform);
 
       // init() sets the coordinates in the mesh and computes h
       rumpflpumpfl.init();
@@ -204,9 +202,6 @@ template
       // These differences should all be greater than eps
       TEST_CHECK(Math::abs(func_norm - DataType(0)) > eps);
       TEST_CHECK(Math::abs(func_det - cell_functional->_fac_det*DataType(1)) > eps);
-
-      delete rmn;
-
     }
 };
 

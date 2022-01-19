@@ -290,11 +290,11 @@ namespace Tutorial06
       Runtime::abort();
     }
 
-    std::shared_ptr<RootMeshNodeType> root_mesh_node;
+    std::unique_ptr<RootMeshNodeType> root_mesh_node;
 
     std::vector<int> neighbor_ranks;
 
-    Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(
+    Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create_unique(
       comm.rank(), comm.size(), root_mesh_node, neighbor_ranks);
 
     String msg = "Neighbors of process " + stringify(comm.rank()) + ":";
@@ -310,7 +310,7 @@ namespace Tutorial06
 
       for(; lvl < level; ++lvl)
       {
-        root_mesh_node = std::shared_ptr<RootMeshNodeType>(root_mesh_node->refine());
+        root_mesh_node = root_mesh_node->refine_unique();
       }
     }
 

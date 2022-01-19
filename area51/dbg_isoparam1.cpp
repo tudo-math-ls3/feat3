@@ -51,26 +51,28 @@ namespace DbgIsoParam
   typedef MeshAtlas<MeshType3D> AtlasType3D;
   typedef RootMeshNode<MeshType3D> MeshNodeType3D;
 
-  std::shared_ptr<AtlasType2D> make_atlas_2d()
+  std::unique_ptr<AtlasType2D> make_atlas_2d()
   {
-    auto atlas = std::make_shared<Geometry::MeshAtlas<MeshType2D>>();
-    atlas->add_mesh_chart("circle", new Geometry::Atlas::Circle<MeshType2D>(0.0, 0.0, 1.0));
+    auto atlas = Geometry::MeshAtlas<MeshType2D>::make_unique();
+    atlas->add_mesh_chart("circle",
+      std::unique_ptr<Geometry::Atlas::Circle<MeshType2D>>(new Geometry::Atlas::Circle<MeshType2D>(0.0, 0.0, 1.0)));
     return atlas;
   }
 
-  std::shared_ptr<AtlasType3D> make_atlas_3d()
+  std::unique_ptr<AtlasType3D> make_atlas_3d()
   {
-    auto atlas = std::make_shared<Geometry::MeshAtlas<MeshType3D>>();
-    auto circle = new Geometry::Atlas::Circle<MeshType2D>(0.0, 0.0, 1.0);
-    auto chart = new Geometry::Atlas::Extrude<MeshType3D, Geometry::Atlas::Circle<MeshType2D>>(circle);
-    atlas->add_mesh_chart("circle", chart);
+    auto atlas = Geometry::MeshAtlas<MeshType3D>::make_unique();
+    std::unique_ptr<Geometry::Atlas::Circle<MeshType2D>> circle(new Geometry::Atlas::Circle<MeshType2D>(0.0, 0.0, 1.0));
+    std::unique_ptr<Geometry::Atlas::Extrude<MeshType3D, Geometry::Atlas::Circle<MeshType2D>>>
+      chart(new Geometry::Atlas::Extrude<MeshType3D, Geometry::Atlas::Circle<MeshType2D>>(std::move(circle)));
+    atlas->add_mesh_chart("circle", std::move(chart));
     return atlas;
   }
 
-  std::shared_ptr<MeshNodeType2D> make_mesh_node(std::shared_ptr<AtlasType2D> atlas)
+  std::unique_ptr<MeshNodeType2D> make_mesh_node(AtlasType2D* atlas)
   {
     Geometry::UnitStarCubeFactory<MeshType2D> factory;
-    auto mesh = new MeshType2D(factory);
+    auto mesh = factory.make_unique();
 
     // move coords from [0,1] to [-0.7,+0.7]
     {
@@ -82,19 +84,17 @@ namespace DbgIsoParam
       }
     }
 
-    auto node = std::make_shared<Geometry::RootMeshNode<MeshType2D>>(mesh, atlas.get());
+    auto node = Geometry::RootMeshNode<MeshType2D>::make_unique(std::move(mesh), atlas);
 
-    Geometry::BoundaryFactory<MeshType2D> bnd_factory(*mesh);
-    auto part = new MeshPartType2D(bnd_factory);
-    auto chart = atlas->find_mesh_chart("circle");
-    node->add_mesh_part("bnd", part, "circle", chart);
+    Geometry::BoundaryFactory<MeshType2D> bnd_factory(*node->get_mesh());
+    node->add_mesh_part("bnd", bnd_factory.make_unique(), "circle", atlas->find_mesh_chart("circle"));
 
     node->adapt();
 
     return node;
   }
 
-  std::shared_ptr<MeshNodeType3D> make_mesh_node(std::shared_ptr<AtlasType3D> atlas)
+  std::unique_ptr<MeshNodeType3D> make_mesh_node(AtlasType3D* atlas)
   {
     Geometry::UnitStarCubeFactory<MeshType2D> factory_2d;
     MeshType2D mesh_2d(factory_2d);
@@ -112,18 +112,14 @@ namespace DbgIsoParam
     // extrude mesh
     Geometry::MeshExtruder<MeshType2D> extruder(1, 0.0, 1.0, "zmin", "zmax");
     Geometry::MeshExtruderFactory<MeshType2D> factory(extruder, mesh_2d);
-    auto mesh = new MeshType3D(factory);
 
-    auto node = std::make_shared<Geometry::RootMeshNode<MeshType3D>>(mesh, atlas.get());
+    auto node = Geometry::RootMeshNode<MeshType3D>::make_unique(factory.make_unique(), atlas);
 
     Geometry::BoundaryFactory<MeshType2D> bnd_factory(mesh_2d);
     MeshPartType2D part_2d(bnd_factory);
 
     Geometry::MeshPartExtruderFactory<MeshType2D> part_factory(extruder, part_2d, mesh_2d);
-    auto part_3d = new MeshPartType3D(part_factory);
-
-    auto chart = atlas->find_mesh_chart("circle");
-    node->add_mesh_part("bnd", part_3d, "circle", chart);
+    node->add_mesh_part("bnd", part_factory.make_unique(), "circle", atlas->find_mesh_chart("circle"));
 
     node->adapt();
 
@@ -253,7 +249,7 @@ namespace DbgIsoParam
     typedef Trafo::Isoparam::Mapping<MeshType, 3> TrafoDeg3;
 
     // create an empty atlas and a root mesh node
-    auto node = make_mesh_node(atlas);
+    auto node = make_mesh_node(atlas.get());
 
     const auto& chart = *atlas->find_mesh_chart("circle");
 
@@ -271,7 +267,7 @@ namespace DbgIsoParam
     {
       if(lvl > 0)
       {
-        node = std::shared_ptr<Geometry::RootMeshNode<MeshType>>(node->refine());
+        node = node->refine_unique();
       }
 
       // get our mesh

@@ -84,7 +84,7 @@ namespace FEAT
         {
         }
 
-        virtual void fill_index_sets(IndexSetHolderType*&) override
+        virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
         {
         }
 
@@ -95,24 +95,25 @@ namespace FEAT
 
       };
 
-      static PartType* create_halo0(int k)
+      static std::unique_ptr<PartType> create_halo0(int k)
       {
         Halo0Factory factory(k);
-        return new PartType(factory);
+        return factory.make_unique();
       }
 
     public:
-      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks)
+      static Index create_unique(int rank, int nprocs, std::unique_ptr<MeshNodeType>& node, std::vector<int>& ranks)
       {
         MeshNodeType* nnode = nullptr;
         std::vector<Index> cranks, ctags;
-        int lvl = create(rank, nprocs, nnode, cranks, ctags);
-        node = std::shared_ptr<MeshNodeType>(nnode);
+        Index level = Index(create(rank, nprocs, nnode, cranks, ctags));
         for(auto it = cranks.begin(); it != cranks.end(); ++it)
           ranks.push_back(int(*it));
-        return Index(lvl);
+        node.reset(nnode);
+        return level;
       }
 
+      // deprecated: use make_unique instead
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
         XASSERT(nprocs > 0);
@@ -130,7 +131,7 @@ namespace FEAT
         // create root mesh node
         {
           RootMeshFactory factory(ii, n);
-          node = new MeshNodeType(new MeshType(factory));
+          node = new MeshNodeType(factory.make_unique());
         }
 
         // left neighbor
@@ -229,7 +230,7 @@ namespace FEAT
         {
         }
 
-        virtual void fill_index_sets(IndexSetHolderType*&) override
+        virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
         {
         }
 
@@ -266,7 +267,7 @@ namespace FEAT
         {
         }
 
-        virtual void fill_index_sets(IndexSetHolderType*&) override
+        virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
         {
         }
 
@@ -279,38 +280,39 @@ namespace FEAT
         }
       };
 
-      static PartType* create_halo0(int k)
+      static std::unique_ptr<PartType> create_halo0(int k)
       {
         Halo0Factory factory(k);
-        return new PartType(factory);
+        return factory.make_unique();
       }
 
-      static PartType* create_halo1(int k)
+      static std::unique_ptr<PartType> create_halo1(int k)
       {
         Halo1Factory factory(k);
-        return new PartType(factory);
+        return factory.make_unique();
       }
 
     public:
-      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks)
+      static Index create_unique(int rank, int nprocs, std::unique_ptr<MeshNodeType>& node, std::vector<int>& ranks)
       {
         MeshNodeType* nnode = nullptr;
         std::vector<Index> cranks, ctags;
-        int lvl = create(rank, nprocs, nnode, cranks, ctags);
-        node = std::shared_ptr<MeshNodeType>(nnode);
+        Index level = Index(create(rank, nprocs, nnode, cranks, ctags));
         for(auto it = cranks.begin(); it != cranks.end(); ++it)
           ranks.push_back(int(*it));
-        return Index(lvl);
+        node.reset(nnode);
+        return level;
       }
+
       /******************WIP********************************************
       * For now an additional wrapper...
        */
-      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks, std::vector<int>& tags)
+      static Index create(int rank, int nprocs, std::unique_ptr<MeshNodeType>& node, std::vector<int>& ranks, std::vector<int>& tags)
       {
         MeshNodeType* nnode = nullptr;
         std::vector<Index> cranks, ctags;
         int lvl = create(rank, nprocs, nnode, cranks, ctags);
-        node = std::shared_ptr<MeshNodeType>(nnode);
+        node = std::unique_ptr<MeshNodeType>(nnode);
         for(auto it = cranks.begin(); it != cranks.end(); ++it)
           ranks.push_back(int(*it));
         for(auto it = ctags.begin(); it != ctags.end(); ++it)
@@ -343,7 +345,7 @@ namespace FEAT
         // create root mesh node
         {
           RootMeshFactory factory(ii, jj, n);
-          node = new MeshNodeType(new MeshType(factory));
+          node = new MeshNodeType(factory.make_unique());
         }
 
         // lower left neighbor
@@ -519,7 +521,7 @@ namespace FEAT
         {
         }
 
-        virtual void fill_index_sets(IndexSetHolderType*&) override
+        virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
         {
         }
 
@@ -556,7 +558,7 @@ namespace FEAT
         {
         }
 
-        virtual void fill_index_sets(IndexSetHolderType*&) override
+        virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
         {
         }
 
@@ -596,7 +598,7 @@ namespace FEAT
         {
         }
 
-        virtual void fill_index_sets(IndexSetHolderType*&) override
+        virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
         {
         }
 
@@ -616,35 +618,37 @@ namespace FEAT
         }
       };
 
-      static PartType* create_halo0(int k)
+      static std::unique_ptr<PartType> create_halo0(int k)
       {
         Halo0Factory factory(k);
-        return new PartType(factory);
+        return factory.make_unique();
       }
 
-      static PartType* create_halo1(int k)
+      static std::unique_ptr<PartType> create_halo1(int k)
       {
         Halo1Factory factory(k);
-        return new PartType(factory);
+        return factory.make_unique();
       }
 
-      static PartType* create_halo2(int k)
+      static std::unique_ptr<PartType> create_halo2(int k)
       {
         Halo2Factory factory(k);
-        return new PartType(factory);
+        return factory.make_unique();
       }
 
+
     public:
-      static Index create(int rank, int nprocs, std::shared_ptr<MeshNodeType>& node, std::vector<int>& ranks)
+      static Index create_unique(int rank, int nprocs, std::unique_ptr<MeshNodeType>& node, std::vector<int>& ranks)
       {
         MeshNodeType* nnode = nullptr;
         std::vector<Index> cranks, ctags;
-        int lvl = create(rank, nprocs, nnode, cranks, ctags);
-        node = std::shared_ptr<MeshNodeType>(nnode);
+        Index level = Index(create(rank, nprocs, nnode, cranks, ctags));
         for(auto it = cranks.begin(); it != cranks.end(); ++it)
           ranks.push_back(int(*it));
-        return Index(lvl);
+        node.reset(nnode);
+        return level;
       }
+
 
       static int create(int rank, int nprocs, MeshNodeType*& node, std::vector<Index>& ranks, std::vector<Index>& ctags)
       {
@@ -684,7 +688,7 @@ namespace FEAT
         // create root mesh
         {
           RootMeshFactory factory(ii, jj, kk, n);
-          node = new MeshNodeType(new MeshType(factory));
+          node = new MeshNodeType(factory.make_unique());
         }
 
         // lower/upper -> kk

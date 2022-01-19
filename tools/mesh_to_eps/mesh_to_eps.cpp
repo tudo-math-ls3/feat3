@@ -85,8 +85,8 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   args.parse("extra", extra);
 
   // create an empty atlas and a root mesh node
-  Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
-  Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
+  auto atlas = Geometry::MeshAtlas<Mesh_>::make_unique();
+  auto node = Geometry::RootMeshNode<Mesh_>::make_unique(nullptr, atlas.get());
 
   // try to parse the mesh file
 #ifndef DEBUG
@@ -123,9 +123,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     if(lvl > 0)
     {
       std::cout << "Refining up to level " << lvl << "..." << std::endl;
-      auto* old = node;
-      node = old->refine(adapt_mode);
-      delete old;
+      node = node->refine_unique(adapt_mode);
     }
 
     if(lvl < lvl_min)
@@ -136,9 +134,6 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
     Geometry::ExportEPS::write(epsname, *node->get_mesh(), box_x, box_y, stroke, extra);
   }
-
-  delete node;
-  delete atlas;
 
   return 0;
 }

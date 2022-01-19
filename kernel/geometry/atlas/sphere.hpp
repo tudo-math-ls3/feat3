@@ -200,10 +200,10 @@ namespace FEAT
       private:
         typedef Sphere<Mesh_> ChartType;
         typedef typename ChartType::CoordType CoordType;
-        ChartReturn_*& _chart;
+        std::unique_ptr<ChartReturn_>& _chart;
 
       public:
-        explicit SphereChartParser(ChartReturn_*& chart) :
+        explicit SphereChartParser(std::unique_ptr<ChartReturn_>& chart) :
           _chart(chart)
         {
         }
@@ -240,7 +240,7 @@ namespace FEAT
           if(!mids.front().parse(mid_x) || !mids.at(1).parse(mid_y) || !mids.back().parse(mid_z))
             throw Xml::GrammarError(iline, sline, "Failed to parse sphere midpoint");
 
-          _chart = new ChartType(mid_x, mid_y, mid_z, radius);
+          _chart.reset(new ChartType(mid_x, mid_y, mid_z, radius));
         }
 
         virtual void close(int, const String&) override

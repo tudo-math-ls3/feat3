@@ -1455,9 +1455,9 @@ namespace FEAT
         // create mesh
         HexaSubMesh* mesh = new HexaSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        HexaSubMesh::AttributeSetType* my_attrib_set = new HexaSubMesh::AttributeSetType(num_entities[0],2);
+        std::unique_ptr<HexaSubMesh::AttributeSetType> my_attrib_set(new HexaSubMesh::AttributeSetType(num_entities[0],2));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "HexaSubAttributeSet");
+        mesh->add_attribute(std::move(my_attrib_set), "HexaSubAttributeSet");
 
         // set up vertex coordinates array
         Real attr[] =

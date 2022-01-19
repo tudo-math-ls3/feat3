@@ -138,7 +138,7 @@ namespace FEAT
       {
       public:
         /// This container's MeshPartNode
-        MeshPartNodeType* node;
+        std::unique_ptr<MeshPartNodeType> node;
         /// Name of the chart
         String chart_name;
         /// Chart belonging to node
@@ -149,17 +149,23 @@ namespace FEAT
          * \brief Constructor
          *
          * \param node_
-         * A \resident pointer to MeshPartNode for this container.
+         * A unique pointer to MeshPartNode for this container.
          *
          * \param chart_
          * A \resident pointer to Chart for this container.
          */
-        explicit MeshPartNodeBin(MeshPartNodeType* node_, String chart_name_, const MeshChartType* chart_) :
-          node(node_),
+        explicit MeshPartNodeBin(std::unique_ptr<MeshPartNodeType> node_, String chart_name_, const MeshChartType* chart_) :
+          node(std::move(node_)),
           chart_name(chart_name_),
           chart(chart_)
         {
         }
+
+        // use default move constructor
+        MeshPartNodeBin(MeshPartNodeBin&&) = default;
+
+        // use default move-assignment operator
+        MeshPartNodeBin& operator=(MeshPartNodeBin&&) = default;
       }; // class MeshPartNodeBin
 
       /// submesh node bin container type
@@ -173,7 +179,7 @@ namespace FEAT
 
     protected:
       /// a pointer to the mesh of this node
-      MeshType* _mesh;
+      std::unique_ptr<MeshType> _mesh;
       /// child submesh nodes
       MeshPartNodeContainer _mesh_part_nodes;
 
@@ -182,10 +188,10 @@ namespace FEAT
        * \brief Constructor.
        *
        * \param[in] mesh
-       * A pointer to the mesh for this node.
+       * A \resident unique pointer to the mesh for this node.
        */
-      explicit MeshNode(MeshType* mesh) :
-        _mesh(mesh),
+      explicit MeshNode(std::unique_ptr<MeshType> mesh) :
+        _mesh(std::move(mesh)),
         _mesh_part_nodes()
       {
       }
@@ -193,27 +199,10 @@ namespace FEAT
     public:
       /**
        * \brief Virtual destructor
-       *
-       * \note _mesh gets deleted because passing it to the MeshNode's constructor passes ownership to it.
        */
       virtual ~MeshNode()
       {
-        // loop over all submesh nodes in reverse order and delete them
-        MeshPartNodeReverseIterator it(_mesh_part_nodes.rbegin());
-        MeshPartNodeReverseIterator jt(_mesh_part_nodes.rend());
-        for(; it != jt; ++it)
-        {
-          if(it->second.node != nullptr)
-          {
-            delete it->second.node;
-          }
-        }
-
-        // delete mesh
-        if(_mesh != nullptr)
-        {
-          delete _mesh;
-        }
+        // nothing to do here thanks to std::unique_ptr
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -229,24 +218,25 @@ namespace FEAT
 
       /**
        * \brief Returns the mesh of this node.
+       *
        * \returns
        * A pointer to the mesh contained in this node.
        */
       MeshType* get_mesh()
       {
-        return _mesh;
+        return _mesh.get();
       }
 
       /** \copydoc get_mesh() */
       const MeshType* get_mesh() const
       {
-        return _mesh;
+        return _mesh.get();
       }
 
-      void set_mesh(MeshType* mesh)
+      void set_mesh(std::unique_ptr<MeshType> mesh)
       {
         XASSERTM(_mesh == nullptr, "Mesh node already has a mesh");
-        _mesh = mesh;
+        _mesh = std::move(mesh);
       }
 
       /**
@@ -277,7 +267,7 @@ namespace FEAT
        * The name of the child node.
        *
        * \param[in] mesh_part_node
-       * A \resident pointer to the mesh_part node to be added.
+       * A \resident unique pointer to the mesh_part node to be added.
        *
        * \param[in] chart_name
        * The name of the chart that the mesh-part is to be linked to.
@@ -286,20 +276,20 @@ namespace FEAT
        * A \resident pointer to the chart that the subnode is to be associated with. May be \c nullptr.
        *
        * \returns
-       * \p mesh_part_node if the insertion was successful, otherwise \c nullptr.
-       *
+       * mesh_part_node.get() if the insertion was successful, otherwise \c nullptr.
        */
       MeshPartNodeType* add_mesh_part_node(
         const String& part_name,
-        MeshPartNodeType* mesh_part_node,
+        std::unique_ptr<MeshPartNodeType> mesh_part_node,
         const String& chart_name = "",
         const MeshChartType* chart = nullptr)
       {
-        if(mesh_part_node != nullptr)
+        if(mesh_part_node)
         {
-          if(_mesh_part_nodes.emplace(part_name, MeshPartNodeBin(mesh_part_node, chart_name, chart)).second)
+          auto r = _mesh_part_nodes.emplace(part_name, MeshPartNodeBin(std::move(mesh_part_node), chart_name, chart));
+          if(r.second)
           {
-            return mesh_part_node;
+            return r.first->second.node.get();
           }
         }
         return nullptr;
@@ -312,7 +302,7 @@ namespace FEAT
        * The name of the child node.
        *
        * \param[in] mesh_part
-       * A \resident pointer to the mesh_part to be added.
+       * A \resident unique pointer to the mesh_part to be added.
        *
        * \param[in] chart_name
        * The name of the chart that the mesh-part is to be linked to.
@@ -325,18 +315,11 @@ namespace FEAT
        */
       MeshPartNodeType* add_mesh_part(
         const String& part_name,
-        MeshPartType* mesh_part,
+        std::unique_ptr<MeshPartType> mesh_part,
         const String& chart_name = "",
         const MeshChartType* chart = nullptr)
       {
-        MeshPartNodeType* part_node = new MeshPartNodeType(mesh_part);
-        if(add_mesh_part_node(part_name, part_node, chart_name, chart) == nullptr)
-        {
-          delete part_node;
-          return nullptr;
-        }
-
-        return part_node;
+        return add_mesh_part_node(part_name, MeshPartNodeType::make_unique(std::move(mesh_part)), chart_name, chart);
       }
 
       /**
@@ -374,14 +357,14 @@ namespace FEAT
       MeshPartNodeType* find_mesh_part_node(const String& part_name)
       {
         MeshPartNodeIterator it(_mesh_part_nodes.find(part_name));
-        return (it != _mesh_part_nodes.end()) ? it->second.node : nullptr;
+        return (it != _mesh_part_nodes.end()) ? it->second.node.get() : nullptr;
       }
 
       /** \copydoc find_mesh_part_node() */
       const MeshPartNodeType* find_mesh_part_node(const String& part_name) const
       {
         MeshPartNodeConstIterator it(_mesh_part_nodes.find(part_name));
-        return (it != _mesh_part_nodes.end()) ? it->second.node : nullptr;
+        return (it != _mesh_part_nodes.end()) ? it->second.node.get() : nullptr;
       }
 
       /**
@@ -456,12 +439,12 @@ namespace FEAT
           if(it == renames.end())
           {
             // no rename, use old name
-            new_map.emplace(v.first, v.second);
+            new_map.emplace(v.first, std::move(v.second));
           }
           else
           {
             // insert with new name
-            new_map.emplace(it->second, v.second);
+            new_map.emplace(it->second, std::move(v.second));
           }
         }
         _mesh_part_nodes = std::move(new_map);
@@ -617,11 +600,11 @@ namespace FEAT
         XASSERT(this->_mesh_part_nodes.empty());
 
         if(other._mesh != nullptr)
-          this->set_mesh(new MeshType(other._mesh->clone()));
+          this->set_mesh(std::unique_ptr<MeshType>(new MeshType(other._mesh->clone())));
 
         for(auto it = other._mesh_part_nodes.begin(); it != other._mesh_part_nodes.end(); ++it)
         {
-          this->add_mesh_part_node(it->first, it->second.node->clone_new(), it->second.chart_name, it->second.chart);
+          this->add_mesh_part_node(it->first, it->second.node->clone_unique(), it->second.chart_name, it->second.chart);
         }
       }
 
@@ -632,8 +615,8 @@ namespace FEAT
        * \param[in] mesh_part
        * A \resident pointer to the MeshPart for this node.
        */
-      explicit MeshPartNode(MeshPartType* mesh_part) :
-        BaseClass(mesh_part)
+      explicit MeshPartNode(std::unique_ptr<MeshPartType> mesh_part) :
+        BaseClass(std::move(mesh_part))
       {
       }
 
@@ -643,13 +626,27 @@ namespace FEAT
       }
 
       /**
-       * \brief Creates an independent clone of this object on the heap.
+       * \brief Creates a new MeshPartNode on the heap and returns a unique pointer to it
        *
-       * \returns A heap pointer to the newly created clone object.
+       * \param[in] mesh_part
+       * A \resident pointer to the MeshPart for the newly created node.
+       *
+       * \returns
+       * A unique pointer to the new MeshPartNode object.
        */
-      MeshPartNode* clone_new() const
+      static std::unique_ptr<MeshPartNode> make_unique(std::unique_ptr<MeshPartType> mesh_part)
       {
-        MeshPartNode* node = new MeshPartNode(nullptr);
+        return std::unique_ptr<MeshPartNode>(new MeshPartNode(std::move(mesh_part)));
+      }
+
+      /**
+       * \brief Creates an independent clone of this object and returns a unique pointer to it
+       *
+       * \returns A unique pointer to the newly created clone object.
+       */
+      std::unique_ptr<MeshPartNode> clone_unique() const
+      {
+        std::unique_ptr<MeshPartNode> node(new MeshPartNode(nullptr));
         node->_clone(*this);
         return node;
       }
@@ -661,22 +658,22 @@ namespace FEAT
        * A \transient reference to the parent mesh/cell subset of this node's cell subset.
        *
        * \returns
-       * A pointer to a MeshPartNode containing the refined cell subset tree.
+       * A unique pointer to a MeshPartNode containing the refined cell subset tree.
        */
       template<typename ParentType_>
-      MeshPartNode* refine(const ParentType_& parent) const
+      std::unique_ptr<MeshPartNode> refine(const ParentType_& parent) const
       {
         // the mesh part may be a nullptr; in this case also return a node containing a nullptr
         if(this->_mesh == nullptr)
         {
-          return new MeshPartNode(nullptr);
+          return std::unique_ptr<MeshPartNode>(new MeshPartNode(nullptr));
         }
 
         // create a refinery
         StandardRefinery<MeshPartType> refinery(*this->_mesh, parent);
 
         // create a new MeshPartNode
-        MeshPartNode* fine_node = new MeshPartNode(new MeshPartType(refinery));
+        auto fine_node = make_unique(refinery.make_unique());
 
         // refine our children
         refine_mesh_parts(*fine_node);
@@ -744,12 +741,12 @@ namespace FEAT
       typedef typename BaseClass::MeshChartType MeshChartType;
 
     protected:
-      /// our atlas
+      /// our atlas pointer
       MeshAtlasType* _atlas;
       /// a map of our halo mesh-parts
-      std::map<int, MeshPartType*> _halos;
+      std::map<int, std::unique_ptr<MeshPartType>> _halos;
       /// a map of our patch mesh-parts
-      std::map<int, MeshPartType*> _patches;
+      std::map<int, std::unique_ptr<MeshPartType>> _patches;
 
 
       void _clone(const RootMeshNode& other)
@@ -758,20 +755,20 @@ namespace FEAT
         XASSERT(this->_mesh_part_nodes.empty());
 
         if(other._mesh != nullptr)
-          this->set_mesh(new MeshType(other._mesh->clone()));
+          this->set_mesh(std::unique_ptr<MeshType>(new MeshType(other._mesh->clone())));
 
         for(auto it = other._mesh_part_nodes.begin(); it != other._mesh_part_nodes.end(); ++it)
         {
-          this->add_mesh_part_node(it->first, it->second.node->clone_new(), it->second.chart_name, it->second.chart);
+          this->add_mesh_part_node(it->first, it->second.node->clone_unique(), it->second.chart_name, it->second.chart);
         }
 
         this->_atlas = other._atlas;
 
         for(auto it = other._halos.begin(); it != other._halos.end(); ++it)
-          this->add_halo(it->first, new MeshPartType(it->second->clone()));
+          this->add_halo(it->first, std::unique_ptr<MeshPartType>(new MeshPartType(it->second->clone())));
 
         for(auto it = other._patches.begin(); it != other._patches.end(); ++it)
-          this->add_patch(it->first, new MeshPartType(it->second->clone()));
+          this->add_patch(it->first, std::unique_ptr<MeshPartType>(new MeshPartType(it->second->clone())));
       }
 
 
@@ -780,13 +777,13 @@ namespace FEAT
        * \brief Constructor.
        *
        * \param[in] mesh
-       * A \resident pointer to the mesh for this node.
+       * A \resident unique pointer to the mesh for this node.
        *
        * \param[in] atlas
-       * A \resident pointer to the atlas for this mesh tree.
+       * A \resident pointer to the atlas for this node.
        */
-      explicit RootMeshNode(MeshType* mesh, MeshAtlasType* atlas = nullptr) :
-        BaseClass(mesh),
+      explicit RootMeshNode(std::unique_ptr<MeshType> mesh, MeshAtlasType* atlas = nullptr) :
+        BaseClass(std::move(mesh)),
         _atlas(atlas),
         _halos(),
         _patches()
@@ -795,16 +792,9 @@ namespace FEAT
 
       /**
        * \brief Virtual destructor
-       *
-       * \note _atlas does not get deleted because it is not owned by the RootMeshNode, as several MeshNodes may refer
-       * to the same atlas.
        */
       virtual ~RootMeshNode()
       {
-        for(auto& x : _patches)
-          delete x.second;
-        for(auto& x : _halos)
-          delete x.second;
       }
 
       /// \returns A pointer to the underlying mesh atlas; may return \c nullptr.
@@ -814,25 +804,30 @@ namespace FEAT
       }
 
       /**
-       * \brief Creates an independent clone of this root mesh node on the heap.
+       * \brief Creates a new RootMeshNode on the heap and returns a unique pointer to it
        *
-       * \returns A pointer to a new clone of this root mesh node.
+       * \param[in] mesh
+       * A \resident unique pointer to the mesh for the newly created node.
+       *
+       * \param[in] atlas
+       * A \resident pointer to the atlas for the newly created node.
+       *
+       * \returns
+       * A unique pointer to the new RootMeshNode object.
        */
-      RootMeshNode* clone_new() const
+      static std::unique_ptr<RootMeshNode> make_unique(std::unique_ptr<MeshType> mesh, MeshAtlasType* atlas = nullptr)
       {
-        RootMeshNode* node = new RootMeshNode(nullptr, nullptr);
-        node->_clone(*this);
-        return node;
+        return std::unique_ptr<RootMeshNode>(new RootMeshNode(std::move(mesh), atlas));
       }
 
       /**
-       * \brief Creates an independent clone of this root mesh node on the heap.
+       * \brief Creates an independent clone of this object and returns a unique pointer to it
        *
-       * \returns A shared pointer to a new clone of this root mesh node.
+       * \returns A unique pointer to the newly created clone object.
        */
-      std::shared_ptr<RootMeshNode> clone_shared() const
+      std::unique_ptr<RootMeshNode> clone_unique() const
       {
-        std::shared_ptr<RootMeshNode> node = std::make_shared<RootMeshNode>(nullptr, nullptr);
+        std::unique_ptr<RootMeshNode> node(new RootMeshNode(nullptr, nullptr));
         node->_clone(*this);
         return node;
       }
@@ -855,12 +850,12 @@ namespace FEAT
        * The rank of the neighbor this halo belongs to.
        *
        * \param[in] halo_part
-       * A \resident pointer to the halo mesh part for the neighbor.
+       * A \resident unique pointer to the halo mesh part for the neighbor.
        */
-      void add_halo(int rank, MeshPartType* halo_part)
+      void add_halo(int rank, std::unique_ptr<MeshPartType> halo_part)
       {
-        XASSERT(halo_part != nullptr);
-        _halos.emplace(rank, halo_part);
+        XASSERTM(bool(halo_part), "cannot add empty halos");
+        _halos.emplace(rank, std::move(halo_part));
       }
 
       /**
@@ -875,11 +870,11 @@ namespace FEAT
       const MeshPartType* get_halo(int rank) const
       {
         auto it = _halos.find(rank);
-        return (it != _halos.end() ? it->second : nullptr);
+        return (it != _halos.end() ? it->second.get() : nullptr);
       }
 
       /// \returns A reference to the internal neighbor-halo map.
-      const std::map<int, MeshPartType*>& get_halo_map() const
+      const std::map<int, std::unique_ptr<MeshPartType>>& get_halo_map() const
       {
         return this->_halos;
       }
@@ -887,8 +882,6 @@ namespace FEAT
       /// Deletes all halo meshparts from this mesh node.
       void clear_halos()
       {
-        for(auto& x : _halos)
-          delete x.second;
         _halos.clear();
       }
 
@@ -906,15 +899,15 @@ namespace FEAT
         if(ranks.empty())
           return;
 
-        std::map<int, MeshPartType*> new_halos;
+        std::map<int, std::unique_ptr<MeshPartType>> new_halos;
 
         for(auto& v : _halos)
         {
           auto it = ranks.find(v.first);
           if(it == ranks.end())
-            new_halos.emplace(v.first, v.second);
+            new_halos.emplace(v.first, std::move(v.second));
           else
-            new_halos.emplace(it->second, v.second);
+            new_halos.emplace(it->second, std::move(v.second));
         }
 
         _halos = std::move(new_halos);
@@ -928,11 +921,14 @@ namespace FEAT
        *
        * \param[in] patch_part
        * A \resident pointer to the patch mesh part for the child.
+       *
+       * \returns
+       * A pointer to the inserted patch mesh part.
        */
-      void add_patch(int rank, MeshPartType* patch_part)
+      MeshPartType* add_patch(int rank, std::unique_ptr<MeshPartType> patch_part)
       {
         XASSERT(patch_part != nullptr);
-        _patches.emplace(rank, patch_part);
+        return _patches.emplace(rank, std::move(patch_part)).first->second.get();
       }
 
       /**
@@ -947,11 +943,11 @@ namespace FEAT
       const MeshPartType* get_patch(int rank) const
       {
         auto it = _patches.find(rank);
-        return (it != _patches.end() ? it->second : nullptr);
+        return (it != _patches.end() ? it->second.get() : nullptr);
       }
 
       /// \returns A reference to the internal child-patch map.
-      const std::map<int, MeshPartType*>& get_patch_map() const
+      const std::map<int, std::unique_ptr<MeshPartType>>& get_patch_map() const
       {
         return this->_patches;
       }
@@ -959,8 +955,6 @@ namespace FEAT
       /// Deletes all halo meshparts from this mesh node.
       void clear_patches()
       {
-        for(auto& x : _patches)
-          delete x.second;
         _patches.clear();
       }
 
@@ -985,7 +979,7 @@ namespace FEAT
           // create a macro factory
           MacroFactory<MeshPartType> factory(*this->_mesh, cell);
           // create a new mesh part and add to this mesh node
-          this->add_mesh_part("_base:" + stringify(cell), new MeshPartType(factory));
+          this->add_mesh_part("_base:" + stringify(cell), factory.make_unique());
         }
       }
 
@@ -996,15 +990,15 @@ namespace FEAT
        * Mode for adaption, defaults to chart.
        *
        * \returns
-       * A pointer to a RootMeshNode containing the refined mesh tree.
+       * A unique pointer to a newly created RootMeshNode containing the refined mesh tree.
        */
-      RootMeshNode* refine(AdaptMode adapt_mode = AdaptMode::chart) const
+      std::unique_ptr<RootMeshNode> refine_unique(AdaptMode adapt_mode = AdaptMode::chart) const
       {
         // create a refinery
         StandardRefinery<MeshType> refinery(*this->_mesh);
 
         // create a new root mesh node
-        RootMeshNode* fine_node = new RootMeshNode(new MeshType(refinery), this->_atlas);
+        std::unique_ptr<RootMeshNode> fine_node = make_unique(refinery.make_unique(), this->_atlas);
 
         // refine our children
         this->refine_children(*fine_node);
@@ -1013,14 +1007,14 @@ namespace FEAT
         for(const auto& v : _halos)
         {
           StandardRefinery<MeshPartType> halo_refinery(*v.second, *this->_mesh);
-          fine_node->add_halo(v.first, new MeshPartType(halo_refinery));
+          fine_node->add_halo(v.first, halo_refinery.make_unique());
         }
 
         // refine our patch mesh-parts
         for(const auto& v : _patches)
         {
           StandardRefinery<MeshPartType> patch_refinery(*v.second, *this->_mesh);
-          fine_node->add_patch(v.first, new MeshPartType(patch_refinery));
+          fine_node->add_patch(v.first, patch_refinery.make_unique());
         }
 
         // adapt by chart?
@@ -1037,20 +1031,6 @@ namespace FEAT
 
         // okay
         return fine_node;
-      }
-
-      /**
-       * \brief Refines this node and its sub-tree.
-       *
-       * \param[in] adapt_mode
-       * Mode for adaption, defaults to chart.
-       *
-       * \returns
-       * A shared pointer to a RootMeshNode containing the refined mesh tree.
-       */
-      std::shared_ptr<RootMeshNode> refine_shared(AdaptMode adapt_mode = AdaptMode::chart) const
-      {
-        return std::shared_ptr<RootMeshNode>(this->refine(adapt_mode));
       }
 
       /**
@@ -1071,7 +1051,7 @@ namespace FEAT
        * \returns
        * A new mesh node representing the extracted patch.
        */
-      RootMeshNode* extract_patch(
+      std::unique_ptr<RootMeshNode> extract_patch(
         std::vector<int>& comm_ranks,
         const Adjacency::Graph& elems_at_rank,
         const int rank)
@@ -1157,27 +1137,23 @@ namespace FEAT
             XABORTM(msg);
           }
 
-          // create patch mesh part
-          patch_mesh_part = new MeshPartType(part_factory);
+          // create patch mesh part and add it to our map
+          patch_mesh_part = this->add_patch(rank, part_factory.make_unique());
+
+          // deduct the target sets
           patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
             base_root_mesh->get_index_set_holder());
-
-          // add this to out patch map
-          this->add_patch(rank, patch_mesh_part);
         }
 
-        // Step 3: Create root mesh of partition by using PatchMeshFactory
-        MeshType* patch_root_mesh = nullptr;
+        // Step 3: Create root mesh node of partition by using PatchMeshFactory
+        std::unique_ptr<RootMeshNode> patch_node;
         {
           // create patch root mesh
           PatchMeshFactory<MeshType> patch_factory(*base_root_mesh, *patch_mesh_part);
-          patch_root_mesh = new MeshType(patch_factory);
+          patch_node = RootMeshNode::make_unique(patch_factory.make_unique(), this->_atlas);
         }
 
-        // Step 4: Create root mesh node for mesh
-        RootMeshNode* patch_node = new RootMeshNode(patch_root_mesh, this->_atlas);
-
-        // Step 5: intersect boundary and other base mesh parts
+        // Step 4: intersect boundary and other base mesh parts
         {
           // create mesh part splitter
           PatchMeshPartSplitter<MeshType> part_splitter(*base_root_mesh, *patch_mesh_part);
@@ -1193,7 +1169,7 @@ namespace FEAT
             XASSERTM(base_part_node != nullptr, String("base-mesh part '") + (*it) + "' not found!");
 
             // our split mesh part
-            MeshPartType* split_part = nullptr;
+            std::unique_ptr<MeshPartType> split_part;
 
             // get base-mesh part
             MeshPartType* base_part = base_part_node->get_mesh();
@@ -1202,15 +1178,15 @@ namespace FEAT
             if((base_part != nullptr) && part_splitter.build(*base_part))
             {
               // create our mesh part
-              split_part = new MeshPartType(part_splitter);
+              split_part = part_splitter.make_unique();
             }
 
             // Insert patch mesh part
-            patch_node->add_mesh_part(*it, split_part, this->find_mesh_part_chart_name(*it), this->find_mesh_part_chart(*it));
+            patch_node->add_mesh_part(*it, std::move(split_part), this->find_mesh_part_chart_name(*it), this->find_mesh_part_chart(*it));
           }
         }
 
-        // Step 6: Create halos
+        // Step 5: Create halos
         {
           // create halo factory
           PatchHaloFactory<MeshType> halo_factory(ranks_at_elem, *base_root_mesh, *patch_mesh_part);
@@ -1222,7 +1198,7 @@ namespace FEAT
             halo_factory.build(Index(*it));
 
             // create halo mesh part and add to our map
-            patch_node->add_halo(*it, new MeshPartType(halo_factory));
+            patch_node->add_halo(*it, halo_factory.make_unique());
           }
         }
 
@@ -1245,9 +1221,9 @@ namespace FEAT
        * The rank of the patch to be created.
        *
        * \returns
-       * A new mesh node representing the extracted patch.
+       * A unique pointer to the new mesh node representing the extracted patch.
        */
-      RootMeshNode* extract_patch(
+      std::unique_ptr<RootMeshNode> extract_patch(
         std::vector<int>& comm_ranks,
         const Partition& partition,
         const int rank)
@@ -1270,12 +1246,12 @@ namespace FEAT
         PatchMeshPartFactory<MeshType> part_factory(Index(rank), elems_at_rank);
 
         // create patch mesh part
-        MeshPartType* patch_mesh_part = new MeshPartType(part_factory);
+        std::unique_ptr<MeshPartType> patch_mesh_part = part_factory.make_unique();
         patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
           this->get_mesh()->get_index_set_holder());
 
         // add patch meshpart to this node
-        this->add_patch(rank, patch_mesh_part);
+        this->add_patch(rank, std::move(patch_mesh_part));
       }
 
       /**

@@ -276,10 +276,10 @@ namespace FEAT
       private:
         typedef Circle<Mesh_> ChartType;
         typedef typename ChartType::CoordType CoordType;
-        ChartReturn_*& _chart;
+        std::unique_ptr<ChartReturn_>& _chart;
 
       public:
-        explicit CircleChartParser(ChartReturn_*& chart) :
+        explicit CircleChartParser(std::unique_ptr<ChartReturn_>& chart) :
           _chart(chart)
         {
         }
@@ -312,7 +312,7 @@ namespace FEAT
           if(radius < CoordType(1E-5))
             throw Xml::GrammarError(iline, sline, "Invalid circle radius");
 
-          // try to parse midpoind
+          // try to parse midpoint
           std::deque<String> mids = attrs.find("midpoint")->second.split_by_whitespaces();
           if(mids.size() != std::size_t(2))
             throw Xml::GrammarError(iline, sline, "Invalid circle midpoint string");
@@ -333,9 +333,9 @@ namespace FEAT
 
           // everything seems fine, let's create the chart then
           if(have_domain)
-            _chart = new ChartType(mid_x, mid_y, radius, dom_0, dom_1);
+            _chart.reset(new ChartType(mid_x, mid_y, radius, dom_0, dom_1));
           else
-            _chart = new ChartType(mid_x, mid_y, radius);
+            _chart.reset(new ChartType(mid_x, mid_y, radius));
         }
 
         virtual void close(int, const String&) override

@@ -389,6 +389,16 @@ namespace FEAT
       {
       }
 
+      template<std::size_t m_>
+      explicit IndexSetWrapper(const std::array<Index, m_>& num_entities) :
+        BaseClass(num_entities),
+        _index_set(
+          num_entities[Shape_::dimension],
+          num_entities[face_dim_])
+      {
+        static_assert(int(m_) > Shape_::dimension, "invalid array size");
+      }
+
       IndexSetWrapper(IndexSetWrapper&& other) :
         BaseClass(std::forward<BaseClass>(other)),
         _index_set(std::forward<IndexSetType>(other._index_set))
@@ -480,6 +490,15 @@ namespace FEAT
           num_entities[Shape_::dimension],
           num_entities[0])
       {
+      }
+
+      template<std::size_t m_>
+      explicit IndexSetWrapper(const std::array<Index, m_>& num_entities) :
+        _index_set(
+          num_entities[Shape_::dimension],
+          num_entities[0])
+      {
+        static_assert(int(m_) > Shape_::dimension, "invalid array size");
       }
 
       IndexSetWrapper(IndexSetWrapper&& other) :
@@ -619,6 +638,14 @@ namespace FEAT
       {
       }
 
+      template<std::size_t m_>
+      explicit IndexSetHolder(const std::array<Index, m_>& num_entities) :
+        BaseClass(num_entities),
+        _index_set_wrapper(num_entities)
+      {
+        static_assert(int(m_) > Shape_::dimension, "invalid array size");
+      }
+
       IndexSetHolder(IndexSetHolder&& other) :
         BaseClass(std::forward<BaseClass>(other)),
         _index_set_wrapper(std::forward<IndexSetWrapperType>(other._index_set_wrapper))
@@ -737,6 +764,11 @@ namespace FEAT
       }
 
       explicit IndexSetHolder(const Index* /*num_entities*/)
+      {
+      }
+
+      template<std::size_t m_>
+      explicit IndexSetHolder(const std::array<Index, m_>&)
       {
       }
 

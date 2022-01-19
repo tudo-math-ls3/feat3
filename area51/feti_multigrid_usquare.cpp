@@ -202,7 +202,7 @@ namespace FETI{
   {
   public:
     // We hold a shared ptr to the root_mesh_node, so we dont create dangling referneces...
-    std::shared_ptr<RootMeshNodeType> root_mesh_node;
+    std::unique_ptr<RootMeshNodeType> root_mesh_node;
     // The mesh for this level
     MeshType& mesh;
     // The trafo for this level
@@ -221,8 +221,8 @@ namespace FETI{
     // This constructor will create a mesh, trafo and space based on the mesh factory.
     // Note that the other member variables of this level (matrix, filter, etc.) are
     // not initialized here - this will be performed in the main function below.
-    explicit Level(std::shared_ptr<RootMeshNodeType> input_root_mesh_node) :
-      root_mesh_node{input_root_mesh_node},
+    explicit Level(std::unique_ptr<RootMeshNodeType> input_root_mesh_node) :
+      root_mesh_node(std::move(input_root_mesh_node)),
       mesh(*root_mesh_node->get_mesh()),
       trafo(mesh),
       space(trafo)
@@ -1672,7 +1672,7 @@ namespace FETI{
     // Normally (i.e. in a "real world" application), mesh nodes are managed by a domain controller
     // class, which also takes care of allocating and deleting mesh nodes on the heap.
     // As we do this on foot in this tutorial, we will use a std::shared_ptr for convenience:
-    std::shared_ptr<RootMeshNodeType> root_mesh_node;
+    std::unique_ptr<RootMeshNodeType> root_mesh_node;
 
     // The generator class will not only give us a mesh-node representing our patch of the domain,
     // but it will also tell us the ranks of all processes that manage our neighbor patches.
@@ -1684,7 +1684,7 @@ namespace FETI{
     // Now we can call our generator to obtain our patch mesh-node as well as our neighbor ranks.
     // Moreover, the create function returns an index that corresponds to the refinement level
     // of the global unit-square domain - we will require this for the further refinement below.
-    Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(
+    Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create_unique(
       comm.rank(),          // input:  the rank of this process
       comm.size(),          // input:  the total number of processes
       root_mesh_node,       // output: the root-mesh-node shared pointer
@@ -1713,14 +1713,15 @@ namespace FETI{
       watch.start();
       for(; lvl < level; ++lvl)
       {
-        levels.push_front(std::make_shared<Level>(root_mesh_node));
-        root_mesh_node = std::shared_ptr<RootMeshNodeType>(root_mesh_node->refine());
+        auto refined_node = root_mesh_node->refine_unique();
+        levels.push_front(std::make_shared<Level>(std::move(root_mesh_node)));
+        root_mesh_node = std::move(refined_node);
         ++level_max;
       }
       watch.stop();
     }
     //add the current mesh (this is the finest level to the deque)
-    levels.push_front(std::make_shared<Level>(root_mesh_node));
+    levels.push_front(std::make_shared<Level>(std::move(root_mesh_node)));
 
     // Now we have a mesh node that represents a single patch of a partitioned unit-square
     // domain on the desired refinement level (or on a higher level) with all the information
@@ -1771,7 +1772,7 @@ namespace FETI{
       // but also other important stuff, such as the "halos", which describe the overlap of
       // neighboured patches. For the assembly of the mirror, we need to get the halo mesh-part
       // from the mesh-node first:
-      const MeshPartType* neighbor_halo = root_mesh_node->get_halo(neighbor_rank);
+      const MeshPartType* neighbor_halo = levels.front()->root_mesh_node->get_halo(neighbor_rank);
 
       // Ensure that we have a halo for this neighbour rank:
       XASSERTM(neighbor_halo != nullptr, "Failed to retrieve neighbour halo!");

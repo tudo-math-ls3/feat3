@@ -312,8 +312,8 @@ namespace Tutorial06
 
     // Normally (i.e. in a "real world" application), mesh nodes are managed by a domain controller
     // class, which also takes care of allocating and deleting mesh nodes on the heap.
-    // As we do this on foot in this tutorial, we will use a std::shared_ptr for convenience:
-    std::shared_ptr<RootMeshNodeType> root_mesh_node;
+    // As we do this on foot in this tutorial, we will use a std::unique_ptr for convenience:
+    std::unique_ptr<RootMeshNodeType> root_mesh_node;
 
     // The generator class will not only give us a mesh-node representing our patch of the domain,
     // but it will also tell us the ranks of all processes that manage our neighbor patches.
@@ -323,13 +323,13 @@ namespace Tutorial06
     std::vector<int> neighbor_ranks;
 
     // Now we can call our generator to obtain our patch mesh-node as well as our neighbor ranks.
-    // Moreover, the create function returns an index that corresponds to the refinement level
+    // Moreover, the create_unique function returns an index that corresponds to the refinement level
     // of the global unit-square domain - we will require this for the further refinement below.
-    Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(
+    Index lvl = Geometry::UnitCubePatchGenerator<MeshType>::create_unique(
       comm.rank(),          // input:  the rank of this process
       comm.size(),          // input:  the total number of processes
-      root_mesh_node,       // output: the root-mesh-node shared pointer
-      neighbor_ranks);     // output: the neighbor ranks vector
+      root_mesh_node,       // output: the root-mesh-node unique pointer
+      neighbor_ranks);      // output: the neighbor ranks vector
 
     // At this point, we have our root mesh node as well as the neighbor ranks.
     // Just for fun, we let each process write its neighbor ranks to the console.
@@ -364,8 +364,8 @@ namespace Tutorial06
 
       for(; lvl < level; ++lvl)
       {
-        // refine_shared() gives us a shared_ptr of the refined mesh node
-        root_mesh_node = root_mesh_node->refine_shared();
+        // use the 'refine_unique' function, which returns a unique pointer
+        root_mesh_node = root_mesh_node->refine_unique();
       }
     }
 
@@ -435,7 +435,7 @@ namespace Tutorial06
       // Call the MirrorAssembler to do the dirty work for us:
       Assembly::MirrorAssembler::assemble_mirror(
         neighbor_mirror,   // the mirror that is to be assembled
-        space,              // the FE space for which we want to assemble the mirror
+        space,             // the FE space for which we want to assemble the mirror
         *neighbor_halo     // the halo mesh-part that the mirror is to be assembled on
       );
 

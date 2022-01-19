@@ -393,9 +393,9 @@ namespace Tutorial08
     // times, we'll use a typedef for convenience here:
     typedef Geometry::RootMeshNode<MeshType> RootMeshNodeType;
 
-    // Next, let us create a shared-pointer for the mesh-node, which will be assigned to
+    // Next, let us create a unique pointer for the mesh-node, which will be assigned to
     // a new object by the mesh file reader in the next step.
-    std::shared_ptr<RootMeshNodeType> mesh_node;
+    std::unique_ptr<RootMeshNodeType> mesh_node;
 
     // Okay, let the parsing begin:
     std::cout << "Parsing mesh files..." << std::endl;
@@ -406,7 +406,7 @@ namespace Tutorial08
     try
     {
       // In its most simple form (precisely: overload), the only input parameter is a reference
-      // to the mesh atlas and the function returns a shared-pointer to a newly allocated
+      // to the mesh atlas and the function returns a unique pointer to a newly allocated
       // mesh-node object, which we assign to the previously declared variable:
       mesh_node = mesh_reader.parse(mesh_atlas);
     }
@@ -452,9 +452,9 @@ namespace Tutorial08
     // Okay, so let's refine the mesh-node up to the desired level:
     for(Index lvl(0); lvl < level; ++lvl)
     {
-      // Refining the mesh-node is really easy: we just have to call the 'refine_shared' function
-      // of the mesh-node, which gives us a shared_ptr of the refined mesh node.
-      mesh_node = mesh_node->refine_shared();
+      // Refining the mesh-node is really easy: we just have to call the 'refine_unique' function
+      // of the mesh-node, which gives us a unique_ptr of the refined mesh node.
+      mesh_node = mesh_node->refine_unique();
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

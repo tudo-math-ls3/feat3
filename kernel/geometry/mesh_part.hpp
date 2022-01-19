@@ -23,7 +23,9 @@
 #include <kernel/geometry/intern/target_set_computer.hpp>
 
 // includes, system
-#include<map>
+#include <map>
+#include <array>
+#include <memory>
 
 namespace FEAT
 {
@@ -135,7 +137,7 @@ namespace FEAT
       typedef AttributeSet<AttributeDataType> AttributeSetType;
 
       /// submesh node bin container type
-      typedef std::map<String, AttributeSetType*> AttributeSetContainer;
+      typedef std::map<String, std::unique_ptr<AttributeSetType>> AttributeSetContainer;
       /// submesh node iterator type
       typedef typename AttributeSetContainer::iterator AttributeSetIterator;
       /// submesh node const-iterator type
@@ -161,9 +163,9 @@ namespace FEAT
 
     protected:
       /// Number of entities for each shape dimension
-      Index _num_entities[shape_dim + 1];
+      std::array<Index, shape_dim + 1> _num_entities;
       /// The index sets of the mesh
-      IndexSetHolderType* _index_set_holder;
+      std::unique_ptr<IndexSetHolderType> _index_set_holder;
       /// The target sets of the mesh.
       TargetSetHolderType _target_set_holder;
       /// The attribute sets of the mesh
@@ -181,15 +183,15 @@ namespace FEAT
        * Determines if the MeshPart is to have a mesh topology.
        */
       explicit MeshPart(const Index num_entities[], bool create_topology = false) :
-        _index_set_holder(nullptr),
+        _index_set_holder(),
         _target_set_holder(num_entities),
         _mesh_attributes()
       {
-        for(int i(0); i <= shape_dim; ++i)
+        for(std::size_t i(0); i <= shape_dim; ++i)
           _num_entities[i] = num_entities[i];
 
         if(create_topology)
-          _index_set_holder = new IndexSetHolderType(num_entities);
+          _index_set_holder.reset(new IndexSetHolderType(num_entities));
       }
 
       /**
@@ -199,7 +201,7 @@ namespace FEAT
        * A \transient reference to the factory that is to be used to create the mesh part.
        */
       explicit MeshPart(Factory<MeshPart>& factory) :
-        _index_set_holder(nullptr),
+        _index_set_holder(),
         _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
         _mesh_attributes()
       {
@@ -217,54 +219,21 @@ namespace FEAT
       }
 
       /// move constructor
-      MeshPart(MeshPart&& other) :
-        _index_set_holder(other._index_set_holder),
-        _target_set_holder(std::forward<TargetSetHolderType>(other._target_set_holder)),
-        _mesh_attributes(std::forward<AttributeSetContainer>(other._mesh_attributes))
-      {
-        for(int i(0); i <= shape_dim; ++i)
-        {
-          _num_entities[i] = other._num_entities[i];
-        }
-        other._index_set_holder = nullptr;
-      }
+      MeshPart(MeshPart&& other) = default;
 
       /// move-assignment operator
-      MeshPart& operator=(MeshPart&& other)
-      {
-        // avoid self-move
-        if(this == &other)
-          return *this;
+      MeshPart& operator=(MeshPart&& other) = default;
 
-        if(_index_set_holder != nullptr)
-          delete _index_set_holder;
+      /// deleted copy constructor
+      MeshPart(const MeshPart& other) = delete;
 
-        _index_set_holder = other._index_set_holder;
-        _target_set_holder = std::forward<TargetSetHolderType>(other._target_set_holder);
-        _mesh_attributes = std::forward<AttributeSetContainer>(other._mesh_attributes);
-        for(int i(0); i <= shape_dim; ++i)
-        {
-          _num_entities[i] = other._num_entities[i];
-        }
-        other._index_set_holder = nullptr;
-
-        return *this;
-      }
+      /// deleted copy-assignment operator
+      MeshPart& operator=(const MeshPart&) = delete;
 
       /// Virtual destructor
       virtual ~MeshPart()
       {
-        if(_index_set_holder != nullptr)
-          delete _index_set_holder;
-
-        // Loop over all mesh attributes in reverse order and delete them
-        AttributeSetReverseIterator it(_mesh_attributes.rbegin());
-        AttributeSetReverseIterator jt(_mesh_attributes.rend());
-        for(; it != jt; ++it)
-        {
-          if(it->second != nullptr)
-            delete it->second;
-        }
+        // unique_ptr takes care of everything
       }
 
       /**
@@ -275,43 +244,37 @@ namespace FEAT
        */
       void clone(const MeshPart& other)
       {
-        for(int d(0); d <= shape_dim; ++d)
-          this->_num_entities[d] = other._num_entities[d];
-        if(other._index_set_holder != nullptr)
+        this->_num_entities = other._num_entities;
+
+        if(other._index_set_holder)
         {
-          if(this->_index_set_holder == nullptr)
+          if(this->_index_set_holder)
             this->_index_set_holder->clone(*other._index_set_holder);
           else
-            this->_index_set_holder = new IndexSetHolderType(other._index_set_holder->clone());
+            this->_index_set_holder.reset(new IndexSetHolderType(other._index_set_holder->clone()));
         }
-        else if(this->_index_set_holder != nullptr)
+        else if(this->_index_set_holder)
         {
-          delete this->_index_set_holder;
-          this->_index_set_holder = nullptr;
+          this->_index_set_holder.reset();
         }
+
         this->_target_set_holder.clone(other._target_set_holder);
-        {
-          AttributeSetReverseIterator it(_mesh_attributes.rbegin());
-          AttributeSetReverseIterator jt(_mesh_attributes.rend());
-          for(; it != jt; ++it)
-          {
-            if(it->second != nullptr)
-              delete it->second;
-          }
-        }
+
+        this->_mesh_attributes.clear();
+
         for(auto it = other._mesh_attributes.begin(); it != other._mesh_attributes.end(); ++it)
-          this->add_attribute(new AttributeSetType(it->second->clone()), it->first);
+          this->add_attribute(std::unique_ptr<AttributeSetType>(new AttributeSetType(it->second->clone())), it->first);
       }
 
       /// \returns An independent clone of \c this mesh part object.
       MeshPart clone() const
       {
-        MeshPart mp(this->_num_entities, this->_index_set_holder != nullptr);
-        if(this->_index_set_holder != nullptr)
+        MeshPart mp(this->_num_entities.data(), this->_index_set_holder.get() != nullptr);
+        if(this->_index_set_holder)
           mp._index_set_holder->clone(*this->_index_set_holder);
         mp._target_set_holder.clone(this->_target_set_holder);
         for(auto it = this->_mesh_attributes.begin(); it != this->_mesh_attributes.end(); ++it)
-          mp.add_attribute(new AttributeSetType(it->second->clone()), it->first);
+          mp.add_attribute(std::unique_ptr<AttributeSetType>(new AttributeSetType(it->second->clone())), it->first);
         return mp;
       }
 
@@ -327,7 +290,7 @@ namespace FEAT
         }
 
         my_bytes += _target_set_holder.bytes();
-        my_bytes +=(_index_set_holder != nullptr ? _index_set_holder->bytes() : std::size_t(0));
+        my_bytes += (_index_set_holder ? _index_set_holder->bytes() : std::size_t(0));
 
         return my_bytes;
       }
@@ -335,7 +298,7 @@ namespace FEAT
       /// \brief Checks if this MeshPart has a mesh topology
       bool has_topology() const
       {
-        return (_index_set_holder != nullptr);
+        return _index_set_holder.operator bool();
       }
 
       /**
@@ -351,7 +314,7 @@ namespace FEAT
       {
         XASSERT(dim >= 0);
         XASSERT(dim <= shape_dim);
-        return _num_entities[dim];
+        return _num_entities[std::size_t(dim)];
       }
 
       /**
@@ -367,14 +330,14 @@ namespace FEAT
       AttributeSetType* find_attribute(const String& identifier)
       {
         AttributeSetIterator it(_mesh_attributes.find(identifier));
-        return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
+        return (it != _mesh_attributes.end()) ? (*it).second.get() : nullptr;
       }
 
       /** \copydoc find_attribute() */
       const AttributeSetType* find_attribute(const String& identifier) const
       {
         AttributeSetConstIterator it(_mesh_attributes.find(identifier));
-        return (it != _mesh_attributes.end()) ? (*it).second: nullptr;
+        return (it != _mesh_attributes.end()) ? (*it).second.get(): nullptr;
       }
 
       /**
@@ -410,14 +373,11 @@ namespace FEAT
        * True if the attribute was successfully added, meaning no attribute with the appropriate identifier was
        * present, or false otherwise.
        */
-      virtual bool add_attribute(AttributeSetType* attribute, const String& identifier)
+      virtual bool add_attribute(std::unique_ptr<AttributeSetType> attribute, const String& identifier)
       {
-        if(attribute != nullptr || (attribute->get_num_values() != get_num_entities(0)) )
-        {
-          return (_mesh_attributes.insert( std::make_pair(identifier, attribute))).second;
-        }
-
-        return false;
+        XASSERTM(bool(attribute), "cannot add empty attribute set");
+        // note: unique_ptr needs to be moved here, otherwise emplace tries to copy instead
+        return _mesh_attributes.emplace(identifier, std::move(attribute)).second;
       }
 
       /**
@@ -435,6 +395,7 @@ namespace FEAT
       template<int cell_dim_, int face_dim_>
       typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set()
       {
+        XASSERTM(has_topology(), "Requested index_set of MeshPart without topology!");
         return _index_set_holder->template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
@@ -448,16 +409,16 @@ namespace FEAT
 
       /// \cond internal
 
-      /// Returns a reference to the index set holder of the mesh.
+      /// Returns a pointer to the index set holder of the mesh or \c nullptr if the mesh has no topology.
       IndexSetHolderType* get_topology()
       {
-        return _index_set_holder;
+        return _index_set_holder.get();
       }
 
       /// \copydoc get_topology()
       const IndexSetHolderType* get_topology() const
       {
-        return _index_set_holder;
+        return _index_set_holder.get();
       }
       /// \endcond
 
@@ -548,7 +509,7 @@ namespace FEAT
 
         // Update num_entities information from the possibly modified _target_set_holder
         for(int i(end_dim_); i <= current_dim_; ++i)
-          _num_entities[i] = _target_set_holder.get_num_entities(i);
+          _num_entities[std::size_t(i)] = _target_set_holder.get_num_entities(i);
       }
 
       /**
@@ -573,7 +534,7 @@ namespace FEAT
 
         // Update num_entities information from the possibly modified _target_set_holder
         for(int i(current_dim_); i <= end_dim_; ++i)
-          _num_entities[i] = _target_set_holder.get_num_entities(i);
+          _num_entities[std::size_t(i)] = _target_set_holder.get_num_entities(i);
       }
 
       /**
@@ -587,8 +548,8 @@ namespace FEAT
        */
       void deduct_topology(const ParentIndexSetHolderType& parent_ish)
       {
-        if(_index_set_holder == nullptr)
-          _index_set_holder = new IndexSetHolderType(_num_entities);
+        if(_index_set_holder)
+          _index_set_holder.reset(new IndexSetHolderType(_num_entities));
 
         Intern::IndexSetFiller<ShapeType::dimension>::fill_ish(
           *_index_set_holder, _target_set_holder, parent_ish);
@@ -651,7 +612,7 @@ namespace FEAT
        * \param[in,out] index_set_holder
        * A \transient reference to the index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) = 0;
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>& index_set_holder) = 0;
 
       /**
        * \brief Fills the target sets.
@@ -660,6 +621,26 @@ namespace FEAT
        * A \transient reference to the target set holder whose target sets are to be filled.
        */
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
+
+      /**
+       * \brief Creates a new mesh part and returns it
+       *
+       * \returns A new mesh part object
+       */
+      MeshPartType make()
+      {
+        return MeshPartType(*this);
+      }
+
+      /**
+       * \brief Creates a new mesh part on the heap and returns a unique pointer to it
+       *
+       * \returns A unique pointer to the newly created mesh part object
+       */
+      std::unique_ptr<MeshPartType> make_unique()
+      {
+        return std::unique_ptr<MeshPartType>(new MeshPartType(*this));
+      }
     }; // class Factory<MeshPart<...>>
 
     /// \cond internal
@@ -802,15 +783,15 @@ namespace FEAT
         for(; it != jt; ++it)
         {
           // Create a new empty attribute of the desired size
-          AttributeType* refined_attribute = new AttributeType(
-            get_num_entities(0), it->second->get_dimension());
+          std::unique_ptr<AttributeType> refined_attribute(new AttributeType(
+            get_num_entities(0), it->second->get_dimension()));
 
           // Refine the attribute in the coarse mesh and write the result to the new attribute
           Intern::StandardAttribRefineWrapper<ShapeType, AttributeType>
             ::refine(*refined_attribute, *(it->second), *_coarse_meshpart.get_topology());
 
           // Add the attribute to the corresponding set
-          XASSERTM(attribute_container.insert(std::make_pair(it->first, refined_attribute)).second, "Error refining attribute " + it->first);
+          XASSERTM(attribute_container.emplace(it->first, std::move(refined_attribute)).second, "Error refining attribute " + it->first);
         }
       }
 
@@ -820,15 +801,15 @@ namespace FEAT
        * \param[in,out] index_set_holder
        * A \transient reference to the index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>& index_set_holder) override
       {
-        XASSERT(index_set_holder == nullptr);
+        XASSERT(index_set_holder.get() == nullptr);
 
         // Only create the topology for the refined mesh if the coarse mesh has a topology
         if(!_coarse_meshpart.has_topology())
           return;
 
-        index_set_holder = new IndexSetHolderType(_num_entities_fine);
+        index_set_holder.reset(new IndexSetHolderType(_num_entities_fine));
 
         // refine indices
         Intern::IndexRefineWrapper<ShapeType>::refine(

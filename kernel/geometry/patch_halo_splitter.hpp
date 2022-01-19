@@ -188,9 +188,9 @@ namespace FEAT
         // no attributes for halo mesh-parts
       }
 
-      virtual void fill_index_sets(typename MeshPartType::IndexSetHolderType*& index_set_holder) override
+      virtual void fill_index_sets(std::unique_ptr<typename MeshPartType::IndexSetHolderType>& index_set_holder) override
       {
-        XASSERT(index_set_holder == nullptr);
+        XASSERT(index_set_holder.get() == nullptr);
         // no index sets for halo mesh-parts
       }
 

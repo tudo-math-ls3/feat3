@@ -132,12 +132,9 @@ namespace AnalyseMeshCGALParallel
       }
     }
 
-    // Fetch the root-mesh-node from the finest level and the corresponding mesh
-    typedef typename DomainType::MeshNodeType RootMeshNodeType;
     // therefore, first fetch the finest level
     DomainLevelType& finest_lvl = *domain.front();
-    RootMeshNodeType* rmn = finest_lvl.get_mesh_node();
-    MeshType& mesh = *rmn->get_mesh();
+    MeshType& mesh = finest_lvl.get_mesh();
 
     // Now it is somehow identical to the non-parallel:
     // We'll print out the number of mesh elements for the rank 0 just for kicks:

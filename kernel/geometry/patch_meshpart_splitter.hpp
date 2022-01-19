@@ -167,7 +167,7 @@ namespace FEAT
        * \param[in,out] index_set_holder
        * A \transient reference to the index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>& index_set_holder) override
       {
         XASSERT(index_set_holder == nullptr);
 
@@ -180,7 +180,7 @@ namespace FEAT
             num_entities[i] = get_num_entities(i);
 
           // Create this MeshPart's topology
-          index_set_holder = new IndexSetHolderType(num_entities);
+          index_set_holder.reset(new IndexSetHolderType(num_entities));
           // This creates vertex-at-shape information for all shapes
           _part_holder.fill_index_sets(*index_set_holder, *_cur_part_topology);
           // Build the redundant index sets
@@ -305,14 +305,14 @@ namespace FEAT
        */
       template<typename Attribute_>
       void fill_attribute_set(
-        std::map<String, Attribute_*>& attribute_container_out,
-        const std::map<String, Attribute_*>& attribute_container_in) const
+        std::map<String, std::unique_ptr<Attribute_>>& attribute_container_out,
+        const std::map<String, std::unique_ptr<Attribute_>>& attribute_container_in) const
       {
         for(auto it(attribute_container_in.begin()); it != attribute_container_in.end(); ++it)
         {
           // Create new attribute for the PatchMeshPart MeshPart
-          Attribute_* new_attribute = new Attribute_(
-            Index(_indices.size()), it->second->get_dimension());
+          std::unique_ptr<Attribute_> new_attribute(new Attribute_(
+            Index(_indices.size()), it->second->get_dimension()));
 
           const int dim = it->second->get_dimension();
 
@@ -324,7 +324,7 @@ namespace FEAT
           }
 
           // Push the new attribute to set_out
-          XASSERTM(attribute_container_out.insert(std::make_pair(it->first, new_attribute)).second, "Error inserting new AttributeSet");
+          XASSERTM(attribute_container_out.insert(std::make_pair(it->first, std::move(new_attribute))).second, "Error inserting new AttributeSet");
         }
       }
 

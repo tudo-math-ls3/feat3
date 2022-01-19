@@ -54,11 +54,11 @@ struct MeshExtrudeHelper
   typedef Geometry::MeshAtlas<ExtrudedMeshType> ExtrudedAtlasType;
 
   static void create(
-    std::shared_ptr<ExtrudedMeshNodeType>& extruded_mesh_node,
-    const std::shared_ptr<MeshNodeType> rmn,
+    std::unique_ptr<ExtrudedMeshNodeType>& extruded_mesh_node,
+    const MeshNodeType& rmn,
     Index DOXY(slices), CoordType DOXY(z_min), CoordType DOXY(z_max), const String& DOXY(z_min_part_name), const String& DOXY(z_max_part_name))
     {
-      extruded_mesh_node = rmn;
+      extruded_mesh_node = rmn.clone_unique();
     }
 
   static void clear(ExtrudedMeshNodeType* DOXY(extruded_mesh_node))
@@ -78,19 +78,20 @@ struct MeshExtrudeHelper<Geometry::ConformalMesh<Shape::Hypercube<2>, 2, Coord_>
   typedef Geometry::MeshAtlas<ExtrudedMeshType> ExtrudedAtlasType;
 
   static void create(
-    std::shared_ptr<ExtrudedMeshNodeType>& extruded_mesh_node,
-    const std::shared_ptr<MeshNodeType> rmn,
+    std::unique_ptr<ExtrudedMeshNodeType>& extruded_mesh_node,
+    const MeshNodeType& rmn,
     Index slices, CoordType z_min, CoordType z_max, const String& z_min_part_name, const String& z_max_part_name)
     {
-      XASSERT(extruded_mesh_node == nullptr);
+      XASSERT(extruded_mesh_node.get() == nullptr);
 
       ExtrudedAtlasType* extruded_atlas(new ExtrudedAtlasType);
-      extruded_mesh_node = std::make_shared<ExtrudedMeshNodeType>(nullptr, extruded_atlas);
+      //extruded_mesh_node = std::make_shared<ExtrudedMeshNodeType>(nullptr, extruded_atlas);
+      extruded_mesh_node = ExtrudedMeshNodeType::make_unique(nullptr, extruded_atlas);
 
       Geometry::MeshExtruder<MeshType> mesh_extruder(slices, z_min, z_max, z_min_part_name, z_max_part_name);
 
-      mesh_extruder.extrude_atlas(*extruded_atlas, *(rmn->get_atlas()));
-      mesh_extruder.extrude_root_node(*extruded_mesh_node, *rmn, extruded_atlas);
+      mesh_extruder.extrude_atlas(*extruded_atlas, *(rmn.get_atlas()));
+      mesh_extruder.extrude_root_node(*extruded_mesh_node, rmn, extruded_atlas);
     }
 
   static void clear(ExtrudedMeshNodeType* extruded_mesh_node)
@@ -177,27 +178,25 @@ class ExtrudedPartiDomainControl :
         this->_layers.push_back(std::make_shared<LayerType>(comm_.comm_dup(), 0));
         this->_layer_levels.resize(std::size_t(1));
 
-        auto coarse_mesh_node_2d = _dom_ctrl_2d.back()->get_mesh_node_ptr();
+        auto coarse_mesh_node_2d = _dom_ctrl_2d.back()->get_mesh_node();
         int lvl_min(_dom_ctrl_2d.min_level_index());
         int lvl_max(_dom_ctrl_2d.max_level_index());
 
         // Create coarse mesh node for this domain control
-        std::shared_ptr<MeshNodeType> mesh_node(nullptr);
-        MeshExtruder::create(mesh_node, coarse_mesh_node_2d, slices, z_min, z_max, z_min_part_name, z_max_part_name);
+        std::unique_ptr<MeshNodeType> mesh_node;
+        MeshExtruder::create(mesh_node, *coarse_mesh_node_2d, slices, z_min, z_max, z_min_part_name, z_max_part_name);
         // Copy the neighbors information from the lower dimensional domain control
         this->_layers.front()->set_neighbor_ranks(_dom_ctrl_2d.front().layer().get_neighbor_ranks());
 
         // Add coarse mesh node to layer_levels
         auto& laylevs = this->_layer_levels.front();
-        laylevs.push_front(std::make_shared<LevelType>(lvl_min, mesh_node));
+        laylevs.push_front(std::make_shared<LevelType>(lvl_min, std::move(mesh_node)));
 
         // Refine up to desired maximum level
         for(int lvl(lvl_min); lvl < lvl_max; ++lvl)
         {
-          std::shared_ptr<MeshNodeType> coarse_node = mesh_node;
-          mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine(/*this->_adapt_mode*/));
-
-          laylevs.push_front(std::make_shared<LevelType>(lvl+1, mesh_node));
+          laylevs.push_front(std::make_shared<LevelType>(lvl+1,
+            laylevs.front()->get_mesh_node()->refine_unique(/*this->_adapt_mode*/)));
         }
 
         // Finally, compile the virtual levels

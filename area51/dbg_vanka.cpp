@@ -83,16 +83,14 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   typedef Geometry::RootMeshNode<MeshType> MeshNode;
 
   // create mesh node
-  MeshNode* mesh_node = nullptr;
-  std::vector<Index> ranks, ctags;
-  Geometry::UnitCubePatchGenerator<MeshType>::create(0, 1, mesh_node, ranks, ctags);
+  std::unique_ptr<MeshNode> mesh_node;
+  std::vector<int> ranks;
+  Geometry::UnitCubePatchGenerator<MeshType>::create_unique(0, 1, mesh_node, ranks);
 
   // refine a few times
   for(int i = 0; i < level; ++i)
   {
-    MeshNode* old_node = mesh_node;
-    mesh_node = old_node->refine();
-    delete old_node;
+    mesh_node = mesh_node->refine_unique();
   }
 
   // get our mesh

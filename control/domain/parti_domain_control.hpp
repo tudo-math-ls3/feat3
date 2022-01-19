@@ -680,34 +680,31 @@ namespace FEAT
 
           TimeStamp stamp_create;
 
-          // create a new base-mesh node
-          std::shared_ptr<MeshNodeType> base_mesh_node = std::make_shared<MeshNodeType>(nullptr, &this->_atlas);
-
           // try to the read the base-mesh
-          mesh_reader.parse(*base_mesh_node, this->_atlas, &_parti_set);
+          std::unique_ptr<MeshNodeType> base_mesh_node = mesh_reader.parse(this->_atlas, &_parti_set);
 
           // create the domain control
 #ifdef FEAT_HAVE_MPI
           if(this->_comm.size() == 1)
           {
             // We've got just one process, so it's a simple choice:
-            this->_create_single_process(base_mesh_node);
+            this->_create_single_process(std::move(base_mesh_node));
           }
           else if(_support_multi_layered && (_desired_levels.size() > std::size_t(2)))
           {
             // The application supports multi-layered domain controls and
             // the user wants that, so create a multi-layered one:
-            this->_create_multi_layered(base_mesh_node);
+            this->_create_multi_layered(std::move(base_mesh_node));
           }
           else
           {
             // Create a single-layered domain control:
-            this->_create_single_layered(base_mesh_node);
+            this->_create_single_layered(std::move(base_mesh_node));
           }
 #else // not FEAT_HAVE_MPI
           {
             // In the non-MPI case, we always have only one process:
-            this->_create_single_process(base_mesh_node);
+            this->_create_single_process(std::move(base_mesh_node));
           }
 #endif // FEAT_HAVE_MPI
 
@@ -918,7 +915,7 @@ namespace FEAT
          * \param[in] base_mesh_node
          * The base-mesh node from which the hierarchy is to be derived from.
          */
-        void _create_single_process(std::shared_ptr<MeshNodeType> base_mesh_node)
+        void _create_single_process(std::unique_ptr<MeshNodeType> base_mesh_node)
         {
           // create and push single layer
           this->push_layer(std::make_shared<LayerType>(this->_comm.comm_dup(), 0));
@@ -935,7 +932,7 @@ namespace FEAT
           for(; lvl < ancestor.desired_level_min; ++lvl)
           {
             // refine the patch mesh
-            base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
+            base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
           }
 
           // save chosen minimum level if it is not equal to the desired maximum level
@@ -945,18 +942,21 @@ namespace FEAT
           // refine up to maximum level and push to control
           for(; lvl < ancestor.desired_level_max; ++lvl)
           {
-            // push this level
-            this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
-
             // refine the patch mesh
-            base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
+            auto refined_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
+            // push this level
+            this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+
+            // continue with refined node
+            base_mesh_node = std::move(refined_node);
           }
 
           // save chosen maximum level
           this->_chosen_levels.push_front(std::make_pair(lvl, 1));
 
           // push finest level
-          this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
+          this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
         }
 
 
@@ -971,7 +971,7 @@ namespace FEAT
          * \param[in] base_mesh_node
          * The base-mesh node from which the hierarchy is to be derived from.
          */
-        void _create_single_layered(std::shared_ptr<MeshNodeType> base_mesh_node)
+        void _create_single_layered(std::unique_ptr<MeshNodeType> base_mesh_node)
         {
           // create and push single layer
           std::shared_ptr<LayerType> layer = std::make_shared<LayerType>(this->_comm.comm_dup(), 0);
@@ -989,7 +989,7 @@ namespace FEAT
           for(; lvl < ancestor.parti_level; ++lvl)
           {
             // refine the base mesh
-            base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
+            base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
           }
 
           // apply partitioner
@@ -1000,7 +1000,7 @@ namespace FEAT
 
           // extract our patch
           std::vector<int> neighbor_ranks;
-          std::shared_ptr<MeshNodeType> patch_mesh_node(
+          std::unique_ptr<MeshNodeType> patch_mesh_node(
             base_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, this->_comm.rank()));
 
           // set the neighbor ranks of our child layer
@@ -1010,7 +1010,7 @@ namespace FEAT
           for(; lvl < ancestor.desired_level_min; ++lvl)
           {
             // refine the patch mesh
-            patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
+            patch_mesh_node = patch_mesh_node->refine_unique(this->_adapt_mode);
           }
 
           // save chosen minimum level
@@ -1020,18 +1020,21 @@ namespace FEAT
           // refine up to maximum level
           for(; lvl < ancestor.desired_level_max; ++lvl)
           {
-            // push this level
-            this->push_level_front(0, std::make_shared<LevelType>(lvl, patch_mesh_node));
-
             // refine the patch mesh
-            patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
+            auto refined_node = patch_mesh_node->refine_unique(this->_adapt_mode);
+
+            // push this (unrefined) level
+            this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(patch_mesh_node)));
+
+            // continue with refined node
+            patch_mesh_node = std::move(refined_node);
           }
 
           // save chosen maximum level
           this->_chosen_levels.push_front(std::make_pair(lvl, this->_comm.size()));
 
           // push finest level
-          this->push_level_front(0, std::make_shared<LevelType>(lvl, patch_mesh_node));
+          this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(patch_mesh_node)));
         }
 
         /**
@@ -1163,7 +1166,7 @@ namespace FEAT
          * \param[in] base_mesh_node
          * The base-mesh node from which the hierarchy is to be derived from.
          */
-        void _create_multi_layered(std::shared_ptr<MeshNodeType> base_mesh_node)
+        void _create_multi_layered(std::unique_ptr<MeshNodeType> base_mesh_node)
         {
           // create layers
           this->_create_multi_layers_scattered();
@@ -1206,14 +1209,17 @@ namespace FEAT
             // refine up to the chosen partitioning level
             for(; lvl < ancestor.parti_level; ++lvl)
             {
+              // refine the base-mesh node
+              auto refined_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
               // push the base mesh into our parent layer if desired
               if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
               {
-                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, base_mesh_node));
+                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
               }
 
-              // refine the base-mesh node
-              base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
+              // continue with refined node
+              base_mesh_node = std::move(refined_node);
             }
 
             // we're now at the partitioning level, so apply the partitioner
@@ -1224,7 +1230,7 @@ namespace FEAT
 
             // extract our patch
             std::vector<int> neighbor_ranks;
-            std::shared_ptr<MeshNodeType> patch_mesh_node(
+            std::unique_ptr<MeshNodeType> patch_mesh_node(
               base_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, ancestor.progeny_child));
 
             // translate neighbor ranks by progeny group to obtain the neighbor ranks
@@ -1263,19 +1269,19 @@ namespace FEAT
             for(; lvl < global_level_min; ++lvl)
             {
               // refine the base mesh node
-              std::shared_ptr<MeshNodeType> coarse_mesh_node = base_mesh_node;
-              base_mesh_node = std::shared_ptr<MeshNodeType>(coarse_mesh_node->refine(this->_adapt_mode));
+              std::unique_ptr<MeshNodeType> coarse_mesh_node(std::move(base_mesh_node));
+              base_mesh_node = coarse_mesh_node->refine_unique(this->_adapt_mode);
 
               // push base mesh to parent layer if desired
               if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
               {
                 // clear patches before pushing this node as they are redundant here
                 coarse_mesh_node->clear_patches();
-                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, coarse_mesh_node));
+                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(coarse_mesh_node)));
               }
 
               // refine the patch mesh
-              patch_mesh_node = std::shared_ptr<MeshNodeType>(patch_mesh_node->refine(this->_adapt_mode));
+              patch_mesh_node = patch_mesh_node->refine_unique(this->_adapt_mode);
             }
 
             // split the halos of our base-mesh and compute the halos of our patches from that
@@ -1302,11 +1308,11 @@ namespace FEAT
             // push the finest base-mesh
             if(ancestor.layer_p >= 0)
             {
-              this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, base_mesh_node));
+              this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
             }
 
             // continue with the next layer
-            base_mesh_node = patch_mesh_node;
+            base_mesh_node = std::move(patch_mesh_node);
           }
 
           // get the desired maximum level
@@ -1316,15 +1322,18 @@ namespace FEAT
 
           for(; lvl < desired_level_max; ++lvl)
           {
-            // push patch mesh to this level
-            this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
-
             // refine the patch mesh
-            base_mesh_node = std::shared_ptr<MeshNodeType>(base_mesh_node->refine(this->_adapt_mode));
+            auto refined_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
+            // push patch mesh to this level
+            this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+
+            // continue with refined node
+            base_mesh_node = std::move(refined_node);
           }
 
           // push finest level
-          this->push_level_front(0, std::make_shared<LevelType>(lvl, base_mesh_node));
+          this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
 
           // set chosen maximum level for finest layer
           this->_chosen_levels.push_front(std::make_pair(lvl, this->_comm.size()));
@@ -1354,7 +1363,7 @@ namespace FEAT
           std::vector<int>& neighbor_ranks)
         {
           // get the map of the base-mesh halos
-          const std::map<int, MeshPartType*>& base_halo_map = base_mesh_node.get_halo_map();
+          const std::map<int, std::unique_ptr<MeshPartType>>& base_halo_map = base_mesh_node.get_halo_map();
 
           // if the base mesh has no halos, then we can jump out of here
           if(base_halo_map.empty())
@@ -1630,7 +1639,7 @@ namespace FEAT
               neighbor_ranks.push_back(neighbor_rank);
 
               // create new mesh-part
-              patch_mesh_node.add_halo(neighbor_rank, new MeshPartType(halo_splitter));
+              patch_mesh_node.add_halo(neighbor_rank, halo_splitter.make_unique());
             }
           }
         }

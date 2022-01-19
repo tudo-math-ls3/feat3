@@ -186,18 +186,16 @@ namespace FEAT
     protected:
       MeshAtlas<RootMesh_>& _atlas;
       String _chart_name;
-      Atlas::ChartBase<RootMesh_>* _chart;
+      std::unique_ptr<Atlas::ChartBase<RootMesh_>> _chart;
 
     public:
       explicit ChartParser(MeshAtlas<RootMesh_>& atlas) :
-        _atlas(atlas), _chart_name(), _chart(nullptr)
+        _atlas(atlas), _chart_name(), _chart()
       {
       }
 
       virtual ~ChartParser()
       {
-        if(_chart != nullptr)
-          delete _chart;
       }
 
       virtual bool attribs(std::map<String,bool>& attrs) const override
@@ -228,12 +226,11 @@ namespace FEAT
       virtual void close(int iline, const String& sline) override
       {
         // make sure that we have a chart here
-        if(_chart == nullptr)
+        if(!_chart)
           throw Xml::GrammarError(iline, sline, "Invalid empty chart");
 
         // insert chart into atlas
-        _atlas.add_mesh_chart(_chart_name, _chart);
-        _chart = nullptr;
+        _atlas.add_mesh_chart(_chart_name, std::move(_chart));
       }
 
       virtual bool content(int, const String&) override
@@ -587,7 +584,7 @@ namespace FEAT
 
     protected:
       MeshPart_& _mesh_part;
-      AttribType* _attrib;
+      std::unique_ptr<AttribType> _attrib;
       Index _my_dim;
       Index _count;
       Index _read;
@@ -596,7 +593,7 @@ namespace FEAT
     public:
       explicit AttributeParser(MeshPart_& mesh_part) :
         _mesh_part(mesh_part),
-        _attrib(nullptr),
+        _attrib(),
         _my_dim(0),
         _count(0),
         _read(0)
@@ -605,9 +602,6 @@ namespace FEAT
 
       virtual ~AttributeParser()
       {
-        // Because adding the AttributeSet to a MeshPart passes ownership, we just need to nullify the pointer here
-        if(_attrib != nullptr)
-          _attrib = nullptr;
       }
 
       virtual bool attribs(std::map<String,bool>& attrs) const override
@@ -635,7 +629,7 @@ namespace FEAT
 
         // create mesh attribute
         _count = _mesh_part.get_num_entities(0);
-        _attrib = new AttribType(_count, int(_my_dim));
+        _attrib.reset(new AttribType(_count, int(_my_dim)));
       }
 
       virtual void close(int iline, const String& sline) override
@@ -645,7 +639,7 @@ namespace FEAT
           throw Xml::GrammarError(iline, sline, "Invalid terminator; expected index");
 
         // okay, add attribute to mesh part
-        _mesh_part.add_attribute(_attrib, _my_name);
+        _mesh_part.add_attribute(std::move(_attrib), _my_name);
       }
 
       virtual std::shared_ptr<MarkupParser> markup(int, const String&, const String&) override
@@ -693,7 +687,7 @@ namespace FEAT
 
     protected:
       RootMeshNode<MeshType>& _root_node;
-      MeshType* _mesh;
+      std::unique_ptr<MeshType> _mesh;
       bool _have_verts;
       std::deque<int> _have_topology;
       std::vector<Index> _sizes;
@@ -720,11 +714,6 @@ namespace FEAT
 
       virtual ~MeshParser()
       {
-        // Note: if the mesh was parsed successfully, then the
-        // pointer to the mesh object is passed to the root mesh node
-        // and the "_mesh" pointer is set back to nullptr.
-        if(_mesh)
-          delete _mesh;
       }
 
       virtual bool attribs(std::map<String,bool>& attrs) const override
@@ -776,7 +765,7 @@ namespace FEAT
         }
 
         // try to create the mesh
-        _mesh = new MeshType(_sizes.data());
+        _mesh.reset(new MeshType(_sizes.data()));
 
         // initialize
         _have_verts = false;
@@ -802,11 +791,7 @@ namespace FEAT
         RedundantIndexSetBuilder<Shape_>::compute(*_mesh->get_topology());
 
         // add to mesh node
-        _root_node.set_mesh(_mesh);
-
-        // clean up our pointer, so that the object is not deleted
-        // upon destruction of this parser object
-        _mesh = nullptr;
+        _root_node.set_mesh(std::move(_mesh));
       }
 
       virtual std::shared_ptr<Xml::MarkupParser> markup(int iline, const String& sline, const String& name) override
@@ -860,7 +845,7 @@ namespace FEAT
     protected:
       RootMeshNode<MeshType>& _root_node;
       MeshNodeLinker<MeshType>& _linker;
-      MeshPartType* _mesh_part;
+      std::unique_ptr<MeshPartType> _mesh_part;
       ChartType* _chart;
       TopoType _topo_type;
       String _name, _parent, _chart_name;
@@ -872,7 +857,7 @@ namespace FEAT
       explicit MeshPartParser(RootMeshNode<MeshType>& root_node, MeshNodeLinker<MeshType>& linker) :
         _root_node(root_node),
         _linker(linker),
-        _mesh_part(nullptr),
+        _mesh_part(),
         _chart(nullptr),
         _topo_type(TopoType::none)
       {
@@ -880,8 +865,6 @@ namespace FEAT
 
       virtual ~MeshPartParser()
       {
-        if(_mesh_part != nullptr)
-          delete _mesh_part;
       }
 
       virtual bool attribs(std::map<String,bool>& attrs) const override
@@ -950,7 +933,7 @@ namespace FEAT
         }
 
         // try to create the mesh part
-        _mesh_part = new MeshPartType(_sizes.data(), _topo_type != TopoType::none);
+        _mesh_part.reset(new MeshPartType(_sizes.data(), _topo_type != TopoType::none));
 
         // initialize
         _have_topology.resize(std::size_t(Shape_::dimension), 0);
@@ -994,10 +977,7 @@ namespace FEAT
         }
 
         // Finally, insert mesh part into root node
-        _root_node.add_mesh_part(_name, _mesh_part/*, _chart_name, _chart*/);
-
-        // Reset pointer
-        _mesh_part = nullptr;
+        _root_node.add_mesh_part(_name, std::move(_mesh_part)/*, _chart_name, _chart*/);
       }
 
       virtual std::shared_ptr<Xml::MarkupParser> markup(int iline, const String& sline, const String& name) override
@@ -1772,17 +1752,17 @@ namespace FEAT
        * May be \p nullptr, if the partitions are to be ignored.
        *
        * \returns
-       * A shared pointer to the root mesh node containing the mesh and the mesh parts.
+       * A unique pointer to the root mesh node containing the mesh and the mesh parts.
        * This mesh node is automatically linked to the given mesh atlas.
        */
       template<typename RootMesh_>
-      std::shared_ptr<RootMeshNode<RootMesh_>> parse(
+      std::unique_ptr<RootMeshNode<RootMesh_>> parse(
         MeshAtlas<RootMesh_>& mesh_atlas,
         PartitionSet* part_set = nullptr)
       {
         // create new root mesh node
-        std::shared_ptr<RootMeshNode<RootMesh_>> root_mesh_node =
-          std::make_shared<RootMeshNode<RootMesh_>>(nullptr, &mesh_atlas);
+        std::unique_ptr<RootMeshNode<RootMesh_>> root_mesh_node =
+          RootMeshNode<RootMesh_>::make_unique(nullptr, &mesh_atlas);
 
         // parse
         this->parse(*root_mesh_node, mesh_atlas, part_set);
@@ -1810,6 +1790,7 @@ namespace FEAT
     struct DimensionalChartHelper
     {
       static_assert(RootMesh_::world_dim == world_dim, "Nonmatching world_dim.");
+
       /**
        * \brief Creates a parser for a chart, its type identified by a name String
        *
@@ -1821,7 +1802,7 @@ namespace FEAT
        *
        */
       static std::shared_ptr<Xml::MarkupParser> markup(const String& DOXY(name),
-      Atlas::ChartBase<RootMesh_>*& DOXY(chart))
+        std::unique_ptr<Atlas::ChartBase<RootMesh_>>& DOXY(chart))
       {
         return nullptr;
       }
@@ -1832,7 +1813,7 @@ namespace FEAT
     struct DimensionalChartHelper<RootMesh_,2>
     {
       static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
-      Atlas::ChartBase<RootMesh_>*& chart)
+        std::unique_ptr<Atlas::ChartBase<RootMesh_>>& chart)
       {
         if(name == "Circle")
           return std::make_shared<Atlas::CircleChartParser<RootMesh_>>(chart);
@@ -1847,7 +1828,7 @@ namespace FEAT
     struct DimensionalChartHelper<RootMesh_,3>
     {
       static std::shared_ptr<Xml::MarkupParser> markup(const String& name,
-      Atlas::ChartBase<RootMesh_>*& chart)
+        std::unique_ptr<Atlas::ChartBase<RootMesh_>>& chart)
       {
         if(name == "Sphere")
           return std::make_shared<Atlas::SphereChartParser<RootMesh_>>(chart);

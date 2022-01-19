@@ -275,8 +275,8 @@ class SlipFilterAssemblyTest
       reader.read_root_markup();
 
       // create an empty atlas and a root mesh node
-      Geometry::MeshAtlas<MeshType>* atlas = new Geometry::MeshAtlas<MeshType>();
-      Geometry::RootMeshNode<MeshType>* node = new Geometry::RootMeshNode<MeshType>(nullptr, atlas);
+      std::unique_ptr<Geometry::MeshAtlas<MeshType>> atlas = Geometry::MeshAtlas<MeshType>::make_unique();
+      std::unique_ptr<Geometry::RootMeshNode<MeshType>> node = Geometry::RootMeshNode<MeshType>::make_unique(nullptr, atlas.get());
 
       reader.parse(*node, *atlas);
 
@@ -286,9 +286,7 @@ class SlipFilterAssemblyTest
       Index lvl_max(0);
       for(Index lvl(0); lvl <= lvl_max; ++lvl)
       {
-        auto* old = node;
-        node = old->refine();
-        delete old;
+        node = node->refine_unique();
       }
 
       // Trafo and space
@@ -354,10 +352,6 @@ class SlipFilterAssemblyTest
         for(int d(0); d < world_dim; ++d)
           TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
       }
-
-      // Clean up
-      delete node;
-      delete atlas;
     }
 
     /**
@@ -384,18 +378,15 @@ class SlipFilterAssemblyTest
       typedef SpaceType_<TrafoType> SpaceType;
 
       // This is for creating the mesh and its MeshParts
-      Geometry::RootMeshNode<MeshType>* node = nullptr;
-      std::vector<Index> ranks;
-      std::vector<Index> ctags;
-      Geometry::UnitCubePatchGenerator<MeshType>::create(0, 1, node, ranks, ctags);
+      std::unique_ptr<Geometry::RootMeshNode<MeshType>> node;
+      std::vector<int> ranks;
+      Geometry::UnitCubePatchGenerator<MeshType>::create_unique(0, 1, node, ranks);
 
       // Refine the MeshNode so the MeshParts get refined, too.
       Index lvl_max(2);
       for(Index lvl(0); lvl <= lvl_max; ++lvl)
       {
-        auto* old = node;
-        node = old->refine();
-        delete old;
+        node = node->refine_unique();
       }
 
       // Trafo and space
@@ -470,9 +461,6 @@ class SlipFilterAssemblyTest
         for(int d(0); d < world_dim; ++d)
           TEST_CHECK_EQUAL(check_vec(i)(d), vec_org(i)(d));
       }
-
-      // Clean up
-      delete node;
     }
 
     void run() const override

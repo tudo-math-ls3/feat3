@@ -50,7 +50,7 @@ namespace FEAT
 
       //protected:
         /// our sub-chart object
-        SubChart_* _sub_chart;
+        std::unique_ptr<SubChart_> _sub_chart;
 
       protected:
         /// the origin point
@@ -62,15 +62,15 @@ namespace FEAT
 
       public:
         explicit Extrude() :
-          _sub_chart(nullptr)
+          _sub_chart()
         {
           _origin.format();
           _offset.format();
           _rotation.set_identity();
         }
 
-        explicit Extrude(SubChart_* sub_chart) :
-          _sub_chart(sub_chart)
+        explicit Extrude(std::unique_ptr<SubChart_> sub_chart) :
+          _sub_chart(std::move(sub_chart))
         {
           _origin.format();
           _offset.format();
@@ -79,8 +79,6 @@ namespace FEAT
 
         virtual ~Extrude()
         {
-          if(_sub_chart != nullptr)
-            delete _sub_chart;
         }
 
         void set_origin(CoordType x, CoordType y)
@@ -101,10 +99,10 @@ namespace FEAT
           _rotation.set_rotation_3d(yaw, pitch, roll);
         }
 
-        void set_sub_chart(SubChart_* sub_chart)
+        void set_sub_chart(std::unique_ptr<SubChart_> sub_chart)
         {
-          XASSERTM(_sub_chart == nullptr, "Extrude chart already has a sub-chart");
-          _sub_chart = sub_chart;
+          XASSERTM(bool(_sub_chart), "Extrude chart already has a sub-chart");
+          _sub_chart = std::move(sub_chart);
         }
 
         virtual bool can_implicit() const override
@@ -350,7 +348,7 @@ namespace FEAT
         public Xml::DummyParser
       {
       public:
-        explicit ExtrudeChartParser(ChartBase<Mesh_>*&)
+        explicit ExtrudeChartParser(std::unique_ptr<ChartBase<Mesh_>>&)
         {
           XABORTM("Thou shall not arrive here");
         }
@@ -362,13 +360,13 @@ namespace FEAT
       {
       private:
         typedef typename ChartBase<Mesh_>::CoordType CoordType;
-        ChartBase<Mesh_>*& _chart;
+        std::unique_ptr<ChartBase<Mesh_>>& _chart;
         CoordType _ori_x, _ori_y;
         CoordType _off_x, _off_y, _off_z;
         CoordType _yaw, _pitch, _roll;
 
       public:
-        explicit ExtrudeChartParser(ChartBase<Mesh_>*& chart) :
+        explicit ExtrudeChartParser(std::unique_ptr<ChartBase<Mesh_>>& chart) :
           _chart(chart),
           _ori_x(CoordType(0)),
           _ori_y(CoordType(0)),
@@ -447,7 +445,7 @@ namespace FEAT
 
         virtual void close(int iline, const String& sline) override
         {
-          if(_chart == nullptr)
+          if(!_chart)
             throw Xml::GrammarError(iline, sline, "invalid empty <Extrude> markup");
         }
 
@@ -465,21 +463,23 @@ namespace FEAT
           // What have we here?
           if(name == "Circle")
           {
-            auto* ext = new Extrude<Mesh_, Circle<SubMeshType>>();
+            std::unique_ptr<Extrude<Mesh_, Circle<SubMeshType>>> ext(new Extrude<Mesh_, Circle<SubMeshType>>());
             ext->set_origin(_ori_x, _ori_y);
             ext->set_offset(_off_x, _off_y, _off_z);
             ext->set_angles(_yaw, _pitch, _roll);
-            _chart = ext;
-            return std::make_shared<Atlas::CircleChartParser<SubMeshType, Circle<SubMeshType>>>(ext->_sub_chart);
+            std::unique_ptr<Circle<SubMeshType>>& sub_chart = ext->_sub_chart;
+            _chart = std::move(ext);
+            return std::make_shared<Atlas::CircleChartParser<SubMeshType, Circle<SubMeshType>>>(sub_chart);
           }
           if(name == "Bezier")
           {
-            auto* ext = new Extrude<Mesh_, Bezier<SubMeshType>>();
+            std::unique_ptr<Extrude<Mesh_, Bezier<SubMeshType>>> ext(new Extrude<Mesh_, Bezier<SubMeshType>>());
             ext->set_origin(_ori_x, _ori_y);
             ext->set_offset(_off_x, _off_y, _off_z);
             ext->set_angles(_yaw, _pitch, _roll);
-            _chart = ext;
-            return std::make_shared<Atlas::BezierChartParser<SubMeshType, Bezier<SubMeshType>>>(ext->_sub_chart);
+            std::unique_ptr<Bezier<SubMeshType>>& sub_chart = ext->_sub_chart;
+            _chart = std::move(ext);
+            return std::make_shared<Atlas::BezierChartParser<SubMeshType, Bezier<SubMeshType>>>(sub_chart);
           }
 
           return nullptr;

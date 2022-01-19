@@ -772,9 +772,9 @@ namespace FEAT
         // create mesh
         TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        TriaSubMesh::AttributeSetType* my_attrib_set = new TriaSubMesh::AttributeSetType(num_entities[0],2);
+        std::unique_ptr<TriaSubMesh::AttributeSetType> my_attrib_set(new TriaSubMesh::AttributeSetType(num_entities[0],2));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "TriaSubAttributeSet");
+        mesh->add_attribute(std::move(my_attrib_set), "TriaSubAttributeSet");
 
         // set up vertex coordinates array
         Real attr[] =
@@ -956,9 +956,9 @@ namespace FEAT
         // create mesh
         TriaSubMesh* mesh = new TriaSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        TriaSubMesh::AttributeSetType* my_attrib_set = new TriaSubMesh::AttributeSetType(num_entities[0]);
+        std::unique_ptr<TriaSubMesh::AttributeSetType> my_attrib_set(new TriaSubMesh::AttributeSetType(num_entities[0]));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "PatchEdgeAttribute");
+        mesh->add_attribute(std::move(my_attrib_set), "PatchEdgeAttribute");
 
         // set up vertex coordinates array
         Real attr[] =

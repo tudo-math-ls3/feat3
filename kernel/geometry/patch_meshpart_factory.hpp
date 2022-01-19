@@ -118,7 +118,7 @@ namespace FEAT
        *
        * This MeshPart does not have a topology.
        */
-      virtual void fill_index_sets(IndexSetHolderType*& DOXY(index_set_holder)) override
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>& DOXY(index_set_holder)) override
       {
         // Do nothing
         return;

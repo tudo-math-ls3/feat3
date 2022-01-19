@@ -1975,9 +1975,9 @@ namespace FEAT
         // create mesh
         TetraSubMesh* mesh = new TetraSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        TetraSubMesh::AttributeSetType* my_attrib_set = new TetraSubMesh::AttributeSetType(num_entities[0], 2);
+        std::unique_ptr<TetraSubMesh::AttributeSetType> my_attrib_set(new TetraSubMesh::AttributeSetType(num_entities[0], 2));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "TriaSubAttributeSet");
+        mesh->add_attribute(std::move(my_attrib_set), "TriaSubAttributeSet");
 
         // set up vertex coordinates array
         Real attr[] =

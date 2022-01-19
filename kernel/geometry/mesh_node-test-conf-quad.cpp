@@ -66,32 +66,32 @@ public:
     /* ********************************************************************* */
 
     // create a root mesh node
-    RootMeshNodeType* root_node_c = new RootMeshNodeType(root_mesh_c);
+    std::unique_ptr<RootMeshNodeType> root_node_c = RootMeshNodeType::make_unique(std::unique_ptr<RootMeshType>(root_mesh_c));
 
     // add quad submesh node
     MeshPartNodeType* subnode_quad_c =
-      root_node_c->add_mesh_part_node("0", new MeshPartNodeType(submesh_quad_c));
+      root_node_c->add_mesh_part_node("0", MeshPartNodeType::make_unique(std::unique_ptr<MeshPartType>(submesh_quad_c)));
 
     // add edge submesh node
     //MeshPartNodeType* subnode_edge_c =
-      root_node_c->add_mesh_part_node("1", new MeshPartNodeType(submesh_edge_c));
+      root_node_c->add_mesh_part_node("1",  MeshPartNodeType::make_unique(std::unique_ptr<MeshPartType>(submesh_edge_c)));
 
     // add edge sub-submesh node
     //MeshPartNodeType* subnode_quad_edge_c =
-      subnode_quad_c->add_mesh_part_node("2", new MeshPartNodeType(submesh_quad_edge_c));
+      subnode_quad_c->add_mesh_part_node("2",  MeshPartNodeType::make_unique(std::unique_ptr<MeshPartType>(submesh_quad_edge_c)));
 
     // add quad cell subset node
     MeshPartNodeType* subsetnode_quad_c =
-      root_node_c->add_mesh_part_node("7", new MeshPartNodeType(subset_quad_c));
+      root_node_c->add_mesh_part_node("7",  MeshPartNodeType::make_unique(std::unique_ptr<MeshPartType>(subset_quad_c)));
 
     // add edge cell subset node
     //MeshPartNodeType* subsetnode_quad_edge_c =
-      subsetnode_quad_c->add_mesh_part_node("42", new MeshPartNodeType(subset_quad_edge_c));
+      subsetnode_quad_c->add_mesh_part_node("42",  MeshPartNodeType::make_unique(std::unique_ptr<MeshPartType>(subset_quad_edge_c)));
 
     /* ********************************************************************* */
 
     // refine the mesh tree
-    RootMeshNodeType* root_node_f = root_node_c->refine();
+    std::unique_ptr<RootMeshNodeType> root_node_f = root_node_c->refine_unique();
 
     /* ********************************************************************* */
 
@@ -145,10 +145,6 @@ public:
     {
       TEST_CHECK_MSG(false, msg);
     }
-
-    // delete refined and coarse root nodes
-    delete root_node_f;
-    delete root_node_c;
   }
 
 } mesh_node_test_conf_quad;

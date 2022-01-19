@@ -173,10 +173,11 @@ namespace Tutorial01
     mesh_reader.add_mesh_files(filenames);
 
     Geometry::MeshAtlas<MeshType> altas;
-    auto root_node = mesh_reader.parse(altas);
+    auto root_node = Geometry::RootMeshNode<MeshType>::make_unique(nullptr, &atlas);
+    mesh_reader.parse(*root_node, altas);
 
     for(Index i(0); i < level; ++i)
-      root_node = std::shared_ptr<Geometry::RootMeshNode<MeshType>>(root_node->refine());
+      root_node = root_node->refine_unique();
 
     run(level, cores, *root_node->get_mesh());
   }

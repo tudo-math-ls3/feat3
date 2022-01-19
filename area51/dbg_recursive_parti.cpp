@@ -29,7 +29,7 @@ namespace DbgRecursiveParti
 
     for(int r(0); r < comm.size(); ++r)
     {
-      const auto* halo = dom_lvl->get_mesh_node_ptr()->get_halo(r);
+      const auto* halo = dom_lvl->get_mesh_node()->get_halo(r);
       if(halo == nullptr)
       {
         vtk.add_vertex_scalar("halo:" + stringify(r).pad_front(2,'0'), vtx.data());

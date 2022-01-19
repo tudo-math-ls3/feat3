@@ -305,8 +305,8 @@ namespace MeshPermAssemblyBench
 
     // create an empty atlas and a root mesh node
     Geometry::MeshAtlas<Mesh_> atlas;
-    std::deque<std::shared_ptr<Geometry::RootMeshNode<Mesh_>>> nodes;
-    nodes.push_back(std::make_shared<Geometry::RootMeshNode<Mesh_>>(nullptr, &atlas));
+    std::deque<std::unique_ptr<Geometry::RootMeshNode<Mesh_>>> nodes;
+    nodes.push_back(Geometry::RootMeshNode<Mesh_>::make_unique(nullptr, &atlas));
 
     // try to parse the mesh file
 #ifndef DEBUG
@@ -334,7 +334,7 @@ namespace MeshPermAssemblyBench
     std::cout << "Refining up to level " << lvl_max << "..." << std::endl;
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
-      nodes.push_back(nodes.back()->refine_shared());
+      nodes.push_back(nodes.back()->refine_unique());
     }
 
     static constexpr std::size_t nperms(5u);
@@ -363,7 +363,7 @@ namespace MeshPermAssemblyBench
         std::cout.flush();
 
         // clone node
-        auto node = nodes.at(lvl)->clone_shared();
+        auto node = nodes.at(lvl)->clone_unique();
 
         // permute
         TimeStamp stamp_1;

@@ -142,31 +142,27 @@ public:
 
     // Check AttributeSet functionality
     // Create attributes of dimension 0
-    AttributeSetType* att_0_1 = new AttributeSetType(mesh_part_to_test.get_num_entities(0));
-    AttributeSetType* att_0_2 = new AttributeSetType(mesh_part_to_test.get_num_entities(0));
-    AttributeSetType* att_0_3 = new AttributeSetType(mesh_part_to_test.get_num_entities(0));
+    std::unique_ptr<AttributeSetType> att_0_1(new AttributeSetType(mesh_part_to_test.get_num_entities(0)));
+    std::unique_ptr<AttributeSetType> att_0_2(new AttributeSetType(mesh_part_to_test.get_num_entities(0)));
+    std::unique_ptr<AttributeSetType> att_0_3(new AttributeSetType(mesh_part_to_test.get_num_entities(0)));
     // Change some data
     att_0_1->operator()(1,0) = DataType(12);
     att_0_3->operator()(1,0) = DataType(-5);
 
     // Add attributes of dimension 0
     TEST_CHECK(mesh_part_to_test.get_num_attributes() == 0);
-    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_1,"SomeName"));
-    TEST_CHECK(mesh_part_to_test.add_attribute(att_0_2,"SomeOtherName"));
+    TEST_CHECK(mesh_part_to_test.add_attribute(std::move(att_0_1),"SomeName"));
+    TEST_CHECK(mesh_part_to_test.add_attribute(std::move(att_0_2),"SomeOtherName"));
 
     TEST_CHECK(mesh_part_to_test.get_num_attributes() == 2);
 
     // As an attribute with the same name is already present, this must return false
-    TEST_CHECK(!mesh_part_to_test.add_attribute(att_0_3,"SomeName"));
+    TEST_CHECK(!mesh_part_to_test.add_attribute(std::move(att_0_3),"SomeName"));
     // There should still be only 2 attributes in the mesh
     TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(),2);
     TEST_CHECK_EQUAL(mesh_part_to_test.find_attribute("SomeName")->operator()(1,0), DataType(12));
     // There should still be only 2 attributes in the mesh
     TEST_CHECK_EQUAL(mesh_part_to_test.get_num_attributes(),2);
-
-    // Since we never successfully inserted this, we have to clean it up
-    delete att_0_3;
-
   }
 
 } mesh_part_test;

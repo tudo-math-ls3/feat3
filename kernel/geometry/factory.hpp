@@ -10,6 +10,9 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 
+// includes, system
+#include <array>
+
 namespace FEAT
 {
   namespace Geometry
@@ -94,6 +97,16 @@ namespace FEAT
             num_ent[i] = factory.get_num_entities(i);
           }
         }
+
+        template<typename Factory_, std::size_t m_>
+        static void apply(Factory_& factory, std::array<Index, m_>& num_ent)
+        {
+          static_assert(int(m_) >= n_+1, "invalid array size");
+          for(int i(0); i <= n_; ++i)
+          {
+            num_ent[std::size_t(i)] = factory.get_num_entities(i);
+          }
+        }
       };
 
       template<int n_>
@@ -113,6 +126,16 @@ namespace FEAT
         template<typename Factory_>
         static void apply(Factory_& factory, Index* num_slic)
         {
+          for(int i(0); i < n_; ++i)
+          {
+            num_slic[i] = factory.get_num_slices(i);
+          }
+        }
+
+        template<typename Factory_, std::size_t m_>
+        static void apply(Factory_& factory, std::array<Index, m_>& num_slic)
+        {
+          static_assert(int(m_) >= n_, "invalid array size");
           for(int i(0); i < n_; ++i)
           {
             num_slic[i] = factory.get_num_slices(i);

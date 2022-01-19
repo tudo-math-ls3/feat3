@@ -376,7 +376,7 @@ namespace DFG95
     // accumulate sizes
     for(Index i(0); i < num_levels; ++i)
     {
-      statistics.bytes[Bytes::mesh] += domain.at(i)->get_mesh_node_ptr()->bytes();
+      statistics.bytes[Bytes::mesh] += domain.at(i)->get_mesh_node()->bytes();
       statistics.bytes[Bytes::gate] += system_levels.at(i)->gate_sys.bytes();
       statistics.bytes[Bytes::muxer] += system_levels.at(i)->coarse_muxer_sys.bytes();
       statistics.bytes[Bytes::matrix] += system_levels.at(i)->matrix_sys.local().bytes();

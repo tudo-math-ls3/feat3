@@ -337,7 +337,7 @@ namespace AnalyseMeshCGAL
 
     // Next, let us create a shared-pointer for the mesh-node, which will be assigned to
     // a new object by the mesh file reader in the next step.
-    std::shared_ptr<RootMeshNodeType> mesh_node;
+    std::unique_ptr<RootMeshNodeType> mesh_node;
 
     // Okay, let the parsing begin:
     std::cout << "Parsing mesh files..." << std::endl;
@@ -397,7 +397,7 @@ namespace AnalyseMeshCGAL
       // Refining the mesh-node is really easy: we just have to call the 'refine' function
       // of the mesh-node. Since we are using shared-pointers here, we have to encapsulate
       // the 'naked' pointer returned by the function in a shared_ptr:
-      mesh_node = std::shared_ptr<RootMeshNodeType>(mesh_node->refine());
+      mesh_node = mesh_node->refine_unique();
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

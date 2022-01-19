@@ -15,6 +15,9 @@
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 #include <kernel/geometry/index_calculator.hpp>
 
+// includes, system
+#include <memory>
+
 namespace FEAT
 {
   namespace Geometry
@@ -664,6 +667,25 @@ namespace FEAT
        */
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder) = 0;
 
+      /**
+       * \brief Creates a new mesh and returns it
+       *
+       * \returns A new mesh object
+       */
+      MeshType make()
+      {
+        return MeshType(*this);
+      }
+
+      /**
+       * \brief Creates a new mesh on the heap and returns a unique pointer to it
+       *
+       * \returns A unique pointer to the newly created mesh object
+       */
+      std::unique_ptr<MeshType> make_unique()
+      {
+        return std::unique_ptr<MeshType>(new MeshType(*this));
+      }
     }; // class Factory<ConformalMesh<...>>
 
     /* ************************************************************************************************************* */

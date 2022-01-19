@@ -145,7 +145,7 @@ namespace FETI{
     std::vector<IndexType> mirror_dofs;
     LocalFilterType filter_local;
     LocalMatrixType matrix_local;
-    std::shared_ptr<RootMeshNodeType> root_mesh_node;
+    std::unique_ptr<RootMeshNodeType> root_mesh_node;
 
 
     MeshType* mesh = nullptr;
@@ -224,7 +224,7 @@ namespace FETI{
       //we wont need neighbour_ranks itself, so just use it as local variable...
       std::vector<int> neighbour_ranks;
 
-      IndexType lvl = Geometry::UnitCubePatchGenerator<MeshType>::create(
+      IndexType lvl = Geometry::UnitCubePatchGenerator<MeshType>::create_unique(
          int(domain_rank),          // input:  the rank of this process
          int(domain_size),          // input:  the total number of processes
          root_mesh_node,       // output: the root-mesh-node shared pointer
@@ -240,7 +240,7 @@ namespace FETI{
 
       for(; lvl < level; ++lvl)
       {
-        root_mesh_node = std::shared_ptr<RootMeshNodeType>(root_mesh_node->refine());
+        root_mesh_node = root_mesh_node->refine_unique();
       }
     }
 

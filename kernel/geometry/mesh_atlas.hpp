@@ -15,6 +15,7 @@
 // includes, system
 #include <map>
 #include <deque>
+#include <memory>
 
 namespace FEAT
 {
@@ -41,7 +42,7 @@ namespace FEAT
 
     protected:
       /// our chart map type
-      typedef std::map<String, MeshChartType*> MeshChartMap;
+      typedef std::map<String, std::unique_ptr<MeshChartType>> MeshChartMap;
 
       /// our chart map
       MeshChartMap _chart_map;
@@ -53,20 +54,32 @@ namespace FEAT
       }
 
       /// move CTOR
-      MeshAtlas(MeshAtlas&& other) :
-        _chart_map(std::move(other._chart_map))
-      {
-      }
+      MeshAtlas(MeshAtlas&& other) = default;
+
+      /// move-assignment operator
+      MeshAtlas& operator=(MeshAtlas&& other) = default;
+
+      /// deleted copy CTOR
+      MeshAtlas(const MeshAtlas&) = delete;
+
+      /// deleted copy-assignment operator
+      MeshAtlas& operator=(const MeshAtlas&) = delete;
 
       /// virtual DTOR
       virtual ~MeshAtlas()
       {
-        // delete all charts
-        for(auto it = _chart_map.begin(); it != _chart_map.end(); ++it)
-        {
-          delete (*it).second;
-        }
-        _chart_map.clear();
+        // map and unique_ptr take care of cleanup
+      }
+
+      /**
+       * \brief Creates a new MeshAtlas on the heap and returns a unique pointer to it
+       *
+       * \returns
+       * A unique pointer to the new MeshAtlas object.
+       */
+      static std::unique_ptr<MeshAtlas> make_unique()
+      {
+        return std::unique_ptr<MeshAtlas>(new MeshAtlas());
       }
 
       /// \returns The size of dynamically allocated memory in bytes.
@@ -85,7 +98,8 @@ namespace FEAT
        * The name of the chart to be inserted.
        *
        * \param[in] chart
-       * The mesh chart to be inserted.
+       * A unique pointer to the mesh chart to be inserted. The atlas takes ownership of the chart
+       * object and deletes it upon destruction.
        *
        * \param[in] replace
        * Specifies whether to replace an old chart with the same name if it already exists.
@@ -94,10 +108,11 @@ namespace FEAT
        * True if the MeshChart was successfully inserted, meaning a chart of that name was either not present
        * yet, or it was present and replace was set to true.
        */
-      bool add_mesh_chart(const String& name, MeshChartType* chart, bool replace = false)
+      bool add_mesh_chart(const String& name,  std::unique_ptr<MeshChartType> chart, bool replace = false)
       {
         // try to insert
-        auto it = _chart_map.insert(std::make_pair(name, chart));
+        // note: unique_ptr needs to be moved here, otherwise emplace tries to copy instead
+        auto it = _chart_map.emplace(name, std::move(chart));
 
         // insertion successful?
         if(it.second)
@@ -107,12 +122,8 @@ namespace FEAT
         if(!replace)
           return false;
 
-        // delete old chart
-        if((it.first->second) != nullptr)
-          delete (it.first->second);
-
         // assign new chart
-        it.first->second = chart;
+        it.first->second = std::move(chart);
         return true;
       }
 
@@ -147,14 +158,15 @@ namespace FEAT
        *
        * \returns
        * A pointer to the mesh chart associated with \p name, or \c nullptr if no chart
-       * with that name was found.
+       * with that name was found. This returned pointer does not transfer ownership and must
+       * therefore \b not be deleted by the caller.
        */
       MeshChartType* find_mesh_chart(const String& name)
       {
         auto it = _chart_map.find(name);
         if(it == _chart_map.end())
           return nullptr;
-        return (*it).second;
+        return (*it).second.get();
       }
 
       /** \copydoc find_mesh_chart() */
@@ -163,7 +175,7 @@ namespace FEAT
         auto it = _chart_map.find(name);
         if(it == _chart_map.end())
           return nullptr;
-        return (*it).second;
+        return (*it).second.get();
       }
 
       /**

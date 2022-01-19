@@ -198,7 +198,7 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_> atlas;
   //Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
-  auto node = std::make_shared<Geometry::RootMeshNode<Mesh_>>(nullptr, &atlas);
+  auto node = Geometry::RootMeshNode<Mesh_>::make_unique(nullptr, &atlas);
 
   // try to parse the mesh file
 #ifndef DEBUG
@@ -231,8 +231,8 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
   for(Index lvl(1); lvl <= lvl_max; ++lvl)
   {
     std::cout << "Refining up to level " << lvl << "..." << std::endl;
-    auto coarse = node;
-    node = coarse->refine_shared();
+    auto coarse = std::move(node);
+    node = coarse->refine_unique();
 
     if(lvl < lvl_min)
     {
@@ -240,7 +240,7 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
     }
 
     //auto* fine = coarse->refine();
-    auto fine = node->clone_shared();
+    auto fine = node->clone_unique();
 
     // permute coarse and fine mesh nodes
     coarse->create_permutation(strat);

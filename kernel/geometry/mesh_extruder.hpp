@@ -236,7 +236,7 @@ namespace FEAT
        * \c true, if the chart was extruded, otherwise \c false.
        */
       template<typename SubChart_>
-      bool try_extrude_chart(HexaChart*& hexa_chart, const QuadChart& quad_chart) const
+      bool try_extrude_chart(std::unique_ptr<HexaChart>& hexa_chart, const QuadChart& quad_chart) const
       {
         // try down-cast to sub-chart
         const SubChart_* sub_chart = dynamic_cast<const SubChart_*>(&quad_chart);
@@ -244,13 +244,16 @@ namespace FEAT
           return false;
 
         // success; create the extruded hexa chart
-        auto* the_chart = new Atlas::Extrude<HexaMesh, SubChart_>(new SubChart_(*sub_chart));
-        hexa_chart = the_chart;
+        std::unique_ptr<Atlas::Extrude<HexaMesh, SubChart_>> the_chart(
+          new Atlas::Extrude<HexaMesh, SubChart_>(
+            std::unique_ptr<SubChart_>(new SubChart_(*sub_chart))));
 
         // set our transformation
         the_chart->set_origin(_origin_x, _origin_y);
         the_chart->set_offset(_offset_x, _offset_y, _offset_z);
         the_chart->set_angles(_angle_y, _angle_p, _angle_r);
+
+        hexa_chart = std::move(the_chart);
         return true;
       }
 
@@ -266,13 +269,13 @@ namespace FEAT
        * \attention
        * The returned object must be deleted by the caller or inserted into an atlas.
        */
-      HexaChart* extrude_chart(const QuadChart& quad_chart) const
+      std::unique_ptr<HexaChart> extrude_chart(const QuadChart& quad_chart) const
       {
         // The following ugly piece of code is a trial-&-error sequence using
         // dynamic-cast to figure out the actual type of the 2D chart.
         // That's not an elegant solution, but I don't have any other ideas...
 
-        HexaChart* hexa_chart = nullptr;
+        std::unique_ptr<HexaChart> hexa_chart;
 
         // Is it a Circle chart?
         if(this->template try_extrude_chart<Atlas::Circle<QuadMesh>>(hexa_chart, quad_chart))
@@ -309,10 +312,10 @@ namespace FEAT
           XASSERT(quad_chart != nullptr);
 
           // extrude chart
-          HexaChart* hexa_chart = extrude_chart(*quad_chart);
+          std::unique_ptr<HexaChart>hexa_chart = extrude_chart(*quad_chart);
 
           // add to hexa atlas
-          hexa_atlas.add_mesh_chart(name, hexa_chart);
+          hexa_atlas.add_mesh_chart(name, std::move(hexa_chart));
         }
       }
 
@@ -630,14 +633,14 @@ namespace FEAT
        * \param[in] quad_attrib
        * A \transient reference to the quadrilateral mesh attribute to be extruded.
        */
-      void extrude_attribute(HexaAttrib*& hexa_attrib, const QuadAttrib& quad_attrib) const
+      void extrude_attribute(std::unique_ptr<HexaAttrib>& hexa_attrib, const QuadAttrib& quad_attrib) const
       {
         const Index quad_num_values = quad_attrib.get_num_values();
         const int attrib_dim = quad_attrib.get_dimension();
 
         // create attribute
-        XASSERT(hexa_attrib == nullptr);
-        hexa_attrib = new HexaAttrib(quad_num_values * (_slices+1), attrib_dim+1);
+        XASSERT(hexa_attrib.get() == nullptr);
+        hexa_attrib.reset(new HexaAttrib(quad_num_values * (_slices+1), attrib_dim+1));
 
         // loop over all slices
         for(Index j(0); j <= _slices; ++j)
@@ -760,7 +763,7 @@ namespace FEAT
         // extrude root mesh
         {
           MeshExtruderFactory<QuadMesh> factory(*this, *quad_mesh);
-          hexa_root_node.set_mesh(new HexaMesh(factory));
+          hexa_root_node.set_mesh(factory.make_unique());
         }
 
         // extrude mesh parts
@@ -785,19 +788,19 @@ namespace FEAT
           MeshPartExtruderFactory<QuadMesh> factory(*this, *quad_part, *quad_mesh);
 
           // create hexa mesh part and insert into root node
-          hexa_root_node.add_mesh_part(name, new HexaPart(factory), chart_name, hexa_chart);
+          hexa_root_node.add_mesh_part(name, factory.make_unique(), chart_name, hexa_chart);
         }
 
         // add zmin/zmax mesh-parts
         if(!_zmin_part_name.empty())
         {
           MeshPartSliceExtruderFactory<QuadMesh> factory(*this, *quad_mesh, _zmin_part_name, Index(0));
-          hexa_root_node.add_mesh_part(_zmin_part_name, new HexaPart(factory));
+          hexa_root_node.add_mesh_part(_zmin_part_name, factory.make_unique());
         }
         if(!_zmax_part_name.empty())
         {
           MeshPartSliceExtruderFactory<QuadMesh> factory(*this, *quad_mesh, _zmax_part_name, _slices);
-          hexa_root_node.add_mesh_part(_zmax_part_name, new HexaPart(factory));
+          hexa_root_node.add_mesh_part(_zmax_part_name, factory.make_unique());
         }
       }
     }; // class MeshExtruder<ConformalMesh<Hypercube<2>,...>>
@@ -937,11 +940,11 @@ namespace FEAT
         _mesh_extruder.extrude_mapping(target_set_holder, _quad_part.get_target_set_holder(), _quad_parent);
       }
 
-      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>& index_set_holder) override
       {
         if(_quad_part.has_topology())
         {
-          index_set_holder = new IndexSetHolderType(_hexa_num_entities);
+          index_set_holder.reset(new IndexSetHolderType(_hexa_num_entities));
           _mesh_extruder.extrude_topology(*index_set_holder, *_quad_part.get_topology());
         }
       }
@@ -951,9 +954,9 @@ namespace FEAT
         // extrude attributes
         for(const auto& quad_attrib : _quad_part.get_mesh_attributes())
         {
-          HexaAttribute* hexa_attrib = nullptr;
+          std::unique_ptr<HexaAttribute> hexa_attrib;
           _mesh_extruder.extrude_attribute(hexa_attrib, *(quad_attrib.second));
-          attribute_container.insert(std::make_pair(quad_attrib.first, hexa_attrib));
+          attribute_container.insert(std::make_pair(quad_attrib.first, std::move(hexa_attrib)));
         }
       }
     }; // class MeshPartExtruderFactory<ConformalMesh<Shape::Hypercube<2>,...>>
@@ -1010,9 +1013,9 @@ namespace FEAT
         _mesh_extruder.extrude_slice_mapping(target_set_holder, _quad_parent, _slice);
       }
 
-      virtual void fill_index_sets(IndexSetHolderType*& index_set_holder) override
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>& index_set_holder) override
       {
-        index_set_holder = nullptr;
+        index_set_holder.reset();
       }
 
       virtual void fill_attribute_sets(AttributeSetContainer& /*attribute_set_holder*/) override

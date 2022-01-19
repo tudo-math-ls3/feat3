@@ -99,11 +99,10 @@ template
     // Create a single reference cell of the shape type
     Geometry::ReferenceCellFactory<ShapeType, DataType> mesh_factory;
     // Create the mesh
-    MeshType* mesh(new MeshType(mesh_factory));
     FilterType my_filter;
 
     // Create the root mesh node
-    Geometry::RootMeshNode<MeshType>* rmn(new Geometry::RootMeshNode<MeshType>(mesh, nullptr));
+    auto rmn = Geometry::RootMeshNode<MeshType>::make_unique(mesh_factory.make_unique());
 
     // Parameters for the Rumpf functional
     DataType fac_norm(2);
@@ -124,9 +123,7 @@ template
     int lvl_max(0);
     for(int lvl(0); lvl < lvl_max; ++lvl)
     {
-      Geometry::RootMeshNode<MeshType>* coarse_node = rmn;
-      rmn = coarse_node->refine(Geometry::AdaptMode::none);
-      delete coarse_node;
+      rmn = rmn->refine_unique(Geometry::AdaptMode::none);
     }
 
     // Trafo and trafo FE space
@@ -137,7 +134,7 @@ template
     std::deque<String> slip_list;
 
     // Create the mesh quality functional
-    HyperelasticityFunctionalType rumpflpumpfl(rmn, trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
+    HyperelasticityFunctionalType rumpflpumpfl(rmn.get(), trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
     // Print information
     std::cout << rumpflpumpfl.info() << std::endl;
 
@@ -238,13 +235,11 @@ template
     writer_initial_post.write(filename);
 
     // Clean up
-    delete rmn;
     delete[] fval_norm;
     delete[] fval_det;
     delete[] fval_rec_det;
     delete[] worst_angle_cellwise;
     delete[] qual_cellwise;
-
   }
 
 };

@@ -71,7 +71,7 @@ namespace FEAT
       }
 
       /// Fills the MeshPart's index_set_holder, except that it doesn't as there is no topology
-      virtual void fill_index_sets(typename BaseClass::IndexSetHolderType*&) override
+      virtual void fill_index_sets(std::unique_ptr<typename BaseClass::IndexSetHolderType>&) override
       {
       }
 

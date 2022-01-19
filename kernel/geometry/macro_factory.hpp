@@ -110,7 +110,7 @@ namespace FEAT
         // nothing to do here
       }
 
-      virtual void fill_index_sets(IndexSetHolderType*&) override
+      virtual void fill_index_sets(std::unique_ptr<IndexSetHolderType>&) override
       {
         // nothing to do here
       }

@@ -14,6 +14,7 @@
 #include <kernel/util/math.hpp>
 
 #include <deque>
+#include <memory>
 
 namespace FEAT
 {
@@ -45,6 +46,7 @@ namespace FEAT
        *
        * \author Jordi Paul
        *
+       * \todo replace bool arrays by something more modern
        */
       template<typename Mesh_>
       class SurfaceMesh :
@@ -62,7 +64,7 @@ namespace FEAT
         /// The type for the mesh defining the discrete surface
         typedef ConformalMesh<ShapeType, 3, CoordType> SurfaceMeshType;
         /// Pointer to the surface mesh object
-        SurfaceMeshType* _surface_mesh;
+        std::unique_ptr<SurfaceMeshType> _surface_mesh;
 
       private:
         /// Marker for edges
@@ -81,8 +83,8 @@ namespace FEAT
         /**
          * \brief Constructor getting an object
          */
-        explicit SurfaceMesh(SurfaceMeshType* surf_mesh) :
-          _surface_mesh(surf_mesh),
+        explicit SurfaceMesh(std::unique_ptr<SurfaceMeshType> surf_mesh) :
+          _surface_mesh(std::move(surf_mesh)),
           _edge_marker(new bool[_surface_mesh->get_num_entities(SurfaceMeshType::shape_dim-1)]),
           _cell_marker(new bool[_surface_mesh->get_num_entities(SurfaceMeshType::shape_dim)])
         {
@@ -96,9 +98,6 @@ namespace FEAT
          */
         virtual ~SurfaceMesh()
         {
-          if(_surface_mesh != nullptr)
-            delete _surface_mesh;
-
           delete[] _edge_marker;
           delete[] _cell_marker;
         }
@@ -230,11 +229,11 @@ namespace FEAT
           // This will hold the coefficients of the transformation mapping
           Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1> bary(CoordType(0));
 
-          // Since we want to project the point an arbitrary distance, we set this to somethin huge
+          // Since we want to project the point an arbitrary distance, we set this to something huge
           CoordType acceptable_distance(Math::huge<CoordType>());
           // Find the facet in the SurfaceMesh we project to and compute the coefficients
           Index best_facet =
-            find_cell(coeffs, point, Index(0), acceptable_distance, _surface_mesh, true);
+            find_cell(coeffs, point, Index(0), acceptable_distance, *_surface_mesh, true);
 
           // Clip the coefficients
           for(int j(0); j < SurfaceMeshType::shape_dim; ++j)
@@ -436,8 +435,7 @@ namespace FEAT
 
                 // Find the facet in the SurfaceMesh we project to and compute the coefficients. We break at the
                 // first facet fulfilling the criteria
-                facet_sm = find_cell(coeffs, x, guesses[current_facet], acceptable_distance,
-                _surface_mesh, false);
+                facet_sm = find_cell(coeffs, x, guesses[current_facet], acceptable_distance, * _surface_mesh, false);
                 // Update the guess for this facet because there might be more points to project
                 guesses[current_facet] = facet_sm;
 
@@ -556,7 +554,7 @@ namespace FEAT
         Index find_cell(
           Tiny::Vector<CoordType, SurfaceMeshType::shape_dim+1, sc_>& coeffs,
           const Tiny::Vector<CoordType, world_dim, sx_>& x, Index guess, CoordType acceptable_distance,
-          const SurfaceMeshType* mesh, bool find_best_approx) const
+          const SurfaceMeshType& mesh, bool find_best_approx) const
         {
           // For every subfacet, we need to know if it was already traversed by adding the neighbor across said
           // facet to the search stack. If the surface is concave, it might happen that facet A says "go to my
@@ -564,10 +562,10 @@ namespace FEAT
           // the facet between A and B.
 
           // Clear traversed information
-          for(Index facet(0); facet < mesh->get_num_entities(SurfaceMeshType::shape_dim-1); ++facet)
+          for(Index facet(0); facet < mesh.get_num_entities(SurfaceMeshType::shape_dim-1); ++facet)
             _edge_marker[facet] = false;
 
-          Index num_cells(mesh->get_num_entities(SurfaceMeshType::shape_dim));
+          Index num_cells(mesh.get_num_entities(SurfaceMeshType::shape_dim));
           // Clear cell todo information
           for(Index cell(0); cell < num_cells; ++cell)
             _cell_marker[cell] = false;
@@ -577,14 +575,14 @@ namespace FEAT
           // Number of vertices per cell
           static constexpr int num_vert_loc = VertAtCellIdxType::num_indices;
           // Vertex at cell information
-          const VertAtCellIdxType& idx(mesh->template get_index_set<SurfaceMeshType::shape_dim, 0>());
+          const VertAtCellIdxType& idx(mesh.template get_index_set<SurfaceMeshType::shape_dim, 0>());
           // Facet at cell information
-          const auto& facet_idx(mesh->template
+          const auto& facet_idx(mesh.template
               get_index_set<SurfaceMeshType::shape_dim, SurfaceMeshType::shape_dim-1>());
           // The mesh's vertex set so we can get at the coordinates
-          const auto& vtx(mesh->get_vertex_set());
+          const auto& vtx(mesh.get_vertex_set());
 
-          const auto& neigh(mesh->get_neighbors());
+          const auto& neigh(mesh.get_neighbors());
 
           // This will contain all vertices making up a cell in the mesh. Since the mesh is of shape
           // Simplex<shape_dim>, there are shape_dim+1 vertices.
@@ -1060,7 +1058,7 @@ namespace FEAT
         public Xml::DummyParser
       {
       public:
-        explicit SurfaceMeshChartParser(ChartBase<Mesh_>*&)
+        explicit SurfaceMeshChartParser(std::unique_ptr<ChartBase<Mesh_>>&)
         {
           XABORTM("Thou shall not arrive here");
         }
@@ -1072,15 +1070,15 @@ namespace FEAT
       {
       protected:
         typedef typename SurfaceMesh<Mesh_>::SurfaceMeshType SurfaceMeshType;
-        ChartBase<Mesh_>*& _chart;
-        SurfaceMeshType* _surfmesh;
+        std::unique_ptr<ChartBase<Mesh_>>& _chart;
+        std::unique_ptr<SurfaceMeshType> _surfmesh;
         Index _nverts, _ntrias;
         bool _have_verts, _have_trias;
 
       public:
-        explicit SurfaceMeshChartParser(ChartBase<Mesh_>*& chart) :
+        explicit SurfaceMeshChartParser(std::unique_ptr<ChartBase<Mesh_>>& chart) :
           _chart(chart),
-          _surfmesh(nullptr),
+          _surfmesh(),
           _nverts(0),
           _ntrias(0),
           _have_verts(false), _have_trias(false)
@@ -1113,7 +1111,7 @@ namespace FEAT
 
           // create surface mesh
           Index num_entities[3] = {_nverts, 0, _ntrias};
-          _surfmesh = new SurfaceMeshType(num_entities);
+          _surfmesh.reset(new SurfaceMeshType(num_entities));
         }
 
         virtual void close(int iline, const String& sline) override
@@ -1126,9 +1124,8 @@ namespace FEAT
           // deduct topology
           _surfmesh->deduct_topology_from_top();
 
-          // okay
-          _chart = new SurfaceMesh<Mesh_>(_surfmesh);
-          _surfmesh = nullptr;
+          // note: '_surfmesh' is a Geometry::ConformalMesh, not a Chart::SurfaceMesh
+          _chart.reset(new SurfaceMesh<Mesh_>(std::move(_surfmesh)));
         }
 
         virtual bool content(int, const String&) override

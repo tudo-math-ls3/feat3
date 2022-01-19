@@ -103,17 +103,18 @@ namespace DbgIsoParam
 
   typedef Analytic::StaticWrapperFunction<2, StaticSolFunction, true, true, true> SolFunction;
 
-  std::shared_ptr<AtlasType> make_atlas()
+  std::unique_ptr<AtlasType> make_atlas()
   {
-    auto atlas = std::make_shared<Geometry::MeshAtlas<MeshType>>();
-    atlas->add_mesh_chart("circle", new Geometry::Atlas::Circle<MeshType>(0.0, 0.0, 1.0));
+    auto atlas = Geometry::MeshAtlas<MeshType>::make_unique();
+    atlas->add_mesh_chart("circle",
+      std::unique_ptr<Geometry::Atlas::Circle<MeshType>>(new Geometry::Atlas::Circle<MeshType>(0.0, 0.0, 1.0)));
     return atlas;
   }
 
-  std::shared_ptr<MeshNodeType> make_mesh_node(std::shared_ptr<AtlasType> atlas)
+  std::unique_ptr<MeshNodeType> make_mesh_node(AtlasType* atlas)
   {
     Geometry::UnitStarCubeFactory<MeshType> factory;
-    auto mesh = new MeshType(factory);
+    auto mesh = factory.make_unique();
 
     // move coords from [0,1] to [-0.7,+0.7]
     {
@@ -125,12 +126,10 @@ namespace DbgIsoParam
       }
     }
 
-    auto node = std::make_shared<Geometry::RootMeshNode<MeshType>>(mesh, atlas.get());
+    auto node = Geometry::RootMeshNode<MeshType>::make_unique(std::move(mesh), atlas);
 
-    Geometry::BoundaryFactory<MeshType> bnd_factory(*mesh);
-    auto part = new MeshPartType(bnd_factory);
-    auto chart = atlas->find_mesh_chart("circle");
-    node->add_mesh_part("bnd", part, "circle", chart);
+    Geometry::BoundaryFactory<MeshType> bnd_factory(*node->get_mesh());
+    node->add_mesh_part("bnd", bnd_factory.make_unique(), "circle", atlas->find_mesh_chart("circle"));
 
     return node;
   }
@@ -220,7 +219,7 @@ namespace DbgIsoParam
 
     // create an empty atlas and a root mesh node
     auto atlas = make_atlas();
-    auto node = make_mesh_node(atlas);
+    auto node = make_mesh_node(atlas.get());
 
     const auto& chart = *atlas->find_mesh_chart("circle");
 
@@ -234,7 +233,7 @@ namespace DbgIsoParam
     {
       if(lvl > 0)
       {
-        node = std::shared_ptr<Geometry::RootMeshNode<MeshType>>(node->refine());
+        node = node->refine_unique();
       }
 
       ErrorTensor& err = errs.at(lvl);

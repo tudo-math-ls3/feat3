@@ -104,7 +104,7 @@ namespace FEAT
         // do nothing as the object has no attribute sets
       }
 
-      virtual void fill_index_sets(typename MeshType::IndexSetHolderType*&) override
+      virtual void fill_index_sets(std::unique_ptr<typename MeshType::IndexSetHolderType>&) override
       {
         // do nothing as the object has no index sets
       }

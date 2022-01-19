@@ -1008,14 +1008,14 @@ namespace FEAT
       private:
         typedef Bezier<Mesh_> ChartType;
         typedef typename ChartType::DataType DataType;
-        ChartReturn_*& _chart;
-        Bezier<Mesh_>* _bezier;
+        std::unique_ptr<ChartReturn_>& _chart;
+        std::unique_ptr<Bezier<Mesh_>> _bezier;
         Index _size;
 
       public:
-        explicit BezierChartParser(ChartReturn_*& chart) :
+        explicit BezierChartParser(std::unique_ptr<ChartReturn_>& chart) :
           _chart(chart),
-          _bezier(nullptr),
+          _bezier(),
           _size(0)
         {
         }
@@ -1072,13 +1072,13 @@ namespace FEAT
             it->second.parse(orientation);
 
           // up to now, everything's fine
-          _bezier = new ChartType(poly_closed, orientation);
+          _bezier.reset(new ChartType(poly_closed, orientation));
         }
 
         virtual void close(int, const String&) override
         {
           // okay
-          _chart = _bezier;
+          _chart = std::move(_bezier);
         }
 
         virtual bool content(int, const String&) override

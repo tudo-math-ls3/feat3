@@ -45,8 +45,8 @@ namespace FEAT
           std::vector<int> ranks;
 
           // create root mesh node
-          std::shared_ptr<MeshNodeType> mesh_node;
-          int lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(rank, Math::max(nprocs,1), mesh_node, ranks);
+          std::unique_ptr<MeshNodeType> mesh_node;
+          int lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create_unique(rank, Math::max(nprocs,1), mesh_node, ranks);
 
           // set front layer neighbor ranks
           this->_layers.front()->set_neighbor_ranks(ranks);
@@ -61,19 +61,19 @@ namespace FEAT
           // refine up to desired minimum level
           for(; lvl < lvl_min; ++lvl)
           {
-            auto coarse_node = mesh_node;
-            mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine());
+            mesh_node = mesh_node->refine_unique();
           }
 
           // add coarse mesh node
-          this->_layer_levels.front().push_front(std::make_shared<LevelType>(lvl, mesh_node));
+          this->_layer_levels.front().push_front(std::make_shared<LevelType>(lvl, std::move(mesh_node)));
 
           // refine up to desired maximum level
           for(; lvl < lvl_max;)
           {
-            auto coarse_node = mesh_node;
-            mesh_node = std::shared_ptr<MeshNodeType>(coarse_node->refine());
-            this->_layer_levels.front().push_front(std::make_shared<LevelType>(++lvl, mesh_node));
+            //mesh_node = mesh_node->refine_unique();
+            //this->_layer_levels.front().push_front(std::make_shared<LevelType>(++lvl, mesh_node));
+            this->_layer_levels.front().push_front(std::make_shared<LevelType>(++lvl,
+              this->_layer_levels.front().front()->get_mesh_node()->refine_unique()));
           }
 
           // compile the virtual level list
@@ -195,8 +195,8 @@ namespace FEAT
             std::map<int,int> reranks; // neighbor rank map: lexi -> 2lvl
 
             // create root mesh node
-            std::shared_ptr<MeshNodeType> mesh_node;
-            const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(crank, csize, mesh_node, ranks);
+            std::unique_ptr<MeshNodeType> mesh_node;
+            const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create_unique(crank, csize, mesh_node, ranks);
 
             // translate neighbor ranks from lexi to 2lvl
             _lexi22lvl(ranks, reranks, csize);
@@ -487,8 +487,8 @@ namespace FEAT
             std::map<int,int> reranks; // neighbor rank map: lexi -> 2lvl
 
             // create root mesh node
-            std::shared_ptr<MeshNodeType> mesh_node;
-            const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create(crank, csize, mesh_node, ranks);
+            std::unique_ptr<MeshNodeType> mesh_node;
+            const int base_lvl = (int)Geometry::UnitCubePatchGenerator<MeshType>::create_unique(crank, csize, mesh_node, ranks);
 
             // translate neighbor ranks from lexi to 2lvl
             _lexi22lvl(ranks, reranks, csize);
@@ -500,7 +500,7 @@ namespace FEAT
             layer.set_neighbor_ranks(ranks);
 
             // create domain level
-            laylevs.push_front(std::make_shared<LevelType>(base_lvl, mesh_node));
+            laylevs.push_front(std::make_shared<LevelType>(base_lvl, std::move(mesh_node)));
 
             // refine and create child mesh parts
             if(i > std::size_t(0))
@@ -509,11 +509,12 @@ namespace FEAT
               int crs_lvl = base_lvl;
               for(int nel(1); nel < children; nel *= 4)
               {
-                std::shared_ptr<MeshNodeType> ref_node = std::shared_ptr<MeshNodeType>(laylevs.front()->get_mesh_node()->refine());
-                laylevs.push_front(std::make_shared<LevelType>(++crs_lvl, ref_node));
-                //ref_node = std::shared_ptr<MeshNodeType>(ref_node->refine());
+                //std::shared_ptr<MeshNodeType> ref_node = std::shared_ptr<MeshNodeType>(laylevs.front()->get_mesh_node()->refine());
+                //laylevs.push_front(std::make_shared<LevelType>(++crs_lvl, ref_node));
+                ////ref_node = std::shared_ptr<MeshNodeType>(ref_node->refine());
+                laylevs.push_front(std::make_shared<LevelType>(++crs_lvl, laylevs.front()->get_mesh_node()->refine_unique()));
               }
-              this->_create_child_meshparts(laylevs.front()->get_mesh_node_ptr());
+              this->_create_child_meshparts(*laylevs.front()->get_mesh_node());
             }
 
             const int head_lvl = laylevs.front()->get_level_index();
@@ -523,8 +524,9 @@ namespace FEAT
             // refine up the desired fine level
             for(int l(head_lvl); l < fin_lvl; ++l)
             {
-              std::shared_ptr<MeshNodeType> ref_node = std::shared_ptr<MeshNodeType>(laylevs.front()->get_mesh_node()->refine());
-              laylevs.push_front(std::make_shared<LevelType>(l+1, ref_node));
+              //std::shared_ptr<MeshNodeType> ref_node = std::shared_ptr<MeshNodeType>(laylevs.front()->get_mesh_node()->refine());
+              //laylevs.push_front(std::make_shared<LevelType>(l+1, ref_node));
+              laylevs.push_front(std::make_shared<LevelType>(l+1, laylevs.front()->get_mesh_node()->refine_unique()));
             }
 
             // drop all levels below desired coarse level
@@ -576,17 +578,17 @@ namespace FEAT
           }
         }
 
-        void _create_child_meshparts(std::shared_ptr<MeshNodeType> mesh_node)
+        void _create_child_meshparts(MeshNodeType& mesh_node)
         {
-          const Index num_elems = mesh_node->get_mesh()->get_num_elements();
+          const Index num_elems = mesh_node.get_mesh()->get_num_elements();
 
           const Index num_entities[] = {4, 4, 1};
-          const auto& ivert = mesh_node->get_mesh()->template get_index_set<2,0>();
-          const auto& iedge = mesh_node->get_mesh()->template get_index_set<2,1>();
+          const auto& ivert = mesh_node.get_mesh()->template get_index_set<2,0>();
+          const auto& iedge = mesh_node.get_mesh()->template get_index_set<2,1>();
 
           for(Index i(0); i < num_elems; ++i)
           {
-            MeshPartType* part = new MeshPartType(num_entities, false);
+            std::unique_ptr<MeshPartType> part(new MeshPartType(num_entities, false));
 
             // manually override target indices
             Index* iv = part->template get_target_set<0>().get_indices();
@@ -600,7 +602,7 @@ namespace FEAT
             }
             iq[0] = i;
 
-            mesh_node->add_patch(int(i), part);
+            mesh_node.add_patch(int(i), std::move(part));
           }
         }
       }; // class HierarchUnitCubeDomainControl2<...>

@@ -39,10 +39,10 @@ public:
   virtual void run() const override
   {
     // create root mesh node
-    RootMeshNodeType* root_mesh_node = nullptr;
+    std::unique_ptr<RootMeshNodeType> root_mesh_node;
     {
       Geometry::RefinedUnitCubeFactory<MeshType> factory(2);
-      root_mesh_node = new RootMeshNodeType(new MeshType(factory));
+      root_mesh_node = RootMeshNodeType::make_unique(factory.make_unique());
     }
 
     // create base cell splitting
@@ -51,9 +51,7 @@ public:
     // refine mesh node
     for(int i(0); i < 2; ++i)
     {
-      auto* old_node = root_mesh_node;
-      root_mesh_node = old_node->refine();
-      delete old_node;
+      root_mesh_node = root_mesh_node->refine_unique();
     }
 
     {
@@ -65,9 +63,6 @@ public:
       test_space<Space::Lagrange2::Element<TrafoType>>(trafo, *root_mesh_node);
       test_space<Space::CroRavRanTur::Element<TrafoType>>(trafo, *root_mesh_node);
     }
-
-    // delete root mesh node
-    delete root_mesh_node;
   }
 
   template<typename Space_>

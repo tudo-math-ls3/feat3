@@ -56,8 +56,8 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   std::cout << " ]" << std::endl;
 
   // create an empty atlas and a root mesh node
-  Geometry::MeshAtlas<Mesh_>* atlas = new Geometry::MeshAtlas<Mesh_>();
-  Geometry::RootMeshNode<Mesh_>* node = new Geometry::RootMeshNode<Mesh_>(nullptr, atlas);
+  auto atlas = Geometry::MeshAtlas<Mesh_>::make_unique();
+  auto node = Geometry::RootMeshNode<Mesh_>::make_unique(nullptr, atlas.get());
 
   // try to parse the mesh file
 #ifndef DEBUG
@@ -84,16 +84,13 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   // adapt coarse mesh
   node->adapt();
 
-
   // refine
   for(Index lvl(0); lvl <= lvl_max; ++lvl)
   {
     if(lvl > 0)
     {
       std::cout << "Refining up to level " << lvl << "..." << std::endl;
-      auto* old = node;
-      node = old->refine();
-      delete old;
+      node = node->refine_unique();
     }
 
     if(lvl < lvl_min)
@@ -128,9 +125,6 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
     exporter.write(vtkname);
   }
-
-  delete node;
-  delete atlas;
 
   return 0;
 }

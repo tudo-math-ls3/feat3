@@ -235,9 +235,9 @@ namespace FEAT
         // create mesh part
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        QuadSubMesh::AttributeSetType* my_attrib_set = new QuadSubMesh::AttributeSetType(num_entities[0],1);
+        std::unique_ptr<QuadSubMesh::AttributeSetType> my_attrib_set(new QuadSubMesh::AttributeSetType(num_entities[0],1));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "EdgeSubAttributeSet");
+        mesh->add_attribute(std::move(my_attrib_set), "EdgeSubAttributeSet");
 
         // set up vertex coordinates array
         Real attr[] =
@@ -355,9 +355,9 @@ namespace FEAT
         // create mesh
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        QuadSubMesh::AttributeSetType* my_attrib_set = new QuadSubMesh::AttributeSetType(num_entities[0],2);
+        std::unique_ptr<QuadSubMesh::AttributeSetType> my_attrib_set(new QuadSubMesh::AttributeSetType(num_entities[0],2));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "QuadSubAttributeSet");
+        mesh->add_attribute(std::move(my_attrib_set), "QuadSubAttributeSet");
 
         // set up vertex coordinates array
         Real attr[] =
@@ -571,9 +571,9 @@ namespace FEAT
         // create mesh
         QuadSubMesh* mesh = new QuadSubMesh(num_entities, true);
         // create a AttributeSet that holds one value for each vertex
-        QuadSubMesh::AttributeSetType* my_attrib_set = new QuadSubMesh::AttributeSetType(num_entities[0],1);
+        std::unique_ptr<QuadSubMesh::AttributeSetType> my_attrib_set(new QuadSubMesh::AttributeSetType(num_entities[0],1));
         // Add the attribute to mesh
-        mesh->add_attribute(my_attrib_set, "QuadSubAttributeSet");
+        mesh->add_attribute(std::move(my_attrib_set), "QuadSubAttributeSet");
 
         // set up vertex coordinates array
         Real attr[] =
