@@ -60,7 +60,6 @@ namespace FEAT
      * \author Peter Zajac
      */
     class NoCaseLess
-      : public std::binary_function<String, String, bool>
     {
     public:
       /**
