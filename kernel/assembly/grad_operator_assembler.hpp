@@ -200,7 +200,7 @@ namespace FEAT
           trial_dof_mapping.prepare(cell);
 
           // scatter into matrix
-          scatter_g(local_matrix, test_dof_mapping, trial_dof_mapping, scale);
+          scatter_matrix(local_matrix, test_dof_mapping, trial_dof_mapping, scale);
 
           // finish dof mapping
           trial_dof_mapping.finish();
