@@ -194,7 +194,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -224,7 +224,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -346,7 +346,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -395,7 +395,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -564,7 +564,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -583,7 +583,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -694,7 +694,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -733,7 +733,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -901,7 +901,7 @@ namespace FEAT
          * \brief Evaluates the basis function gradients on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis gradient vector receiveing the result.
+         * A reference to a basis gradient vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
@@ -1003,7 +1003,7 @@ namespace FEAT
          * \brief Evaluates the basis function hessians on the reference cell.
          *
          * \param[out] data
-         * A reference to a basis hessian vector receiveing the result.
+         * A reference to a basis hessian vector receiving the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
