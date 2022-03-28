@@ -49,6 +49,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if major >= 13:
     cxxflags += " -Wreserved-identifier -Wunused-but-set-parameter -Wunused-but-set-variable -Wnull-pointer-subtraction"
 
+  if major >= 14:
+    cxxflags += " -fminimize-whitespace"
+
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
 
