@@ -141,7 +141,8 @@ namespace FEAT
        // The i-th basis functions can be evaluated in (x,y) via Intern::base_q(x,y,coef[i])
         Tiny::Matrix<DataType_, 3, 3> coef;
 
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType TrafoEvalData;
+        static constexpr TrafoTags trafo_tags = TrafoTags::img_point | TrafoTags::jac_det;
+        typedef typename TrafoEvalType::template ConfigTraits<trafo_tags>::EvalDataType TrafoEvalData;
 
         typedef Cubature::Rule<ShapeType, DataType_, DataType_, DomainPointType> CubRuleType;
 
@@ -166,7 +167,7 @@ namespace FEAT
           _trafo_eval.prepare(cell_index);
 
           // declare trafo evaluation data
-          typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType trafo_data;
+          TrafoEvalData trafo_data;
 
 
           Tiny::Matrix<DataType_, 3, 3> temp(DataType_(0));
@@ -280,7 +281,8 @@ namespace FEAT
 
 
         // declare trafo evaluation data
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType TrafoEvalData;
+        static constexpr TrafoTags trafo_tags = TrafoTags::img_point | TrafoTags::jac_det;
+        typedef typename TrafoEvalType::template ConfigTraits<trafo_tags>::EvalDataType TrafoEvalData;
 
         typedef Cubature::Rule<ShapeType, DataType_, DataType_, DomainPointType> CubRuleType;
 
@@ -305,7 +307,7 @@ namespace FEAT
           _trafo_eval.prepare(cell_index);
 
           // declare trafo evaluation data
-          typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType trafo_data;
+          TrafoEvalData trafo_data;
 
           Tiny::Matrix<DataType_, 9, 9> temp(DataType_(0));
           DataType mean(DataType(0));
@@ -427,7 +429,8 @@ namespace FEAT
 
 
         // declare trafo evaluation data
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType TrafoEvalData;
+        static constexpr TrafoTags trafo_tags = TrafoTags::img_point | TrafoTags::jac_det;
+        typedef typename TrafoEvalType::template ConfigTraits<trafo_tags>::EvalDataType TrafoEvalData;
 
         typedef Cubature::Rule<ShapeType, DataType_, DataType_, DomainPointType> CubRuleType;
 
@@ -452,7 +455,7 @@ namespace FEAT
           _trafo_eval.prepare(cell_index);
 
           // declare trafo evaluation data
-          typename TrafoEvalType::template ConfigTraits<TrafoTags::img_point | TrafoTags::jac_det>::EvalDataType trafo_data;
+          TrafoEvalData trafo_data;
 
           Tiny::Matrix<DataType_, 27, 27> temp(DataType_(0));
           DataType mean(DataType(0));
