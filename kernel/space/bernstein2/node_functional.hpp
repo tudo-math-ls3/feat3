@@ -201,7 +201,7 @@ namespace FEAT
             temp.format();
           } // end cubature
           // scale coefficient matrix
-          coef = coef * (2 / mean);
+          coef *= DataType(2) / mean;
           temp.set_inverse(coef);
           coef.set_transpose(temp);
         } // end prepare
@@ -348,7 +348,7 @@ namespace FEAT
             temp.format();
           } // end cubature
           // scale coefficient matrix
-          coef = coef * (4 / mean);
+          coef *= DataType(4) / mean;
           temp.set_inverse(coef);
           coef.set_transpose(temp);
         } // end prepare
@@ -504,7 +504,7 @@ namespace FEAT
             temp.format();
           } // end cubature
           // scale coefficient matrix
-          coef = coef * (8 / mean);
+          coef *= DataType(8) / mean;
           temp.set_inverse(coef);
           coef.set_transpose(temp);
         } // end prepare
