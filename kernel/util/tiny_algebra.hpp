@@ -320,7 +320,7 @@ namespace FEAT
       }
 
       /// scalar-multiply operator
-      Vector& operator*=(T_ alpha)
+      Vector& operator*=(DataType alpha)
       {
         for(int i(0); i < n_; ++i)
         {
