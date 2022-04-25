@@ -109,8 +109,12 @@ namespace FEAT
           (*(cfg_ & (TrafoTags::jac_inv | TrafoTags::hess_inv)) ?
             TrafoTags::jac_inv : TrafoTags::none) |
           /// specifies whether jacobian matrices are required
+          //(*(cfg_ & (TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::jac_inv | TrafoTags::hess_inv | TrafoTags::normal)) ?
           (*(cfg_ & (TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::jac_inv | TrafoTags::hess_inv)) ?
             TrafoTags::jac_mat : TrafoTags::none) |
+          /// specifies whether normal vectors are required
+          (*(cfg_ & TrafoTags::normal) ?
+            TrafoTags::normal : TrafoTags::none) |
           /// specifies whether image points are required
           (*(cfg_ & (TrafoTags::img_point)) ?
             TrafoTags::img_point : TrafoTags::none) |
@@ -254,6 +258,11 @@ namespace FEAT
         // calculate inverse hessian tensor
         static constexpr bool want_hess_inv = *(TrafoData::config & TrafoTags::hess_inv);
         Intern::TrafoEvalHelper<want_hess_inv>::calc_hess_inv(trafo_data, cast());
+
+        // note: normal vectors are computed directly by the assembler classes
+        // calculate normal vector
+        //static constexpr bool want_normal = *(TrafoData::config & TrafoTags::normal);
+        //Intern::TrafoEvalHelper<want_normal>::calc_normal(trafo_data, cast());
       }
 
       // Note:
@@ -349,6 +358,9 @@ namespace FEAT
 
         template<typename TrafoData_, typename Evaluator_>
         static void calc_hess_inv(TrafoData_&, const Evaluator_&) {}
+
+        //template<typename TrafoData_, typename Evaluator_>
+        //static void calc_normal(TrafoData_&, const Evaluator_&) {}
       };
 
       template<>
@@ -420,6 +432,16 @@ namespace FEAT
           trafo_data.hess_inv.format();
           trafo_data.hess_inv.add_mat_tensor_mult(trafo_data.jac_inv, hess_jac, -DataType(1));
         }
+
+        /*template<typename TrafoData_, typename Evaluator_>
+        static void calc_normal(TrafoData_& trafo_data, const Evaluator_&)
+        {
+          if(!*(Evaluator_::eval_caps & TrafoTags::normal))
+            XABORTM("trafo evaluator can't compute normal vectors");
+          // compute the normal vector from of the jacobian matrix
+          trafo_data.normal = Tiny::orthogonal(trafo_data.jac_mat);
+          trafo_data.normal.normalize();
+        }*/
       };
     } // namespace Intern
     /// \endcond

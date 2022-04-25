@@ -445,19 +445,19 @@ namespace DFG95
     Assembly::TraceAssembler<typename SpaceVeloType::TrafoType> body_force_asm(the_domain_level.trafo);
     if(mesh_part_bnd_c != nullptr)
       body_force_asm.add_mesh_part(*mesh_part_bnd_c);
-    body_force_asm.compile_facets();
+    body_force_asm.compile();
 
     // create trace assembler for upper flux
     Assembly::TraceAssembler<typename SpaceVeloType::TrafoType> flux_asm_u(the_domain_level.trafo);
     if(mesh_part_inner_u != nullptr)
       flux_asm_u.add_mesh_part(*mesh_part_inner_u);
-    flux_asm_u.compile_facets(false);
+    flux_asm_u.compile();
 
     // create trace assembler for lower flux
     Assembly::TraceAssembler<typename SpaceVeloType::TrafoType> flux_asm_l(the_domain_level.trafo);
     if(mesh_part_inner_l != nullptr)
       flux_asm_l.add_mesh_part(*mesh_part_inner_l);
-    flux_asm_l.compile_facets(false);
+    flux_asm_l.compile();
 
     // unmap pressure evaluation points p_a and p_e
     Trafo::InverseMappingData<DataType, dim> point_iv_a, point_iv_e;

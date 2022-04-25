@@ -192,11 +192,11 @@ namespace FEAT
       {
         typedef Space_ SpaceType;
         typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
-        static_assert(SpaceEval::can_value != 0, "space cannot evaluate basis function values!");
+        //static_assert(SpaceEval::can_value != 0, "space cannot evaluate basis function values!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceTags::value> SpaceConfigTraits;
         typedef typename SpaceConfigTraits::EvalDataType SpaceData;
-        static constexpr SpaceTags trafo_value_config = SpaceConfigTraits::trafo_config;
+        static constexpr TrafoTags trafo_value_config = SpaceConfigTraits::trafo_config;
         typedef typename TrafoEval::template ConfigTraits<trafo_value_config>::EvalDataType TrafoData;
         typedef typename VectorType_::ValueType ValueType;
         Tiny::Vector<ValueType, SpaceEval::max_local_dofs> loc_vec;

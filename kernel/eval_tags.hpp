@@ -36,7 +36,11 @@ namespace FEAT
     /// specifies whether the trafo should supply hessian tensors
     hess_ten  = 0x0020,
     /// specifies whether the trafo should supply inverse hessian tensors
-    hess_inv  = 0x0040
+    hess_inv  = 0x0040,
+    /// specifies whether the trafo should supply outer normal vectors
+    /// note: The normal vector is always automatically defined by the Assembly::TraceAssembler
+    /// class and does not have to be specifies explicitly
+    normal    = 0x0080
   };
 
   /**
@@ -79,7 +83,7 @@ namespace FEAT
   static constexpr inline bool operator*(TrafoTags a)
   {
     // just check the interesting bits
-    return (static_cast<int>(a) & 0x7F) != 0;
+    return (static_cast<int>(a) & 0xFF) != 0;
   }
 
   /**

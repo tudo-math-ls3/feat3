@@ -377,14 +377,27 @@ namespace FEAT
       }
 
       /**
-       * \brief Normalizes the vector.
+       * \brief Normalizes this vector.
+       *
+       * \returns \c *this
        */
-      void normalize()
+      Vector& normalize()
       {
-        DataType norm2(this->norm_euclid());
-        ASSERTM(norm2 > Math::eps<DataType>(), "Trying to normalize a zero vector!");
-        norm2 = DataType(1)/norm2;
-        (*this) *= norm2;
+        const DataType norm2(this->norm_euclid());
+        ASSERTM(norm2 > Math::eps<DataType>(), "Trying to normalize a null vector!");
+        return ((*this) *= (DataType(1)/norm2));
+      }
+
+      /**
+       * \brief Negates the vector, i.e. effectively multiplies all components by -1
+       *
+       * \returns \c *this
+       */
+      Vector& negate()
+      {
+        for(int i(0); i < n_; ++i)
+          v[i] = -v[i];
+        return *this;
       }
 
       /**

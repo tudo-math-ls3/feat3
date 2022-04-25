@@ -116,7 +116,7 @@ namespace Tutorial01
     {
       Assembly::TraceAssembler<TrafoType> trace_asm(trafo);
       trace_asm.add_mesh_part(boundary);
-      trace_asm.compile_facets();
+      trace_asm.compile();
       NeumannRhsFunction neu_func;
       Assembly::Common::ForceFunctional<decltype(neu_func)> neu_force(neu_func);
       trace_asm.assemble_functional_vector(vec_rhs, neu_force, space, cubature_factory);

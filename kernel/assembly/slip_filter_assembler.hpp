@@ -145,7 +145,7 @@ namespace FEAT
                 // the reference cell
                 orientation[parent_l] = CoordType(
                   Geometry::Intern::CongruencySampler<FacetType>::orientation(orientation_code)
-                  *Shape::ReferenceCell<ShapeType>::orientation(l));
+                  *Shape::ReferenceCell<ShapeType>::facet_orientation(l));
               }
             } // facets
           } // cells
@@ -234,7 +234,7 @@ namespace FEAT
      * \tparam Mesh_
      * The mesh type.
      *
-     * The assemble() routine is implemented for the homogenous slip condition for Lagrange 1/2 elements only. For
+     * The assemble() routine is implemented for the homogeneous slip condition for Lagrange 1/2 elements only. For
      * the many other limitations, see the SlipFilter class documentation.
      *
      * \see SlipFilter
@@ -264,7 +264,7 @@ namespace FEAT
         bool recompute;
         /// Number of entities of various shape dimensions in the slip boundary represented by this filter
         Index _num_entities[Mesh_::shape_dim+1];
-        /// Mapping of boundary entities to mesh entieties (i.e. vertices, edges, facets)
+        /// Mapping of boundary entities to mesh entities (i.e. vertices, edges, facets)
         TargetSetHolderType* _target_set_holder;
 
       public:
@@ -446,7 +446,7 @@ namespace FEAT
          * \param[in,out] space
          * The filter gets applied of functions of this FE space
          *
-         * This implements a primite P1/Q1 to P2/Q2 interpolation of the outer unit normal vector field. It would be
+         * This implements a primitive P1/Q1 to P2/Q2 interpolation of the outer unit normal vector field. It would be
          * nicer to have a real inter FE space mapping, but that would require the application of node functionals
          * to FE functions. This is not implemented yet due to regularity issues (i.e. application of a Q1 node
          * functional requires point evaluation at mesh vertices, but Q1~ functions are not continuous so this is not

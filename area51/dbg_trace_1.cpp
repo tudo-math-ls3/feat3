@@ -131,7 +131,7 @@ namespace Tutorial01
       Assembly::Common::IdentityOperator id_op;
       Assembly::TraceAssembler<TrafoType> trace_asm(trafo);
       trace_asm.add_mesh_part(boundary);
-      trace_asm.compile_facets();
+      trace_asm.compile();
       trace_asm.assemble_operator_matrix1(matrix, id_op, space, cubature_factory);
     }
 

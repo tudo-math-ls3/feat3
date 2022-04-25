@@ -68,6 +68,9 @@ TARGET_LINK_LIBRARIES(dbg-trace-1 feat)
 ADD_EXECUTABLE(dbg-trace-2 dbg_trace_2.cpp)
 TARGET_LINK_LIBRARIES(dbg-trace-2 feat)
 
+ADD_EXECUTABLE(dbg-trace-3 dbg_trace_3.cpp)
+TARGET_LINK_LIBRARIES(dbg-trace-3 feat)
+
 ADD_EXECUTABLE(dbg-stabilize dbg_stabilize.cpp)
 TARGET_LINK_LIBRARIES(dbg-stabilize feat)
 

@@ -70,6 +70,8 @@ namespace FEAT
       typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianTensorType;
       /// inverse hessian tensor type
       typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianInverseType;
+      /// normal vector type (only for facet trafo)
+      typedef Tiny::Vector<DataType, image_dim> NormalVectorType;
     }; // class StandardEvalPolicy<...>
   } // namespace Trafo
 } // namespace FEAT

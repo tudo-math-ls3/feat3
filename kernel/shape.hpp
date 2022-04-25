@@ -287,7 +287,7 @@ namespace FEAT
        * \returns
        * 1 for a positively or -1 for a negatively oriented facet.
        */
-      static int orientation(int facet_index);
+      static int facet_orientation(int facet_index);
     };
 #endif // DOXYGEN
 
@@ -351,25 +351,22 @@ namespace FEAT
       /**
        * \brief Facet orientation for simplices
        *
-       * For Simplex<1>, the left vertex is negatively oriented (the outer normal being -1), the right vertex is
-       * positively oriented (the outer normal being 1).
-       * Simplex<2> and Simplex<3> only have positively oriented facets.
+       * For Simplex<1>, the left vertex is negatively oriented (the outer normal being -1),
+       * the right vertex is positively oriented (the outer normal being 1).
+       * For Simplex<2>, all edges are positively oriented.
+       * For Simplex<3>, triangle 0 and 2 are positively and 1 and 3 negatively oriented, resp.
        *
        * \param[in] facet_index
        * The number of the facet to return the orientation for.
        *
        * \returns
        * 1 for a positively or -1 for a negatively oriented facet.
-       *
        */
-      static int orientation(int facet_index)
+      static int facet_orientation(int facet_index)
       {
         ASSERTM((facet_index >= 0), "facet index out of range!");
-        ASSERTM((facet_index < FaceTraits<Simplex<dim_>,dim_-1>::count), "facet index out of range!");
-#ifndef DEBUG
-        (void) facet_index;
-#endif
-        return 1 - ( dim_ > 1 ? 0 : (( facet_index & 1 ) ^ 1 ) << 1);
+        ASSERTM((facet_index < FaceTraits<Simplex<dim_>, dim_-1>::count), "facet index out of range!");
+        return 1 - (dim_ == 2 ? 0 : dim_ == 3 ? (facet_index & 1) << 1 : ((facet_index & 1) ^ 1) << 1);
       }
     };
 
@@ -414,7 +411,7 @@ namespace FEAT
        * 1 for a positively or -1 for a negatively oriented facet.
        *
        */
-      static int orientation(int facet_index)
+      static int facet_orientation(int facet_index)
       {
         ASSERTM((facet_index >= 0), "facet index out of range!");
         ASSERTM((facet_index < FaceTraits<Hypercube<dim_>,dim_-1>::count), "facet index out of range!");

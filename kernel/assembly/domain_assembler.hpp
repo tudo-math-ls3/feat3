@@ -1152,7 +1152,7 @@ namespace FEAT
        *
        * \note
        * If you want to compile the assembler for all cells/elements of the trafo's
-       * underlying mesh, consider using the #compile_all_elements() instead.
+       * underlying mesh, consider using the #compile_all_elements() function instead.
        */
       void compile()
       {

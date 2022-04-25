@@ -1476,9 +1476,9 @@ namespace NavierStokesPP
       if(mesh_part_l != nullptr)
         flux_l_asm.add_mesh_part(*mesh_part_l);
 
-      body_force_asm.compile_facets(true);
-      flux_u_asm.compile_facets(false);
-      flux_l_asm.compile_facets(false);
+      body_force_asm.compile();
+      flux_u_asm.compile();
+      flux_l_asm.compile();
 
       // set up inverse trafo mapping
       typedef Trafo::InverseMapping<TrafoType, DataType> InvMappingType;

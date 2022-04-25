@@ -49,6 +49,8 @@ namespace FEAT
       typename EvalTraits::JacobianInverseType jac_inv;
       /// jacobian matrix
       typename EvalTraits::JacobianMatrixType jac_mat;
+      /// normal vector (only defined by Assembly::TraceAssembler)
+      typename EvalTraits::NormalVectorType normal;
       /// image point
       typename EvalTraits::ImagePointType img_point;
       /// domain point
@@ -68,6 +70,7 @@ namespace FEAT
         hess_ten = qnan;
         jac_inv = qnan;
         jac_mat = qnan;
+        normal = qnan;
         img_point = qnan;
         dom_point = qnan;
         jac_det = qnan;

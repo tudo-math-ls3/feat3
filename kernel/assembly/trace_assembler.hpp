@@ -113,20 +113,28 @@ namespace FEAT
           return glob_dofs[i];
         }
       }; // class CommonDofMap<...>
-
     } // namespace Intern
     /// \endcond
 
     /**
-     * \brief Assembles Facet information for assembling operators
+     * \brief Assembler for operators/functionals on boundaries and other sub-dimensional mesh parts.
      *
-     * This functionality similar to the OuterNormalComputer (which assembles only boundary facets, but can compute
-     * weighted outer normals, too).
+     * This class can be used to assemble operators, functionals and various other quantities on
+     * (a part of) the boundary of a mesh or any other set of mesh facets.
+     *
+     * After you have constructed the trace assembler object, you still have to tell the assembler
+     * on which set of facets the assembly should take place before you can actually assemble anything.
+     * There are 2 ways to do this:
+     * - You can tell the assembler to assemble on all inner and/or outer facets of the mesh by
+     *   calling the #compile_all_facets() function.
+     * - You can add individual facets or whole mesh parts to the assembler by calling the
+     *   #add_facet() and #add_mesh_part() functions. Afterwards, you need to compile the assembler
+     *   by calling the #compile() function.
      *
      * \tparam Trafo_
-     * The transformation
+     * The transformation on whose underlying mesh the assembly should take place
      *
-     * \note After all MeshParts are added, compile_facets() needs to be called
+     * \author Peter Zajac
      */
     template<typename Trafo_>
     class TraceAssembler
@@ -140,18 +148,30 @@ namespace FEAT
       static constexpr int facet_dim = shape_dim-1;
 
     protected:
+      /// a reference to the trafo
       const TrafoType& _trafo;
+      /// the facet masks, local cell facet indices and facet orientation codes
       std::vector<int> _facet_mask, _cell_facet, _facet_ori;
+      /// the indices of all cells and facets to loop over during assembly
       std::vector<Index> _cells, _facets;
 
     public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] trafo
+       * A \resident reference to the trafo on which to assemble
+       */
       explicit TraceAssembler(const TrafoType& trafo) :
         _trafo(trafo),
         _facet_mask(trafo.get_mesh().get_num_entities(facet_dim), 0)
       {
       }
 
-      void clear_facets()
+      /**
+       * \brief Clears the assembler
+       */
+      void clear()
       {
         _cell_facet.clear();
         _facet_ori.clear();
@@ -161,12 +181,24 @@ namespace FEAT
           f = Index(0);
       }
 
+      /**
+       * \brief Adds a single facet to the assembler.
+       *
+       * \param[in] facet
+       * The index of the facet to be added to the assembler.
+       */
       void add_facet(Index ifacet)
       {
         ASSERTM(ifacet < Index(_facets.size()), "invalid facet index");
         _facet_mask.at(ifacet) = 1;
       }
 
+      /**
+       * \brief Adds all facets of a mesh part to the assembler.
+       *
+       * \param[in] mesh_part
+       * The mesh part whose facets are to be added.
+       */
       void add_mesh_part(const Geometry::MeshPart<MeshType>& mesh_part)
       {
         const auto& trg = mesh_part.template get_target_set<facet_dim>();
@@ -174,7 +206,17 @@ namespace FEAT
           _facet_mask.at(trg[i]) = 1;
       }
 
-      void compile_facets(bool only_boundary = true)
+      /**
+       * \brief Compiles the assembler for all facets that have been added manually.
+       *
+       * This function compiles the assembler for all facets that have been added manually by
+       * previous calls of the #add_facet or #add_mesh_part functions.
+       *
+       * \note
+       * If you want to compile the assembler for all facets of the trafo's underlying mesh,
+       * consider using the #compile_all_facets() function instead.
+       */
+      void compile()
       {
         _cell_facet.clear();
         _facet_ori.clear();
@@ -193,8 +235,8 @@ namespace FEAT
             continue;
 
           // ensure that this is a boundary facet if required
-          if(only_boundary && (elem_at_facet.degree(iface) != Index(1)))
-            XABORTM("facet is adjacent to more than 1 element");
+          //if(only_boundary && (elem_at_facet.degree(iface) != Index(1)))
+            //XABORTM("facet is adjacent to more than 1 element");
 
           // add all elements
           for(auto it = elem_at_facet.image_begin(iface); it != elem_at_facet.image_end(iface); ++it)
@@ -203,7 +245,7 @@ namespace FEAT
 
             // try to compute local facet index and orientation
             int loc_face(0), face_ori(0);
-            if(!find_local_facet(iface, icell, loc_face, face_ori))
+            if(!_find_local_facet(iface, icell, loc_face, face_ori))
               XABORTM("failed to find local facet");
 
             // alright, add this facet to our list
@@ -215,6 +257,16 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Compiles the assembler for all inner and/our outer facets of the underlying mesh
+       *
+       * \param[in] inner
+       * Specifies whether the mesh's inner facets are to be added to the assembler or not.
+       *
+       * \param[in] outer
+       * Specifies whether the mesh's outer (i.e. boundary) facets are to be added to the
+       * assembler or not.
+       */
       void compile_all_facets(bool inner, bool outer)
       {
         _cell_facet.clear();
@@ -229,12 +281,16 @@ namespace FEAT
         // loop over all facets
         for(Index iface(0); iface < Index(_facet_mask.size()); ++iface)
         {
+          // how many elements are adjacent to this facet?
           const int degree = int(elem_at_facet.degree(iface));
           XASSERT(degree > 0);
           XASSERT(degree < 3);
 
+          // outer facet with only 1 adjacent element?
           if((degree == 1) && !outer)
             continue;
+
+          // inner facet with 2 adjacent elements?
           if((degree == 2) && !inner)
             continue;
 
@@ -245,7 +301,7 @@ namespace FEAT
 
             // try to compute local facet index and orientation
             int loc_face(0), face_ori(0);
-            if(!find_local_facet(iface, icell, loc_face, face_ori))
+            if(!_find_local_facet(iface, icell, loc_face, face_ori))
               XABORTM("failed to find local facet");
 
             // alright, add this facet to our list
@@ -257,6 +313,31 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Assembles a bilinear operator into a matrix.
+       *
+       * This function is the version for identical test- and trial-spaces.
+       *
+       * \note
+       * The assembler automatically computes the normal vectors in the cubature points of each
+       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
+       * during the <c>set_point()</c> function call of the operator's evaluator.
+       *
+       * \param[in,out] matrix
+       * The \transient matrix that is to be assembled.
+       *
+       * \param[in] operat
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
+       *
+       * \param[in] space
+       * A \transient reference to the finite-element test-/trial-space to be used.
+       *
+       * \param[in] cubature_factory
+       * A \transient reference to the cubature factory to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
+       */
       template<
         typename Matrix_,
         typename Operator_,
@@ -269,9 +350,38 @@ namespace FEAT
         const CubatureFactory_& cubature_factory,
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
       {
+        // call the version for 2 FE spaces for the sake of laziness
         assemble_operator_matrix2(matrix, operat, space, space, cubature_factory, alpha);
       }
 
+      /**
+       * \brief Assembles a bilinear operator into a matrix.
+       *
+       * This function is the version for different test- and trial-spaces.
+       *
+       * \note
+       * The assembler automatically computes the normal vectors in the cubature points of each
+       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
+       * during the <c>set_point()</c> function call of the operator's evaluator.
+       *
+       * \param[in,out] matrix
+       * The \transient matrix that is to be assembled.
+       *
+       * \param[in] operat
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
+       *
+       * \param[in] test_space
+       * A \transient reference to the finite-element test-space to be used.
+       *
+       * \param[in] trial_space
+       * A \transient reference to the finite-element trial-space to be used.
+       *
+       * \param[in] cubature_factory
+       * A \transient reference to the cubature factory to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
+       */
       template<
         typename Matrix_,
         typename Operator_,
@@ -323,7 +433,8 @@ namespace FEAT
         typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
         TrafoFacetEvaluator trafo_facet_eval(trafo);
 
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
+        static constexpr TrafoTags trafo_facet_tags = TrafoTags::jac_det | TrafoTags::jac_mat;
+        typedef typename TrafoFacetEvaluator::template ConfigTraits<trafo_facet_tags>::EvalDataType TrafoFacetEvalData;
 
         // create space evaluators
         typename AsmTraits::TestEvaluator test_eval(test_space);
@@ -377,6 +488,10 @@ namespace FEAT
           // compute orientation trafos
           Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, _facet_ori[f]);
 
+          // compute orientation of actual cell facet
+          const int cell_facet_ori = Geometry::Intern::CongruencySampler<FacetType>::orientation(_facet_ori[f])
+            * Shape::ReferenceCell<ShapeType>::facet_orientation(_cell_facet[f]);
+
           // prepare trafo evaluators
           trafo_facet_eval.prepare(face);
           trafo_eval.prepare(cell);
@@ -407,6 +522,11 @@ namespace FEAT
             // compute trafo data
             trafo_facet_eval(trafo_facet_data, cub_pt);
             trafo_eval(trafo_data, cub_cf);
+
+            // compute normal vector
+            trafo_data.normal = Tiny::orthogonal(trafo_facet_data.jac_mat).normalize();
+            if(cell_facet_ori < 0)
+              trafo_data.normal.negate();
 
             // compute basis function data
             test_eval(test_data, trafo_data);
@@ -457,6 +577,29 @@ namespace FEAT
         // okay, that's it
       }
 
+      /**
+       * \brief Assembles a linear functional into a vector.
+       *
+       * \note
+       * The assembler automatically computes the normal vectors in the cubature points of each
+       * facet (even if the functional did not ask for this), which can be queried by <c>tau.normal</c>
+       * during the <c>set_point()</c> function call of the operator's evaluator.
+       *
+       * \param[in,out] vector
+       * A \transient reference to the vector that is to be assembled.
+       *
+       * \param[in] functional
+       * A \transient reference to the linear functional implementing the LinearFunctional interface to be assembled.
+       *
+       * \param[in] space
+       * A \transient reference to the finite-element (test) space to be used.
+       *
+       * \param[in] cubature_factory
+       * A \transient reference to the cubature factory to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the linear functional.
+       */
       template<
         typename Vector_,
         typename Functional_,
@@ -512,6 +655,9 @@ namespace FEAT
         // create a functional evaluator
         typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
 
+        // Type that evaluator returns
+        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType FunctionalValueType;
+
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
         TrafoFacetEvalData trafo_facet_data;
@@ -520,7 +666,7 @@ namespace FEAT
         typename AsmTraits::TestEvalData test_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad;
+        typename Tiny::Vector<FunctionalValueType, AsmTraits::max_local_test_dofs> lvad;
 
         // create cubature rule
         typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -552,6 +698,10 @@ namespace FEAT
           // compute orientation trafos
           Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, _facet_ori[f]);
 
+          // compute orientation of actual cell facet
+          const int cell_facet_ori = Geometry::Intern::CongruencySampler<FacetType>::orientation(_facet_ori[f])
+            * Shape::ReferenceCell<ShapeType>::facet_orientation(_cell_facet[f]);
+
           // prepare trafo evaluators
           trafo_facet_eval.prepare(face);
           trafo_eval.prepare(cell);
@@ -580,6 +730,11 @@ namespace FEAT
             // compute trafo data
             trafo_facet_eval(trafo_facet_data, cub_pt);
             trafo_eval(trafo_data, cub_cf);
+
+            // compute normal vector
+            trafo_data.normal = Tiny::orthogonal(trafo_facet_data.jac_mat).normalize();
+            if(cell_facet_ori < 0)
+              trafo_data.normal.negate();
 
             // compute test basis function data
             test_eval(test_data, trafo_data);
@@ -702,14 +857,9 @@ namespace FEAT
         typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
         TrafoFacetEvaluator trafo_facet_eval(trafo);
 
-        /// \compilerhack PGI and Intel(18) do not understand complex template statements
-#if defined(FEAT_COMPILER_PGI) || (defined(FEAT_COMPILER_INTEL) && FEAT_COMPILER_INTEL >= 1800 && FEAT_COMPILER_INTEL < 1900)
+        // trafo facet evaluation data
         static constexpr TrafoTags trafo_facet_eval_tags = TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat;
         typedef typename TrafoFacetEvaluator::template ConfigTraits <trafo_facet_eval_tags>::EvalDataType TrafoFacetEvalData;
-#else
-        typedef typename TrafoFacetEvaluator::template ConfigTraits
-          <TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat>::EvalDataType TrafoFacetEvalData;
-#endif
 
         // create a space evaluator and evaluation data
         typename AsmTraits::TrialEvaluator space_eval_v(space_v);
@@ -1323,7 +1473,27 @@ namespace FEAT
       }
 
     protected:
-      bool find_local_facet(Index face, Index cell, int& facet, int& ori)
+      /**
+       * \brief Helper function: tries to find the local facet index for a given facet/cell pair
+       *
+       * \param[in] face
+       * The global index of the facet that is adjacent to \p cell
+       *
+       * \param[in] cell
+       * The global index of the cell/element that is adjacent to \p face
+       *
+       * \param[out] facet
+       * The local facet index of \p face with respect to \p cell
+       *
+       * \param[out] ori
+       * The local facet orientation code of \p face with respect to the corresponding reference
+       * element facet of \p cell
+       *
+       * \returns
+       * \c true, if the local facet was identified, or \c false, if \p face does not seem to be
+       * a facet of \p cell
+       */
+      bool _find_local_facet(Index face, Index cell, int& facet, int& ori)
       {
         typedef typename Shape::FaceTraits<ShapeType, facet_dim>::ShapeType FacetType;
         static constexpr int num_facets = Shape::FaceTraits<ShapeType, shape_dim-1>::count;

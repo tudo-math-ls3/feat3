@@ -227,18 +227,18 @@ public:
 
     // Check reference cell facet orientations
     // For Simplex<1>, these are -1, +1
-    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::orientation(0), -1);
-    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::orientation(1), 1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::facet_orientation(0), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<1>>::facet_orientation(1), +1);
 
-    // For all other simplices, all facet orientations are positive
-    for(int facet_index(0); facet_index < FaceTraits<Simplex<2>,1>::count; ++facet_index)
-    {
-      TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<2>>::orientation(facet_index), 1);
-    }
+    // For Simplex<2>, all are +1
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<2>>::facet_orientation(0), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<2>>::facet_orientation(1), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<2>>::facet_orientation(2), +1);
 
-    for(int facet_index(0); facet_index < FaceTraits<Simplex<3>,2>::count; ++facet_index)
-    {
-      TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::orientation(facet_index), 1);
-    }
+    // For Simplex<3>, we have +1 -1 +1 -1
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(0), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(1), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(2), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(3), -1);
   }
 } shape_test;

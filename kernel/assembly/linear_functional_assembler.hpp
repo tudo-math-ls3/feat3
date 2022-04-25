@@ -38,6 +38,9 @@ namespace FEAT
        *
        * \param[in] cubature_factory
        * A reference to the cubature factory to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the linear functional.
        */
       template<
         typename Vector_,
