@@ -78,7 +78,7 @@ namespace Stokes3Field
       public BilinearOperator::Evaluator<AsmTraits_>
     {
     public:
-      typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
       typedef typename AsmTraits_::TestBasisData TestBasisData;
       typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
@@ -87,7 +87,7 @@ namespace Stokes3Field
 
       // 2D version with 4 components
       template<typename T_>
-      static void eval(Tiny::Matrix<T_, 4, 2, 4, 2>& K, const Tiny::Vector<T_, 2, 2>& dx, const T_ s)
+      static void ev(Tiny::Matrix<T_, 4, 2, 4, 2>& K, const Tiny::Vector<T_, 2, 2>& dx, const T_ s)
       {
         // sigma_1 [11] = dx u_1 = (dx, 0) : (u_1, u_2)
         K(0,0) = s * dx(0);
@@ -108,7 +108,7 @@ namespace Stokes3Field
 
       // 2D version with 3 components
       template<typename T_>
-      static void eval(Tiny::Matrix<T_, 3, 2, 3, 2>& K, const Tiny::Vector<T_, 2, 2>& dx, const T_ s)
+      static void ev(Tiny::Matrix<T_, 3, 2, 3, 2>& K, const Tiny::Vector<T_, 2, 2>& dx, const T_ s)
       {
         // sigma_1 [11] = dx u_1 = (dx, 0) : (u_1, u_2)
         K(0,0) = s * dx(0);
@@ -123,11 +123,11 @@ namespace Stokes3Field
         K(2,1) = s * dx(0) / T_(2);
       }
 
-      OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+      ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
       {
         // call 3 or 4 component version
-        OperatorValueType K;
-        eval(K, phi.grad, -psi.value);
+        ValueType K;
+        ev(K, phi.grad, -psi.value);
         return K;
       }
     }; // class OperatorK
@@ -151,7 +151,7 @@ namespace Stokes3Field
       public BilinearOperator::Evaluator<AsmTraits_>
     {
     public:
-      typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
       typedef typename AsmTraits_::TestBasisData TestBasisData;
       typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
@@ -160,7 +160,7 @@ namespace Stokes3Field
 
       // 2D version with 4 components
       template<typename T_>
-      static void eval(Tiny::Matrix<T_, 2, 4, 2, 4>& R, const Tiny::Vector<T_, 2, 2>& dx, const T_ u)
+      static void ev(Tiny::Matrix<T_, 2, 4, 2, 4>& R, const Tiny::Vector<T_, 2, 2>& dx, const T_ u)
       {
         // u_1 = dx sigma_11 + dy sigma_12 = dx sigma_1 + dy sigma_2
         //     = (dx, dy, 0, 0) : (sigma_11, sigma_12, sigma_21, sigma_22)
@@ -179,7 +179,7 @@ namespace Stokes3Field
 
       // 2D version with 3 components
       template<typename T_>
-      static void eval(Tiny::Matrix<T_, 2, 3, 2, 3>& R, const Tiny::Vector<T_, 2, 2>& dx, const T_ u)
+      static void ev(Tiny::Matrix<T_, 2, 3, 2, 3>& R, const Tiny::Vector<T_, 2, 2>& dx, const T_ u)
       {
         // u_1 = dx sigma_11 + dy sigma_12 = dx sigma_1 + dy sigma_3
         //     = (dx, 0, dy) : (sigma_11, sigma_22, sigma_12)
@@ -194,11 +194,11 @@ namespace Stokes3Field
         R(1,2) = u * dx(0);
       }
 
-      OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+      ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
       {
         // call 3 or 4 component version
-        OperatorValueType R;
-        eval(R, phi.grad, -psi.value);
+        ValueType R;
+        ev(R, phi.grad, -psi.value);
         return R;
       }
     }; // class OperatorR
@@ -443,23 +443,23 @@ namespace Stokes3Field
     // assemble matrix block A
     //Assembly::Common::LaplaceOperatorBlocked<dim> operator_a; // gradient tensor
     //Assembly::Common::DuDvOperatorBlocked<dim>  operator_a; // deformation tensor
-    //Assembly::BilinearOperatorAssembler::assemble_block_matrix1(matrix_a, operator_a, space_velo, cubature);
+    //Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_a, operator_a, space_velo, cubature);
 
     // assemble matrix blocks B and D
     Assembly::GradPresDivVeloAssembler::assemble(matrix_b, matrix_d, space_velo, space_pres, cubature);
 
     // assemble matrix block M
     //Assembly::Common::IdentityOperatorBlocked<nsc> operator_m;
-    //Assembly::BilinearOperatorAssembler::assemble_block_matrix1(matrix_m, operator_m, space_stress, cubature);
+    //Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_m, operator_m, space_stress, cubature);
     Assembly::OldroydAssembler::assemble_matrix(matrix_m, vec_sol_v, space_velo, space_stress, cubature, 1.0, 0.0, 0.0);
 
     // assemble matrix block K
     OperatorK<dim,nsc> operator_k;
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix2(matrix_k, operator_k, space_stress, space_velo, cubature);
+    Assembly::BilinearOperatorAssembler::assemble_matrix2(matrix_k, operator_k, space_stress, space_velo, cubature);
 
     // assemble matrix block R
     OperatorR<dim,nsc> operator_r;
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix2(matrix_r, operator_r, space_velo, space_stress, cubature);
+    Assembly::BilinearOperatorAssembler::assemble_matrix2(matrix_r, operator_r, space_velo, space_stress, cubature);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly

@@ -330,7 +330,7 @@ namespace FEAT
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorType local_vector;
+        typename AsmTraits::template TLocalVector<DT_> local_vector;
 
         // create matrix scatter-axpy
         typename VectorType::GatherAxpy gather_axpy(vector);

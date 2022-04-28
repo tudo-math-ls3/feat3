@@ -1009,7 +1009,7 @@ namespace DFG95
       local_velo_mass_matrix.format();
 
       Assembly::Common::IdentityOperatorBlocked<dim_> id_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix1(local_velo_mass_matrix, id_op, space_velo, cubature);
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(local_velo_mass_matrix, id_op, space_velo, cubature);
     }
 
     void compile_local_matrix()

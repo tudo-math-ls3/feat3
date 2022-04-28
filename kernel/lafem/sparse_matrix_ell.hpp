@@ -326,6 +326,8 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indexype
       typedef IT_ IndexType;
+      /// Our value type
+      typedef DT_ ValueType;
       /// Compatible L-vector type
       typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
       /// Compatible R-vector type

@@ -476,7 +476,7 @@ namespace FEAT
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad;
+        typename AsmTraits::template TLocalVector<DataType> lvad;
 
         // create matrix scatter-axpy
         typename VectorType::GatherAxpy gather_axpy(vector);
@@ -1116,8 +1116,9 @@ namespace FEAT
 
         // create local vector data
         typedef Tiny::Vector<DataType, dim> VectorValue;
-        typedef Tiny::Vector<VectorValue, AsmTraits::max_local_test_dofs> LocalVectorType;
-        LocalVectorType lvad;
+
+        // create local vector data
+        typename AsmTraits::template TLocalVector<VectorValue> lvad;
 
         // create matrix scatter-axpy
         typename VectorType::GatherAxpy gather_axpy(vector);

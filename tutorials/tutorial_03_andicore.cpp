@@ -210,8 +210,11 @@ namespace Tutorial03
       // Moreover, the assembly traits contains the type of the trafo evaluator.
       typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
 
-      // Finally, we also need the DataType typedef.
+      // Next, we also need the scalar DataType typedef.
       typedef typename AsmTraits_::DataType DataType;
+
+      // Finally, we need the ValueType typedef, which is identical to DataType for scalar operators.
+      typedef DataType ValueType;
 
     protected:
       // The first thing that we require is again a const reference to our data object:
@@ -231,9 +234,9 @@ namespace Tutorial03
       // function pair. However, as we do not require them, we may simply skip implementing them,
       // as the base-class we derived from already contains a 'do-nothing' implementation for those.
 
-      // Finally, we can provide the actual evaluation operator, which performs the actual work:
-      // This operator returns a scalar value and its parameters are const references to...
-      DataType operator()(
+      // Finally, we can provide the actual evaluation function, which performs the actual work:
+      // This function returns a (scalar) value and its parameters are const references to...
+      ValueType eval(
         const TrialBasisData& phi,  // ...the trial basis data object
         const TestBasisData& psi    // ...the test basis data object
         ) const
@@ -325,7 +328,7 @@ namespace Tutorial03
       // is again an evaluator class similar to the one we are currently building up.
       typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
 
-      // Finally, we also need the DataType typedef.
+      // Next, we also need the DataType typedef.
       typedef typename AsmTraits_::DataType DataType;
 
       // Now comes the interesting part:
@@ -335,12 +338,13 @@ namespace Tutorial03
       // However, its template parameter is *not* our assembly traits type 'AsmTraits_', but another
       // type called 'analytic evaluation traits', which we need to provide here.
       // Luckily, there is another template class in the 'Analytic' namespace which takes care
-      // of all the necessary typedefing. The only two template parameters are the data type which
+      // of all the necessary typedef'ing. The only two template parameters are the data type which
       // we want to use internally and the function class itself:
       typedef Analytic::EvalTraits<DataType, SolFunction_> AnalyticEvalTraits;
 
-      // Return value of the analytic function, can be scalar or vector-valued in general but is scalar here
-      // Has to be public for the ForceFunctional
+      // The return value of the analytic function, which can be scalar or vector-valued in general,
+      // determines the ValueType for this functional, too. Since we are using a scalar function
+      // in this tutorial, ValueType is again identical to DataType here:
       typedef typename AnalyticEvalTraits::ValueType ValueType;
 
       // With that type, we can now define the type of the solution function evaluator:
@@ -404,11 +408,11 @@ namespace Tutorial03
           + _data.c * value;
       }
 
-      // Once again, we implement our evaluation operator, which is quite similar to the one
+      // Once again, we implement our evaluation function, which is quite similar to the one
       // for bilinear operators, with the only difference being that there is no trial function.
       // It takes a const reference to the test-function data object as a parameter
       // and returns the evaluation of the functional in the current cubature point:
-      ValueType operator()(const TestBasisData& psi) const
+      ValueType eval(const TestBasisData& psi) const
       {
         // As we have already computed the value of our force functional in the "set_point" function
         // above, we just need to multiply by the function value of 'psi':

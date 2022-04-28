@@ -391,6 +391,8 @@ namespace FEAT
     public:
       /// Our datatype
       typedef DT_ DataType;
+      /// Our value type
+      typedef DT_ ValueType;
       /// Our indextype
       typedef IT_ IndexType;
       /// Our memory architecture type

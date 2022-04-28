@@ -53,6 +53,10 @@ namespace FEAT
         typedef typename AsmTraits_::TestBasisData TestBasisData;
         /// trial function data type
         typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+#ifdef DOXYGEN
+        /// value type (either equal to DataType or Tiny::Vector/Matrix of DataType's)
+        typedef ... ValueType;
+#endif // DOXYGEN
 
       public:
         /**
@@ -89,10 +93,10 @@ namespace FEAT
 
 #ifdef DOXYGEN
         /**
-         * \brief Evaluation operator
+         * \brief Evaluation function
          *
-         * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
-         * a single point.
+         * This function evaluates the bilinear operator for a given combination of test- and
+         * trial-functions in a single cubature point.
          *
          * \param[in] phi
          * The \transient trial function data in the current evaluation point. \see Space::EvalData
@@ -103,7 +107,7 @@ namespace FEAT
          * \returns
          * The value of the bilinear operator.
          */
-        DataType operator()(const TrialBasisData& phi, const TestBasisData& psi) const;
+        ValueType eval(const TrialBasisData& phi, const TestBasisData& psi) const;
 #endif // DOXYGEN
       }; // class BilinearOperator::Evaluator<...>
     }; // class BilinearOperator

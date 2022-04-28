@@ -96,7 +96,7 @@ namespace FEAT
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename Tiny::Vector<ValueType, AsmTraits::SpaceEvaluator::max_local_dofs> lvad;
+        typename AsmTraits::template TLocalVector<ValueType> loc_vec;
 
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
@@ -105,13 +105,13 @@ namespace FEAT
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
           // format local matrix
-          lvad.format();
+          loc_vec.format();
 
           // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch local vector
-          gather_axpy(lvad, dof_mapping);
+          gather_axpy(loc_vec, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();
@@ -149,7 +149,8 @@ namespace FEAT
             for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate fe function
-              value += lvad[i] * space_data.phi[i].value;
+              Tiny::axpy(value, loc_vec[i], space_data.phi[i].value);
+
               // continue with next basis function
             }
 
@@ -311,7 +312,7 @@ namespace FEAT
         typename AsmTraits::SpaceEvalData space_data;
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad;
+        typename AsmTraits::template TLocalVector<ValueType> loc_vec;
 
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
@@ -320,13 +321,13 @@ namespace FEAT
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
           // format local matrix
-          lvad.format();
+          loc_vec.format();
 
           // initialize dof-mapping
           dof_mapping.prepare(cell);
 
           // fetch local vector
-          gather_axpy(lvad, dof_mapping);
+          gather_axpy(loc_vec, dof_mapping);
 
           // finish dof-mapping
           dof_mapping.finish();
@@ -359,7 +360,7 @@ namespace FEAT
             for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
-              val += lvad[i] * space_data.phi[i].value;
+              Tiny::axpy(val, loc_vec[i], space_data.phi[i].value);
               // continue with next basis function
             }
 

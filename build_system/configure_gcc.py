@@ -246,6 +246,6 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
 
     else:
       cxxflags += " -march=native"
-      print ("Warning: Detected cpu type " + cpu + " not supported by configure_gcc.py, using -march=native instead.")
+      print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
   return cxxflags, cmake_flags

@@ -324,6 +324,8 @@ namespace FEAT
       typedef DenseVector<MemType, DataType, IT_> VectorTypeR;
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_banded;
+      /// our value type
+      typedef DT_ ValueType;
       /// ImageIterator class for Adjactor interface implementation
       class ImageIterator
       {

@@ -455,8 +455,15 @@ namespace FEAT
         typename AsmTraits::TestEvalData test_data;
         typename AsmTraits::TrialEvalData trial_data;
 
+        // the value type of the operator
+        typedef typename OperatorType::template Evaluator<AsmTraits>::ValueType ValueType;
+
+        // ensure that the operator and matrix value types are compatible
+        static_assert(std::is_same<ValueType, typename MatrixType::ValueType>::value,
+          "matrix and bilinear operator have different value types!");
+
         // create local matrix data
-        typename AsmTraits::LocalMatrixType lmd;
+        typename AsmTraits::template TLocalMatrix<ValueType> loc_mat;
 
         // create cubature rule
         typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -508,7 +515,7 @@ namespace FEAT
           int num_loc_trial_dofs = trial_eval.get_num_local_dofs();
 
           // format local matrix
-          lmd.format();
+          loc_mat.format();
 
           // loop over all quadrature points and integrate
           for(int k(0); k < cubature_rule.get_num_points(); ++k)
@@ -542,8 +549,8 @@ namespace FEAT
               for(int j(0); j < num_loc_trial_dofs; ++j)
               {
                 // evaluate operator and integrate
-                lmd(i,j) += trafo_facet_data.jac_det * cubature_rule.get_weight(k) *
-                  oper_eval(trial_data.phi[j], test_data.phi[i]);
+                Tiny::axpy(loc_mat(i,j), oper_eval.eval(trial_data.phi[j], test_data.phi[i]),
+                  trafo_facet_data.jac_det * cubature_rule.get_weight(k));
                 // continue with next trial function
               }
               // continue with next test function
@@ -565,7 +572,7 @@ namespace FEAT
           trial_dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lmd, test_dof_mapping, trial_dof_mapping, alpha);
+          scatter_axpy(loc_mat, test_dof_mapping, trial_dof_mapping, alpha);
 
           // finish dof mapping
           trial_dof_mapping.finish();
@@ -655,9 +662,6 @@ namespace FEAT
         // create a functional evaluator
         typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
 
-        // Type that evaluator returns
-        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType FunctionalValueType;
-
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
         TrafoFacetEvalData trafo_facet_data;
@@ -665,8 +669,15 @@ namespace FEAT
         // create space evaluation data
         typename AsmTraits::TestEvalData test_data;
 
+        // the value type of the functional
+        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType ValueType;
+
+        // ensure that the functional and vector value types are compatible
+        static_assert(std::is_same<ValueType, typename VectorType::ValueType>::value,
+          "vector and linear functional have different value types!");
+
         // create local vector data
-        typename Tiny::Vector<FunctionalValueType, AsmTraits::max_local_test_dofs> lvad;
+        typename AsmTraits::template TLocalVector<ValueType> loc_vec;
 
         // create cubature rule
         typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -716,7 +727,7 @@ namespace FEAT
           int num_loc_dofs = test_eval.get_num_local_dofs();
 
           // format local matrix
-          lvad.format();
+          loc_vec.format();
 
           // loop over all quadrature points and integrate
           for(int k(0); k < cubature_rule.get_num_points(); ++k)
@@ -746,7 +757,8 @@ namespace FEAT
             for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functional and integrate
-              lvad(i) += trafo_facet_data.jac_det * cubature_rule.get_weight(k) * func_eval(test_data.phi[i]);
+              Tiny::axpy(loc_vec(i), func_eval.eval(test_data.phi[i]),
+                trafo_facet_data.jac_det * cubature_rule.get_weight(k));
               // continue with next trial function
             }
             // continue with next test function
@@ -764,7 +776,7 @@ namespace FEAT
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lvad, dof_mapping, alpha);
+          scatter_axpy(loc_vec, dof_mapping, alpha);
 
           // finish dof-mapping
           dof_mapping.finish();

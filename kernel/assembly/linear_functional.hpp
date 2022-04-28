@@ -50,6 +50,10 @@ namespace FEAT
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// test function data type
         typedef typename AsmTraits_::TestBasisData TestBasisData;
+#ifdef DOXYGEN
+        /// value type (either equal to DataType or Tiny::Vector/Matrix of DataType's)
+        typedef ... ValueType;
+#endif // DOXYGEN
 
       public:
         /**
@@ -86,9 +90,9 @@ namespace FEAT
 
 #ifdef DOXYGEN
         /**
-         * \brief Evaluation operator
+         * \brief Evaluation function
          *
-         * This operator evaluates the linear functional for a given test function in a single point.
+         * This function evaluates the linear functional for a given test function in a single cubature point.
          *
          * \param[in] psi
          * The \transient test function data in the current evaluation point. \see Space::EvalData
@@ -96,7 +100,7 @@ namespace FEAT
          * \returns
          * The value of the linear functional.
          */
-        DataType operator()(const TestBasisData& psi) const;
+        ValueType eval(const TestBasisData& psi) const;
 #endif // DOXYGEN
       }; // class LinearFunctional::Evaluator<...>
     }; // class LinearFunctional

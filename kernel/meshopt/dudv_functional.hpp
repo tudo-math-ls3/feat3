@@ -262,7 +262,7 @@ namespace FEAT
 
           Assembly::Common::DuDvOperatorBlocked<MeshType::world_dim> my_operator;
 
-          Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
+          Assembly::BilinearOperatorAssembler::assemble_matrix1(
             matrix_sys,           // the matrix that receives the assembled operator
             my_operator, // the operator that is to be assembled
             trafo_space,            // the finite element space in use

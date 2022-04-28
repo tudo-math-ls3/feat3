@@ -113,16 +113,16 @@ namespace FEAT
         typename AsmTraits::SpaceEvalData space_data;
 
         // allocate fine-mesh mass matrix
-        typename AsmTraits::LocalMatrixType mass;
+        typename AsmTraits::template TLocalMatrix<DT_> mass;
 
         // pivot array for factorization
         int pivot[mass.n];
 
         // create local vector data
-        typename AsmTraits::LocalVectorType lvad, lxad;
+        typename AsmTraits::template TLocalVector<DT_> lvad, lxad;
 
         // create local weight data
-        typename AsmTraits::LocalVectorType lwad;
+        typename AsmTraits::template TLocalVector<DT_> lwad;
 
         // fetch the dof count
         const Index num_dofs(space.get_num_dofs());

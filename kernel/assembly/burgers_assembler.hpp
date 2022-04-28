@@ -521,7 +521,7 @@ namespace FEAT
         static constexpr int max_local_dofs = AsmTraits::max_local_test_dofs;
 
         // create local matrix data
-        typedef typename AsmTraits::LocalMatrixType LocalMatrixType;
+        typedef typename AsmTraits::template TLocalMatrix<DataType> LocalMatrixType;
         LocalMatrixType local_matrix;
 
         // create local vector data

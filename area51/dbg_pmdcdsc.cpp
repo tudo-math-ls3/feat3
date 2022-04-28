@@ -101,7 +101,7 @@ namespace PoissonMixed
     {
       the_system_level.matrix_a.local().format();
       Assembly::Common::IdentityOperatorBlocked<dim> identity_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(
         the_system_level.matrix_a.local(), identity_op, the_domain_level.space_velo, cubature);
     }
 

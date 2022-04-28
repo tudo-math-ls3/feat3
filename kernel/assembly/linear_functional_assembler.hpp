@@ -85,8 +85,6 @@ namespace FEAT
 
         // create a functional evaluator
         typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
-        // Type that evaluator returns
-        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType FunctionalValueType;
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -94,8 +92,15 @@ namespace FEAT
         // create space evaluation data
         typename AsmTraits::TestEvalData test_data;
 
+        // the value type of the functional
+        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType ValueType;
+
+        // ensure that the functional and vector value types are compatible
+        static_assert(std::is_same<ValueType, typename VectorType::ValueType>::value,
+          "vector and linear functional have different value types!");
+
         // create local vector data
-        typename Tiny::Vector<FunctionalValueType, AsmTraits::max_local_test_dofs> lvad;
+        typename AsmTraits::template TLocalVector<ValueType> loc_vec;
 
         // create cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
@@ -119,7 +124,7 @@ namespace FEAT
           int num_loc_dofs = test_eval.get_num_local_dofs();
 
           // format local matrix
-          lvad.format();
+          loc_vec.format();
 
           // loop over all quadrature points and integrate
           for(int k(0); k < cubature_rule.get_num_points(); ++k)
@@ -137,7 +142,8 @@ namespace FEAT
             for(int i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functional and integrate
-              lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) * func_eval(test_data.phi[i]);
+              Tiny::axpy(loc_vec(i), func_eval.eval(test_data.phi[i]),
+                 trafo_data.jac_det * cubature_rule.get_weight(k));
               // continue with next trial function
             }
             // continue with next test function
@@ -154,7 +160,7 @@ namespace FEAT
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lvad, dof_mapping, alpha);
+          scatter_axpy(loc_vec, dof_mapping, alpha);
 
           // finish dof-mapping
           dof_mapping.finish();

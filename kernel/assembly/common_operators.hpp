@@ -62,6 +62,8 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         public:
           /**
@@ -89,7 +91,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return dot(phi.grad, psi.grad);
           }
@@ -136,14 +138,14 @@ namespace FEAT
         public:
           /// the data type to be used
           typedef typename AsmTraits_::DataType DataType;
-          /// the data type for the block system
-          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
           /// the assembler's trafo data type
           typedef typename AsmTraits_::TrafoData TrafoData;
           /// the assembler's test-function data type
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
 
         public:
           /**
@@ -171,7 +173,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             ValueType r(DataType(0));
             r.add_scalar_main_diag(Tiny::dot(phi.grad, psi.grad));
@@ -240,6 +242,8 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         private:
           /// the transformation Gram matrix and its inverse
@@ -273,7 +277,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear operator.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return gram_inv.scalar_product(phi.ref_grad, psi.ref_grad);
           }
@@ -321,6 +325,8 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         public:
           /**
@@ -348,7 +354,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.value;
           }
@@ -428,7 +434,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             ValueType r(DataType(0));
             r.add_scalar_main_diag(phi.value * psi.value);
@@ -480,10 +486,12 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         protected:
           /// the desired derivative
-          int deriv;
+          const int deriv;
 
         public:
           /**
@@ -514,7 +522,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.grad[deriv];
           }
@@ -578,10 +586,12 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         protected:
           /// the desired derivative
-          int deriv;
+          const int deriv;
 
         public:
           /**
@@ -612,7 +622,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.value * psi.grad[deriv];
           }
@@ -664,12 +674,14 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         protected:
           /// Row index
-          int ir;
+          const int ir;
           /// Column index
-          int ic;
+          const int ic;
 
         public:
           /**
@@ -698,7 +710,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return phi.grad[ic] * psi.grad[ir];
           }
@@ -778,12 +790,14 @@ namespace FEAT
           typedef typename AsmTraits_::TestBasisData TestBasisData;
           /// the assembler's trial-function data type
           typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
 
         protected:
           /// Row index
-          int ir;
+          const int ir;
           /// Column index
-          int ic;
+          const int ic;
 
         public:
           /**
@@ -812,7 +826,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          DataType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             return ((ir==ic) ? dot(phi.grad,psi.grad) : DataType(0)) + phi.grad[ir] * psi.grad[ic];
           }
@@ -921,7 +935,7 @@ namespace FEAT
            * \returns
            * The value of the bilinear functor.
            **/
-          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             ValueType r(DataType(0));
             r.set_outer_product(phi.grad, psi.grad);
@@ -1103,7 +1117,7 @@ namespace FEAT
             R(2,5) = u * der(0);
           }
 
-          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             ValueType R;
             eval(R, phi.grad, psi.value);
@@ -1289,7 +1303,7 @@ namespace FEAT
             K(5,2) = s * der(0) / T_(2);
           }
 
-          ValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
             ValueType K;
             eval(K, phi.grad, psi.value);

@@ -52,7 +52,7 @@ namespace DbgTrace3
         ni = tau.normal[i_];
       }
 
-      DataType operator()(const TestBasisData& psi) const
+      ValueType eval(const TestBasisData& psi) const
       {
         return ni * psi.value;
       }
@@ -87,7 +87,7 @@ namespace DbgTrace3
         n = tau.normal;
       }
 
-      ValueType operator()(const TestBasisData& psi) const
+      ValueType eval(const TestBasisData& psi) const
       {
         return psi.value * n;
       }

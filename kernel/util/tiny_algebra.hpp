@@ -151,9 +151,9 @@ namespace FEAT
         /// The number of times the ValueType is some kind of Vector. A Vector is a tensor of order 1+level.
         static constexpr int level = DataTypeExtractor<T_>::level+1;
       };
-      template<typename T_, int m_, int n_, int sm_, int sn_>
 
       // Same for Matrix
+      template<typename T_, int m_, int n_, int sm_, int sn_>
       struct DataTypeExtractor<Matrix<T_, m_, n_, sm_, sn_>>
       {
         /// Recursive typedef
@@ -656,28 +656,6 @@ namespace FEAT
       }
     }; // class Vector
 
-    /**
-     * \brief Computes the dot-product of two vectors.
-     *
-     * This function returns the dot-product of \e a and \e b:
-     * \f[\sum_{k=0}^{n-1} a_k\cdot b_k\f]
-     *
-     * \param[in] a,b
-     * The vectors whose dot-product is to be computed.
-     *
-     * \returns The dot-product of \p a and \p b.
-     */
-    template<typename T_, int n_, int sa_, int sb_>
-    inline T_ dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
-    {
-      T_ r(0);
-
-      for(int i(0); i < n_; ++i)
-      {
-        r += a.v[i] * b.v[i];
-      }
-      return r;
-    }
     /*
     template<typename T_, int sx_, int sa_>
     inline void cross(Vector<T_, 2, sx_>& x, const Vector<T_, 2, sa_>& a)
@@ -1534,7 +1512,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Sets this matrix to the identitiy matrix.
+       * \brief Sets this matrix to the identity matrix.
        *
        * \returns \p *this
        */
@@ -1725,29 +1703,6 @@ namespace FEAT
     inline Matrix<T_, m_, n_> operator-(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>(a) -= b;
-    }
-
-    /**
-     * \brief Computes the dot-product of two matrices.
-     *
-     * This function returns the dot-product of \e A and \e B:
-     * \f[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1} a_{ij} \cdot b_{ij}\f]
-     *
-     * \param[in] a,b
-     * The matrices whose dot-product is to be computed.
-     *
-     * \returns The dot-product of \p a and \p b.
-     */
-    template<typename T_, int m_, int n_, int sma_, int sna_, int smb_, int snb_>
-    inline T_ dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
-    {
-      T_ r(0);
-      for(int i(0); i < m_; ++i)
-      {
-        for(int j(0); j < n_; ++j)
-          r += a(i,j) * b(i,j);
-      }
-      return r;
     }
 
     /* ************************************************************************************************************* */
@@ -2111,32 +2066,242 @@ namespace FEAT
     // Various helper functions
     /* ************************************************************************************************************* */
     /* ************************************************************************************************************* */
+    /**
+     * \brief Computes the dot-product of two scalars.
+     *
+     * \param[in] a,b
+     * The scalar whose product is to be computed.
+     *
+     * \returns The product of \p a and \p b.
+     *
+     * \note
+     * This overload is disabled by SFINAE for Tiny::Vector, Tiny::Matrix and Tiny::Tensor3 types.
+     */
+    template<typename T_, typename std::enable_if<Intern::DataTypeExtractor<T_>::level == 0, bool>::type = true>
+    inline T_ dot(const T_& a, const T_& b)
+    {
+      return a*b;
+    }
 
+    /**
+     * \brief Computes the dot-product of two vectors.
+     *
+     * This function returns the dot-product of \e a and \e b:
+     * \f[\sum_{k=0}^{n-1} a_k\cdot b_k\f]
+     *
+     * \param[in] a,b
+     * The vectors whose dot-product is to be computed.
+     *
+     * \returns The dot-product of \p a and \p b.
+     */
+    template<typename T_, int n_, int sa_, int sb_>
+    inline typename Vector<T_, n_>::DataType dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
+    {
+      typename Vector<T_, n_>::DataType r(0);
+
+      for(int i(0); i < n_; ++i)
+      {
+        r += Tiny::dot(a.v[i], b.v[i]);
+      }
+      return r;
+    }
+
+    /**
+     * \brief Computes the dot-product of two matrices.
+     *
+     * This function returns the dot-product of \e A and \e B:
+     * \f[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1} a_{ij} \cdot b_{ij}\f]
+     *
+     * \param[in] a,b
+     * The matrices whose dot-product is to be computed.
+     *
+     * \returns The dot-product of \p a and \p b.
+     */
+    template<typename T_, int m_, int n_, int sma_, int sna_, int smb_, int snb_>
+    inline typename Matrix<T_, m_, n_>::DataType dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    {
+      typename Matrix<T_, m_, n_>::DataType r(0);
+      for(int i(0); i < m_; ++i)
+      {
+        r += Tiny::dot(a.v[i], b.v[i]);
+      }
+      return r;
+    }
+
+    /**
+     * \brief Computes the dot-product of two tensor3 objects.
+     *
+     * \param[in] a,b
+     * The tensor3 whose dot-product is to be computed.
+     *
+     * \returns The dot-product of \p a and \p b.
+     */
+    template<typename T_, int l_, int m_, int n_, int sla_ ,int sma_, int sna_, int slb_, int smb_, int snb_>
+    inline typename Tensor3<T_, l_, m_, n_>::DataType dot(
+      const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a,
+      const Tensor3<T_, l_, m_, n_, slb_, smb_, snb_>& b)
+    {
+      typename Tensor3<T_, l_, m_, n_>::DataType r(0);
+      for(int i(0); i < l_; ++i)
+      {
+        r += Tiny::dot(a.v[i], b.v[i]);
+      }
+      return r;
+    }
+
+    /**
+     * \brief Adds a scaled identity onto a scalar.
+     *
+     * \param[in,out] x
+     * The scalar onto which to add to
+     *
+     * \param[in] alpha
+     * The scalar to be added onto \p x
+     */
     template<typename T_>
-    inline void add_id(T_& x, const T_& y)
+    inline void add_id(T_& x, const T_& alpha)
     {
-      x += y;
+      x += alpha;
     }
 
+    /**
+     * \brief Adds a scaled identity onto a vector.
+     *
+     * \param[in,out] x
+     * The vector onto which to add to
+     *
+     * \param[in] alpha
+     * The scalar to be added onto \p x
+     */
     template<typename T_, int n_, int sn_>
-    inline void add_id(Vector<T_, n_, sn_>& x, const T_& y)
+    inline void add_id(Vector<T_, n_, sn_>& x, const typename Vector<T_, n_, sn_>::DataType& alpha)
     {
       for(int i(0); i < n_; ++i)
-        add_id(x(i), y);
+        add_id(x(i), alpha);
     }
 
+    /**
+     * \brief Adds a scaled identity onto a matrix.
+     *
+     * \param[in,out] x
+     * The matrix onto which to add to
+     *
+     * \param[in] alpha
+     * The scalar to be added onto the main diagonal of \p x
+     */
     template<typename T_, int n_, int sm_, int sn_>
-    inline void add_id(Matrix<T_, n_, n_, sm_, sn_>& x, const T_& y)
+    inline void add_id(Matrix<T_, n_, n_, sm_, sn_>& x, const typename Matrix<T_, n_, n_, sm_, sn_>::DataType& alpha)
     {
       for(int i(0); i < n_; ++i)
-        add_id(x(i,i), y);
+        add_id(x(i,i), alpha);
     }
 
+    /**
+     * \brief Adds a scaled identity onto a tensor3.
+     *
+     * \param[in,out] x
+     * The tensor3 onto which to add to
+     *
+     * \param[in] alpha
+     * The scalar to be added onto the main diagonal of \p x
+     */
     template<typename T_, int n_, int sl_, int sm_, int sn_>
-    inline void add_id(Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>& x, const T_& y)
+    inline void add_id(Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>& x, const typename Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>::DataType& alpha)
     {
       for(int i(0); i < n_; ++i)
-        add_id(x(i,i,i), y);
+        add_id(x(i,i,i), alpha);
+    }
+
+    /**
+     * \brief Performs an AXPY of two scalars
+     *
+     * This function performs: y += alpha*x
+     *
+     * \param[in,out] y
+     * The object that receives the AXPY result
+     *
+     * \param[in] x
+     * The object that is to be added onto \p y
+     *
+     * \param[in] alpha
+     * The scaling factor for \p x
+     */
+    template<typename T_>
+    inline void axpy(T_& y, const T_& x, const T_& alpha)
+    {
+      y += alpha*x;
+    }
+
+    /**
+     * \brief Performs an AXPY of two vectors
+     *
+     * This function performs: y += alpha*x
+     *
+     * \param[in,out] y
+     * The object that receives the AXPY result
+     *
+     * \param[in] x
+     * The object that is to be added onto \p y
+     *
+     * \param[in] alpha
+     * The scaling factor for \p x
+     */
+    template<typename T_, int n_, int sn_>
+    inline void axpy(
+      Vector<T_, n_, sn_>& y,
+      const Vector<T_, n_, sn_>& x,
+      const typename Vector<T_, n_, sn_>::DataType& alpha)
+    {
+      for(int i(0); i < n_; ++i)
+        axpy(y.v[i], x.v[i], alpha);
+    }
+
+    /**
+     * \brief Performs an AXPY of two matrices
+     *
+     * This function performs: y += alpha*x
+     *
+     * \param[in,out] y
+     * The object that receives the AXPY result
+     *
+     * \param[in] x
+     * The object that is to be added onto \p y
+     *
+     * \param[in] alpha
+     * The scaling factor for \p x
+     */
+    template<typename T_, int m_, int n_, int sm_, int sn_>
+    inline void axpy(
+      Matrix<T_, m_, n_, sm_, sn_>& y,
+      const Matrix<T_, m_, n_, sm_, sn_>& x,
+      const typename Matrix<T_, m_, n_, sm_, sn_>::DataType& alpha)
+    {
+      for(int i(0); i < m_; ++i)
+        axpy(y.v[i], x.v[i], alpha);
+    }
+
+    /**
+     * \brief Performs an AXPY of two tensor3
+     *
+     * This function performs: y += alpha*x
+     *
+     * \param[in,out] y
+     * The object that receives the AXPY result
+     *
+     * \param[in] x
+     * The object that is to be added onto \p y
+     *
+     * \param[in] alpha
+     * The scaling factor for \p x
+     */
+    template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
+    inline void axpy(
+      Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& y,
+      const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& x,
+      const typename Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>::DataType& alpha)
+    {
+      for(int i(0); i < l_; ++i)
+        axpy(y.v[i], x.v[i], alpha);
     }
 
     /* ************************************************************************************************************* */

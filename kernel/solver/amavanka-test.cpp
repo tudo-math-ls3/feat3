@@ -113,7 +113,7 @@ public:
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
 
     Assembly::Common::DuDvOperatorBlocked<2> dudv_op;
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix1(mat_a, dudv_op, space_v, cubature);
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a, dudv_op, space_v, cubature);
     Assembly::GradPresDivVeloAssembler::assemble(mat_b, mat_d, space_v, space_p, cubature);
 
     // assemble filter

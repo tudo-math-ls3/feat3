@@ -1344,7 +1344,7 @@ namespace NavierStokesPP
         auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
         loc_mat_a.format();
         Assembly::Common::IdentityOperatorBlocked<dim> id_op;
-        Assembly::BilinearOperatorAssembler::assemble_block_matrix1(loc_mat_a, id_op, domain.at(i)->space_velo, cubature);
+        Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_a, id_op, domain.at(i)->space_velo, cubature);
 
         system_levels.at(i)->inverse_lumped_mass_velo = system_levels.at(i)->matrix_a.lump_rows();
         system_levels.at(i)->inverse_lumped_mass_velo.component_invert(system_levels.at(i)->inverse_lumped_mass_velo);

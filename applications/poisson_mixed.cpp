@@ -341,7 +341,7 @@ namespace PoissonMixed
 
       system_levels.at(i)->matrix_a.local().format();
       Assembly::Common::IdentityOperatorBlocked<dim> identity_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix1(system_levels.at(i)->matrix_a.local(),
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(system_levels.at(i)->matrix_a.local(),
       identity_op, domain.at(i)->space_velo, cubature);
 
       system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);

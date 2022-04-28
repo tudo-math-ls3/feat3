@@ -98,7 +98,7 @@ namespace Tutorial07
       /// the data type to be used
       typedef typename AsmTraits_::DataType DataType;
       /// the data type for the block system
-      typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
       /// the assembler's trafo data type
       typedef typename AsmTraits_::TrafoData TrafoData;
       /// the assembler's test-function data type
@@ -111,9 +111,9 @@ namespace Tutorial07
       {
       }
 
-      OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+      ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
       {
-        OperatorValueType r(DataType(0));
+        ValueType r(DataType(0));
         r(0,0) = r(1,2) = -phi.grad[0] * psi.value;
         r(0,1) = r(1,3) = -phi.grad[1] * psi.value;
         return r;
@@ -140,7 +140,7 @@ namespace Tutorial07
       /// the data type to be used
       typedef typename AsmTraits_::DataType DataType;
       /// the data type for the block system
-      typedef typename AsmTraits_::OperatorValueType OperatorValueType;
+      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
       /// the assembler's trafo data type
       typedef typename AsmTraits_::TrafoData TrafoData;
       /// the assembler's test-function data type
@@ -153,9 +153,9 @@ namespace Tutorial07
       {
       }
 
-      OperatorValueType operator()(const TrialBasisData& phi, const TestBasisData& psi)
+      ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
       {
-        OperatorValueType r(DataType(0));
+        ValueType r(DataType(0));
         r(0,0) = -phi.grad[0] * psi.value;
         r(3,1) = -phi.grad[1] * psi.value;
         r(1,0) = r(2,0) = -0.5 * phi.grad[1] * psi.value;
@@ -504,20 +504,20 @@ namespace Tutorial07
     // In analogy to all previous (scalar) tutorials, we now use the BilinearOperatorAssembler
     // to do the dirty work for us. The only notable difference is that we have to call the
     // "assemble_block_matrix1" function instead of its scalar counterpart "assemble_matrix1":
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(
       matrix_a, operator_a, space_velo, cubature_factory);
 
     /*Assembly::Common::IdentityOperatorBlocked<4> operator_m;
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix1(
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(
       matrix_m, operator_m, space_stress, cubature_factory);*/
     assemble_stress_matrix(matrix_m, vec_sol.at<0>(), space_velo, space_stress, cubature_factory, 1.0, 1.0);
 
     MyOperatorR operator_r;
     MyOperatorK operator_k;
 
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix2(
+    Assembly::BilinearOperatorAssembler::assemble_matrix2(
       matrix_r, operator_r, space_velo, space_stress, cubature_factory);
-    Assembly::BilinearOperatorAssembler::assemble_block_matrix2(
+    Assembly::BilinearOperatorAssembler::assemble_matrix2(
       matrix_k, operator_k, space_stress, space_velo, cubature_factory);
 
     // Next, we need to assemble the sub-matrices B and D for the pressure gradient and

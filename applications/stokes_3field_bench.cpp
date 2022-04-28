@@ -231,16 +231,16 @@ namespace Stokes3Field
       this->matrix_l.local().format();
 
       Assembly::Common::DuDvOperatorBlocked<dim_> dudv_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix1(this->matrix_a.local(), dudv_op, space_velo, cubature, nu);
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(this->matrix_a.local(), dudv_op, space_velo, cubature, nu);
 
       Assembly::Common::IdentityOperatorBlocked<nsc_> id_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix1(this->matrix_m.local(), id_op, space_stress, cubature);
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(this->matrix_m.local(), id_op, space_stress, cubature);
 
       Assembly::Common::StrainRateTensorOperator<dim_, nsc_> du_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix2(this->matrix_k.local(), du_op, space_stress, space_velo, cubature, -eta);
+      Assembly::BilinearOperatorAssembler::assemble_matrix2(this->matrix_k.local(), du_op, space_stress, space_velo, cubature, -eta);
 
       Assembly::Common::StressDivergenceOperator<dim_, nsc_> div_op;
-      Assembly::BilinearOperatorAssembler::assemble_block_matrix2(this->matrix_l.local(), div_op, space_velo, space_stress, cubature, -chi);
+      Assembly::BilinearOperatorAssembler::assemble_matrix2(this->matrix_l.local(), div_op, space_velo, space_stress, cubature, -chi);
     }
   };
 

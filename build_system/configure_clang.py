@@ -189,6 +189,6 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
 
     else:
       cxxflags += " -march=native"
-      print ("Warning: Detected cpu type " + cpu + " not supported by configure_clang.py, using -march=native instead.")
+      print ("Warning: Detected cpu type not supported by configure_clang.py, using -march=native instead.")
 
   return cxxflags

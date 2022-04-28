@@ -771,7 +771,7 @@ namespace FEAT
 
         void eval(ValueType& val, const DataType& weight, typename AsmTraits::TestBasisData& psi)
         {
-          val += weight * func_eval(psi);
+          Tiny::axpy(val, func_eval.eval(psi), weight);
         }
 
         void finish()
@@ -884,7 +884,7 @@ namespace FEAT
 
         void eval(ValueType& val, const DataType& weight, typename AsmTraits::TestBasisData& psi)
         {
-          val += (weight * psi.value) * func_value;
+          Tiny::axpy(val, func_value, weight * psi.value);
         }
       }; // class Task
 
@@ -991,7 +991,7 @@ namespace FEAT
         void eval(ValueType& val, const DataType& weight,
           typename AsmTraits::TrialBasisData& phi, typename AsmTraits::TestBasisData& psi)
         {
-          val += weight * oper_eval(phi, psi);
+          val += weight * oper_eval.eval(phi, psi);
         }
 
         void finish()
@@ -1108,7 +1108,7 @@ namespace FEAT
         void eval(ValueType& val, const DataType& weight,
           typename AsmTraits::TrialBasisData& phi, typename AsmTraits::TestBasisData& psi)
         {
-          val += weight * oper_eval(phi, psi);
+          Tiny::axpy(val, oper_eval.eval(phi, psi), weight);
         }
 
         void finish()

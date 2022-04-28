@@ -181,7 +181,7 @@ namespace Andicore
         _force_value = -_nu * hess.trace() + _beta * dot(conv, grad) + _theta*value;
       }
 
-      ValueType operator()(const TestBasisData& psi) const
+      ValueType eval(const TestBasisData& psi) const
       {
         return _force_value * psi.value;
       }

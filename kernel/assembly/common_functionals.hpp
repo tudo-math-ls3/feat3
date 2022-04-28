@@ -103,7 +103,7 @@ namespace FEAT
            * \returns
            * The value of the linear functional.
            **/
-          ValueType operator()(const TestBasisData& psi) const
+          ValueType eval(const TestBasisData& psi) const
           {
             return _func_value * psi.value;
           }
@@ -211,7 +211,7 @@ namespace FEAT
            * \returns
            * The value of the linear functional.
            **/
-          DataType operator()(const TestBasisData& psi) const
+          ValueType eval(const TestBasisData& psi) const
           {
             return _func_laplace * psi.value;
           }
