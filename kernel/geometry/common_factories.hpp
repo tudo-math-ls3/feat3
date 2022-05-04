@@ -232,9 +232,7 @@ namespace FEAT
         }
       }
     }; // class UnitCubeFactory<ConformalMesh<Hypercube<3>,...>>
-    /// \endcond
 
-    /// \cond internal
     template<>
     class UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >:
     public Factory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
@@ -277,7 +275,6 @@ namespace FEAT
         ei[3] = 3;
       }
     }; //UnitCubeFactory< MeshPart<ConformalMesh<Shape::Hypercube<2> > > >
-    /// \endcond
 
     /**
      * \brief Unit-Cube mesh factory specialization for simplical meshes
@@ -340,8 +337,6 @@ namespace FEAT
         _factory->fill_index_sets(index_set_holder);
       }
     }; // class UnitCubeFactory<ConformalMesh<Simplex<dim_>,...>>
-    /// \endcond
-
 
     template<int dim_, typename Coord_>
     class UnitCubeFactory< StructuredMesh<dim_, dim_, Coord_> > :
@@ -391,6 +386,7 @@ namespace FEAT
         }
       }
     };
+    /// \endcond
 
     /**
      * \brief Refine mesh factory

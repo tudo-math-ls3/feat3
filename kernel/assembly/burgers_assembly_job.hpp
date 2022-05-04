@@ -37,13 +37,37 @@ namespace FEAT
      * - \b M is the reactive operator:
      *   \f[\mathbf{M}(u,\psi) := \int_\Omega u\psi\f]
      * - \b K is the convective operator:
-     *   \f[\mathbf{K}(v,u,\psi) := \int_\Omega v\cdot \nabla u \psi\f]
-     * - <b>K'</b> is the Frechet derivative of the convective operator (vector-valued operators only):
-     *   \f[\mathbf{K'}(v,u,\psi) := \int_\Omega \nabla v u \psi\f]
+     *   \f[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi\f]
+     * - <b>K'</b> is the additional term for the Fr&eacute;chet derivative of the convective operator \b K
+         (vector-valued operators only; see note below for details):
+     *   \f[\mathbf{K'}(v,u,\psi) := \int_\Omega (\nabla v) u \psi\f]
      * - \b S is the Samarskij-style streamline-diffusion stabilization operator:
      *   \f[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\f]
      *   where
      *   \f[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\f]
+     *
+     * <b>Notes on the Fr&eacute;chet derivative of the convective term:</b>\n
+     * The trilinearform \f$\mathbf{K}(v,u,\psi)\f$ represents the weak formulation of the convective term \f$v\cdot\nabla u\f$,
+     * which is the generalization of the non-linear term \f$u\cdot\nabla u\f$. To obtain the Fr&eacute;chet derivative
+     * \f$D\mathbf{K}\f$ of this non-linear operator in the case of \f$v=u\f$, which is required for the Newton method
+     * on the Burgers equation, by definition of the Fr&eacute;chet derivative we have to compute
+     * \f[D\mathbf{K}(v,u,\psi) = \bigg[\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}\bigg]\bigg|_{\hat{u}=u,\hat{v}=v}\f]
+     * with \f$\hat{u},\hat{v}\in V_h\f$ with \f$\|\hat{u}\| = \|\hat{v}\| = 1\f$. So, here goes:
+       \f{align*}
+       \lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}
+       &=\lim_{\varepsilon\rightarrow 0} \int_\Omega \frac{(v + \varepsilon \hat{v})\cdot\nabla(u+\varepsilon \hat{u}) - v\cdot\nabla u}{\varepsilon}\psi~dx\\
+       &= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{v\cdot\nabla u +\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u} - v\cdot\nabla u}{\varepsilon}\psi~dx\\
+       &= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u}}{\varepsilon}\psi~dx\\
+       &= \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \frac{\varepsilon^2}{\varepsilon} \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
+       &= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \varepsilon \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
+       &= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx
+       \f}
+     * Finally, we obtain our Fr&eacute;chet derivative by setting \f$\hat{u} := u\f$ and \f$\hat{v} = v\f$:
+     * \f[D\mathbf{K}(v,u,\psi) = \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=~\mathbf{K}(v,u,\psi)} + \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=:~\mathbf{K}'(v,u,\psi)}\f]
+     * Note that in the case of this assembly class, the Fr&eacute;chet derivative \f$D\mathbf{K}(v,u,\psi)\f$ is split
+     * into its two additive parts \f$\mathbf{K}(v,u,\psi)\f$ and \f$\mathbf{K}'(v,u,\psi)\f$, which are individually
+     * scaled by \f$\beta\f$ and \f$\beta'\f$, respectively, so one has to set both \f$\beta = \beta' = 1\f$ to use the
+     * full Fr&eacute;chet derivative operator \f$D\mathbf{K}\f$.
      *
      * <b>Notes on Streamline Diffusion Stabilization:</b>\n
      * The implementation of the streamline diffusion stabilization is based on Turek's CFD book (see \cite TurekCFD,
@@ -57,8 +81,8 @@ namespace FEAT
      * -# Set the viscosity parameter #sd_nu, which is usually set equal to nu. The only reason for this extra parameter
      *    to exist is so that you can use this assembler class to assemble the stabilization without necessarily also
      *    assembling the diffusion operator, which is what would happen if you set nu to a non-zero value.
-     * -# Set the (maximum) velocity norm #sd_v_norm of the convection field, which corresponds to \f$\|v\|_\Omega\f$ and
-     *    is required for the computation of the local delta_T parameters. You can do this by either specifying the
+     * -# Set the (maximum) velocity norm #sd_v_norm of the convection field, which corresponds to \f$\|v\|_\Omega\f$
+     *    and is required for the computation of the local delta_T parameters. You can do this by either specifying the
      *    value directly or, more conveniently, use one of this class's set_sd_v_norm() functions to compute this norm
      *    from a (local or global) convection field vector.
      *

@@ -199,6 +199,7 @@ namespace FEAT
     class VelocityAnalyser
     {
     private:
+      /// \cond internal
       template<typename DT_, int sm_, int sn_>
       static DT_ calc_vorticity(const Tiny::Matrix<DT_, 2, 2, sm_, sn_>& jac)
       {
