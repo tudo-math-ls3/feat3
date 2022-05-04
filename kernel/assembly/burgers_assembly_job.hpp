@@ -8,6 +8,8 @@
 #define KERNEL_ASSEMBLY_BURGERS_ASSEMBLY_JOB_HPP
 
 #include <kernel/assembly/base.hpp>
+#include <kernel/assembly/asm_traits.hpp>
+#include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
@@ -172,37 +174,56 @@ namespace FEAT
       }
 
       /**
-       * \brief Sets the convection field norm \f$\|v\|_\Omega\f$ for the local streamline diffusion parameter delta_T.
+       * \brief Calculates the convection field norm \f$\|v\|_\Omega\f$ for the local streamline diffusion parameter delta_T.
        *
        * \param[in] convect
        * The \transient (local) convection field vector.
+       *
+       * \returns
+       * The convection vector field norm.
        */
       template<typename IndexType_, int conv_dim_>
-      void set_sd_v_norm(const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, conv_dim_>& convect)
+      static DataType calc_sd_v_norm(const LAFEM::DenseVectorBlocked<Mem::Main, DataType_, IndexType_, conv_dim_>& convect)
       {
         const auto* vals = convect.elements();
         DataType_ r = DataType_(0);
         for(Index i(0); i < convect.size(); ++i)
           r = Math::max(r, vals[i].norm_euclid());
-        this->sd_v_norm = r;
+        return r;
       }
 
       /**
-       * \brief Sets the convection field norm \f$\|v\|_\Omega\f$ for the streamline diffusion parameter delta_T.
+       * \brief Calculates the convection field norm \f$\|v\|_\Omega\f$ for the streamline diffusion parameter delta_T.
        *
        * \note
        * This function automatically syncs the norm over all processes by using the vector's gate.
        *
        * \param[in] convect
        * The \transient (global) convection field vector.
+       *
+       * \returns
+       * The convection vector field norm.
        */
       template<typename LocalVector_, typename Mirror_>
-      void set_sd_v_norm(const Global::Vector<LocalVector_, Mirror_>& convect)
+      static DataType calc_sd_v_norm(const Global::Vector<LocalVector_, Mirror_>& convect)
       {
-        this->set_sd_v_norm(convect.local());
         const auto* gate = convect.get_gate();
         if(gate != nullptr)
-          this->sd_v_norm = gate->max(this->sd_v_norm);
+          return gate->max(calc_sd_v_norm(convect.local()));
+        else
+          return calc_sd_v_norm(convect.local());
+      }
+
+      /**
+       * \brief Sets the convection field norm \f$\|v\|_\Omega\f$ for the local streamline diffusion parameter delta_T.
+       *
+       * \param[in] convect
+       * The \transient (local) convection field vector.
+       */
+      template<typename VectorType_>
+      void set_sd_v_norm(const VectorType_& convect)
+      {
+        this->sd_v_norm = calc_sd_v_norm(convect);
       }
     }; // class BurgersAssemblyJobBase<...>
 

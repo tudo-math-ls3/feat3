@@ -10,7 +10,6 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
-#include <kernel/solver/legacy_preconditioners.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
@@ -26,7 +25,7 @@
 #include <kernel/solver/jacobi_precond.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
-#include <control/stokes_basic.hpp>
+#include <control/stokes_power.hpp>
 
 namespace StokesDriCav2D
 {
@@ -65,7 +64,7 @@ namespace StokesDriCav2D
     static constexpr int dim = ShapeType::dimension;
 
     // define our system level
-    typedef Control::StokesUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::StokesPowerUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
@@ -78,7 +77,7 @@ namespace StokesDriCav2D
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
+    const String cubature("auto-degree:5");
 
     /* ***************************************************************************************** */
 
@@ -86,6 +85,7 @@ namespace StokesDriCav2D
 
     for (Index i(0); i < num_levels; ++i)
     {
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
       if((i+1) < domain.size_virtual())
       {
@@ -100,8 +100,10 @@ namespace StokesDriCav2D
 
     for(Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature);
-      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
+      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->domain_asm,
+        domain.at(i)->space_velo, cubature);
+      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->domain_asm,
+        domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
       system_levels.at(i)->compile_system_matrix();
     }
 
@@ -116,7 +118,8 @@ namespace StokesDriCav2D
       // assemble schur matrix
       mat_loc_s.format();
       Assembly::Common::IdentityOperator id_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, domain.front()->space_pres, cubature, -DataType(1));
+      Assembly::assemble_bilinear_operator_matrix_1(domain.front()->domain_asm, mat_loc_s, id_op,
+        domain.front()->space_pres, cubature, -DataType(1));
     }
 
     /* ***************************************************************************************** */
@@ -278,22 +281,21 @@ namespace StokesDriCav2D
 
     if(args.check("no-err") < 0)
     {
-      // define reference solution functions
-      Analytic::Common::ConstantFunction<2> zero_func;
-
       // compute local errors
       auto vi = Assembly::VelocityAnalyser::compute(vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature);
-      auto pi = Assembly::ScalarErrorComputer<0>::compute(
-        vec_sol.local().template at<1>(), zero_func, the_domain_level.space_pres, cubature);
+      //auto pi = Assembly::ScalarErrorComputer<0>::compute(
+        //vec_sol.local().template at<1>(), zero_func, the_domain_level.space_pres, cubature);
+      auto pi = Assembly::integrate_discrete_function<0>(the_domain_level.domain_asm,
+        vec_sol.local().template at<1>(), the_domain_level.space_pres, cubature);
 
-      // synhronise all local errors
+      // synchronize all local errors
       vi.synchronize(comm);
       pi.synchronize(comm);
 
       // print errors
       comm.print("");
       comm.print(vi.format_string());
-      comm.print("Pressure..: " + stringify_fp_sci(pi.norm_h0));
+      comm.print("Pressure..: " + stringify_fp_sci(Math::sqrt(pi.norm_h0_sqr)));
     }
 
     /* ***************************************************************************************** */
@@ -384,7 +386,7 @@ namespace StokesDriCav2D
     run(args, domain);
 
     // print elapsed runtime
-    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+    comm.print("\nRun-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 } // namespace StokesDriCav2D
 

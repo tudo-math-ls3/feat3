@@ -961,6 +961,108 @@ namespace FEAT
       }; // class DuDVOperatorBlocked
 
       /**
+       * \brief Gradient operator applied onto the trial function
+       *
+       * This is the gradient bilinear form using blocked types without partial integration:
+       * \f$ a(\phi, \psi)_m = \int_\Omega(\nabla \phi, \psi e_m) dx, m=1,\dots,d \f$
+       *
+       * \author Peter Zajac
+       */
+      template<int dimension_>
+      class GradientTrialOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        static constexpr int BlockHeight = dimension_;
+        static constexpr int BlockWidth = 1;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef Tiny::Matrix<DataType, dimension_, 1> ValueType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          explicit Evaluator(const GradientTrialOperatorBlocked&)
+          {
+          }
+
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            ValueType r(DataType(0));
+            for(int i(0); i < dimension_; ++i)
+              r(i,0) = phi.grad[i] * psi.value;
+            return r;
+          }
+        }; // class GradientTrialOperatorBlocked::Evaluator<...>
+      }; // class GradientTrialOperatorBlocked
+
+      /**
+       * \brief Gradient operator applied onto the test function
+       *
+       * This is the gradient bilinear form using blocked types with partial integration:
+       * \f$ a(\phi, \psi)_m = \int_\Omega(\phi e_m, \nabla \psi) dx, m=1,\dots,d \f$
+       *
+       * \author Peter Zajac
+       */
+      template<int dimension_>
+      class GradientTestOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        static constexpr int BlockHeight = dimension_;
+        static constexpr int BlockWidth = 1;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::grad;
+        static constexpr SpaceTags trial_config = SpaceTags::value;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef Tiny::Matrix<DataType, dimension_, 1> ValueType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        public:
+          explicit Evaluator(const GradientTestOperatorBlocked&)
+          {
+          }
+
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            ValueType r(DataType(0));
+            for(int i(0); i < dimension_; ++i)
+              r(i,0) = phi.value * psi.grad[i];
+            return r;
+          }
+        }; // class GradientTestOperatorBlocked::Evaluator<...>
+      }; // class GradientTestOperatorBlocked
+
+      /**
        * \brief Stress-Divergence Operator
        *
        * This operator implements the stress-divergence operator \f$\nabla\cdot\sigma\f$

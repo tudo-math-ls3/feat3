@@ -4,8 +4,8 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_STOKES_BASIC_HPP
-#define CONTROL_STOKES_BASIC_HPP 1
+#ifndef CONTROL_STOKES_POWER_HPP
+#define CONTROL_STOKES_POWER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -31,6 +31,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
+#include <kernel/assembly/domain_assembler_helpers.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
@@ -60,7 +61,7 @@ namespace FEAT
       typename IndexType_ = Index,
       typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>,
       typename TransferMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
-    struct StokesBasicSystemLevel
+    struct StokesPowerSystemLevel
     {
       static_assert(std::is_same<MemType_, typename ScalarMatrix_::MemType>::value, "MemType mismatch!");
       static_assert(std::is_same<DataType_, typename ScalarMatrix_::DataType>::value, "DataType mismatch!");
@@ -153,7 +154,7 @@ namespace FEAT
       GlobalPresTransfer transfer_pres;
       GlobalSystemTransfer transfer_sys;
 
-      StokesBasicSystemLevel() :
+      StokesPowerSystemLevel() :
         matrix_sys(&gate_sys, &gate_sys),
         matrix_a(&gate_velo, &gate_velo),
         matrix_b(&gate_velo, &gate_pres),
@@ -165,7 +166,7 @@ namespace FEAT
       {
       }
 
-      virtual ~StokesBasicSystemLevel()
+      virtual ~StokesPowerSystemLevel()
       {
       }
 
@@ -189,7 +190,7 @@ namespace FEAT
       }
 
       template<typename M_, typename D_, typename I_, typename SM_, typename TM_>
-      void convert(const StokesBasicSystemLevel<dim_, M_, D_, I_, SM_, TM_> & other)
+      void convert(const StokesPowerSystemLevel<dim_, M_, D_, I_, SM_, TM_> & other)
       {
         gate_velo.convert(other.gate_velo);
         gate_pres.convert(other.gate_pres);
@@ -487,7 +488,7 @@ namespace FEAT
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
         const Cubature_& cubature,
-        const StokesBasicSystemLevel* sys_lvl_coarse = nullptr)
+        const StokesPowerSystemLevel* sys_lvl_coarse = nullptr)
       {
         // if the coarse level is a parent, then we need the coarse system level
         XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
@@ -594,7 +595,7 @@ namespace FEAT
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
         const Cubature_& cubature,
-        const StokesBasicSystemLevel* sys_lvl_coarse = nullptr)
+        const StokesPowerSystemLevel* sys_lvl_coarse = nullptr)
       {
         // if the coarse level is a parent, then we need the coarse system level
         XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
@@ -686,15 +687,16 @@ namespace FEAT
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
         const Cubature_& cubature,
-        const StokesBasicSystemLevel* sys_lvl_coarse = nullptr)
+        const StokesPowerSystemLevel* sys_lvl_coarse = nullptr)
       {
         this->assemble_velocity_truncation(virt_lvl_fine, virt_lvl_coarse, cubature, sys_lvl_coarse);
         this->assemble_pressure_truncation(virt_lvl_fine, virt_lvl_coarse, cubature, sys_lvl_coarse);
         this->compile_system_transfer();
       }
 
-      template<typename SpaceVelo_, typename Cubature_>
-      void assemble_velocity_laplace_matrix(const SpaceVelo_& space_velo, const Cubature_& cubature, const DataType nu = DataType(1))
+      template<typename Trafo_, typename SpaceVelo_, typename Cubature_>
+      void assemble_velocity_laplace_matrix(Assembly::DomainAssembler<Trafo_>& dom_asm,
+        const SpaceVelo_& space_velo, const Cubature_& cubature, const DataType nu = DataType(1))
       {
         // get the local matrix A
         LocalMatrixBlockA& mat_loc_a = this->matrix_a.local();
@@ -717,7 +719,7 @@ namespace FEAT
         {
           mat_loc_a1.format();
           Assembly::Common::LaplaceOperator laplace_op;
-          Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_a1, laplace_op, space_velo, cubature, nu);
+          Assembly::assemble_bilinear_operator_matrix_1(dom_asm, mat_loc_a1, laplace_op, space_velo, cubature, nu);
         }
 
         // copy data into A22,...,Ann
@@ -725,8 +727,9 @@ namespace FEAT
           mat_loc_a.get(i,i).copy(mat_loc_a1);
       }
 
-      template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
-      void assemble_grad_div_matrices(const SpaceVelo_& space_velo, const SpacePres_& space_pres, const Cubature_& cubature)
+      template<typename Trafo_, typename SpaceVelo_, typename SpacePres_, typename Cubature_>
+      void assemble_grad_div_matrices(Assembly::DomainAssembler<Trafo_>& dom_asm,
+        const SpaceVelo_& space_velo, const SpacePres_& space_pres, const Cubature_& cubature)
       {
         // get the local matrix B and D
         LocalMatrixBlockB& mat_loc_b = this->matrix_b.local();
@@ -749,7 +752,7 @@ namespace FEAT
           LocalScalarMatrix& mat_loc_bi = mat_loc_b.get(ider,0);
           mat_loc_bi.format();
           Assembly::Common::TestDerivativeOperator deri(ider);
-          Assembly::BilinearOperatorAssembler::assemble_matrix2(mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
+          Assembly::assemble_bilinear_operator_matrix_2(dom_asm, mat_loc_bi, deri, space_velo, space_pres, cubature, -DataType(1));
         }
 
         // assemble velocity divergence matrices
@@ -757,7 +760,7 @@ namespace FEAT
         for(int i(0); i < mat_loc_b.num_row_blocks; ++i)
           mat_loc_d.get(0,i) = mat_loc_b.get(i,0).transpose();
       }
-    }; // struct StokesBasicSystemLevel<...>
+    }; // struct StokesPowerSystemLevel<...>
 
     template<
       int dim_,
@@ -765,10 +768,10 @@ namespace FEAT
       typename DataType_ = Real,
       typename IndexType_ = Index,
       typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
-    struct StokesUnitVeloNonePresSystemLevel :
-      public StokesBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
+    struct StokesPowerUnitVeloNonePresSystemLevel :
+      public StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
     {
-      typedef StokesBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
+      typedef StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
       // define local filter types
       typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> UnitVeloFilter;
@@ -799,14 +802,10 @@ namespace FEAT
       }
 
       /**
-       *
        * \brief Conversion method
-       *
-       * Use source StokesUnitVeloNonePresSystemLevel content as content of current StokesUnitVeloNonePresSystemLevel.
-       *
        */
       template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesUnitVeloNonePresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      void convert(const StokesPowerUnitVeloNonePresSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);
@@ -814,7 +813,7 @@ namespace FEAT
 
         compile_system_filter();
       }
-    }; // struct StokesUnitVeloNonePresSystemLevel<...>
+    }; // struct StokesPowerUnitVeloNonePresSystemLevel<...>
 
 
     template<
@@ -823,10 +822,10 @@ namespace FEAT
       typename DataType_ = Real,
       typename IndexType_ = Index,
       typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_> >
-    struct StokesUnitVeloMeanPresSystemLevel :
-      public StokesBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
+    struct StokesPowerUnitVeloMeanPresSystemLevel :
+      public StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_>
     {
-      typedef StokesBasicSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
+      typedef StokesPowerSystemLevel<dim_, MemType_, DataType_, IndexType_, ScalarMatrix_> BaseClass;
 
       // define local filter types
       typedef LAFEM::UnitFilter<MemType_, DataType_, IndexType_> UnitVeloFilter;
@@ -858,14 +857,10 @@ namespace FEAT
       }
 
       /**
-       *
        * \brief Conversion method
-       *
-       * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
-       *
        */
       template<typename M_, typename D_, typename I_, typename SM_>
-      void convert(const StokesUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
+      void convert(const StokesPowerUnitVeloMeanPresSystemLevel<dim_, M_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);
@@ -900,8 +895,8 @@ namespace FEAT
         // build the mean filter
         fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
       }
-    }; // struct StokesUnitVeloNonePresSystemLevel<...>
+    }; // struct StokesPowerUnitVeloNonePresSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
 
-#endif // CONTROL_STOKES_BASIC_HPP
+#endif // CONTROL_STOKES_POWER_HPP

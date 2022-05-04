@@ -255,7 +255,7 @@ namespace DFG95
     }
 
     // cubature for assembly
-    Cubature::DynamicFactory cubature("gauss-legendre:3");
+    const String cubature("gauss-legendre:3");
 
     // cubature for post-processing
     Cubature::DynamicFactory cubature_postproc("gauss-legendre:5");
@@ -267,6 +267,7 @@ namespace DFG95
     // assemble gates, muxers and transfers
     for (Index i(0); i < num_levels; ++i)
     {
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
 
       if((i+1) < domain.size_virtual())
@@ -309,8 +310,8 @@ namespace DFG95
     {
       system_levels.at(i)->assemble_velo_struct(domain.at(i)->space_velo);
       system_levels.at(i)->assemble_pres_struct(domain.at(i)->space_pres);
-      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature, nu, defo);
-      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
+      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->domain_asm, domain.at(i)->space_velo, cubature, nu, defo);
+      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->domain_asm, domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
       system_levels.at(i)->compile_system_matrix();
     }
 
@@ -399,6 +400,10 @@ namespace DFG95
     typedef typename SystemLevelType::GlobalSystemMatrix GlobalSystemMatrix;
     typedef typename SystemLevelType::GlobalSystemFilter GlobalSystemFilter;
     typedef typename SystemLevelType::GlobalSystemTransfer GlobalSystemTransfer;
+
+    // get our local system types
+    typedef typename SystemLevelType::LocalMatrixBlockA LocalMatrixBlockA;
+    typedef typename SystemLevelType::LocalVeloVector LocalVeloVector;
 
     // fetch our finest levels
     DomainLevelType& the_domain_level = *domain.front();
@@ -627,21 +632,6 @@ namespace DFG95
       if(!plot_mg_iter)
         solver->set_plot_mode(Solver::PlotMode::none);
 
-      // setup burgers assembler for matrix
-      Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
-      burgers_mat.deformation = defo;
-      burgers_mat.nu = nu;
-      burgers_mat.beta = DataType(1);
-      burgers_mat.frechet_beta = DataType(newton ? 1 : 0);
-      burgers_mat.sd_delta = upsam;
-      burgers_mat.sd_nu = nu;
-
-      // setup burgers assembler for defect vector
-      Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_def;
-      burgers_def.deformation = defo;
-      burgers_def.nu = nu;
-      burgers_def.beta = DataType(1);
-
       // vector of all non-linear defect norms
       std::vector<DataType> nl_defs;
 
@@ -652,12 +642,19 @@ namespace DFG95
       {
         statistics.counts[Counts::nonlin_iter] = nl_step;
 
+        // set up Burgers assembly job for our defect vector
+        Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
+          vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
+          vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature);
+        burgers_def_job.deformation = defo;
+        burgers_def_job.nu = -nu;
+        burgers_def_job.beta = -DataType(1);
+
         // assemble nonlinear defect vector
         watch_nonlin_def_asm.start();
         vec_def.format();
         // assemble burgers operator defect
-        burgers_def.assemble_vector(vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
-          vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature, -1.0);
+        the_domain_level.domain_asm.assemble(burgers_def_job);
         // compute remainder of defect vector
         the_system_level.matrix_sys.local().block_b().apply(
           vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -1.0);
@@ -715,20 +712,38 @@ namespace DFG95
           typename SystemLevelType::GlobalVeloVector vec_conv(
             &the_system_level.gate_velo, vec_sol.local().template at<0>().clone());
 
-          // set velocity norm for streamline diffusion (if enabled)
-          if(Math::abs(upsam) > DataType(0))
-          {
-            // set norm by convection vector; we can use this for all levels
-            burgers_mat.set_sd_v_norm(vec_conv);
-          }
+          // initialize velocity norm for streamline diffusion (if enabled)
+          DataType sd_v_norm = DataType(0);
 
           // loop over all system levels
           for(std::size_t i(0); i < system_levels.size(); ++i)
           {
-            // assemble our system matrix
             auto& loc_mat_a = system_levels.at(i)->matrix_sys.local().block_a();
             loc_mat_a.format();
-            burgers_mat.assemble_matrix(loc_mat_a, vec_conv.local(), domain.at(i)->space_velo, cubature);
+
+            // set up Burgers assembly job
+            Assembly::BurgersBlockedMatrixAssemblyJob<LocalMatrixBlockA, SpaceVeloType, LocalVeloVector>
+              burgers_mat_job(loc_mat_a, vec_conv.local(), domain.at(i)->space_velo, cubature);
+
+            burgers_mat_job.deformation = defo;
+            burgers_mat_job.nu = nu;
+            burgers_mat_job.beta = DataType(1);
+            burgers_mat_job.frechet_beta = DataType(newton ? 1 : 0);
+            burgers_mat_job.sd_delta = upsam;
+            burgers_mat_job.sd_nu = nu;
+            if(i == size_t(0))
+            {
+              burgers_mat_job.set_sd_v_norm(vec_conv);
+              sd_v_norm = burgers_mat_job.sd_v_norm;
+            }
+            else
+            {
+              // use fine mesh norm
+              burgers_mat_job.sd_v_norm = sd_v_norm;
+            }
+
+            // assemble our system matrix
+            domain.at(i)->domain_asm.assemble(burgers_mat_job);
             system_levels.at(i)->compile_local_matrix();
 
             // restrict our convection vector
@@ -1206,7 +1221,7 @@ namespace DFG95
     run(args, domain);
 
     // print elapsed runtime
-    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+    comm.print("\nRun-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 
   void main(int argc, char* argv[])

@@ -24,9 +24,10 @@
 #include <kernel/global/transfer.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
-#include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
+#include <kernel/assembly/domain_assembler_helpers.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
@@ -373,10 +374,28 @@ namespace FEAT
           Assembly::SymbolicAssembler::assemble_matrix_std1(loc_matrix, space);
         }
 
-        // format and assemble laplace
+        // format and assemble Laplace
         loc_matrix.format();
         Assembly::Common::LaplaceOperator laplace_op;
         Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_matrix, laplace_op, space, cubature, nu);
+      }
+
+      template<typename Trafo_, typename Space_>
+      void assemble_laplace_matrix(Assembly::DomainAssembler<Trafo_>& dom_asm, const Space_& space, const String& cubature, const DataType nu = DataType(1))
+      {
+        // get local matrix
+        auto& loc_matrix = this->matrix_sys.local();
+
+        // assemble structure?
+        if(loc_matrix.empty())
+        {
+          Assembly::SymbolicAssembler::assemble_matrix_std1(loc_matrix, space);
+        }
+
+        // format and assemble Laplace
+        loc_matrix.format();
+        Assembly::Common::LaplaceOperator laplace_op;
+        Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_matrix, laplace_op, space, cubature, nu);
       }
     }; // class ScalarBasicSystemLevel<...>
 

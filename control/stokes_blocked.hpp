@@ -27,6 +27,7 @@
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/domain_assembler_helpers.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/gpdv_assembler.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
@@ -709,13 +710,29 @@ namespace FEAT
         space_velo, space_pres, cubature);
       }
 
+      template<typename Trafo_, typename SpaceVelo_, typename SpacePres_>
+      void assemble_grad_div_matrices(Assembly::DomainAssembler<Trafo_>& dom_asm,
+        const SpaceVelo_& space_velo, const SpacePres_& space_pres, const String& cubature)
+      {
+        // assemble matrix structure of B
+        if(this->matrix_b.local().empty())
+          Assembly::SymbolicAssembler::assemble_matrix_std2(this->matrix_b.local(), space_velo, space_pres);
+
+        // assemble matrix B
+        Assembly::Common::GradientTestOperatorBlocked<dim_> grad_op;
+        Assembly::assemble_bilinear_operator_matrix_2(
+          dom_asm, this->matrix_b.local(), grad_op, space_velo, space_pres, cubature, -DataType(1));
+
+        // transpose to obtain matrix D
+        this->matrix_d.local().transpose(this->matrix_b.local());
+      }
+
       template<typename SpaceVelo_>
       void assemble_velo_struct(const SpaceVelo_& space_velo)
       {
         // assemble matrix structure
         Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_a.local(), space_velo);
       }
-
 
       template<typename SpacePres_>
       void assemble_pres_struct(const SpacePres_& space_pres)

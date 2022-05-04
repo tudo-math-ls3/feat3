@@ -143,6 +143,28 @@ namespace FEAT
       /// the component-wise Lmax-norm (only for vector fields)
       ValueType_ norm_lmax_comp;
 
+      /**
+       * \brief squared L2-norm of the vector field divergence
+       *
+       * This entry stores the squared L2-norm of the divergence of the vector field:
+       * \f[ \| \nabla \cdot u\|_{\mathcal{L}^2}^2 = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\f]
+       *
+       * \note
+       * This entry is only meaningful if u is a vector field from R^n to R^n with n=2 or n=3.
+       */
+      DataType divergence_l2_sqr;
+
+      /**
+       * \brief squared L2-norm of the vector field vorticity
+       *
+       * This entry stores the squared L2-norm of the curl of the vector field:
+       * \f[ \| \nabla \times u\|_{\mathcal{L}^2}^2 \f]
+       *
+       * \note
+       * This entry is only meaningful if u is a vector field from R^n to R^n with n=2 or n=3.
+       */
+      DataType vorticity_l2_sqr;
+
     private:
       /// \cond internal
       static void _push_lmax(DataType_& a, const DataType_& b)
@@ -157,55 +179,55 @@ namespace FEAT
           a[i] = Math::max(a[i], b[i]);
       }
 
-      static void _write_to(DataType_* ptr, std::size_t k, const DataType_& x)
+      static void _write_to(DataType_* ptr, std::size_t& k, const DataType_& x)
       {
         ptr[k] = x;
         ++k;
       }
 
       template<int n_, int sn_>
-      static void _write_to(DataType_* ptr, std::size_t k, const Tiny::Vector<DataType_, n_, sn_>& x)
+      static void _write_to(DataType_* ptr, std::size_t& k, const Tiny::Vector<DataType_, n_, sn_>& x)
       {
         for(int i(0); i < n_; ++i, ++k)
           ptr[k] = x[i];
       }
 
       template<int m_, int n_, int sm_, int sn_>
-      static void _write_to(DataType_* ptr, std::size_t k, const Tiny::Matrix<DataType_, m_, n_, sm_, sn_>& x)
+      static void _write_to(DataType_* ptr, std::size_t& k, const Tiny::Matrix<DataType_, m_, n_, sm_, sn_>& x)
       {
         for(int i(0); i < m_; ++i)
           _write_to(ptr, k, x[i]);
       }
 
       template<int l_, int m_, int n_, int sl_, int sm_, int sn_>
-      static void _write_to(DataType_* ptr, std::size_t k, const Tiny::Tensor3<DataType_, l_, m_, n_, sl_, sm_, sn_>& x)
+      static void _write_to(DataType_* ptr, std::size_t& k, const Tiny::Tensor3<DataType_, l_, m_, n_, sl_, sm_, sn_>& x)
       {
         for(int i(0); i < l_; ++i)
           _write_to(ptr, k, x[i]);
       }
 
-      static void _read_from(DataType_* ptr, std::size_t k, DataType_& x)
+      static void _read_from(DataType_* ptr, std::size_t& k, DataType_& x)
       {
         x = ptr[k];
         ++k;
       }
 
       template<int n_, int sn_>
-      static void _read_from(DataType_* ptr, std::size_t k, Tiny::Vector<DataType_, n_, sn_>& x)
+      static void _read_from(DataType_* ptr, std::size_t& k, Tiny::Vector<DataType_, n_, sn_>& x)
       {
         for(int i(0); i < n_; ++i, ++k)
           x[i] = ptr[k];
       }
 
       template<int m_, int n_, int sm_, int sn_>
-      static void _read_from(DataType_* ptr, std::size_t k, Tiny::Matrix<DataType_, m_, n_, sm_, sn_>& x)
+      static void _read_from(DataType_* ptr, std::size_t& k, Tiny::Matrix<DataType_, m_, n_, sm_, sn_>& x)
       {
         for(int i(0); i < m_; ++i)
           _read_from(ptr, k, x[i]);
       }
 
       template<int l_, int m_, int n_, int sl_, int sm_, int sn_>
-      static void _read_from(DataType_* ptr, std::size_t k, Tiny::Tensor3<DataType_, l_, m_, n_, sl_, sm_, sn_>& x)
+      static void _read_from(DataType_* ptr, std::size_t& k, Tiny::Tensor3<DataType_, l_, m_, n_, sl_, sm_, sn_>& x)
       {
         for(int i(0); i < l_; ++i)
           _read_from(ptr, k, x[i]);
@@ -257,6 +279,32 @@ namespace FEAT
       {
         return _print_val(Math::sqrt(x), prec) + " " + _print_val_sqrt(v, prec);
       }
+
+      template<int m_, int n_, int sm_, int sn_>
+      static DataType _calc_vorticity(const Tiny::Matrix<DataType, m_, n_, sm_, sn_>&)
+      {
+        // R^m -> R^n with m != n ==> nothing to do here
+        return DataType(0);
+      }
+
+      template<int sm_, int sn_>
+      static DataType _calc_vorticity(const Tiny::Matrix<DataType, 2, 2, sm_, sn_>& g)
+      {
+        // 2D: (dx u2 - dy u1)^2
+        // J_ij = d/d_j f_i ==> (J_01 - J_10)^2
+        return Math::sqr(g[1][0] - g[0][1]);
+      }
+
+      template<int sm_, int sn_>
+      static DataType _calc_vorticity(const Tiny::Matrix<DataType, 3, 3, sm_, sn_>& g)
+      {
+        // 3D: (dy u3 - dz u2)^2 + (dz u1 - dx u3)^2 + (dx u2 - dy u1)
+        return
+          Math::sqr(g[2][1] - g[1][2]) + // dy u3 - dz u2 = J_21 - J_12
+          Math::sqr(g[0][2] - g[2][0]) + // dz u1 - dx u3 = J_02 - J_20
+          Math::sqr(g[1][0] - g[0][1]);  // dx u2 - dy u1 = J_10 - J_01
+      }
+
       /// \endcond
 
     public:
@@ -277,7 +325,9 @@ namespace FEAT
         norm_h1_sqr_comp(DataType(0)),
         norm_h2_sqr_comp(DataType(0)),
         norm_l1_comp(DataType(0)),
-        norm_lmax_comp(DataType(0))
+        norm_lmax_comp(DataType(0)),
+        divergence_l2_sqr(DataType(0)),
+        vorticity_l2_sqr(DataType(0))
       {
       }
 
@@ -285,6 +335,9 @@ namespace FEAT
        * \brief Assembly helper function: adds another info object
        *
        * This function is used by the assembly and is not meant to be used elsewhere.
+       *
+       * \param[in] other
+       * The other integral info that is to be incorporated into this one.
        */
       void push(const FunctionIntegralInfo& other)
       {
@@ -301,6 +354,8 @@ namespace FEAT
         norm_h2_sqr_comp += other.norm_h2_sqr_comp;
         norm_l1_comp += other.norm_l1_comp;
         _push_lmax(norm_lmax_comp, other.norm_lmax_comp);
+        divergence_l2_sqr += other.divergence_l2_sqr;
+        vorticity_l2_sqr += other.vorticity_l2_sqr;
       }
 
       /**
@@ -391,6 +446,12 @@ namespace FEAT
           norm_h1_sqr += omega * sv;
           norm_h1_sqr_comp[i] += omega * sv;
         }
+
+        // add divergence component
+        divergence_l2_sqr += omega * Math::sqr(g.trace());
+
+        // add vorticity component (if possible)
+        vorticity_l2_sqr += omega * _calc_vorticity(g);
       }
 
       /**
@@ -445,7 +506,11 @@ namespace FEAT
        */
       void synchronize(const Dist::Comm& comm)
       {
-        static constexpr std::size_t max_len = std::size_t(5) +
+        // nothing to do here?
+        if(comm.size() <= 1)
+          return;
+
+        static constexpr std::size_t max_len = std::size_t(7) +
           (6u*sizeof(ValueType) + sizeof(GradientType) + sizeof(HessianType)) / sizeof(DataType);
         DataType v[max_len];
 
@@ -462,6 +527,8 @@ namespace FEAT
         _write_to(v, k, norm_h1_sqr_comp);
         _write_to(v, k, norm_h2_sqr_comp);
         _write_to(v, k, norm_l1_comp);
+        _write_to(v, k, divergence_l2_sqr);
+        _write_to(v, k, vorticity_l2_sqr);
         XASSERT(k <= max_len);
 
         // synchronize
@@ -480,6 +547,8 @@ namespace FEAT
         _read_from(v, k, norm_h1_sqr_comp);
         _read_from(v, k, norm_h2_sqr_comp);
         _read_from(v, k, norm_l1_comp);
+        _read_from(v, k, divergence_l2_sqr);
+        _read_from(v, k, vorticity_l2_sqr);
 
         // write lmax values
         k = std::size_t(0u);
@@ -506,6 +575,9 @@ namespace FEAT
        *
        * \param[in] pad_char
        * The character used for padding. Defaults to a dot.
+       *
+       * \note
+       * This function does not print the divergence or vorticity, even if these have been computed.
        *
        * \returns
        * A formatted multi-line string that contains all the computed norms.

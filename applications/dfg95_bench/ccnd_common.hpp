@@ -16,7 +16,7 @@
 #include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
-#include <kernel/assembly/burgers_assembler.hpp>
+#include <kernel/assembly/burgers_assembly_job.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
@@ -983,33 +983,28 @@ namespace DFG95
     // the local velocity mass matrix
     MatrixBlockA_ local_velo_mass_matrix;
 
-    template<typename SpaceV_, typename Cubature_>
-    void assemble_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, bool defo)
+    template<typename Trafo_, typename SpaceV_>
+    void assemble_velocity_laplace_matrix(Assembly::DomainAssembler<Trafo_>& dom_asm,
+      const SpaceV_& space_velo, const String& cubature, const DataType_ nu, bool defo)
     {
-      Assembly::BurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
-      burgers_mat.deformation = defo;
-      burgers_mat.nu = nu;
-      burgers_mat.beta = 0.0;
-      burgers_mat.theta = 0.0;
-
       auto& loc_a = this->matrix_a.local();
       loc_a.format();
-
-      // create dummy convection vector
-      auto vec_c = loc_a.create_vector_l();
-      vec_c.format();
-
-      burgers_mat.assemble_matrix(loc_a, vec_c, space_velo, cubature);
+      Assembly::Common::LaplaceOperatorBlocked<dim_> lapl_op;
+      Assembly::Common::DuDvOperatorBlocked<dim_> dudv_op;
+      if(defo)
+        Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_a, dudv_op, space_velo, cubature, nu);
+      else
+        Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_a, lapl_op, space_velo, cubature, nu);
     }
 
-    template<typename SpaceV_, typename Cubature_>
-    void assemble_velocity_mass_matrix(const SpaceV_& space_velo, const Cubature_& cubature)
+    template<typename Trafo_, typename SpaceV_>
+    void assemble_velocity_mass_matrix(Assembly::DomainAssembler<Trafo_>& dom_asm, const SpaceV_& space_velo, const String& cubature)
     {
       local_velo_mass_matrix = this->matrix_a.local().clone(LAFEM::CloneMode::Weak);
       local_velo_mass_matrix.format();
 
       Assembly::Common::IdentityOperatorBlocked<dim_> id_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(local_velo_mass_matrix, id_op, space_velo, cubature);
+      Assembly::assemble_bilinear_operator_matrix_1(dom_asm, local_velo_mass_matrix, id_op, space_velo, cubature);
     }
 
     void compile_local_matrix()

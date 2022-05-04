@@ -28,13 +28,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/lagrange3/element.hpp>
-#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/analytic/common.hpp>
-#include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/symbolic_assembler.hpp>
-#include <kernel/assembly/bilinear_operator_assembler.hpp>
-#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
@@ -233,9 +227,6 @@ namespace PoissonDirichlet
     typedef typename DomainControlType::MeshType MeshType;
     typedef typename DomainControlType::ShapeType ShapeType;
 
-    // choose our desired analytical solution
-    Analytic::Common::ExpBubbleFunction<ShapeType::dimension> sol_func;
-
     // define our system level
     typedef Control::ScalarUnitFilterSystemLevel<MemType, DataType, IndexType> SystemLevelType;
 
@@ -290,7 +281,7 @@ namespace PoissonDirichlet
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("gauss-legendre:" + stringify(SpaceType::local_degree+1));
+    const String cubature("gauss-legendre:" + stringify(SpaceType::local_degree+1));
 
     /* ***************************************************************************************** */
 
@@ -299,6 +290,7 @@ namespace PoissonDirichlet
     for (Index i(0); i < num_levels; ++i)
     {
       TimeStamp ts;
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gate(domain.at(i));
       stats.times[i][Times::asm_gate] += ts.elapsed_now();
       if((i+1) < domain.size_virtual())
@@ -318,7 +310,7 @@ namespace PoissonDirichlet
     for (Index i(0); i < num_levels; ++i)
     {
       TimeStamp ts;
-      system_levels.at(i)->assemble_laplace_matrix(domain.at(i)->space, cubature);
+      system_levels.at(i)->assemble_laplace_matrix(domain.at(i)->domain_asm, domain.at(i)->space, cubature);
       double tt = ts.elapsed_now();
       stats.times[i][Times::asm_total] += tt;
       stats.times[i][Times::asm_matrix] += tt;
@@ -368,12 +360,10 @@ namespace PoissonDirichlet
     vec_rhs.format();
 
     {
-      // get the local vector
-      typename SystemLevelType::LocalSystemVector& vec_f = vec_rhs.local();
-
-      // assemble the force
-      Assembly::Common::LaplaceFunctional<decltype(sol_func)> force_func(sol_func);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_domain_level.space, cubature);
+      // assemble the constant force functional
+      Analytic::Common::ConstantFunction<ShapeType::dimension, DataType> one_func(DataType(1));
+      Assembly::assemble_force_function_vector(the_domain_level.domain_asm, vec_rhs.local(),
+        one_func, the_domain_level.space, cubature);
 
       // sync the vector
       vec_rhs.sync_0();

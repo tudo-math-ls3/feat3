@@ -221,9 +221,9 @@ namespace Stokes3Field
       this->filter_velo.local().filter_offdiag_row_mat(this->local_matrix_sys.template at<0,2>());
     }
 
-    template<typename SpaceVelo_, typename SpaceStress_>
-    void assemble_matrices(const SpaceVelo_& space_velo, const SpaceStress_& space_stress,
-      const Cubature::DynamicFactory& cubature, const DataType_ nu, const DataType_ eta, const DataType_ chi)
+    template<typename Trafo_, typename SpaceVelo_, typename SpaceStress_>
+    void assemble_matrices(Assembly::DomainAssembler<Trafo_>& dom_asm, const SpaceVelo_& space_velo, const SpaceStress_& space_stress,
+      const String& cubature, const DataType_ nu, const DataType_ eta, const DataType_ chi)
     {
       this->matrix_a.local().format();
       this->matrix_m.local().format();
@@ -231,16 +231,16 @@ namespace Stokes3Field
       this->matrix_l.local().format();
 
       Assembly::Common::DuDvOperatorBlocked<dim_> dudv_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(this->matrix_a.local(), dudv_op, space_velo, cubature, nu);
+      Assembly::assemble_bilinear_operator_matrix_1(dom_asm, this->matrix_a.local(), dudv_op, space_velo, cubature, nu);
 
       Assembly::Common::IdentityOperatorBlocked<nsc_> id_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(this->matrix_m.local(), id_op, space_stress, cubature);
+      Assembly::assemble_bilinear_operator_matrix_1(dom_asm, this->matrix_m.local(), id_op, space_stress, cubature);
 
       Assembly::Common::StrainRateTensorOperator<dim_, nsc_> du_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix2(this->matrix_k.local(), du_op, space_stress, space_velo, cubature, -eta);
+      Assembly::assemble_bilinear_operator_matrix_2(dom_asm, this->matrix_k.local(), du_op, space_stress, space_velo, cubature, -eta);
 
       Assembly::Common::StressDivergenceOperator<dim_, nsc_> div_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix2(this->matrix_l.local(), div_op, space_velo, space_stress, cubature, -chi);
+      Assembly::assemble_bilinear_operator_matrix_2(dom_asm, this->matrix_l.local(), div_op, space_velo, space_stress, cubature, -chi);
     }
   };
 
@@ -838,13 +838,14 @@ namespace Stokes3Field
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("gauss-legendre:4");
+    const String cubature("gauss-legendre:4");
 
     /* ***************************************************************************************** */
 
     for (Index i(0); i < num_levels; ++i)
     {
       TimeStamp ts;
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
       stats.times[i][Times::asm_gate] += ts.elapsed_now();
 
@@ -867,7 +868,7 @@ namespace Stokes3Field
       TimeStamp ts;
       system_levels.at(i)->assemble_structs(domain.at(i)->space_velo, domain.at(i)->space_pres, domain.at(i)->space_stress);
       system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
-      system_levels.at(i)->assemble_matrices(domain.at(i)->space_velo, domain.at(i)->space_stress, cubature, nu, eta, chi);
+      system_levels.at(i)->assemble_matrices(domain.at(i)->domain_asm, domain.at(i)->space_velo, domain.at(i)->space_stress, cubature, nu, eta, chi);
       system_levels.at(i)->compile_system_matrix();
       double tt = ts.elapsed_now();
       stats.times[i][Times::asm_total] += tt;

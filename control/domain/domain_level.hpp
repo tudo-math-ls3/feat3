@@ -9,6 +9,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/assembly/domain_assembler.hpp>
 
 namespace FEAT
 {
@@ -104,11 +105,14 @@ namespace FEAT
         TrafoType trafo;
         SpaceType space;
 
+        Assembly::DomainAssembler<TrafoType> domain_asm;
+
       public:
         explicit SimpleDomainLevel(int lvl_idx, std::unique_ptr<Geometry::RootMeshNode<MeshType>> node) :
           BaseClass(lvl_idx, std::move(node)),
           trafo(BaseClass::get_mesh()),
-          space(trafo)
+          space(trafo),
+          domain_asm(trafo)
         {
         }
       }; // class SimpleDomainLevel<...>
@@ -129,12 +133,15 @@ namespace FEAT
         SpaceVeloType space_velo;
         SpacePresType space_pres;
 
+        Assembly::DomainAssembler<TrafoType> domain_asm;
+
       public:
         explicit StokesDomainLevel(int lvl_idx, std::unique_ptr<Geometry::RootMeshNode<MeshType>> node) :
           BaseClass(lvl_idx, std::move(node)),
           trafo(BaseClass::get_mesh()),
           space_velo(trafo),
-          space_pres(trafo)
+          space_pres(trafo),
+          domain_asm(trafo)
         {
         }
       }; // class StokesDomainLevel<...>
@@ -157,13 +164,16 @@ namespace FEAT
         SpacePresType space_pres;
         SpaceStressType space_stress;
 
+        Assembly::DomainAssembler<TrafoType> domain_asm;
+
       public:
         explicit Stokes3FieldDomainLevel(int lvl_idx, std::unique_ptr<Geometry::RootMeshNode<MeshType>> node) :
           BaseClass(lvl_idx, std::move(node)),
           trafo(BaseClass::get_mesh()),
           space_velo(trafo),
           space_pres(trafo),
-          space_stress(trafo)
+          space_stress(trafo),
+          domain_asm(trafo)
         {
         }
       }; // class Stokes3FieldDomainLevel<...>

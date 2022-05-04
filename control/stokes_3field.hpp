@@ -28,6 +28,7 @@
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/domain_assembler_helpers.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/gpdv_assembler.hpp>
 #include <kernel/assembly/grid_transfer.hpp>

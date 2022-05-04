@@ -12,20 +12,12 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/solver/legacy_preconditioners.hpp>
-#include <kernel/assembly/unit_filter_assembler.hpp>
-#include <kernel/assembly/error_computer.hpp>
-#include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/analytic/common.hpp>
+#include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/common_functionals.hpp>
-#include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/symbolic_assembler.hpp>
-#include <kernel/assembly/bilinear_operator_assembler.hpp>
-#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/pcg.hpp>
-#include <kernel/solver/precon_wrapper.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/scale_precond.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
@@ -75,7 +67,7 @@ namespace PoissonDirichlet
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
+    const String cubature("auto-degree:5");
 
     /* ***************************************************************************************** */
 
@@ -85,6 +77,7 @@ namespace PoissonDirichlet
 
     for (Index i(0); i < num_levels; ++i)
     {
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gate(domain.at(i));
       if((i+1) < domain.size_virtual())
       {
@@ -99,7 +92,7 @@ namespace PoissonDirichlet
 
     for (Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_laplace_matrix(domain.at(i)->space, cubature);
+      system_levels.at(i)->assemble_laplace_matrix(domain.at(i)->domain_asm, domain.at(i)->space, cubature);
     }
 
     /* ***************************************************************************************** */
@@ -130,12 +123,10 @@ namespace PoissonDirichlet
     vec_rhs.format();
 
     {
-      // get the local vector
-      typename SystemLevelType::LocalSystemVector& vec_f = vec_rhs.local();
-
-      // assemble the force
+      // assemble the force functional
       Assembly::Common::LaplaceFunctional<decltype(sol_func)> force_func(sol_func);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_domain_level.space, cubature);
+      Assembly::assemble_linear_functional_vector(the_domain_level.domain_asm, vec_rhs.local(),
+        force_func, the_domain_level.space, cubature);
 
       // sync the vector
       vec_rhs.sync_0();
@@ -221,15 +212,14 @@ namespace PoissonDirichlet
     if (args.check("no-err") < 0)
     {
       // Compute and print the H0-/H1-errors
-      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
-        (vec_sol.local(), sol_func, the_domain_level.space, cubature);
+      auto errors = Assembly::integrate_error_function<1>(
+        the_domain_level.domain_asm, sol_func, vec_sol.local(), the_domain_level.space, cubature);
 
-      // synchronize all local errors
+      // synchronize over all processes
       errors.synchronize(comm);
 
       // print errors
-      comm.print("");
-      comm.print(errors.format_string());
+      comm.print("\nError Analysis:\n" + errors.print_norms());
     }
 
     /* ***************************************************************************************** */
@@ -353,7 +343,7 @@ namespace PoissonDirichlet
     run(args, domain);
 
     // print elapsed runtime
-    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+    comm.print("\nRun-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 } // namespace PoissonDirichlet
 

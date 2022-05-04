@@ -26,7 +26,7 @@
 #include <kernel/solver/jacobi_precond.hpp>
 
 #include <control/domain/unit_cube_domain_control.hpp>
-#include <control/stokes_basic.hpp>
+#include <control/stokes_power.hpp>
 
 namespace StokesVortex2D
 {
@@ -125,7 +125,7 @@ namespace StokesVortex2D
     static constexpr int dim = ShapeType::dimension;
 
     // define our system level
-    typedef Control::StokesUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
+    typedef Control::StokesPowerUnitVeloMeanPresSystemLevel<dim, MemType, DataType, IndexType> SystemLevelType;
 
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
@@ -137,7 +137,7 @@ namespace StokesVortex2D
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
+    const String cubature("auto-degree:5");
 
     /* ***************************************************************************************** */
 
@@ -145,6 +145,7 @@ namespace StokesVortex2D
 
     for (Index i(0); i < num_levels; ++i)
     {
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
       if((i+1) < domain.size_virtual())
       {
@@ -159,8 +160,10 @@ namespace StokesVortex2D
 
     for(Index i(0); i < num_levels; ++i)
     {
-      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature);
-      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
+      system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->domain_asm,
+        domain.at(i)->space_velo, cubature);
+      system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->domain_asm,
+        domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
       system_levels.at(i)->compile_system_matrix();
     }
 
@@ -175,7 +178,8 @@ namespace StokesVortex2D
       // assemble schur matrix
       mat_loc_s.format();
       Assembly::Common::IdentityOperator id_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_loc_s, id_op, domain.front()->space_pres, cubature, -DataType(1));
+      Assembly::assemble_bilinear_operator_matrix_1(domain.front()->domain_asm, mat_loc_s, id_op,
+        domain.front()->space_pres, cubature, -DataType(1));
     }
 
     /* ***************************************************************************************** */
@@ -255,10 +259,8 @@ namespace StokesVortex2D
       // assemble the two forces
       Analytic::StaticWrapperFunction<2, ForceFuncX> force_x;
       Analytic::StaticWrapperFunction<2, ForceFuncY> force_y;
-      Assembly::Common::ForceFunctional<decltype(force_x)> force_func_x(force_x);
-      Assembly::Common::ForceFunctional<decltype(force_y)> force_func_y(force_y);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_fx, force_func_x, the_domain_level.space_velo, cubature);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_fy, force_func_y, the_domain_level.space_velo, cubature);
+      Assembly::assemble_force_function_vector(the_domain_level.domain_asm, vec_fx, force_x, the_domain_level.space_velo, cubature);
+      Assembly::assemble_force_function_vector(the_domain_level.domain_asm, vec_fy, force_y, the_domain_level.space_velo, cubature);
 
       // sync the vector
       vec_rhs.sync_0();
@@ -389,30 +391,31 @@ namespace StokesVortex2D
       const auto& vp = vec_sol.local().template at<1>();
 
       // compute local errors
-      Assembly::ScalarErrorInfo<DataType> vxerr = Assembly::ScalarErrorComputer<1>::compute(
-        vx, velo_x_func, the_domain_level.space_velo, cubature);
-      Assembly::ScalarErrorInfo<DataType> vyerr = Assembly::ScalarErrorComputer<1>::compute(
-        vy, velo_y_func, the_domain_level.space_velo, cubature);
-      Assembly::ScalarErrorInfo<DataType> vperr = Assembly::ScalarErrorComputer<0>::compute(
-        vp, pres_func, the_domain_level.space_pres, cubature);
+      auto vxerr = Assembly::integrate_error_function<1>(the_domain_level.domain_asm,
+        velo_x_func, vx, the_domain_level.space_velo, cubature);
+      auto vyerr = Assembly::integrate_error_function<1>(the_domain_level.domain_asm,
+        velo_y_func, vy, the_domain_level.space_velo, cubature);
+      auto p_err = Assembly::integrate_error_function<0>(the_domain_level.domain_asm,
+        pres_func, vp, the_domain_level.space_pres, cubature);
 
       // synhronise all local errors
       vxerr.synchronize(comm);
       vyerr.synchronize(comm);
+      p_err.synchronize(comm);
 
       // compute field errors
-      DataType vv_h0 = Math::sqrt(Math::sqr(vxerr.norm_h0) + Math::sqr(vyerr.norm_h0));
-      DataType vv_h1 = Math::sqrt(Math::sqr(vxerr.norm_h1) + Math::sqr(vyerr.norm_h1));
+      const DataType vv_h0 = Math::sqrt(vxerr.norm_h0_sqr + vyerr.norm_h0_sqr);
+      const DataType vv_h1 = Math::sqrt(vxerr.norm_h1_sqr + vyerr.norm_h1_sqr);
 
       // print errors
-      if (comm.rank() == 0)
-      {
-        std::cout << "Velocity H0-Error: " << stringify_fp_sci(vv_h0, 12) << " [ ";
-        std::cout << stringify_fp_sci(vxerr.norm_h0, 12) << " , " << stringify_fp_sci(vyerr.norm_h0, 12) << " ]" << std::endl;
-        std::cout << "Velocity H1-Error: " << stringify_fp_sci(vv_h1, 12) << " [ ";
-        std::cout << stringify_fp_sci(vxerr.norm_h1, 12) << " , " << stringify_fp_sci(vyerr.norm_h1, 12) << " ]" << std::endl;
-        std::cout << "Pressure H0-Error: " << stringify_fp_sci(vperr.norm_h0, 12) << std::endl;
-      }
+      comm.print("\nError Analysis:");
+      comm.print("Velocity H0-Error: " + stringify_fp_sci(vv_h0, 12) + " [ " +
+        stringify_fp_sci(Math::sqrt(vxerr.norm_h0_sqr), 12) + " , " +
+        stringify_fp_sci(Math::sqrt(vyerr.norm_h0_sqr), 12) + " ]");
+      comm.print("Velocity H1-Error: " + stringify_fp_sci(vv_h1, 12) + " [ " +
+        stringify_fp_sci(Math::sqrt(vxerr.norm_h1_sqr), 12) + " , " +
+        stringify_fp_sci(Math::sqrt(vyerr.norm_h1_sqr), 12) + " ]");
+      comm.print("Pressure L2-Error: " + stringify_fp_sci(Math::sqrt(p_err.norm_h0_sqr), 12));
     }
 
     /* ***************************************************************************************** */

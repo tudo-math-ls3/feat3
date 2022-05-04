@@ -6,10 +6,8 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/error_computer.hpp>
-#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -306,7 +304,7 @@ namespace PoissonMixed
         XABORTM("--bc supports only 'dirichlet' or 'neumann', but got "+bc_name);
     }
 
-    Cubature::DynamicFactory cubature("auto-degree:7");
+    const String cubature("auto-degree:7");
     //Cubature::DynamicFactory cubature("gauss-lobatto:3");
 
     /* ***************************************************************************************** */
@@ -317,6 +315,7 @@ namespace PoissonMixed
 
     for (Index i(0); i < num_levels; ++i)
     {
+      domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
     }
 
@@ -341,8 +340,8 @@ namespace PoissonMixed
 
       system_levels.at(i)->matrix_a.local().format();
       Assembly::Common::IdentityOperatorBlocked<dim> identity_op;
-      Assembly::BilinearOperatorAssembler::assemble_matrix1(system_levels.at(i)->matrix_a.local(),
-      identity_op, domain.at(i)->space_velo, cubature);
+      Assembly::assemble_bilinear_operator_matrix_1(domain.at(i)->domain_asm,
+        system_levels.at(i)->matrix_a.local(), identity_op, domain.at(i)->space_velo, cubature);
 
       system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
     }
@@ -360,7 +359,7 @@ namespace PoissonMixed
 
         for(auto& it: fil_loc_v)
         {
-          // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+          // Add the MeshPart to the assembler if it is there. There are legitimate reasons for it NOT to be
           // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
           auto* mpp = domain.at(i)->get_mesh_node()->find_mesh_part(it.first);
 
@@ -407,12 +406,10 @@ namespace PoissonMixed
     vec_rhs.format();
 
     {
-      // get the local vector
-      typename SystemLevelType::LocalPresVector& vec_f = vec_rhs.local();
-
-      // assemble the force
+      // assemble the force functional
       Assembly::Common::LaplaceFunctional<decltype(sol_func)> force_func(sol_func);
-      Assembly::LinearFunctionalAssembler::assemble_vector(vec_f, force_func, the_domain_level.space_pres, cubature);
+      Assembly::assemble_linear_functional_vector(the_domain_level.domain_asm, vec_rhs.local(),
+        force_func, the_domain_level.space_pres, cubature);
 
       // sync the vector
       vec_rhs.sync_0();
@@ -595,15 +592,14 @@ namespace PoissonMixed
     if (args.check("no-err") < 0)
     {
       // Compute and print the H0-/H1-errors
-      Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::compute
-        (vec_sol.local(), sol_func, the_domain_level.space_pres, cubature);
+      auto errors = Assembly::integrate_error_function<1>(
+        the_domain_level.domain_asm, sol_func, vec_sol.local(), the_domain_level.space_pres, cubature);
 
       // synchronize all local errors
       errors.synchronize(comm);
 
       // print errors
-      comm.print("");
-      comm.print(errors.format_string());
+      comm.print("\nError Analysis:\n" + errors.print_norms());
     }
 
     /* ***************************************************************************************** */
@@ -756,7 +752,7 @@ namespace PoissonMixed
     run(args, domain);
 
     // print elapsed runtime
-    comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+    comm.print("\nRun-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
   }
 
 
