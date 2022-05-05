@@ -21,12 +21,10 @@ SET (app_list
   poisson_mixed
   poisson_neumann
   poisson_scarc
-  poisson_solver_factory
   stokes_3field_bench
   stokes_dricav_2d
   stokes_poiseuille_2d
   stokes_vortex_2d
-  stokes_solver_factory
   )
 
 FOREACH (app ${app_list} )
@@ -176,8 +174,8 @@ else (FEAT_HAVE_MPI)
     --build-noclean
     --test-command ${VALGRIND_EXE}
     ${FEAT_BINARY_DIR}/applications/poisson_mixed --bc neumann --test-iter 8 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
-  SET_PROPERTY(TEST poisson_dirichlet_serial PROPERTY LABELS "serial")
-  SET_PROPERTY(TEST poisson_dirichlet_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  SET_PROPERTY(TEST poisson_mixed_serial PROPERTY LABELS "serial")
+  SET_PROPERTY(TEST poisson_mixed_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
 
 ######################### stokes_poiseuille_2d
@@ -236,77 +234,6 @@ else (FEAT_HAVE_MPI)
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
-
-######################### poisson_solver_factory
-if (FEAT_HAVE_MPI)
-  ADD_TEST(sleep1 sleep 2)
-  SET_PROPERTY(TEST sleep1 PROPERTY LABELS "mpi,sleep")
-
-  ADD_TEST(poisson_solver_factory_mpi_4 ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target poisson_solver_factory
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST poisson_solver_factory_mpi_4 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST poisson_solver_factory_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-  ADD_TEST(sleep31 sleep 2)
-  SET_PROPERTY(TEST sleep31 PROPERTY LABELS "mpi,sleep")
-
-  ADD_TEST(poisson_solver_factory_mpi_3 ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target poisson_solver_factory
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST poisson_solver_factory_mpi_3 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST poisson_solver_factory_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-  ADD_TEST(sleep32 sleep 2)
-  SET_PROPERTY(TEST sleep32 PROPERTY LABELS "mpi,sleep")
-
-  ADD_TEST(poisson_solver_factory_mpi_6 ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target poisson_solver_factory
-    --build-nocmake
-    --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 6 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini ${MPIEXEC_POSTFLAGS})
-  SET_PROPERTY(TEST poisson_solver_factory_mpi_6 PROPERTY LABELS "mpi")
-  SET_PROPERTY(TEST poisson_solver_factory_mpi_6 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-else (FEAT_HAVE_MPI)
-  ADD_TEST(poisson_solver_factory_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target poisson_solver_factory
-    --build-nocmake
-    --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example.ini)
-  SET_PROPERTY(TEST poisson_solver_factory_serial PROPERTY LABELS "serial")
-  SET_PROPERTY(TEST poisson_solver_factory_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-
-  if (FEAT_HAVE_CUDA)
-    ADD_TEST(poisson_solver_factory_serial_cuda ${CMAKE_CTEST_COMMAND}
-      --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-      --build-generator ${CMAKE_GENERATOR}
-      --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-      --build-target poisson_solver_factory
-      --build-nocmake
-      --build-noclean
-      --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_solver_factory --test-iter 5 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml --solver-ini ${FEAT_SOURCE_DIR}/data/ini/solver_example_cuda.ini)
-    SET_PROPERTY(TEST poisson_solver_factory_serial_cuda PROPERTY LABELS "serial")
-    SET_PROPERTY(TEST poisson_solver_factory_serial_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  endif (FEAT_HAVE_CUDA)
-endif (FEAT_HAVE_MPI)
-
 
 # add all tests to applications_tests
 ADD_CUSTOM_TARGET(applications_tests DEPENDS ${app_list})
