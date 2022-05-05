@@ -21,28 +21,28 @@ namespace FEAT
      * \brief Base class for Burgers assembly jobs
      *
      * This base class is used by various Burgers assemblers to outsource common coefficient
-     * member variables as well as code related to precomputing quantities for the streamline
-     * diffusion stabilization.
+     * member variables as well as code related to precomputing quantities required for the
+     * streamline diffusion stabilization.
      *
      * The operators assembled by the derived classes are the scalar and vector-valued Burgers operators:
      *
-     * \f[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'(v,u,\psi)} + \delta \mathbf{S}(v,u,\psi)\f]
+     * \f[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'}(v,u,\psi) + \delta \mathbf{S}(v,u,\psi)\f]
      *
      * where
      * - \b L is the diffusive operator, which is either
      *   - the <em>gradient tensor</em>:
-     *     \f[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi \f]
+     *     \f[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi~dx \f]
      *   - or the <em>deformation tensor</em> (vector-valued operators only):
-     *     \f[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi\f]
+     *     \f[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi~dx\f]
      * - \b M is the reactive operator:
-     *   \f[\mathbf{M}(u,\psi) := \int_\Omega u\psi\f]
+     *   \f[\mathbf{M}(u,\psi) := \int_\Omega u\psi~dx\f]
      * - \b K is the convective operator:
-     *   \f[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi\f]
+     *   \f[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi~dx\f]
      * - <b>K'</b> is the additional term for the Fr&eacute;chet derivative of the convective operator \b K
          (vector-valued operators only; see note below for details):
-     *   \f[\mathbf{K'}(v,u,\psi) := \int_\Omega (\nabla v) u \psi\f]
-     * - \b S is the Samarskij-style streamline-diffusion stabilization operator:
-     *   \f[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\f]
+     *   \f[\mathbf{K'}(v,u,\psi) := \int_\Omega (\nabla v) u \psi~dx\f]
+     * - \b S is the Samarskij-style streamline-diffusion stabilization operator (see note below for details):
+     *   \f[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)~dx\f]
      *   where
      *   \f[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\f]
      *
@@ -65,7 +65,7 @@ namespace FEAT
      * Finally, we obtain our Fr&eacute;chet derivative by setting \f$\hat{u} := u\f$ and \f$\hat{v} = v\f$:
      * \f[D\mathbf{K}(v,u,\psi) = \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=~\mathbf{K}(v,u,\psi)} + \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=:~\mathbf{K}'(v,u,\psi)}\f]
      * Note that in the case of this assembly class, the Fr&eacute;chet derivative \f$D\mathbf{K}(v,u,\psi)\f$ is split
-     * into its two additive parts \f$\mathbf{K}(v,u,\psi)\f$ and \f$\mathbf{K}'(v,u,\psi)\f$, which are individually
+     * into its two additive parts \f$\mathbf{K}(v,u,\psi)\f$ and \f$\mathbf{K'}(v,u,\psi)\f$, which are individually
      * scaled by \f$\beta\f$ and \f$\beta'\f$, respectively, so one has to set both \f$\beta = \beta' = 1\f$ to use the
      * full Fr&eacute;chet derivative operator \f$D\mathbf{K}\f$.
      *
