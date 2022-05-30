@@ -168,19 +168,55 @@ namespace FEAT
           this->_param.push_back(param);
         }
 
+        /**
+         * \brief Specifies whether the chart can perform explicit projection.
+         *
+         * \returns
+         * \c true if explicit projection is possible, otherwise \c false.
+         */
         virtual bool can_explicit() const override
         {
           return !_param.empty();
         }
 
+        /**
+         * \brief Returns a (const) reference to the internal world points deque.
+         *
+         * \returns A (const) reference to the internal world points deque.
+         */
         std::deque<WorldPoint>& get_world_points()
         {
           return _world;
         }
 
+        /**
+         * \brief Returns a (const) reference to the internal world points deque.
+         *
+         * \returns A (const) reference to the internal world points deque.
+         */
         const std::deque<WorldPoint>& get_world_points() const
         {
           return _world;
+        }
+
+        /**
+         * \brief Returns a (const) reference to the internal vertex pointers deque.
+         *
+         * \returns A (const) reference to the internal vertex pointers deque.
+         */
+        std::deque<std::size_t>& get_vertex_pointers()
+        {
+          return _vtx_ptr;
+        }
+
+        /**
+         * \brief Returns a (const) reference to the internal vertex pointers deque.
+         *
+         * \returns A (const) reference to the internal vertex pointers deque.
+         */
+        const std::deque<std::size_t>& get_vertex_pointers() const
+        {
+          return _vtx_ptr;
         }
 
         /// \copydoc ChartBase:transform()
