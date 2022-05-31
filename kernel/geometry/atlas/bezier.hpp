@@ -169,6 +169,14 @@ namespace FEAT
         }
 
         /**
+         * \brief Marks the Bezier chart as closed.
+         */
+        void push_close()
+        {
+          this->_closed = true;
+        }
+
+        /**
          * \brief Specifies whether the chart can perform explicit projection.
          *
          * \returns
