@@ -93,12 +93,16 @@ namespace FEAT
          *
          * \param[in] closed
          * Specifies whether the spline is closed.
+         *
+         * \param[in] orientation
+         * The orientation code for the curve. Must be either +1 or -1.
          */
         explicit Bezier(
           const std::deque<std::size_t>& vtx_ptr,
           const std::deque<WorldPoint>& world,
           const std::deque<ParamPoint>& param,
-          bool closed, DataType orientation = DataType(1)) :
+          bool closed,
+          DataType orientation = DataType(1)) :
           BaseClass(),
           _vtx_ptr(vtx_ptr),
           _world(world),
@@ -174,6 +178,38 @@ namespace FEAT
         void push_close()
         {
           this->_closed = true;
+        }
+
+        /**
+         * \brief Checks whether the curve is open or closed.
+         *
+         * \returns \c true, if the curve is closed, otherwise \c false.
+         */
+        bool is_closed() const
+        {
+          return this->_closed;
+        }
+
+        /**
+         * \brief Returns the orientation code for the curve.
+         *
+         * \return +1 if the curve is positively oriented or -1 if it's negatively oriented.
+         */
+        int get_orientation() const
+        {
+          return this->_orientation;
+        }
+
+        /**
+         * \brief Sets the orientation code for the curve.
+         *
+         * \param[in] ori
+         * The new orientation code. Must be either +1 or -1.
+         */
+        void set_orientation(int ori)
+        {
+          XASSERTM(Math::abs(ori) == 1, "invalid orientation; must be +1 or -1");
+          this->_orientation = ori;
         }
 
         /**
