@@ -12,6 +12,9 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
 
+// includes, system
+#include <initializer_list>
+
 namespace FEAT
 {
   /**
@@ -237,6 +240,27 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Initializer list constructor
+       *
+       * This operator allows to assign values to a new vector in a simple manner:
+       * \code{.cpp}
+         Tiny::Vector<double, 3> v1{0.1, 2.1, 7.3};
+         Tiny::Vector<double, 3> v2 = {0.1, 2.1, 7.3};
+       * \endcode
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      explicit Vector(const std::initializer_list<Tx_>& x)
+      {
+        XASSERTM(std::size_t(n_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < n_; ++i, ++it)
+          v[i] = T_(*it);
+      }
+
       /// value-assignment operator
       Vector& operator=(DataType value)
       {
@@ -255,6 +279,30 @@ namespace FEAT
         {
           v[i] = x.v[i];
         }
+        return *this;
+      }
+
+      /**
+       * \brief Initializer list assignment operator
+       *
+       * This operator allows to assign values to the vector in a simple manner:
+       * \code{.cpp}
+         Tiny::Vector<double, 3> v;
+         v = {0.1, 2.1, 7.3};
+       * \endcode
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       *
+       * \returns *this
+       */
+      template<typename Tx_>
+      Vector& operator=(const std::initializer_list<Tx_>& x)
+      {
+        XASSERTM(std::size_t(n_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < n_; ++i, ++it)
+          v[i] = T_(*it);
         return *this;
       }
 
@@ -768,6 +816,48 @@ namespace FEAT
         }
       }
 
+      /**
+       * \brief Initializer list of Tiny::Vector constructor
+       *
+       * \code{.cpp}
+       * Tiny::Vector<double, 2> v{...}, w{...};
+       * Tiny::Matrix<double, 2, 2> m{v, w};
+       * \endcode
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      explicit Matrix(const std::initializer_list<Tx_>& x)
+      {
+        XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < m_; ++i, ++it)
+          v[i] = *it;
+      }
+
+      /**
+       * \brief Initializer list constructor
+       *
+       * \note This overload seems to be necessary, because the example code below
+       * does not compile otherwise for some reason that I do not understand...
+       *
+       * \code{.cpp}
+       * Tiny::Matrix<double, 2, 2> v{{0.0, 1.0}, {2.0, 3.0}};
+       * \endcode
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      explicit Matrix(const std::initializer_list<std::initializer_list<Tx_>>& x)
+      {
+        XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < m_; ++i, ++it)
+          v[i] = *it;
+      }
+
       /// value-assignment operator
       Matrix& operator=(DataType value)
       {
@@ -786,6 +876,49 @@ namespace FEAT
         {
           v[i] = a.v[i];
         }
+        return *this;
+      }
+
+      /**
+       * \brief Initializer list assignment operator
+       *
+       * \code{.cpp}
+       * Tiny::Vector<double, 2> v{1.0, 2.0}, w{3.0, 4.0};
+       * Tiny::Matrix<double, 2, 2> m;
+         m = {v, w};
+       * \endcode
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      Matrix& operator=(const std::initializer_list<Tx_>& x)
+      {
+        XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < m_; ++i, ++it)
+          v[i] = *it;
+        return *this;
+      }
+
+      /**
+       * \brief Initializer list assignment operator
+       *
+       * \code{.cpp}
+       * Tiny::Matrix<double, 2, 2> m;
+         m = {{0.0, 1.0}, {2.0, 3.0}};
+       * \endcode
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      Matrix& operator=(const std::initializer_list<std::initializer_list<Tx_>>& x)
+      {
+        XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < m_; ++i, ++it)
+          v[i] = *it;
         return *this;
       }
 
@@ -1757,6 +1890,36 @@ namespace FEAT
           v[i] = value;
       }
 
+      /**
+       * \brief Initializer list constructor
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      explicit Tensor3(const std::initializer_list<Tx_>& x)
+      {
+        XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < l_; ++i, ++it)
+          v[i] = *it;
+      }
+
+      /**
+       * \brief Initializer list constructor
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       */
+      template<typename Tx_>
+      explicit Tensor3(const std::initializer_list<std::initializer_list<std::initializer_list<Tx_>>>& x)
+      {
+        XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < l_; ++i, ++it)
+          v[i] = *it;
+      }
+
       /// copy-constructor
       template<int sla_, int sma_, int sna_>
       Tensor3(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
@@ -1779,6 +1942,42 @@ namespace FEAT
       {
         for(int i(0); i < l_; ++i)
           v[i] = a.v[i];
+        return *this;
+      }
+
+      /**
+       * \brief Initializer list assignment operator
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       *
+       * \returns *this
+       */
+      template<typename Tx_>
+      Tensor3& operator=(const std::initializer_list<Tx_>& x)
+      {
+        XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < l_; ++i, ++it)
+          v[i] = *it;
+        return *this;
+      }
+
+      /**
+       * \brief Initializer list assignment operator
+       *
+       * \param[in] x
+       * The initializer list whose elements are to be assigned.
+       *
+       * \returns *this
+       */
+      template<typename Tx_>
+      Tensor3& operator=(const std::initializer_list<std::initializer_list<std::initializer_list<Tx_>>>& x)
+      {
+        XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
+        auto it(x.begin());
+        for(int i(0); i < l_; ++i, ++it)
+          v[i] = *it;
         return *this;
       }
 

@@ -164,8 +164,67 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(def, DataType_(0), tol);
   }
 
+  void test_initializer_list() const
+  {
+    const DataType_ one = DataType_(1);
+    const DataType_ two = DataType_(2);
+    const DataType_ fiv = DataType_(5);
+    const DataType_ six = DataType_(6);
+    const DataType_ sev = DataType_(7);
+    const DataType_ nin = DataType_(9);
+
+    Tiny::Vector<DataType_, 2> v{one, two}, w{two, one};
+    TEST_CHECK_EQUAL(v[0], one);
+    TEST_CHECK_EQUAL(v[1], two);
+
+    v = {nin, six};
+    TEST_CHECK_EQUAL(v[0], nin);
+    TEST_CHECK_EQUAL(v[1], six);
+
+    Tiny::Matrix<DataType_, 2, 2> m{{one, two}, {six, sev}};
+    TEST_CHECK_EQUAL(m(0,0), one);
+    TEST_CHECK_EQUAL(m(0,1), two);
+    TEST_CHECK_EQUAL(m(1,0), six);
+    TEST_CHECK_EQUAL(m(1,1), sev);
+
+    m = {{sev, nin}, {two, six}};
+    TEST_CHECK_EQUAL(m(0,0), sev);
+    TEST_CHECK_EQUAL(m(0,1), nin);
+    TEST_CHECK_EQUAL(m(1,0), two);
+    TEST_CHECK_EQUAL(m(1,1), six);
+
+    m = {v, w};
+    TEST_CHECK_EQUAL(m(0,0), nin);
+    TEST_CHECK_EQUAL(m(0,1), six);
+    TEST_CHECK_EQUAL(m(1,0), two);
+    TEST_CHECK_EQUAL(m(1,1), one);
+
+    Tiny::Tensor3<DataType_, 2, 2, 2> t{{{one, two}, {fiv, six}}, {{sev, nin}, {six, two}}};
+    TEST_CHECK_EQUAL(t(0,0,0), one);
+    TEST_CHECK_EQUAL(t(0,0,1), two);
+    TEST_CHECK_EQUAL(t(0,1,0), fiv);
+    TEST_CHECK_EQUAL(t(0,1,1), six);
+    TEST_CHECK_EQUAL(t(1,0,0), sev);
+    TEST_CHECK_EQUAL(t(1,0,1), nin);
+    TEST_CHECK_EQUAL(t(1,1,0), six);
+    TEST_CHECK_EQUAL(t(1,1,1), two);
+
+    t = {{{six, one}, {nin, fiv}}, {{one, two}, {sev, nin}}};
+    TEST_CHECK_EQUAL(t(0,0,0), six);
+    TEST_CHECK_EQUAL(t(0,0,1), one);
+    TEST_CHECK_EQUAL(t(0,1,0), nin);
+    TEST_CHECK_EQUAL(t(0,1,1), fiv);
+    TEST_CHECK_EQUAL(t(1,0,0), one);
+    TEST_CHECK_EQUAL(t(1,0,1), two);
+    TEST_CHECK_EQUAL(t(1,1,0), sev);
+    TEST_CHECK_EQUAL(t(1,1,1), nin);
+  }
+
   virtual void run() const override
   {
+    // test initializer list constructor/operators
+    test_initializer_list();
+
     // test matrix inversion
     test_mat_inv_lehmer<1>(); // specialized
     test_mat_inv_lehmer<2>(); // specialized
