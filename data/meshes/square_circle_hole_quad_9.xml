@@ -1,0 +1,145 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This file contains a quadrilateral mesh for the [0,1]x[0,1] domain with a circle cutout
+    of radius 0.25 around the midpoint (0.5,0.5) consisting of 9 squares.
+  </Info>
+  <Chart name="circle">
+    <Circle radius="0.25" midpoint="0.5 0.5" domain="0.375 -0.625" />
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="16 24 8">
+    <Vertices>
+      0 0
+      1 0
+      1 1
+      0 1
+      0.3232233 0.6767767
+      0.6767767 0.6767767
+      0.6767767 0.3232233
+      0.3232233 0.3232233
+      0.3232233 1
+      0.6767767 1
+      1 0.6767767
+      1 0.3232233
+      0.6767767 0
+      0.3232233 0
+      0 0.3232233
+      0 0.6767767
+    </Vertices>
+    <Topology dim="1">
+      8 3
+      3 15
+      4 15
+      8 4
+      4 5
+      9 5
+      9 8
+      10 2
+      2 9
+      10 5
+      5 6
+      11 6
+      11 10
+      12 1
+      1 11
+      12 6
+      6 7
+      13 7
+      13 12
+      0 13
+      14 7
+      14 0
+      7 4
+      15 14
+    </Topology>
+    <Topology dim="2">
+      8 3 4 15
+      4 5 8 9
+      10 2 5 9
+      5 6 10 11
+      12 1 6 11
+      6 7 12 13
+      0 13 14 7
+      7 4 14 15
+    </Topology>
+  </Mesh>
+  <MeshPart name="bnd:b" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      0
+      13
+      12
+      1
+    </Mapping>
+    <Mapping dim="1">
+      19
+      18
+      13
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:r" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      1
+      11
+      10
+      2
+    </Mapping>
+    <Mapping dim="1">
+      14
+      12
+      7
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:t" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      2
+      9
+      8
+      3
+    </Mapping>
+    <Mapping dim="1">
+      8
+      6
+      0
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:l" parent="root" topology="none" size="4 3">
+    <Mapping dim="0">
+      3
+      15
+      14
+      0
+    </Mapping>
+    <Mapping dim="1">
+      1
+      23
+      21
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:c" parent="root" chart="circle" topology="full" size="5 4">
+    <Mapping dim="0">
+      4
+      5
+      6
+      7
+      4
+    </Mapping>
+    <Mapping dim="1">
+      4
+      10
+      16
+      22
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      0.25
+      0.5
+      0.75
+      1
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
