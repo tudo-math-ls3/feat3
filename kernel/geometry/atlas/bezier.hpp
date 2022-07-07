@@ -757,11 +757,16 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         DataType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_dist) const
         {
+          const DataType tol = Math::sqrt(Math::eps<DataType>());
+          const DataType sqr_eps = Math::sqr(Math::eps<DataType>());
           DataType best_distance_sqr(Math::huge<DataType>());
-          DataType best_sign(_orientation*Math::huge<DataType>());
+          DataType best_sign(_orientation);
 
           WorldPoint projected(DataType(0));
           WorldPoint best_nu(DataType(0));
+
+          // remember whether the best candidate is a vertex; ~0 means not a vertex
+          Index best_is_vertex = ~Index(0);
 
           // loop over all line segments
           for(Index i(0); (i+1) < Index(this->_vtx_ptr.size()); ++i)
@@ -776,61 +781,119 @@ namespace FEAT
 
             // compute squared distance to original point
             DataType my_distance_sqr(difference.norm_euclid_sqr());
+
             WorldPoint nu(get_normal_on_segment(i, t));
 
             // If we have a point inside this segment we are happy and can leave
-            if(my_distance_sqr <= Math::sqr(Math::eps<DataType>()))
+            if(my_distance_sqr <= sqr_eps)
             {
               best_distance_sqr = DataType(0);
               best_nu = nu;
-              best_sign = -DataType(1);
+              best_sign = DataType(0);
+              best_is_vertex = ~Index(0);
               break;
             }
 
-            DataType my_sign(1);
-            if(_closed)
-            {
-              // Compute normal so we can compute the sign
-              my_sign = Math::signum(Tiny::dot(nu, difference));
-
-              // If the sign is 0, the projected point lies in the continuation of the current segment, meaning
-              // t got clamped to 0 or 1. So we compute the sign according to the normal wrt. to the other segment.
-              // If the sign is still 0 then, the projected point lies in the continuation of the next segment,
-              // so the same situation will arise in the next iteration anyway.
-              if(my_sign == DataType(0))
-              {
-                if(Math::abs(t) < Math::sqrt(Math::eps<DataType>()))
-                {
-                  Index other_segment;
-                  (i == Index(0)) ? other_segment = Index(this->_vtx_ptr.size()-2) : other_segment = i-Index(1);
-                  WorldPoint other_nu(get_normal_on_segment(other_segment, DataType(1)));
-                  my_sign = Math::signum(Tiny::dot(difference, other_nu));
-                }
-                else if(Math::abs(t - DataType(1)) < Math::sqrt(Math::eps<DataType>()))
-                {
-                  Index other_segment;
-                  (i == Index(this->_vtx_ptr.size()-2)) ? other_segment = Index(0) : other_segment = i+Index(1);
-                  WorldPoint other_nu(get_normal_on_segment(other_segment, DataType(0)));
-                  my_sign = Math::signum(Tiny::dot(difference, other_nu));
-                }
-                //else
-                //  XABORTM("signum == "+stringify_fp_sci(my_sign)+" but t = "+stringify_fp_sci(t));
-              }
-            }
-
-            // Update the projection candidate iff it is the first segment, or the distance is lower
+            // Update the projection candidate iff it is the first segment, or the distance is smaller
             if(i == Index(0) || (my_distance_sqr < best_distance_sqr))
             {
               best_distance_sqr = my_distance_sqr;
               best_nu = nu;
-              // best_sign can be 0 if this happens for i==0
-              best_sign = my_sign;
+              if(_closed)
+                best_sign = _orientation * Math::signum(Tiny::dot(nu, difference));
               grad_dist = difference;
+
+              // is the new candidate a vertex?
+              if(t <= DataType(0))
+                best_is_vertex = i; // start vertex of this curve segment
+              else if(t >= DataType(1))
+                best_is_vertex = i+1; // end vertex of this curve segment
+              else
+                best_is_vertex = ~Index(0); // candidate point is on inside of curve segment
             }
           }
 
+          // do we have a closed curve and is our candidate a vertex?
+          if(_closed && (best_is_vertex != ~Index(0)))
+          {
+            // The candidate point is a vertex, so we now have to determine the correct sign, because the
+            // 'best_sign' that we have figured out up to now might be incorrect in this case. The reason
+            // is that the point might be considered 'inside' with respect to one of the segments and
+            // 'outside' with respect to the other one. To figure out the correct sign, we have to find
+            // out whether the candidate vertex is a convex or concave vertex; see below for more details.
+
+            // a closed curve must have at least 2 segments ==> at least 3 vertices
+            XASSERT(this->_vtx_ptr.size() >= std::size_t(3));
+
+            // if this is the first vertex, then the previous line segment is the last one in the list
+            Index prev_seg(0);
+            if(best_is_vertex == Index(0))
+              prev_seg = Index(this->_vtx_ptr.size()-2u);
+            else
+              prev_seg = best_is_vertex - 1u;
+
+            // if this is the last vertex, then the next line segment is the first one in the list
+            Index next_seg(0);
+            if(best_is_vertex == Index(this->_vtx_ptr.size()-1u))
+              next_seg = Index(0);
+            else
+              next_seg = best_is_vertex;
+
+            // Now we want to check whether the angle between the two curve segments is < 180 deg, = 180 deg
+            // or > 180 deg and we do this by computing the normal vectors, then turning the first one by 90 deg,
+            // computing the dot-product and checking that against 0. In the two mighty fine pieces of art below,
+            // 'X' is the common candidate vertex, 'Prev' is the previous segment, 'Next' is the next segment,
+            // 'T' is the tangent of 'Prev' at 'X' and 'N' is the (outer) normal vector of 'Next' at 'X'. By
+            // computing the dot product of 'N' and 'T' we can find out whether the vertex is convex (N*T > 0,
+            // left image) or concave (N*T < 0, right image). Note that the vertex 'X' can only be a candidate
+            // for world points 'W' which lie in the concave area (outside on left image, inside on right image),
+            // because if the world point 'W' were inside the convex area, we would have found a candidate point
+            // on either 'Prev' or 'Next' that is closer to the world point than the vertex 'X', so we would not
+            // be in this if-clause at all.
+            //
+            //                      outside / inside               outside \ inside            .
+            //                             /                      '-.       \                  .
+            //                       Prev /                         N '-.    \ Prev            .
+            //             W             /                                '-. \                .
+            //                         .X                                     'X      W        .
+            //                     .-' ' \                                    / '              .
+            //              N  .-'    '   \ Next                        Next /   '             .
+            //             .-'       '     \                                /     ' T          .
+            //                      ' T     \                              /       '           .
+            //
+            // In short: if the candidate vertex 'X' is a convex vertex (N*T > 0), then the world point 'W'
+            // lies on the outside of our Bezier figure and if the candidate vertex 'X' is a concave vertex
+            // (N*T < 0) then the world point 'W' is on the inside of our Bezier figure. Note that if the
+            // vertex is straight (N*T = 0), then we have already figured out the correct sign by checking
+            // it against the normal of either segment before, i.e. 'best_sign' is already correct.
+
+            // so let's compute the normal vectors in that vertex wrt. the two adjacent curve segments
+            WorldPoint prev_normal = get_normal_on_segment(prev_seg, 1.0);
+            WorldPoint next_normal = get_normal_on_segment(next_seg, 0.0);
+
+            // now let's rotate the previous segment normal by 90 degrees
+            WorldPoint prev_tangent({-prev_normal[1], prev_normal[0]});
+
+            // now let's compute the dot-product of the previous tangential and the next normal
+            DataType nu = Tiny::dot(prev_tangent, next_normal);
+
+            if(nu < -tol)
+            {
+              // dot-product (N*T) is negative, so we have an angle of > 180 degrees ==> concave vertex
+              // since this vertex is our candidate, so the projected point must be inside
+              best_sign = +DataType(_orientation);
+            }
+            else if(nu > +tol)
+            {
+              // dot-product is positive, so we have an angle of < 180 degrees ==> convex vertex
+              // since this vertex is our candidate, so the projected point must be outside
+              best_sign = -DataType(_orientation);
+            }
+            // the else-case is redundant, because the sign is already correct
+          }
+
           // If the point was far enough away from the interface, we can normalize the difference vector
-          if(best_distance_sqr > Math::sqr(Math::eps<DataType>()) && best_sign != DataType(0))
+          if((best_distance_sqr > sqr_eps) && best_sign != DataType(0))
           {
             grad_dist.normalize();
             grad_dist *= -best_sign;
@@ -841,10 +904,11 @@ namespace FEAT
           {
             grad_dist = DataType(-1)*best_nu;
             grad_dist.normalize();
-            XASSERT(Math::abs(grad_dist.norm_euclid()-DataType(1)) < Math::sqrt(Math::eps<DataType>()));
+            XASSERT(Math::abs(grad_dist.norm_euclid() - DataType(1)) < tol);
           }
 
-          return best_sign*Math::sqrt(best_distance_sqr);
+          // we've done it!
+          return best_sign * Math::sqrt(best_distance_sqr);
         }
 
         /** \copydoc ChartBase::write */
