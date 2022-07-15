@@ -1,0 +1,207 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Chart name="circle:b">
+    <Circle radius="0.25" midpoint="0.5 0" domain="2.0 0.0" />
+  </Chart>
+  <Chart name="circle:t">
+    <Circle radius="0.25" midpoint="0.5 1" domain="7.0 5.0" />
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="23 34 12">
+    <Vertices>
+      0.000000000000 0.000000000000
+      0.250000000000 0.000000000000
+      0.323223304703 0.176776695297
+      0.500000000000 0.250000000000
+      0.676776695297 0.176776695297
+      0.750000000000 0.000000000000
+      1.000000000000 0.000000000000
+      1.000000000000 0.250000000000
+      1.000000000000 0.500000000000
+      1.000000000000 0.750000000000
+      1.000000000000 1.000000000000
+      0.750000000000 1.000000000000
+      0.676776695297 0.823223304703
+      0.500000000000 0.750000000000
+      0.323223304703 0.823223304703
+      0.250000000000 1.000000000000
+      0.000000000000 1.000000000000
+      0.000000000000 0.750000000000
+      0.000000000000 0.500000000000
+      0.000000000000 0.250000000000
+      0.250000000000 0.500000000000
+      0.500000000000 0.500000000000
+      0.750000000000 0.500000000000
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+      4 5
+      5 6
+      6 7
+      7 8
+      8 9
+      9 10
+      10 11
+      11 12
+      12 13
+      13 14
+      14 15
+      15 16
+      16 17
+      17 18
+      18 19
+      0 19
+      2 19
+      2 20
+      3 21
+      4 22
+      4 7
+      18 20
+      20 21
+      21 22
+      8 22
+      14 17
+      14 20
+      13 21
+      12 22
+      9 12
+    </Topology>
+    <Topology dim="2">
+      0 1 19 2
+      18 19 20 2
+      2 3 20 21
+      3 4 21 22
+      7 8 4 22
+      4 5 7 6
+      14 15 17 16
+      17 18 14 20
+      13 14 21 20
+      12 13 22 21
+      8 9 22 12
+      9 10 12 11
+    </Topology>
+  </Mesh>
+  <MeshPart parent="root" name="bnd:l" topology="none" size="5 4 0">
+    <Mapping dim="0">
+      16
+      19
+      17
+      0
+      18
+    </Mapping>
+    <Mapping dim="1">
+      17
+      18
+      16
+      19
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:r" topology="none" size="5 4 0">
+    <Mapping dim="0">
+      7
+      9
+      10
+      8
+      6
+    </Mapping>
+    <Mapping dim="1">
+      6
+      7
+      9
+      8
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:bl" topology="none" size="2 1 0">
+    <Mapping dim="0">
+      0
+      1
+    </Mapping>
+    <Mapping dim="1">
+      0
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:br" topology="none" size="2 1 0">
+    <Mapping dim="0">
+      5
+      6
+    </Mapping>
+    <Mapping dim="1">
+      5
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:tl" topology="none" size="2 1 0">
+    <Mapping dim="0">
+      15
+      16
+    </Mapping>
+    <Mapping dim="1">
+      15
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:tr" topology="none" size="2 1 0">
+    <Mapping dim="0">
+      10
+      11
+    </Mapping>
+    <Mapping dim="1">
+      10
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:bc" chart="circle:b" topology="full" size="5 4">
+    <Mapping dim="0">
+      1
+      2
+      3
+      4
+      5
+    </Mapping>
+    <Mapping dim="1">
+      1
+      2
+      3
+      4
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Attribute name="param" dim="1">
+      1.00
+      1.25
+      1.50
+      1.75
+      2.00
+    </Attribute>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:tc" chart="circle:t" topology="full" size="5 4">
+    <Mapping dim="0">
+      11
+      12
+      13
+      14
+      15
+    </Mapping>
+    <Mapping dim="1">
+      11
+      12
+      13
+      14
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Attribute name="param" dim="1">
+      5.00
+      5.25
+      5.50
+      5.75
+      6.00
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
