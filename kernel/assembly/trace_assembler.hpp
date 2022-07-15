@@ -189,7 +189,7 @@ namespace FEAT
        */
       void add_facet(Index ifacet)
       {
-        ASSERTM(ifacet < Index(_facets.size()), "invalid facet index");
+        ASSERTM(ifacet < Index(_facet_mask.size()), "invalid facet index");
         _facet_mask.at(ifacet) = 1;
       }
 
