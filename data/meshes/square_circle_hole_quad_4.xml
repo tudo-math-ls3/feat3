@@ -1,0 +1,105 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This file contains a quadrilateral mesh for the [0,1]x[0,1] domain with a circle cutout
+    of radius 0.25 around the midpoint (0.5,0.5) consisting of 4 trapezoids.
+  </Info>
+  <Chart name="circle">
+    <Circle radius="0.25" midpoint="0.5 0.5" domain="0.625 -0.375" />
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="8 12 4">
+    <Vertices>
+      0 0
+      1 0
+      0 1
+      1 1
+      0.3232233 0.3232233
+      0.6767767 0.3232233
+      0.3232233 0.6767767
+      0.6767767 0.6767767
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 3
+      3 2
+      2 0
+      4 6
+      6 7
+      7 5
+      5 4
+      0 4
+      1 5
+      2 6
+      3 7
+    </Topology>
+    <Topology dim="2">
+      0 1 4 5
+      0 4 2 6
+      5 1 7 3
+      6 7 2 3
+    </Topology>
+  </Mesh>
+  <MeshPart name="bnd:b" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      0
+      1
+    </Mapping>
+    <Mapping dim="1">
+      0
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:r" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      1
+      3
+    </Mapping>
+    <Mapping dim="1">
+      1
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:t" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      3
+      2
+    </Mapping>
+    <Mapping dim="1">
+      2
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:l" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      2
+      0
+    </Mapping>
+    <Mapping dim="1">
+      3
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:c" parent="root" chart="circle" topology="full" size="5 4">
+    <Mapping dim="0">
+      4
+      6
+      7
+      5
+      4
+    </Mapping>
+    <Mapping dim="1">
+      4
+      5
+      6
+      7
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      0.25
+      0.5
+      0.75
+      1
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
