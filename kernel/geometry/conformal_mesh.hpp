@@ -14,6 +14,7 @@
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 #include <kernel/geometry/index_calculator.hpp>
+#include <kernel/geometry/facet_flipper.hpp>
 
 // includes, system
 #include <memory>
@@ -562,12 +563,27 @@ namespace FEAT
 
       /**
        * \brief Deducts the topology from the Vertex-At-Shape index set.
+       *
+       * This function ensures that the deducted topology will have positively oriented facets.
+       * This function also computes the neighbor structures.
        */
       void deduct_topology_from_top()
       {
         RedundantIndexSetBuilder<ShapeType>::compute(_index_set_holder);
         NumEntitiesExtractor<shape_dim>::set_num_entities(_index_set_holder, _num_entities);
         this->fill_neighbors();
+        this->reorient_boundary_facets();
+      }
+
+      /**
+       * \brief Ensures that all boundary facets are positively oriented
+       *
+       * This function checks the orientation of each boundary facet and flips it if it is
+       * negatively oriented to obtain positive orientation on all boundary facets.
+       */
+      void reorient_boundary_facets()
+      {
+        Geometry::FacetFlipper<ShapeType>::reorient(this->_index_set_holder);
       }
 
       /**

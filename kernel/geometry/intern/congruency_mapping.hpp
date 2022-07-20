@@ -10,6 +10,9 @@
 // includes, FEAT
 #include <kernel/geometry/intern/congruency_sampler.hpp>
 
+// includes, system
+#include <algorithm>
+
 namespace FEAT
 {
   namespace Geometry
@@ -52,6 +55,15 @@ namespace FEAT
          * The mapped local face index.
          */
         static int map(int orient, int idx);
+
+        /**
+         * \brief Flips the indices of the shape to invert the orientation
+         *
+         * \param[inout] idx
+         * The index tuple which is to be flipped to invert its orientation
+         */
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx);
       };
 #endif // DOXYGEN
 
@@ -73,6 +85,13 @@ namespace FEAT
           };
 
           return indices[orient][idx];
+        }
+
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx)
+        {
+          // swap vertex 0 and 1
+          std::swap(idx[0], idx[1]);
         }
       };
 
@@ -100,6 +119,15 @@ namespace FEAT
 
           return indices[orient][idx];
         }
+
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx)
+        {
+          // 2          1
+          // |'\.   --> |'\.
+          // 0---1      0---2
+          std::swap(idx[1], idx[2]);
+        }
       };
 
       /**
@@ -126,6 +154,21 @@ namespace FEAT
 
           return indices[orient][idx];
         }
+
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx)
+        {
+          // 2          1
+          // |'\.   --> |'\.
+          // 0---1      0---2
+          //
+          // X          X
+          // 2'1.   --> 0'1.
+          // X-0-X      X-2-X
+          //
+          // swap edge 0 and 2
+          std::swap(idx[0], idx[2]);
+        }
       };
 
       /**
@@ -146,6 +189,13 @@ namespace FEAT
           };
 
           return indices[orient][idx];
+        }
+
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx)
+        {
+          // swap vertex 0 and 1
+          std::swap(idx[0], idx[1]);
         }
       };
 
@@ -174,6 +224,16 @@ namespace FEAT
 
           return indices[orient][idx];
         }
+
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx)
+        {
+          // 2---3      0---1
+          // |   |  --> |   |
+          // 0---1      2---3
+          std::swap(idx[0], idx[2]);
+          std::swap(idx[1], idx[3]);
+        }
       };
 
       /**
@@ -200,6 +260,21 @@ namespace FEAT
           };
 
           return indices[orient][idx];
+        }
+
+        template<typename IdxTuple_>
+        static void flip(IdxTuple_& idx)
+        {
+          // 2---3      0---1
+          // |   |  --> |   |
+          // 0---1      2---3
+          //
+          // X-1-X      X-0-X
+          // 2   3  --> 2   3
+          // X-0-X      X-1-X
+          //
+          // swap edge 0 and 1
+          std::swap(idx[0], idx[1]);
         }
       };
     } // namespace Intern

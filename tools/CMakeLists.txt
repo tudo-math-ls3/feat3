@@ -16,6 +16,9 @@ TARGET_LINK_LIBRARIES(matrix-cond feat)
 ADD_EXECUTABLE(matrix-info matrix_info/matrix_info.cpp)
 TARGET_LINK_LIBRARIES(matrix-info feat)
 
+ADD_EXECUTABLE(mesh-indexer mesh_indexer/mesh_indexer.cpp)
+TARGET_LINK_LIBRARIES(mesh-indexer feat)
+
 ADD_EXECUTABLE(mesh-extruder mesh_extruder/mesh_extruder.cpp)
 TARGET_LINK_LIBRARIES(mesh-extruder feat)
 
