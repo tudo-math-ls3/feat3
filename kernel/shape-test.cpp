@@ -240,5 +240,23 @@ public:
     TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(1), -1);
     TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(2), +1);
     TEST_CHECK_EQUAL(ReferenceCell<Shape::Simplex<3>>::facet_orientation(3), -1);
+
+    // For Hypercube<1>, these are -1, +1
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<1>>::facet_orientation(0), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<1>>::facet_orientation(1), +1);
+
+    // For Hypercube<2>, these are +1, -1, -1, +1
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<2>>::facet_orientation(0), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<2>>::facet_orientation(1), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<2>>::facet_orientation(2), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<2>>::facet_orientation(3), +1);
+
+    // For Hypercube<2>, these are +1, -1, -1, +1
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<3>>::facet_orientation(0), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<3>>::facet_orientation(1), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<3>>::facet_orientation(2), +1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<3>>::facet_orientation(3), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<3>>::facet_orientation(4), -1);
+    TEST_CHECK_EQUAL(ReferenceCell<Shape::Hypercube<3>>::facet_orientation(5), +1);
   }
 } shape_test;
