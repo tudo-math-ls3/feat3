@@ -341,11 +341,11 @@ namespace CCND_FIBER
         watch_total_run.stop();
       }
 
-
       bool is_root_process() const
       {
         return _inner_solver.system_levels.front()->base_splitter_sys.is_root();
       }
+
 
       /**
         * \brief This solves the standard steady incompressible Navier-Stokes equations, i.e. N_s = N_p = 0, and writes the solution as projection into the OrientSpace.
@@ -903,6 +903,8 @@ namespace CCND_FIBER
           //project the velocity solution into vec_sol_orient
           Assembly::FEInterpolator<SpaceOrientationType, SpaceVeloType>::interpolate(vec_sol_orient, joined_sol.template at<0>(), *orient_space_ptr, _inner_solver._domain_ptr->front().level_b().space_velo);
 
+          if(verbose)
+            _comm.print("Solving time step " + stringify(time_step) + " of the extended Navier-Stokes equations");
 
           ++time_step;
 
@@ -1018,7 +1020,6 @@ namespace CCND_FIBER
         {
           return _inner_solver._domain_ptr->front().level_b().trafo;
         }
-
 
   }; //class CCNDUnsteadyInterface
 
@@ -1282,6 +1283,7 @@ namespace CCND_FIBER
     bool joined_solution = false;
 
     bool umf_cgs_hold = false;
+
   public:
     const Dist::Comm& _comm;
     std::unique_ptr<Control::Domain::PartiDomainControl<DomainLevel_>> _domain_ptr;
@@ -1332,285 +1334,282 @@ namespace CCND_FIBER
       _domain_ptr(std::move(domain_ptr)),
       cubature(cubature_string),
       statistics(interface_statistic)
-    {
-      navier = (args.check("stokes") < 0);
-      newton = (args.check("picard") < 0);
-      adapt_tol = (args.check("mg-tol-rel") < 0);
-      testmode = (args.check("test-mode") >= 0);
-      plot_mg_iter = (args.check("plot-mg-iter") >= 0);
-      joined_solution = (args.check("joined-sol") >= 0);
-
-      // diffusion parameter
-      mu = parse(args, "mu", DataType(1e-1));
-      //convetion speed
-      rho = parse(args, "rho", DataType(1.));
-      // maximum velocity, default: 2D: 0.3, 3D: 0.45
-      v_max = parse(args, "v-max", DataType(dim) * DataType(0.15));
-      // max. nonlinear solver iterations
-      max_nl_iter = parse(args, "max-nl-iter", Index(20));
-      // min. multigrid iterations
-      min_mg_iter = parse(args, "min-mg-iter", Index(1));
-      // max. multigrid iterations
-      max_mg_iter = parse(args, "max-mg-iter", Index(25));
-      // number of smoothing steps
-      smooth_steps = parse(args, "smooth-steps", Index(8));
-      // damping parameter for smoother
-      smooth_damp = parse(args, "smooth-damp", DataType(0.7));
-      // rel. tolerance for linear solver
-      mg_tol_rel = parse(args, "mg-tol-rel", DataType(1E-2));
-      // absolute tolerance for nonlinear solver
-      nl_tol_abs = parse(args, "nl-tol-abs", DataType(1E-8));
-      //shear-rate Parameter
-      n_s = parse(args, "n-s", DataType(0.));
-      //particle number
-      n_p = parse(args, "n-p", DataType(1.));
-      alpha = parse(args, "alpha", DataType(0.));
-
-
-
-      //get reference to domain
-      Control::Domain::PartiDomainControl<DomainLevel_>& domain = *_domain_ptr;
-
-      #ifdef FEAT_HAVE_UMFPACK
-      const bool umf_cgs = (domain.back_layer().comm().size() == 1) && (args.check("no-umfpack") < 0);
-      #else
-      const bool umf_cgs = false;
-      #endif
-
-      umf_cgs_hold = umf_cgs;
-
-      const Index num_levels = Index(domain.size_physical());
-
-      // create system levels
-      for (Index i(0); i < num_levels; ++i)
       {
-        system_levels.push_back(std::make_shared<SystemLevelType>());
-      }
+          navier = (args.check("stokes") < 0);
+          newton = (args.check("picard") < 0);
+          adapt_tol = (args.check("mg-tol-rel") < 0);
+          testmode = (args.check("test-mode") >= 0);
+          plot_mg_iter = (args.check("plot-mg-iter") >= 0);
+          joined_solution = (args.check("joined-sol") >= 0);
 
-      /* --------------------------------------------------------------------------------------------------------------------------------------------------------
-       * Symbolic Assembly
-       * ----------------------------------------------------------------------------------------------------------------------------------------------------- */
+          // diffusion parameter
+          mu = parse(args, "mu", DataType(1e-1));
+          //convetion speed
+          rho = parse(args, "rho", DataType(1.));
+          // maximum velocity, default: 2D: 0.3, 3D: 0.45
+          v_max = parse(args, "v-max", DataType(dim) * DataType(0.15));
+          // max. nonlinear solver iterations
+          max_nl_iter = parse(args, "max-nl-iter", Index(20));
+          // min. multigrid iterations
+          min_mg_iter = parse(args, "min-mg-iter", Index(1));
+          // max. multigrid iterations
+          max_mg_iter = parse(args, "max-mg-iter", Index(25));
+          // number of smoothing steps
+          smooth_steps = parse(args, "smooth-steps", Index(8));
+          // damping parameter for smoother
+          smooth_damp = parse(args, "smooth-damp", DataType(0.7));
+          // rel. tolerance for linear solver
+          mg_tol_rel = parse(args, "mg-tol-rel", DataType(1E-2));
+          // absolute tolerance for nonlinear solver
+          nl_tol_abs = parse(args, "nl-tol-abs", DataType(1E-8));
+          //shear-rate Parameter
+          n_s = parse(args, "n-s", DataType(0.));
+          //particle number
+          n_p = parse(args, "n-p", DataType(1.));
+          alpha = parse(args, "alpha", DataType(0.));
 
-      stamp_ass.stamp();
 
-      // assemble gates
-      for (Index i(0); i < num_levels; ++i)
-      {
-        domain.at(i)->domain_asm.compile_all_elements();
-        system_levels.at(i)->assemble_gates(domain.at(i));
-      }
 
-      // assemble muxers and transfers
-      for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
-      {
-        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-        if((i+1) < domain.size_physical())
-          system_levels.at(i)->assemble_transfers(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature_string, navier);
-        else
-          system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature_string, navier);
-      }
+          //get reference to domain
+          Control::Domain::PartiDomainControl<DomainLevel_>& domain = *_domain_ptr;
 
-      if(joined_solution)
-        system_levels.front()->assemble_base_splitters(domain.front());
+          #ifdef FEAT_HAVE_UMFPACK
+          const bool umf_cgs = (domain.back_layer().comm().size() == 1) && (args.check("no-umfpack") < 0);
+          #else
+          const bool umf_cgs = false;
+          #endif
 
-      // collect some finest-level statistics
-      {
-        auto tv = system_levels.front()->gate_velo._freqs.clone(LAFEM::CloneMode::Deep);
-        tv.format(1.0);
-        Index velo_dofs = Index(system_levels.front()->gate_velo.dot(tv, tv));
-        Index locp_dofs = system_levels.front()->gate_pres._freqs.size();
-        Index pres_dofs = Index(system_levels.front()->gate_pres.sum(DataType(locp_dofs)));
-        statistics.counts[Counts::velo_dofs] = velo_dofs/dim;
-        statistics.counts[Counts::pres_dofs] = pres_dofs;
-        statistics.counts[Counts::total_dofs] = velo_dofs+pres_dofs;
-        statistics.counts[Counts::elements] = domain.front()->get_mesh().get_num_elements();
-      }
+          umf_cgs_hold = umf_cgs;
 
-      basic_asm.stamp();
-      // assemble basic matrices
-      for(Index i(0); i < num_levels; ++i)
-      {
-        system_levels.at(i)->assemble_velo_struct(domain.at(i)->space_velo);
-        system_levels.at(i)->assemble_pres_struct(domain.at(i)->space_pres);
-        system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature, mu);
-        system_levels.at(i)->assemble_velocity_mass_matrix(domain.at(i)->space_velo, cubature);
-        system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
-        system_levels.at(i)->compile_system_matrix();
-      }
-      statistics.times[Times::basic_matrix_asm] = basic_asm.elapsed_now();
+          const Index num_levels = Index(domain.size_physical());
 
-      // the names of the mesh parts on which to assemble
-      std::deque<String> part_names = domain.front()->get_mesh_node()->get_mesh_part_names(true);
-
-      for(Index i(0); i < num_levels; ++i)
-      {
-        // get our local velocity filter
-        auto& fil_loc_v = system_levels.at(i)->filter_velo.local();
-
-        // create unit-filter assembler
-        Assembly::UnitFilterAssembler<MeshType> unit_asm_boundary, unit_asm_noflow;
-
-        // loop over all boundary parts
-        for(const auto& name : part_names)
-        {
-          // skip non-boundary mesh-parts
-          if(!name.starts_with("bnd:"))
-            continue;
-
-          // try to fetch the corresponding mesh part node
-          auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
-          XASSERT(mesh_part_node != nullptr);
-
-          auto* mesh_part = mesh_part_node->get_mesh();
-          if (mesh_part != nullptr)
+          // create system levels
+          for (Index i(0); i < num_levels; ++i)
           {
-            if(name == InflowFacetName)
-            {
-              // inflow
-              unit_asm_boundary.add_mesh_part(*mesh_part);
-            }
-            else if(name != OutflowFacetName)
-              unit_asm_noflow.add_mesh_part(*mesh_part);
+            system_levels.push_back(std::make_shared<SystemLevelType>());
           }
-        }
 
-        // assemble the filter
-        unit_asm_boundary.assemble(fil_loc_v, domain.at(i)->space_velo, diri_func);
-        unit_asm_noflow.assemble(fil_loc_v, domain.at(i)->space_velo, no_slip_func);
+          /* --------------------------------------------------------------------------------------------------------------------------------------------------------
+           * Symbolic Assembly
+           * ----------------------------------------------------------------------------------------------------------------------------------------------------- */
+          stamp_ass.stamp();
+          // split gate assembly and transfer assembly
+          for(Index i(0); i < num_levels; ++i)
+          {
+            domain.at(i)->domain_asm.compile_all_elements();
+            system_levels.at(i)->assemble_gates(domain.at(i));
+          }
+          // assemble gates, muxers and transfers
+          for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
+          {
+            system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+            if((i+1) < domain.size_physical())
+              system_levels.at(i)->assemble_transfers(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature_string, navier);
+            else
+              system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature_string, navier);
+          }
 
-        // finally, compile the system filter
-        system_levels.at(i)->compile_system_filter();
-      }
+          if(joined_solution)
+            system_levels.front()->assemble_base_splitters(domain.front());
 
-      // finally, compile the local type-1 matrices
-      for(Index i(0); i < num_levels; ++i)
-      {
-        system_levels.at(i)->compile_local_matrix();
-      }
+          // collect some finest-level statistics
+          {
+            auto tv = system_levels.front()->gate_velo._freqs.clone(LAFEM::CloneMode::Deep);
+            tv.format(1.0);
+            Index velo_dofs = Index(system_levels.front()->gate_velo.dot(tv, tv));
+            Index locp_dofs = system_levels.front()->gate_pres._freqs.size();
+            Index pres_dofs = Index(system_levels.front()->gate_pres.sum(DataType(locp_dofs)));
+            statistics.counts[Counts::velo_dofs] = velo_dofs/dim;
+            statistics.counts[Counts::pres_dofs] = pres_dofs;
+            statistics.counts[Counts::total_dofs] = velo_dofs+pres_dofs;
+            statistics.counts[Counts::elements] = domain.front()->get_mesh().get_num_elements();
+          }
 
-      Statistics::toe_assembly = stamp_ass.elapsed_now();
+          basic_asm.stamp();
+          // assemble basic matrices
+          for(Index i(0); i < num_levels; ++i)
+          {
+            system_levels.at(i)->assemble_velo_struct(domain.at(i)->space_velo);
+            system_levels.at(i)->assemble_pres_struct(domain.at(i)->space_pres);
+            system_levels.at(i)->assemble_velocity_laplace_matrix(domain.at(i)->space_velo, cubature, mu);
+            system_levels.at(i)->assemble_velocity_mass_matrix(domain.at(i)->space_velo, cubature);
+            system_levels.at(i)->assemble_grad_div_matrices(domain.at(i)->space_velo, domain.at(i)->space_pres, cubature);
+            system_levels.at(i)->compile_system_matrix();
+          }
+          statistics.times[Times::basic_matrix_asm] = basic_asm.elapsed_now();
 
-      // accumulate sizes
-      for(Index i(0); i < num_levels; ++i)
-      {
-        statistics.bytes[Bytes::mesh] += domain.at(i)->get_mesh_node()->bytes();
-        statistics.bytes[Bytes::gate] += system_levels.at(i)->gate_sys.bytes();
-        statistics.bytes[Bytes::muxer] += system_levels.at(i)->coarse_muxer_sys.bytes();
-        statistics.bytes[Bytes::matrix] += system_levels.at(i)->matrix_sys.local().bytes();
-        statistics.bytes[Bytes::transfer] += system_levels.at(i)->transfer_sys.bytes();
-        const auto& loc_a = system_levels.at(i)->matrix_sys.local().block_a();
-        const auto& loc_b = system_levels.at(i)->matrix_sys.local().block_b();
-        const auto& loc_d = system_levels.at(i)->matrix_sys.local().block_d();
-        statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.used_elements() + loc_a.rows() + Index(1));
-        statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.used_elements() + loc_b.rows() + Index(1));
-        statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.used_elements() + loc_d.rows() + Index(1));
-        statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.template used_elements<LAFEM::Perspective::pod>());
-        statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.template used_elements<LAFEM::Perspective::pod>());
-        statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.template used_elements<LAFEM::Perspective::pod>());
-      }
+          // the names of the mesh parts on which to assemble
+          std::deque<String> part_names = domain.front()->get_mesh_node()->get_mesh_part_names(true);
 
-      // fetch our finest levels
-      //       DomainLevelType& the_domain_level = *domain.front();
-      SystemLevelType& the_system_level = *system_levels.front();
-      //       SpaceVeloType& velo_space = the_domain_level.space_velo;
-      //       SpacePresType& pres_space = the_domain_level.space_pres;
+          for(Index i(0); i < num_levels; ++i)
+          {
+            // get our local velocity filter
+            auto& fil_loc_v = system_levels.at(i)->filter_velo.local();
 
-      // get our global solve matrix and filter
-      GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
-      GlobalSystemFilter& filter = the_system_level.filter_sys;
+            // create unit-filter assembler
+            Assembly::UnitFilterAssembler<MeshType> unit_asm_boundary, unit_asm_noflow;
 
-      // create new vectors
-      vec_def = the_system_level.matrix_sys.create_vector_r();
-      vec_cor = the_system_level.matrix_sys.create_vector_r();
+            // loop over all boundary parts
+            for(const auto& name : part_names)
+            {
+              // skip non-boundary mesh-parts
+              if(!name.starts_with("bnd:"))
+                continue;
 
-      // format the vectors
-      vec_def.format();
-      vec_cor.format();
+              // try to fetch the corresponding mesh part node
+              auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
+              XASSERT(mesh_part_node != nullptr);
 
-      {
-        // count non-zeros in a and b
-        statistics.counts[Counts::nnze_a] = the_system_level.matrix_sys.local().block_a().used_elements();
-        statistics.counts[Counts::nnze_b] = the_system_level.matrix_sys.local().block_b().used_elements();
-        statistics.counts[Counts::nnze_total] = the_system_level.matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
-      }
+              auto* mesh_part = mesh_part_node->get_mesh();
+              if (mesh_part != nullptr)
+              {
+                if(name == InflowFacetName)
+                {
+                  // inflow
+                  unit_asm_boundary.add_mesh_part(*mesh_part);
+                }
+                else if(name != OutflowFacetName)
+                  unit_asm_noflow.add_mesh_part(*mesh_part);
+              }
+            }
+
+            // assemble the filter
+            unit_asm_boundary.assemble(fil_loc_v, domain.at(i)->space_velo, diri_func);
+            unit_asm_noflow.assemble(fil_loc_v, domain.at(i)->space_velo, no_slip_func);
+
+            // finally, compile the system filter
+            system_levels.at(i)->compile_system_filter();
+          }
+
+          // finally, compile the local type-1 matrices
+          for(Index i(0); i < num_levels; ++i)
+          {
+            system_levels.at(i)->compile_local_matrix();
+          }
+
+          Statistics::toe_assembly = stamp_ass.elapsed_now();
+
+          // accumulate sizes
+          for(Index i(0); i < num_levels; ++i)
+          {
+            statistics.bytes[Bytes::mesh] += domain.at(i)->get_mesh_node()->bytes();
+            statistics.bytes[Bytes::gate] += system_levels.at(i)->gate_sys.bytes();
+            statistics.bytes[Bytes::muxer] += system_levels.at(i)->coarse_muxer_sys.bytes();
+            statistics.bytes[Bytes::matrix] += system_levels.at(i)->matrix_sys.local().bytes();
+            statistics.bytes[Bytes::transfer] += system_levels.at(i)->transfer_sys.bytes();
+            const auto& loc_a = system_levels.at(i)->matrix_sys.local().block_a();
+            const auto& loc_b = system_levels.at(i)->matrix_sys.local().block_b();
+            const auto& loc_d = system_levels.at(i)->matrix_sys.local().block_d();
+            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.used_elements() + loc_a.rows() + Index(1));
+            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.used_elements() + loc_b.rows() + Index(1));
+            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.used_elements() + loc_d.rows() + Index(1));
+            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.template used_elements<LAFEM::Perspective::pod>());
+            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.template used_elements<LAFEM::Perspective::pod>());
+            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.template used_elements<LAFEM::Perspective::pod>());
+          }
+
+          // fetch our finest levels
+          //       DomainLevelType& the_domain_level = *domain.front();
+          SystemLevelType& the_system_level = *system_levels.front();
+          //       SpaceVeloType& velo_space = the_domain_level.space_velo;
+          //       SpacePresType& pres_space = the_domain_level.space_pres;
+
+          // get our global solve matrix and filter
+          GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
+          GlobalSystemFilter& filter = the_system_level.filter_sys;
+
+          // create new vectors
+          vec_def = the_system_level.matrix_sys.create_vector_r();
+          vec_cor = the_system_level.matrix_sys.create_vector_r();
+
+          // format the vectors
+          vec_def.format();
+          vec_cor.format();
+
+          {
+            // count non-zeros in a and b
+            statistics.counts[Counts::nnze_a] = the_system_level.matrix_sys.local().block_a().used_elements();
+            statistics.counts[Counts::nnze_b] = the_system_level.matrix_sys.local().block_b().used_elements();
+            statistics.counts[Counts::nnze_total] = the_system_level.matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
+          }
 
 
-      /* ***************************************************************************************** */
-      /* ***************************************************************************************** */
-      /* ***************************************************************************************** */
+          /* ***************************************************************************************** */
+          /* ***************************************************************************************** */
+          /* ***************************************************************************************** */
 
-      // create a multigrid solver
-      _multigrid_hierarchy = std::make_shared<
-      Solver::MultiGridHierarchy<GlobalSystemMatrix, GlobalSystemFilter, GlobalSystemTransfer>>(domain.size_virtual());
+          // create a multigrid solver
+          _multigrid_hierarchy = std::make_shared<
+          Solver::MultiGridHierarchy<GlobalSystemMatrix, GlobalSystemFilter, GlobalSystemTransfer>>(domain.size_virtual());
 
-      //     // array of Vanka pointers - this is only required to collect the memory usage
-      //     // statistics of the Vankas, as we need the memory usage after factorization
-      //     std::deque<
-      //       std::shared_ptr<
-      //         Solver::AmaVanka<
-      //           typename SystemLevelType::LocalSystemMatrix,
-      //           typename SystemLevelType::LocalSystemFilter>>> ama_vankas;
+          //     // array of Vanka pointers - this is only required to collect the memory usage
+          //     // statistics of the Vankas, as we need the memory usage after factorization
+          //     std::deque<
+          //       std::shared_ptr<
+          //         Solver::AmaVanka<
+          //           typename SystemLevelType::LocalSystemMatrix,
+          //           typename SystemLevelType::LocalSystemFilter>>> ama_vankas;
 
-      // push levels into multigrid
-      for(std::size_t i(0); i < system_levels.size(); ++i)
-      {
-        SystemLevelType& lvl = *system_levels.at(i);
+          // push levels into multigrid
+          for(std::size_t i(0); i < system_levels.size(); ++i)
+          {
+            SystemLevelType& lvl = *system_levels.at(i);
 
-        if((i+1) < domain.size_virtual())
-        {
-          auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
-          ama_vankas.push_back(vanka);
-          auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
-          //           auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
-          //instead use a bicg solver
-          auto smoother = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          //           smoother->set_min_iter(smooth_steps);
-          smoother->set_max_iter(smooth_steps);
-          //           smoother->skip_defect_calc(true); // skip defect calculation
-          _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
-        }
-        #ifdef FEAT_HAVE_UMFPACK
-        else if(umf_cgs)
-        {
-          // create UMFPACK coarse grid solver
-          auto umfpack = Solver::new_generic_umfpack(lvl.local_matrix_sys);
-          auto cgsolver = Solver::new_schwarz_precond(umfpack, lvl.filter_sys);
-          _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
-        }
-        #endif //  FEAT_HAVE_UMFPACK
-        else
-        {
-          // create BiCGStab-AmaVanka coarse grid solver
-          auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
-          ama_vankas.push_back(vanka);
-          auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
-          auto cgsolver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          cgsolver->set_max_iter(500);
-          cgsolver->set_tol_rel(1e-3);
-          //cgsolver->set_plot_mode(Solver::PlotMode::summary);
+            if((i+1) < domain.size_virtual())
+            {
+              auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
+              ama_vankas.push_back(vanka);
+              auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+              //           auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
+              //instead use a bicg solver
+              auto smoother = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
+              //           smoother->set_min_iter(smooth_steps);
+              smoother->set_max_iter(smooth_steps);
+              //           smoother->skip_defect_calc(true); // skip defect calculation
+              _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
+            }
+            #ifdef FEAT_HAVE_UMFPACK
+            else if(umf_cgs)
+            {
+              // create UMFPACK coarse grid solver
+              auto umfpack = Solver::new_generic_umfpack(lvl.local_matrix_sys);
+              auto cgsolver = Solver::new_schwarz_precond(umfpack, lvl.filter_sys);
+              _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
+            }
+            #endif //  FEAT_HAVE_UMFPACK
+            else
+            {
+              // create BiCGStab-AmaVanka coarse grid solver
+              auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
+              ama_vankas.push_back(vanka);
+              auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+              auto cgsolver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
+              cgsolver->set_max_iter(500);
+              cgsolver->set_tol_rel(1e-3);
+              //cgsolver->set_plot_mode(Solver::PlotMode::summary);
 
-          _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
-        }
-      }
+              _multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
+            }
+          }
 
-      // create our multigrid solver
-      auto multigrid = Solver::new_multigrid(_multigrid_hierarchy, Solver::MultiGridCycle::V);
+          // create our multigrid solver
+          auto multigrid = Solver::new_multigrid(_multigrid_hierarchy, Solver::MultiGridCycle::V);
 
-      // create our solver
-      _solver = Solver::new_richardson(matrix, filter, 1.0, multigrid);
+          // create our solver
+          _solver = Solver::new_richardson(matrix, filter, 1.0, multigrid);
 
-      _solver->set_plot_name("Multigrid");
+          _solver->set_plot_name("Multigrid");
 
-      _solver->set_min_iter(min_mg_iter);
-      _solver->set_max_iter(max_mg_iter);
-      _solver->set_tol_rel(mg_tol_rel);
-      _solver->set_min_stag_iter(Index(3));
+          _solver->set_min_iter(min_mg_iter);
+          _solver->set_max_iter(max_mg_iter);
+          _solver->set_tol_rel(mg_tol_rel);
+          _solver->set_min_stag_iter(Index(3));
 
-      //init the solver
-      watch_nonlin_solver_init.start();
-      _multigrid_hierarchy->init_symbolic();
-      _solver->init_symbolic();
-      watch_nonlin_solver_init.stop();
+          //init the solver
+          watch_nonlin_solver_init.start();
+          _multigrid_hierarchy->init_symbolic();
+          _solver->init_symbolic();
+          watch_nonlin_solver_init.stop();
 
       }
 
@@ -1748,300 +1747,299 @@ namespace CCND_FIBER
         }
       }
 
-    Solver::Status solve_basic_navier(GlobalSystemVector& vec_sol, const GlobalSystemVector& vec_rhs, bool verbose = false)
-    {
-
-      //this function should only be called directly after initialization, since we expect the matrix to be assembled with Stokes data...
-
-      //get reference to domain
-      Control::Domain::PartiDomainControl<DomainLevel_>& domain = *_domain_ptr;
-      // fetch our finest levels
-      DomainLevelType& the_domain_level = *domain.front();
-      SystemLevelType& the_system_level = *system_levels.front();
-      // --------------------------------------------------------------------------------------------
-      // SOLVE STANDARD STOKES
-      // --------------------------------------------------------------------------------------------
-
-      // get our global solve matrix and filter
-      GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
-      GlobalSystemFilter& filter = the_system_level.filter_sys;
-
-      _solver->set_plot_mode(Solver::PlotMode::iter);
-      watch_nonlin_solver_init.start();
-      _multigrid_hierarchy->init_numeric();
-      _solver->init_numeric();
-      watch_nonlin_solver_init.stop();
-
-      // accumulate vanka sizes
-      statistics.counts[Counts::vanka_data] = ama_vankas.size() > 0 ? Index(ama_vankas.front()->data_size()) : Index(0);
-      statistics.bytes[Bytes::vanka] = 0ull;
-      for(auto& v : ama_vankas)
-        statistics.bytes[Bytes::vanka] += v->bytes();
-
-      watch_stokes_solve.start();
-      Solver::Status stokes_status = Solver::solve(*_solver, vec_sol, vec_rhs, matrix, filter);
-      watch_stokes_solve.stop();
-
-      statistics.counts[Counts::linsol_iter] = _solver->get_num_iter();
-
-      _solver->done_numeric();
-      _multigrid_hierarchy->done_numeric();
-
-      FEAT::Statistics::compress_solver_expressions();
-
-      if(!Solver::status_success(stokes_status))
+      Solver::Status solve_basic_navier(GlobalSystemVector& vec_sol, const GlobalSystemVector& vec_rhs, bool verbose = false)
       {
-        _comm.print("\nERROR: BASIC STOKES LINEAR SOLVER BREAKDOWN\n");
-        if(testmode)
-          _comm.print("Test-Mode: FAILED");
-        return stokes_status;
-      }
 
-      Solver::Status status = stokes_status;
-      // --------------------------------------------------------------------------------------------
-      // SOLVE NAVIER-STOKES (IF DESIRED)
-      // --------------------------------------------------------------------------------------------
-      if(navier)
-      {
-        if(verbose)
-          _comm.print("\nSolving Navier-Stokes system...");
+        //this function should only be called directly after initialization, since we expect the matrix to be assembled with Stokes data...
 
-        if(!plot_mg_iter)
-          _solver->set_plot_mode(Solver::PlotMode::none);
+        //get reference to domain
+        Control::Domain::PartiDomainControl<DomainLevel_>& domain = *_domain_ptr;
+        // fetch our finest levels
+        DomainLevelType& the_domain_level = *domain.front();
+        SystemLevelType& the_system_level = *system_levels.front();
+        // --------------------------------------------------------------------------------------------
+        // SOLVE STANDARD STOKES
+        // --------------------------------------------------------------------------------------------
 
-        // setup burgers assembler for matrix
-        Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
-        burgers_mat.nu = mu;
-        burgers_mat.beta = rho;
-        burgers_mat.frechet_beta = DataType(newton ? 1 : 0);
-        burgers_mat.theta = DataType(0);
-        burgers_mat.deformation = true;
+        // get our global solve matrix and filter
+        GlobalSystemMatrix& matrix = the_system_level.matrix_sys;
+        GlobalSystemFilter& filter = the_system_level.filter_sys;
 
-        // setup burgers assembler for defect vector
-        Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_def;
-        burgers_def.nu = mu;
-        burgers_def.beta = rho;
-        burgers_def.theta = DataType(0);
-        burgers_def.deformation = true;
+        _solver->set_plot_mode(Solver::PlotMode::iter);
+        watch_nonlin_solver_init.start();
+        _multigrid_hierarchy->init_numeric();
+        _solver->init_numeric();
+        watch_nonlin_solver_init.stop();
 
-        // vector of all non-linear defect norms
-        std::vector<DataType> nl_defs;
+        // accumulate vanka sizes
+        statistics.counts[Counts::vanka_data] = ama_vankas.size() > 0 ? Index(ama_vankas.front()->data_size()) : Index(0);
+        statistics.bytes[Bytes::vanka] = 0ull;
+        for(auto& v : ama_vankas)
+          statistics.bytes[Bytes::vanka] += v->bytes();
 
-        watch_nonlin_loop.start();
+        watch_stokes_solve.start();
+        Solver::Status stokes_status = Solver::solve(*_solver, vec_sol, vec_rhs, matrix, filter);
+        watch_stokes_solve.stop();
 
+        statistics.counts[Counts::linsol_iter] = _solver->get_num_iter();
 
-        // nonlinear loop
-        for(Index nl_step(0); nl_step <= max_nl_iter; ++nl_step)
+        _solver->done_numeric();
+        _multigrid_hierarchy->done_numeric();
+
+        FEAT::Statistics::compress_solver_expressions();
+
+        if(!Solver::status_success(stokes_status))
         {
-          statistics.counts[Counts::nonlin_iter] = nl_step;
+          _comm.print("\nERROR: BASIC STOKES LINEAR SOLVER BREAKDOWN\n");
+          if(testmode)
+            _comm.print("Test-Mode: FAILED");
+          return stokes_status;
+        }
 
-          // assemble nonlinear defect vector
-          watch_nonlin_def_asm.start();
-          vec_def.format();
-          //i think full copy is not needed... for now we will take no chances
-          vec_def.local().template at<0>().scale(vec_rhs.local().template at<0>(), DataType(1.));
-          //since vec_rhs is a type 0 vector here, vec_def is also...
-          //           vec_def.from_1_to_0();
-          // assemble burgers operator defect
-          burgers_def.assemble_vector(vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
-                                      vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature, -1.0);
-          // compute remainder of defect vector
-          the_system_level.matrix_sys.local().block_b().apply(
-            vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -1.0);
-          the_system_level.matrix_sys.local().block_d().apply(
-            vec_def.local().template at<1>(), vec_sol.local().template at<0>(), vec_def.local().template at<1>(), -1.0);
-          // sync and filter
-          vec_def.sync_0();
-          filter.filter_def(vec_def);
-          watch_nonlin_def_asm.stop();
+        Solver::Status status = stokes_status;
+        // --------------------------------------------------------------------------------------------
+        // SOLVE NAVIER-STOKES (IF DESIRED)
+        // --------------------------------------------------------------------------------------------
+        if(navier)
+        {
+          if(verbose)
+            _comm.print("\nSolving Navier-Stokes system...");
 
-          // compute defect norm
-          const DataType def_prev = (nl_defs.empty() ? DataType(1) : nl_defs.back());
-          const DataType def_nl = vec_def.norm2();
-          const DataType def_improve = def_nl / def_prev;
-          nl_defs.push_back(def_nl);
+          if(!plot_mg_iter)
+            _solver->set_plot_mode(Solver::PlotMode::none);
+
+          // setup burgers assembler for matrix
+          Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
+          burgers_mat.nu = mu;
+          burgers_mat.beta = rho;
+          burgers_mat.frechet_beta = DataType(newton ? 1 : 0);
+          burgers_mat.theta = DataType(0);
+          burgers_mat.deformation = true;
+
+          // setup burgers assembler for defect vector
+          Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_def;
+          burgers_def.nu = mu;
+          burgers_def.beta = rho;
+          burgers_def.theta = DataType(0);
+          burgers_def.deformation = true;
+
+          // vector of all non-linear defect norms
+          std::vector<DataType> nl_defs;
+
+          watch_nonlin_loop.start();
 
 
-          String line = (newton ? "Newton: " : "Picard: ");
-          line += stringify(nl_step).pad_front(2) + ": ";
-          line += stringify_fp_sci(def_nl, 6) + " / ";
-          line += stringify_fp_sci(def_nl/nl_defs.front()) + " / ";
-          line += stringify_fp_sci(def_nl/def_prev, 3);
-
-          if(def_nl > nl_defs.front() * DataType(1E+3))
+          // nonlinear loop
+          for(Index nl_step(0); nl_step <= max_nl_iter; ++nl_step)
           {
-            if(verbose)
-            {
-              _comm.print(line);
-              _comm.print("\nERROR: NONLINEAR SOLVER DIVERGED !!!\n");
-            }
-            if(testmode)
-              _comm.print("Test-Mode: FAILED");
-            return status;
-          }
-          else if(def_nl < nl_tol_abs)
-          {
-            if(verbose)
-            {
-              _comm.print(line);
-              _comm.print("\nNonlinear solver converged!");
-            }
-            break;
-          }
-          else if(nl_step >= max_nl_iter)
-          {
-            if(verbose)
-            {
-              _comm.print(line);
-              _comm.print("\nMaximum iterations reached!");
-            }
-            break;
-          }
-          else if((nl_step >= 3) && (DataType(0.95)*def_prev < def_nl))
-          {
-            if(verbose)
-            {
-              _comm.print(line);
-              _comm.print("\nNonlinear solver stagnated!");
-            }
-            break;
-          }
+            statistics.counts[Counts::nonlin_iter] = nl_step;
 
-          // assemble burgers matrices on all levels
-          watch_nonlin_mat_asm.start();
-          {
-            // get a clone of the global velocity vector
-            typename SystemLevelType::GlobalVeloVector vec_conv(
-              &the_system_level.gate_velo, vec_sol.local().template at<0>().clone());
+            // assemble nonlinear defect vector
+            watch_nonlin_def_asm.start();
+            vec_def.format();
+            //i think full copy is not needed... for now we will take no chances
+            vec_def.local().template at<0>().scale(vec_rhs.local().template at<0>(), DataType(1.));
+            //since vec_rhs is a type 0 vector here, vec_def is also...
+            //           vec_def.from_1_to_0();
+            // assemble burgers operator defect
+            burgers_def.assemble_vector(vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
+                                        vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature, -1.0);
+            // compute remainder of defect vector
+            the_system_level.matrix_sys.local().block_b().apply(
+              vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -1.0);
+            the_system_level.matrix_sys.local().block_d().apply(
+              vec_def.local().template at<1>(), vec_sol.local().template at<0>(), vec_def.local().template at<1>(), -1.0);
+            // sync and filter
+            vec_def.sync_0();
+            filter.filter_def(vec_def);
+            watch_nonlin_def_asm.stop();
 
-            // loop over all system levels
-            for(std::size_t i(0); i < system_levels.size(); ++i)
+            // compute defect norm
+            const DataType def_prev = (nl_defs.empty() ? DataType(1) : nl_defs.back());
+            const DataType def_nl = vec_def.norm2();
+            const DataType def_improve = def_nl / def_prev;
+            nl_defs.push_back(def_nl);
+
+
+            String line = (newton ? "Newton: " : "Picard: ");
+            line += stringify(nl_step).pad_front(2) + ": ";
+            line += stringify_fp_sci(def_nl, 6) + " / ";
+            line += stringify_fp_sci(def_nl/nl_defs.front()) + " / ";
+            line += stringify_fp_sci(def_nl/def_prev, 3);
+
+            if(def_nl > nl_defs.front() * DataType(1E+3))
             {
-              // assemble our system matrix
-              auto& loc_mat_a = system_levels.at(i)->matrix_sys.local().block_a();
-              loc_mat_a.format();
-              burgers_mat.assemble_matrix(loc_mat_a, vec_conv.local(), domain.at(i)->space_velo, cubature);
-              system_levels.at(i)->compile_local_matrix();
-
-              // restrict our convection vector
-              if((i+1) >= domain.size_virtual())
-                break;
-
-              // does this process have another system level?
-              if((i+1) < system_levels.size())
+              if(verbose)
               {
-                // create a coarse mesh velocity vector
-                auto vec_crs = system_levels.at(i+1)->matrix_a.create_vector_l();
-
-                // truncate fine mesh velocity vector
-                system_levels.at(i)->transfer_velo.trunc(vec_conv, vec_crs);
-
-                // the coarse vector is our next convection vector
-                vec_conv = std::move(vec_crs);
+                _comm.print(line);
+                _comm.print("\nERROR: NONLINEAR SOLVER DIVERGED !!!\n");
               }
-              else
+              if(testmode)
+                _comm.print("Test-Mode: FAILED");
+              return status;
+            }
+            else if(def_nl < nl_tol_abs)
+            {
+              if(verbose)
               {
-                // this process is a child, so send truncation to parent
-                system_levels.at(i)->transfer_velo.trunc_send(vec_conv);
+                _comm.print(line);
+                _comm.print("\nNonlinear solver converged!");
+              }
+              break;
+            }
+            else if(nl_step >= max_nl_iter)
+            {
+              if(verbose)
+              {
+                _comm.print(line);
+                _comm.print("\nMaximum iterations reached!");
+              }
+              break;
+            }
+            else if((nl_step >= 3) && (DataType(0.95)*def_prev < def_nl))
+            {
+              if(verbose)
+              {
+                _comm.print(line);
+                _comm.print("\nNonlinear solver stagnated!");
+              }
+              break;
+            }
+
+            // assemble burgers matrices on all levels
+            watch_nonlin_mat_asm.start();
+            {
+              // get a clone of the global velocity vector
+              typename SystemLevelType::GlobalVeloVector vec_conv(
+                &the_system_level.gate_velo, vec_sol.local().template at<0>().clone());
+
+              // loop over all system levels
+              for(std::size_t i(0); i < system_levels.size(); ++i)
+              {
+                // assemble our system matrix
+                auto& loc_mat_a = system_levels.at(i)->matrix_sys.local().block_a();
+                loc_mat_a.format();
+                burgers_mat.assemble_matrix(loc_mat_a, vec_conv.local(), domain.at(i)->space_velo, cubature);
+                system_levels.at(i)->compile_local_matrix();
+
+                // restrict our convection vector
+                if((i+1) >= domain.size_virtual())
+                  break;
+
+                // does this process have another system level?
+                if((i+1) < system_levels.size())
+                {
+                  // create a coarse mesh velocity vector
+                  auto vec_crs = system_levels.at(i+1)->matrix_a.create_vector_l();
+
+                  // truncate fine mesh velocity vector
+                  system_levels.at(i)->transfer_velo.trunc(vec_conv, vec_crs);
+
+                  // the coarse vector is our next convection vector
+                  vec_conv = std::move(vec_crs);
+                }
+                else
+                {
+                  // this process is a child, so send truncation to parent
+                  system_levels.at(i)->transfer_velo.trunc_send(vec_conv);
+                }
               }
             }
-          }
-          watch_nonlin_mat_asm.stop();
+            watch_nonlin_mat_asm.stop();
 
-          // initialize linear solver
-          watch_nonlin_solver_init.start();
-          _multigrid_hierarchy->init_numeric();
-          _solver->init_numeric();
-          watch_nonlin_solver_init.stop();
+            // initialize linear solver
+            watch_nonlin_solver_init.start();
+            _multigrid_hierarchy->init_numeric();
+            _solver->init_numeric();
+            watch_nonlin_solver_init.stop();
 
-          // specify adaptive tolerance?
-          if(adapt_tol && (nl_step > Index(0)))
-          {
-            if(newton)
+            // specify adaptive tolerance?
+            if(adapt_tol && (nl_step > Index(0)))
             {
-              // We're using Newton as the nonlinear solver, which optimally should
-              // result in quadratic convergence, i.e. let def_{j} and def_{j-1}
-              // denote the two previous nonlinear defect norms, then the next
-              // defect norm def_{j+1} should fulfill
-              //
-              //     (def_{j+1} / def_{j}) \approx (def_{j} / def_{j+1})^2
-              //
-              // If the multiply the above equation by def_{j}, we can therefore
-              // estimate the next def_{j+1} based on the two previous defects:
-              //
-              //      def_{j+1} \approx def_{j} * (def_{j} / def_{j+1})^2
-              //
-              // We now multiply the approximation by 0.1, which gives us an absolute
-              // tolerance for the multigrid solver for this nonlinear iteration.
-              // (Note that def_improve := def_{j} / def_{j+1})
-              DataType abs_tol = def_nl * def_improve * def_improve * DataType(0.1);
-              // We furthermore limit this absolute tolerance to ensure that we do not
-              // overshoot the mark by overoptimistic quadratic convergence expectations.
-              _solver->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
-              // Also make sure that we gain at least 2 digits.
-              _solver->set_tol_rel(1E-2);
+              if(newton)
+              {
+                // We're using Newton as the nonlinear solver, which optimally should
+                // result in quadratic convergence, i.e. let def_{j} and def_{j-1}
+                // denote the two previous nonlinear defect norms, then the next
+                // defect norm def_{j+1} should fulfill
+                //
+                //     (def_{j+1} / def_{j}) \approx (def_{j} / def_{j+1})^2
+                //
+                // If the multiply the above equation by def_{j}, we can therefore
+                // estimate the next def_{j+1} based on the two previous defects:
+                //
+                //      def_{j+1} \approx def_{j} * (def_{j} / def_{j+1})^2
+                //
+                // We now multiply the approximation by 0.1, which gives us an absolute
+                // tolerance for the multigrid solver for this nonlinear iteration.
+                // (Note that def_improve := def_{j} / def_{j+1})
+                DataType abs_tol = def_nl * def_improve * def_improve * DataType(0.1);
+                // We furthermore limit this absolute tolerance to ensure that we do not
+                // overshoot the mark by overoptimistic quadratic convergence expectations.
+                _solver->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
+                // Also make sure that we gain at least 2 digits.
+                _solver->set_tol_rel(1E-2);
+        }
+        else
+        {
+          // In the case if Picard iteration, we only expect linear convergence,
+          // which (in analogy to Newton) leads us to the following estimate:
+          //
+          //      def_{j+1} \approx def_{j} * (def_{j} / def_{j+1})
+          //
+          DataType abs_tol = def_nl * def_improve * DataType(0.1);
+          _solver->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
+          _solver->set_tol_rel(1E-2);
+        }
       }
       else
       {
-        // In the case if Picard iteration, we only expect linear convergence,
-        // which (in analogy to Newton) leads us to the following estimate:
-        //
-        //      def_{j+1} \approx def_{j} * (def_{j} / def_{j+1})
-        //
-        DataType abs_tol = def_nl * def_improve * DataType(0.1);
-        _solver->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
-        _solver->set_tol_rel(1E-2);
+        // disable absolute tolerance
+        _solver->set_tol_abs(1E+10);
+        _solver->set_tol_rel(mg_tol_rel);
       }
+
+      // solve linear system
+      watch_nonlin_solver_apply.start();
+      status = _solver->apply(vec_cor, vec_def);
+      watch_nonlin_solver_apply.stop();
+
+      statistics.counts[Counts::linsol_iter] += _solver->get_num_iter();
+
+
+      line += String(" | ") + stringify(_solver->get_num_iter()).pad_front(3) + ": "
+      + stringify_fp_sci(_solver->get_def_final(), 4) + " / "
+      + stringify_fp_sci(_solver->get_def_final() / _solver->get_def_initial(), 4);
+      if(adapt_tol && (nl_step > Index(0)))
+        line += String(" [") + stringify_fp_sci(_solver->get_tol_abs(), 4) + "]";
+      _comm.print(line);
+
+      // release linear solver
+      _solver->done_numeric();
+      _multigrid_hierarchy->done_numeric();
+
+      if(!Solver::status_success(status))
+      {
+        _comm.print("\nERROR: LINEAR SOLVER BREAKDOWN\n");
+        if(testmode)
+          _comm.print("Test-Mode: FAILED");
+        return status;
+      }
+
+      // update solution
+      vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+
+      FEAT::Statistics::compress_solver_expressions();
+      // next non-linear iteration
     }
-    else
-    {
-      // disable absolute tolerance
-      _solver->set_tol_abs(1E+10);
-      _solver->set_tol_rel(mg_tol_rel);
-    }
 
-    // solve linear system
-    watch_nonlin_solver_apply.start();
-    status = _solver->apply(vec_cor, vec_def);
-    watch_nonlin_solver_apply.stop();
+    watch_nonlin_loop.stop();
 
-    statistics.counts[Counts::linsol_iter] += _solver->get_num_iter();
+    // end of Navier-Stokes solve
+     }
 
-
-    line += String(" | ") + stringify(_solver->get_num_iter()).pad_front(3) + ": "
-    + stringify_fp_sci(_solver->get_def_final(), 4) + " / "
-    + stringify_fp_sci(_solver->get_def_final() / _solver->get_def_initial(), 4);
-    if(adapt_tol && (nl_step > Index(0)))
-      line += String(" [") + stringify_fp_sci(_solver->get_tol_abs(), 4) + "]";
-    _comm.print(line);
-
-    // release linear solver
-    _solver->done_numeric();
-    _multigrid_hierarchy->done_numeric();
-
-    if(!Solver::status_success(status))
-    {
-      _comm.print("\nERROR: LINEAR SOLVER BREAKDOWN\n");
-      if(testmode)
-        _comm.print("Test-Mode: FAILED");
-      return status;
-    }
-
-    // update solution
-    vec_sol.axpy(vec_cor, DataType(1));
-
-    FEAT::Statistics::compress_solver_expressions();
-    // next non-linear iteration
+     return status;
   }
-
-  watch_nonlin_loop.stop();
-
-  // end of Navier-Stokes solve
-   }
-
-   return status;
-
-}
 
 void truncate_orientation_moment_vectors(const DenseVectorBlocked2ndMoment& second_moment, const DenseVectorBlocked4thMoment& fourth_moment)
 {
@@ -2580,8 +2578,6 @@ Solver::Status solve_navier(GlobalSystemVector& vec_sol, const GlobalSystemVecto
 
       // assemble the no-flow filter first
       unit_asm_noflow.assemble(fil_loc_v, domain.at(i)->space_velo, noslip_func);
-
-      unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, diri_func);
 
       // finally, compile the system filter
       system_levels.at(i)->compile_system_filter();
