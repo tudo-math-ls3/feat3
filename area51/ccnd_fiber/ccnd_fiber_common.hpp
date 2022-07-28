@@ -185,24 +185,24 @@ namespace CCND_FIBER
       // append memory info
       s += String("\nMemory Statistics:\n");
       s += String("Peak Physical Memory").pad_back(padlen,pc) + ": "
-        + stringify_fp_fix(double(bytes_sum[Bytes::peak_p]) / (1024.0*1024.0), 3, 12) + " MB             { "
+      + stringify_fp_fix(double(bytes_sum[Bytes::peak_p]) / (1024.0*1024.0), 3, 12) + " MB             { "
         + stringify_fp_fix(double(bytes_min[Bytes::peak_p]) / (1024.0*1024.0), 3, 12) + " MB / "
         + stringify_fp_fix(double(bytes_max[Bytes::peak_p]) / (1024.0*1024.0), 3, 12) + " MB }\n";
-      s += String("Peak Virtual Memory").pad_back(padlen,pc) + ": "
+        s += String("Peak Virtual Memory").pad_back(padlen,pc) + ": "
         + stringify_fp_fix(double(bytes_sum[Bytes::peak_v]) / (1024.0*1024.0), 3, 12) + " MB             { "
-        + stringify_fp_fix(double(bytes_min[Bytes::peak_v]) / (1024.0*1024.0), 3, 12) + " MB / "
-        + stringify_fp_fix(double(bytes_max[Bytes::peak_v]) / (1024.0*1024.0), 3, 12) + " MB }\n";
-      s += format_submemory_mm("Mesh-Node Size", bytes_sum[Bytes::mesh], bytes_min[Bytes::mesh], bytes_max[Bytes::mesh]);
-      s += format_submemory_mm("Gate Size", bytes_sum[Bytes::gate], bytes_min[Bytes::gate], bytes_max[Bytes::gate]);
-      s += format_submemory_mm("Muxer Size", bytes_sum[Bytes::muxer], bytes_min[Bytes::muxer], bytes_max[Bytes::muxer]);
-      s += format_submemory_mm("Matrix Total Size", bytes_sum[Bytes::matrix], bytes_min[Bytes::matrix], bytes_max[Bytes::matrix]);
-      s += format_submemory_mm("Matrix Struct Size", bytes_sum[Bytes::matrix_struct], bytes_min[Bytes::matrix_struct], bytes_max[Bytes::matrix_struct]);
-      s += format_submemory_mm("Matrix Values Size", bytes_sum[Bytes::matrix_values], bytes_min[Bytes::matrix_values], bytes_max[Bytes::matrix_values]);
-      s += format_submemory_mm("Transfer Size", bytes_sum[Bytes::transfer], bytes_min[Bytes::transfer], bytes_max[Bytes::transfer]);
-      s += format_submemory_mm("Vanka Size", bytes_sum[Bytes::vanka], bytes_min[Bytes::vanka], bytes_max[Bytes::vanka]);
-      s += format_submemory_mm("Tensor Size", bytes_sum[Bytes::tensor], bytes_min[Bytes::tensor], bytes_max[Bytes::tensor]);
+          + stringify_fp_fix(double(bytes_min[Bytes::peak_v]) / (1024.0*1024.0), 3, 12) + " MB / "
+          + stringify_fp_fix(double(bytes_max[Bytes::peak_v]) / (1024.0*1024.0), 3, 12) + " MB }\n";
+          s += format_submemory_mm("Mesh-Node Size", bytes_sum[Bytes::mesh], bytes_min[Bytes::mesh], bytes_max[Bytes::mesh]);
+          s += format_submemory_mm("Gate Size", bytes_sum[Bytes::gate], bytes_min[Bytes::gate], bytes_max[Bytes::gate]);
+          s += format_submemory_mm("Muxer Size", bytes_sum[Bytes::muxer], bytes_min[Bytes::muxer], bytes_max[Bytes::muxer]);
+          s += format_submemory_mm("Matrix Total Size", bytes_sum[Bytes::matrix], bytes_min[Bytes::matrix], bytes_max[Bytes::matrix]);
+          s += format_submemory_mm("Matrix Struct Size", bytes_sum[Bytes::matrix_struct], bytes_min[Bytes::matrix_struct], bytes_max[Bytes::matrix_struct]);
+          s += format_submemory_mm("Matrix Values Size", bytes_sum[Bytes::matrix_values], bytes_min[Bytes::matrix_values], bytes_max[Bytes::matrix_values]);
+          s += format_submemory_mm("Transfer Size", bytes_sum[Bytes::transfer], bytes_min[Bytes::transfer], bytes_max[Bytes::transfer]);
+          s += format_submemory_mm("Vanka Size", bytes_sum[Bytes::vanka], bytes_min[Bytes::vanka], bytes_max[Bytes::vanka]);
+          s += format_submemory_mm("Tensor Size", bytes_sum[Bytes::tensor], bytes_min[Bytes::tensor], bytes_max[Bytes::tensor]);
 
-      return s;
+          return s;
     }
 
     void sync(const Dist::Comm& comm)
@@ -239,7 +239,7 @@ namespace CCND_FIBER
       double mmi = double(mmin) / (1024.0*1024.0);
       double mma = double(mmax) / (1024.0*1024.0);
       return s.pad_back(padlen, '.') + ": " + stringify_fp_fix(mb, 3, 12) + " MB [" + stringify_fp_fix(100.0*double(m)/double(total), 3, 7)
-        + "% ] { " + stringify_fp_fix(mmi, 3, 12) + " MB / " + stringify_fp_fix(mma, 3, 12) + " MB }\n";
+      + "% ] { " + stringify_fp_fix(mmi, 3, 12) + " MB / " + stringify_fp_fix(mma, 3, 12) + " MB }\n";
     }
 
     String format_subtime(String s, double t) const
@@ -260,7 +260,7 @@ namespace CCND_FIBER
     String format_subtime_mm(String s, double t, double total, double tmin, double tmax) const
     {
       return s.pad_back(padlen, '.') + ": " + stringify_fp_fix(t, 3, 10) + " sec [" + stringify_fp_fix(100.0*t/total, 3, 7)
-        + "% ] { " + stringify_fp_fix(tmin, 3, 10) + " / " + stringify_fp_fix(tmax, 3, 10) + " }\n";
+      + "% ] { " + stringify_fp_fix(tmin, 3, 10) + " / " + stringify_fp_fix(tmax, 3, 10) + " }\n";
     }
   }; // struct BenchmarkSummary<...>
 
@@ -282,20 +282,20 @@ namespace CCND_FIBER
 
 
 
-/**
+  /**
    * \brief modified Navier-Stokes System Level class
    */
   template<
-    int dim_,
-    typename MemType_ = Mem::Main,
-    typename DataType_ = DataType,
-    typename IndexType_ = Index,
-    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
+  int dim_,
+  typename MemType_ = Mem::Main,
+  typename DataType_ = DataType,
+  typename IndexType_ = Index,
+  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
   class ModNavierStokesBlockedSystemLevel :
-    public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+  public Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
     typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
@@ -330,24 +330,24 @@ namespace CCND_FIBER
     }
 
     // ????!
-//     //the standard BurgersAssembler
-//     template<typename SpaceV_, typename Cubature_>
-//     void assemble_velocity_chaning_defo_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ defo_threshold, const DataType alpha = DataType(0))
-//     {
-//       Assembly::ChangeGradToDefoBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
-//       burgers_mat.nu = nu;
-//       burgers_mat.beta = DataType(0);
-//       burgers_mat.theta = alpha;
-//
-//       auto& loc_a = this->matrix_a.local();
-//       loc_a.format();
-//
-//       // create dummy convection vector
-//       auto vec_c = loc_a.create_vector_l();
-//       vec_c.format();
-//
-//       burgers_mat.assemble_matrix(loc_a, vec_c, space_velo, cubature, defo_threshold);
-//     }
+    //     //the standard BurgersAssembler
+    //     template<typename SpaceV_, typename Cubature_>
+    //     void assemble_velocity_chaning_defo_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ defo_threshold, const DataType alpha = DataType(0))
+    //     {
+    //       Assembly::ChangeGradToDefoBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
+    //       burgers_mat.nu = nu;
+    //       burgers_mat.beta = DataType(0);
+    //       burgers_mat.theta = alpha;
+    //
+    //       auto& loc_a = this->matrix_a.local();
+    //       loc_a.format();
+    //
+    //       // create dummy convection vector
+    //       auto vec_c = loc_a.create_vector_l();
+    //       vec_c.format();
+    //
+    //       burgers_mat.assemble_matrix(loc_a, vec_c, space_velo, cubature, defo_threshold);
+    //     }
 
 
 
@@ -370,32 +370,32 @@ namespace CCND_FIBER
       burgers_mat.assemble_matrix(loc_a, vec_c, orientation, space_velo, cubature);
     }
 
-//     template<typename SpaceV_, typename Cubature_>
-//     void assemble_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType alpha = DataType(0.))
-//     {
-//       Assembly::ModBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
-//       burgers_mat.nu = nu;
-//       burgers_mat.beta = 0.0;
-//       burgers_mat.theta = alpha;
-//       burgers_mat.N_s = N_s;
-//
-//       //create placeholder orientation matrix:
-//       Tiny::Matrix<DataType_, dim_, dim_> orientation;
-//       orientation.format();
-//       for(int i = 0; i < dim_; ++i)
-//       {
-//         orientation(i, i) = DataType_(1);
-//       }
-//
-//       auto& loc_a = this->matrix_a.local();
-//       loc_a.format();
-//
-//       // create dummy convection vector
-//       auto vec_c = loc_a.create_vector_l();
-//       vec_c.format();
-//
-//       burgers_mat.assemble_matrix(loc_a, vec_c, orientation, space_velo, cubature);
-//     }
+    //     template<typename SpaceV_, typename Cubature_>
+    //     void assemble_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType alpha = DataType(0.))
+    //     {
+    //       Assembly::ModBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
+    //       burgers_mat.nu = nu;
+    //       burgers_mat.beta = 0.0;
+    //       burgers_mat.theta = alpha;
+    //       burgers_mat.N_s = N_s;
+    //
+    //       //create placeholder orientation matrix:
+    //       Tiny::Matrix<DataType_, dim_, dim_> orientation;
+    //       orientation.format();
+    //       for(int i = 0; i < dim_; ++i)
+    //       {
+    //         orientation(i, i) = DataType_(1);
+    //       }
+    //
+    //       auto& loc_a = this->matrix_a.local();
+    //       loc_a.format();
+    //
+    //       // create dummy convection vector
+    //       auto vec_c = loc_a.create_vector_l();
+    //       vec_c.format();
+    //
+    //       burgers_mat.assemble_matrix(loc_a, vec_c, orientation, space_velo, cubature);
+    //     }
 
     //for Orientation matrix
     template<typename SpaceV_, typename Cubature_, typename Function_>
@@ -544,28 +544,28 @@ namespace CCND_FIBER
   }; // class ModNavierStokesBlockedSystemLevel
 
 
-/**
+  /**
    * \brief modified Navier-Stokes System Level class
    */
   template<
-    int dim_,
-    typename MemType_ = Mem::Main,
-    typename DataType_ = DataType,
-    typename IndexType_ = Index,
-    typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
-    typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
-    typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
-    typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
+  int dim_,
+  typename MemType_ = Mem::Main,
+  typename DataType_ = DataType,
+  typename IndexType_ = Index,
+  typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, dim_>,
+  typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, dim_, 1>,
+  typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<MemType_, DataType_, IndexType_, 1, dim_>,
+  typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<MemType_, DataType_, IndexType_>>
   class ModNavierStokesBlockedMeanPresSystemLevel :
-    public Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
+  public Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_>
   {
   public:
     typedef Control::StokesBlockedUnitVeloMeanPresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     // the noflow velocity filter, used in bench3 simulation
     typename BaseClass::LocalVeloFilter local_velo_filter_noflow;
-//     // the mean pres filter
-//     typename BaseClass::LocalPresFilter local_pres_filter_mean;
+    //     // the mean pres filter
+    //     typename BaseClass::LocalPresFilter local_pres_filter_mean;
 
     // the filtered local system matrix for Vanka
     typename BaseClass::LocalSystemMatrix local_matrix_sys;
@@ -612,32 +612,32 @@ namespace CCND_FIBER
       burgers_mat.assemble_matrix(loc_a, vec_c, orientation, space_velo, cubature);
     }
 
-//     template<typename SpaceV_, typename Cubature_>
-//     void assemble_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType alpha = DataType(0.))
-//     {
-//       Assembly::ModBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
-//       burgers_mat.nu = nu;
-//       burgers_mat.beta = 0.0;
-//       burgers_mat.theta = alpha;
-//       burgers_mat.N_s = N_s;
-//
-//       //create placeholder orientation matrix:
-//       Tiny::Matrix<DataType_, dim_, dim_> orientation;
-//       orientation.format();
-//       for(int i = 0; i < dim_; ++i)
-//       {
-//         orientation(i, i) = DataType_(1);
-//       }
-//
-//       auto& loc_a = this->matrix_a.local();
-//       loc_a.format();
-//
-//       // create dummy convection vector
-//       auto vec_c = loc_a.create_vector_l();
-//       vec_c.format();
-//
-//       burgers_mat.assemble_matrix(loc_a, vec_c, orientation, space_velo, cubature);
-//     }
+    //     template<typename SpaceV_, typename Cubature_>
+    //     void assemble_velocity_laplace_matrix(const SpaceV_& space_velo, const Cubature_& cubature, const DataType_ nu, const DataType_ N_s, const DataType alpha = DataType(0.))
+    //     {
+    //       Assembly::ModBurgersAssembler<DataType_, IndexType_, dim_> burgers_mat;
+    //       burgers_mat.nu = nu;
+    //       burgers_mat.beta = 0.0;
+    //       burgers_mat.theta = alpha;
+    //       burgers_mat.N_s = N_s;
+    //
+    //       //create placeholder orientation matrix:
+    //       Tiny::Matrix<DataType_, dim_, dim_> orientation;
+    //       orientation.format();
+    //       for(int i = 0; i < dim_; ++i)
+    //       {
+    //         orientation(i, i) = DataType_(1);
+    //       }
+    //
+    //       auto& loc_a = this->matrix_a.local();
+    //       loc_a.format();
+    //
+    //       // create dummy convection vector
+    //       auto vec_c = loc_a.create_vector_l();
+    //       vec_c.format();
+    //
+    //       burgers_mat.assemble_matrix(loc_a, vec_c, orientation, space_velo, cubature);
+    //     }
 
     //for Orientation matrix
     template<typename SpaceV_, typename Cubature_, typename Function_>

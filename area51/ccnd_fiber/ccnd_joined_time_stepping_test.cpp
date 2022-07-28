@@ -11,6 +11,7 @@ namespace CCND_FIBER
   template<int dim_, template<typename> class SpaceOrientTemp>
   void run_dim(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
   {
+    XASSERTM(comm.size() > 1, "Startet with only one process!");
 //     auto domain_ptr = create_hypercube_domain_control<dim_>(args, comm, mesh_reader);
 
     // define our mesh type
@@ -30,6 +31,12 @@ namespace CCND_FIBER
 
     domain_ptr->parse_args(args);
     domain_ptr->set_desired_levels(args.query("level")->second);
+    //if it is desired to gather our local solution to a global solution on the root process
+    if(args.check("joined-sol") >= 0)
+    {
+      comm.print("Keeping base levels");
+      domain_ptr->keep_base_levels();
+    }
 
 
     domain_ptr->create(mesh_reader);
@@ -96,8 +103,14 @@ namespace CCND_FIBER
 
 
     //create solution space and vector
-    SpaceOrientationType orient_space(unsteady_solver._inner_solver._domain_ptr->front()->trafo);
-    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim_> orient_sol(orient_space.get_num_dofs());
+    std::unique_ptr<SpaceOrientationType> orient_ptr;
+    if(unsteady_solver.is_root_process())
+    {
+      TrafoType& trafo = unsteady_solver.get_joined_trafo();
+      SpaceOrientationType* orient_space = new SpaceOrientationType{trafo};
+      orient_ptr.reset(orient_space);
+    }
+    LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, dim_> orient_sol(unsteady_solver.is_root_process() ? orient_ptr->get_num_dofs() : 0);
     orient_sol.format();
 
     //get our starting solution, solves the basic, steady Navier-Stokes system
@@ -107,8 +120,8 @@ namespace CCND_FIBER
     unsteady_solver._vec_sol.format();
     Assembly::Interpolator::project(unsteady_solver._vec_sol.local().template at<0>(), inflow_func, unsteady_solver._inner_solver._domain_ptr->front()->space_velo);
 
-    //interpolate into our OrientationSpace
-    Assembly::FEInterpolator<SpaceOrientationType, SpaceVeloType>::interpolate(orient_sol, unsteady_solver._vec_sol.local().template at<0>(), orient_space, unsteady_solver._inner_solver._domain_ptr->front()->space_velo);
+
+    unsteady_solver.joined_interpolate(orient_sol, unsteady_solver._vec_sol, orient_ptr.get());
     //copy vec_sol_1 anyway...
     unsteady_solver._prev_sol1.copy(unsteady_solver._vec_sol);
     unsteady_solver._prev_sol2.copy(unsteady_solver._vec_sol);
@@ -116,6 +129,7 @@ namespace CCND_FIBER
     DataType h0_project_error{DataType(0)};
     DataType h1_project_error{DataType(0)};
     //now calculate the error
+    if(unsteady_solver.is_root_process())
     {
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         // Post-Processing: Computing L2/H1-Errors
@@ -124,7 +138,7 @@ namespace CCND_FIBER
         Cubature::DynamicFactory cubature_postproc("auto-degree:6");
 
         Assembly::VectorErrorInfo<DataType, dim_> velo_errors = Assembly::VectorErrorComputer<1>::compute(
-          orient_sol, inflow_func, orient_space, cubature_postproc);
+          orient_sol, inflow_func, *orient_ptr, cubature_postproc);
 
         // As usual, we want to compute the L2- and H1-errors against our reference solution.
         // For this, we first compute the errors on our patch by analysing our local solution vector:
@@ -133,7 +147,7 @@ namespace CCND_FIBER
 
         // And then we need to synchronize the errors over our communicator to sum up the errors of
         // each patch to obtain the errors over the whole domain:
-        velo_errors.synchronize(comm);
+
         h0_project_error = velo_errors.norm_h0;
         h1_project_error = velo_errors.norm_h1;
 
@@ -154,8 +168,8 @@ namespace CCND_FIBER
 //     }
 
     //create dummy Orientation Tensors
-    typename CCNDSteadyInterface<DomainLevelType>::DenseVectorBlocked2ndMoment second_moment_vector(orient_space.get_num_dofs(), DataType(0));
-    typename CCNDSteadyInterface<DomainLevelType>::DenseVectorBlocked4thMoment fourth_moment_vector(orient_space.get_num_dofs(), DataType(0));
+    typename CCNDSteadyInterface<DomainLevelType>::DenseVectorBlocked2ndMoment second_moment_vector(unsteady_solver.is_root_process() ? orient_ptr->get_num_dofs() : 0, DataType(0));
+    typename CCNDSteadyInterface<DomainLevelType>::DenseVectorBlocked4thMoment fourth_moment_vector(unsteady_solver.is_root_process() ? orient_ptr->get_num_dofs() : 0, DataType(0));
 
     //create our tensor functions and project onto the orientation space
     //function do not map to the vectors...
@@ -177,8 +191,11 @@ namespace CCND_FIBER
       second_moment_func.set_time(cur_time);
       fourth_moment_func.set_time(cur_time);
 
-      Assembly::Interpolator::project(second_moment_vector, second_moment_func, orient_space);
-      Assembly::Interpolator::project(fourth_moment_vector, fourth_moment_func, orient_space);
+      if(unsteady_solver.is_root_process())
+      {
+        Assembly::Interpolator::project(second_moment_vector, second_moment_func, *orient_ptr);
+        Assembly::Interpolator::project(fourth_moment_vector, fourth_moment_func, *orient_ptr);
+      }
 
       //reinitaliaze filter and right handside
       unsteady_solver.update_filters(inflow_func, inflow_func);
@@ -186,7 +203,7 @@ namespace CCND_FIBER
 
 
       //call our solver
-      Solver::Status status = unsteady_solver.solve_time_step(orient_sol, orient_space, second_moment_vector, fourth_moment_vector);
+      Solver::Status status = unsteady_solver.joined_solve_time_step(orient_sol, orient_ptr.get(), second_moment_vector, fourth_moment_vector);
 
       if(status != Solver::Status::success)
       {
@@ -194,7 +211,7 @@ namespace CCND_FIBER
         return;
       }
 
-      if(verbose)
+      if(verbose && unsteady_solver.is_root_process())
       {
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         // Post-Processing: Computing L2/H1-Errors
@@ -203,16 +220,13 @@ namespace CCND_FIBER
         Cubature::DynamicFactory cubature_postproc("auto-degree:6");
 
         Assembly::VectorErrorInfo<DataType, dim_> velo_errors = Assembly::VectorErrorComputer<1>::compute(
-          orient_sol, inflow_func, orient_space, cubature_postproc);
+          orient_sol, inflow_func, *orient_ptr, cubature_postproc);
 
         // As usual, we want to compute the L2- and H1-errors against our reference solution.
         // For this, we first compute the errors on our patch by analysing our local solution vector:
         //       Assembly::ScalarErrorInfo<DataType> pres_errors = Assembly::ScalarErrorComputer<0>::compute(
         //         vec_sol.local().template at<1>(), pres_sol, pres_space, cubature_postproc);
 
-        // And then we need to synchronize the errors over our communicator to sum up the errors of
-        // each patch to obtain the errors over the whole domain:
-        velo_errors.synchronize(comm);
 
 
 
@@ -229,6 +243,7 @@ namespace CCND_FIBER
     }
 
     //now calculate the error
+    if(unsteady_solver.is_root_process())
       {
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         // Post-Processing: Computing L2/H1-Errors
@@ -237,16 +252,13 @@ namespace CCND_FIBER
         Cubature::DynamicFactory cubature_postproc("auto-degree:6");
 
         Assembly::VectorErrorInfo<DataType, dim_> velo_errors = Assembly::VectorErrorComputer<1>::compute(
-          orient_sol, inflow_func, orient_space, cubature_postproc);
+          orient_sol, inflow_func, *orient_ptr, cubature_postproc);
 
         // As usual, we want to compute the L2- and H1-errors against our reference solution.
         // For this, we first compute the errors on our patch by analysing our local solution vector:
         //       Assembly::ScalarErrorInfo<DataType> pres_errors = Assembly::ScalarErrorComputer<0>::compute(
         //         vec_sol.local().template at<1>(), pres_sol, pres_space, cubature_postproc);
 
-        // And then we need to synchronize the errors over our communicator to sum up the errors of
-        // each patch to obtain the errors over the whole domain:
-        velo_errors.synchronize(comm);
 
         if(velo_errors.norm_h0 >= h0_project_error * DataType(1.8))
         {

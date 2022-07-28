@@ -4,7 +4,7 @@
 using namespace FEAT;
 using namespace FEAT::Tiny;
 using namespace FEAT::TestSystem;
-using namespace FEAT::CCND_FIBER;
+using namespace CCND_FIBER;
 
 using Math::sqr;
 using Math::cub;

@@ -5,7 +5,6 @@
 #include <area51/ccnd_fiber/ccnd_fiber_common.hpp>
 #include <kernel/analytic/function.hpp>
 
-
 namespace CCND_FIBER
 {
   using namespace FEAT;
@@ -44,7 +43,7 @@ namespace CCND_FIBER
       {
         const DataType x = point[0];
         const DataType y = point[1];
-//         const DataType z = point[2];
+        //         const DataType z = point[2];
 
         ValueType val;
         val[0] = val[1] = DataType(0);
