@@ -263,13 +263,18 @@ namespace FEAT
          --level <n>
          Sets the refinement level to <n>.
          \endverbatim
+     *
+     * \param[in] double_newline
+     * Inserts double-newline instead of single newline at the end of each argument.
      */
-    String get_supported_help() const
+    String get_supported_help(bool double_newline = true) const
     {
       String s;
       for(auto it = _supported.begin(); it != _supported.end(); ++it)
       {
-        s += "--" + it->first + " " + it->second + "\n";
+        if(!s.empty())
+          s += (double_newline ? "\n\n" : "\n");
+        s += "--" + it->first + " " + it->second;
       }
       return s;
     }
