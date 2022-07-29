@@ -802,6 +802,41 @@ namespace FEAT
 
 
       /**
+       * \brief Checks whether the layout of this vector is identical to another sparse vector.
+       *
+       * \param[in] other
+       * A \transient reference to the other vector to compare to.
+       *
+       * \returns
+       * \c true, if both vectors have the same layout, otherwise \c false.
+       */
+      bool compare_layout(const SparseVector& other) const
+      {
+        if(this->size() != other.size())
+          return false;
+        if(this->used_elements() != other.used_elements())
+          return false;
+
+        Index n = this->used_elements();
+        const IT_* a = this->indices();
+        const IT_* b = this->indices();
+
+        // shallow copy? (aka same array)
+        if(a == b)
+          return true;
+
+        // check all array entries
+        for(Index i(0); i < n; ++i)
+        {
+          if(a[i] != b[i])
+            return false;
+        }
+
+        // okay, arrays are identical
+        return true;
+      }
+
+      /**
        * \brief SparseVector comparison operator
        *
        * \param[in] a A vector to compare with.

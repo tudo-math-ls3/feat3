@@ -3,6 +3,7 @@
 #enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
+ADD_SUBDIRECTORY( ccnd_simple )
 ADD_SUBDIRECTORY( dfg95_bench )
 ADD_SUBDIRECTORY( meshopt_boundary-app )
 ADD_SUBDIRECTORY( meshopt_r_adapt-app )

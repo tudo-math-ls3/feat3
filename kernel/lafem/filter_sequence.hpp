@@ -25,6 +25,8 @@ namespace FEAT
      * We cannot use an std::map because the order of the filters in the sequence might be important (i.e. if one has
      * singularities in the essential boundary conditions enforced by a UnitFilter, as it is the case for the
      * Stokes problem with driven cavity).
+     *
+     * \author Jordi Paul
      */
     template<typename Filter_>
     class FilterSequence : public std::deque<std::pair<String, Filter_>>
@@ -52,7 +54,7 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       using FilterType = FilterSequence<typename Filter_::template FilterType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a filter sequence with new Memory, Datatape and Index types
+      /// this typedef lets you create a filter sequence with new Data and Index types
       template <typename DT2_, typename IT2_>
       using FilterTypeByDI = FilterType<DT2_, IT2_>;
 
@@ -126,7 +128,6 @@ namespace FEAT
         {
           BaseClass::push_back(std::make_pair<String, InnerFilterType>(it->first, it->second->clone(clone_mode)));
         }
-
       }
 
       /**
@@ -157,6 +158,18 @@ namespace FEAT
         }
 
         return my_bytes;
+      }
+
+      Filter_& find_or_add(const String& name)
+      {
+        for(iterator it(BaseClass::begin()); it != BaseClass::end(); ++it)
+        {
+          if(it->first == name)
+            return it->second;
+        }
+        // if we come out here, we have to add a new sub-filter
+        this->push_back(std::make_pair(name, Filter_()));
+        return this->back().second;
       }
 
 

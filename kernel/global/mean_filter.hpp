@@ -86,7 +86,7 @@ namespace FEAT
         else
           _volume = _vec_prim.dot(_vec_dual);
 
-        XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        //XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
       }
 
       /// move ctor
@@ -204,6 +204,11 @@ namespace FEAT
         return _vec_prim.bytes() + _vec_dual.bytes();
       }
 
+      bool empty() const
+      {
+        return _vec_prim.empty();
+      }
+
       /**
        * \brief Applies the filter onto the right-hand-side vector.
        *
@@ -212,6 +217,9 @@ namespace FEAT
        */
       void filter_rhs(VectorType& vector) const
       {
+        if(empty())
+          return;
+
         // compute dual integral
         DataType integ = DataType(0);
         if(_vec_freq.empty() || (_comm == nullptr))
@@ -233,6 +241,8 @@ namespace FEAT
        */
       void filter_sol(VectorType& vector) const
       {
+        if(empty())
+          return;
         // compute primal integral
         DataType integ = DataType(0);
         if(_vec_freq.empty() || (_comm == nullptr))

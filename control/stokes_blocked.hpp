@@ -11,6 +11,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/filter_chain.hpp>
+#include <kernel/lafem/filter_sequence.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_bwrappedcsr.hpp>
@@ -1139,6 +1140,164 @@ namespace FEAT
           // Temporary DenseVector for syncing
           typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
           my_col_gate.sync_0(tmp);
+        }
+      }
+    };
+
+
+    template
+      <
+      int dim_,
+      typename DataType_ = Real,
+      typename IndexType_ = Index,
+      typename MatrixBlockA_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, dim_>,
+      typename MatrixBlockB_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, dim_, 1>,
+      typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
+      >
+    class StokesBlockedCombinedSystemLevel :
+      public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
+    {
+    public:
+      typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+
+      // define local velocity filter chain
+      typedef LAFEM::SlipFilter<DataType_, IndexType_, dim_> LocalVeloSlipFilter;
+      typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloUnitFilter;
+      typedef LAFEM::FilterSequence<LocalVeloSlipFilter> LocalVeloSlipFilterSeq;
+      typedef LAFEM::FilterSequence<LocalVeloUnitFilter> LocalVeloUnitFilterSeq;
+      typedef LAFEM::FilterChain<LocalVeloSlipFilterSeq, LocalVeloUnitFilterSeq> LocalVeloFilter;
+
+      // define local pressure filter chain
+      typedef Global::MeanFilter<DataType_, IndexType_> LocalPresMeanFilter;
+      //typedef LAFEM::UnitFilter<DataType_, IndexType_> LocalPresUnitFilter;
+      //typedef LAFEM::FilterChain<LocalPresMeanFilter, LocalPresUnitFilter> LocalPresFilter;
+      typedef LocalPresMeanFilter LocalPresFilter;
+
+      // define local system filter
+      typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
+
+      // define global filter types
+      typedef Global::Filter<LocalVeloFilter, typename BaseClass::VeloMirror> GlobalVeloFilter;
+      typedef Global::Filter<LocalPresFilter, typename BaseClass::PresMirror> GlobalPresFilter;
+      typedef Global::Filter<LocalSystemFilter, typename BaseClass::SystemMirror> GlobalSystemFilter;
+
+      // (global) filters
+      GlobalSystemFilter filter_sys;
+      GlobalVeloFilter filter_velo;
+      GlobalPresFilter filter_pres;
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return this->filter_sys.bytes() + BaseClass::bytes();
+      }
+
+      void compile_system_filter()
+      {
+        filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
+      }
+
+      template<typename D_, typename I_, typename SM_>
+      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_velo.convert(other.filter_velo);
+        filter_pres.convert(other.filter_pres);
+
+        compile_system_filter();
+      }
+
+      LocalVeloSlipFilterSeq& get_local_velo_slip_filter_seq()
+      {
+        return this->filter_velo.local().template at<0>();
+      }
+
+      LocalVeloUnitFilterSeq& get_local_velo_unit_filter_seq()
+      {
+        return this->filter_velo.local().template at<1>();
+      }
+
+      LocalPresMeanFilter& get_local_pres_mean_filter()
+      {
+        return this->filter_pres.local()/*.at<0>()*/;
+      }
+
+      /*LocalPresUnitFilter& get_local_pres_unit_filter()
+      {
+        return this->filter_pres.local().at<1>();
+      }*/
+
+      template<typename SpacePres_>
+      void assemble_pressure_mean_filter(const SpacePres_& space_pres, const String& cubature_name)
+      {
+        // create two global vectors
+        typename BaseClass::GlobalPresVector vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
+
+        // fetch the local vectors
+        typename BaseClass::LocalPresVector& vec_loc_v = vec_glob_v.local();
+        typename BaseClass::LocalPresVector& vec_loc_w = vec_glob_w.local();
+
+        // fetch the frequency vector of the pressure gate
+        typename BaseClass::LocalPresVector& vec_loc_f = this->gate_pres._freqs;
+
+        // assemble the mean filter
+        Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space_pres, cubature_name);
+
+        // synchronize the vectors
+        vec_glob_v.sync_1();
+        vec_glob_w.sync_0();
+
+        // build the mean filter
+        this->filter_pres.local() = LocalPresMeanFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
+      }
+
+      void sync_velocity_slip_filters()
+      {
+        // Sync the filter vector in the SlipFilter
+        const typename BaseClass::VeloGate& my_col_gate(this->gate_velo);
+
+        // For all slip filters...
+        for(auto& it : get_local_velo_slip_filter_seq())
+        {
+          // get the filter vector
+          auto& slip_filter_vector = it.second.get_filter_vector();
+
+          if(slip_filter_vector.used_elements() > 0)
+          {
+            // Temporary DenseVector for syncing
+            typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
+
+            auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
+            auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
+
+            // Copy sparse filter vector contents to DenseVector
+            for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+            {
+              Index idense(slip_filter_vector.indices()[isparse]);
+              tmp_elements[idense] = sfv_elements[isparse];
+            }
+
+            my_col_gate.sync_0(tmp);
+            // Copy sparse filter vector contents to DenseVector
+            for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+            {
+              Index idense(slip_filter_vector.indices()[isparse]);
+              tmp_elements[idense].normalize();
+              sfv_elements[isparse] = tmp_elements[idense];
+            }
+          }
+          else
+          {
+            // Temporary DenseVector for syncing
+            typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
+            my_col_gate.sync_0(tmp);
+          }
         }
       }
     };

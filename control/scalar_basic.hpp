@@ -141,12 +141,11 @@ namespace FEAT
         transfer_sys.convert(&coarse_muxer_sys, other.transfer_sys);
       }
 
-      template<typename DomainLevel_>
-      void assemble_gate(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl)
+      template<typename DomainLevel_, typename SpaceType_>
+      void assemble_gate(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl, const SpaceType_& space)
       {
         const auto& dom_level = virt_dom_lvl.level();
         const auto& dom_layer = virt_dom_lvl.layer();
-        const auto& space = dom_level.space;
 
         // set the gate comm
         this->gate_sys.set_comm(dom_layer.comm_ptr());
@@ -173,6 +172,12 @@ namespace FEAT
 
         // compile gate
         this->gate_sys.compile(std::move(tmpl_s));
+      }
+
+      template<typename DomainLevel_>
+      void assemble_gate(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl)
+      {
+        assemble_gate(virt_dom_lvl, virt_dom_lvl->space);
       }
 
       template<typename DomainLevel_>
