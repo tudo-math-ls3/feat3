@@ -29,7 +29,7 @@
       <!--<WarningLevel>EnableAllWarnings</WarningLevel>-->
       <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;$(FeatDefList)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;$(FeatDefList);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FeatRootPath);$(FeatIncDirList)</AdditionalIncludeDirectories>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
