@@ -959,31 +959,6 @@ namespace FEAT
       }
 
       /**
-       * \brief Creates mesh-parts for all base cells of this root mesh.
-       *
-       * This function must be called for the unrefined base root mesh, if one
-       * intends to use the Assembly::BaseSplitter class for the redistribution
-       * of data in dynamic load balancing.
-       */
-      void create_base_splitting()
-      {
-        // make sure we have a mesh
-        XASSERT(this->_mesh != nullptr);
-
-        // get number of cells
-        Index num_cells = this->_mesh->get_num_entities(MeshType::shape_dim);
-
-        // loop over all cell indices
-        for(Index cell(0); cell < num_cells; ++cell)
-        {
-          // create a macro factory
-          MacroFactory<MeshPartType> factory(*this->_mesh, cell);
-          // create a new mesh part and add to this mesh node
-          this->add_mesh_part("_base:" + stringify(cell), factory.make_unique());
-        }
-      }
-
-      /**
        * \brief Refines this node and its sub-tree.
        *
        * \param[in] adapt_mode

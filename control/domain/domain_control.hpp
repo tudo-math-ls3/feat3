@@ -203,18 +203,22 @@ namespace FEAT
         std::shared_ptr<LevelType> _level;
         std::shared_ptr<LevelType> _level_child;
         std::shared_ptr<LevelType> _level_parent;
+        std::shared_ptr<LevelType> _level_base;
         std::shared_ptr<LayerType> _layer;
         std::shared_ptr<LayerType> _layer_child;
         std::shared_ptr<LayerType> _layer_parent;
+        bool _has_base;
 
       public:
         explicit VirtualLevel(std::shared_ptr<LevelType> level_, std::shared_ptr<LayerType> layer_) :
           _level(level_),
           _level_child(),
           _level_parent(),
+          _level_base(),
           _layer(layer_),
           _layer_child(),
-          _layer_parent()
+          _layer_parent(),
+          _has_base(false)
         {
         }
 
@@ -226,9 +230,11 @@ namespace FEAT
           _level(level_parent_ ? level_parent_ : level_child_),
           _level_child(level_child_),
           _level_parent(level_parent_),
+          _level_base(),
           _layer(layer_parent_ ? layer_parent_ : layer_child_),
           _layer_child(layer_child_),
-          _layer_parent(layer_parent_)
+          _layer_parent(layer_parent_),
+          _has_base(false)
         {
           XASSERT(bool(_level_child));
           XASSERT(bool(_layer_child));
@@ -263,6 +269,22 @@ namespace FEAT
         bool is_ghost() const
         {
           return is_child() && !is_parent();
+        }
+
+        bool has_base() const
+        {
+          return _has_base;
+        }
+
+        void set_base(std::shared_ptr<LevelType> level_base_)
+        {
+          _level_base = level_base_;
+          _has_base = true;
+        }
+
+        void set_base()
+        {
+          _has_base = true;
         }
 
         LevelType& operator*()
@@ -353,14 +375,29 @@ namespace FEAT
           return *_layer_parent;
         }
 
+        LevelType& level_b()
+        {
+          XASSERT(bool(_level_base));
+          return *_level_base;
+        }
+
+        const LevelType& level_b() const
+        {
+          XASSERT(bool(_level_base));
+          return *_level_base;
+        }
+
         std::size_t bytes() const
         {
+          std::size_t b(0u);
+          if(_level_base)
+            b += _level_base->bytes();
           if(is_parent())
-            return this->_level_child->bytes() + this->_layer_parent->bytes();
+            return b + this->_level_child->bytes() + this->_layer_parent->bytes();
           else if(is_child())
-            return this->_level_child->bytes();
+            return b + this->_level_child->bytes();
           else
-            return this->_level->bytes();
+            return b + this->_level->bytes();
         }
       }; // class VirtualLevel<...>
 
@@ -386,16 +423,21 @@ namespace FEAT
         const Dist::Comm& _comm;
         AtlasType _atlas;
         std::deque<std::shared_ptr<LayerType>> _layers;
+        std::deque<std::shared_ptr<LevelType>> _base_levels;
         std::deque<std::deque<std::shared_ptr<LevelType>>> _layer_levels;
         std::deque<VirtLevelType> _virt_levels;
         std::size_t _num_global_layers;
         std::size_t _virt_size;
 
+        /// keep base-mesh levels on root process?
+        bool _keep_base_levels;
+
       public:
         explicit DomainControl(const Dist::Comm& comm_) :
           _comm(comm_),
           _num_global_layers(0u),
-          _virt_size(0u)
+          _virt_size(0u),
+          _keep_base_levels(false)
         {
         }
 
@@ -574,6 +616,24 @@ namespace FEAT
           return _atlas;
         }
 
+        /**
+         * \brief Instructs the domain controller to keep the base-mesh levels after partitioning
+         *
+         * Calling this function requests the domain controller to keep the base-mesh levels and
+         * refine them even after the partitioning process. This functionality is required to
+         * assemble a Global::Splitter object, which allows to serialize and deserialize vectors
+         * independent of the partitioning used to create the vector.
+         *
+         * \attention
+         * The functionality requested by this function is \b NOT scalable for large process
+         * counts, i.e. the root process \b WILL run out of memory in large-scale simulations.
+         * This functionality should only be used for moderate process counts.
+         */
+        void keep_base_levels()
+        {
+          this->_keep_base_levels = true;
+        }
+
         void compile_virtual_levels()
         {
           // get number of layers of this process
@@ -587,6 +647,15 @@ namespace FEAT
 
           // push the finest level
           _virt_levels.push_back(VirtLevelType(_layer_levels.front().front(), _layers.front()));
+
+          // do we have a base-level? If so, then set the base for the
+          if(_keep_base_levels)
+          {
+            if(!_base_levels.empty())
+              _virt_levels.front().set_base(_base_levels.front());
+            else
+              _virt_levels.front().set_base();
+          }
 
           // loop over all layers, front to back
           for(std::size_t ilay(0); ilay < _layers.size(); ++ilay)
@@ -603,7 +672,18 @@ namespace FEAT
 
             // push all inner layer levels
             for(std::size_t ilev(1); (ilev+1) < laylevs.size(); ++ilev)
+            {
               _virt_levels.push_back(VirtLevelType(laylevs.at(ilev), layer));
+
+              // push base-levels? (only for front layer)
+              if(_keep_base_levels && (ilay == std::size_t(0)))
+              {
+                if(!_base_levels.empty())
+                  _virt_levels.back().set_base(_base_levels.at(ilev));
+                else
+                  _virt_levels.back().set_base();
+              }
+            }
 
             // push the last level
             if((ilay+1) < _layers.size())

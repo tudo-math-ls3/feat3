@@ -72,7 +72,7 @@ namespace FEAT
 
     public:
       /// standard constructor
-      explicit Muxer() :
+      Muxer() :
         _sibling_comm(nullptr),
         _parent_rank(-1),
         _buffer_size(0),
@@ -95,7 +95,6 @@ namespace FEAT
       virtual ~Muxer()
       {
       }
-
 
       /// move-assignment operator
       Muxer& operator=(Muxer&& other)
@@ -189,7 +188,7 @@ namespace FEAT
        * \brief Sets the sibling communicator.
        *
        * \param[in] sibling_comm_
-       * The sibling communicator.
+       * A \resident pointer to the sibling communicator.
        *
        * \param[in] parent_rank
        * The rank of the parent process in the sibling comm.
@@ -222,7 +221,7 @@ namespace FEAT
        * \brief Compiles the muxer.
        *
        * \param[in] vec_tmp_
-       * A temporary vector for internal use.
+       * A \transient reference to a temporary vector for internal use.
        */
       void compile(const LocalVector_& vec_tmp_)
       {
@@ -259,7 +258,7 @@ namespace FEAT
        * \brief Sends a join operation to the parent process.
        *
        * \param[in] vec_src
-       * The type-0 child vector that is to be joined on the parent process.
+       * A \transient reference to the type-0 child vector that is to be joined on the parent process.
        */
       void join_send(const LocalVector_& vec_src) const
       {
@@ -292,10 +291,10 @@ namespace FEAT
        * \brief Performs a join operation on the parent process.
        *
        * \param[in] vec_src
-       * The type-0 child vector that is to be joined on the parent process.
+       * A \transient reference to the type-0 child vector that is to be joined on the parent process.
        *
        * \param[in] vec_trg
-       * The joined type-0 parent vector.
+       * A \transient reference to the joined type-0 parent vector.
        */
       void join(const LocalVector_& vec_src, LocalVector_& vec_trg) const
       {
@@ -356,7 +355,7 @@ namespace FEAT
        * \brief Receives a split operation from the parent process.
        *
        * \param[out] vec_trg
-       * The split type-1 child vector.
+       * A \transient reference to the split type-1 child vector.
        */
       void split_recv(LocalVector_& vec_trg) const
       {
@@ -389,10 +388,10 @@ namespace FEAT
        * \brief Performs a split operation on the parent process.
        *
        * \param[out] vec_trg
-       * The split type-1 child vector.
+       * A \transient reference to the split type-1 child vector.
        *
        * \param[in] vec_src
-       * The type-1 parent vector that is to be split
+       * A \transient reference to the type-1 parent vector that is to be split
        */
       void split(LocalVector_& vec_trg, const LocalVector_& vec_src) const
       {

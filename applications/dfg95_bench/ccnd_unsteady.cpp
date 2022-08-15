@@ -205,6 +205,22 @@
 // will continue from the simulation time and time step from when the checkpoint was written.
 //
 //
+// -----------------------------------------------------
+// Initial Solution Read-In and Final Solution Write-Out
+// -----------------------------------------------------
+//
+// --save-joined-sol <filename>
+// Specifies that the application should write the final solution into a joined binary output
+// file by utilizing the base splitter. The output file can be loaded by the --load-joined-sol
+// option if the input mesh and refinement level are identical, however, the process count
+// and/or partitioning may differ. This feature should only be used with at most one parallel
+// domain layer and moderate process counts.
+//
+// --load-joined-sol <filename>
+// Specifies that the application should read in the initial joined solution guess from a
+// single binary output file, which was written by a --save-joined-sol from a previous run.
+// If specified, the solving of the Stokes system to obtain an initial guess is skipped.
+//
 // ------------------------
 // Miscellaneous Parameters
 // ------------------------
@@ -215,9 +231,12 @@
 // If given, specifies that the application should start with a null solution instead of a steady-
 // state Stokes solution time step 0 for the bench 2 benchmark. Has no effect for bench 3.
 //
-// --vtk <filename> [<stepping>]
+// --vtk <filename> [<stepping>] [<refined-filename>]
 // Specifies that the application should write a VTK visualization output file every <stepping>
-// time steps. The stepping parameter is optional and defaults to 1.
+// time steps. The stepping parameter is optional and defaults to 1. The third optional parameter
+// specifies the filename for a VTK output file on a once refined mesh, if given.
+// Note: it is possible to output only the refined VTKs by passing a whitespace string as the
+// first filename, e.g.: --vtk " " 1 myvtk
 //
 // --ext-stats
 // If given, specifies that the application should output extensive statistics at the end of the
@@ -266,7 +285,7 @@ namespace DFG95
     /* ****************************************************************************************** */
 
     // solve stokes for initial solution? (bench2 only)
-    const bool stokes = (args.check("no-stokes") < 0);
+    const bool stokes = (args.check("no-stokes") < 0) && (args.check("load-joined-sol") < 0);
     const bool newton = (args.check("picard") < 0);
     const bool defo = (args.check("defo") >= 0);
     const bool adapt_tol = (args.check("mg-tol-rel") < 0);
@@ -339,8 +358,15 @@ namespace DFG95
     String vtk_name = String("dfg95-cc") + stringify(dim) + "d-bench" + stringify(bench);
     vtk_name += "-lvl" + stringify(domain.front()->get_level_index());
     vtk_name += "-n" + stringify(comm.size());
+    String vtk_name2; // for refined mesh output
     Index vtk_step = Index(args.check("vtk") >= 0 ? 1 : 0);
-    args.parse("vtk", vtk_name, vtk_step);
+    args.parse("vtk", vtk_name, vtk_step, vtk_name2);
+
+    // initial solution joined input file
+    String load_joined_sol_name;
+    args.parse("load-joined-sol", load_joined_sol_name);
+    String save_joined_sol_name;
+    args.parse("save-joined-sol", save_joined_sol_name);
 
     // dump some information to the console
     {
@@ -375,7 +401,10 @@ namespace DFG95
         comm.print(String("Coarse Solver").pad_back(pl, pc) + ": BiCGStab-AmaVanka");
       if(vtk_step > Index(0))
       {
-        comm.print(String("VTK Output Filename").pad_back(pl, pc) + ": '" + vtk_name + "'");
+        if(!vtk_name2.empty())
+          comm.print(String("VTK Output Filename").pad_back(pl, pc) + ": '" + vtk_name + "' / '" + vtk_name2 + "'");
+        else
+          comm.print(String("VTK Output Filename").pad_back(pl, pc) + ": '" + vtk_name + "'");
         comm.print(String("VTK Output Stepping").pad_back(pl, pc) + ": " + stringify(vtk_step));
       }
       else
@@ -407,6 +436,14 @@ namespace DFG95
         comm.print(String("Restart Time").pad_back(pl, pc) + ": N/A");
         comm.print(String("Restart Timestep").pad_back(pl, pc) + ": N/A");
       }
+      if(!load_joined_sol_name.empty())
+        comm.print(String("Load Initial Solution").pad_back(pl, pc) + ": '" + load_joined_sol_name + "'");
+      else
+        comm.print(String("Load Initial Solution").pad_back(pl, pc) + ": N/A");
+      if(!save_joined_sol_name.empty())
+        comm.print(String("Save Final Solution").pad_back(pl, pc) + ": '" + save_joined_sol_name + "'");
+      else
+        comm.print(String("Save Final Solution").pad_back(pl, pc) + ": N/A");
     }
 
     /* ***************************************************************************************** */
@@ -418,6 +455,15 @@ namespace DFG95
     std::deque<std::shared_ptr<SystemLevelType>> system_levels;
 
     const Index num_levels = Index(domain.size_physical());
+
+    // create a refined mesh for refined VTK output if required
+    std::unique_ptr<MeshType> refined_mesh;
+    if((vtk_step > 0) && !vtk_name2.empty())
+    {
+      // refine mesh
+      Geometry::StandardRefinery<MeshType> refinery(domain.front()->get_mesh());
+      refined_mesh = refinery.make_unique();
+    }
 
     // create system levels
     for (Index i(0); i < num_levels; ++i)
@@ -447,6 +493,10 @@ namespace DFG95
         system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
       }
     }
+
+    // assemble base splitter on finest level if required
+    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+      system_levels.front()->assemble_base_splitters(domain.front());
 
     // assemble velocity truncation operators -- we need those for the assembly of the
     // non-linear burgers operators on the coarser levels
@@ -778,8 +828,22 @@ namespace DFG95
     for(auto& v : ama_vankas)
       statistics.bytes[Bytes::vanka] += v->bytes();
 
-    // solve Stokes for bench 2
-    if(stokes && (bench == 2) && !restart)
+    // load initial solution from file?
+    if(!load_joined_sol_name.empty())
+    {
+      watch_checkpoint.start();
+
+      comm.print("\nReading joined initial solution from '" + load_joined_sol_name + "'...");
+
+      // parse vector from file
+      the_system_level.base_splitter_sys.split_read_from(vec_sol, load_joined_sol_name);
+
+      // apply our solution filter in case the BCs have changed
+      the_system_level.filter_sys.filter_sol(vec_sol);
+
+      watch_checkpoint.stop();
+    }
+    else if(stokes && (bench == 2) && !restart)
     {
       comm.print("\nSolving Stokes system...");
 
@@ -819,55 +883,60 @@ namespace DFG95
           comm.print("Test-Mode: FAILED");
         return;
       }
-
-      // write VTK files
-      if(vtk_step > 0)
-      {
-        watch_vtk_write.start();
-        String now_vtk_name = vtk_name + "." + stringify(0).pad_front(5, '0');
-        String line = "Writing VTK file: '" + now_vtk_name + "'";
-        comm.print(line);
-        {
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
-
-          // project velocity and pressure
-          exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
-
-          // project pressure
-          Cubature::DynamicFactory cub("gauss-legendre:2");
-          LAFEM::DenseVector<Mem::Main, DataType, Index> vtx_p;
-          Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
-
-          // write pressure
-          exporter.add_cell_scalar("pressure", vtx_p.elements());
-
-          // finally, write the VTK file
-          exporter.write(now_vtk_name, comm);
-        }
-        watch_vtk_write.stop();
-      }
     }
 
-    comm.print("\nSolving nonsteady Navier-Stokes system...");
-    /*
-    // setup burgers assembler for matrix
-    Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_mat;
-    burgers_mat.deformation = defo;
-    burgers_mat.nu = nu;
-    burgers_mat.beta = DataType(1);
-    burgers_mat.frechet_beta = DataType(newton ? 1 : 0);
-    burgers_mat.sd_delta = upsam;
-    burgers_mat.sd_nu = nu;
-    burgers_mat.theta = DataType(1) / delta_t; // implicit Euler in first time step
+    // write VTK files
+    if((vtk_step > 0) && !vtk_name.empty())
+    {
+      watch_vtk_write.start();
+      String now_vtk_name = vtk_name + "." + stringify(0).pad_front(5, '0');
+      String line = "Writing VTK file: '" + now_vtk_name + "'";
+      comm.print(line);
+      {
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
-    // setup burgers assembler for defect vector
-    Assembly::BurgersAssembler<DataType, IndexType, dim> burgers_def;
-    burgers_def.deformation = defo;
-    burgers_def.nu = nu;
-    burgers_def.beta = DataType(1);
-    burgers_def.theta = DataType(1) / delta_t; // implicit Euler in first time step
-    */
+        // project velocity and pressure
+        exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
+
+        // project pressure
+        Cubature::DynamicFactory cub("gauss-legendre:2");
+        LAFEM::DenseVector<Mem::Main, DataType, Index> vtx_p;
+        Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
+
+        // write pressure
+        exporter.add_cell_scalar("pressure", vtx_p.elements());
+
+        // finally, write the VTK file
+        exporter.write(now_vtk_name, comm);
+      }
+      watch_vtk_write.stop();
+    }
+    if((vtk_step > 0) && !vtk_name2.empty())
+    {
+      watch_vtk_write.start();
+      String now_vtk_name = vtk_name2 + "." + stringify(0).pad_front(5, '0');
+      String line = "Writing refined VTK file: '" + now_vtk_name + "'";
+      comm.print(line);
+      {
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(*refined_mesh);
+
+        // project velocity and pressure
+        exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
+
+        // finally, write the VTK file
+        exporter.write(now_vtk_name, comm);
+      }
+      watch_vtk_write.stop();
+    }
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+
+    comm.print("\nSolving unsteady Navier-Stokes system...");
+
     // vector of all non-linear defect norms
     std::vector<DataType> nl_defs;
 
@@ -1007,13 +1076,18 @@ namespace DFG95
     // ============================================================================================
     // ============================================================================================
 
+    // if we did not restart, copy the initial solution to vec_sol_1 because it is required for the
+    // assembly of the RHS vector in the first time step
+    if(!restart)
+      vec_sol_1.copy(vec_sol);
+
     // time-step loop
-    while((cur_time += delta_t) <= t_max)
+    while((cur_time += delta_t) <= t_max + 1E-10) // small tolerance for accumulated rounding errors
     {
       // next time step
       ++time_step;
 
-      // stop after 3 timesteps in test-mode
+      // stop after 3 time-steps in test-mode
       if(testmode && (time_step > 3))
         break;
 
@@ -1025,7 +1099,7 @@ namespace DFG95
       // print current runtime
       comm.print(t_line + " > Runtime: " + watch_total_run.elapsed_string(TimeFormat::h_m_s_m));
 
-      // extrapolate initial u[k] from u[k-1] and u[k-2] for this time-step
+      // extrapolate initial u_{k} from u_{k-1}, u_{k-2} and u_{k-3} for this time-step
       if(time_step > Index(1))
       {
         auto& vec_sol_3 = vec_rhs; // abuse RHS vector, which is formatted below anyways
@@ -1038,14 +1112,14 @@ namespace DFG95
         // extrapolate to current time step
         if((t_expo >= Index(2)) && (time_step > Index(2)))
         {
-          // perform quadratic extrapolation of solution to current timestep
+          // perform quadratic extrapolation of solution to current time-step
           // u_{k} := 3*u_{k-1} - 3*u_{k-2}) + u_{k-3}
           vec_sol.axpy(vec_sol_1, vec_sol_3, DataType(3));
           vec_sol.axpy(vec_sol_2, vec_sol, -DataType(3));
         }
         else if((t_expo >= Index(1)) && (time_step > Index(1)))
         {
-          // perform linear extrapolation of solution to current timestep
+          // perform linear extrapolation of solution to current time-step
           // u_{k} := 2*u_{k-1} - u_{k-2}
           vec_sol.scale(vec_sol_1, DataType(2));
           vec_sol.axpy(vec_sol_2, vec_sol, -DataType(1));
@@ -1501,7 +1575,7 @@ namespace DFG95
       vec_def.axpy(vec_sol_1, vec_sol, -DataType(1));
       vec_def.scale(vec_def, DataType(1) / delta_t);
 
-      // compute L2-norm of velocity time-derivative by utilising the velocity mass matrix
+      // compute L2-norm of velocity time-derivative by utilizing the velocity mass matrix
       // |dt v|_L2 = sqrt( (dt v)^T * M * (dt v) )
       the_system_level.local_velo_mass_matrix.apply(
         vec_cor.local().template at<0>(), vec_def.local().template at<0>());
@@ -1520,10 +1594,12 @@ namespace DFG95
       if((vtk_step > 0) && (time_step % vtk_step == 0))
       {
         watch_vtk_write.start();
-        String now_vtk_name = vtk_name + "." + stringify(time_step).pad_front(5, '0');
-        String line = t_line +  " > Writing VTK file: '" + now_vtk_name + "'";
-        comm.print(line);
+        if(!vtk_name.empty())
         {
+          String now_vtk_name = vtk_name + "." + stringify(time_step).pad_front(5, '0');
+          String line = t_line +  " > Writing VTK file: '" + now_vtk_name + "'";
+          comm.print(line);
+
           // Create a VTK exporter for our mesh
           Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
@@ -1544,6 +1620,24 @@ namespace DFG95
           // finally, write the VTK file
           exporter.write(now_vtk_name, comm);
         }
+        if(!vtk_name2.empty())
+        {
+          String now_vtk_name = vtk_name2 + "." + stringify(time_step).pad_front(5, '0');
+          String line = t_line +  " > Writing refined VTK file: '" + now_vtk_name + "'";
+          comm.print(line);
+          {
+            // Create a VTK exporter for our mesh
+            Geometry::ExportVTK<MeshType> exporter(*refined_mesh);
+
+            // project velocity and pressure
+            exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
+            exporter.add_vertex_vector("velo_der", vec_def.local().template at<0>());
+
+            // finally, write the VTK file
+            exporter.write(now_vtk_name, comm);
+          }
+        }
+
         watch_vtk_write.stop();
       }
 
@@ -1562,6 +1656,27 @@ namespace DFG95
     // END OF TIME STEPPING LOOP
     // ============================================================================================
     // ============================================================================================
+
+    if(args.check("save-joined-sol") >= 0)
+    {
+      watch_checkpoint.start();
+
+      String save_name;
+      if(args.parse("save-joined-sol", save_name) < 1)
+      {
+        save_name = String("dfg95-cc") + stringify(dim) + "d-bench" + stringify(bench);
+        save_name += "-joined-lvl" + stringify(the_domain_level.get_level_index()) + ".bin";
+        // don't include number of processes, because its invariant
+      }
+
+      comm.print("\nWriting joined solution to '" + save_name + "'");
+
+      // write out in binary format
+      the_system_level.base_splitter_sys.join_write_out(vec_sol, save_name);
+
+      watch_checkpoint.stop();
+    }
+
 
     // release solver
     solver->done_symbolic();
@@ -1641,7 +1756,7 @@ namespace DFG95
       comm.print("\nTest-Mode: PASSED");
   }
 
-  template<int dim_>
+  /*template<int dim_>
   void run_dim(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
   {
     // define our mesh type
@@ -1675,7 +1790,7 @@ namespace DFG95
 
     // print elapsed runtime
     comm.print("\nRun-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
-  }
+  }*/
 
   template<int dim_>
   void run_dim_iso(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
@@ -1696,6 +1811,11 @@ namespace DFG95
 
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
+
+    // if we want to write/read a joined solution, we also need to tell the domain control to keep the base levels
+    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+      domain.keep_base_levels();
+
     domain.create(mesh_reader);
 
     // print partitioning info
@@ -1768,6 +1888,8 @@ namespace DFG95
     //args.support("isoparam");
     args.support("checkpoint");
     args.support("restart");
+    args.support("load-joined-sol");
+    args.support("save-joined-sol");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();

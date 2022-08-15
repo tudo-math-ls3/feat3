@@ -22,6 +22,7 @@
 #include <kernel/global/vector.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/transfer.hpp>
+#include <kernel/global/splitter.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
 #include <kernel/assembly/common_operators.hpp>
@@ -86,6 +87,9 @@ namespace FEAT
       /// define system muxer
       typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
 
+      /// define system splitter
+      typedef Global::Splitter<LocalSystemVector, SystemMirror> SystemSplitter;
+
       /// define global system vector type
       typedef Global::Vector<LocalSystemVector, SystemMirror> GlobalSystemVector;
 
@@ -102,6 +106,9 @@ namespace FEAT
 
       /// our coarse-level system muxer
       SystemMuxer coarse_muxer_sys;
+
+      /// our base-mesh multiplexer
+      SystemSplitter base_splitter_sys;
 
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
@@ -123,7 +130,7 @@ namespace FEAT
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
-        return this->gate_sys.bytes() + this->coarse_muxer_sys.bytes()
+        return this->gate_sys.bytes() + this->coarse_muxer_sys.bytes() + this->base_splitter_sys.bytes()
           + this->transfer_sys.bytes() + this->matrix_sys.local().bytes();
       }
 
@@ -132,6 +139,7 @@ namespace FEAT
       {
         gate_sys.convert(other.gate_sys);
         coarse_muxer_sys.convert(other.coarse_muxer_sys);
+        base_splitter_sys.convert(other.base_splitter_sys);
         matrix_sys.convert(&gate_sys, &gate_sys, other.matrix_sys);
         transfer_sys.convert(&coarse_muxer_sys, other.transfer_sys);
       }
@@ -216,6 +224,57 @@ namespace FEAT
           LocalSystemVector vec_tmp(level_c.space.get_num_dofs());
           this->coarse_muxer_sys.compile(vec_tmp);
         }
+      }
+
+      template<typename DomainLevel_>
+      void assemble_base_splitter(const Domain::VirtualLevel<DomainLevel_>& virt_lvl)
+      {
+        // does this virtual level have a base-mesh level?
+        if(!virt_lvl.has_base())
+          return;
+
+        // get the layer
+        const auto& layer = virt_lvl.layer();
+
+        // is this the root process?
+        if(layer.comm().rank() == 0)
+        {
+          const DomainLevel_& level_b = virt_lvl.level_b();
+
+          // set parent vector template
+          this->base_splitter_sys.set_base_vector_template(LocalSystemVector(level_b.space.get_num_dofs()));
+
+          // assemble patch mirrors on root process
+          for(int i(0); i < layer.comm().size(); ++i)
+          {
+            const auto* patch = level_b.find_patch_part(i);
+            XASSERT(patch != nullptr);
+            SystemMirror patch_mirror;
+            Assembly::MirrorAssembler::assemble_mirror(patch_mirror, level_b.space, *patch);
+            this->base_splitter_sys.push_patch(std::move(patch_mirror));
+          }
+        }
+
+        // nothing to assemble?
+        if(layer.comm().size() <= 1)
+          return;
+
+        // assemble muxer child
+        const DomainLevel_& level = virt_lvl.level();
+
+        // manually set up an identity gather/scatter matrix
+        Index n = level.space.get_num_dofs();
+        SystemMirror root_mirror(n, n);
+        auto* idx = root_mirror.indices();
+        for(Index i(0); i < n; ++i)
+          idx[i] = i;
+
+        // set parent and sibling comms
+        this->base_splitter_sys.set_root(layer.comm_ptr(), 0, std::move(root_mirror));
+
+        // compile muxer
+        LocalSystemVector vec_tmp(level.space.get_num_dofs());
+        this->base_splitter_sys.compile(vec_tmp);
       }
 
       template<typename DomainLevel_, typename Cubature_>

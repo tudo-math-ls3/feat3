@@ -40,6 +40,7 @@
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
 #include <kernel/global/transfer.hpp>
+#include <kernel/global/splitter.hpp>
 
 namespace FEAT
 {
@@ -109,6 +110,11 @@ namespace FEAT
       typedef Global::Muxer<LocalPresVector, PresMirror> PresMuxer;
       typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
 
+      // define splitters
+      typedef Global::Splitter<LocalVeloVector, VeloMirror> VeloSplitter;
+      typedef Global::Splitter<LocalPresVector, PresMirror> PresSplitter;
+      typedef Global::Splitter<LocalSystemVector, SystemMirror> SystemSplitter;
+
       // define global vector types
       typedef Global::Vector<LocalVeloVector, VeloMirror> GlobalVeloVector;
       typedef Global::Vector<LocalPresVector, PresMirror> GlobalPresVector;
@@ -137,6 +143,11 @@ namespace FEAT
       VeloMuxer coarse_muxer_velo;
       PresMuxer coarse_muxer_pres;
       SystemMuxer coarse_muxer_sys;
+
+      /// our base-mesh multiplexer
+      VeloSplitter base_splitter_velo;
+      PresSplitter base_splitter_pres;
+      SystemSplitter base_splitter_sys;
 
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
@@ -201,6 +212,10 @@ namespace FEAT
         coarse_muxer_velo.convert(other.coarse_muxer_velo);
         coarse_muxer_pres.convert(other.coarse_muxer_pres);
         coarse_muxer_sys.convert(other.coarse_muxer_sys);
+
+        base_splitter_velo.convert(other.base_splitter_velo);
+        base_splitter_pres.convert(other.base_splitter_pres);
+        base_splitter_sys.convert(other.base_splitter_sys);
 
         matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
         matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
@@ -305,20 +320,8 @@ namespace FEAT
           PresMirror& parent_mirror_p = parent_mirror_sys.template at<1>();
 
           // manually set up an identity gather/scatter matrix
-          {
-            Index n = level_c.space_velo.get_num_dofs();
-            parent_mirror_v = ScalarMirror(n, n);
-            auto* idx = parent_mirror_v.indices();
-            for(Index i(0); i < n; ++i)
-              idx[i] = i;
-          }
-          {
-            Index n = level_c.space_pres.get_num_dofs();
-            parent_mirror_p = ScalarMirror(n, n);
-            auto* idx = parent_mirror_p.indices();
-            for(Index i(0); i < n; ++i)
-              idx[i] = i;
-          }
+          parent_mirror_v = VeloMirror::make_identity(level_c.space_velo.get_num_dofs());
+          parent_mirror_p = PresMirror::make_identity(level_c.space_pres.get_num_dofs());
 
           // set parent and sibling comms
           this->coarse_muxer_velo.set_parent(
@@ -345,6 +348,75 @@ namespace FEAT
           this->coarse_muxer_pres.compile(tmpl_p);
           this->coarse_muxer_sys.compile(tmpl_s);
         }
+      }
+
+      template<typename DomainLevel_>
+      void assemble_base_splitters(const Domain::VirtualLevel<DomainLevel_>& virt_lvl)
+      {
+        // does this virtual level have a base-mesh level?
+        if(!virt_lvl.has_base())
+          return;
+
+        // get the layer
+        const auto& layer = virt_lvl.layer();
+
+        // is this the root process?
+        if(layer.comm().rank() == 0)
+        {
+          const DomainLevel_& level_b = virt_lvl.level_b();
+
+          LocalVeloVector tmpl_v(level_b.space_velo.get_num_dofs());
+          LocalPresVector tmpl_p(level_b.space_pres.get_num_dofs());
+          LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
+
+          // set parent vector template
+          this->base_splitter_velo.set_base_vector_template(std::move(tmpl_v));
+          this->base_splitter_pres.set_base_vector_template(std::move(tmpl_p));
+          this->base_splitter_sys.set_base_vector_template(std::move(tmpl_s));
+
+          // assemble patch mirrors on root process
+          for(int i(0); i < layer.comm().size(); ++i)
+          {
+            const auto* patch = level_b.find_patch_part(i);
+            XASSERT(patch != nullptr);
+            SystemMirror patch_mirror;
+            VeloMirror& patch_mirror_v = patch_mirror.template at<0>();
+            PresMirror& patch_mirror_p = patch_mirror.template at<1>();
+            Assembly::MirrorAssembler::assemble_mirror(patch_mirror_v, level_b.space_velo, *patch);
+            Assembly::MirrorAssembler::assemble_mirror(patch_mirror_p, level_b.space_pres, *patch);
+            this->base_splitter_velo.push_patch(patch_mirror_v.clone(LAFEM::CloneMode::Shallow));
+            this->base_splitter_pres.push_patch(patch_mirror_p.clone(LAFEM::CloneMode::Shallow));
+            this->base_splitter_sys.push_patch(std::move(patch_mirror));
+          }
+        }
+
+        // nothing to assemble?
+        if(layer.comm().size() <= 1)
+          return;
+
+        // assemble muxer child
+        const DomainLevel_& level = virt_lvl.level();
+
+        SystemMirror root_mirror_sys;
+        VeloMirror& root_mirror_v = root_mirror_sys.template at<0>();
+        PresMirror& root_mirror_p = root_mirror_sys.template at<1>();
+
+        // manually set up an identity gather/scatter matrix
+        root_mirror_v = VeloMirror::make_identity(level.space_velo.get_num_dofs());
+        root_mirror_p = PresMirror::make_identity(level.space_pres.get_num_dofs());
+
+        // set parent and sibling comms
+        this->base_splitter_velo.set_root(layer.comm_ptr(), 0, root_mirror_v.clone(LAFEM::CloneMode::Shallow));
+        this->base_splitter_pres.set_root(layer.comm_ptr(), 0, root_mirror_p.clone(LAFEM::CloneMode::Shallow));
+        this->base_splitter_sys.set_root(layer.comm_ptr(), 0, std::move(root_mirror_sys));
+
+        // compile muxer
+        LocalVeloVector tmpl_v(level.space_velo.get_num_dofs());
+        LocalPresVector tmpl_p(level.space_pres.get_num_dofs());
+        LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
+        this->base_splitter_velo.compile(tmpl_v);
+        this->base_splitter_pres.compile(tmpl_p);
+        this->base_splitter_sys.compile(tmpl_s);
       }
 
       template<typename DomainLevel_, typename Cubature_>

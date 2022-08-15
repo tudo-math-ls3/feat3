@@ -23,6 +23,9 @@ TARGET_LINK_LIBRARIES(dbg-alg-dof-parti feat)
 ADD_EXECUTABLE(dbg-amavanka dbg_amavanka.cpp)
 TARGET_LINK_LIBRARIES(dbg-amavanka feat)
 
+ADD_EXECUTABLE(dbg-base-splitter dbg_base_splitter.cpp)
+TARGET_LINK_LIBRARIES(dbg-base-splitter feat)
+
 ADD_EXECUTABLE(dbg-cubature dbg_cubature.cpp)
 TARGET_LINK_LIBRARIES(dbg-cubature feat)
 

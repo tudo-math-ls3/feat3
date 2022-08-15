@@ -97,7 +97,7 @@ namespace FEAT
           int layer;
           /// the index of the parent layer or -1, if this process is not part of the parent layer
           int layer_p;
-          /// the number of processors that participate in this layer
+          /// the number of processes that participate in this layer
           int num_procs;
           /// the number of partitions for each patch of the parent layer
           int num_parts;
@@ -222,6 +222,7 @@ namespace FEAT
          */
         bool parse_args(SimpleArgParser& args)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
           // Try to parse --parti-type <types...>
           {
             auto it = args.query("parti-type");
@@ -283,6 +284,7 @@ namespace FEAT
          */
         bool parse_property_map(PropertyMap& pmap)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
           auto parti_type_p = pmap.query("parti-type");
           if(parti_type_p.second)
           {
@@ -360,6 +362,7 @@ namespace FEAT
          */
         void set_adapt_mode(Geometry::AdaptMode adapt_mode)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
           _adapt_mode = adapt_mode;
         }
 
@@ -382,6 +385,7 @@ namespace FEAT
          */
         void set_permutation_strategy(Geometry::PermutationStrategy strategy)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
           _permutation_strategy = strategy;
         }
 
@@ -413,6 +417,8 @@ namespace FEAT
          */
         void set_desired_levels(const std::deque<String>& slvls)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
+
           const int nranks = this->_comm.size();
           std::deque<String> sv;
 
@@ -481,6 +487,8 @@ namespace FEAT
          */
         void set_desired_levels(int lvl_max, int lvl_min = -1)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
+
           // single-layered hierarchy
           int _desired_level_max = lvl_max;
           int _desired_level_min = (lvl_min >= 0 ? lvl_min : lvl_max + lvl_min + 1);
@@ -509,6 +517,8 @@ namespace FEAT
          */
         void set_desired_levels(int lvl_max, int lvl_med, int lvl_min)
         {
+          XASSERTM(!_was_created, "This function has to be called before domain control creation!");
+
           // double-layered hierarchy
           int _desired_level_max = lvl_max;
           int _desired_level_med = (lvl_med >= 0 ? lvl_med : lvl_max + lvl_med + 1);
@@ -914,6 +924,11 @@ namespace FEAT
          *
          * \param[in] base_mesh_node
          * The base-mesh node from which the hierarchy is to be derived from.
+         *
+         * \note
+         * This function does not keep the base-mesh levels explicitly even if
+         * _keep_base_levels is set to true, because it is not required to use
+         * the base splitter on a single process.
          */
         void _create_single_process(std::unique_ptr<MeshNodeType> base_mesh_node)
         {
@@ -981,6 +996,9 @@ namespace FEAT
           this->_create_ancestry_single();
           Ancestor& ancestor = this->_ancestry.front();
 
+          // do we have to keep the base-mesh levels on this process?
+          const bool keep_base = this->_keep_base_levels && (this->_comm.rank() == 0);
+
           // choose a partitioning strategy
           this->_check_parti(ancestor, *base_mesh_node, true);
 
@@ -1006,11 +1024,25 @@ namespace FEAT
           // set the neighbor ranks of our child layer
           layer->set_neighbor_ranks(neighbor_ranks);
 
+          // if we have to keep the base-mesh levels, then we also need the patches
+          if(keep_base)
+          {
+            // Note: patch mesh-part for rank = 0 was already created by 'extract_patch' call
+            for(int i(1); i < ancestor.num_parts; ++i)
+            {
+              base_mesh_node->create_patch_meshpart(ancestor.parti_graph, i);
+            }
+          }
+
           // refine up to minimum level
           for(; lvl < ancestor.desired_level_min; ++lvl)
           {
             // refine the patch mesh
             patch_mesh_node = patch_mesh_node->refine_unique(this->_adapt_mode);
+
+            // keep base mesh node?
+            if(keep_base)
+              base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
           }
 
           // save chosen minimum level
@@ -1028,6 +1060,19 @@ namespace FEAT
 
             // continue with refined node
             patch_mesh_node = std::move(refined_node);
+
+            // keep base mesh node?
+            if(keep_base)
+            {
+              // refine base-mesh node
+              auto refined_base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
+              // push this (unrefined) level
+              this->_base_levels.push_front(std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+
+              // continue with refined node
+              base_mesh_node = std::move(refined_base_mesh_node);
+            }
           }
 
           // save chosen maximum level
@@ -1035,6 +1080,10 @@ namespace FEAT
 
           // push finest level
           this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(patch_mesh_node)));
+
+          // keep base mesh node?
+          if(keep_base)
+            this->_base_levels.push_front(std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
         }
 
         /**
@@ -1174,8 +1223,19 @@ namespace FEAT
           // create ancestry
           this->_create_ancestry_scattered();
 
+          // do we have to keep the base-mesh levels on this process?
+          const bool keep_base = this->_keep_base_levels && (this->_comm.rank() == 0);
+
+          // make sure we have at most 2 layers if we want to keep the base-mesh levels
+          XASSERTM(!keep_base || (this->_ancestry.size() <= std::size_t(1)), "cannot keep base levels for more than 2 domain layers (yet)");
+
           // we start counting at level 0
           int lvl = 0;
+
+          // move the base-mesh pointer to a new parent-mesh pointer;
+          // the base-mesh is always the one on the layer with only 1 process
+          std::unique_ptr<MeshNodeType> parent_mesh_node = std::move(base_mesh_node);
+          base_mesh_node.reset();
 
           // loop over all global layers in reverse order (coarse to fine)
           for(std::size_t slayer = this->_ancestry.size(); slayer > std::size_t(0); )
@@ -1196,7 +1256,7 @@ namespace FEAT
               parent_min_lvl = this->_desired_levels.back().first;
 
             // check available partitioning strategies
-            this->_check_parti(ancestor, *base_mesh_node, is_base_layer);
+            this->_check_parti(ancestor, *parent_mesh_node, is_base_layer);
 
             // the check_parti function returns the partitioning level w.r.t. the current
             // level (which may be > 0), so we have to compensate that by adding our current level:
@@ -1210,20 +1270,33 @@ namespace FEAT
             for(; lvl < ancestor.parti_level; ++lvl)
             {
               // refine the base-mesh node
-              auto refined_node = base_mesh_node->refine_unique(this->_adapt_mode);
+              auto refined_node = parent_mesh_node->refine_unique(this->_adapt_mode);
 
               // push the base mesh into our parent layer if desired
               if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
               {
-                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(parent_mesh_node)));
               }
 
               // continue with refined node
-              base_mesh_node = std::move(refined_node);
+              parent_mesh_node = std::move(refined_node);
+
+              // refine base-mesh node if we have one
+              if(base_mesh_node)
+              {
+                // refine base-mesh node
+                auto refined_base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
+                // push this (unrefined) level
+                this->_base_levels.push_front(std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+
+                // continue with refined node
+                base_mesh_node = std::move(refined_base_mesh_node);
+              }
             }
 
             // we're now at the partitioning level, so apply the partitioner
-            if(!this->_apply_parti(ancestor, *base_mesh_node))
+            if(!this->_apply_parti(ancestor, *parent_mesh_node))
             {
               XABORTM("Failed to find a suitable partitioning");
             }
@@ -1231,7 +1304,7 @@ namespace FEAT
             // extract our patch
             std::vector<int> neighbor_ranks;
             std::unique_ptr<MeshNodeType> patch_mesh_node(
-              base_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, ancestor.progeny_child));
+              parent_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, ancestor.progeny_child));
 
             // translate neighbor ranks by progeny group to obtain the neighbor ranks
             // w.r.t. this layer's communicator
@@ -1245,13 +1318,13 @@ namespace FEAT
               patch_mesh_node->rename_halos(halo_map);
             }
 
-            // does this process participate in the parent layer?
-            if(ancestor.layer_p >= 0)
+            // does this process participate in the parent layer or do we need to keep the base-meshes anyways?
+            if((ancestor.layer_p >= 0) || (keep_base && is_base_layer))
             {
               // Note: patch mesh-part for rank = 0 was already created by 'extract_patch' call
               for(int i(1); i < ancestor.num_parts; ++i)
               {
-                base_mesh_node->create_patch_meshpart(ancestor.parti_graph, i);
+                parent_mesh_node->create_patch_meshpart(ancestor.parti_graph, i);
               }
             }
 
@@ -1269,8 +1342,8 @@ namespace FEAT
             for(; lvl < global_level_min; ++lvl)
             {
               // refine the base mesh node
-              std::unique_ptr<MeshNodeType> coarse_mesh_node(std::move(base_mesh_node));
-              base_mesh_node = coarse_mesh_node->refine_unique(this->_adapt_mode);
+              std::unique_ptr<MeshNodeType> coarse_mesh_node(std::move(parent_mesh_node));
+              parent_mesh_node = coarse_mesh_node->refine_unique(this->_adapt_mode);
 
               // push base mesh to parent layer if desired
               if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
@@ -1282,10 +1355,23 @@ namespace FEAT
 
               // refine the patch mesh
               patch_mesh_node = patch_mesh_node->refine_unique(this->_adapt_mode);
+
+              // refine base-mesh node if we have one
+              if(base_mesh_node)
+              {
+                // refine base-mesh node
+                auto refined_base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
+                // push this (unrefined) level
+                this->_base_levels.push_front(std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+
+                // continue with refined node
+                base_mesh_node = std::move(refined_base_mesh_node);
+              }
             }
 
             // split the halos of our base-mesh and compute the halos of our patches from that
-            this->_split_basemesh_halos(ancestor, *base_mesh_node, *patch_mesh_node, neighbor_ranks);
+            this->_split_basemesh_halos(ancestor, *parent_mesh_node, *patch_mesh_node, neighbor_ranks);
 
             // does this process participate in the child layer?
             if(ancestor.layer >= 0)
@@ -1305,14 +1391,22 @@ namespace FEAT
               this->_chosen_levels.push_front(std::make_pair(lvl, 1));
             }
 
+            // if we have to keep the base-mesh, then we have to create a clone here if we're still on the base layer;
+            // we don't need to worry that this is a clone, because it will get refined in the next layer anyways
+            if(keep_base && is_base_layer)
+            {
+              XASSERT(base_mesh_node.get() == nullptr);
+              base_mesh_node = parent_mesh_node->clone_unique();
+            }
+
             // push the finest base-mesh
             if(ancestor.layer_p >= 0)
             {
-              this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+              this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(parent_mesh_node)));
             }
 
             // continue with the next layer
-            base_mesh_node = std::move(patch_mesh_node);
+            parent_mesh_node = std::move(patch_mesh_node);
           }
 
           // get the desired maximum level
@@ -1323,20 +1417,37 @@ namespace FEAT
           for(; lvl < desired_level_max; ++lvl)
           {
             // refine the patch mesh
-            auto refined_node = base_mesh_node->refine_unique(this->_adapt_mode);
+            auto refined_node = parent_mesh_node->refine_unique(this->_adapt_mode);
 
             // push patch mesh to this level
-            this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+            this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(parent_mesh_node)));
 
             // continue with refined node
-            base_mesh_node = std::move(refined_node);
+            parent_mesh_node = std::move(refined_node);
+
+            // refine base-mesh node if we have one
+            if(base_mesh_node)
+            {
+              // refine base-mesh node
+              auto refined_base_mesh_node = base_mesh_node->refine_unique(this->_adapt_mode);
+
+              // push this (unrefined) level
+              this->_base_levels.push_front(std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+
+              // continue with refined node
+              base_mesh_node = std::move(refined_base_mesh_node);
+            }
           }
 
           // push finest level
-          this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
+          this->push_level_front(0, std::make_shared<LevelType>(lvl, std::move(parent_mesh_node)));
 
           // set chosen maximum level for finest layer
           this->_chosen_levels.push_front(std::make_pair(lvl, this->_comm.size()));
+
+          // refine base-mesh node if we have one
+          if(base_mesh_node)
+            this->_base_levels.push_front(std::make_shared<LevelType>(lvl, std::move(base_mesh_node)));
         }
 
         /**

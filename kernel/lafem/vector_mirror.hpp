@@ -126,12 +126,29 @@ namespace FEAT
         return *this;
       }
 
-      /** \brief Clone operation
+      /**
+       * \brief Creates and returns an identity mirror
+       *
+       * \param[in] size_in
+       * The desired size of the mirror to be created
+       *
+       * \returns The new identity mirror
+       */
+      static VectorMirror make_identity(IndexType size_in)
+      {
+        VectorMirror mir(size_in, size_in);
+        IndexType* idx = mir.indices();
+        for(IndexType i(0); i < size_in; ++i)
+          idx[i] = i;
+        return mir;
+      }
+
+      /**
+       * \brief Clone operation
        *
        * Create a clone of this container.
        *
        * \param[in] clone_mode The actual cloning procedure.
-       *
        */
       VectorMirror clone(CloneMode clone_mode = CloneMode::Weak) const
       {
@@ -140,13 +157,13 @@ namespace FEAT
         return t;
       }
 
-      /** \brief Clone operation
+      /**
+       * \brief Clone operation
        *
        * Create a clone of another container.
        *
        * \param[in] other The source container to create the clone from.
        * \param[in] clone_mode The actual cloning procedure.
-       *
        */
       template<typename Mem2_, typename DT2_, typename IT2_>
       void clone(const VectorMirror<Mem2_, DT2_, IT2_> & other, CloneMode clone_mode = CloneMode::Weak)

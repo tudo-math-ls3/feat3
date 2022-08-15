@@ -121,18 +121,45 @@
 // multiply the above estimate by 0.1.
 //
 //
+// -----------------------------------------------------
+// Initial Solution Read-In and Final Solution Write-Out
+// -----------------------------------------------------
+//
+// --save-sol <filename>
+// Specifies that the application should write the final (partitioned) solution (and the
+// partitioning) to a single binary output file. The output file can be loaded by the --load-sol
+// option if the input mesh, the refinement level as well as the partitioning (and thus the
+// process count) are identical.
+//
+// --save-joined-sol <filename>
+// Specifies that the application should write the final solution into a joined binary output
+// file by utilizing the base splitter. The output file can be loaded by the --load-joined-sol
+// option if the input mesh and refinement level are identical, however, the process count
+// and/or partitioning may differ. This feature should only be used with at most one parallel
+// domain layer and moderate process counts.
+//
+// --load-sol <filename>
+// Specifies that the application should read in the initial (partitioned) solution guess
+// from a single binary output file, which was written by a --save-sol from a previous run.
+// If specified, the solving of the Stokes system to obtain an initial guess is skipped.
+//
+// --load-joined-sol <filename>
+// Specifies that the application should read in the initial joined solution guess from a
+// single binary output file, which was written by a --save-joined-sol from a previous run.
+// If specified, the solving of the Stokes system to obtain an initial guess is skipped.
+//
+//
 // ------------------------
 // Miscellaneous Parameters
 // ------------------------
 // This section describes miscellaneous parameters that do not fit into any other section and
 // which do not deserve a custom section of their own.
 //
-// --vtk <filename>
-// Specifies that the application should write a VTK visualization output file.
-//
-// --save-sol <filename>
-// Specifies that the application should write the final solution (and the partitioning) to
-// a binary output file.
+// --vtk <filename> [<refined-filename>]
+// Specifies that the application should write a VTK visualization output file. The second
+// optional parameter specifies the filename for a VTK output file on a once refined mesh,
+// if given. Note: it is possible to output only the refined VTKs by passing a whitespace
+// string as the first filename, e.g.: --vtk " " myvtk
 //
 // --ext-stats
 // If given, specifies that the application should output extensive statistics at the end of the
@@ -276,6 +303,10 @@ namespace DFG95
         system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
       }
     }
+
+    // assemble base splitter on finest level if required
+    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+      system_levels.front()->assemble_base_splitters(domain.front());
 
     if(navier)
     {
@@ -587,12 +618,10 @@ namespace DFG95
     StopWatch watch_nonlin_solver_init;
     StopWatch watch_nonlin_solver_apply;
 
-    comm.print("\nSolving Stokes system...");
-
     // initialize solver
     watch_nonlin_solver_init.start();
-    multigrid_hierarchy->init();
-    solver->init();
+    multigrid_hierarchy->init_symbolic();
+    solver->init_symbolic();
     watch_nonlin_solver_init.stop();
 
     // accumulate vanka sizes
@@ -601,26 +630,77 @@ namespace DFG95
     for(auto& v : ama_vankas)
       statistics.bytes[Bytes::vanka] += v->bytes();
 
-    // solve Stokes system
-    solver->set_plot_mode(Solver::PlotMode::iter);
-    watch_stokes_solve.start();
-    Solver::Status stokes_status = Solver::solve(*solver, vec_sol, vec_def, matrix, filter);
-    watch_stokes_solve.stop();
-
-    statistics.counts[Counts::linsol_iter] = solver->get_num_iter();
-
-    // release solvers
-    solver->done_numeric();
-    multigrid_hierarchy->done_numeric();
-
-    FEAT::Statistics::compress_solver_expressions();
-
-    if(!Solver::status_success(stokes_status))
+    // load distributed solution?
+    if(args.check("load-sol") > 0)
     {
-      comm.print("\nERROR: LINEAR SOLVER BREAKDOWN\n");
-      if(testmode)
-        comm.print("Test-Mode: FAILED");
-      return;
+      StopWatch watch_checkpoint;
+      watch_checkpoint.start();
+
+      String save_name;
+      args.parse("load-sol", save_name);
+      comm.print("\nReading (partitioned) initial solution from '" + save_name + "'...");
+
+      // read file into streams
+      BinaryStream bs_com, bs_sol;
+      DistFileIO::read_combined(bs_com, bs_sol, save_name, comm);
+
+      // parse vector from stream
+      vec_sol.local().read_from(LAFEM::FileMode::fm_binary, bs_sol);
+
+      // apply our solution filter in case the BCs have changed
+      the_system_level.filter_sys.filter_sol(vec_sol);
+
+      watch_checkpoint.stop();
+      statistics.times[Times::checkpoint] += watch_checkpoint.elapsed();
+    }
+    else if(args.check("load-joined-sol") > 0)
+    {
+      StopWatch watch_checkpoint;
+      watch_checkpoint.start();
+
+      String save_name;
+      args.parse("load-joined-sol", save_name);
+      comm.print("\nReading joined initial solution from '" + save_name + "'...");
+
+      // parse vector from file
+      the_system_level.base_splitter_sys.split_read_from(vec_sol, save_name);
+
+      // apply our solution filter in case the BCs have changed
+      the_system_level.filter_sys.filter_sol(vec_sol);
+
+      watch_checkpoint.stop();
+      statistics.times[Times::checkpoint] += watch_checkpoint.elapsed();
+    }
+    else // solve Stokes to obtain initial solution
+    {
+      comm.print("\nSolving Stokes system...");
+
+      watch_nonlin_solver_init.start();
+      multigrid_hierarchy->init_numeric();
+      solver->init_numeric();
+      watch_nonlin_solver_init.stop();
+
+      // solve Stokes system
+      solver->set_plot_mode(Solver::PlotMode::iter);
+      watch_stokes_solve.start();
+      Solver::Status stokes_status = Solver::solve(*solver, vec_sol, vec_def, matrix, filter);
+      watch_stokes_solve.stop();
+
+      statistics.counts[Counts::linsol_iter] = solver->get_num_iter();
+
+      // release solvers
+      solver->done_numeric();
+      multigrid_hierarchy->done_numeric();
+
+      FEAT::Statistics::compress_solver_expressions();
+
+      if(!Solver::status_success(stokes_status))
+      {
+        comm.print("\nERROR: LINEAR SOLVER BREAKDOWN\n");
+        if(testmode)
+          comm.print("Test-Mode: FAILED");
+        return;
+      }
     }
 
     // Don't we solve Navier-Stokes?
@@ -1016,7 +1096,7 @@ namespace DFG95
         save_name += "-n" + stringify(comm.size()) + ".sol";
       }
 
-      comm.print("\nWriting Solution to '" + save_name + "'");
+      comm.print("\nWriting (partitioned) solution to '" + save_name + "'");
 
       // serialize the partitioning
       std::vector<char> buf_pdc = domain.serialize_partitioning();
@@ -1029,7 +1109,33 @@ namespace DFG95
       DistFileIO::write_combined(buf_pdc, bs_sol.container(), save_name, comm);
 
       watch_checkpoint.stop();
-      statistics.times[Times::checkpoint] = watch_checkpoint.elapsed();
+      statistics.times[Times::checkpoint] += watch_checkpoint.elapsed();
+    }
+
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+    /* ***************************************************************************************** */
+
+    if(args.check("save-joined-sol") >= 0)
+    {
+      StopWatch watch_checkpoint;
+      watch_checkpoint.start();
+
+      String save_name;
+      if(args.parse("save-joined-sol", save_name) < 1)
+      {
+        save_name = String("dfg95-cc") + stringify(dim) + "d-bench1";
+        save_name += "-joined-lvl" + stringify(the_domain_level.get_level_index()) + ".bin";
+        // don't include number of processes, because its invariant
+      }
+
+      comm.print("\nWriting joined solution to '" + save_name + "'");
+
+      // write out in binary format
+      the_system_level.base_splitter_sys.join_write_out(vec_sol, save_name);
+
+      watch_checkpoint.stop();
+      statistics.times[Times::checkpoint] += watch_checkpoint.elapsed();
     }
 
     /* ***************************************************************************************** */
@@ -1053,12 +1159,13 @@ namespace DFG95
 
       comm.print("\nWriting VTK output to '" + vtk_name + ".pvtu'");
 
+      if(!vtk_name.empty())
       {
         // Create a VTK exporter for our mesh
         Geometry::ExportVTK<MeshType> exporter(the_domain_level.get_mesh());
 
         // project velocity and pressure
-        exporter.add_vertex_vector("v", vec_sol.local().template at<0>());
+        exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
 
         // project pressure
         Cubature::DynamicFactory cub("gauss-legendre:2");
@@ -1073,7 +1180,7 @@ namespace DFG95
       }
 
       // write refined VTK?
-      if(npars > 1)
+      if(!vtk_name2.empty())
       {
         comm.print("Writing refined VTK output to '" + vtk_name2 + ".pvtu'");
 
@@ -1085,7 +1192,7 @@ namespace DFG95
         Geometry::ExportVTK<MeshType> exporter(mesh);
 
         // project velocity and pressure
-        exporter.add_vertex_vector("v", vec_sol.local().template at<0>());
+        exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
 
         // finally, write the VTK file
         exporter.write(vtk_name2, comm);
@@ -1145,7 +1252,7 @@ namespace DFG95
       comm.print("\nTest-Mode: PASSED");
   }
 
-  template<int dim_>
+  /*template<int dim_>
   void run_dim(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
   {
     // define our mesh type
@@ -1179,7 +1286,7 @@ namespace DFG95
 
     // print elapsed runtime
     comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
-  }
+  }*/
 
   template<int dim_>
   void run_dim_iso(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
@@ -1200,6 +1307,11 @@ namespace DFG95
 
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
+
+    // if we want to write/read a joined solution, we also need to tell the domain control to keep the base levels
+    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+      domain.keep_base_levels();
+
     domain.create(mesh_reader);
 
     // print partitioning info
@@ -1264,7 +1376,10 @@ namespace DFG95
     args.support("test-mode");
     args.support("ext-stats");
     args.support("no-umfpack");
+    args.support("load-sol");
+    args.support("load-joined-sol");
     args.support("save-sol");
+    args.support("save-joined-sol");
     //args.support("isoparam");
 
     // check for unsupported options
