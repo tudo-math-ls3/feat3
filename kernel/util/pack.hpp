@@ -792,10 +792,8 @@ namespace FEAT
       (void) type;
       (void) tolerance;
       XABORTM("cannot encode compressed type; zfp not available");
-#endif // FEAT_HAVE_ZFP*/
-
-      // return 0
       return std::size_t(0);
+#endif // FEAT_HAVE_ZFP*/
     }
 
     /**
@@ -951,6 +949,7 @@ namespace FEAT
       (void) pack_type;
       (void) count;
       XABORTM("cannot encode compressed type; zlib not available");
+      return std::size_t(0);
 #endif // FEAT_HAVE_ZLIB
     }
 
@@ -1072,6 +1071,7 @@ namespace FEAT
       (void) pack_type;
       (void) count;
       XABORTM("cannot decode compressed type; zlib not available");
+      return std::size_t(0);
 #endif // FEAT_HAVE_ZLIB
     }
 
@@ -1190,6 +1190,7 @@ namespace FEAT
       (void) count;
       (void) tolerance;
       XABORTM("cannot encode compressed type; zfp not available");
+      return std::size_t(0);
 #endif //FEAT_HAVE_ZFP
     }
 
@@ -1298,6 +1299,7 @@ namespace FEAT
       (void) swap_bytes;
       (void) pack_type;
       XABORTM("cannot decode compressed type; zfp not available");
+      return std::size_t(0);
 #endif //FEAT_HAVE_ZFP
     }
   } // namespace Pack
