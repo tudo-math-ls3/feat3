@@ -313,7 +313,7 @@ namespace DFG95
     // number of smoothing steps
     const Index smooth_steps = parse(args, "smooth-steps", Index(8));
     // damping parameter for smoother
-    const DataType smooth_damp = parse(args, "smooth-damp", DataType(0.7));
+    const DataType smooth_damp = parse(args, "smooth-damp", DataType(0.5));
     // rel. tolerance for linear solver
     const DataType mg_tol_rel = parse(args, "mg-tol-rel", DataType(1E-5));
     // absolute tolerance for nonlinear solver
@@ -593,6 +593,7 @@ namespace DFG95
     GlobalSystemVector vec_rhs = the_system_level.matrix_sys.create_vector_r();
     GlobalSystemVector vec_def = the_system_level.matrix_sys.create_vector_r();
     GlobalSystemVector vec_cor = the_system_level.matrix_sys.create_vector_r();
+    GlobalSystemVector vec_def_unsynced = the_system_level.matrix_sys.create_vector_r();
 
     // format the vectors
     vec_sol.format();
@@ -1151,6 +1152,9 @@ namespace DFG95
           vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -1.0);
         the_system_level.matrix_sys.local().block_d().apply(
           vec_def.local().template at<1>(), vec_sol.local().template at<0>(), vec_def.local().template at<1>(), -1.0);
+        // store the unsynced and unfiltered defect for later body forces computation
+        vec_def_unsynced.copy(vec_def);
+        // synchronize and filter the defect
         // sync and filter
         vec_def.sync_0();
         filter.filter_def(vec_def);
@@ -1421,22 +1425,17 @@ namespace DFG95
         summary.lift_coeff_line = body_force_accum.lift;
       }
 
-      // compute drag & lift coefficients via volume integration
+      // compute drag & lift coefficients via volume integration from unsynchronized final defect
       {
-        const auto& vec_sol_v = vec_sol.local().template at<0>();
-        const auto& vec_sol_p = vec_sol.local().template at<1>();
+        Tiny::Vector<DataType, dim> bdf;
+        assemble_bdforces_vol<DataType, dim>(bdf, vec_def_unsynced.local().first(), vec_char);
 
-        Tiny::Matrix<DataType, 2, dim> bdf;
-        assemble_bdforces_vol<DataType, dim>(bdf, vec_sol_v, vec_sol_p, vec_char,
-          the_domain_level.space_velo, the_domain_level.space_pres, cubature_postproc);
-
-        const DataType dpf1 = nu;
         const DataType dpf2 = DataType(2) / (dim == 2 ?
           DataType(0.100)*Math::sqr(v_max*(DataType(2)/DataType(3))) : // = 2 / (rho * U^2 * D)
           DataType(0.041)*Math::sqr(v_max*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
 
-        summary.drag_coeff_vol = the_system_level.gate_sys.sum(dpf2 * (dpf1 * bdf[0][0] + bdf[1][0]));
-        summary.lift_coeff_vol = the_system_level.gate_sys.sum(dpf2 * (dpf1 * bdf[0][1] + bdf[1][1]));
+        summary.drag_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[0]);
+        summary.lift_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[1]);
       }
 
       // compute pressure difference

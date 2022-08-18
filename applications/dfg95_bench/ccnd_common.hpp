@@ -696,263 +696,28 @@ namespace DFG95
     }
   }; // class XFluxAccumulator
 
-  // computes the bbody forces by the 'volume integration' approach
+  // computes the body forces by the volumetric 'defect vector' approach
   template<
     typename DataType_,
     int dim_,
     typename VectorTypeV_,
-    typename VectorTypeP_,
-    typename VectorTypeC_,
-    typename SpaceV_,
-    typename SpaceP_,
-    typename Cubature_>
-  void assemble_bdforces_vol(
-    //Tiny::Tensor3<DataType_, 3, 2, dim_>& forces,
-    Tiny::Matrix<DataType_, 2, dim_>& forces,
-    const VectorTypeV_& vec_sol_v,
-    const VectorTypeP_& vec_sol_p,
-    const VectorTypeC_& vec_char,
-    const SpaceV_& space_v,
-    const SpaceP_& space_p,
-    const Cubature_& cubature_factory)
+    typename VectorTypeC_>
+    void assemble_bdforces_vol(
+      Tiny::Vector<DataType_, dim_>& forces,
+      const VectorTypeV_& vec_def_v, // unsync'ed and unfiltered !!
+      const VectorTypeC_& vec_char)
   {
     forces.format();
 
-    // assembly traits
-    typedef Assembly::AsmTraits2<
-      DataType_,
-      SpaceV_,
-      SpaceP_,
-      TrafoTags::jac_det,
-      SpaceTags::grad,
-      SpaceTags::value> AsmTraits;
+    XASSERT(vec_def_v.size() == vec_char.size());
 
-    // fetch the trafo
-    const typename AsmTraits::TrafoType& trafo = space_v.get_trafo();
-
-    // create a trafo evaluator
-    typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
-
-    // create space evaluators
-    typename AsmTraits::TestEvaluator velo_eval(space_v);
-    typename AsmTraits::TrialEvaluator pres_eval(space_p);
-
-    // create dof-mappings
-    typename AsmTraits::TestDofMapping velo_dof_mapping(space_v);
-    typename AsmTraits::TrialDofMapping pres_dof_mapping(space_p);
-
-    // create trafo evaluation data
-    typename AsmTraits::TrafoEvalData trafo_data;
-
-    // create space evaluation data
-    typename AsmTraits::TestEvalData velo_data;
-    typename AsmTraits::TrialEvalData pres_data;
-
-    // maximum number of dofs
-    static constexpr int max_velo_dofs = AsmTraits::max_local_test_dofs;
-    static constexpr int max_pres_dofs = AsmTraits::max_local_trial_dofs;
-
-    // create cubature rule
-    typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-    // create vector gathers
-    typename VectorTypeV_::GatherAxpy gather_velo(vec_sol_v);
-    typename VectorTypeP_::GatherAxpy gather_pres(vec_sol_p);
-    typename VectorTypeC_::GatherAxpy gather_char(vec_char);
-
-    // create local vector data
-    typedef typename VectorTypeV_::ValueType VeloValue;
-    typedef typename VectorTypeP_::ValueType PresValue;
-    typedef typename VectorTypeC_::ValueType CharValue;
-    typedef Tiny::Vector<VeloValue, max_velo_dofs> LocalVectorTypeV;
-    typedef Tiny::Vector<PresValue, max_pres_dofs> LocalVectorTypeP;
-    typedef Tiny::Vector<CharValue, max_velo_dofs> LocalVectorTypeC;
-
-    LocalVectorTypeV local_velo_dofs;
-    LocalVectorTypeP local_pres_dofs;
-    LocalVectorTypeC local_char_dofs;//, local_char_dofs2, local_char_dofs3;
-
-    // our local velocity gradient
-    Tiny::Matrix<DataType_, dim_, dim_> loc_grad_v;
-    PresValue loc_pres;
-    Tiny::Vector<DataType_, dim_> loc_nu_v, loc_char1;//, loc_char2, loc_char3;
-
-    loc_grad_v.format();
-    loc_pres = DataType_(0);
-    loc_char1.format();
-    //loc_char2.format();
-    //loc_char3.format();
-
-    // loop over all cells of the mesh
-    for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+    // get the vector arrays
+    const Index n = vec_def_v.size();
+    const auto* vdef = vec_def_v.elements();
+    const auto* vchr = vec_char.elements();
+    for(Index i(0); i < n; ++i)
     {
-      // prepare trafo evaluator
-      trafo_eval.prepare(cell);
-
-      // prepare space evaluator
-      velo_eval.prepare(trafo_eval);
-      pres_eval.prepare(trafo_eval);
-
-      // initialize dof-mapping
-      velo_dof_mapping.prepare(cell);
-      pres_dof_mapping.prepare(cell);
-
-      // fetch number of local dofs
-      const int num_loc_velo_dofs = velo_eval.get_num_local_dofs();
-      const int num_loc_pres_dofs = pres_eval.get_num_local_dofs();
-
-      // gather our local dofs
-      local_velo_dofs.format();
-      local_pres_dofs.format();
-      local_char_dofs.format();
-      gather_velo(local_velo_dofs, velo_dof_mapping);
-      gather_pres(local_pres_dofs, pres_dof_mapping);
-      gather_char(local_char_dofs, velo_dof_mapping);
-
-      // note: the following were experimental variants of the characteristic function that were
-      // chose in hope of obtaining higher EOCs. some seemed to work in 2D, but all failed in 3D.
-      /*if(dim == 2)
-      {
-        // build char dofs 2
-        local_char_dofs2[0] = local_char_dofs[0];
-        local_char_dofs2[1] = local_char_dofs[1];
-        local_char_dofs2[2] = local_char_dofs[2];
-        local_char_dofs2[3] = local_char_dofs[3];
-        local_char_dofs2[4] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[1]));
-        local_char_dofs2[5] = Math::sqr(DataType(0.5) * (local_char_dofs[2] + local_char_dofs[3]));
-        local_char_dofs2[6] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[2]));
-        local_char_dofs2[7] = Math::sqr(DataType(0.5) * (local_char_dofs[1] + local_char_dofs[3]));
-        local_char_dofs2[8] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[1] + local_char_dofs[2] + local_char_dofs[3]));
-
-        // build char dofs 3
-        local_char_dofs3[0] = local_char_dofs[0];
-        local_char_dofs3[1] = local_char_dofs[1];
-        local_char_dofs3[2] = local_char_dofs[2];
-        local_char_dofs3[3] = local_char_dofs[3];
-        local_char_dofs3[4] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[1]));
-        local_char_dofs3[5] = Math::sqr(DataType(0.5) * (local_char_dofs[2] + local_char_dofs[3]));
-        local_char_dofs3[6] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[2]));
-        local_char_dofs3[7] = Math::sqr(DataType(0.5) * (local_char_dofs[1] + local_char_dofs[3]));
-        local_char_dofs3[8] = 0.0;
-      }
-      else
-      {
-        // build char dofs 2
-        local_char_dofs2[ 0] = local_char_dofs[0];
-        local_char_dofs2[ 1] = local_char_dofs[1];
-        local_char_dofs2[ 2] = local_char_dofs[2];
-        local_char_dofs2[ 3] = local_char_dofs[3];
-        local_char_dofs2[ 4] = local_char_dofs[4];
-        local_char_dofs2[ 5] = local_char_dofs[5];
-        local_char_dofs2[ 6] = local_char_dofs[6];
-        local_char_dofs2[ 7] = local_char_dofs[7];
-        local_char_dofs2[ 8] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[1]));
-        local_char_dofs2[ 9] = Math::sqr(DataType(0.5) * (local_char_dofs[2] + local_char_dofs[3]));
-        local_char_dofs2[10] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[2]));
-        local_char_dofs2[11] = Math::sqr(DataType(0.5) * (local_char_dofs[1] + local_char_dofs[3]));
-        local_char_dofs2[12] = Math::sqr(DataType(0.5) * (local_char_dofs[4] + local_char_dofs[5]));
-        local_char_dofs2[13] = Math::sqr(DataType(0.5) * (local_char_dofs[6] + local_char_dofs[7]));
-        local_char_dofs2[14] = Math::sqr(DataType(0.5) * (local_char_dofs[4] + local_char_dofs[6]));
-        local_char_dofs2[15] = Math::sqr(DataType(0.5) * (local_char_dofs[5] + local_char_dofs[7]));
-        local_char_dofs2[16] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[4]));
-        local_char_dofs2[17] = Math::sqr(DataType(0.5) * (local_char_dofs[1] + local_char_dofs[5]));
-        local_char_dofs2[18] = Math::sqr(DataType(0.5) * (local_char_dofs[2] + local_char_dofs[6]));
-        local_char_dofs2[19] = Math::sqr(DataType(0.5) * (local_char_dofs[3] + local_char_dofs[7]));
-        local_char_dofs2[20] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[1] + local_char_dofs[2] + local_char_dofs[3]));
-        local_char_dofs2[21] = Math::sqr(DataType(0.25) * (local_char_dofs[4] + local_char_dofs[5] + local_char_dofs[6] + local_char_dofs[7]));
-        local_char_dofs2[22] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[1] + local_char_dofs[4] + local_char_dofs[5]));
-        local_char_dofs2[23] = Math::sqr(DataType(0.25) * (local_char_dofs[2] + local_char_dofs[3] + local_char_dofs[6] + local_char_dofs[7]));
-        local_char_dofs2[24] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[2] + local_char_dofs[4] + local_char_dofs[6]));
-        local_char_dofs2[25] = Math::sqr(DataType(0.25) * (local_char_dofs[1] + local_char_dofs[3] + local_char_dofs[5] + local_char_dofs[7]));
-        local_char_dofs2[26] = Math::sqr(DataType(0.125) * (local_char_dofs[0] + local_char_dofs[1] + local_char_dofs[2] + local_char_dofs[3] + local_char_dofs[4] + local_char_dofs[5] + local_char_dofs[6] + local_char_dofs[7]));
-
-        // build char dofs 3
-        local_char_dofs3[ 0] = local_char_dofs[0];
-        local_char_dofs3[ 1] = local_char_dofs[1];
-        local_char_dofs3[ 2] = local_char_dofs[2];
-        local_char_dofs3[ 3] = local_char_dofs[3];
-        local_char_dofs3[ 4] = local_char_dofs[4];
-        local_char_dofs3[ 5] = local_char_dofs[5];
-        local_char_dofs3[ 6] = local_char_dofs[6];
-        local_char_dofs3[ 7] = local_char_dofs[7];
-        local_char_dofs3[ 8] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[1]));
-        local_char_dofs3[ 9] = Math::sqr(DataType(0.5) * (local_char_dofs[2] + local_char_dofs[3]));
-        local_char_dofs3[10] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[2]));
-        local_char_dofs3[11] = Math::sqr(DataType(0.5) * (local_char_dofs[1] + local_char_dofs[3]));
-        local_char_dofs3[12] = Math::sqr(DataType(0.5) * (local_char_dofs[4] + local_char_dofs[5]));
-        local_char_dofs3[13] = Math::sqr(DataType(0.5) * (local_char_dofs[6] + local_char_dofs[7]));
-        local_char_dofs3[14] = Math::sqr(DataType(0.5) * (local_char_dofs[4] + local_char_dofs[6]));
-        local_char_dofs3[15] = Math::sqr(DataType(0.5) * (local_char_dofs[5] + local_char_dofs[7]));
-        local_char_dofs3[16] = Math::sqr(DataType(0.5) * (local_char_dofs[0] + local_char_dofs[4]));
-        local_char_dofs3[17] = Math::sqr(DataType(0.5) * (local_char_dofs[1] + local_char_dofs[5]));
-        local_char_dofs3[18] = Math::sqr(DataType(0.5) * (local_char_dofs[2] + local_char_dofs[6]));
-        local_char_dofs3[19] = Math::sqr(DataType(0.5) * (local_char_dofs[3] + local_char_dofs[7]));
-        local_char_dofs3[20] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[1] + local_char_dofs[2] + local_char_dofs[3]));
-        local_char_dofs3[21] = Math::sqr(DataType(0.25) * (local_char_dofs[4] + local_char_dofs[5] + local_char_dofs[6] + local_char_dofs[7]));
-        local_char_dofs3[22] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[1] + local_char_dofs[4] + local_char_dofs[5]));
-        local_char_dofs3[23] = Math::sqr(DataType(0.25) * (local_char_dofs[2] + local_char_dofs[3] + local_char_dofs[6] + local_char_dofs[7]));
-        local_char_dofs3[24] = Math::sqr(DataType(0.25) * (local_char_dofs[0] + local_char_dofs[2] + local_char_dofs[4] + local_char_dofs[6]));
-        local_char_dofs3[25] = Math::sqr(DataType(0.25) * (local_char_dofs[1] + local_char_dofs[3] + local_char_dofs[5] + local_char_dofs[7]));
-        local_char_dofs3[26] = 0.0;
-      }*/
-
-      // loop over all quadrature points and integrate
-      for(int point(0); point < cubature_rule.get_num_points(); ++point)
-      {
-        // compute trafo data
-        trafo_eval(trafo_data, cubature_rule.get_point(point));
-
-        // compute basis function data
-        velo_eval(velo_data, trafo_data);
-        pres_eval(pres_data, trafo_data);
-
-        // pre-compute cubature weight
-        const DataType_ weight = trafo_data.jac_det * cubature_rule.get_weight(point);
-
-        // compute local velocity gradient and characteristic gradient
-        loc_grad_v.format();
-        loc_char1.format();
-        //loc_char2.format();
-        //loc_char3.format();
-        for(int i(0); i < num_loc_velo_dofs; ++i)
-        {
-          // update velocity gradient
-          loc_grad_v.add_outer_product(local_velo_dofs[i], velo_data.phi[i].grad);
-          loc_char1.axpy(local_char_dofs[i], velo_data.phi[i].grad);
-          //loc_char2.axpy(local_char_dofs2[i], velo_data.phi[i].grad);
-          //loc_char3.axpy(local_char_dofs3[i], velo_data.phi[i].grad);
-        }
-
-        // compute local pressure
-        loc_pres = DataType_(0);
-        for(int i(0); i < num_loc_pres_dofs; ++i)
-        {
-          loc_pres += local_pres_dofs[i] * pres_data.phi[i].value;
-        }
-
-        // V-forces
-        forces[0].add_mat_vec_mult(loc_grad_v, loc_char1, -weight);
-        //forces[0][0].add_mat_vec_mult(loc_grad_v, loc_char1, -weight);
-        //forces[1][0].add_mat_vec_mult(loc_grad_v, loc_char2, -weight);
-        //forces[2][0].add_mat_vec_mult(loc_grad_v, loc_char3, -weight);
-
-        // P-forces
-        forces[1].axpy(weight * loc_pres, loc_char1);
-        //forces[0][1].axpy(weight * loc_pres, loc_char1);
-        //forces[1][1].axpy(weight * loc_pres, loc_char2);
-        //forces[2][1].axpy(weight * loc_pres, loc_char3);
-
-        // continue with next cubature point
-      }
-
-      // finish dof mapping
-      pres_dof_mapping.finish();
-      velo_dof_mapping.finish();
-
-      // finish evaluators
-      pres_eval.finish();
-      velo_eval.finish();
-      trafo_eval.finish();
+      forces.axpy(vchr[i], vdef[i]);
     }
   }
 
