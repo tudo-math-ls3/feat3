@@ -195,8 +195,8 @@ struct MeshoptRefinementApp
     String file_basename(name()+"_n"+stringify(comm.size()));
 
     // Adapt the finest level
-    dom_ctrl.set_adapt_mode(finest_adapt_mode);
-    dom_ctrl.front()->get_mesh_node()->adapt();
+    if(finest_adapt_mode == Geometry::AdaptMode::chart)
+      dom_ctrl.front()->get_mesh_node()->adapt();
 
     // Save new coordinates. We need them for calling prepare() to set the initial guess
     meshopt_ctrl->mesh_to_buffer();

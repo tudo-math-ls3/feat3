@@ -192,9 +192,6 @@ struct MeshoptBoundaryApp
     dom_ctrl.parse_property_map(*domain_control_settings_section);
     dom_ctrl.set_desired_levels(lvl_max, lvl_min);
     dom_ctrl.create(mesh_file_reader);
-    // After the initial creation of the hierarchy, we need to set the adapt mode to none because we will be modifying
-    // the vertex coordinates directly and do not want adapt() to interfere with that
-    dom_ctrl.set_adapt_mode(Geometry::AdaptMode::none);
 
     // Mesh on the finest level, mainly for computing quality indicators
     const auto& finest_mesh = dom_ctrl.front()->get_mesh();
