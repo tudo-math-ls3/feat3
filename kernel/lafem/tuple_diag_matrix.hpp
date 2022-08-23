@@ -483,7 +483,7 @@ namespace FEAT
         rest().scale_rows(a.rest(), w.rest());
       }
 
-      void scale_cols(const TupleDiagMatrix& a, const VectorTypeL& w)
+      void scale_cols(const TupleDiagMatrix& a, const VectorTypeR& w)
       {
         first().scale_cols(a.first(), w.first());
         rest().scale_cols(a.rest(), w.rest());
@@ -860,7 +860,7 @@ namespace FEAT
         first().scale_rows(a.first(), w.first());
       }
 
-      void scale_cols(const TupleDiagMatrix& a, const VectorTypeL& w)
+      void scale_cols(const TupleDiagMatrix& a, const VectorTypeR& w)
       {
         first().scale_cols(a.first(), w.first());
       }
@@ -878,7 +878,7 @@ namespace FEAT
         this->first().set_line(row, pval_set, pcol_set, col_start, stride);
       }
 
-      void set_line_revse(const Index row, DataType * const pval_set, const Index stride = 1) const
+      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1) const
       {
         this->first().set_line_reverse(row, pval_set, stride);
       }

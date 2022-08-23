@@ -572,7 +572,7 @@ namespace FEAT
         rest().scale_rows(a.rest(), w.rest());
       }
 
-      void scale_cols(const PowerDiagMatrix& a, const VectorTypeL& w)
+      void scale_cols(const PowerDiagMatrix& a, const VectorTypeR& w)
       {
         first().scale_cols(a.first(), w.first());
         rest().scale_cols(a.rest(), w.rest());
@@ -979,7 +979,7 @@ namespace FEAT
         first().scale_rows(a.first(), w.first());
       }
 
-      void scale_cols(const PowerDiagMatrix& a, const VectorTypeL& w)
+      void scale_cols(const PowerDiagMatrix& a, const VectorTypeR& w)
       {
         first().scale_cols(a.first(), w.first());
       }
