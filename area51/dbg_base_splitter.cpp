@@ -12,6 +12,7 @@
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/interpolator.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/scalar_basic.hpp>
@@ -36,6 +37,7 @@ namespace DbgBaseSplitter
     args.support("mesh");
     args.support("level");
     args.support("in");
+    args.support("in-b");
     args.support("out");
 
     // check for unsupported options
@@ -100,6 +102,10 @@ namespace DbgBaseSplitter
     // get our assembled vector type
     typedef typename SystemLevelType::GlobalSystemVector GlobalSystemVector;
 
+    typedef typename SystemLevelType::SystemMirror MirrorType;
+
+    typedef LAFEM::DenseVectorBlocked<MemType, DataType, IndexType, 2> VectorTypeBlocked;
+
     // fetch our finest levels
     DomainLevelType& the_domain_level = *domain.front();
     SystemLevelType the_system_level;
@@ -111,6 +117,7 @@ namespace DbgBaseSplitter
     // create new vector
     GlobalSystemVector vector(&the_system_level.gate_sys);
     Assembly::Interpolator::project(vector.local(), sol_func, the_domain_level.space);
+
 
     GlobalSystemVector vector2 = vector.clone(LAFEM::CloneMode::Layout);
     vector2.format();
@@ -141,6 +148,28 @@ namespace DbgBaseSplitter
       vector2.axpy(vector, vector2, -1.0);
       double ad = vector2.max_abs_element();
       comm.print("Max absolute difference: " + stringify_fp_sci(ad));
+    }
+
+    // read in a blocked vector?
+    if(args.check("in-b") > 0)
+    {
+      //if(comm.rank() == 0) __debugbreak();
+
+      VectorTypeBlocked vector_b(the_domain_level.space.get_num_dofs());
+
+      // convert gate (just for kicks)
+      Global::Gate<VectorTypeBlocked, MirrorType> gate_blocked;
+      gate_blocked.convert(the_system_level.gate_sys, vector_b.clone());
+
+      // convert splitter
+      Global::Splitter<VectorTypeBlocked, MirrorType> splitter_blocked;
+      splitter_blocked.convert(the_system_level.base_splitter_sys, vector_b.clone());
+
+      String filename;
+      args.parse("in-b", filename);
+
+      comm.print("Reading input file '" + filename + "'");
+      splitter_blocked.split_read_from(vector_b, filename, file_mode);
     }
   }
 } // namespace DbgBaseSplitter
