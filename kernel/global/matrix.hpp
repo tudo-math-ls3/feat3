@@ -117,7 +117,7 @@ namespace FEAT
         if((_row_gate != nullptr) && (_col_gate != nullptr))
         {
           // the gates must be defined on the same communicator
-          XASSERT(_row_gate.get_comm() == _col_gate.get_comm());
+          XASSERT(_row_gate->get_comm() == _col_gate->get_comm());
         }
       }
 
