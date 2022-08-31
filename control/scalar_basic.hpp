@@ -236,6 +236,10 @@ namespace FEAT
         // get the layer
         const auto& layer = virt_lvl.layer();
 
+        // nothing to assemble?
+        if(layer.comm().size() <= 1)
+          return;
+
         // is this the root process?
         if(layer.comm().rank() == 0)
         {
@@ -254,10 +258,6 @@ namespace FEAT
             this->base_splitter_sys.push_patch(std::move(patch_mirror));
           }
         }
-
-        // nothing to assemble?
-        if(layer.comm().size() <= 1)
-          return;
 
         // assemble muxer child
         const DomainLevel_& level = virt_lvl.level();
