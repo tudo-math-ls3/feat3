@@ -330,6 +330,9 @@ namespace FEAT
 
         // permute index sets
         this->_index_set_holder.permute(this->_permutation.get_perms(), this->_permutation.get_inv_perms());
+
+        // rebuild neighbor index set
+        fill_neighbors();
       }
 
       /**
@@ -364,6 +367,9 @@ namespace FEAT
 
         // permute index sets
         this->_index_set_holder.permute(this->_permutation.get_perms(), this->_permutation.get_inv_perms());
+
+        // rebuild neighbor index set
+        fill_neighbors();
       }
 
       /**
