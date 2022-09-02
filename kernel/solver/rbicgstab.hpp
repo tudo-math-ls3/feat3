@@ -244,7 +244,7 @@ namespace FEAT
 
         vec_vh.copy(vec_z);
 
-        rho = dot_rho->wait();
+        rho = dot_rho.wait();
         rho_old = rho;
 
         pre_iter.destroy();
@@ -267,7 +267,7 @@ namespace FEAT
             return Status::aborted;
           }
 
-          delta = dot_delta->wait();
+          delta = dot_delta.wait();
           alpha = rho / delta;
 
           vec_th.axpy(vec_s, vec_z, -alpha);
@@ -291,16 +291,16 @@ namespace FEAT
             return Status::aborted;
           }
 
-          theta = dot_theta->wait();
-          phi = dot_phi->wait();
-          psi = dot_psi->wait();
+          theta = dot_theta.wait();
+          phi = dot_phi.wait();
+          psi = dot_psi.wait();
 
           // Check if we are already converged or failed after the "half" update
           {
             Status status_half(Status::progress);
 
             DataType def_old(this->_def_cur);
-            DataType def_half(norm_def_half->wait());
+            DataType def_half(norm_def_half.wait());
 
             // ensure that the defect is neither NaN nor infinity
             if(!Math::isfinite(def_half))
@@ -351,7 +351,7 @@ namespace FEAT
           vec_vh.axpy(vec_s, vec_vh, -omega);
           vec_vh.axpy(vec_vh, vec_z, beta);
 
-          status = this->_update_defect(norm_def_cur->wait());
+          status = this->_update_defect(norm_def_cur.wait());
           if(status != Status::progress)
           {
             stat.destroy();

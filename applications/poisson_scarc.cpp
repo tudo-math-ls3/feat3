@@ -52,7 +52,10 @@ namespace PoissonScaRC
       // clone transfer matrix
       auto locmat = this->transfer_sys.local().get_mat_prol().clone(LAFEM::CloneMode::Weak);
 
-      Global::synch_matrix(locmat, *this->gate_sys._comm, this->gate_sys._ranks, this->gate_sys._mirrors, coarse_level.gate_sys._mirrors);
+      Global::SynchMatrix<typename BaseClass::LocalSystemTransferMatrix, typename BaseClass::SystemMirror> synch_mat(
+        *this->gate_sys._comm, this->gate_sys._ranks, this->gate_sys._mirrors, coarse_level.gate_sys._mirrors);
+      synch_mat.init(locmat);
+      synch_mat.exec(locmat);
 
       this->local_transfer_sys.get_mat_prol() = locmat.clone(LAFEM::CloneMode::Shallow);
       this->local_transfer_sys.get_mat_rest() = locmat.transpose();

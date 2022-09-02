@@ -14,43 +14,42 @@ namespace FEAT
 {
   namespace Global
   {
-
-  /**
-   * \brief Symmetric lumped Schur complement matrix
-   *
-   * \tparam LumpedMatrixA_
-   * Type for the vector representing the diagonal middle matrix
-   *
-   * \tparam MatrixB_
-   * Type for the right matrix
-   *
-   * \tparam MatrixD_
-   * Type for the left matrix
-   *
-   * \tparam FilterA_
-   * Filter for the diagonal middle matrix
-   *
-   * For given matrices \f$ B, A = diag(a), D = B^T \f$, this emulates the matrix
-   * \f[ S = B^T A^{-1} B. \f]
-   * This is called Lumped because the diagonal structure of A usually comes from lumping.
-   *
-   * \warning For efficiency reasons, \f$ B^T \f$ needs to be explicitly computed and passed as \f$ D \f$, but this
-   * property is only checked very superficially (and only in debug mode).
-   *
-   * \note In the current implementation, all container template parameters must be Global:: as the synchronization
-   * is done manually by using local() objects and calling sync_0()
-   *
-   * \author Jordi Paul
-   */
-  template
-  <
-    typename LumpedMatrixA_,
-    typename MatrixB_,
-    typename MatrixD_,
-    typename FilterA_
-  >
-  class SymmetricLumpedSchurMatrix
-  {
+    /**
+     * \brief Symmetric lumped Schur complement matrix
+     *
+     * \tparam LumpedMatrixA_
+     * Type for the vector representing the diagonal middle matrix
+     *
+     * \tparam MatrixB_
+     * Type for the right matrix
+     *
+     * \tparam MatrixD_
+     * Type for the left matrix
+     *
+     * \tparam FilterA_
+     * Filter for the diagonal middle matrix
+     *
+     * For given matrices \f$ B, A = diag(a), D = B^T \f$, this emulates the matrix
+     * \f[ S = B^T A^{-1} B. \f]
+     * This is called Lumped because the diagonal structure of A usually comes from lumping.
+     *
+     * \warning For efficiency reasons, \f$ B^T \f$ needs to be explicitly computed and passed as \f$ D \f$, but this
+     * property is only checked very superficially (and only in debug mode).
+     *
+     * \note In the current implementation, all container template parameters must be Global:: as the synchronization
+     * is done manually by using local() objects and calling sync_0()
+     *
+     * \author Jordi Paul
+     */
+    template
+    <
+      typename LumpedMatrixA_,
+      typename MatrixB_,
+      typename MatrixD_,
+      typename FilterA_
+    >
+    class SymmetricLumpedSchurMatrix
+    {
     public:
       /// The type of A = diag(a)
       typedef LumpedMatrixA_ LumpedMatrixTypeA;
@@ -113,22 +112,23 @@ namespace FEAT
        * \param[in] filter_a_
        * Filter for A
        */
-      SymmetricLumpedSchurMatrix(const LumpedMatrixA_& lumped_matrix_a_,
-      const MatrixB_& matrix_b_,
-      const MatrixD_& matrix_d_,
-      const FilterA_& filter_a_) :
+      SymmetricLumpedSchurMatrix(
+        const LumpedMatrixA_& lumped_matrix_a_,
+        const MatrixB_& matrix_b_,
+        const MatrixD_& matrix_d_,
+        const FilterA_& filter_a_) :
         inv_lumped_matrix_a(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
         matrix_b(matrix_b_),
         matrix_d(matrix_d_),
         filter_a(filter_a_),
         _vec_ml(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
         _vec_mr(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout))
-        {
-          ASSERT(matrix_d.columns() == matrix_b.rows());
-          ASSERT(matrix_d.used_elements() == matrix_b.used_elements());
+      {
+        ASSERT(matrix_d.columns() == matrix_b.rows());
+        ASSERT(matrix_d.used_elements() == matrix_b.used_elements());
 
-          inv_lumped_matrix_a.component_invert(lumped_matrix_a_);
-        }
+        inv_lumped_matrix_a.component_invert(lumped_matrix_a_);
+      }
 
       /**
        * \brief Virtual destructor
@@ -351,7 +351,7 @@ namespace FEAT
       //  return locmat;
       //}
 
-  };
+    }; // class SymmetricLumpedSchurMatrix<...>
   } // namespace Global
 } // namespace FEAT
 

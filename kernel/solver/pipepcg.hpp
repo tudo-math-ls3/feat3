@@ -242,10 +242,10 @@ namespace FEAT
           matrix.apply(vec_n, vec_m);
           filter.filter_def(vec_n);
 
-          gamma = dot_gamma->wait();
-          delta = dot_delta->wait();
+          gamma = dot_gamma.wait();
+          delta = dot_delta.wait();
 
-          status = this->_update_defect(norm_def_cur->wait());
+          status = this->_update_defect(norm_def_cur.wait());
           if(status != Status::progress)
           {
             stat.destroy();

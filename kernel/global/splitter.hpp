@@ -347,15 +347,15 @@ namespace FEAT
       }
 
       /**
-      * \brief Splits a base-mesh local vector on the root process into a patch-local vector
-      *
-      * \param[inout] vector
-      * A \transient reference to the type-1 patch-local vector that receives the split base-mesh vector.
-      * Must be allocated to correct size(s), but its numerical contents are ignored.
-      *
-      * \param[in] vec_base
-      * A \transient reference to a base-mesh local vector that is to be split.
-      */
+       * \brief Splits a base-mesh local vector on the root process into a patch-local vector
+       *
+       * \param[inout] vector
+       * A \transient reference to the type-1 patch-local vector that receives the split base-mesh vector.
+       * Must be allocated to correct size(s), but its numerical contents are ignored.
+       *
+       * \param[in] vec_base
+       * A \transient reference to a base-mesh local vector that is to be split.
+       */
       void split(LocalVector_& vector, const LocalVector_& vec_base) const
       {
         // are there no other processes involved here?

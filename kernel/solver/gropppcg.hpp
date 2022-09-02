@@ -227,7 +227,7 @@ namespace FEAT
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
           }
-          t = dot_t->wait();
+          t = dot_t.wait();
 
           alpha = gamma / t;
 
@@ -242,14 +242,14 @@ namespace FEAT
           matrix.apply(vec_Z, vec_z);
           filter.filter_def(vec_Z);
 
-          gamma_new = dot_gamma_new->wait();
+          gamma_new = dot_gamma_new.wait();
           beta = gamma_new / gamma;
           gamma = gamma_new;
 
           vec_p.axpy(vec_p, vec_z, beta);
           vec_s.axpy(vec_s, vec_Z, beta);
 
-          status = this->_update_defect(norm_def_cur->wait());
+          status = this->_update_defect(norm_def_cur.wait());
           if(status != Status::progress)
           {
             stat.destroy();

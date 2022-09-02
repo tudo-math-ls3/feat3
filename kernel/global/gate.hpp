@@ -58,8 +58,8 @@ namespace FEAT
       typedef LAFEM::DenseVector<Mem::Main, DataType, IndexType> BufferVectorType;
       typedef Mirror_ MirrorType;
 
-      typedef std::shared_ptr<SynchScalarTicket<DataType>> ScalarTicketType;
-      typedef std::shared_ptr<SynchVectorTicket<LocalVector_, Mirror_>> VectorTicketType;
+      typedef SynchScalarTicket<DataType> ScalarTicketType;
+      typedef SynchVectorTicket<LocalVector_, Mirror_> VectorTicketType;
 
     public:
       /// our communicator
@@ -307,10 +307,11 @@ namespace FEAT
        */
       void sync_0(LocalVector_& vector) const
       {
-        if(_ranks.empty())
-          return;
-
-        synch_vector(vector, *_comm, _ranks, _mirrors);
+        if(!_ranks.empty())
+        {
+          SynchVectorTicket<LocalVector_, Mirror_> ticket(vector, *_comm, _ranks, _mirrors);
+          ticket.wait();
+        }
       }
 
       /**
@@ -327,7 +328,10 @@ namespace FEAT
        */
       VectorTicketType sync_0_async(LocalVector_& vector) const
       {
-        return std::make_shared<SynchVectorTicket<LocalVector_, Mirror_>>(vector, *_comm, _ranks, _mirrors);
+        if(_ranks.empty())
+          return SynchVectorTicket<LocalVector_, Mirror_>(); // empty ticket
+
+        return SynchVectorTicket<LocalVector_, Mirror_>(vector, *_comm, _ranks, _mirrors);
       }
 
       /**
@@ -346,11 +350,12 @@ namespace FEAT
        */
       void sync_1(LocalVector_& vector) const
       {
-        if(_ranks.empty())
-          return;
-
-        from_1_to_0(vector);
-        synch_vector(vector, *_comm, _ranks, _mirrors);
+        if(!_ranks.empty())
+        {
+          from_1_to_0(vector);
+          SynchVectorTicket<LocalVector_, Mirror_> ticket(vector, *_comm, _ranks, _mirrors);
+          ticket.wait();
+        }
       }
 
       /**
@@ -370,8 +375,11 @@ namespace FEAT
        */
       VectorTicketType sync_1_async(LocalVector_& vector) const
       {
+        if(_ranks.empty())
+          return SynchVectorTicket<LocalVector_, Mirror_>(); // empty ticket
+
         from_1_to_0(vector);
-        return sync_0_async(vector);
+        return SynchVectorTicket<LocalVector_, Mirror_>(vector, *_comm, _ranks, _mirrors);
       }
 
       /**
@@ -426,7 +434,7 @@ namespace FEAT
        */
       DataType sum(DataType x) const
       {
-        return synch_scalar(x, *_comm, Dist::op_sum, false);
+        return sum_async(x).wait();
       }
 
       /**
@@ -439,7 +447,7 @@ namespace FEAT
        */
       ScalarTicketType sum_async(DataType x, bool sqrt = false) const
       {
-        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_sum, sqrt);
+        return SynchScalarTicket<DataType>(x, *_comm, Dist::op_sum, sqrt);
       }
 
       /**
@@ -453,7 +461,7 @@ namespace FEAT
        */
       DataType min(DataType x) const
       {
-        return synch_scalar(x, *_comm, Dist::op_min, false);
+        return min_async(x).wait();
       }
 
       /**
@@ -466,7 +474,7 @@ namespace FEAT
        */
       ScalarTicketType min_async(DataType x) const
       {
-        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_min, false);
+        return SynchScalarTicket<DataType>(x, *_comm, Dist::op_min, false);
       }
 
       /**
@@ -480,7 +488,7 @@ namespace FEAT
        */
       DataType max(DataType x) const
       {
-        return synch_scalar(x, *_comm, Dist::op_max, false);
+        return max_async(x).wait();
       }
 
       /**
@@ -493,7 +501,7 @@ namespace FEAT
        */
       ScalarTicketType max_async(DataType x) const
       {
-        return std::make_shared<SynchScalarTicket<DataType>>(x, *_comm, Dist::op_max, false);
+        return SynchScalarTicket<DataType>(x, *_comm, Dist::op_max, false);
       }
 
       /**
@@ -510,7 +518,7 @@ namespace FEAT
        */
       DataType norm2(DataType x) const
       {
-        return synch_scalar(x*x, *_comm, Dist::op_sum, true);
+        return norm2_async(x).wait();
       }
 
       /**
@@ -526,111 +534,7 @@ namespace FEAT
        */
       ScalarTicketType norm2_async(DataType x) const
       {
-        return std::make_shared<SynchScalarTicket<DataType>>(x*x, *_comm, Dist::op_sum, true);
-      }
-
-      /**
-       * \brief Retrieve the absolute maximum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the absolute maximum value
-       *
-       * \return The largest absolute value of \p x.
-       */
-      DataType max_abs_element(const LocalVector_ & x) const
-      {
-        return synch_scalar(x.max_abs_element(), *_comm, Dist::op_max);
-      }
-
-      /**
-       * \brief Retrieve the absolute maximum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the absolute maximum value
-       *
-       * \returns A scalar ticket that has to be waited upon to complete the operation.
-       */
-      ScalarTicketType max_abs_element_async(const LocalVector_ & x) const
-      {
-        return std::make_shared<SynchScalarTicket<DataType>>(x.max_abs_element(), *_comm, Dist::op_max);
-      }
-
-      /**
-       * \brief Retrieve the absolute minimum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the absolute minimum value
-       *
-       * \return The smallest absolute value of \p x.
-       */
-      DataType min_abs_element(const LocalVector_ & x) const
-      {
-        return synch_scalar(x.min_abs_element(), *_comm, Dist::op_min);
-      }
-
-      /**
-       * \brief Retrieve the absolute minimum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the absolute minimum value
-       *
-       * \returns A scalar ticket that has to be waited upon to complete the operation.
-       */
-      ScalarTicketType min_abs_element_async(const LocalVector_ & x) const
-      {
-        return std::make_shared<SynchScalarTicket<DataType>>(x.min_abs_element(), *_comm, Dist::op_min);
-      }
-
-      /**
-       * \brief Retrieve the maximum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the maximum value
-       *
-       * \return The largest value of \p x.
-       */
-      DataType max_element(const LocalVector_ & x) const
-      {
-        return synch_scalar(x.max_element(), *_comm, Dist::op_max);
-      }
-
-      /**
-       * \brief Retrieve the maximum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the maximum value
-       *
-       * \returns A scalar ticket that has to be waited upon to complete the operation.
-       */
-      ScalarTicketType max_element_async(const LocalVector_ & x) const
-      {
-        return std::make_shared<SynchScalarTicket<DataType>>(x.max_element(), *_comm, Dist::op_max);
-      }
-
-      /**
-       * \brief Retrieve the minimum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the minimum value
-       *
-       * \return The smallest value of \p x.
-       */
-      DataType min_element(const LocalVector_ & x) const
-      {
-        return synch_scalar(x.min_element(), *_comm, Dist::op_max);
-      }
-
-      /**
-       * \brief Retrieve the minimum value of a vector.
-       *
-       * \param[in] x
-       * A \transient reference to the vector from which to compute the minimum value
-       *
-       * \returns A scalar ticket that has to be waited upon to complete the operation.
-       */
-      ScalarTicketType min_element_async(const LocalVector_ & x) const
-      {
-        return std::make_shared<SynchScalarTicket<DataType>>(x.min_element(), *_comm, Dist::op_max);
+        return SynchScalarTicket<DataType>(x*x, *_comm, Dist::op_sum, true);
       }
     }; // class Gate<...>
   } // namespace Global

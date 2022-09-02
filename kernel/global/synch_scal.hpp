@@ -61,6 +61,27 @@ namespace FEAT
       bool _finished;
 
     public:
+      /// standard constructor
+      SynchScalarTicket() :
+        _r(DT_(0)),
+        _x(DT_(0)),
+        _sqrt(false),
+        _mpi_exec(0.0),
+        _mpi_wait(0.0),
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        _mutex(),
+        _cv_allreduce_called(),
+        _flag_allreduce_called(false),
+        _thread(),
+#else // no MPI_THREAD_MULTIPLE
+        _req(),
+#endif // MPI_THREAD_MULTIPLE
+#endif //(defined(FEAT_HAVE_MPI) && defined(FEAT_MPI_THREAD_MULTIPLE)) || defined(DOXYGEN)
+        _finished(true)
+      {
+      }
+
       /**
        * \brief Constructor
        *
@@ -116,6 +137,55 @@ namespace FEAT
       /// Unwanted copy assignment operator: Do not implement!
       SynchScalarTicket & operator=(const SynchScalarTicket &) = delete;
 
+      /// move constructor
+      SynchScalarTicket(SynchScalarTicket&& other) :
+        _r(other._r),
+        _x(other._x),
+        _sqrt(other._sqrt),
+        _mpi_exec(other._mpi_exec),
+        _mpi_wait(other._mpi_wait),
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        _mutex(std::forward<std::mutex>(other._mutex)),
+        _cv_allreduce_called(other._cv_allreduce_called),
+        _flag_allreduce_called(other._flag_allreduce_called),
+        _thread(std::foward<std::thread>(other._thread)),
+#else // no MPI_THREAD_MULTIPLE
+        _req(std::forward<Dist::Request>(other._req)),
+#endif // MPI_THREAD_MULTIPLE
+#endif //(defined(FEAT_HAVE_MPI) && defined(FEAT_MPI_THREAD_MULTIPLE)) || defined(DOXYGEN)
+        _finished(other._finished)
+      {
+        other._finished = true;
+      }
+
+      /// move-assign operator
+      SynchScalarTicket& operator=(SynchScalarTicket&& other)
+      {
+        if(this == &other)
+          return *this;
+
+        _r = other._r;
+        _x = other._x;
+        _sqrt = other._sqrt;
+        _mpi_exec = other._mpi_exec;
+        _mpi_wait = other._mpi_wait;
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        _mutex = std::forward<std::mutex>(other._mutex);
+        _cv_allreduce_called = other._cv_allreduce_called;
+        _flag_allreduce_called = other._flag_allreduce_called;
+        _thread = std::foward<std::thread>(other._thread);
+#else // no MPI_THREAD_MULTIPLE
+        _req = std::forward<Dist::Request>(other._req);
+#endif // MPI_THREAD_MULTIPLE
+#endif //(defined(FEAT_HAVE_MPI) && defined(FEAT_MPI_THREAD_MULTIPLE)) || defined(DOXYGEN)
+        _finished = other._finished;
+
+        other._finished = true;
+        return *this;
+      }
+
       /**
        * \brief wait method
        *
@@ -166,31 +236,6 @@ namespace FEAT
       }
 #endif // FEAT_HAVE_MPI
     }; // class SynchScalarTicket
-
-    /**
-     * \brief Synchronizes a scalar value by applying a reduction operation
-     *
-     * \param[in] x
-     * The value to be synchronized.
-     *
-     * \param[in] comm
-     * The communicator to be used for synchronization.
-     *
-     * \param[in] op
-     * The reduction operation to be applied.
-     *
-     * \param[in] sqrt
-     * Specifies whether to apply the square-root onto the reduction result.
-     *
-     * \returns
-     * The synchronized value.
-     */
-    template<typename DT_>
-    DT_ synch_scalar(DT_ x, const Dist::Comm& comm, const Dist::Operation& op, bool sqrt = false)
-    {
-      SynchScalarTicket<DT_> ticket(x, comm, op, sqrt);
-      return ticket.wait();
-    }
   } // namespace Global
 } // namespace FEAT
 

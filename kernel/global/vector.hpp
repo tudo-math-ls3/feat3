@@ -402,7 +402,7 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> dot_async(const Vector& x) const
+      SynchScalarTicket<DataType> dot_async(const Vector& x) const
       {
         return _gate->dot_async(_vector, x.local());
       }
@@ -428,7 +428,7 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> norm2sqr_async() const
+      SynchScalarTicket<DataType> norm2sqr_async() const
       {
         return dot_async(*this);
       }
@@ -454,7 +454,7 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> norm2_async() const
+      SynchScalarTicket<DataType> norm2_async() const
       {
         return _gate->dot_async(_vector, _vector, true);
       }
@@ -499,7 +499,7 @@ namespace FEAT
       DataType max_abs_element() const
       {
         if (_gate != nullptr)
-          return _gate->max_abs_element(_vector);
+          return _gate->max(_vector.max_abs_element());
         return _vector.max_abs_element();
       }
 
@@ -511,9 +511,9 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> max_abs_element_async() const
+      SynchScalarTicket<DataType> max_abs_element_async() const
       {
-        return _gate->max_abs_element_async(_vector);
+        return _gate->max_async(_vector.max_abs_element());
       }
 
       /**
@@ -527,7 +527,7 @@ namespace FEAT
       DataType min_abs_element() const
       {
         if (_gate != nullptr)
-          return _gate->min_abs_element(_vector);
+          return _gate->min(_vector.min_abs_element());
         return _vector.min_abs_element();
       }
 
@@ -539,9 +539,9 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> min_abs_element_async() const
+      SynchScalarTicket<DataType> min_abs_element_async() const
       {
-        return _gate->min_abs_element_async(_vector);
+        return _gate->min_async(_vector.min_abs_element());
       }
 
       /**
@@ -567,9 +567,9 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> max_element_async() const
+      SynchScalarTicket<DataType> max_element_async() const
       {
-        return _gate->max_element_async(_vector);
+        return _gate->max_async(_vector.max_element());
       }
 
       /**
@@ -595,9 +595,9 @@ namespace FEAT
        * \attention This function must be called by all processes participating in the gate's
        * communicator, otherwise the application will deadlock.
        */
-      std::shared_ptr<SynchScalarTicket<DataType>> min_element_async() const
+      SynchScalarTicket<DataType> min_element_async() const
       {
-        return _gate->min_element_async(_vector);
+        return _gate->min_async(_vector.min_element());
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()

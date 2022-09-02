@@ -506,7 +506,11 @@ namespace FEAT
       {
         LocalMatrix_ locmat = _matrix.clone(LAFEM::CloneMode::Weak);
         if((_row_gate != nullptr) && (_col_gate != nullptr))
-          synch_matrix(locmat, *_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
+        {
+          SynchMatrix<LocalMatrix_, RowMirror_> synch(*_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
+          synch.init(locmat);
+          synch.exec(locmat);
+        }
         return locmat;
       }
 

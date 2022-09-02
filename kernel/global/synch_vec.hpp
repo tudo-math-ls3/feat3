@@ -4,8 +4,8 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef GLOBAL_SYNCH_VEC_HPP
-#define GLOBAL_SYNCH_VEC_HPP 1
+#ifndef KERNEL_GLOBAL_SYNCH_VEC_HPP
+#define KERNEL_GLOBAL_SYNCH_VEC_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -40,11 +40,11 @@ namespace FEAT
 
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       /// the vector to be synchronized
-      VT_& _target;
+      VT_* _target;
       /// our communicator
-      const Dist::Comm& _comm;
+      const Dist::Comm* _comm;
       /// the vector mirrors
-      const std::vector<VMT_>& _mirrors;
+      const std::vector<VMT_>* _mirrors;
       /// send and receive request vectors
       Dist::RequestVector _send_reqs, _recv_reqs;
       /// send and receive buffers
@@ -52,6 +52,23 @@ namespace FEAT
 #endif // FEAT_HAVE_MPI || DOXYGEN
 
     public:
+      /// default constructor
+      SynchVectorTicket() :
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+        _finished(true),
+        _target(nullptr),
+        _comm(nullptr),
+        _mirrors(nullptr),
+        _send_reqs(),
+        _recv_reqs(),
+        _send_bufs(),
+        _recv_bufs()
+#else
+        _finished(true)
+#endif // FEAT_HAVE_MPI || DOXYGEN
+      {
+      }
+
       /**
        * \brief Constructor
        *
@@ -70,14 +87,14 @@ namespace FEAT
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
       SynchVectorTicket(VT_ & target, const Dist::Comm& comm, const std::vector<int>& ranks, const std::vector<VMT_> & mirrors) :
         _finished(false),
-        _target(target),
-        _comm(comm),
-        _mirrors(mirrors)
+        _target(&target),
+        _comm(&comm),
+        _mirrors(&mirrors)
       {
         TimeStamp ts_start;
         const std::size_t n = ranks.size();
 
-        XASSERTM(mirrors.size() == n, "invalid vector mirror count");
+        XASSERTM(_mirrors->size() == n, "invalid vector mirror count");
 
         // post receives
         _recv_reqs.reserve(n);
@@ -85,10 +102,10 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer vector in main memory
-          _recv_bufs.at(i) = BufferMain(_mirrors.at(i).buffer_size(target), LAFEM::Pinning::disabled);
+          _recv_bufs.at(i) = BufferMain(_mirrors->at(i).buffer_size(target), LAFEM::Pinning::disabled);
 
           // post receive
-          _recv_reqs.push_back(_comm.irecv(_recv_bufs.at(i).elements(), _recv_bufs.at(i).size(), ranks.at(i)));
+          _recv_reqs.push_back(_comm->irecv(_recv_bufs.at(i).elements(), _recv_bufs.at(i).size(), ranks.at(i)));
         }
 
         // post sends
@@ -97,16 +114,16 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer in device memory
-          BufferType buffer(_mirrors.at(i).buffer_size(target), LAFEM::Pinning::disabled);
+          BufferType buffer(_mirrors->at(i).buffer_size(target), LAFEM::Pinning::disabled);
 
           // gather from mirror
-          _mirrors.at(i).gather(buffer, _target);
+          _mirrors->at(i).gather(buffer, *_target);
 
           // convert buffer to main memory
           _send_bufs.at(i).convert(buffer);
 
           // post send
-          _send_reqs.push_back(_comm.isend(_send_bufs.at(i).elements(), _send_bufs.at(i).size(), ranks.at(i)));
+          _send_reqs.push_back(_comm->isend(_send_bufs.at(i).elements(), _send_bufs.at(i).size(), ranks.at(i)));
         }
 
         Statistics::add_time_mpi_execute_blas2(ts_start.elapsed_now());
@@ -122,6 +139,58 @@ namespace FEAT
       SynchVectorTicket(const SynchVectorTicket &) = delete;
       /// Unwanted copy assignment operator: Do not implement!
       SynchVectorTicket & operator=(const SynchVectorTicket &) = delete;
+
+      /// move constructor
+      SynchVectorTicket(SynchVectorTicket&& other) :
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+        _finished(other._finished),
+        _target(other->_target),
+        _comm(other->_comm),
+        _mirrors(other->_mirrors),
+        _send_reqs(std::forward<Dist::RequestVector>(other._send_reqs)),
+        _recv_reqs(std::forward<Dist::RequestVector>(other._recv_reqs)),
+        _send_bufs(std::forward<Dist::RequestVector>(other._send_bufs)),
+        _recv_bufs(std::forward<Dist::RequestVector>(other._recv_bufs))
+      {
+        other->_finished = true;
+        other->_comm = nullptr;
+        other->_target = nullptr;
+        other->_mirrors = nullptr;
+      }
+#else
+        _finished(other._finished)
+      {
+        other->_finished = true;
+      }
+#endif // FEAT_HAVE_MPI
+
+      /// move-assign operator
+      SynchVectorTicket& operator=(SynchVectorTicket&& other)
+      {
+        if(this == &other)
+          return *this;
+
+#if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
+        _finished = other._finished;
+        _target = other->_target;
+        _comm = other->_comm;
+        _mirrors = other->_mirrors;
+        _send_reqs = std::forward<Dist::RequestVector>(other._send_reqs);
+        _recv_reqs = std::forward<Dist::RequestVector>(other._recv_reqs);
+        _send_bufs = std::forward<Dist::RequestVector>(other._send_bufs);
+        _recv_bufs = std::forward<Dist::RequestVector>(other._recv_bufs);
+
+        other->_finished = true;
+        other->_comm = nullptr;
+        other->_target = nullptr;
+        other->_mirrors = nullptr;
+#else
+        _finished = other._finished;
+        other->_finished = true;
+#endif // FEAT_HAVE_MPI
+
+        return *this;
+      }
 
       /**
        * \brief wait method
@@ -144,7 +213,7 @@ namespace FEAT
           buffer.convert(_recv_bufs.at(idx));
 
           // scatter the receive buffer
-          _mirrors.at(idx).scatter_axpy(_target, buffer);
+          _mirrors->at(idx).scatter_axpy(*_target, buffer);
         }
 
         // wait for all sends to finish
@@ -159,32 +228,10 @@ namespace FEAT
       /// Destructor
       ~SynchVectorTicket()
       {
-        XASSERT(_finished);
+        XASSERTM(_finished, "trying to destroy an unfinished SynchVectorTicket");
       }
     }; // class SynchVectorTicket
-
-    /**
-     * \brief Synchronizes a type-0 vector
-     *
-     * \param[inout] target
-     * The type-0 vector to be synchronized
-     *
-     * \param[in] comm
-     * The communicator
-     *
-     * \param[in] ranks
-     * The neighbor ranks within the communicator
-     *
-     * \param[in] mirrors
-     * The vector mirrors to be used for synchronization
-     */
-    template<typename VT_, typename VMT_>
-    void synch_vector(VT_& target, const Dist::Comm& comm, const std::vector<int>& ranks, const std::vector<VMT_>& mirrors)
-    {
-      SynchVectorTicket<VT_, VMT_> ticket(target, comm, ranks, mirrors);
-      ticket.wait();
-    }
   } // namespace Global
 } // namespace FEAT
 
-#endif // GLOBAL_SYNCH_VEC_HPP
+#endif // KERNEL_GLOBAL_SYNCH_VEC_HPP

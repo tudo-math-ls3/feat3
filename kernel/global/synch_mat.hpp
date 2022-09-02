@@ -270,33 +270,6 @@ namespace FEAT
 #endif // FEAT_HAVE_MPI
     }; // class SynchMatrix
 
-    /**
-     * \brief Synchronizes a type-0 matrix
-     *
-     * \param[inout] target
-     * The type-0 matrix to be synchronized
-     *
-     * \param[in] comm
-     * The communicator
-     *
-     * \param[in] ranks
-     * The neighbor ranks within the communicator
-     *
-     * \param[in] mirrors_row
-     * The row vector mirrors to be used for synchronization
-     *
-     * \param[in] mirrors_col
-     * The column vector mirrors to be used for synchronization
-     */
-    template<typename MT_, typename VMT_>
-    void synch_matrix(MT_& target, const Dist::Comm& comm, const std::vector<int>& ranks,
-        const std::vector<VMT_>& mirrors_row, const std::vector<VMT_>& mirrors_col)
-    {
-      SynchMatrix<MT_, VMT_> synch(comm, ranks, mirrors_row, mirrors_col);
-      synch.init(target);
-      synch.exec(target);
-    }
-
     template <typename MT_, typename SVMT_, int blocks_>
     class SynchMatrix<LAFEM::PowerDiagMatrix<MT_, blocks_>, SVMT_>
     {
@@ -380,6 +353,34 @@ namespace FEAT
 #endif // FEAT_HAVE_MPI
     };
 
+    /**
+     * \brief Synchronizes a type-0 matrix
+     *
+     * \deprecated Use the 'convert_to_1' function of the Global::Matrix class instead
+     *
+     * \param[inout] target
+     * The type-0 matrix to be synchronized
+     *
+     * \param[in] comm
+     * The communicator
+     *
+     * \param[in] ranks
+     * The neighbor ranks within the communicator
+     *
+     * \param[in] mirrors_row
+     * The row vector mirrors to be used for synchronization
+     *
+     * \param[in] mirrors_col
+     * The column vector mirrors to be used for synchronization
+     */
+    template<typename MT_, typename VMT_>
+    void synch_matrix(MT_& target, const Dist::Comm& comm, const std::vector<int>& ranks,
+        const std::vector<VMT_>& mirrors_row, const std::vector<VMT_>& mirrors_col)
+    {
+      SynchMatrix<MT_, VMT_> synch(comm, ranks, mirrors_row, mirrors_col);
+      synch.init(target);
+      synch.exec(target);
+    }
   } // namespace Global
 } // namespace FEAT
 
