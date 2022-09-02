@@ -126,7 +126,7 @@ namespace FEAT
       {
         XASSERT(slices > Index(0));
         XASSERT(z_min < z_max);
-        for(Index i(0); i < slices; ++i)
+        for(Index i(0); i <= slices; ++i)
           _z_list.push_back(z_min + (z_max-z_min)*CoordType(i)/CoordType(slices));
       }
 
