@@ -136,6 +136,42 @@ namespace FEAT
     }
 
     /**
+     * \brief Updates the minimum of a set of values.
+     *
+     * This functions performs: xmin := min(xmin, x)
+     *
+     * \param[in,out] xmin
+     * The minimum that is to be updated.
+     *
+     * \param[in] x
+     * The new value for the minimum update.
+     */
+    template<typename T_>
+    inline void mini(T_& xmin, T_ x)
+    {
+      if(x < xmin)
+        xmin = x;
+    }
+
+    /**
+     * \brief Updates the maximum of a set of values.
+     *
+     * This functions performs: xmax := max(xmax, x)
+     *
+     * \param[in,out] xmax
+     * The maximum that is to be updated.
+     *
+     * \param[in] x
+     * The new value for the maximum update.
+     */
+    template<typename T_>
+    inline void maxi(T_& xmax, T_ x)
+    {
+      if(xmax < x)
+        xmax = x;
+    }
+
+    /**
      * \brief Updates the minimum and maximum.
      *
      * This functions performs:

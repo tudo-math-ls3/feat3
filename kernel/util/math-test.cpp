@@ -32,9 +32,45 @@ public:
 
   virtual void run() const override
   {
+    test_minimaxi();
     test_factorial();
     test_binomial();
     test_ilog10();
+  }
+
+  void test_minimaxi() const
+  {
+    int imin(0), imax(0);
+
+    imin = Math::min(3, 7);
+    TEST_CHECK_EQUAL(imin, 3);
+
+    imax = Math::max(3, 7);
+    TEST_CHECK_EQUAL(imax, 7);
+
+    Math::mini(imin, 5);
+    TEST_CHECK_EQUAL(imin, 3);
+
+    Math::mini(imin, 2);
+    TEST_CHECK_EQUAL(imin, 2);
+
+    Math::maxi(imax, 5);
+    TEST_CHECK_EQUAL(imax, 7);
+
+    Math::maxi(imax, 8);
+    TEST_CHECK_EQUAL(imax, 8);
+
+    Math::minimax(5, imin, imax);
+    TEST_CHECK_EQUAL(imin, 2);
+    TEST_CHECK_EQUAL(imax, 8);
+
+    Math::minimax(1, imin, imax);
+    TEST_CHECK_EQUAL(imin, 1);
+    TEST_CHECK_EQUAL(imax, 8);
+
+    Math::minimax(9, imin, imax);
+    TEST_CHECK_EQUAL(imin, 1);
+    TEST_CHECK_EQUAL(imax, 9);
   }
 
   void test_factorial() const
