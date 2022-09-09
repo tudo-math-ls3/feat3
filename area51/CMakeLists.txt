@@ -11,6 +11,9 @@ ADD_SUBDIRECTORY( ccnd_fiber )
 
 # applications to build
 
+ADD_EXECUTABLE(dbg-dist-mesh-distortion dbg_dist_mesh_distortion.cpp)
+TARGET_LINK_LIBRARIES(dbg-dist-mesh-distortion feat)
+
 ADD_EXECUTABLE(dbg-mesh-distortion dbg_mesh_distortion.cpp)
 TARGET_LINK_LIBRARIES(dbg-mesh-distortion feat)
 
