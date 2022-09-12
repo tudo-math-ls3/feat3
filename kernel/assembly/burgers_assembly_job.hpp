@@ -312,6 +312,9 @@ namespace FEAT
       /// keep track what we need to assemble
       const bool need_diff, need_conv, need_conv_frechet, need_reac, need_streamdiff;
 
+      /// enable computation of certain quantities
+      bool need_loc_v, need_loc_grad_v, need_mean_v, need_local_h;
+
       /// the test-/trial-space to be used
       const SpaceType& space;
       /// the cubature factory used for integration
@@ -352,6 +355,9 @@ namespace FEAT
       /// reference element barycenter
       Tiny::Vector<DataType, shape_dim> barycenter;
 
+      /// local mesh width for streamline diffusion
+      DataType local_h;
+
       /// local delta for streamline diffusion
       DataType local_delta;
 
@@ -378,6 +384,10 @@ namespace FEAT
         need_conv_frechet(Math::abs(frechet_beta) > DataType(0)),
         need_reac(Math::abs(theta) > DataType(0)),
         need_streamdiff((Math::abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps)),
+        need_loc_v(need_conv),
+        need_loc_grad_v(need_conv_frechet),
+        need_mean_v(need_streamdiff),
+        need_local_h(need_streamdiff),
         space(job_.space),
         trafo(space.get_trafo()),
         trafo_eval(trafo),
@@ -394,6 +404,7 @@ namespace FEAT
         loc_grad_v(),
         streamdiff_coeffs(),
         barycenter(),
+        local_h(DataType(0)),
         local_delta(DataType(0))
       {
         // compute reference element barycenter
@@ -426,10 +437,10 @@ namespace FEAT
         gather_conv(local_conv_dofs, dof_mapping);
 
         // compute mesh width if necessary
-        if(need_streamdiff)
+        if(need_mean_v || need_local_h || need_streamdiff)
         {
-          // reset local delta
-          local_delta = DataType(0);
+          // reset local h and delta
+          local_h = local_delta = DataType(0);
 
           // evaluate trafo and space at barycenter
           trafo_eval(trafo_data, barycenter);
@@ -447,7 +458,7 @@ namespace FEAT
           if(local_norm_v > tol_eps)
           {
             // compute local mesh width w.r.t. mean velocity
-            const DataType local_h = trafo_eval.width_directed(mean_v) * local_norm_v;
+            local_h = trafo_eval.width_directed(mean_v) * local_norm_v;
 
             // compute local Re_T
             const DataType local_re = (local_norm_v * local_h) / this->sd_nu;
@@ -477,7 +488,7 @@ namespace FEAT
         space_eval(space_data, trafo_data);
 
         // evaluate convection function and its gradient (if required)
-        if(need_conv || need_streamdiff)
+        if(need_loc_v || need_conv || need_streamdiff)
         {
           loc_v.format();
           for(int i(0); i < num_local_dofs; ++i)
@@ -486,7 +497,7 @@ namespace FEAT
             loc_v.axpy(space_data.phi[i].value, local_conv_dofs[i]);
           }
         }
-        if(need_conv_frechet)
+        if(need_loc_grad_v || need_conv_frechet)
         {
           loc_grad_v.format();
           for(int i(0); i < num_local_dofs; ++i)
@@ -579,6 +590,131 @@ namespace FEAT
       }
 
       /**
+       * \brief Assembles the Burger operator in a single cubature point
+       *
+       * \param[in] weight
+       * The cubature weight, pre-multiplied by the Jacobian determinant
+       */
+      void assemble_burgers_point(const DataType weight)
+      {
+        // assemble diffusion matrix?
+        if(this->need_diff)
+        {
+          // assemble gradient-tensor diffusion
+
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              // compute scalar value
+              const DataType value = this->nu * weight * Tiny::dot(this->space_data.phi[i].grad, this->space_data.phi[j].grad);
+
+              // update local matrix
+              local_matrix[i][j].add_scalar_main_diag(value);
+            }
+          }
+
+          // assemble deformation tensor?
+          if(this->deformation)
+          {
+            // test function loop
+            for(int i(0); i < this->num_local_dofs; ++i)
+            {
+              // trial function loop
+              for(int j(0); j < this->num_local_dofs; ++j)
+              {
+                // add outer product of grad(phi) and grad(psi)
+                local_matrix[i][j].add_outer_product(this->space_data.phi[j].grad, this->space_data.phi[i].grad, this->nu * weight);
+              }
+            }
+          }
+        }
+
+        // assemble convection?
+        if(this->need_conv)
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              // compute scalar value
+              const DataType value = this->beta * weight * this->space_data.phi[i].value * Tiny::dot(this->loc_v, this->space_data.phi[j].grad);
+
+              // update local matrix
+              local_matrix[i][j].add_scalar_main_diag(value);
+            }
+          }
+        }
+
+        // assemble convection Frechet?
+        if(this->need_conv_frechet)
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              // compute scalar value
+              const DataType value = this->frechet_beta * weight * this->space_data.phi[i].value * this->space_data.phi[j].value;
+
+              // update local matrix
+              local_matrix[i][j].axpy(value, this->loc_grad_v);
+            }
+          }
+        }
+
+        // assemble reaction?
+        if(this->need_reac)
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              // compute scalar value
+              const DataType value = this->theta * weight *  this->space_data.phi[i].value * this->space_data.phi[j].value;
+
+              // update local matrix
+              local_matrix[i][j].add_scalar_main_diag(value);
+            }
+          }
+        }
+      }
+
+      /**
+       * \brief Assembles the Streamline Diffusion stabilization operator in a single cubature point
+       *
+       * \param[in] weight
+       * The cubature weight, pre-multiplied by the Jacobian determinant
+       */
+      void assemble_streamline_diffusion(const DataType weight)
+      {
+        // assemble streamline diffusion?
+        if(this->need_streamdiff && (this->local_delta > this->tol_eps))
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              // compute scalar value
+              const DataType value = this->local_delta * weight * this->streamdiff_coeffs[i] * this->streamdiff_coeffs[j];
+
+              // update local matrix
+              local_matrix[i][j].add_scalar_main_diag(value);
+            }
+          }
+        }
+      }
+
+      /**
        * \brief Performs the assembly of the local matrix.
        */
       void assemble()
@@ -594,112 +730,11 @@ namespace FEAT
           // precompute cubature weight
           const DataType weight = this->trafo_data.jac_det * this->cubature_rule.get_weight(point);
 
-          // assemble diffusion matrix?
-          if(this->need_diff)
-          {
-            // assemble gradient-tensor diffusion
+          // assemble the Burgers operator
+          this->assemble_burgers_point(weight);
 
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                // compute scalar value
-                const DataType value = this->nu * weight * Tiny::dot(this->space_data.phi[i].grad, this->space_data.phi[j].grad);
-
-                // update local matrix
-                local_matrix[i][j].add_scalar_main_diag(value);
-              }
-            }
-
-            // assemble deformation tensor?
-            if(this->deformation)
-            {
-              // test function loop
-              for(int i(0); i < this->num_local_dofs; ++i)
-              {
-                // trial function loop
-                for(int j(0); j < this->num_local_dofs; ++j)
-                {
-                  // add outer product of grad(phi) and grad(psi)
-                  local_matrix[i][j].add_outer_product(this->space_data.phi[j].grad, this->space_data.phi[i].grad, this->nu * weight);
-                }
-              }
-            }
-          }
-
-          // assemble convection?
-          if(this->need_conv)
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                // compute scalar value
-                const DataType value = this->beta * weight * this->space_data.phi[i].value * Tiny::dot(this->loc_v, this->space_data.phi[j].grad);
-
-                // update local matrix
-                local_matrix[i][j].add_scalar_main_diag(value);
-              }
-            }
-          }
-
-          // assemble convection Frechet?
-          if(this->need_conv_frechet)
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                // compute scalar value
-                const DataType value = this->frechet_beta * weight * this->space_data.phi[i].value * this->space_data.phi[j].value;
-
-                // update local matrix
-                local_matrix[i][j].axpy(value, this->loc_grad_v);
-              }
-            }
-          }
-
-          // assemble reaction?
-          if(this->need_reac)
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                // compute scalar value
-                const DataType value = this->theta * weight *  this->space_data.phi[i].value * this->space_data.phi[j].value;
-
-                // update local matrix
-                local_matrix[i][j].add_scalar_main_diag(value);
-              }
-            }
-          }
-
-          // assemble streamline diffusion?
-          if(this->need_streamdiff && (this->local_delta > this->tol_eps))
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                // compute scalar value
-                const DataType value = this->local_delta * weight * this->streamdiff_coeffs[i] * this->streamdiff_coeffs[j];
-
-                // update local matrix
-                local_matrix[i][j].add_scalar_main_diag(value);
-              }
-            }
-          }
+          // assemble the streamline diffusion
+          this->assemble_streamline_diffusion(weight);
         } // continue with next cubature point
       }
     }; // class BurgersBlockedAssemblyTaskBase<...>
@@ -921,10 +956,11 @@ namespace FEAT
           }
         }
 
-        void assemble()
+        /**
+         * \brief Computes the local vector by multiplying the local matrix by the solution vector
+         */
+        void compute_local_vector()
         {
-          // assemble the local matrix
-          BaseClass::assemble();
           local_vector.format();
 
           // compute local vector from local matrix and sol vector dofs
@@ -940,6 +976,15 @@ namespace FEAT
               for(int j(0); j < this->num_local_dofs; ++j)
                 this->local_vector[i].add_mat_vec_mult(this->local_matrix(i,j), this->local_conv_dofs[j]);
           }
+        }
+
+        void assemble()
+        {
+          // assemble the local matrix
+          BaseClass::assemble();
+
+          // compute the local vector from the matrix
+          compute_local_vector();
         }
 
         /// scatters the local vector
@@ -997,6 +1042,86 @@ namespace FEAT
       }
 
       /**
+       * \brief Assembles the Burger operator in a single cubature point
+       *
+       * \param[in] weight
+       * The cubature weight, pre-multiplied by the Jacobian determinant
+       */
+      void assemble_burgers_point(const DataType weight)
+      {
+        // assemble diffusion matrix?
+        if(this->need_diff)
+        {
+          // assemble gradient-tensor diffusion
+
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              local_matrix[i][j] += this->nu * weight
+                * Tiny::dot(this->space_data.phi[i].grad, this->space_data.phi[j].grad);
+            }
+          }
+        }
+
+        // assemble convection?
+        if(this->need_conv)
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              local_matrix[i][j] += this->beta * weight
+                * this->space_data.phi[i].value * Tiny::dot(this->loc_v, this->space_data.phi[j].grad);
+            }
+          }
+        }
+
+        // assemble reaction?
+        if(this->need_reac)
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              local_matrix[i][j] += this->theta * weight
+                * this->space_data.phi[i].value * this->space_data.phi[j].value;
+            }
+          }
+        }
+      }
+
+      /**
+       * \brief Assembles the Streamline Diffusion stabilization operator in a single cubature point
+       *
+       * \param[in] weight
+       * The cubature weight, pre-multiplied by the Jacobian determinant
+       */
+      void assemble_streamline_diffusion(const DataType weight)
+      {
+        // assemble streamline diffusion?
+        if(this->need_streamdiff && (this->local_delta > this->tol_eps))
+        {
+          // test function loop
+          for(int i(0); i < this->num_local_dofs; ++i)
+          {
+            // trial function loop
+            for(int j(0); j < this->num_local_dofs; ++j)
+            {
+              local_matrix[i][j] += this->local_delta * weight
+                * this->streamdiff_coeffs[i] * this->streamdiff_coeffs[j];
+            }
+          }
+        }
+      }
+
+      /**
        * \brief Performs the assembly of the local matrix.
        */
       void assemble()
@@ -1012,67 +1137,11 @@ namespace FEAT
           // precompute cubature weight
           const DataType weight = this->trafo_data.jac_det * this->cubature_rule.get_weight(point);
 
-          // assemble diffusion matrix?
-          if(this->need_diff)
-          {
-            // assemble gradient-tensor diffusion
+          // assemble the Burgers operator
+          this->assemble_burgers_point(weight);
 
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                local_matrix[i][j] += this->nu * weight
-                  * Tiny::dot(this->space_data.phi[i].grad, this->space_data.phi[j].grad);
-              }
-            }
-          }
-
-          // assemble convection?
-          if(this->need_conv)
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                local_matrix[i][j] += this->beta * weight
-                  * this->space_data.phi[i].value * Tiny::dot(this->loc_v, this->space_data.phi[j].grad);
-              }
-            }
-          }
-
-          // assemble reaction?
-          if(this->need_reac)
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                local_matrix[i][j] += this->theta * weight
-                  * this->space_data.phi[i].value * this->space_data.phi[j].value;
-              }
-            }
-          }
-
-          // assemble streamline diffusion?
-          if(this->need_streamdiff && (this->local_delta > this->tol_eps))
-          {
-            // test function loop
-            for(int i(0); i < this->num_local_dofs; ++i)
-            {
-              // trial function loop
-              for(int j(0); j < this->num_local_dofs; ++j)
-              {
-                local_matrix[i][j] += this->local_delta * weight
-                  * this->streamdiff_coeffs[i] * this->streamdiff_coeffs[j];
-              }
-            }
-          }
+          // assembles the streamline diffusion stabilization
+          this->assemble_streamline_diffusion(weight);
         } // continue with next cubature point
       }
     }; // class BurgersScalarAssemblyTaskBase<...>
@@ -1277,17 +1346,26 @@ namespace FEAT
           this->gather_vec_sol(this->local_sol_dofs, this->dof_mapping);
         }
 
-        void assemble()
+        /**
+         * \brief Computes the local vector by multiplying the local matrix by the solution vector
+         */
+        void compute_local_vector()
         {
-          // assemble the local matrix
-          BaseClass::assemble();
-
           // compute local vector from local matrix and sol vector dofs
           this->local_vector.format();
           for(int i(0); i < this->num_local_dofs; ++i)
             for(int j(0); j < this->num_local_dofs; ++j)
               this->local_vector[i] += this->local_matrix(i,j) * this->local_sol_dofs[j];
           //this->local_vector.set_mat_vec_mult(this->local_matrix, this->local_sol_dofs);
+        }
+
+        void assemble()
+        {
+          // assemble the local matrix
+          BaseClass::assemble();
+
+          // compute local vector from the matrix
+          compute_local_vector();
         }
 
         /// scatters the local vector
