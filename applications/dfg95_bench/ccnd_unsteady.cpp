@@ -221,6 +221,23 @@
 // single binary output file, which was written by a --save-joined-sol from a previous run.
 // If specified, the solving of the Stokes system to obtain an initial guess is skipped.
 //
+// --save-joined-velo <base-filename>
+// Specifies that the application should write the velocities in each time steo into a joined
+// binary output file by utilizing the base splitter.
+// The output file can be loaded by the --load-joined-sol
+// option if the input mesh and refinement level are identical, however, the process count
+// and/or partitioning may differ. This feature should only be used with at most one parallel
+// domain layer and moderate process counts.
+//
+// --save-joined-pres <base-filename>
+// Specifies that the application should write the velocities in each time steo into a joined
+// binary output file by utilizing the base splitter.
+// The output file can be loaded by the --load-joined-sol
+// option if the input mesh and refinement level are identical, however, the process count
+// and/or partitioning may differ. This feature should only be used with at most one parallel
+// domain layer and moderate process counts.
+//
+//
 // ------------------------
 // Miscellaneous Parameters
 // ------------------------
@@ -367,6 +384,10 @@ namespace DFG95
     args.parse("load-joined-sol", load_joined_sol_name);
     String save_joined_sol_name;
     args.parse("save-joined-sol", save_joined_sol_name);
+    String save_joined_velo_all;
+    args.parse("save-joined-velo", save_joined_velo_all);
+    String save_joined_pres_all;
+    args.parse("save-joined-pres", save_joined_pres_all);
 
     // dump some information to the console
     {
@@ -495,8 +516,11 @@ namespace DFG95
     }
 
     // assemble base splitter on finest level if required
-    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+    if( (args.check("save-joined-sol")  >= 0) || (args.check("load-joined-sol")  >= 0)
+      ||(args.check("save-joined-pres") >= 0) || (args.check("save-joined-velo") >= 0))
+    {
       system_levels.front()->assemble_base_splitters(domain.front());
+    }
 
     // assemble velocity truncation operators -- we need those for the assembly of the
     // non-linear burgers operators on the coarser levels
@@ -930,6 +954,21 @@ namespace DFG95
       }
       watch_vtk_write.stop();
     }
+    if (!save_joined_pres_all.empty())
+    {
+      const typename SystemLevelType::GlobalPresVector vec_pres(
+        &the_system_level.gate_pres, vec_sol.local().template at<1>().clone(LAFEM::CloneMode::Shallow));
+      String save_name = save_joined_pres_all + "_" + stringify(0).pad_front(5, '0') + ".bin";
+      the_system_level.base_splitter_pres.join_write_out(vec_pres, save_name);
+    }
+    if (!save_joined_velo_all.empty())
+    {
+      const typename SystemLevelType::GlobalVeloVector vec_velo(
+        &the_system_level.gate_velo, vec_sol.local().template at<0>().clone(LAFEM::CloneMode::Shallow));
+      String save_name = save_joined_velo_all + "_" + stringify(0).pad_front(5, '0') + ".bin";
+      the_system_level.base_splitter_velo.join_write_out(vec_velo, save_name);
+    }
+
 
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
@@ -1640,6 +1679,20 @@ namespace DFG95
 
         watch_vtk_write.stop();
       }
+      if (!save_joined_pres_all.empty())
+      {
+        const typename SystemLevelType::GlobalPresVector vec_pres(
+          &the_system_level.gate_pres, vec_sol.local().template at<1>().clone(LAFEM::CloneMode::Shallow));
+        String save_name = save_joined_pres_all + "_" + stringify(time_step).pad_front(5, '0') + ".bin";
+        the_system_level.base_splitter_pres.join_write_out(vec_pres, save_name);
+      }
+      if (!save_joined_velo_all.empty())
+      {
+        const typename SystemLevelType::GlobalVeloVector vec_velo(
+          &the_system_level.gate_velo, vec_sol.local().template at<0>().clone(LAFEM::CloneMode::Shallow));
+        String save_name = save_joined_velo_all + "_" + stringify(time_step).pad_front(5, '0') + ".bin";
+        the_system_level.base_splitter_velo.join_write_out(vec_velo, save_name);
+      }
 
       // steady state reached?
       if(norm_der_v <= steady_tol)
@@ -1813,8 +1866,11 @@ namespace DFG95
     domain.set_desired_levels(args.query("level")->second);
 
     // if we want to write/read a joined solution, we also need to tell the domain control to keep the base levels
-    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+    if( (args.check("save-joined-sol")  >= 0) || (args.check("load-joined-sol")  >= 0)
+      ||(args.check("save-joined-pres") >= 0) || (args.check("save-joined-velo") >= 0))
+    {
       domain.keep_base_levels();
+    }
 
     domain.create(mesh_reader);
 
@@ -1890,6 +1946,8 @@ namespace DFG95
     args.support("restart");
     args.support("load-joined-sol");
     args.support("save-joined-sol");
+    args.support("save-joined-velo");
+    args.support("save-joined-pres");
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();
