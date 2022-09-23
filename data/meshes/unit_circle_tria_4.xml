@@ -1,6 +1,6 @@
 <FeatMeshFile version="1" mesh="conformal:simplex:2:2">
   <Info>
-   This is the unit-circle mesh consisting of four triangles.
+   This is the unit-circle mesh consisting of four right triangles.
   </Info>
   <Chart name="outer">
     <Circle radius="1" midpoint="0 0" domain="0 4" />

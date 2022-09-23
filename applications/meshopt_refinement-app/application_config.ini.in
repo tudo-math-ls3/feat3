@@ -1,5 +1,5 @@
 [ApplicationSettings]
-mesh_files = ./unit-circle-tria.xml
+mesh_files = ./unit_circle_tria_4.xml
 meshopt_config_file = ./meshopt_config.ini
 mesh_optimizer = HyperelasticityDefault
 solver_config_file = ./solver_config.ini

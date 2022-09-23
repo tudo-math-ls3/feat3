@@ -1,0 +1,77 @@
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+  <Info>
+   This is the unit-circle mesh consisting of six equilateral triangles.
+  </Info>
+  <Chart name="outer">
+    <Circle radius="1" midpoint="0 0" domain="0 6" />
+  </Chart>
+  <Mesh type="conformal:simplex:2:2" size="7 12 6">
+    <Vertices>
+      0 0
+      1 0
+      0.5 0.866025404
+      -0.5 0.866025404
+      -1.0 0
+      -0.5 -0.866025404
+      0.5 -0.866025404
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      0 2
+      0 3
+      0 4
+      0 5
+      0 6
+      1 2
+      2 3
+      3 4
+      4 5
+      5 6
+      6 1
+    </Topology>
+    <Topology dim="2">
+      0 1 2
+      3 0 2
+      3 4 0
+      0 4 5
+      6 0 5
+      6 1 0
+    </Topology>
+  </Mesh>
+  <MeshPart name="bnd:o" parent="root" chart="outer" topology="full" size="7 6">
+    <Mapping dim="0">
+      1
+      2
+      3
+      4
+      5
+      6
+      1
+    </Mapping>
+    <Mapping dim="1">
+      6
+      7
+      8
+      9
+      10
+      11
+    </Mapping>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+      4 5
+      5 6
+    </Topology>
+    <Attribute name="param" dim="1">
+      0
+      1
+      2
+      3
+      4
+      5
+      6
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
