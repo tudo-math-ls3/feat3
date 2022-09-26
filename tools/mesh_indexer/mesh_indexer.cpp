@@ -29,13 +29,13 @@ namespace MeshIndexerTool
     std::cout << "--out <meshfile>" << std::endl;
     std::cout << "Specifies the filename of the output mesh file that is to be generated." << std::endl;
     std::cout << std::endl;
-    std::cout << "--vtx <filename>" << std::endl;
+    std::cout << "--vtx <filenames...>" << std::endl;
     std::cout << "Specifies the name of the input text file that contains the vertex coordinates." << std::endl;
     std::cout << "Each line of this file should contain the coordinate tuple of a single vertex" << std::endl;
     std::cout << "and the number of coordinates must match the mesh shape specified by '--shape'." << std::endl;
     std::cout << "Empty lines and lines beginning with the hash character '#' are ignored. " << std::endl;
     std::cout << std::endl;
-    std::cout << "--idx <filename>" << std::endl;
+    std::cout << "--idx <filenames...>" << std::endl;
     std::cout << "Specifies the name of the input text file that contains the vertices-at-element indices." << std::endl;
     std::cout << "Each line of this file should contain the vertex-index tuple of a single element" << std::endl;
     std::cout << "and the number of indices must match the mesh shape specified by '--shape'." << std::endl;
@@ -259,13 +259,125 @@ namespace MeshIndexerTool
   }
 #endif
 
+  template<int dim_>
+  void merge_vtx(std::vector<Real>& vtx, std::vector<std::size_t>& vtx_off,
+    std::vector<std::size_t>& vtx_idx, const std::vector<std::vector<Real>>& vvtx)
+  {
+    std::cout << "Merging vertex sets..." << std::endl;
+    typedef Tiny::Vector<Real, dim_> Vtx;
+
+    // count total number of vertex coords and build vertex offsets
+    std::size_t num_coords(0u);
+    vtx_off.resize(vvtx.size(), 0u);
+
+    // loop over all vertex sets
+    for(std::size_t i(0); i < vvtx.size(); ++i)
+    {
+      vtx_off.at(i) = num_coords / std::size_t(dim_);
+      num_coords += vvtx.at(i).size();
+    }
+
+    // vertex index table
+    vtx_idx.resize(num_coords / std::size_t(dim_), 0u);
+    vtx.resize(num_coords, 0.0);
+    Vtx* vx = reinterpret_cast<Vtx*>(vtx.data());
+
+    // loop over all vertex sets
+    std::size_t num_vtx = 0u; //num_coords / std::size_t(dim_);
+    for(std::size_t i(0); i < vvtx.size(); ++i)
+    {
+      // get vertex array and cast to tiny vector array
+      const auto& vtx_i = vvtx.at(i);
+      const Vtx* vv = reinterpret_cast<const Vtx*>(vtx_i.data());
+      const std::size_t nv = vtx_i.size() / std::size_t(dim_);
+
+      // loop over all vertices in current set
+      for(std::size_t j(0); j < nv; ++j)
+      {
+        bool add_vert = true;
+        // loop over all previously added vertices
+        for(std::size_t k(0); k < num_vtx; ++k)
+        {
+          // compare vertex k and new candidate
+          if((vx[k] - vv[j]).norm_euclid_sqr() < 1E-8)
+          {
+            // found that vertex, so don't add it a second time
+            add_vert = false;
+            vtx_idx[vtx_off[i] + j] = k;
+            break;
+          }
+        }
+        // add this vertex if no duplicate was found
+        if(add_vert)
+        {
+          vx[num_vtx] = vv[j];
+          vtx_idx[vtx_off[i] + j] = num_vtx;
+          ++num_vtx;
+        }
+      }
+    }
+
+    if(num_vtx < vtx_idx.size())
+    {
+      std::cout << "Originally had " << vtx_idx.size() << " vertices but reduced to " << num_vtx << std::endl;
+      std::cout << "In other words: removed " << (vtx_idx.size()-num_vtx) << " duplicate vertices" << std::endl;
+      vtx.resize(num_vtx * std::size_t(dim_));
+    }
+  }
+
+  template<std::size_t nvi_>
+  void merge_idx(
+    std::vector<Index>& idx, const std::vector<std::size_t>& vtx_off,
+    const std::vector<std::size_t>& vtx_idx, const std::vector<std::vector<Index>>& iidx)
+  {
+    std::cout << "Merging index sets..." << std::endl;
+    typedef std::array<Index, std::size_t(nvi_)> Idx;
+
+    std::size_t num_indices(0u);
+    for(std::size_t i(0); i < iidx.size(); ++i)
+    {
+      num_indices += iidx.at(i).size();
+    }
+
+    idx.resize(num_indices);
+
+    Idx* ix = reinterpret_cast<Idx*>(idx.data());
+
+    // loop over all index sets
+    std::size_t num_elem = 0u;
+    for(std::size_t i(0); i < iidx.size(); ++i)
+    {
+      const auto& idx_i = iidx.at(i);
+      const Idx* iv = reinterpret_cast<const Idx*>(idx_i.data());
+      const std::size_t nv = idx_i.size() / nvi_;
+
+      // loop over all elements
+      for(std::size_t j(0); j < nv; ++j)
+      {
+        for(std::size_t k(0); k < nvi_; ++k)
+          ix[num_elem][k] = vtx_idx[vtx_off[i] + iv[j][k]];
+        ++num_elem;
+      }
+    }
+  }
+
   template<typename MeshType_>
-  int run_shape(SimpleArgParser& args, std::vector<Real>& vtx, std::vector<Index>& idx)
+  int run_shape(SimpleArgParser& args, std::vector<std::vector<Real>>& vvtx, std::vector<std::vector<Index>>& iidx)
   {
     typedef typename MeshType_::ShapeType ShapeType;
     static constexpr int shape_dim = MeshType_::shape_dim;
     static constexpr int world_dim = MeshType_::world_dim;
     static constexpr int num_corners = Shape::FaceTraits<ShapeType, 0>::count;
+
+    std::vector<Real> vtx;
+    std::vector<Index> idx;
+    std::vector<std::size_t> vtx_idx, vtx_off;
+
+    // merge vertex sets
+    merge_vtx<world_dim>(vtx, vtx_off, vtx_idx, vvtx);
+
+    // merge index sets
+    merge_idx<std::size_t(num_corners)>(idx, vtx_off, vtx_idx, iidx);
 
     const Index num_verts = Index(vtx.size()) / Index(world_dim);
     const Index num_elems = Index(idx.size()) / Index(num_corners);
@@ -344,6 +456,7 @@ namespace MeshIndexerTool
     return 0;
   }
 
+
   int main(int argc, char** argv)
   {
     typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, Real> S2M2D;
@@ -370,16 +483,15 @@ namespace MeshIndexerTool
       return 0;
     }
 
-    String vtx_file, idx_file;
-    if(args.parse("vtx", vtx_file) < 1)
+    if(args.check("vtx") < 1)
     {
-      std::cerr << "ERROR: mandatory vertex coordinate input file must be specified via --vtx <filename>" << std::endl;
+      std::cerr << "ERROR: mandatory vertex coordinate input files must be specified via --vtx <filenames...>" << std::endl;
       display_help();
       return 1;
     }
-    if(args.parse("idx", idx_file) < 1)
+    if(args.check("idx") < 1)
     {
-      std::cerr << "ERROR: mandatory element indices input file must be specified via --idx <filename>" << std::endl;
+      std::cerr << "ERROR: mandatory element indices input files must be specified via --idx <filenames...>" << std::endl;
       display_help();
       return 1;
     }
@@ -426,25 +538,39 @@ namespace MeshIndexerTool
       num_corners = 4;
     }
 
-    // parse vertex file
-    std::vector<Real> vtx;
-    int rtn = parse_vtx(vtx, vtx_file, world_dim);
-    if(rtn != 0)
-      return rtn;
+    // parse vertex files
+    const std::deque<String>& vtx_files = args.query("vtx")->second;
+    std::vector<std::vector<Real>> vtx(vtx_files.size());
+    Index num_vertices(0u);
+    for(std::size_t i(0); i < vtx_files.size(); ++i)
+    {
+      int rtn = parse_vtx(vtx.at(i), vtx_files.at(i), world_dim);
+      if(rtn != 0)
+        return rtn;
+      std::cout << "Parsed " << Index(vtx.at(i).size()) / Index(world_dim) << " vertices from file" << std::endl;
+      num_vertices += Index(vtx.at(i).size());
+    }
+    num_vertices /= Index(world_dim);
 
     // compute number of parsed vertices
-    const Index num_vertices = Index(vtx.size()) / Index(world_dim);
-    std::cout << "Parsed " << num_vertices << " vertices" << std::endl;
+    std::cout << "Parsed " << num_vertices << " total vertices" << std::endl << std::endl;
 
     // parse index file
-    std::vector<Index> idx;
-    rtn = parse_idx(idx, idx_file, num_corners, num_vertices);
-    if(rtn != 0)
-      return rtn;
+    const std::deque<String>& idx_files = args.query("idx")->second;
+    std::vector<std::vector<Index>> idx(idx_files.size());
+    Index num_elements(0u);
+    for(std::size_t i(0); i < idx_files.size(); ++i)
+    {
+      int rtn = parse_idx(idx.at(i), idx_files.at(i), num_corners, num_vertices);
+      if(rtn != 0)
+        return rtn;
 
-    // compute number of parsed elements
-    const Index num_elements = Index(idx.size()) / Index(num_corners);
-    std::cout << "Parsed " << num_elements << " elements" << std::endl;
+      std::cout << "Parsed " << Index(idx.at(i).size()) / Index(num_corners) << " elements from file" << std::endl;
+      num_elements += Index(idx.at(i).size());
+    }
+
+    num_elements /= Index(num_corners);
+    std::cout << "Parsed " << num_elements << " total elements" << std::endl << std::endl;
 
     if(shape_type.compare_no_case("h2") == 0)
       return run_shape<H2M2D>(args, vtx, idx);
