@@ -953,11 +953,11 @@ static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int 
 {
   if(test_number == 1)
   {
-    mesh_files.push_back("unit-circle-quad.xml");
+    mesh_files.push_back("unit_circle_quad_5.xml");
   }
   else if(test_number == 2)
   {
-    mesh_files.push_back("unit-circle-tria.xml");
+    mesh_files.push_back("unit_circle_tria_4.xml");
   }
   else
   {
