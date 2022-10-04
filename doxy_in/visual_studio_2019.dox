@@ -145,17 +145,17 @@ thirdparty
 \subsection win_vs16_thirdparty_hypre HYPRE
 <c>HYPRE</c> is a library that offers a large set of parallel solvers and preconditioners, most notably the
 <c>BoomerAMG</c> solver/preconditioner.
-- Lastest tested Version: 2.11.2 (from 2017-03-13)
-- Download Link: https://computation.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods/software
+- Lastest tested Version: 2.25.0 (from 202-06-15)
+- Download Link: https://github.com/hypre-space/hypre/tags
 
 \attention
-It is \b highly recommended that you use version 2.11.2 of the HYPRE library even if there is a newer version
+It is \b highly recommended that you use version 2.25.0 of the HYPRE library even if there is a newer version
 available on the download site. The reason is that you have to apply a patch to the extracted files (see instructions
 below), which may not work if you use another version.
 
 <b>Instructions:</b>
--# Download the GZ-Archive <b>for version 2.11.2</b> and unpack its contents into the directory <c>thirdparty</c>.
--# Rename the sub-directory from <c>hypre-2.11.2</c> to <c>hypre</c>.
+-# Download the ZIP-Archive <b>for version 2.25.0</b> and unpack its contents into the directory <c>thirdparty</c>.
+-# Rename the sub-directory from <c>hypre-2.25.0</c> to <c>hypre</c>.
 -# Execute the Python script <c>vc_patch_hypre.py</c> in the <c>thirdparty</c> directory.\n
    <b>Note:</b> Without this patch, HYPRE will not compile due to some incorrect preprocessor definitions.
 -# The <c>thirdparty</c> directory should now have the following sub-directory structure:
