@@ -10,7 +10,7 @@ import os
 class HYPRE(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.version = "2.20.0"
+    self.version = "2.25.0"
     self.names = ["hypre"]
     self.dirname = "hypre-" + self.version
     self.filename = "hypre-" + self.version + ".tar.gz"
@@ -21,7 +21,7 @@ class HYPRE(ThirdpartyPackage):
 
   def patch(self):
     print("Patching HYPRE sources...")
-    # there is a shell script named 'version' in "thirdparty/hypre/hypre-2.20.0/src/utilities"
+    # there is a shell script named 'version' in "thirdparty/hypre/hypre-2.25.0/src/utilities"
     # which has to be renamed because it collides with clang's internal <version> header
     x = os.path.join(self.target_dirname, self.dirname, "src", "utilities", "version")
     if os.path.isfile(x):
