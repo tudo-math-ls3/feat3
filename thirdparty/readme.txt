@@ -8,7 +8,7 @@ hypre                   2.11.2
 ParMETIS                4.0.3
 SuiteSparse             4.4.3, 5.2.0, 5.4.0
 Triangle                1.6
-zfp                     0.5.5
+zfp                     0.5.5, 1.0.0
 zlib                    1.2.11
 
 
