@@ -2,7 +2,7 @@
 # Copyright (C) 2010 - 2021 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
-__author__ = "Dirk Ribbrock"
+__author__ = "Dirk Ribbrock, Peter Zajac"
 __date__   = "April 2017"
 from build_system.thirdparty_package import ThirdpartyPackage
 import os
@@ -10,7 +10,7 @@ import os
 class ZLIB(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.version = "1.2.11"
+    self.version = "1.2.12"
     self.names = ["zlib"]
     self.dirname = "zlib-" + self.version
     self.filename = "zlib-" + self.version + ".tar.gz"

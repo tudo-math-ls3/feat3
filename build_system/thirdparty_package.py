@@ -52,7 +52,14 @@ class ThirdpartyPackage(object):
   def unpack(self):
     target_filename = os.path.join(self.trunk_dirname, self.filename)
 
-    if(self.filename.endswith(".zip")):
+    is_zip = False
+    is_tar = False
+    is_tar = is_tar or self.filename.endswith(".zip")
+    is_tar = is_tar or self.filename.endswith(".tar.gz")
+    is_tar = is_tar or self.filename.endswith(".tar.bz2")
+    is_tar = is_tar or self.filename.endswith(".tar.xz")
+
+    if(is_zip):
       import zipfile
       archive = zipfile.ZipFile(target_filename, "r")
       for f in archive.namelist():
@@ -60,7 +67,7 @@ class ThirdpartyPackage(object):
           print("Error: File "+self.filename+" contains absolute path or one starting with '..' ")
           print("This is an unsafe operation, aborting.")
           sys.exit(1)
-    elif(self.filename.endswith("tar.gz")):
+    elif(is_tar):
       import tarfile
       archive = tarfile.open(target_filename, "r")
       for f in archive.getnames():
@@ -68,6 +75,10 @@ class ThirdpartyPackage(object):
           print("Error: File "+self.filename+" contains absolute path or one starting with '..' ")
           print("This is an unsafe operation, aborting.")
           sys.exit(1)
+    else:
+      print("Error: Unknown archive extension: '" + self.filename + "'")
+      print("Don't know what to do, aborting.")
+      sys.exit(1)
 
     archive.extractall(self.target_dirname)
 
