@@ -54,7 +54,7 @@ class ThirdpartyPackage(object):
 
     is_zip = False
     is_tar = False
-    is_tar = is_tar or self.filename.endswith(".zip")
+    is_zip = is_zip or self.filename.endswith(".zip")
     is_tar = is_tar or self.filename.endswith(".tar.gz")
     is_tar = is_tar or self.filename.endswith(".tar.bz2")
     is_tar = is_tar or self.filename.endswith(".tar.xz")
