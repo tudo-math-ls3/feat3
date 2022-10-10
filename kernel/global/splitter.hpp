@@ -119,7 +119,7 @@ namespace FEAT
         if((void*)this == (void*)&other)
           return;
 
-        this->_muxer.convert(other.muxer);
+        this->_muxer.convert(other._muxer);
         this->_base_vector_tmpl.convert(other._base_vector_tmpl);
       }
 
