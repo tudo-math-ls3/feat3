@@ -197,18 +197,21 @@
 #include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/bernstein2/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/burgers_assembler.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
 #include <kernel/assembly/discrete_evaluator.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
-#include <kernel/global/symmetric_lumped_schur_matrix.hpp>
+#include <kernel/global/pmdcdsc_matrix.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/umfpack.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/stokes_blocked.hpp>
@@ -323,6 +326,12 @@ namespace NavierStokesCP2D
     // use multigrid for S-solver ?
     bool multigrid_s;
 
+    // use UMFPACK as coarse grid solver?
+    bool coarse_umfpack_a;
+
+    // use UMFPACK as coarse grid solver?
+    bool coarse_umfpack_s;
+
     // maximum number of iterations for velocity mg
     Index max_iter_a;
 
@@ -377,6 +386,13 @@ namespace NavierStokesCP2D
       dpm_steps(1),
       multigrid_a(false),
       multigrid_s(false),
+#ifdef FEAT_HAVE_UMFPACK
+      coarse_umfpack_a(true),
+      coarse_umfpack_s(true),
+#else
+      coarse_umfpack_a(false),
+      coarse_umfpack_s(false),
+#endif
       max_iter_a(50),
       tol_rel_a(1E-5),
       smooth_steps_a(4),
@@ -444,6 +460,10 @@ namespace NavierStokesCP2D
       args.parse("dpm-steps", dpm_steps);
       multigrid_a = (args.check("no-multigrid-a") < 0);
       multigrid_s = (args.check("no-multigrid-s") < 0);
+#ifdef FEAT_HAVE_UMFPACK
+      coarse_umfpack_a = (args.check("no-umfpack-a") < 0);
+      coarse_umfpack_s = (args.check("no-umfpack-s") < 0);
+#endif
       args.parse("max-iter-a", max_iter_a);
       args.parse("tol-rel-a", tol_rel_a);
       args.parse("smooth-a", smooth_steps_a);
@@ -739,26 +759,26 @@ namespace NavierStokesCP2D
     typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, MemType_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_> BaseClass;
 
     typedef typename BaseClass::GlobalVeloVector GlobalVeloVector;
+    typedef typename BaseClass::LocalMatrixBlockA LocalMatrixBlockA;
     typedef typename BaseClass::GlobalMatrixBlockB GlobalMatrixBlockB;
     typedef typename BaseClass::GlobalMatrixBlockD GlobalMatrixBlockD;
 
     // lumped velocity mass matrix
     GlobalVeloVector lumped_mass_velo;
+    // inverse lumped velocity mass matrix
+    GlobalVeloVector inverse_lumped_mass_velo;
 
-    typedef Global::SymmetricLumpedSchurMatrix
-    <
-      GlobalVeloVector,
-      typename BaseClass::GlobalMatrixBlockB,
-      typename BaseClass::GlobalMatrixBlockD,
-      typename BaseClass::GlobalVeloFilter
-    > GlobalSchurMatrix;
+    typedef Global::PMDCDSCMatrix<GlobalMatrixBlockB, GlobalMatrixBlockD> GlobalSchurMatrix;
+
+    // filtered local matrix A for UMFPACK coarse grid solver
+    LocalMatrixBlockA local_matrix_a_filtered;
 
     // schur matrix
     GlobalSchurMatrix matrix_s;
 
     NavierStokesBlockedSystemLevel() :
       lumped_mass_velo(&this->gate_velo),
-      matrix_s(this->lumped_mass_velo, this->matrix_b, this->matrix_d, this->filter_velo)
+      matrix_s(this->inverse_lumped_mass_velo, this->matrix_b, this->matrix_d)
     {
     }
   }; // class NavierStokesBlockedSystemLevel
@@ -928,18 +948,34 @@ namespace NavierStokesCP2D
 
       // assemble lumped velocity mass matrix
       {
-        Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_mat;
+        /*Assembly::BurgersAssembler<DataType, IndexType, 2> burgers_mat;
         burgers_mat.theta = DataType(1);
 
         auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
         auto loc_vec_v = loc_mat_a.create_vector_l();
         loc_vec_v.format();
         loc_mat_a.format();
-        burgers_mat.assemble_matrix(loc_mat_a, loc_vec_v, domain.at(i)->space_velo, cubature);
+        burgers_mat.assemble_matrix(loc_mat_a, loc_vec_v, domain.at(i)->space_velo, cubature);*/
+        auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
+        loc_mat_a.format();
+        Assembly::Common::IdentityOperatorBlocked<dim> id_op;
+        Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_a, id_op, domain.at(i)->space_velo, cubature);
+      }
 
-        system_levels.at(i)->lumped_mass_velo = system_levels.at(i)->matrix_a.lump_rows();
+      system_levels.at(i)->lumped_mass_velo = system_levels.at(i)->matrix_a.lump_rows();
+      system_levels.at(i)->inverse_lumped_mass_velo.clone(system_levels.at(i)->lumped_mass_velo);
+      system_levels.at(i)->inverse_lumped_mass_velo.component_invert(system_levels.at(i)->lumped_mass_velo);
 
-        system_levels.at(i)->matrix_s.update_lumped_a(system_levels.at(i)->lumped_mass_velo);
+      // coarse grid level?
+      if((i+1u) == domain.size_virtual())
+      {
+        system_levels.at(i)->local_matrix_a_filtered = system_levels.at(i)->matrix_a.convert_to_1();
+      }
+
+      // perform symbolic initialization of Schur-complement matrix
+      if((i == Index(0)) || cfg.multigrid_s)
+      {
+        system_levels.at(i)->matrix_s.init_symbolic();
       }
     }
 
@@ -994,6 +1030,19 @@ namespace NavierStokesCP2D
 
       // assemble inflow BC
       unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow);
+
+      // apply velocity filter onto inverse lumped mass matrix
+      fil_loc_v.filter_cor(system_levels.at(i)->inverse_lumped_mass_velo.local());
+
+      // filter matrix block A if available
+      if(system_levels.at(i)->local_matrix_a_filtered.rows() > Index(0))
+        fil_loc_v.filter_mat(system_levels.at(i)->local_matrix_a_filtered);
+
+      // perform numeric initialization of Schur-complement matrix
+      if((i == Index(0)) || cfg.multigrid_s)
+      {
+        system_levels.at(i)->matrix_s.init_numeric();
+      }
     }
 
     /* ***************************************************************************************** */
@@ -1097,6 +1146,14 @@ namespace NavierStokesCP2D
           multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, lvl.transfer_velo,
             smoother, smoother, smoother);
         }
+#ifdef FEAT_HAVE_UMFPACK
+        else if(cfg.coarse_umfpack_a)
+        {
+          auto umf = Solver::new_generic_umfpack(lvl.local_matrix_a_filtered);
+          auto cgs = Solver::new_schwarz_precond(umf, lvl.filter_velo);
+          multigrid_hierarchy_velo->push_level(lvl.matrix_a, lvl.filter_velo, cgs);
+        }
+#endif // FEAT_HAVE_UMFPACK
         else
         {
           // coarse grid solver
@@ -1137,6 +1194,14 @@ namespace NavierStokesCP2D
           multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, lvl.transfer_pres,
             smoother, smoother, smoother);
         }
+#ifdef FEAT_HAVE_UMFPACK
+        else if(cfg.coarse_umfpack_s)
+        {
+          auto umf = Solver::new_umfpack(lvl.matrix_s.get_local_schur_matrix());
+          auto cgs = Solver::new_schwarz_precond(umf, lvl.filter_pres);
+          multigrid_hierarchy_pres->push_level(lvl.matrix_s, lvl.filter_pres, cgs);
+        }
+#endif // FEAT_HAVE_UMFPACK
         else
         {
           // coarse grid solver
@@ -1586,7 +1651,7 @@ namespace NavierStokesCP2D
       if(rank == 0)
       {
         String line(" | ");
-        line += stamp_start.elapsed_string_now();
+        line += stamp_start.elapsed_string_now().pad_front(10);
         std::cout << line << std::endl;
       }
 
@@ -1825,7 +1890,7 @@ namespace NavierStokesCP2D
 
     // create our domain control
     typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> DomainLevelType;
-    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, false);
+    Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
 
     // parse arguments and set levels
     domain.parse_args(args);
@@ -1844,6 +1909,10 @@ namespace NavierStokesCP2D
     cfg.level_min_in = Index(domain.get_desired_level_min());
     cfg.level_max = Index(domain.max_level_index());
     cfg.level_min = Index(domain.min_level_index());
+
+    // ensure that we do not use UMFPACK if we have more than 1 coarse mesh processes
+    if(domain.back_layer().comm().size() > 1)
+      cfg.coarse_umfpack_a = cfg.coarse_umfpack_s = false;
 
     // dump our configuration
     cfg.dump(comm);
