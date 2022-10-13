@@ -1,11 +1,13 @@
 @echo off
 @rem FEAT3: Finite Element Analysis Toolbox, Version 3
-@rem Copyright (C) 2010 - 2021 by Stefan Turek & the FEAT group
+@rem Copyright (C) 2010 - 2022 by Stefan Turek & the FEAT group
 @rem FEAT3 is released under the GNU General Public License version 3,
 @rem see the file 'copyright.txt' in the top level directory for details.
 
 rem ===========================================================================
 rem Check for Visual Studio version
+if "%VSVER%" neq "" goto havevs
+
 echo Checking for Visual Studio installation...
 if "%VS16PATH%" neq "" (
   echo Found Visual Studio 2019 installation
@@ -24,6 +26,7 @@ if "%VS16PATH%" neq "" (
 rem Ensure that we have a path to devenv.exe
 if "%VSVER%" == "" goto novs
 
+:havevs
 rem Create output directories if necessary
 if not exist "..\lib" mkdir "..\lib"
 if not exist "..\obj" mkdir "..\obj"

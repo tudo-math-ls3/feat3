@@ -68,6 +68,7 @@ thirdparty/superlu_dist-*/
 thirdparty/triangle/
 thirdparty/zfp-*/
 thirdparty/zlib-*/
+thirdparty/Zoltan-*/
 
 # Ignore Visual Studio symlinks
 build_system/vc16/kernel/

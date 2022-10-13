@@ -9,6 +9,7 @@ ADD_SUBDIRECTORY( test_aux )
 # list of geometry source files and depenencies
 SET(kernel-geometry-list
   cgal.cpp
+  parti_zoltan.cpp
 )
 
 if (FEAT_EICKT)

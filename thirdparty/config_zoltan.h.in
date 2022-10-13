@@ -1,0 +1,4 @@
+// generated from thirdparty/config_zoltan.h.in
+#define HAVE_MPI
+#define HOST_LINUX 1
+#define UNSIGNED_LONG_LONG_GLOBAL_IDS 1

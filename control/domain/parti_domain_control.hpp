@@ -21,6 +21,7 @@
 #include <kernel/geometry/parti_2lvl.hpp>
 #include <kernel/geometry/parti_iterative.hpp>
 #include <kernel/geometry/parti_metis.hpp>
+#include <kernel/geometry/parti_zoltan.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -44,7 +45,7 @@ namespace FEAT
         args.support("parti-type", "<types...>\n"
           "Specifies which partitioner types are allowed to be used.\n"
           "May contain the following types:\n"
-          "2level extern metis genetic naive"
+          "2level extern genetic metis naive zoltan"
         );
         args.support("parti-extern-name", "<names...>\n"
           "Specifies the names of the allowed extern partitions."
@@ -86,7 +87,6 @@ namespace FEAT
         /// our mesh-part type
         typedef typename LevelType::PartType MeshPartType;
 
-      protected:
         /**
          * \brief Ancestor info class
          */
@@ -151,6 +151,8 @@ namespace FEAT
         bool _allow_parti_genetic;
         /// allow naive partitioner?
         bool _allow_parti_naive;
+        /// allow Zoltan partitioner?
+        bool _allow_parti_zoltan;
 
         /// support multi-layered hierarchy?
         bool _support_multi_layered;
@@ -193,6 +195,7 @@ namespace FEAT
           _allow_parti_metis(false),
           _allow_parti_genetic(false), // this one is exotic
           _allow_parti_naive(true),
+          _allow_parti_zoltan(false),
           _support_multi_layered(support_multi_layered),
           _desired_levels(),
           _extern_parti_names(),
@@ -231,7 +234,7 @@ namespace FEAT
               // disallow all strategies by default
               _allow_parti_extern = _allow_parti_2level = false;
               _allow_parti_metis = _allow_parti_naive = false;
-              _allow_parti_genetic = false;
+              _allow_parti_genetic = _allow_parti_zoltan = false;
 
               // loop over all allowed strategies
               for(const auto& t : it->second)
@@ -246,6 +249,8 @@ namespace FEAT
                   _allow_parti_genetic = true;
                 else if(t.compare_no_case("naive") == 0)
                   _allow_parti_naive = true;
+                else if(t.compare_no_case("zoltan") == 0)
+                  _allow_parti_zoltan = true;
                 else
                 {
                   this->_comm.print("ERROR: unknown partitioner type '" + t + "'");
@@ -291,7 +296,7 @@ namespace FEAT
             // disallow all strategies by default
             _allow_parti_extern = _allow_parti_2level = false;
             _allow_parti_metis = _allow_parti_naive = false;
-            _allow_parti_genetic = false;
+            _allow_parti_genetic = _allow_parti_zoltan = false;
 
             std::deque<String> allowed_partitioners = parti_type_p.first.split_by_whitespaces();
 
@@ -307,6 +312,8 @@ namespace FEAT
                 _allow_parti_metis = true;
               else if(t == "naive")
                 _allow_parti_naive = true;
+              else if(t == "zoltan")
+                _allow_parti_zoltan = true;
               else
               {
                 this->_comm.print("ERROR: unknown partitioner type '" + t + "'");
@@ -781,6 +788,14 @@ namespace FEAT
             s += ((*it).layer_p >= 0 ? ">" : " ");
           }
           return s;
+        }
+
+        /**
+         * \brief Returns a const reference to the ancestry
+         */
+        const std::deque<Ancestor>& get_ancestry() const
+        {
+          return this->_ancestry;
         }
 
         /**
@@ -1838,6 +1853,8 @@ namespace FEAT
           XASSERT(ancestor.num_parts <= int(base_mesh_node.get_mesh()->get_num_elements()));
 
           // try the various a-posteriori partitioners
+          if(this->_apply_parti_zoltan(ancestor, base_mesh_node))
+            return true;
           if(this->_apply_parti_metis(ancestor, base_mesh_node))
             return true;
           if(this->_apply_parti_genetic(ancestor, base_mesh_node))
@@ -1908,6 +1925,51 @@ namespace FEAT
           ancestor.parti_level = int(partitioner.parti_level());
           ancestor.parti_graph = partitioner.build_elems_at_rank();
           return true;
+        }
+
+        /**
+         * \brief Applies the Zoltan partitioner onto the base-mesh
+         *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
+         *
+         * \param[in] base_mesh_node
+         * The base-mesh node that is to be partitioned.
+         *
+         * \returns
+         * \c true, if Zoltan was applied successfully, otherwise \c false.
+         */
+        bool _apply_parti_zoltan(Ancestor& ancestor, const MeshNodeType& base_mesh_node)
+        {
+#ifdef FEAT_HAVE_ZOLTAN
+          // is this even allowed?
+          if(!this->_allow_parti_zoltan)
+            return false;
+
+          // create partitioner on the corresponding progeny communicator
+          Geometry::PartiZoltan partitioner(ancestor.progeny_comm);
+
+          // get the corresponding adjacency graph for partitioning
+          constexpr int shape_dim = MeshNodeType::MeshType::ShapeType::dimension;
+          const auto& faces_at_elem = base_mesh_node.get_mesh()->template get_index_set<shape_dim, 0>();
+
+          // call the partitioner
+          if(!partitioner.execute(faces_at_elem, ancestor.num_parts))
+            return false;
+
+          // create partition graph
+          ancestor.parti_graph = partitioner.build_elems_at_rank();
+
+          // set info string
+          ancestor.parti_info = String("Applied Zoltan partitioner");
+
+          // okay
+          return true;
+#else // FEAT_HAVE_ZOLTAN
+          (void)ancestor;
+          (void)base_mesh_node;
+          return false;
+#endif // FEAT_HAVE_ZOLTAN
         }
 
         /**

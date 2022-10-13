@@ -6,6 +6,10 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # add custom 'thirdparty' target
 ADD_CUSTOM_TARGET(thirdparty)
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
 if (FEAT_HAVE_ALGLIB)
   file(GLOB alglib-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ALGLIB}/cpp/src/*.cpp")
 
@@ -22,6 +26,10 @@ if (FEAT_HAVE_ALGLIB)
   endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 endif (FEAT_HAVE_ALGLIB)
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
 if (FEAT_HAVE_FPARSER)
   file(GLOB fparser-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FPARSER}/*.cc")
 
@@ -36,6 +44,10 @@ if (FEAT_HAVE_FPARSER)
   SET_PROPERTY(TARGET thirdparty-fparser PROPERTY COMPILE_FLAGS " -w")
   SET_PROPERTY(TARGET thirdparty-fparser APPEND PROPERTY LINK_FLAGS " -w")
 endif (FEAT_HAVE_FPARSER)
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 if (FEAT_HAVE_UMFPACK)
   file(GLOB suite_sparse-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUITESPARSE}/SuiteSparse_config/*.c")
@@ -75,6 +87,10 @@ if (FEAT_HAVE_UMFPACK)
   SET_PROPERTY(TARGET thirdparty-umfpack APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUITESPARSE}/UMFPACK/Include/")
 endif (FEAT_HAVE_UMFPACK)
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
 if (FEAT_HAVE_PARMETIS)
   file(GLOB gklib-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/metis/GKlib/*.c")
   file(GLOB metis-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/metis/libmetis/*.c")
@@ -102,8 +118,11 @@ if (FEAT_HAVE_PARMETIS)
   SET_PROPERTY(TARGET thirdparty-parmetis APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/libparmetis")
   SET_PROPERTY(TARGET thirdparty-parmetis APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/include")
   TARGET_LINK_LIBRARIES(thirdparty-parmetis thirdparty-metis)
-
 endif (FEAT_HAVE_PARMETIS)
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 if (FEAT_HAVE_ZLIB)
   file(GLOB zlib-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZLIB}/*.c")
@@ -120,6 +139,10 @@ if (FEAT_HAVE_ZLIB)
   #endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 endif (FEAT_HAVE_ZLIB)
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
 if (FEAT_HAVE_TRIANGLE)
   # only this one source file is required
   file(GLOB triangle-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_TRIANGLE}/triangle.c")
@@ -132,6 +155,10 @@ if (FEAT_HAVE_TRIANGLE)
   SET_PROPERTY(TARGET thirdparty-triangle APPEND PROPERTY COMPILE_FLAGS " -w -DANSI_DECLARATORS -DTRILIBRARY")
   SET_PROPERTY(TARGET thirdparty-triangle APPEND PROPERTY LINK_FLAGS " -w")
 endif (FEAT_HAVE_TRIANGLE)
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 if (FEAT_HAVE_HYPRE)
   file(READ filelist_hypre hypre-list-in)
@@ -167,12 +194,20 @@ if (FEAT_HAVE_HYPRE)
   SET_PROPERTY(TARGET thirdparty-hypre APPEND PROPERTY LINK_FLAGS " -w")
 endif (FEAT_HAVE_HYPRE)
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
 if (FEAT_HAVE_DEATH_HANDLER)
   ADD_LIBRARY(thirdparty-deathhandler STATIC "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_DEATHHANDLER}/DeathHandler-master/death_handler.cc")
   ADD_DEPENDENCIES(thirdparty thirdparty-deathhandler)
   SET_PROPERTY(TARGET thirdparty-deathhandler APPEND PROPERTY COMPILE_FLAGS " -w")
   SET_PROPERTY(TARGET thirdparty-deathhandler APPEND PROPERTY LINK_FLAGS " -w")
 endif (FEAT_HAVE_DEATH_HANDLER)
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 if (FEAT_HAVE_ZFP)
   file(GLOB zfp-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZFP}/src/*.c")
@@ -187,6 +222,10 @@ if (FEAT_HAVE_ZFP)
   SET_PROPERTY(TARGET thirdparty-zfp APPEND PROPERTY COMPILE_FLAGS " -w")
   SET_PROPERTY(TARGET thirdparty-zfp APPEND PROPERTY LINK_FLAGS " -w")
 endif (FEAT_HAVE_ZFP)
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 if (FEAT_HAVE_SUPERLU_DIST)
   file(READ filelist_superlu superlu-list-in)
@@ -204,3 +243,41 @@ if (FEAT_HAVE_SUPERLU_DIST)
   endif (FEAT_HAVE_MPI)
   SET_PROPERTY(TARGET thirdparty-superlu APPEND PROPERTY LINK_FLAGS " -w")
 endif (FEAT_HAVE_SUPERLU_DIST)
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+if (FEAT_HAVE_ZOLTAN)
+  file(READ filelist_zoltan zoltan-list-in)
+  STRING(REGEX REPLACE "\n" ";" zoltan-list-in "${zoltan-list-in}")
+  foreach(zoltan-list-item ${zoltan-list-in})
+    SET(zoltan-list "${zoltan-list}" "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/${zoltan-list-item}")
+  endforeach()
+  ADD_LIBRARY (thirdparty-zoltan STATIC ${zoltan-list})
+  ADD_DEPENDENCIES(thirdparty thirdparty-zoltan)
+  configure_file(${FEAT_SOURCE_DIR}/thirdparty/config_zoltan.h.in ${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/include/Zoltan_config.h @ONLY)
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/include")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/all")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/Utilities/shared")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/Utilities/Timer")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/zz")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/coloring")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/graph")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/ha")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/hier")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/hsfc")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/lb")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/matrix")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/order")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/par")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/params")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/phg")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/rcb")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/reftree")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/simple")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/timer")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY INCLUDE_DIRECTORIES "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/tpls")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY COMPILE_FLAGS " -w")
+  SET_PROPERTY(TARGET thirdparty-zoltan APPEND PROPERTY LINK_FLAGS " -w")
+endif (FEAT_HAVE_ZOLTAN)

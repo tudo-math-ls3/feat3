@@ -4,12 +4,13 @@ tested with FEAT.
 ALGLIB                  3.10.0, 3.13.0
 fparser                 4.5.2
 half                    1.12.0, 2.1.0
-hypre                   2.11.2
+hypre                   2.25.0
 ParMETIS                4.0.3
 SuiteSparse             4.4.3, 5.2.0, 5.4.0
 Triangle                1.6
 zfp                     0.5.5, 1.0.0
-zlib                    1.2.11
+zlib                    1.2.12
+Zoltan                  3.901
 
 
 Note for Visual Studio users:

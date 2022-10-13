@@ -32,7 +32,7 @@ if exist %OBJPATH% (
 
 rem Set Compiler flags
 set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /TC /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:none /EHsc /nologo
-set CXXFLAGS=%CXXFLAGS% /wd"4996" /wd"4267"
+set CXXFLAGS=%CXXFLAGS% /wd"4996" /wd"4244" /wd"4267"
 set CXXFLAGS=%CXXFLAGS% /I"./zlib"
 set CXXFLAGS=%CXXFLAGS% /Fd"../obj/zlib.%1-%2-%3/zlib.%1-%2-%3.pdb"
 set CXXFLAGS=%CXXFLAGS% /Fp"../obj/zlib.%1-%2-%3/zlib.%1-%2-%3.pch"

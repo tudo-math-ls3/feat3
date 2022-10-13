@@ -118,6 +118,9 @@
   <PropertyGroup Condition="Exists('..\..\lib\zlib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib')">
     <FeatHaveZlib>true</FeatHaveZlib>
   </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\..\lib\zoltan.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib') And '$(SerialMode)'=='false'">
+    <FeatHaveZoltan>true</FeatHaveZoltan>
+  </PropertyGroup>
 
   <!-- ********************************************************************* -->
   <!-- FEAT Additional Paths and Dependencies -->
@@ -162,6 +165,8 @@
       Include="FEAT_HAVE_ZFP" />
     <FeatDef Condition="'$(FeatHaveZlib)'=='true'"
       Include="FEAT_HAVE_ZLIB" />
+    <FeatDef Condition="'$(FeatHaveZoltan)'=='true'"
+      Include="FEAT_HAVE_ZOLTAN" />
   </ItemGroup>
 
   <!-- FEAT additional include directory list -->
@@ -196,6 +201,8 @@
       Include="$(FeatRootPath)\thirdparty\zfp\include;" />
     <FeatIncDir Condition="'$(FeatHaveZlib)'=='true'"
       Include="$(FeatRootPath)\thirdparty\zlib;" />
+    <FeatIncDir Condition="'$(FeatHaveZoltan)'=='true'"
+      Include="$(FeatRootPath)\thirdparty\Zoltan\src\include;" />
   </ItemGroup>
 
   <!-- FEAT additional library search path list -->
@@ -249,6 +256,8 @@
       Include="zfp.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
     <FeatLibDep Condition="'$(FeatHaveZlib)'=='true'"
       Include="zlib.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
+    <FeatLibDep Condition="'$(FeatHaveZoltan)'=='true'"
+      Include="zoltan.vc16-$(FeatDebugPrefix)-$(FeatPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->
