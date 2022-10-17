@@ -20,7 +20,7 @@
 #include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/parti_2lvl.hpp>
 #include <kernel/geometry/parti_iterative.hpp>
-#include <kernel/geometry/parti_metis.hpp>
+#include <kernel/geometry/parti_parmetis.hpp>
 #include <kernel/geometry/parti_zoltan.hpp>
 
 #include <control/domain/domain_control.hpp>
@@ -1853,9 +1853,9 @@ namespace FEAT
           XASSERT(ancestor.num_parts <= int(base_mesh_node.get_mesh()->get_num_elements()));
 
           // try the various a-posteriori partitioners
-          if(this->_apply_parti_zoltan(ancestor, base_mesh_node))
-            return true;
           if(this->_apply_parti_metis(ancestor, base_mesh_node))
+            return true;
+          if(this->_apply_parti_zoltan(ancestor, base_mesh_node))
             return true;
           if(this->_apply_parti_genetic(ancestor, base_mesh_node))
             return true;
@@ -1986,29 +1986,31 @@ namespace FEAT
          */
         bool _apply_parti_metis(Ancestor& ancestor, const MeshNodeType& base_mesh_node)
         {
-#if defined(FEAT_HAVE_METIS) || defined(FEAT_HAVE_PARMETIS)
+#ifdef FEAT_HAVE_PARMETIS
           // is this even allowed?
           if(!this->_allow_parti_metis)
             return false;
 
-          // build element adjacency graph
-          // connectivity by facets
-          /// \todo dirk: use centralized method for adj graph retrieval
-          /// \todo dirk: does any partitioner need self-adjacencies? -> remove it in creation
-          ///       peter: yes, other partitioners need self-adjacencies
-          const auto dimension = MeshNodeType::MeshType::ShapeType::dimension;
-          Adjacency::Graph facets_at_elem(Adjacency::RenderType::as_is, base_mesh_node.get_mesh()->template get_index_set<dimension, dimension-1>());
-          Adjacency::Graph elems_at_facet(Adjacency::RenderType::transpose, facets_at_elem);
-          Adjacency::Graph adj_graph = Adjacency::Graph(Adjacency::RenderType::injectify, facets_at_elem, elems_at_facet);
+          // create partitioner on the corresponding progeny communicator
+          Geometry::PartiParMETIS partitioner(ancestor.progeny_comm);
 
-          // create a metis partitioner
-          Geometry::PartiMetis<MeshType> partitioner(adj_graph, Index(ancestor.num_parts));
+          // get the corresponding adjacency graph for partitioning
+          constexpr int shape_dim = MeshNodeType::MeshType::ShapeType::dimension;
+          const auto& faces_at_elem = base_mesh_node.get_mesh()->template get_index_set<shape_dim, 0>();
 
-          // create elems-at-rank graph
+          // get vertices-at-element and vertex set
+          const auto& verts_at_elem = base_mesh_node.get_mesh()->template get_index_set<shape_dim, 0>();
+          const auto& vertex_set =  base_mesh_node.get_mesh()->get_vertex_set();
+
+          // call the partitioner
+          if(!partitioner.execute(faces_at_elem, verts_at_elem, vertex_set, ancestor.num_parts))
+            return false;
+
+          // create partition graph
           ancestor.parti_graph = partitioner.build_elems_at_rank();
 
           // set info string
-          ancestor.parti_info = String("Applied METIS partitioner");
+          ancestor.parti_info = String("Applied ParMETIS partitioner");
 
           // okay
           return true;
@@ -2016,7 +2018,7 @@ namespace FEAT
           (void)ancestor;
           (void)base_mesh_node;
           return false;
-#endif // defined(FEAT_HAVE_METIS) || defined(FEAT_HAVE_PARMETIS)
+#endif // FEAT_HAVE_PARMETIS
         }
 
         /**

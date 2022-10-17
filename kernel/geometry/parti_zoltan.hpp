@@ -40,7 +40,7 @@ namespace FEAT
     class PartiZoltan
     {
       // maximum number of processes to use by Zoltan
-      static constexpr int max_procs = 100;
+      static constexpr int max_procs = 1000;
       // minimum number of elements per process for Zoltan
       static constexpr int min_elems = 1000;
 
@@ -147,7 +147,7 @@ namespace FEAT
       /// auxiliary function: applies Zoltan onto the hypergraph
       bool _apply_zoltan();
       /// auxiliary function: gathers the partitioned coloring onto the root process
-      void _gather_coloring(const int num_export, const int* export_parts);
+      bool _gather_coloring(const int num_export, const int* export_parts);
       /// auxiliary function: broadcasts the coloring from the root process
       bool _broadcast_coloring(bool zoltan_ok);
     }; // class PartiZoltan

@@ -256,8 +256,9 @@ namespace FEAT
         &num_export, &export_global_ids, &export_local_ids, &export_procs, &export_parts);
 
       // create coloring from Zoltan partitioning
+      bool gather_ok = true;
       if(rtn == ZOLTAN_OK)
-        this->_gather_coloring(num_export, export_parts);
+        gather_ok = this->_gather_coloring(num_export, export_parts);
 
       Zoltan_LB_Free_Part(&import_global_ids, &import_local_ids, &import_procs, &import_parts);
       Zoltan_LB_Free_Part(&export_global_ids, &export_local_ids, &export_procs, &export_parts);
@@ -265,10 +266,10 @@ namespace FEAT
       Zoltan_Destroy(&zz);
       this->_zz = nullptr;
 
-      return (rtn == ZOLTAN_OK);
+      return gather_ok && (rtn == ZOLTAN_OK);
     }
 
-    void PartiZoltan::_gather_coloring(const int num_export, const int* export_parts)
+    bool PartiZoltan::_gather_coloring(const int num_export, const int* export_parts)
     {
       // get my rank and size
       const int z_rank = _zoltan_comm.rank();
@@ -291,7 +292,7 @@ namespace FEAT
 
       // all ranks > 0 are done here
       if(z_rank > 0)
-        return;
+        return true;
 
       // compute total element count
       int num_elems(0);
@@ -310,6 +311,21 @@ namespace FEAT
         for(int j(1); j <= n; ++j, ++k)
           col[k] = recv_buf[off+j];
       }
+
+      // build color counts
+      std::vector<int> color_counts(this->_num_parts, 0);
+      for(Index i(0); i < this->_num_elems; ++i)
+        ++color_counts[col[i]];
+
+      // make sure we have at least 1 element per color/partition
+      for(Index i(0); i < this->_num_parts; ++i)
+      {
+        if(color_counts[i] == 0)
+          return false;
+      }
+
+      // okay
+      return true;
     }
 
     bool PartiZoltan::_broadcast_coloring(bool zoltan_ok)
