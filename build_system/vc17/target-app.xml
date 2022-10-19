@@ -1,0 +1,46 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- global project properties -->
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <RootNamespace>$(FeatAppName)</RootNamespace>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+
+  <!-- import common properties -->
+  <Import Project="common-props.xml" />
+
+  <!-- ********************************************************************* -->
+  <!-- Compiler / Linker Properties -->
+  <!-- ********************************************************************* -->
+
+  <!-- set output path -->
+  <PropertyGroup>
+    <IntDir>$(FeatObjPath)\$([MSBuild]::MakeRelative('$(FeatRootPath)',$(ProjectDir)))\$(FeatBuildName)\</IntDir>
+    <OutDir>$(SolutionDir)\</OutDir>
+  </PropertyGroup>
+
+  <!-- add link dependencies -->
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(FeatLibDirList)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(FeatLibDepList)</AdditionalDependencies>
+      <StackReserveSize>16777216</StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- import common targets -->
+  <Import Project="common-options.xml" />
+
+</Project>

@@ -192,4 +192,4 @@ public:
       + stringify(ref_iters) + " +/- " + stringify(iter_tol));
   }
 };
-AMGTest<SparseMatrixCSR, Mem::Main, double, unsigned long> amg_csr_generic_double_ulong;
+AMGTest<SparseMatrixCSR, Mem::Main, double, Index> amg_csr_generic_double_ulong;

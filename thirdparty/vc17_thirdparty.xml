@@ -1,0 +1,161 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- ############################################################################################################# -->
+  <!-- Third-Party Library versions that we want to check for -->
+  <!-- ############################################################################################################# -->
+  <PropertyGroup Label="ThirdPartyVersions">
+    <VersionBoost>1_80_0</VersionBoost> <!-- boost uses underscores -->
+    <VersionCGAL>5.5.1</VersionCGAL>
+    <VersionFParser>4.5.2</VersionFParser>
+    <VersionHypre>2.26.0</VersionHypre>
+    <VersionParMetis>4.0.3</VersionParMetis>
+    <VersionSuiteSparse>5.13.0</VersionSuiteSparse>
+    <VersionSuperLU>8.1.1</VersionSuperLU>
+    <VersionTriangle>1.6</VersionTriangle>
+    <VersionZfp>1.0.0</VersionZfp>
+    <VersionZlib>1.2.13</VersionZlib>
+    <VersionZoltan>3.901</VersionZoltan>
+  </PropertyGroup>
+
+  <!-- Note: the nightly regression test system specifies these paths explicitly -->
+  <!-- set default third-party sources path (root\thirdparty) if not already set -->
+  <PropertyGroup Condition="'$(FeatTPLSrcPath)'==''">
+    <FeatTPLSrcPath>$(FeatRootPath)\thirdparty</FeatTPLSrcPath>
+  </PropertyGroup>
+  <!-- set default third-party lib path (root\lib) if not already set -->
+  <PropertyGroup Condition="'$(FeatTPLLibPath)'==''">
+    <FeatTPLLibPath>$(FeatRootPath)\lib</FeatTPLLibPath>
+  </PropertyGroup>
+
+  <!-- ############################################################################################################# -->
+  <!-- Third-Party Library Detection -->
+  <!-- ############################################################################################################# -->
+  <!-- Note: BOOST is a pure header library -->
+  <PropertyGroup Condition="Exists('$(FeatTPLSrcPath)\boost_$(VersionBoost)\README.md')">
+    <FeatHaveBoost>true</FeatHaveBoost>
+  </PropertyGroup>
+  <!-- Note: CGAL is a pure header library -->
+  <PropertyGroup Condition="Exists('$(FeatTPLSrcPath)\CGAL-$(VersionCGAL)\README')">
+    <FeatHaveCGAL>true</FeatHaveCGAL>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\fparser-$(VersionFParser).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHaveFParser>true</FeatHaveFParser>
+  </PropertyGroup>
+  <!-- Note: There are two builds of HYPRE: a serial one and an MPI-based one -->
+  <!--       We need to check for the one that matches our current FEAT build -->
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\hypre-mpi-$(VersionHypre).vc17-$(FeatBuildMode)-$(FeatPlatform).lib') And '$(EnableMPI)'=='true'">
+    <!-- MPI-version of hypre exists + FEAT build in MPI mode -->
+    <FeatHaveHypre>true</FeatHaveHypre>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\hypre-seq-$(VersionHypre).vc17-$(FeatBuildMode)-$(FeatPlatform).lib') And '$(EnableMPI)'=='false'">
+    <!-- serial version of hypre exists + FEAT build in serial mode -->
+    <FeatHaveHypre>true</FeatHaveHypre>
+  </PropertyGroup>
+  <!-- Note: ParMETIS can only be used in combination with MPI -->
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\ParMETIS-$(VersionParMetis).vc17-$(FeatBuildMode)-$(FeatPlatform).lib') And '$(EnableMPI)'=='true'">
+    <FeatHaveParMetis>true</FeatHaveParMetis>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\SuiteSparse-$(VersionSuiteSparse).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHaveSuiteSparse>true</FeatHaveSuiteSparse>
+  </PropertyGroup>
+  <!-- Note: SuperLU_DIST can only be used in combination with MPI -->
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\SuperLU_dist-$(VersionSuperLU).vc17-$(FeatBuildMode)-$(FeatPlatform).lib') And '$(EnableMPI)'=='true'">
+    <FeatHaveSuperLU>true</FeatHaveSuperLU>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\triangle-$(VersionTriangle).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHaveTriangle>true</FeatHaveTriangle>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\zfp-$(VersionZfp).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHaveZfp>true</FeatHaveZfp>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\zlib-$(VersionZlib).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHaveZlib>true</FeatHaveZlib>
+  </PropertyGroup>
+  <!-- Note: Zoltan can only be used in combination with MPI -->
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\zoltan-$(VersionZoltan).vc17-$(FeatBuildMode)-$(FeatPlatform).lib') And '$(EnableMPI)'=='true'">
+    <FeatHaveZoltan>true</FeatHaveZoltan>
+  </PropertyGroup>
+
+  <!-- ############################################################################################################# -->
+  <!-- FEAT Third-Party Library pre-processor define list -->
+  <!-- ############################################################################################################# -->
+  <ItemGroup Label="FEAT Third-Party Defines">
+    <FeatTPLDef Condition="'$(FeatHaveBoost)'=='true'"
+      Include="FEAT_HAVE_BOOST" />
+    <FeatTPLDef Condition="'$(FeatHaveCGAL)'=='true'"
+      Include="FEAT_HAVE_CGAL" />
+    <FeatTPLDef Condition="'$(FeatHaveFParser)'=='true'"
+      Include="FEAT_HAVE_FPARSER" />
+    <FeatTPLDef Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='true'"
+      Include="FEAT_HAVE_HYPRE;HYPRE_HAVE_MPI" />
+    <FeatTPLDef Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='false'"
+      Include="FEAT_HAVE_HYPRE;HYPRE_SEQUENTIAL" />
+    <FeatTPLDef Condition="'$(FeatHaveParMetis)'=='true'"
+      Include="FEAT_HAVE_METIS;FEAT_HAVE_PARMETIS" />
+    <FeatTPLDef Condition="'$(FeatHaveSuiteSparse)'=='true'"
+      Include="FEAT_HAVE_SUITESPARSE;FEAT_HAVE_UMFPACK" />
+    <FeatTPLDef Condition="'$(FeatHaveSuperLU)'=='true'"
+      Include="FEAT_HAVE_SUPERLU_DIST" />
+    <FeatTPLDef Condition="'$(FeatHaveTriangle)'=='true'"
+      Include="FEAT_HAVE_TRIANGLE" />
+    <FeatTPLDef Condition="'$(FeatHaveZfp)'=='true'"
+      Include="FEAT_HAVE_ZFP" />
+    <FeatTPLDef Condition="'$(FeatHaveZlib)'=='true'"
+      Include="FEAT_HAVE_ZLIB" />
+    <FeatTPLDef Condition="'$(FeatHaveZoltan)'=='true'"
+      Include="FEAT_HAVE_ZOLTAN" />
+  </ItemGroup>
+
+  <!-- ############################################################################################################# -->
+  <!-- FEAT Third-Party Library additional include directory list -->
+  <!-- ############################################################################################################# -->
+  <ItemGroup Label="FEAT Include Paths">
+    <FeatTPLInc Condition="'$(FeatHaveBoost)'=='true'"
+      Include="$(FeatTPLSrcPath)\boost_$(VersionBoost);" />
+    <FeatTPLInc Condition="'$(FeatHaveCGAL)'=='true'"
+      Include="$(FeatTPLSrcPath)\CGAL-$(VersionCGAL)\include;" />
+    <FeatTPLInc Condition="'$(FeatHaveFParser)'=='true'"
+      Include="$(FeatTPLSrcPath)\fparser-$(VersionFParser);" />
+    <FeatTPLInc Condition="'$(FeatHaveHypre)'=='true'"
+      Include="$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\krylov;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\parcsr_ls;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\utilities;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\seq_mv;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\parcsr_mv;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\IJ_mv;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\multivector;" />
+    <FeatTPLInc Condition="'$(FeatHaveParmetis)'=='true'"
+      Include="$(FeatTPLSrcPath)\parmetis-$(VersionParMetis)\include;$(FeatTPLSrcPath)\parmetis-$(VersionParMetis)\metis\include;" />
+    <FeatTPLInc Condition="'$(FeatHaveSuperLU)'=='true'"
+      Include="$(FeatTPLSrcPath)\superlu_dist-$(VersionSuperLU)\SRC;" />
+    <FeatTPLInc Condition="'$(FeatHaveTriangle)'=='true'"
+      Include="$(FeatTPLSrcPath)\triangle-$(VersionTriangle);" />
+    <FeatTPLInc Condition="'$(FeatHaveSuiteSparse)'=='true'"
+      Include="$(FeatTPLSrcPath)\SuiteSparse-$(VersionSuiteSparse)\SuiteSparse_config;$(FeatTPLSrcPath)\SuiteSparse-$(VersionSuiteSparse)\AMD\Include;$(FeatTPLSrcPath)\SuiteSparse-$(VersionSuiteSparse)\UMFPACK\Include" />
+    <FeatTPLInc Condition="'$(FeatHaveZfp)'=='true'"
+      Include="$(FeatTPLSrcPath)\zfp-$(VersionZfp)\include;" />
+    <FeatTPLInc Condition="'$(FeatHaveZlib)'=='true'"
+      Include="$(FeatTPLSrcPath)\zlib-$(VersionZlib);" />
+    <FeatTPLInc Condition="'$(FeatHaveZoltan)'=='true'"
+      Include="$(FeatTPLSrcPath)\Zoltan-$(VersionZoltan)\src\include;" />
+  </ItemGroup>
+
+  <!-- FEAT additional library dependencies list -->
+  <ItemGroup Label="FEAT Library Dependencies">
+    <FeatTPLDep Condition="'$(FeatHaveFParser)'=='true'"
+      Include="fparser-$(VersionFParser).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='true'"
+      Include="hypre-mpi-$(VersionHypre).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='false'"
+      Include="hypre-seq-$(VersionHypre).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveParMetis)'=='true'"
+      Include="ParMETIS-$(VersionParMetis).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveSuiteSparse)'=='true'"
+      Include="SuiteSparse-$(VersionSuiteSparse).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveSuperLU)'=='true'"
+      Include="SuperLU_dist-$(VersionSuperLU).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveTriangle)'=='true'"
+      Include="triangle-$(VersionTriangle).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveZfp)'=='true'"
+      Include="zfp-$(VersionZfp).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveZlib)'=='true'"
+      Include="zlib-$(VersionZlib).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHaveZoltan)'=='true'"
+      Include="zoltan-$(VersionZoltan).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+  </ItemGroup>
+
+</Project>

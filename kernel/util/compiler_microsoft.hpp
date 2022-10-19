@@ -20,7 +20,9 @@
 #  define FEAT_COMPILER_MICROSOFT _MSC_VER
 
 // detect the compiler verson and define the FEAT_COMPILER macro
-#  if (_MSC_VER >= 1920)
+#  if (_MSC_VER >= 1930)
+#    define FEAT_COMPILER "Microsoft Visual C++ 2022"
+#  elif (_MSC_VER >= 1920)
 #    define FEAT_COMPILER "Microsoft Visual C++ 2019"
 #  elif (_MSC_VER >= 1910)
 #    define FEAT_COMPILER "Microsoft Visual C++ 2017"

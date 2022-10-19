@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- required: create symbolic link via 'mklink /D kernel ..\..\kernel' -->
+  <!-- global project properties -->
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{98608C16-F806-46BE-BDB4-77BA4023DC38}</ProjectGuid>
+    <FeatAppName>kernel</FeatAppName>
+    <FeatRootPath>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory)\..\..))</FeatRootPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ReplaceWildcardsInProjectItems>true</ReplaceWildcardsInProjectItems>
+    <ReadOnlyProject>true</ReadOnlyProject>
+  </PropertyGroup>
+  <!-- import common config -->
+  <Import Project="$(FeatRootPath)\build_system\vc17\common-config.xml" />
+  <!-- Kernel Header Inclusion List -->
+  <ItemGroup>
+    <FeatKernelIncludeHeader Include="kernel\**\*.hpp" />
+  </ItemGroup>
+  <!-- Kernel Source Inclusion List -->
+  <ItemGroup>
+    <FeatKernelIncludeSource Include="kernel\**\*.cpp" />
+  </ItemGroup>
+  <!-- Kernel Source Exclusion List -->
+  <ItemGroup>
+    <!-- exclude all test sources -->
+    <FeatKernelExcludeSource Include="kernel\**\*-test*.cpp" />
+    <!-- exclude all EICKT sources -->
+    <FeatKernelExcludeSource Include="kernel\**\*-eickt*.cpp" />
+    <!-- exclude geometry test_aux sources -->
+    <FeatKernelExcludeSource Include="kernel\geometry\test_aux\*.cpp" />
+    <!-- exclude MKL sources unless the MKL backend is enabled -->
+    <FeatKernelExcludeSource Include="kernel\**\*_mkl.cpp" Condition="'$(BackendMKL)'!='true'" />
+    <!-- exclude OS Windows utility source (this one is included explicitly below) -->
+    <FeatKernelExcludeSource Include="kernel\util\os_windows.cpp" />
+  </ItemGroup>
+  <!-- Kernel Cuda Inclusion List -->
+  <ItemGroup>
+    <FeatKernelIncludeCuda Include="kernel\**\*.cu" />
+  </ItemGroup>
+  <!-- Kernel Cuda Exclusion List -->
+  <!-- ************************************************************************************************************* -->
+  <!-- File Inclusion Lists -->
+  <!-- ************************************************************************************************************* -->
+  <!-- C++ Header File List -->
+  <ItemGroup>
+    <ClInclude Include="@(FeatKernelIncludeHeader)" />
+  </ItemGroup>
+  <!-- C++ Source File List -->
+  <ItemGroup>
+    <ClCompile Include="@(FeatKernelIncludeSource)" Exclude="@(FeatKernelExcludeSource)" />
+    <!-- OS Windows utility source file -->
+    <ClCompile Include="kernel\util\os_windows.cpp">
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemGroup>
+  <!-- CUDA Source File List -->
+  <ItemGroup>
+    <CudaCompile Include="@(FeatKernelIncludeCuda)" />
+  </ItemGroup>
+  <!-- import lib target -->
+  <Import Project="$(FeatRootPath)\build_system\vc17\target-lib.xml" />
+</Project>

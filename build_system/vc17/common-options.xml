@@ -1,0 +1,151 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemDefinitionGroup>
+    <BuildLog>
+      <Path>$(IntDir)\$(FeatBuildName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+
+  <!-- ************************************************************************************************************* -->
+  <!-- Compiler / Linker Settings -->
+  <!-- ************************************************************************************************************* -->
+  <PropertyGroup>
+    <TargetName>$(FeatBuildName)</TargetName>
+    <LinkIncremental>$(DebugMode)</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseDebugLibraries>$(DebugMode)</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DebugMode)'=='false'" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+
+  <!-- Common Settings -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <!--<WarningLevel>EnableAllWarnings</WarningLevel>-->
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;$(FeatDefList);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(FeatRootPath);$(FeatIncDirList)</AdditionalIncludeDirectories>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <LargeAddressAware>true</LargeAddressAware>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <LinkErrorReporting>NoErrorReport</LinkErrorReporting>
+    </Link>
+  </ItemDefinitionGroup>
+  <!-- Debug-Mode Settings -->
+  <ItemDefinitionGroup Condition="'$(DebugMode)'=='true'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <FloatingPointExceptions>true</FloatingPointExceptions>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <!-- Opt-Mode Settings -->
+  <ItemDefinitionGroup Condition="'$(DebugMode)'=='false'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <OmitFramePointers>true</OmitFramePointers>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <!-- OpenMP Settings -->
+  <ItemDefinitionGroup Condition="'$(EnableOMP)'=='true'">
+    <ClCompile>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <!-- CUDA Settings -->
+  <!--<ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true'">
+    <CudaCompile>
+      <GPUDebugInfo>$(DebugMode)</GPUDebugInfo>
+      <HostDebugInfo>$(DebugMode)</HostDebugInfo>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
+      <AdditionalCompilerOptions>/FS /wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='Win32'">
+    <CudaCompile>
+      <TargetMachinePlatform>32</TargetMachinePlatform>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='x64'">
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
+  </ItemDefinitionGroup>-->
+
+  <!-- ************************************************************************************************************* -->
+  <!-- Visual Studio Import Mumbo-Jumbo -->
+  <!-- ************************************************************************************************************* -->
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <!--<ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA $(FeatCudaVersion).targets" Condition="'$(FeatHaveCuda)'=='true'"/>
+  </ImportGroup>-->
+
+  <Target Name="Dump">
+    <Message Importance="High" Text="Project File Name = $(MSBuildProjectFile)" />
+    <Message Importance="High" Text="ProjectDir: '$(ProjectDir)'" />
+    <Message Importance="High" Text="ProjectName: '$(ProjectName)'" />
+    <Message Importance="High" Text="FeatRootPath: '$(FeatRootPath)'" />
+    <Message Importance="High" Text="Defines: @(FeatDef);@(FeatTPLDef)" />
+    <Message Importance="High" Text="Includes: @(FeatIncDir);@(FeatTPLInc)" />
+    <Message Importance="High" Text="LidDirs: @(FeatLibDir)" />
+    <Message Importance="High" Text="Depends: @(FeatLibDep);@(FeatTPLDep)" />
+    <Message Importance="High" Text="VersionBoost.......: $(VersionBoost)" />
+    <Message Importance="High" Text="VersionCGAL........: $(VersionCGAL)" />
+    <Message Importance="High" Text="VersionFParser.....: $(VersionFParser)" />
+    <Message Importance="High" Text="VersionHypre.......: $(VersionHypre)" />
+    <Message Importance="High" Text="VersionParMetis....: $(VersionParMetis)" />
+    <Message Importance="High" Text="VersionSuiteSparse.: $(VersionSuiteSparse)" />
+    <Message Importance="High" Text="VersionSuperLU.....: $(VersionSuperLU)" />
+    <Message Importance="High" Text="VersionTriangle....: $(VersionTriangle)" />
+    <Message Importance="High" Text="VersionZfp.........: $(VersionZfp)" />
+    <Message Importance="High" Text="VersionZlib........: $(VersionZlib)" />
+    <Message Importance="High" Text="VersionZoltan......: $(VersionZoltan)" />
+    <Message Importance="High" Text="FeatHaveBoost......: '$(FeatHaveBoost)'" />
+    <Message Importance="High" Text="FeatHaveBoost......: '$(FeatHaveBoost)'" />
+    <Message Importance="High" Text="FeatHaveCGAL.......: '$(FeatHaveCGAL)'" />
+    <Message Importance="High" Text="FeatHaveFParser....: '$(FeatHaveFParser)'" />
+    <Message Importance="High" Text="FeatHaveHypre......: '$(FeatHaveHypre)'" />
+    <Message Importance="High" Text="FeatHaveParMetis...: '$(FeatHaveParMetis)'" />
+    <Message Importance="High" Text="FeatHaveSuiteSparse: '$(FeatHaveSuiteSparse)'" />
+    <Message Importance="High" Text="FeatHaveSuperLU....: '$(FeatHaveSuperLU)'" />
+    <Message Importance="High" Text="FeatHaveTriangle...: '$(FeatHaveTriangle)'" />
+    <Message Importance="High" Text="FeatHaveZfp........: '$(FeatHaveZfp)'" />
+    <Message Importance="High" Text="FeatHaveZlib.......: '$(FeatHaveZlib)'" />
+    <Message Importance="High" Text="FeatHaveZoltan.....: '$(FeatHaveZoltan)'" />
+  </Target>
+
+</Project>

@@ -56,6 +56,7 @@ thirdparty/*.gz
 thirdparty/*.tgz
 thirdparty/*.zip
 thirdparty/alglib-*/
+thirdparty/boost_*/
 thirdparty/CGAL-*/
 thirdparty/deathhandler/
 thirdparty/fparser-*/
@@ -65,17 +66,18 @@ thirdparty/hypre-*/
 thirdparty/parmetis-*/
 thirdparty/SuiteSparse-*/
 thirdparty/superlu_dist-*/
-thirdparty/triangle/
+thirdparty/triangle-*/
 thirdparty/zfp-*/
 thirdparty/zlib-*/
 thirdparty/Zoltan-*/
 
 # Ignore Visual Studio symlinks
-build_system/vc16/kernel/
+build_system/vc*/kernel
 
 # Ignore Visual Studio user/filter files
 *.vcxproj.user
 *.vcxproj.filters
+.vs
 
 # Ignore Visual Studio output files
 lib/*
@@ -93,4 +95,4 @@ ipch
 *.lnk
 
 # Ignore Visual Studio user-configfiles
-config-vc16.xml
+config-vc*.xml
