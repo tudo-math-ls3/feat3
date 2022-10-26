@@ -35,21 +35,20 @@ namespace FEAT
 
     public:
       /// Create a new CGALWrapper Instance and open the provided off file.
-      CGALWrapper(String filename);
+      explicit CGALWrapper(String filename);
 
       /// Create a new CGALWrapper Instance and open the provided off (file-) stream.
-      CGALWrapper(std::istream & file);
+      explicit CGALWrapper(std::istream & file);
+
+      /// Destructor
+      virtual ~CGALWrapper();
 
       /// Check whether a point is inside the Polyhedron defined at objects' construction.
       bool point_inside(double x, double y, double z) const;
 
       /// Returns the minimun squared distance between the query point and all input primitives defined at objects' construction.
       double squared_distance(double x, double y, double z) const;
-
-      /// Destructor
-      ~CGALWrapper();
-    };
-
+    }; // class CGALWrapper
   } // namespace Geometry
 } // namespace FEAT
 #endif //defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)

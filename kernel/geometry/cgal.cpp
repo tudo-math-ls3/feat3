@@ -12,6 +12,10 @@
 
 #define CGAL_HEADER_ONLY 1
 
+#ifdef FEAT_COMPILER_MICROSOFT
+#pragma warning(disable: 4244)
+#endif // FEAT_COMPILER_MICROSOFT
+
 FEAT_DISABLE_WARNINGS
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/AABB_tree.h>
@@ -28,6 +32,10 @@ FEAT_RESTORE_WARNINGS
 #pragma warning disable 3280
 #pragma warning disable 1224
 #endif //FEAT_COMPILER_INTEL
+
+#ifdef FEAT_COMPILER_MICROSOFT
+#pragma warning(default: 4244)
+#endif // FEAT_COMPILER_MICROSOFT
 
 #include <kernel/geometry/cgal.hpp>
 
@@ -54,9 +62,12 @@ struct CGALWrapperData
 
   ~CGALWrapperData()
   {
-    delete _inside_tester;
-    delete _tree;
-    delete _polyhedron;
+    if(_inside_tester)
+      delete _inside_tester;
+    if(_tree)
+      delete _tree;
+    if(_polyhedron)
+      delete _polyhedron;
   }
 };
 
@@ -74,6 +85,12 @@ FEAT::Geometry::CGALWrapper::CGALWrapper(std::istream & file) :
   _cgal_data(nullptr)
 {
   _parse_off_data(file);
+}
+
+FEAT::Geometry::CGALWrapper::~CGALWrapper()
+{
+  if(_cgal_data)
+    delete (CGALWrapperData*)_cgal_data;
 }
 
 bool FEAT::Geometry::CGALWrapper::point_inside(double x, double y, double z) const
@@ -101,19 +118,21 @@ void FEAT::Geometry::CGALWrapper::_parse_off_data(std::istream & file)
   CGALWrapperData * cd = (CGALWrapperData*)_cgal_data;
 
   cd->_polyhedron = new Polyhedron_;
-  bool status = read_off(file, *(cd->_polyhedron));
+
+  // note: 'read_off' wandered into CGAL::IO namespace in version 5.3
+#if (CGAL_VERSION_NR < 1050301000)
+  bool status = CGAL::read_off(file, *(cd->_polyhedron));
   XASSERTM(status == true, "CGAL::read_off: read error!");
+#else
+  bool status = CGAL::IO::read_OFF(file, *(cd->_polyhedron));
+  XASSERTM(status, "CGAL::IO::read_OFF: read error!");
+#endif // (CGAL_VERSION_NR < 1050000000)
 
   // Construct AABB tree with a KdTree
   cd->_tree = new Tree_(faces(*(cd->_polyhedron)).first, faces(*(cd->_polyhedron)).second, *(cd->_polyhedron));
   cd->_tree->accelerate_distance_queries();
   // Initialize the point-in-polyhedron tester
   cd->_inside_tester = new Point_inside_(*(cd->_tree));
-}
-
-FEAT::Geometry::CGALWrapper::~CGALWrapper()
-{
-  delete (CGALWrapperData*)_cgal_data;
 }
 
 #elif !defined(DOXYGEN)
