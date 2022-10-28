@@ -6,7 +6,6 @@
 
 \section main_sec_buildsys Build-System
 - \ref feat_for_win_vs17
-- \ref feat_for_win_vs16
 
 \section main_sec_subsystems Kernel Subsystems
 The subsystems are in detail:
