@@ -189,7 +189,7 @@ namespace FEAT
           buffer.insert(std::end(buffer), sizeof(std::uint64_t), 0); //set datalength to an arbitrary value
           std::uint64_t ireal_size = it.second->set_checkpoint_data(buffer, _config);
           char * csize = reinterpret_cast<char *>(&ireal_size);
-          for(uint i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the the datalength
+          for(std::uint64_t i(0) ; i < sizeof(std::uint64_t) ; ++i)  //overwrite the the datalength
           {
             buffer[old_size + i] = csize[i];
           }
