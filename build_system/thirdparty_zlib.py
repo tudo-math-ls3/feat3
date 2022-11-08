@@ -10,7 +10,7 @@ import os
 class ZLIB(ThirdpartyPackage):
 
   def __init__(self,trunk_dirname):
-    self.version = "1.2.12"
+    self.version = "1.2.13"
     self.names = ["zlib"]
     self.dirname = "zlib-" + self.version
     self.filename = "zlib-" + self.version + ".tar.gz"
