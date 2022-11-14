@@ -2018,7 +2018,7 @@ class ThirdPartyZlib(ThirdPartyPackage):
     self.dir = self.name + "-" + self.version
     self.trunk = "."
     self.license_files = ["LICENSE"]
-    self.url = "https://zlib.net/" + self.file
+    self.url = "https://zlib.net/fossils/" + self.file
     self.page = "https://zlib.net"
     self.baseflags += ' /wd"4996" /wd"4244" /wd"4267"'
     self.baseflags += ' /I"./' + self.dir + '"'

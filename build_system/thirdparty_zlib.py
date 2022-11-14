@@ -14,7 +14,7 @@ class ZLIB(ThirdpartyPackage):
     self.names = ["zlib"]
     self.dirname = "zlib-" + self.version
     self.filename = "zlib-" + self.version + ".tar.gz"
-    self.url = "http://www.zlib.net/" + self.filename
+    self.url = "http://www.zlib.net/fossils/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_ZLIB:BOOL=ON -DFEAT_DIRNAME_ZLIB:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname
