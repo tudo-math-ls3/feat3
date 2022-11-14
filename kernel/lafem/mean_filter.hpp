@@ -69,14 +69,16 @@ namespace FEAT
        * \param[in] sol_mean
        * The desired integral mean of the solution vector. Defaults to 0.
        */
-      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual,
-        DataType sol_mean = DataType(0)) :
+      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual, DataType sol_mean = DataType(0)) :
         _vec_prim(std::forward<VectorType>(vec_prim)),
         _vec_dual(std::forward<VectorType>(vec_dual)),
         _volume(_vec_prim.dot(_vec_dual)),
         _sol_mean(sol_mean)
       {
-        XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        if(!_vec_prim.empty())
+        {
+          XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        }
       }
 
       /**
@@ -97,7 +99,10 @@ namespace FEAT
         _volume(volume),
         _sol_mean(sol_mean)
       {
-        XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        if(!_vec_prim.empty())
+        {
+          XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        }
       }
 
       /// move ctor
@@ -138,7 +143,7 @@ namespace FEAT
 
       /**
        * \brief Clones data from another MeanFilter
-       * \warning _volume will always be a deep copy
+       * \warning _volume and _sol_mean will always be a deep copy
        */
       void clone(const MeanFilter & other, CloneMode clone_mode = CloneMode::Deep)
       {
@@ -156,6 +161,18 @@ namespace FEAT
         _vec_dual.convert(other.get_vec_dual());
         _volume = DataType(other.get_volume());
         _sol_mean = DataType(other.get_sol_mean());
+        if(!_vec_prim.empty())
+        {
+          XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");
+        }
+      }
+
+      /// Clears this filter
+      void clear()
+      {
+        _vec_prim.clear();
+        _vec_dual.clear();
+        _volume = _sol_mean = DataType(0);
       }
 
       /// \cond internal
@@ -262,6 +279,5 @@ namespace FEAT
     }; // class MeanFilter<...>
   } // namespace LAFEM
 } // namespace FEAT
-
 
 #endif // KERNEL_LAFEM_MEAN_FILTER_HPP
