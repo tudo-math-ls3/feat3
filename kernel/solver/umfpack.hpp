@@ -513,7 +513,7 @@ namespace FEAT
           for(Index ip(irow_ptr_d[i]); ip < irow_ptr_d[i+1]; ++ip)
           {
             // convert block to scalar value
-            for(Index k(0); k < Index(dim_); ++k, ++op)
+            for(int k(0); k < dim_; ++k, ++op)
               odata[op] = double(idata_d[ip][0][k]);
           }
           // copy weight vector entry as last column entry
