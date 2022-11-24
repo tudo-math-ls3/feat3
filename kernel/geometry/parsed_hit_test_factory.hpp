@@ -35,12 +35,9 @@ namespace FEAT
      * \tparam Mesh_
      * The type of the mesh for which the cell sub-set is to be computed.
      *
-     * \int dim_
-     * Dimension of the function formula.
-     *
      * \author Gesa Pottbrock
      */
-    template<typename Mesh_, int dim_>
+    template<typename Mesh_>
     class ParsedHitTestFactory :
       public Factory< MeshPart<Mesh_> >
     {
@@ -53,6 +50,9 @@ namespace FEAT
       typedef MeshPart<Mesh_> MeshType;
       /// target set holder type
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
+      /// mesh world dimension
+      static constexpr int world_dim = Mesh_::world_dim;
 
     protected:
       class ParsedHitFunction
@@ -80,8 +80,8 @@ namespace FEAT
         {
           // add variables to our parser
           String vars("x");
-          if (dim_ > 1) vars += ",y";
-          if (dim_ > 2) vars += ",z";
+          if (world_dim > 1) vars += ",y";
+          if (world_dim > 2) vars += ",z";
 
           // try to parse the function
           const int ret = _parser.Parse(formula.c_str(), vars.c_str());
@@ -110,7 +110,7 @@ namespace FEAT
         bool operator()(const PointType& point) const
         {
           //convert DataType to double
-          const Tiny::Vector<double, dim_> vars(point);
+          const Tiny::Vector<double, world_dim> vars(point);
 
           // evaluate the parser
           const double val= _parser.Eval(vars.v);

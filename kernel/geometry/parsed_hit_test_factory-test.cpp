@@ -54,9 +54,9 @@ public:
     MeshType mesh_fine(refinery);
 
     // create two ParsedHitTestFactories
-    ParsedHitTestFactory< MeshType,int(2)> hit_test( mesh, "0.3-sqrt((x-0.5)^2+(y-0.5)^2)");
+    ParsedHitTestFactory<MeshType> hit_test( mesh, "0.3-sqrt((x-0.5)^2+(y-0.5)^2)");
     BoundaryType sphere(hit_test);
-    ParsedHitTestFactory< MeshType,int(2)> hit_test_fine( mesh_fine, "0.3-sqrt((x-0.5)^2+(y-0.5)^2)");
+    ParsedHitTestFactory<MeshType> hit_test_fine( mesh_fine, "0.3-sqrt((x-0.5)^2+(y-0.5)^2)");
     BoundaryType sphere_fine(hit_test_fine);
 
     // number of nodes, edges, quads

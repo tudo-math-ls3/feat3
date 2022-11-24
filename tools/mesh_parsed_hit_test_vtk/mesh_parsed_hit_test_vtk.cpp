@@ -68,8 +68,6 @@ String get_file_title(const String& filename)
 template<typename Mesh_>
 int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const String& filename)
 {
-  static constexpr int world_dim = Mesh_::world_dim;
-
   // parse levels
   Index lvl_min(0);
   Index lvl_max(0);
@@ -129,7 +127,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     }
 
     // create mesh part
-    Geometry::ParsedHitTestFactory<Mesh_, world_dim> hit_test(mesh);
+    Geometry::ParsedHitTestFactory<Mesh_> hit_test(mesh);
 #ifndef DEBUG
     try
 #endif

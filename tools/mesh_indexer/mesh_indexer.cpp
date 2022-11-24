@@ -235,7 +235,7 @@ namespace MeshIndexerTool
       try
       {
         // try to parse the formula
-        Geometry::ParsedHitTestFactory<MeshType_, MeshType_::world_dim> factory(*mesh_node.get_mesh());
+        Geometry::ParsedHitTestFactory<MeshType_> factory(*mesh_node.get_mesh());
 
         // parse formula
         factory.parse(formula);
