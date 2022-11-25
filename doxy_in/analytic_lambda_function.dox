@@ -1,0 +1,255 @@
+/** \page analytic_lambda_function Analytic Lambda Expression Functions
+
+The main purpose of this page is to outsource and concentrate most of the vital documentation from all the classes and
+helper functions related to analytical lambda function to avoid large amounts of copy-&-pasted documentation, because
+the classes are syntactically mostly identical, but outsourcing the code is not possible of feasible due to technical
+limitation and/or to obey the <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS principle</a>.
+
+\tableofcontents
+
+\section ana_lambda_general General Information
+This page describes the basic principles as well as the interface and usage recommendations of the lambda function
+class templates defined in the kernel/analytic/lambda_function.hpp header file, which allow the user to easily create
+objects that implement the FEAT::Analytic::Function interface by supplying formulae as C++ standard conforming lambda
+expressions, thus providing an easy-to-use and little-to-write way of implementing simple functions for the assembly
+of right-hand-sides, boundary condition functions, initial value functions, etc.
+
+\see For more information about C++ lambda expressions and the can of worms associated with them, please refer to e.g.:
+- https://en.cppreference.com/w/cpp/language/lambda
+- https://www.cprogramming.com/c++11/c++11-lambda-closures.html
+
+The documentation on this page refers to the five class templates
+- FEAT::Analytic::LambdaScalarFunction1D : R<sup>1</sup> -> R
+- FEAT::Analytic::LambdaScalarFunction2D : R<sup>2</sup> -> R
+- FEAT::Analytic::LambdaScalarFunction3D : R<sup>3</sup> -> R
+- FEAT::Analytic::LambdaVectorFunction2D : R<sup>2</sup> -> R<sup>2</sup>
+- FEAT::Analytic::LambdaVectorFunction3D : R<sup>3</sup> -> R<sup>3</sup>
+
+as well as their corresponding construction helper function overloads
+- FEAT::Analytic::create_lambda_function_scalar_1d : R<sup>1</sup> -> R
+- FEAT::Analytic::create_lambda_function_scalar_2d : R<sup>2</sup> -> R
+- FEAT::Analytic::create_lambda_function_scalar_3d : R<sup>3</sup> -> R
+- FEAT::Analytic::create_lambda_function_vector_2d : R<sup>2</sup> -> R<sup>2</sup>
+- FEAT::Analytic::create_lambda_function_vector_3d : R<sup>3</sup> -> R<sup>3</sup>
+
+\note There is no support for vector-valued lambda functions for R<sup>m</sup> -> R<sup>n</sup> with m != n for three
+reasons: Firstly, this case is a bit more exotic than the case m=n and therefore implementing it is kind of a waste of
+time and, secondly, supporting this case would require a more complicated = more confusing = more error-prone
+implementation of all the (helper) classes involved and, thirdly, it would lead to ambiguities in the meaning of the
+parameters supplied to the create_lambda_function_vector_nd functions. Therefore, the m != n case has been deliberately
+ignored; if you are in need for a function class for this case, implement it directly as a custom class deriving from
+the FEAT::Analytic::Function interface -- I swear, it's really not that hard ^_^
+
+
+\section ana_lambda_format Lambda Expression Interface
+
+All lambda expressions, which are to be used by any of the classes and functions mentioned on this page, are expected
+to conform to the following format, where \c DT_ denotes the datatype (typically \c double) that is used for the
+assembly:
+\code{.cpp}
+[](DT_ x              ) -> DT_ {return ...;} // for 1D
+[](DT_ x, DT_ y       ) -> DT_ {return ...;} // for 2D
+[](DT_ x, DT_ y, DT_ z) -> DT_ {return ...;} // for 3D
+\endcode
+Obviously, the \c x, \c y and \c z parameters represent the (real element) space coordinates in which the analytic
+function is being evaluated.
+
+Furthermore, one may also make use of generic lambda expressions to let the compiler deduct the datatype automatically:
+\code{.cpp}
+[](auto x                ) {return ...;} // for 1D
+[](auto x, auto y        ) {return ...;} // for 2D
+[](auto x, auto y, auto z) {return ...;} // for 3D
+\endcode
+However, the use of generic lambda expressions may lead to floating point conversion warnings if the literals used in
+the return expression do not match the datatype of the coordinate parameters.
+
+\subsection ana_lambda_params Additional Parameters in Lambda Expressions
+It is possible to supply additional constants and variables to lambda expressions by capturing local variables (see
+lambda captures in online sources), either by value or by reference. For example, the sine-bubble function, which is
+implemented in FEAT::Analytic::Common::SineBubbleFunction, can be written as a lambda expression conforming to the above
+mentioned interace as follows:
+\code{.cpp}
+const DT_ pi = Math::pi<DT_>();
+auto lambda_sine = [pi](DT_ x, DT_ y) -> DT_ {return Math::sin(pi*x)*Math::sin(pi*y);};
+\endcode
+
+As a more complex example, the pressure function of the Taylor-Green-Vortex, which is implemented in
+FEAT::Analytic::Common::TaylorGreenVortexPres2D, can be written as a lambda expression as follows:
+
+\code{.cpp}
+const DT_ pi = Math::pi<DT_>();
+DT_ nu = ...; // viscosity parameter 'nu'
+DT_ t = ...;  // current simulation time 't'
+
+// all-in-one lambda expression
+auto lambda_tg1 = [pi,&nu,&t](DT_ x, DT_ y) -> DT_ {return Math::exp(-DT_(4)*pi*pi*nu*t) * DT_(0.5) * (Math::sqr(Math::cos(pi*x)) + Math::sqr(Math::cos(pi*y)) - DT_(1));};
+
+// alternatively: oursource exp-factor:
+DT_ ef = Math::exp(-DT_(4)*pi*pi*nu*t) * DT_(0.5);
+auto lambda_tg2 = [pi,&ef](DT_ x, DT_ y) -> DT_ {return ef * (Math::sqr(Math::cos(pi*x)) + Math::sqr(Math::cos(pi*y)) - DT_(1));};
+\endcode
+
+\subsection ana_lambda_threads Lambda Expression Thread Safety
+Generally, you are free to use all the various types of variable capturing (by copy, by reference) that is offered by
+the C++ standard, however, you should keep a few things in mind, especially when referencing more complex data structures
+than simple local variables of some fundamental types such as \c double or \c int.
+
+\attention Firstly, the functor objects, which are created from the lambda expressions, must be \b copyable, because the
+Evaluator sub-classes of the actual lambda function implementation will explicitly create a an independent copy of the
+lambda functor for each Evaluator object. Noncopyable lambda expression will lead to compiler errors during the
+instantiation of the Evaluator classes.
+
+\note Fortunately, it is actually somewhat challenging to create a non-copyable lambda expression, so it is unlikely
+that you'll run into this problem by accident, because it requires to capture a non-copyable-but-moveable object by
+actually moving it into a local object by value. Simply don't do this.
+
+\attention Secondly, assembly classes (such as the FEAT::Assembly::DomainAssembler) are explicitly allowed to create
+multiple instances of the Evaluator classes -- and therefore the lambda functor objects embedded in these Evaluator
+objects -- simultaneously side by side, especially in the context of a multi-threaded assembly. In consequence, the
+lambda expressions must \b not modify any local variables that they capture by reference, because this would inevitably
+lead to race conditions between the various instances of the lambda functor objects.
+
+\note In fact, you should generally assume that several copies of you lambda expressions will exist side-by-side and
+that these copies might be used simultaneously by different threads. However, it is safe to assume that no single lambda
+functor object will be used by multiple threads simultaneously, because each thread owns his own exclusive set of lambda
+functor object copies.
+
+\section ana_lambda_create Lambda Function Object Creation
+It is highly recommended to use the \c create_lambda_function_scalar_nd / \c create_lambda_function_vector_nd helper
+functions to create new instances of the \c LambdaScalarFunctionND / \c LambdaVectorFunctionND class templates and
+receiving the returned objects in an \c auto-declared object instead of trying to create the class template instances
+directly by hand, because the latter approach would result in an incomprehensible lambda-template type nesting mumbo-
+jumbo that is extremely prone to typing errors.
+
+\note All instances of the \c LambdaScalarFunctionND / \c LambdaVectorFunctionND class templates are by default both
+copyable and moveable, and therefore there is usually no need to create these objects on the heap.
+
+To create a lambda function object, choose the create helper function that corresponds to the type of function that
+you want to define from the list below:
+
+as well as their corresponding construction helper function overloads
+- FEAT::Analytic::create_lambda_function_scalar_1d creates a FEAT::Analytic::LambdaScalarFunction1D for f: R<sup>1</sup> -> R
+- FEAT::Analytic::create_lambda_function_scalar_2d creates a FEAT::Analytic::LambdaScalarFunction2D for f: R<sup>2</sup> -> R
+- FEAT::Analytic::create_lambda_function_scalar_3d creates a FEAT::Analytic::LambdaScalarFunction3D for f: R<sup>3</sup> -> R
+- FEAT::Analytic::create_lambda_function_vector_2d creates a FEAT::Analytic::LambdaVectorFunction2D for f: R<sup>2</sup> -> R<sup>2</sup>
+- FEAT::Analytic::create_lambda_function_vector_3d creates a FEAT::Analytic::LambdaVectorFunction3D for f: R<sup>3</sup> -> R<sup>3</sup>
+
+Each of the create functions offers a total of 3 overloads:
+- an overload that accepts lambda expression for the function values only
+- an overload that accepts lambda expressions for up to first-order partial derivatives
+- an overload that accepts lambda expressions for up to second-order partial derivatives
+
+\note The lambda expression(s) for the function value(s) are mandatory and therefore cannot be omitted, whereas the lambda
+expressions for the derivatives are optional and thus the first and second overloads can be used to omit the specification
+of second and even first order derivatives. For the sake of convenience, these overloads will then utilize a Richardson
+extrapolation scheme based on second-order central difference quotients, which also allows the user/assembler to evaluate
+both the gradients and hessians of lambda functions even if these have not been explicitly supplied by the user as lambda
+expressions. In consequence, it is unnecessary (and therefore also pointless) to wrap a lambda function object in an
+FEAT::Analytic::AutoDerive wrapper under any circumstances.
+
+
+In the case of the create_lambda_function_scalar_nd functions, the lambda expressions are specified in the following order:
+- function value (1 expression)
+- first-order partial derivatives (dx, dy [2D/3D], dz [3D])
+- second-order partial derivatives (dxx, dyy [2D/3D], dzz [3D])
+- second-order mixed partial derivatives (dxy [2D/3d], dyz [3D], dzx [3D])
+
+In the case of the create_lambda_function_vector_nd functions, the order of the lambda expressions is the same as for
+scalar functions, however, each scalar component is now replaced by lambda expressions for each indiviual component of
+the vector field:
+- function values:
+  - value1, value2 [2D/3D], value3 [3D]
+- first-order partial derivatives:
+  - dx1, dx2 [2D/3D], dx3 [3D]
+  - dy1 [2D], dy2 [2D/3D], dy3 [3D]
+  - dz1 [3D], dz2 [3D], dz3 [3D]
+- second-order partial derivatives (dxx, dyy [2D/3D], dzz [3D])
+  - analoguous to first-order derivatives
+- second-order mixed partial derivatives (dxy [2D/3d], dyz [3D], dzx [3D])
+  - analoguous to first-order derivatives
+
+It is possible, but not necessary to create local objects for the lambda expression functors before passing them as
+arguments to the create_lambda_function_scalar/vector_nd functions -- it is usually more convenient to pass the
+lambda expressions directly as arguments to the create_lambda_function_scalar/vector_nd functions.
+
+\subsection ana_lambda_derive_extrapol Richardson Extrapolation of Derivatives
+As said before, if you do not specify the formulae for the first and/or second order derivatives explicitly, then the
+Lambda function classes will automatically enable a Richardson extrapolation scheme based on second-order central
+difference quotients. The Richardson extrapolation scheme can be configured up to a certain extend by specifying an
+initial h for the extrapolation scheme as well as the maximum number of Richardson iterations by setting the
+\c initial_h_grad / \c initial_h_hess and \c max_steps_grad / \c max_steps_hess attributes of the Lambda function
+classes. The default initial for both gradient and hessian extrapolation is set to 0.01 and the default maximum number
+of extrapolation steps is set to 10. There are currently no getter/setter functions for these two attributes, but they
+are public, so you can access them directly, although there is little reason to change them unless in very specific
+scenarios.
+
+\subsection ana_lambda_examples_scalar Scalar Examples
+
+A simple example to create an analytic Lambda function object for the scalar 2D function \f$x^2-y^2\f$ (without
+specifying any partial derivatives explicitly) by using generic lambdas is given here:
+\code{.cpp}
+auto saddle_func = create_lambda_function_scalar_2d( [](auto x, auto y){return x*x - y*y;} );
+\endcode
+
+One may also provide the first and second partial derivatives:
+\code{.cpp}
+auto saddle_func = create_lambda_function_scalar_2d(
+  [](auto x, auto y) {return  x*x - y*y;}, // function value
+  [](auto x, auto y) {return  2.0*x;},     // X-derivative
+  [](auto x, auto y) {return -2.0*y;},     // Y-derivative
+  [](auto x, auto y) {return  2.0;},       // XX-derivative
+  [](auto x, auto y) {return -2.0;},       // YY-derivative
+  [](auto x, auto y) {return  0.0;}        // XY-derivative
+);
+\endcode
+Please note that the compiler may emit floating point conversion warnings in the above example if the function is used
+in an assembly method that uses \c float as the datatype because the literals 2.0 and 0.0 are both of type \c double.
+
+The following example creates a local variable for pi and captures by copy it to implement the sine-bubble function in 3D
+including all first and second order partial derivatives:
+\code{.cpp}
+const DataType pi = Math::pi<DataType>();
+auto sine_bubble = create_lambda_function_scalar_3d(
+  [pi](auto x, auto y, auto z) {return        Math::sin(pi*x)*Math::sin(pi*y)*Math::sin(pi*z);}, // function value
+  [pi](auto x, auto y, auto z) {return     pi*Math::cos(pi*x)*Math::sin(pi*y)*Math::sin(pi*z);}, // X-derivative
+  [pi](auto x, auto y, auto z) {return     pi*Math::sin(pi*x)*Math::cos(pi*y)*Math::sin(pi*z);}, // Y-derivative
+  [pi](auto x, auto y, auto z) {return     pi*Math::sin(pi*x)*Math::sin(pi*y)*Math::cos(pi*z);}, // Z-derivative
+  [pi](auto x, auto y, auto z) {return -pi*pi*Math::sin(pi*x)*Math::sin(pi*y)*Math::sin(pi*z);}, // XX-derivative
+  [pi](auto x, auto y, auto z) {return -pi*pi*Math::sin(pi*x)*Math::sin(pi*y)*Math::sin(pi*z);}, // YY-derivative
+  [pi](auto x, auto y, auto z) {return -pi*pi*Math::sin(pi*x)*Math::sin(pi*y)*Math::sin(pi*z);}, // ZZ-derivative
+  [pi](auto x, auto y, auto z) {return  pi*pi*Math::cos(pi*x)*Math::cos(pi*y)*Math::sin(pi*z);}, // XY-derivative
+  [pi](auto x, auto y, auto z) {return  pi*pi*Math::sin(pi*x)*Math::cos(pi*y)*Math::cos(pi*z);}, // YZ-derivative
+  [pi](auto x, auto y, auto z) {return  pi*pi*Math::cos(pi*x)*Math::sin(pi*y)*Math::cos(pi*z);}  // ZX-derivative
+);
+\endcode
+
+\subsection ana_lambda_examples_vector Vector-Valued Examples
+
+Here comes a vector-valued example, which implements the Taylor-Green-Vortex velocity field, which is also implemented
+by the class FEAT::Analytic::Common:TaylorGreenVortexVelo2D. This example outsources the exponential forefactor that
+contains the current simulation time into a local variable named \c factor, which is then captured by reference, so that
+the lambda function object will always use the up-to-date factor, even when it changes during the simulation:
+\code{.cpp}
+const DataType pi = Math::pi<DataType>();
+
+// exponential factor containing the time variable
+DataType factor = Math::exp(-2.0*pi*pi*nu*t));
+
+// create Taylor-Green velocity field
+auto taylor_green_velocity = create_lambda_vector_2d(
+  [pi,&factor](auto x, auto y, auto z) {return  factor *         Math::sin(pi*x) * Math::cos(pi*y);}, // u1 value
+  [pi,&factor](auto x, auto y, auto z) {return -factor *         Math::cos(pi*x) * Math::sin(pi*y);}, // u2 value
+  [pi,&factor](auto x, auto y, auto z) {return  factor *    pi * Math::cos(pi*x) * Math::cos(pi*y);}, // u1 X-derivative
+  [pi,&factor](auto x, auto y, auto z) {return  factor *    pi * Math::sin(pi*x) * Math::sin(pi*y);}, // u2 X-derivative
+  [pi,&factor](auto x, auto y, auto z) {return -factor *    pi * Math::sin(pi*x) * Math::sin(pi*y);}, // u1 Y-derivative
+  [pi,&factor](auto x, auto y, auto z) {return -factor *    pi * Math::cos(pi*x) * Math::cos(pi*y);}, // u2 Y-derivative
+  [pi,&factor](auto x, auto y, auto z) {return -factor * pi*pi * Math::sin(pi*x) * Math::cos(pi*y);}, // u1 XX-derivative
+  [pi,&factor](auto x, auto y, auto z) {return  factor * pi*pi * Math::cos(pi*x) * Math::sin(pi*y);}, // u2 XX-derivative
+  [pi,&factor](auto x, auto y, auto z) {return -factor * pi*pi * Math::sin(pi*x) * Math::cos(pi*y);}, // u1 YY-derivative
+  [pi,&factor](auto x, auto y, auto z) {return  factor * pi*pi * Math::cos(pi*x) * Math::sin(pi*y);}, // u2 YY-derivative
+  [pi,&factor](auto x, auto y, auto z) {return -factor * pi*pi * Math::cos(pi*x) * Math::sin(pi*y);}, // u1 XY-derivative
+  [pi,&factor](auto x, auto y, auto z) {return  factor * pi*pi * Math::sin(pi*x) * Math::cos(pi*y);}  // u2 XY-derivative
+);
+\endcode
+\author Peter Zajac
+**/
