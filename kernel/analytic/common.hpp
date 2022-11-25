@@ -3163,9 +3163,6 @@ namespace FEAT
           \sin\bigg(\frac{\pi y}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
           \sin\bigg(\frac{\pi z}{\sqrt{x^2+y^2+z^2}}\bigg)\f]
        *
-       * \tparam DT_
-       * The floating point type
-       *
        * \author Peter Zajac
        */
       class SphereSinBubbleFunction : public Analytic::Function
@@ -3372,6 +3369,87 @@ namespace FEAT
           }
         }; // class SphereSinBubbleFunction::Evaluator<...>
       }; // class SphereSinBubbleFunction
+
+      /**
+       * \brief Standing-Vortex function in 2D
+       *
+       * This function represents the 2D standing vortex velocity field, which is a common benchmark
+       * velocity field for testing the stability of Navier-Stokes discretizations and stabilizations.
+       *
+       * The field is given with \f$r := \sqrt{(x-0.5)^2 \cdot(y-0.5)^2}\f$ as
+       *
+       * \f[u(x,y,z) = \begin{cases}\begin{bmatrix}5(y-0.5)\\ -5(x-0.5)\end{bmatrix},& r < 0.2\\
+         \begin{bmatrix}(2/r - 5)(y-0.5) \\ (-2/r + 5)(x-0.5)\end{bmatrix},& 0.2 \leq r < 0.4\\0, & \text{else}\end{cases}\f]
+       *
+       * \author Peter Zajac
+       */
+      class StandingVortexFunction2D :
+        public Analytic::Function
+      {
+      public:
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Vector<2> ImageType;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = false;
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        protected:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+          typedef typename Traits_::GradientType GradientType;
+
+        public:
+          explicit Evaluator(const StandingVortexFunction2D&)
+          {
+          }
+
+          ValueType value(const PointType& point) const
+          {
+            ValueType val(DataType(0));
+            const DataType x = point[0] - DataType(0.5);
+            const DataType y = point[1] - DataType(0.5);
+            const DataType r = Math::sqrt(x*x + y*y);
+            if (r < DataType(0.2))
+            {
+              val[0] =  DataType(5)*y;
+              val[1] = -DataType(5)*x;
+            }
+            else if (r < DataType(0.4))
+            {
+              val[0] = ( DataType(2)/r - DataType(5))*y;
+              val[1] = (-DataType(2)/r + DataType(5))*x;
+            }
+            return val;
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            GradientType grad(DataType(0));
+            const DataType x = point[0] - DataType(0.5);
+            const DataType y = point[1] - DataType(0.5);
+            const DataType r = Math::sqrt(x*x + y*y);
+            if (r < DataType(0.2))
+            {
+              grad[0][1] =  DataType(5);
+              grad[1][0] = -DataType(5);
+            }
+            else if (r < DataType(0.4))
+            {
+              const DataType s = DataType(1) / (r*r*r);
+              grad[0][0] = -DataType(2)*x*y*s;
+              grad[0][1] = -DataType(2)*y*y*s + DataType(2)/r - DataType(5);
+              grad[1][0] =  DataType(2)*x*x*s - DataType(2)/r + DataType(5);
+              grad[1][1] =  DataType(2)*x*y*s;
+            }
+            return grad;
+          }
+        };
+      }; // class StandingVortexFunction2D
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

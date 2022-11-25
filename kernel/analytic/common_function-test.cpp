@@ -1612,6 +1612,38 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess_3[0][0], DT_(234), tol);
   }
 
+  void test_standing_vortex_function_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create standing-vortex function object
+    Analytic::Common::StandingVortexFunction2D func;
+
+    // evaluate in point (0.6,0.575)
+    Tiny::Vector<DT_, 2> val_1 = Analytic::eval_value_x(func, DT_(0.6), DT_(0.575));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_(0.375), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-0.5), tol);
+
+    // evaluate in p0int (0.7, 0.8)
+    Tiny::Vector<DT_, 2> val_2 = Analytic::eval_value_x(func, DT_(0.7), DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[0], DT_(0.1641005886756876), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2[1], DT_(-0.1094003924504584), tol);
+
+    // evaluate gradient in point (0.6,0.575)
+    Tiny::Matrix<DT_, 2, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.6), DT_(0.575));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], DT_(5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_(-5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(0), tol);
+
+    // evaluate gradient in point (0.7, 0.8)
+    Tiny::Matrix<DT_, 2, 2> grad_2 = Analytic::eval_gradient_x(func, DT_(0.7), DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][0], DT_(-2.560154751808750), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[0][1], DT_(-3.293230165460834), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][0], DT_(1.159767872286875), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][1], DT_(2.560154751808750), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1661,6 +1693,7 @@ public:
     test_guermond_stokes_sol_rhs_2d();
     test_guermond_stokes_sol_rhs_3d();
     test_polynomial_function_1d();
+    test_standing_vortex_function_2d();
   }
 };
 
