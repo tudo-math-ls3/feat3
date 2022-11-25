@@ -1644,6 +1644,52 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad_2[1][1], DT_(2.560154751808750), tol);
   }
 
+  void test_taylor_green_vortex_velo_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Analytic::Common::TaylorGreenVortexVelo2D<DT_> func(DT_(0.01), DT_(0.5));
+
+    // evaluate function
+    Tiny::Vector<DT_, 2> val_1 = Analytic::eval_value_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_( 0.59188481860155275663), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-0.24516671922750232133), tol);
+
+    // evaluate gradient
+    Tiny::Matrix<DT_, 2, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_( 1.8594609978899655386), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], DT_(-0.77021396402983280152), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_( 0.77021396402983280152), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(-1.8594609978899655386), tol);
+
+    // evaluate hessian
+    Tiny::Tensor3<DT_, 2, 2, 2> hess_1 = Analytic::eval_hessian_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][0], DT_(-5.8416690106078617623), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][1], DT_(-2.4196985310883959903), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][0], DT_(-2.4196985310883959903), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][1], DT_(-5.8416690106078617623), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][0], DT_( 2.4196985310883959903), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][1], DT_( 5.8416690106078617623), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][0], DT_( 5.8416690106078617623), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][1], DT_( 2.4196985310883959903), tol);
+  }
+
+  void test_taylor_green_vortex_pres_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Analytic::Common::TaylorGreenVortexPres2D<DT_> func(DT_(0.01), DT_(0.5));
+
+    // evaluate function
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0.14511045913710802783), tol);
+
+    // evaluate gradient
+    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.25), DT_(0.125));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(-1.2894175660971681167), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.91175590476836093505), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1694,6 +1740,8 @@ public:
     test_guermond_stokes_sol_rhs_3d();
     test_polynomial_function_1d();
     test_standing_vortex_function_2d();
+    test_taylor_green_vortex_velo_2d();
+    test_taylor_green_vortex_pres_2d();
   }
 };
 

@@ -3450,6 +3450,219 @@ namespace FEAT
           }
         };
       }; // class StandingVortexFunction2D
+
+      /**
+       * \brief Taylor-Green Vortex velocity field
+       *
+       * This class implements the Taylor-Green vortex velocity field,
+       * which is the velocity field of an analytical solution to the
+       * incompressible 2D Navier-Stokes equations on the unit-square.
+       * The compatible pressure function is TaylorGreenVortexPres2D.
+       *
+       * \f[v(t,x,y) := \begin{bmatrix}\sin(\pi x)\cos(\pi y)\exp(-2\pi^2 \nu t)\\
+         -\cos(\pi x)\sin(\pi y)\exp(-2\pi^2 \nu t)\end{bmatrix}\f]
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class TaylorGreenVortexVelo2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<2> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can't compute the Hessian
+        static constexpr bool can_hess = true;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /// The viscosity parameter
+        DataType nu;
+        /// The current simulation time
+        DataType cur_t;
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] nu_
+         * The viscosity parameter nu.
+         *
+         * \param[in] t_
+         * The current simulation time t.
+         */
+        explicit TaylorGreenVortexVelo2D(DataType nu_ = DataType(1), DataType t_ = DataType(0)) :
+          nu(nu_),
+          cur_t(t_)
+        {
+        }
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const DataType _pi;
+          const DataType _fac;
+
+        public:
+          explicit Evaluator(const TaylorGreenVortexVelo2D& function) :
+            _pi(Math::pi<DataType>()),
+            _fac(Math::exp(-DataType(2)*_pi*_pi*function.nu*function.cur_t))
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            ValueType val = ValueType::null();
+            val[0] = +_fac * Math::sin(_pi*point[0]) * Math::cos(_pi*point[1]);
+            val[1] = -_fac * Math::cos(_pi*point[0]) * Math::sin(_pi*point[1]);
+            return val;
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            GradientType grad = GradientType::null();
+            grad[0][0] = +_fac * _pi * Math::cos(_pi*point[0]) * Math::cos(_pi*point[1]);
+            grad[0][1] = -_fac * _pi * Math::sin(_pi*point[0]) * Math::sin(_pi*point[1]);
+            grad[1][0] = +_fac * _pi * Math::sin(_pi*point[0]) * Math::sin(_pi*point[1]);
+            grad[1][1] = -_fac * _pi * Math::cos(_pi*point[0]) * Math::cos(_pi*point[1]);
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            HessianType hess = HessianType::null();
+            hess[0][0][0] = -_fac * _pi*_pi * Math::sin(_pi*point[0]) * Math::cos(_pi*point[1]);
+            hess[0][0][1] = -_fac * _pi*_pi * Math::cos(_pi*point[0]) * Math::sin(_pi*point[1]);
+            hess[0][1][0] = -_fac * _pi*_pi * Math::cos(_pi*point[0]) * Math::sin(_pi*point[1]);
+            hess[0][1][1] = -_fac * _pi*_pi * Math::sin(_pi*point[0]) * Math::cos(_pi*point[1]);
+            hess[1][0][0] = +_fac * _pi*_pi * Math::cos(_pi*point[0]) * Math::sin(_pi*point[1]);
+            hess[1][0][1] = +_fac * _pi*_pi * Math::sin(_pi*point[0]) * Math::cos(_pi*point[1]);
+            hess[1][1][0] = +_fac * _pi*_pi * Math::sin(_pi*point[0]) * Math::cos(_pi*point[1]);
+            hess[1][1][1] = +_fac * _pi*_pi * Math::cos(_pi*point[0]) * Math::sin(_pi*point[1]);
+            return hess;
+          }
+        }; // class TaylorGreenVortexVelo::Evaluator<...>
+      }; // class TaylorGreenVortexVelo<...>
+
+      /**
+       * \brief Taylor-Green Vortex pressure function
+       *
+       * This class implements the Taylor-Green vortex pressure function,
+       * which is the pressure function of an analytical solution to the
+       * incompressible 2D Navier-Stokes equations on the unit-square.
+       * The compatible pressure function is TaylorGreenVortexVelo2D.
+       *
+       * \f[p(t,x,y) := \frac{1}{2}\Big(\cos(\pi x)^2 + \cos(\pi y)^2 -1\Big)\exp(-4\pi^2 \nu t)\f]
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class TaylorGreenVortexPres2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Scalar ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /// The viscosity parameter
+        DataType nu;
+        /// The current simulation time
+        DataType cur_t;
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] nu_
+         * The viscosity parameter nu.
+         *
+         * \param[in] t_
+         * The current simulation time t.
+         */
+        explicit TaylorGreenVortexPres2D(DataType nu_ = DataType(1), DataType t_ = DataType(0)) :
+          nu(nu_),
+          cur_t(t_)
+        {
+        }
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const DataType _pi;
+          const DataType _fac;
+
+        public:
+          explicit Evaluator(const TaylorGreenVortexPres2D& function) :
+            _pi(Math::pi<DataType>()),
+            _fac(Math::exp(-DataType(4)*_pi*_pi*function.nu*function.cur_t) * DataType(0.5))
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            return ValueType(_fac * (Math::sqr(Math::cos(_pi*point[0])) + Math::sqr(Math::cos(_pi*point[1])) - DataType(1)));
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            GradientType grad = GradientType::null();
+            grad[0] = -DataType(2) * _pi * _fac * Math::sin(_pi*point[0]) * Math::cos(_pi*point[0]);
+            grad[1] = -DataType(2) * _pi * _fac * Math::sin(_pi*point[1]) * Math::cos(_pi*point[1]);
+            return grad;
+          }
+
+          HessianType hessian(const PointType& DOXY(point)) const
+          {
+            return HessianType::null();
+          }
+        }; // class TaylorGreenVortexPres::Evaluator<...>
+      }; // class TaylorGreenVortexPres<...>
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT
