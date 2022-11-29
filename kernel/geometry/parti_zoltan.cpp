@@ -152,7 +152,7 @@ namespace FEAT
         _zoltan_comm = _comm.comm_dup();
 
       // get my rank and size
-      const int z_rank = _zoltan_comm.rank();
+      //const int z_rank = _zoltan_comm.rank();
       const int z_size = _zoltan_comm.size();
 
       // make sure that the number of desired parts is not smaller than the size of the communicator
