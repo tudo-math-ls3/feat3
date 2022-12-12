@@ -5,6 +5,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of solver tests
 SET (test_list
+  auto_derive-test
   common_function-test
   lambda_function-test
   parsed_function-test

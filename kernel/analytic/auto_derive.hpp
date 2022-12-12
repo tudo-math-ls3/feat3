@@ -316,6 +316,21 @@ namespace FEAT
           return r;
         }
 
+        // compute scalar difference quotient for gradient
+        template<int sn_>
+        static void _set_grad_quot(Tiny::Vector<DataType, domain_dim, sn_>& x, int i, const DataType& vr, const DataType& vl, const DataType denom)
+        {
+          x[i] = denom * (vr - vl);
+        }
+
+        // compute vector difference quotient for gradient
+        template<int img_dim_, int sm_, int sn_>
+        static void _set_grad_quot(Tiny::Matrix<DataType, img_dim_, domain_dim, sm_, sn_>& x, int i, const ValueType& vr, const ValueType& vl, const DataType denom)
+        {
+          for(int k(0); k < img_dim_; ++k)
+            x[k][i] = denom * (vr[k] - vl[k]);
+        }
+
         /// evaluates the first-order difference quotients
         void _eval_grad_quot(GradientType& x, PointType& v, const DataType h)
         {
@@ -337,12 +352,42 @@ namespace FEAT
             v[i] = vi - h;
             vl = _func_eval.value(v);
 
-            // compute difference quotient
-            x[i] = denom * (vr - vl);
+            // compute difference quotient with appropriate overload (scalar/vector)
+            _set_grad_quot(x, i, vr, vl, denom);
 
             // restore coord
             v[i] = vi;
           }
+        }
+
+        // compute scalar difference quotient for hessian for i == j
+        template<int sm_, int sn_>
+        static void _set_hess_quot(Tiny::Matrix<DataType, domain_dim, domain_dim, sm_, sn_>& x, int i, const ValueType& vr, const ValueType& vl,  const ValueType& vc, const DataType denom)
+        {
+          x[i][i] = denom * (vr + vl - DataType(2)*vc);
+        }
+
+        // compute scalar difference quotient for hessian for i != j
+        template<int sm_, int sn_>
+        static void _set_hess_quot(Tiny::Matrix<DataType, domain_dim, domain_dim, sm_, sn_>& x, int i, int j, const ValueType& vne, const ValueType& vsw, const ValueType& vnw, const ValueType& vse, const DataType denom)
+        {
+          x[i][j] = x[j][i] = denom * ((vne + vsw) - (vnw + vse));
+        }
+
+        // compute vector difference quotient for hessian for i == j
+        template<int image_dim_, int sl_, int sm_, int sn_>
+        static void _set_hess_quot(Tiny::Tensor3<DataType, image_dim_, domain_dim, domain_dim, sl_, sm_, sn_>& x, int i, const ValueType& vr, const ValueType& vl,  const ValueType& vc, const DataType denom)
+        {
+          for(int k(0); k < image_dim_; ++k)
+            x[k][i][i] = denom * (vr[k] + vl[k] - DataType(2)*vc[k]);
+        }
+
+        // compute vector difference quotient for for hessian i != j
+        template<int image_dim_, int sl_, int sm_, int sn_>
+        static void _set_hess_quot(Tiny::Tensor3<DataType, image_dim_, domain_dim, domain_dim, sl_, sm_, sn_>& x, int i, int j, const ValueType& vne, const ValueType& vsw, const ValueType& vnw, const ValueType& vse, const DataType denom)
+        {
+          for(int k(0); k < image_dim_; ++k)
+            x[k][i][j] = x[k][j][i] = denom * ((vne[k] + vsw[k]) - (vnw[k] + vse[k]));
         }
 
         /// evaluates the second-order difference quotients
@@ -371,7 +416,7 @@ namespace FEAT
             vl = _func_eval.value(v);
 
             // compute difference quotient
-            x[i][i] = denom1 * (vr + vl - DataType(2)*vc);
+            _set_hess_quot(x, i, vr, vl, vc, denom1);
 
             // now the mixed derivatives
             for(int j(i+1); j < domain_dim; ++j)
@@ -401,7 +446,7 @@ namespace FEAT
               vsw = _func_eval.value(v);
 
               // combine into difference quotient
-              x[i][j] = x[j][i] = denom2 * ((vne + vsw) - (vnw + vse));
+              _set_hess_quot(x, i, j, vne, vsw, vnw, vse, denom2);
 
               // restore coord
               v[j] = vj;
