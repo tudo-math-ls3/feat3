@@ -98,7 +98,7 @@ namespace FEAT
      *     \frac{\rho_k}{\left< \hat{r}_0, q_k \right>}, & \mathrm{~left~preconditioned} \\
      *     \frac{\rho_k}{\left< \hat{r}_0, \tilde{q}_k \right>}, & \mathrm{~right~preconditioned} \\
      *   \end{cases}\\
-     *   x_{k+1/2} & = x_k + \alpha_k \tilde{p}\\
+     *   x_{k+1/2} & = x_k + \alpha_k \tilde{p}_k\\
      *   r_{k+1/2} & = r_k - \alpha_k q_k \\
      *   \mathrm{If~} x_{k+1/2}, r_{k+1/2}& \mathrm{~are~good~enough:~break}\\
      *   \tilde{r}_{k+1/2} & = \tilde{r}_k - \alpha_k \tilde{q}_k \\
