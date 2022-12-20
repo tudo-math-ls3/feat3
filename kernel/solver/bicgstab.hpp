@@ -83,7 +83,7 @@ namespace FEAT
      * \f{align*}{
      *   r_0 & := b - A x_0 \\
      *   \hat{r}_0 & := r_0 \\
-     *   \tilde{r}_0 & := M^{-1} r \\
+     *   \tilde{r}_0 & := M^{-1} r_0 \\
      *   \tilde{p}_0 & := \tilde{r}_0 \\
      *   \rho_0 & :=
      *   \begin{cases}
