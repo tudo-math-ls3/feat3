@@ -7,6 +7,7 @@
 namespace CCND_FIBER
 {
   using namespace FEAT;
+  typedef unsigned int uint;
 
   //template for pow operation... inlined...
   template<uint exp_>

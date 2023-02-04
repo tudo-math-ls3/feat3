@@ -130,7 +130,7 @@
 #define FEAT_CUDA_ARCH "${FEAT_CUDA_ARCH}"
 #endif
 
-#ifdef FEAT_MPI
+#ifdef FEAT_HAVE_MPI
 /// absolute path to mpi compiler wrapper
 #define MPI_CXX_COMPILER "${MPI_CXX_COMPILER}"
 /// absolute path to mpi execution wrapper

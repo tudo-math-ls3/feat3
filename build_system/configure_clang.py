@@ -1,8 +1,9 @@
 # FEAT3: Finite Element Analysis Toolbox, Version 3
-# Copyright (C) 2010 - 2021 by Stefan Turek & the FEAT group
+# Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 import platform
+import sys
 from build_system.feat_util import get_output
 
 def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_errors):
@@ -17,7 +18,12 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     print ("Error: Clang Compiler version less then 3.3 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-std=c++11 -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic -stdlib=libc++"
+  standard = "-std=c++11"
+  stdlibuse = "-stdlib=libc++"
+  if(platform.system() == "Windows"):
+    standard = "-std=c++14"
+    stdlibuse = ""
+  cxxflags = standard + " -ggdb -fcolor-diagnostics -m64 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wuninitialized -Wswitch -Wunused-label -Woverloaded-shift-op-parentheses -Wempty-body -Wheader-guard -Wimplicit-fallthrough -Wloop-analysis -Wheader-hygiene -Wpedantic " + stdlibuse
 
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
@@ -50,7 +56,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     cxxflags += " -Wreserved-identifier -Wunused-but-set-parameter -Wunused-but-set-variable -Wnull-pointer-subtraction"
 
   if major >= 14:
-    cxxflags += " -fminimize-whitespace"
+    print("System is {}".format(platform.system()))
+    if platform.system() != "Windows":
+      cxxflags += " -fminimize-whitespace"
 
   if system_host_compiler:
     cxxflags += " --gcc-toolchain=" + system_host_compiler
@@ -73,8 +81,9 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     cxxflags += " -ftemplate-backtrace-limit=0 -fdiagnostics-show-template-tree -fdiagnostics-show-category=name -fno-omit-frame-pointer -fno-optimize-sibling-calls"
     if platform.system() != "Darwin":
       cxxflags += " -fsanitize=undefined" # darwin clang does not like sanitize=undefined
-    if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid:
-      cxxflags += " -fsanitize=address" #" -fsanitize=memory" #-fsanitize=address-full
+    if "mpi" not in buildid and "cuda" not in buildid and "valgrind" not in buildid and "xcode" not in buildid and platform.system() != "Windows":
+      cxxflags += " -fsanitize=address" #" -fsanitize=memory" #-fsanitize=address-full  #Problem with clang LLVM on windows with VS22..
+      #see https://github.com/llvm/llvm-project/issues/56300
 
   elif "opt" in buildid or "fast" in buildid:
     if major >= 7:
@@ -179,8 +188,17 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
     elif cpu == "zen":
       cxxflags += " -m64 -march=znver1"
     elif cpu == "zen2":
-      cxxflags += " -m64 -march=znver2"
-
+      if major >= 9:
+        cxxflags += " -m64 -march=znver2"
+      else:
+        cxxflags += " -m64 -march=znver1"
+    elif cpu == "zen3":
+      if major >= 12:
+        cxxflags += " -m64 -march=znver3"
+      elif major >= 9:
+        cxxflags += " -m64 -march=znver2"
+      else:
+        cxxflags += " -m64 -march=znver1"
     #ARM
     elif cpu == "cortexa53":
       cxxflags += " -march=a53"

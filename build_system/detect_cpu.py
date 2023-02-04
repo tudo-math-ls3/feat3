@@ -1,5 +1,5 @@
 # FEAT3: Finite Element Analysis Toolbox, Version 3
-# Copyright (C) 2010 - 2021 by Stefan Turek & the FEAT group
+# Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 import platform
@@ -264,6 +264,9 @@ def detect_cpu():
         cputype = "zen"
       elif model == 49:
         cputype = "zen2"
+    elif cpu_family == 25:
+      if model == 80:
+        cputype = "zen3"
 
   # TODO insert sparc support here once it has been implemented properly
 

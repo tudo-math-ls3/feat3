@@ -6,6 +6,7 @@
 
 \section main_sec_buildsys Build-System
 - \ref feat_for_win_vs17
+- \ref feat_for_vscode
 
 \section main_sec_subsystems Kernel Subsystems
 The subsystems are in detail:

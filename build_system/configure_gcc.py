@@ -1,5 +1,5 @@
 # FEAT3: Finite Element Analysis Toolbox, Version 3
-# Copyright (C) 2010 - 2021 by Stefan Turek & the FEAT group
+# Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 import platform
@@ -73,18 +73,19 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     if platform.system() != "Darwin" and not "cuda" in buildid:
       cxxflags += " -D_GLIBCXX_DEBUG"
 
-    cxxflags += " -lpthread -ldl"
-    if (major >= 4 and minor >= 9) or major > 4:
-      cxxflags += " -fsanitize=undefined"
-    if major >= 5:
-      cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
-      cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
-    if major >= 6:
-      cxxflags += " -fsanitize=bounds-strict"
-    if major >= 6 and major != 9 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
-      cxxflags += " -fsanitize=address"
-    if major >= 9:
-      cxxflags += " -lrt"
+    if platform.system() != "Windows":
+      cxxflags += " -lpthread -ldl"
+      if (major >= 4 and minor >= 9) or major > 4:
+        cxxflags += " -fsanitize=undefined"
+      if major >= 5:
+        cxxflags += " -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=bounds"
+        cxxflags += " -fsanitize=alignment -fsanitize=object-size -fsanitize=vptr"
+      if major >= 6:
+        cxxflags += " -fsanitize=bounds-strict"
+      if major >= 6 and major != 9 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
+        cxxflags += " -fsanitize=address"
+      if major >= 9:
+        cxxflags += " -lrt"
 
   elif "opt" in buildid or "fast" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
@@ -227,6 +228,13 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags += " -m64 -march=znver1"
     elif cpu == "zen2":
       if major >= 9:
+        cxxflags += " -m64 -march=znver2"
+      else:
+        cxxflags += " -m64 -march=znver1"
+    elif cpu == "zen3":
+      if major > 10 or (major == 10 and minor >= 3):
+        cxxflags += " -m64 -march=znver3"
+      elif major >= 9:
         cxxflags += " -m64 -march=znver2"
       else:
         cxxflags += " -m64 -march=znver1"

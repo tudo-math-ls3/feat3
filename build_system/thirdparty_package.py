@@ -1,5 +1,5 @@
 # FEAT3: Finite Element Analysis Toolbox, Version 3
-# Copyright (C) 2010 - 2021 by Stefan Turek & the FEAT group
+# Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 __author__ = "Jordi Paul, Peter Zajac"
@@ -11,6 +11,7 @@ import imp
 import inspect
 import glob
 import ssl
+import sys
 
 # Baseclass for third party packages
 class ThirdpartyPackage(object):
@@ -19,6 +20,7 @@ class ThirdpartyPackage(object):
     self.name = ["NullPackage"]
     # Name of folder where the package is expected to be found.
     self.dirname = "NullDirName"
+    self.realdirname = self.dirname
     # Url from where to download the file, not including the filename.
     self.url = "NullUrl"
     # Filename
@@ -87,6 +89,45 @@ class ThirdpartyPackage(object):
 
     return
 
+    # patch_lst entry: [line-no, original, patched]
+  def patch_file(self, filename, patch_lst):
+    filename = os.path.join(self.realdirname, filename)
+    # create backup file if it doesn't exist
+    filename_b = filename + ".backup"
+    if not os.path.isfile(filename_b):
+      os.rename(filename, filename_b)
+    print("Patching '%s'..." % filename)
+    # open backup file for reading
+    fi = open(filename_b, "rt")
+    # open file for writing
+    fo = open(filename, "wt")
+    # loop over all input file lines
+    lno = 0
+    for line in fi:
+      lno = lno + 1
+      if (len(patch_lst) > 0) and (patch_lst[0][0] == lno):
+        # this line is to be patched
+        if line.strip() != patch_lst[0][1]:
+          print("ERROR: when processing file '%s': in line %i" % (filename, lno))
+          print("expected : '%s'" % patch_lst[0][1])
+          print("but found: '%s'" % line.strip())
+          print("Patch aborted!")
+          sys.exit(1)
+        # okay replace line
+        fo.write(patch_lst[0][2] + "\n")
+        # remove patch line
+        patch_lst = patch_lst[1:]
+      else:
+        fo.write(line)
+    # ensure that all patches were applied
+    if len(patch_lst) > 0:
+      print("ERROR: when processing file '%s': end of file found, but there are still patches left")
+      print("Patch aborted!")
+      sys.exit(1)
+    # okay, that's it
+    fo.close()
+    fi.close()
+
   # patches the source code after unpacking;
   # this may be overriden by a derived class
   def patch(self):
@@ -108,7 +149,8 @@ def download(url,filename):
   else:
     import urllib.request
     import shutil
-    with urllib.request.urlopen(url) as response:
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'})
+    with urllib.request.urlopen(req) as response:
       with open(filename, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
   return

@@ -3,18 +3,47 @@ cmake_minimum_required (VERSION 3.9)
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-# list of util source files
-ADD_LIBRARY(kernel-util STATIC
-  assertion.cpp
-  dist.cpp
-  dist_file_io.cpp
-  kahan_summation.cpp
-  memory_pool.cpp
-  property_map.cpp
-  runtime.cpp
-  statistics.cpp
-  xml_scanner.cpp
+set(KERNEL_LIBRARY_FILES assertion.cpp
+dist.cpp
+dist_file_io.cpp
+kahan_summation.cpp
+memory_pool.cpp
+property_map.cpp
+runtime.cpp
+statistics.cpp
+xml_scanner.cpp
 )
+
+if(WIN32)
+    set(KERNEL_LIBRARY_FILES ${KERNEL_LIBRARY_FILES} os_windows.cpp)
+endif(WIN32)
+
+# list of util source files
+ADD_LIBRARY(kernel-util STATIC ${KERNEL_LIBRARY_FILES})
+
+if(WIN32)
+  TARGET_LINK_LIBRARIES(kernel-util -limagehlp)
+  if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    TARGET_LINK_LIBRARIES(kernel-util -lmsvcr120)
+  endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+endif(WIN32)
+
+# if(DEFINED ENV{OS})
+#   #check if we are on Windows
+#   if("$ENV{OS}" STREQUAL "Windows_NT")
+#     #we probably only need to do this with libc based linkers, i.e. check if we use gcc
+#     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+#       TARGET_LINK_LIBRARIES(kernel-util -limagehlp)
+#       TARGET_LINK_LIBRARIES(kernel-util -lmsvcr120)
+#     endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+#     if(${MINGW})
+#     if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+#       TARGET_LINK_LIBRARIES(kernel-util -limagehlp)
+#       TARGET_LINK_LIBRARIES(kernel-util -lmsvcr120)
+#     endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+#     endif(${MINGW})
+#   endif("$ENV{OS}" STREQUAL "Windows_NT")
+# endif(DEFINED ENV{OS})
 
 if (FEAT_COTIRE)
   cotire(kernel-util)

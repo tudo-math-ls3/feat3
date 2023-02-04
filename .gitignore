@@ -12,6 +12,7 @@
 *.dll
 *.ilk
 *.pdb
+*.pyc
 
 # Ignore backup files
 *~
@@ -44,6 +45,8 @@ kernel/util/CMakeFiles/
 kernel/util/Testing/
 test_system/CMakeFiles/
 test_system/Testing/
+/build
+/.vscode
 
 # Ignore FEAT test output files
 *test*.log
