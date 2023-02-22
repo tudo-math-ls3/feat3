@@ -79,6 +79,25 @@ foreach (app ${dfg95_bench1_list} )
   target_link_libraries(${app} feat)
 endforeach (app)
 
+######################### Scalexa FROSch applications
+
+if (FEAT_HAVE_TRILINOS)
+  add_executable(scalexa-nvs-cc-2d scalexa_nvs_cc.cpp)
+  add_executable(scalexa-nvs-cc-3d scalexa_nvs_cc.cpp)
+  add_executable(scalexa-nvs-pp-2d scalexa_nvs_pp.cpp)
+  add_executable(scalexa-nvs-pp-3d scalexa_nvs_pp.cpp)
+  add_executable(scalexa-poisson-2d scalexa_poisson.cpp)
+  add_executable(scalexa-poisson-3d scalexa_poisson.cpp)
+
+  foreach (app scalexa-nvs-cc-2d scalexa-nvs-pp-2d scalexa-poisson-2d)
+    target_compile_definitions(${app} PRIVATE SCALEXA_DIM=2)
+    target_link_libraries(${app} PRIVATE feat)
+  endforeach ()
+  foreach (app scalexa-nvs-cc-3d scalexa-nvs-pp-3d scalexa-poisson-3d)
+    target_compile_definitions(${app} PRIVATE SCALEXA_DIM=3)
+    target_link_libraries(${app} PRIVATE feat)
+  endforeach ()
+endif ()
 
 ######################### hierarch_transfer_test-app
 

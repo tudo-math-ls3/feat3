@@ -9,6 +9,7 @@ set(kernel-solver-list
   direct_sparse_solver_mumps.cpp
   direct_sparse_solver_superlu.cpp
   direct_sparse_solver_umfpack.cpp
+  frosch.cpp
   hypre.cpp
   mkl_dss.cpp
   superlu.cpp
@@ -38,7 +39,6 @@ if (FEAT_HAVE_CUDA)
   target_link_libraries(feat-kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} feat-kernel-util-cuda)
   target_link_libraries(feat-kernel-solver PRIVATE feat-kernel-solver-cuda)
 endif (FEAT_HAVE_CUDA)
-
 
 if(FEAT_HAVE_ALGLIB)
   find_package(Alglib 3.16.0 REQUIRED)
@@ -72,6 +72,7 @@ if (FEAT_HAVE_UMFPACK)
   find_package(UMFPACK 6.3.5 REQUIRED)
   target_link_libraries(feat-kernel-solver PRIVATE SuiteSparse::UMFPACK)
 endif (FEAT_HAVE_UMFPACK)
+
 
 # list of solver tests
 set(test_list

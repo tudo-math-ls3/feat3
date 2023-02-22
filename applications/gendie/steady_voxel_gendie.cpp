@@ -527,6 +527,11 @@ namespace Gendie
   template<typename SystemLevel_, typename DomainLevel_, typename ScalarVector_, typename ParamHolder_>
   void write_vtk(const typename SystemLevel_::GlobalSystemVector& vec_sol, const typename SystemLevel_::GlobalSystemVector& vec_rhs, const DomainLevel_& domain, SystemLevel_& system_level, const ScalarVector_& vec_shearrate, const ScalarVector_& vec_viscosity, const ParamHolder_& param_holder, const Logger* logger)
   {
+    if(!param_holder.want_vtk)
+    {
+      logger->print("Vtk output not requested!", warning);
+      return;
+    }
     logger->print("Writing VTK output to '" + param_holder.vtk_name + ".pvtu'", info);
 
     std::unique_ptr<MeshType> refined_mesh;

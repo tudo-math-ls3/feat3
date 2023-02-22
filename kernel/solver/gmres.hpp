@@ -246,6 +246,8 @@ namespace FEAT
       /// \copydoc IterativeSolver::apply()
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
+
+        // BEGIN: Test auskommentiert
         // save input rhs vector as initial defect
         this->_vec_v.at(0).copy(vec_rhs);
 
@@ -385,6 +387,17 @@ namespace FEAT
             }
           }
 
+          if(1)
+          {
+            /* DEBUG  */
+            String msg = this->_plot_name
+              +  "* " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+              + " : " + stringify_fp_sci(Math::abs(this->_q.back()))
+              + " <= " + stringify_fp_sci(this->_inner_res_scale * this->_tol_abs)
+              + " && " + stringify_fp_sci(this->_inner_res_scale * this->_tol_rel);
+            this->_print_line(msg);
+          }
+
           Index n = Math::min(i, this->_krylov_dim);
 
           // solve H*q = q
@@ -419,6 +432,15 @@ namespace FEAT
 
           // set the current defect
           status = this->_set_new_defect(this->_vec_v.at(0), vec_sol);
+
+          if(1)
+          {
+            /* DEBUG  */
+            String msg = this->_plot_name
+              +  "* " + stringify(this->_num_iter).pad_front(this->_iter_digits)
+              + " : this->_set_new_defect = " + stringify_fp_sci(this->_def_cur);
+            this->_print_line(msg);
+          }
         }
 
         // finished

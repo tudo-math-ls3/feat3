@@ -1,0 +1,105 @@
+<ParameterList name="Scalexa CC ML">
+    <Parameter name="Preconditioner Type" type="string" value="FROSch"/>
+    <ParameterList name="Preconditioner Types">
+        <ParameterList name="FROSch">
+            <Parameter name="Dimension"                                         type="int"      value="2"/>
+            <Parameter name="Overlap"                                           type="int"      value="1"/>
+            <Parameter name="FROSch Preconditioner Type"                        type="string"   value="TwoLevelBlockPreconditioner"/>
+            <Parameter name="OverlappingOperator Type"                          type="string"   value="AlgebraicOverlappingOperator"/>
+            <Parameter name="CoarseOperator Type"                               type="string"   value="IPOUHarmonicCoarseOperator"/>
+            <!-- <Parameter name="Null Space Type"                                   type="string"   value="Stokes-Feat-Pres-P1Disc"/> -->
+            <Parameter name="Null Space Type"                                   type="string"   value="Input"/>
+            <!-- Auf Dimension des Grobgitterproblems achten -->
+
+            <ParameterList name="Blocks">
+                <ParameterList name="1">
+                    <Parameter name="Dofs Per Node"                         type="int"     value="2"/>
+                </ParameterList>
+                <ParameterList name="2">
+                    <Parameter name="Dofs Per Node"                         type="int"     value="3"/>
+                </ParameterList>
+            </ParameterList>
+
+            <ParameterList name="AlgebraicOverlappingOperator">
+                <Parameter name="Reuse: Symbolic Factorization" type="bool" value="false"/>
+                <ParameterList name="Solver">
+                    <Parameter name="SolverType"                                type="string" value="Amesos2"/>
+                    <Parameter name="Solver"                                    type="string" value="Mumps"/>
+                </ParameterList>
+            </ParameterList>
+
+            <ParameterList name="IPOUHarmonicCoarseOperator">
+
+                <ParameterList name="Blocks">
+
+                    <ParameterList name="1">
+                        <Parameter name="Use For Coarse Space"                  type="bool"     value="true"/>
+
+                        <Parameter name="Exclude"                               type="string"   value="2"/>
+                        <Parameter name="Rotations"                             type="bool"     value="false"/>
+                        <!-- <Parameter name="Interface Communication Strategy"      type="string"   value="CreateOneToOneMap"/><!-\- CreateOneToOneMap, CrsGraph, CrsMatrix -\-> -->
+
+                        <ParameterList name="InterfacePartitionOfUnity">
+                            <Parameter name="Type"                              type="string"   value="GDSW"/>
+                            <ParameterList name="GDSW">
+                                <Parameter name="Type"                          type="string"   value="Full"/>
+                                <Parameter name="Distance Function"             type="string"   value="Constant"/>
+                                <ParameterList name="Custom">
+                                    <Parameter name="Roots"                     type="bool"     value="true"/>
+                                </ParameterList>
+                            </ParameterList>
+                        </ParameterList>
+                    </ParameterList>
+
+                    <ParameterList name="2">
+                        <Parameter name="Use For Coarse Space"                  type="bool"     value="true"/>
+
+                        <Parameter name="Exclude"                               type="string"   value="1"/>
+                        <Parameter name="Rotations"                             type="bool"     value="false"/>
+                        <!-- <Parameter name="Interface Communication Strategy"      type="string"   value="CreateOneToOneMap"/><!-\- CreateOneToOneMap, CrsGraph, CrsMatrix -\-> -->
+
+                        <ParameterList name="InterfacePartitionOfUnity">
+                            <Parameter name="Type"                              type="string"   value="GDSW"/>
+                            <ParameterList name="GDSW">
+                                <Parameter name="Type"                          type="string"   value="Full"/>
+                                <Parameter name="Distance Function"             type="string"   value="Constant"/>
+                                <ParameterList name="Custom">
+                                    <Parameter name="Roots"                     type="bool"     value="true"/>
+                                </ParameterList>
+                            </ParameterList>
+                        </ParameterList>
+                    </ParameterList>
+                </ParameterList>
+
+                <ParameterList name="ExtensionSolver">
+                    <Parameter name="SolverType"                                type="string"   value="Amesos2"/>
+                    <Parameter name="Solver"                                    type="string"   value="Mumps"/>
+
+                    <Parameter name="Reuse Symbolic Factorization" type="bool" value="false"/>
+                    <ParameterList name="MUMPS">
+                        <Parameter name="Reuse SymbolicFactorization" type="bool" value="true"/>
+                    </ParameterList>
+                </ParameterList>
+
+                <ParameterList name="Distribution">
+                    <Parameter name="Type"                                      type="string"   value="linear"/>
+                    <Parameter name="NumProcs"                                  type="int"      value="1"/>
+                    <Parameter name="Factor"                                    type="double"   value="1.0"/>
+                    <Parameter name="GatheringSteps"                            type="int"      value="1"/>
+                    <ParameterList name="Gathering Communication">
+                        <Parameter name="Send type"                             type="string"   value="Send"/>
+                    </ParameterList>
+                </ParameterList>
+
+                <ParameterList name="CoarseSolver">
+                    <Parameter name="SolverType"                                type="string"   value="Amesos2"/>
+                    <Parameter name="Solver"                                    type="string"   value="Mumps"/>
+                </ParameterList>
+
+            </ParameterList>
+
+        </ParameterList>
+
+    </ParameterList>
+
+</ParameterList>

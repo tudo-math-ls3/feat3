@@ -21,7 +21,7 @@
 #include <kernel/util/string.hpp>
 
 #include <kernel/solver/direct_stokes_solver.hpp>
-// #include <kernel/solver/frosch.hpp>
+#include <kernel/solver/frosch.hpp>
 #include <control/scalar_basic.hpp>
 #include "scalexa_gendie_scalarize_helper.hpp"
 #include "format_helper.hpp"
@@ -400,15 +400,32 @@ namespace Gendie
     FEAT::Index _frosch_gmres_dim;
     FEAT::Index _frosch_miniter;
     FEAT::Index _frosch_maxiter;
+    DataType _frosch_tol_rel;
+    DataType _frosch_inner_rescale;
     int _frosch_nlevels;
     int _frosch_overlap;
-    FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver _frosch_directsolver;
+    FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver _frosch_directsolver_coarse;
+    FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver _frosch_directsolver_overlapping;
+    FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver _frosch_directsolver_extension;
+    FEAT::Solver::Trilinos::FROSchParameterList::CombineLevel _frosch_combine_lvl;
     FEAT::Solver::Trilinos::FROSchParameterList::Preconditioner _frosch_precond_type;
     FEAT::Solver::Trilinos::FROSchParameterList::PartitionType _frosch_parti;
     FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach _frosch_approach;
     FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap _frosch_combine_overlap;
     FEAT::Solver::Trilinos::FROSchParameterList::IPOU _frosch_ipou_velo;
     FEAT::Solver::Trilinos::FROSchParameterList::IPOU _frosch_ipou_pres;
+    bool _frosch_exclude_velocity_pressure;
+    bool _frosch_exclude_pressure_velocity;
+    // reuse symbolic factorization of overlapping operator
+    bool _frosch_reuse_sf_ao;
+    // reuse symbolic factorization of coarse matrix
+    bool _frosch_reuse_sf_cm;
+    // reuse symbolic factorization of extension solver
+    bool _frosch_reuse_sf_ext;
+    // reuse coarse matrix
+    bool _frosch_reuse_cm;
+    // reuse coarse basis
+    bool _frosch_reuse_cb;
     FEAT::String _frosch_xml;
     bool _frosch_use_timers;
     bool _frosch_print_internal;
@@ -447,6 +464,8 @@ namespace Gendie
       success &= prop->parse_entry("solve-gmres", solve_gmres_dim);
       success &= prop->parse_entry("smooth-steps", smooth_steps);
       success &= prop->parse_entry("smooth-damp", smoother_damp);
+      success &= prop->parse_entry("coarse-tol", coarse_tol_rel);
+      success &= prop->parse_entry("coarse-max-iter", coarse_max_steps);
       solver_backend = Gendie::parse_backend(prop->query("backend", "generic"));
       coarse_gmres |=  Gendie::check_for_config_option(prop->query("coarse-gmres"));
       coarse_frosch |=  Gendie::check_for_config_option(prop->query("coarse-frosch"));
@@ -471,6 +490,8 @@ namespace Gendie
       success &= prop->parse_entry("frosch-gmres-dim", _frosch_gmres_dim);
       success &= prop->parse_entry("frosch-min-iter", _frosch_miniter);
       success &= prop->parse_entry("frosch-max-iter", _frosch_maxiter);
+      success &= prop->parse_entry("frosch-tol-rel", _frosch_tol_rel);
+      success &= prop->parse_entry("frosch-inner-rescale", _frosch_inner_rescale);
       if(Gendie::check_for_config_option(prop->query("frosch-xml")))
       {
         _frosch_xml = prop->query("frosch-xml", "");
@@ -479,28 +500,74 @@ namespace Gendie
       XASSERTM(_frosch_nlevels == 1, "For now, only nlevels == 1 allowed");
       success &= prop->parse_entry("frosch-overlap", _frosch_overlap);
 
-      // parse directsolver
+      // parse directsolver coarse
       {
-        const auto& val = prop->query("frosch-direct-solver");
+        const auto& val = prop->query("frosch-direct-solver-coarse");
         if(val.second)
         {
-          if(val.first.compare_no_case("umfpack"))
+          if(!val.first.compare_no_case("umfpack"))
           {
-            _frosch_directsolver = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK;
+            _frosch_directsolver_coarse = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK;
           }
-          else if(val.first.compare_no_case("mumps"))
+          else if(!val.first.compare_no_case("mumps"))
           {
-            _frosch_directsolver = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::MUMPS;
+            _frosch_directsolver_coarse = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::MUMPS;
           }
-          else if(val.first.compare_no_case("ilu"))
+          else if(!val.first.compare_no_case("ilu"))
           {
-            _frosch_directsolver = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::ILU;
+            _frosch_directsolver_coarse = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::ILU;
           }
-          else if(val.first.compare_no_case("klu"))
+          else if(!val.first.compare_no_case("klu"))
           {
-            _frosch_directsolver = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::KLU;
+            _frosch_directsolver_coarse = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::KLU;
           }
           else
+          {
+            XABORTM("Unknown parameter " + val.first);
+          }
+        }
+      }
+      // parse directsolver overlapping
+      {
+        const auto &val = prop->query("frosch-direct-solver-overlapping");
+        if (val.second)
+        {
+          if (!val.first.compare_no_case("umfpack"))
+          {
+            _frosch_directsolver_overlapping = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK;
+          } else if (!val.first.compare_no_case("mumps"))
+          {
+            _frosch_directsolver_overlapping = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::MUMPS;
+          } else if (!val.first.compare_no_case("ilu"))
+          {
+            _frosch_directsolver_overlapping = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::ILU;
+          } else if (!val.first.compare_no_case("klu"))
+          {
+            _frosch_directsolver_overlapping = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::KLU;
+          } else
+          {
+            XABORTM("Unknown parameter " + val.first);
+          }
+        }
+      }
+      // parse directsolver extension
+      {
+        const auto &val = prop->query("frosch-direct-solver-extension");
+        if (val.second)
+        {
+          if (!val.first.compare_no_case("umfpack"))
+          {
+            _frosch_directsolver_extension = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK;
+          } else if (!val.first.compare_no_case("mumps"))
+          {
+            _frosch_directsolver_extension = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::MUMPS;
+          } else if (!val.first.compare_no_case("ilu"))
+          {
+            _frosch_directsolver_extension = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::ILU;
+          } else if (!val.first.compare_no_case("klu"))
+          {
+            _frosch_directsolver_extension = FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::KLU;
+          } else
           {
             XABORTM("Unknown parameter " + val.first);
           }
@@ -511,15 +578,15 @@ namespace Gendie
         const auto& val = prop->query("frosch-precond-type");
         if(val.second)
         {
-          if(val.first.compare_no_case("onelevel"))
+          if(!val.first.compare_no_case("onelevel"))
           {
             _frosch_precond_type = FEAT::Solver::Trilinos::FROSchParameterList::Preconditioner::ONELEVEL;
           }
-          else if(val.first.compare_no_case("twolevel"))
+          else if(!val.first.compare_no_case("twolevel"))
           {
             _frosch_precond_type = FEAT::Solver::Trilinos::FROSchParameterList::Preconditioner::TWOLEVEL;
           }
-          else if(val.first.compare_no_case("twolevelblock"))
+          else if(!val.first.compare_no_case("twolevelblock"))
           {
             _frosch_precond_type = FEAT::Solver::Trilinos::FROSchParameterList::Preconditioner::TWOLEVELBLOCK;
           }
@@ -534,15 +601,15 @@ namespace Gendie
         const auto& val = prop->query("frosch-partition-type");
         if(val.second)
         {
-          if(val.first.compare_no_case("PHG"))
+          if(!val.first.compare_no_case("PHG"))
           {
             _frosch_parti = FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PHG;
           }
-          else if(val.first.compare_no_case("PARMETIS"))
+          else if(!val.first.compare_no_case("PARMETIS"))
           {
             _frosch_parti = FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PARMETIS;
           }
-          else if(val.first.compare_no_case("BLOCK"))
+          else if(!val.first.compare_no_case("BLOCK"))
           {
             _frosch_parti = FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::BLOCK;
           }
@@ -557,11 +624,11 @@ namespace Gendie
         const auto& val = prop->query("frosch-partition-approach");
         if(val.second)
         {
-          if(val.first.compare_no_case("partition"))
+          if(!val.first.compare_no_case("partition"))
           {
             _frosch_approach = FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach::PARTITION;
           }
-          else if(val.first.compare_no_case("repartition"))
+          else if(!val.first.compare_no_case("repartition"))
           {
             _frosch_approach = FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach::REPARTITION;
           }
@@ -576,15 +643,15 @@ namespace Gendie
         const auto& val = prop->query("frosch-combine-overlap");
         if(val.second)
         {
-          if(val.first.compare_no_case("restricted"))
+          if(!val.first.compare_no_case("restricted"))
           {
             _frosch_combine_overlap = FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::RESTRICTED;
           }
-          else if(val.first.compare_no_case("full"))
+          else if(!val.first.compare_no_case("full"))
           {
             _frosch_combine_overlap = FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::FULL;
           }
-          else if(val.first.compare_no_case("averaging"))
+          else if(!val.first.compare_no_case("averaging"))
           {
             _frosch_combine_overlap = FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::AVERAGING;
           }
@@ -594,20 +661,36 @@ namespace Gendie
           }
         }
       }
+      // parse combine level
+      {
+        const auto &val = prop->query("frosch-combine-level");
+        if (val.second)
+        {
+          if (!val.first.compare_no_case("additive"))
+          {
+            _frosch_combine_lvl = FEAT::Solver::Trilinos::FROSchParameterList::CombineLevel::ADDITIVE;
+          } else if (!val.first.compare_no_case("multiplicative"))
+          {
+            _frosch_combine_lvl = FEAT::Solver::Trilinos::FROSchParameterList::CombineLevel::MULTIPLICATIVE;
+          } else {
+            XABORTM("Unknown parameter " + val.first);
+          }
+        }
+      }
       // parse ipou velocity
       {
         const auto& val = prop->query("frosch-ipou-velocity");
         if(val.second)
         {
-          if(val.first.compare_no_case("gdsw"))
+          if(!val.first.compare_no_case("gdsw"))
           {
             _frosch_ipou_velo = FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW;
           }
-          else if(val.first.compare_no_case("gdswstar"))
+          else if(!val.first.compare_no_case("gdswstar"))
           {
             _frosch_ipou_velo = FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR;
           }
-          else if(val.first.compare_no_case("rgdsw"))
+          else if(!val.first.compare_no_case("rgdsw"))
           {
             _frosch_ipou_velo = FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW;
           }
@@ -622,15 +705,15 @@ namespace Gendie
         const auto& val = prop->query("frosch-ipou-pressure");
         if(val.second)
         {
-          if(val.first.compare_no_case("gdsw"))
+          if(!val.first.compare_no_case("gdsw"))
           {
             _frosch_ipou_pres = FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW;
           }
-          else if(val.first.compare_no_case("gdswstar"))
+          else if(!val.first.compare_no_case("gdswstar"))
           {
             _frosch_ipou_pres = FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR;
           }
-          else if(val.first.compare_no_case("rgdsw"))
+          else if(!val.first.compare_no_case("rgdsw"))
           {
             _frosch_ipou_pres = FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW;
           }
@@ -639,6 +722,19 @@ namespace Gendie
             XABORTM("Unknown parameter " + val.first);
           }
         }
+      }
+      // parse exclude velocity pressure coupling
+      {
+        _frosch_exclude_velocity_pressure = Gendie::check_for_config_option(prop->query("frosch-exclude-velocity-pressure"));
+        _frosch_exclude_pressure_velocity = Gendie::check_for_config_option(prop->query("frosch-exclude-pressure-velocity"));
+      }
+      // parse reuse of symbolic factorizations or coarse elements
+      {
+        _frosch_reuse_sf_ao = Gendie::check_for_config_option(prop->query("frosch-reuse-sf-algebraic-overlapping-solver"));
+        _frosch_reuse_sf_cm = Gendie::check_for_config_option(prop->query("frosch-reuse-sf-coarse-matrix"));
+        _frosch_reuse_sf_ext = Gendie::check_for_config_option(prop->query("frosch-reuse-sf-extension-solver"));
+        _frosch_reuse_cm = Gendie::check_for_config_option(prop->query("frosch-reuse-coarse-matrix"));
+        _frosch_reuse_cb = Gendie::check_for_config_option(prop->query("frosch-reuse-coarse-basis"));
       }
       // print internal timers and debug output?
       {
@@ -663,17 +759,22 @@ namespace Gendie
 
       this->frosch_params->set_nlevels(_frosch_nlevels);
       this->frosch_params->set_precond(_frosch_precond_type);
-      this->frosch_params->set_coarse_solver(_frosch_directsolver);
-      this->frosch_params->set_solvers(_frosch_directsolver, _frosch_directsolver);
+      this->frosch_params->set_coarse_solver(_frosch_directsolver_coarse);
+      this->frosch_params->set_solvers(_frosch_directsolver_overlapping, _frosch_directsolver_extension);
       this->frosch_params->set_overlaps(_frosch_overlap);
       this->frosch_params->set_combine_overlap(_frosch_combine_overlap);
+      this->frosch_params->set_combine_lvl(_frosch_combine_lvl);
       this->frosch_params->set_parti_types(_frosch_parti);
       this->frosch_params->set_parti_approach(_frosch_approach);
       this->frosch_params->set_ipous(_frosch_ipou_velo, _frosch_ipou_pres);
       this->frosch_params->set_subregions(_frosch_subregions);
+      this->frosch_params->set_excludes_velo_pres(_frosch_exclude_velocity_pressure);
+      this->frosch_params->set_excludes_pres_velo(_frosch_exclude_pressure_velocity);
+      this->frosch_params->set_reuse_sf(_frosch_reuse_sf_ao, _frosch_reuse_sf_cm, _frosch_reuse_sf_ext);
+      this->frosch_params->set_reuse_coarse(_frosch_reuse_cm, _frosch_reuse_cb);
 
-      this->frosch_params->set_print(_frosch_use_timers);
-      this->frosch_params->set_use_timer(_frosch_print_internal);
+      this->frosch_params->set_print(_frosch_print_internal);
+      this->frosch_params->set_use_timer(_frosch_use_timers);
 
       return true;
     }
@@ -750,16 +851,23 @@ namespace Gendie
           std::shared_ptr<FEAT::Solver::IterativeSolver<typename ScalarizedSystemLevelType::GlobalSystemVector>> solver_iterative;
 
           if(_frosch_gmres_dim > 0)
+          {
             solver_iterative = Solver::new_fgmres(scalarize_helper->scalarized_level.matrix_sys,
-              scalarize_helper->scalarized_level.filter_sys, _frosch_gmres_dim, DataType(1.), this->frosch_precond);
-          else
+              scalarize_helper->scalarized_level.filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
+            solver_iterative->set_tol_rel(_frosch_tol_rel);
+            // solver_iterative->set_tol_abs(tol_abs);
+            solver_iterative->set_tol_abs_low(1e-14);
+            solver_iterative->set_min_iter(_frosch_miniter);
+            solver_iterative->set_max_iter(_frosch_maxiter);
+          } else {
             solver_iterative = Solver::new_richardson(scalarize_helper->scalarized_level.matrix_sys,
               scalarize_helper->scalarized_level.filter_sys, DataType(1), this->frosch_precond);
-          solver_iterative->set_tol_rel(mg_tol_rel);
-          // solver_iterative->set_tol_abs(tol_abs);
-          solver_iterative->set_tol_abs_low(1e-14);
-          solver_iterative->set_min_iter(min_iter);
-          solver_iterative->set_max_iter(max_iter);
+            solver_iterative->set_tol_rel(mg_tol_rel);
+            // solver_iterative->set_tol_abs(tol_abs);
+            solver_iterative->set_tol_abs_low(1e-14);
+            solver_iterative->set_min_iter(min_iter);
+            solver_iterative->set_max_iter(max_iter);
+          }
           // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
@@ -857,18 +965,26 @@ namespace Gendie
           std::shared_ptr<FEAT::Solver::IterativeSolver<typename ScalarizedSystemLevelType::GlobalSystemVector>> solver_iterative;
 
           if(_frosch_gmres_dim > 0)
+          {
             solver_iterative = Solver::new_fgmres(scalarize_helper->scalarized_level.matrix_sys,
-              scalarize_helper->scalarized_level.filter_sys, _frosch_gmres_dim, DataType(1.), this->frosch_precond);
-          else
+              scalarize_helper->scalarized_level.filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
+            solver_iterative->set_tol_rel(_frosch_tol_rel);
+            // solver_iterative->set_tol_abs(tol_abs);
+            solver_iterative->set_tol_abs_low(1e-14);
+            solver_iterative->set_min_iter(_frosch_miniter);
+            solver_iterative->set_max_iter(_frosch_maxiter);
+          } else
+          {
             solver_iterative = Solver::new_richardson(scalarize_helper->scalarized_level.matrix_sys,
               scalarize_helper->scalarized_level.filter_sys, DataType(1), this->frosch_precond);
 
-          solver_iterative->set_tol_rel(coarse_tol_rel);
-          // solver_iterative->set_tol_abs(tol_abs);
-          solver_iterative->set_tol_abs_low(1e-14);
-          solver_iterative->set_min_iter(1);
-          solver_iterative->set_max_iter(coarse_max_steps);
-          solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
+            solver_iterative->set_tol_rel(coarse_tol_rel);
+            // solver_iterative->set_tol_abs(tol_abs);
+            solver_iterative->set_tol_abs_low(1e-14);
+            solver_iterative->set_min_iter(1);
+            solver_iterative->set_max_iter(coarse_max_steps);
+          }
+          // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
           this->coarse_solver = std::make_shared<Gendie::GendieScalarizeWrapper<System_, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
@@ -1020,15 +1136,29 @@ namespace Gendie
 #ifdef FEAT_HAVE_TRILINOS
         _frosch_subregions(1, 1),
         _frosch_gmres_dim(FEAT::Index(16)),
+        _frosch_miniter(FEAT::Index(1)),
+        _frosch_maxiter(FEAT::Index(500)),
+        _frosch_tol_rel(DataType(1e-3)),
+        _frosch_inner_rescale(DataType(1.)),
         _frosch_nlevels(1),
         _frosch_overlap(1),
-        _frosch_directsolver(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_directsolver_coarse(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_directsolver_overlapping(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_directsolver_extension(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_combine_lvl(FEAT::Solver::Trilinos::FROSchParameterList::CombineLevel::ADDITIVE),
         _frosch_precond_type(FEAT::Solver::Trilinos::FROSchParameterList::Preconditioner::TWOLEVELBLOCK),
         _frosch_parti(FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PARMETIS),
         _frosch_approach(FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach::REPARTITION),
         _frosch_combine_overlap(FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::RESTRICTED),
         _frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
         _frosch_ipou_pres(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW),
+        _frosch_exclude_velocity_pressure(false),
+        _frosch_exclude_pressure_velocity(false),
+        _frosch_reuse_sf_ao(false),
+        _frosch_reuse_sf_cm(false),
+        _frosch_reuse_sf_ext(false),
+        _frosch_reuse_cm(false),
+        _frosch_reuse_cb(false),
         _frosch_xml(),
         _frosch_use_timers(false),
         _frosch_print_internal(false),
@@ -1063,15 +1193,29 @@ namespace Gendie
 #ifdef FEAT_HAVE_TRILINOS
         _frosch_subregions(1, 1),
         _frosch_gmres_dim(FEAT::Index(16)),
+        _frosch_miniter(FEAT::Index(1)),
+        _frosch_maxiter(FEAT::Index(500)),
+        _frosch_tol_rel(DataType(1e-3)),
+        _frosch_inner_rescale(DataType(1.)),
         _frosch_nlevels(1),
         _frosch_overlap(1),
-        _frosch_directsolver(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_directsolver_coarse(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_directsolver_overlapping(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_directsolver_extension(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
+        _frosch_combine_lvl(FEAT::Solver::Trilinos::FROSchParameterList::CombineLevel::ADDITIVE),
         _frosch_precond_type(FEAT::Solver::Trilinos::FROSchParameterList::Preconditioner::TWOLEVELBLOCK),
         _frosch_parti(FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PARMETIS),
         _frosch_approach(FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach::REPARTITION),
         _frosch_combine_overlap(FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::RESTRICTED),
         _frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
         _frosch_ipou_pres(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW),
+        _frosch_exclude_velocity_pressure(false),
+        _frosch_exclude_pressure_velocity(false),
+        _frosch_reuse_sf_ao(false),
+        _frosch_reuse_sf_cm(false),
+        _frosch_reuse_sf_ext(false),
+        _frosch_reuse_cm(false),
+        _frosch_reuse_cb(false),
         _frosch_xml(),
         _frosch_use_timers(false),
         _frosch_print_internal(false),

@@ -45,3 +45,18 @@ frosch-use-timers = false
 
 # print internal debug states of frosch?
 frosch-print-internal =  false
+
+# reuse symbolic factorization of algebraic overlapping solver
+frosch-reuse-sf-algebraic-overlapping-solver = false
+
+# reuse symbolic factorization of extions solver (use for coarse space)
+frosch-reuse-sf-extension-solver = false
+
+# reuse symbolic factorization of coarse matrix
+frosch-reuse-sf-coarse-matrix = false
+
+# reuse the complete coarse matrix
+frosch-reuse-coarse-matrix = false
+
+# reuse the coarse basis function
+frosch-reuse-coarse-basis = false

@@ -41,8 +41,8 @@ target_link_libraries(feat-kernel-util PRIVATE feat-kernel-root)
 add_library(feat INTERFACE)
 
 # add additional alias to be cmake conformant
-add_library(feat::feat ALIAS feat)
 
+add_library(feat::feat ALIAS feat)
 # list of libraries to include in feat lib
 target_link_libraries(feat INTERFACE
   feat-kernel-adjacency
@@ -75,9 +75,36 @@ if (FEAT_HAVE_FPARSER)
 endif(FEAT_HAVE_FPARSER)
 
 if (FEAT_HAVE_TRILINOS)
-  #LINK_DIRECTORIES( ${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
-  ## TODO: clear this dependency
-  target_link_libraries(feat INTERFACE ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
+  find_package(Trilinos
+      REQUIRED
+      PATHS "${FEAT_TRILINOS_PATH}/"
+      COMPONENTS
+      # Amesos
+      # AztecOO
+      Belos
+      # Epetra
+      # Ifpack
+      # MueLu
+      Teuchos
+      Tpetra
+      Thyra
+      # ShyLU
+      ShyLU_DD
+      Xpetra
+      Zoltan
+      Zoltan2)
+  add_library(TRILINOS_TPL INTERFACE)
+  target_link_libraries(TRILINOS_TPL INTERFACE Trilinos::all_selected_libs)
+  target_link_libraries(TRILINOS_TPL INTERFACE $<TARGET_NAME_IF_EXISTS:UMFPACK::all_libs>)
+
+  ## if trilinos has mumps available, we have to link against the fortran headers, which requires fortran to be an activates language of the project
+  ## for now, we decide on this with the help of the FEAT_TRILINOS_WITH_MUMPS flag
+  if(TARGET MUMPS::all_libs)
+    set(CMAKE_Fortran_COMPILER "mpifort" CACHE STRING "" FORCE)
+    enable_language(Fortran)
+    find_package(MPI COMPONENTS Fortran C CXX)
+    target_link_libraries(TRILINOS_TPL INTERFACE MUMPS::all_libs MPI::MPI_CXX MPI::MPI_Fortran mpi_mpifh)
+  endif()
 endif (FEAT_HAVE_TRILINOS)
 
 #libquadmath needs to be the last library linked against
