@@ -114,6 +114,29 @@ endif (FEAT_VALGRIND)
 
 # include directories of third-party libraries
 
+if (FEAT_TRILINOS_PATH)
+  find_package(Trilinos
+      REQUIRED PATHS "${FEAT_TRILINOS_PATH}/"
+      COMPONENTS
+      Amesos
+      AztecOO
+      Belos
+      Epetra
+      Ifpack
+      MueLu
+      Teuchos
+      Tpetra
+      Thyra
+      ShyLU
+      Xpetra
+      Zoltan
+      Zoltan2)
+  INCLUDE_DIRECTORIES(${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
+  LINK_DIRECTORIES(${Trilinos_TPL_LIBRARY_DIRS})
+  TARGET_LINK_LIBRARIES(${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
+endif (FEAT_TRILINOS_PATH)
+
+
 if (FEAT_HAVE_ALGLIB)
   INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ALGLIB}/cpp/src")
 endif(FEAT_HAVE_ALGLIB)

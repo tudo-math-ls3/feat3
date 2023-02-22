@@ -233,6 +233,7 @@ compiler_cc = ""
 cuda_arch = ""
 cuda_verbose = False
 restrict_errors = False
+trilinos_path = ""
 
 unused_extra_options = copy.copy(extra_options)
 for option in extra_options:
@@ -332,6 +333,16 @@ for option in extra_options:
   if option.startswith("--restrict_errors"):
     unused_extra_options.remove(option)
     restrict_errors = True
+
+  if option.startswith("--trilinos_path="):
+    unused_extra_options.remove(option)
+    if trilinos_path:
+      print ("Error: multiple trilinos_path parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    trilinos_path = option.replace("--trilinos_path=", "", 1)
+    if not os.path.exists(trilinos_path):
+      print ("Error: trilinos_path " + trilinos_path + " does not exist!")
+    cmake_flags += " -DFEAT_TRILINOS_PATH:FILEPATH=" + trilinos_path
 
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
