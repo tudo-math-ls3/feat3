@@ -71,7 +71,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Precision extensions: quadmath, half, floatx")
   print ("  Compilation process optimisations: cotire")
   print ("  Compiler optimisation steps: lto")
-  print ("  Third party source code: alglib, fparser, half, hypre, metis, superlu, umfpack, zlib, zoltan")
+  print ("  Third party source code: alglib, fparser, half, hypre, metis, superlu, trilinos, umfpack, zlib, zoltan")
   print ("Note that you must provide exactly one build mode, one parallelisation mode and one compiler.")
   print ("Note that you cannot combine any build id token with the guess token.")
   print ("Note that cudamemcheck is only active if cuda is activated, too.")
@@ -538,6 +538,15 @@ if "quadmath" in buildid:
 if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
   cmake_flags += " -DFEAT_COTIRE:BOOL=ON"
+
+if "trilinos" in buildid:
+  remove_string(unused_tokens, "trilinos")
+  cmake_flags += " -DFEAT_HAVE_TRILINOS:BOOL=ON"
+
+# prevent trilinos_path set without active trilinos support
+if "trilinos" not in buildid and trilinos_path:
+  print("Error: You need to activate trilinos support via 'trilinos' in buildid to facilitate trilinos_path!")
+  sys.exit()
 
 # prevent parmetis without mpi enabled (needed by parmetis)
 if "mpi" not in buildid and ("parmetis" in buildid or "metis" in buildid):

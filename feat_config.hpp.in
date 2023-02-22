@@ -81,6 +81,9 @@
 /// Do we have SuperLU support enabled?
 #cmakedefine FEAT_HAVE_SUPERLU_DIST
 
+/// Do we have Trilinos support enabled?
+#cmakedefine FEAT_HAVE_TRILINOS
+
 /// Do we use a compiler wrapper, e.g. ccache or distcc
 #cmakedefine FEAT_USE_COMPILER_WRAPPER
 
