@@ -149,7 +149,7 @@ namespace FEAT
         _mutex(std::forward<std::mutex>(other._mutex)),
         _cv_allreduce_called(other._cv_allreduce_called),
         _flag_allreduce_called(other._flag_allreduce_called),
-        _thread(std::foward<std::thread>(other._thread)),
+        _thread(std::forward<std::thread>(other._thread)),
 #else // no MPI_THREAD_MULTIPLE
         _req(std::forward<Dist::Request>(other._req)),
 #endif // MPI_THREAD_MULTIPLE
@@ -175,7 +175,7 @@ namespace FEAT
         _mutex = std::forward<std::mutex>(other._mutex);
         _cv_allreduce_called = other._cv_allreduce_called;
         _flag_allreduce_called = other._flag_allreduce_called;
-        _thread = std::foward<std::thread>(other._thread);
+        _thread = std::forward<std::thread>(other._thread);
 #else // no MPI_THREAD_MULTIPLE
         _req = std::forward<Dist::Request>(other._req);
 #endif // MPI_THREAD_MULTIPLE

@@ -104,8 +104,12 @@ namespace FEAT
 
     bool initialize(int& argc, char**& argv)
     {
-      // initialize MPI runtime first
+      int already_initialized(0);
+      if (::MPI_Initialized(&already_initialized) != MPI_SUCCESS)
+        return false;
+
 #ifdef FEAT_MPI_THREAD_MULTIPLE
+      XASSERTM((bool)!already_initialized, "MPI was already initialized by another library, we cannot ensure MPI_THREAD_MULTIPLE support!");
       int required = MPI_THREAD_MULTIPLE;
       int provided = MPI_THREAD_SINGLE;
       if (::MPI_Init_thread(&argc, &argv, required, &provided) != MPI_SUCCESS)
@@ -113,7 +117,8 @@ namespace FEAT
       if (provided != MPI_THREAD_MULTIPLE)
         return false;
 #else
-      if (::MPI_Init(&argc, &argv) != MPI_SUCCESS)
+      // initialize MPI runtime, if not already done by another library
+      if (!already_initialized && ::MPI_Init(&argc, &argv) != MPI_SUCCESS)
         return false;
 #endif //FEAT_MPI_THREAD_MULTIPLE
 
@@ -159,7 +164,10 @@ namespace FEAT
 #endif // FEAT_HAVE_HALFMATH
 
       // finalize MPI
-      MPI_Finalize();
+      int already_finalized(0);
+      ::MPI_Finalized(&already_finalized);
+      if (!already_finalized)
+        MPI_Finalize();
     }
 
     // datatypes

@@ -108,7 +108,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Override MPI operations with custom implementations.")
   print ("--in-source")
   print ("  Allow for in-source builds.")
-  print ("--mpi_thread_multiple.")
+  print ("--mpi_thread_multiple")
   print ("  Use multiple threads for asynchronous mpi calls.")
   print ("--mpi_c=xyz")
   print ("  Set mpi c compiler wrapper to xyz.")
