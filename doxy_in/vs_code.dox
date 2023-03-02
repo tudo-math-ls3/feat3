@@ -8,39 +8,39 @@ This page describes the setup and use of FEAT with the Visual Studio Code editor
 
 In addition to a working build toolchain, i.e. a compiler toolchain, e.g. gcc or LLVM/clang, and a generator, e.g. make or ninja, in your path,
 you need at least a version of CMake 3.9 or higher and a version of python(3) installed, both of which should also be in your path.
-Of course you will also need VScode installed.
+Of course you will also need <c>VScode</c> installed.
 To also use MPI, etc., see the configure script, but basically certain packages, such as MPI or CUDA, need to be pre-installed and findable on your system,
 i.e. in your path or you are able to pass the location, others like UMFPACK, Zoltan, ... will be automatically installed in a FEAT subdirectory if you pass the
 flag to the configure system, more on this later.
 
 \subsubsection unix_vscode_greenhouse Special case: Modul based enviroment
 
-In the case of a module-based software distribution (i.e. our greenhouse servers), first load the modules you need, then open VScode from the terminal by changing to the current directory to the feat3 source folder.
-directory to the feat3 source folder and run
+In the case of a module-based software distribution (e.g. our greenhouse servers), first load the modules you need, then open <c>VScode</c> from the terminal by changing the current directory
+to the FEAT source folder and run
 \verbatim
   code .
 \endverbatim
 
-You should also consider running VScode from a compute server so that the building and IntelliSense shenanigans are performed on the server's resources.
+You should also consider running <c>VScode</c> from a compute server so that the building and IntelliSense shenanigans are performed on the server's resources.
 
 \subsection win_vscode_prereques Prerequisites under Windows
-For a number of reasons, FEAT in VScode can only be fully compiled (i.e. with (all) third party libraries) using the Visual Studio 2022 clang/llvm toolchain,
-which has the side-effect that, due to a bug in the VS22 implementation, no address sanitiser can be used for the time being.
+For a number of reasons, FEAT in <c>VScode</c> can only be fully compiled (i.e. with (all) third party libraries) using the <c>Visual Studio 2022 clang/llvm</c> toolchain,
+which has the side-effect that, due to a bug in the <c>VS22</c> implementation, no address sanitiser can be used for the time being.
 Hopefully this will be fixed in the next major release.
-You will also need at least a CMake 3.9 version, preferably at least a CMake 3.15 version, and a python3 version.
-While VS22 provides ninja as a build generator, you can of course provide your own (e.g. MinGW's make).
-All of these need to be found in your path, see standard Windows documentation.
+You will also need at least a <c>CMake 3.9</c> version, preferably at least a <c>CMake 3.15</c> version, and a <c>python3</c> version.
+While <c>VS22</c> provides ninja as a build generator, you can of course provide your own (e.g. <c>MinGW</c>'s <c>make</c>).
+All of these need to be included in your path, see standard Windows documentation on how to do this.
 
 \attention
-A few notes on installing VS22:
+A few notes on installing <c>VS22</c>:
 To use clang with GNU-style command-line arguments (which is currently the only supported compilation toolchain), you need to add the corresponding
-option in your VS22 installation.
+option in your <c>VS22</c> installation.
 You will also need a relatively new Windows SDK that your compiler can find.
-An easy way to archive this is to also select the option to install the latest Windows SDK in your VS22 installation.
-If VS22 is in your path, you should be able to find the GNU style Clang toolchain.
+An easy way to archive this is to also select the option to install the latest Windows SDK in your <c>VS22</c> installation.
+If <c>VS22</c> is in your path, you should then be able to find the GNU style Clang toolchain.
 
 \subsubsection win_vscode_prereqs_mpi Microsoft MPI
-If you want to make use of FEAT's parallel computing capability, you will also need to install the <b>Microsoft MPI</b>
+If you want to make use of FEAT's parallel computing capabilities, you will also need to install the <b>Microsoft MPI</b>
 library as well as the corresponding SDK. Note that installing MPI is <b>not</b> mandatory, however, without this
 library, FEAT is limited to its "single-process" functionality.
 
@@ -72,27 +72,27 @@ Intel MKL is not currently supported by the FEAT Visual Studio build system. Thi
 
 \section vscode_setup VScode setup
 
-Before configuring FEAT with VScode for the first time, we need to set up a few things in VScode.
-First of all, you need to install (by Microsoft recommended) the C/C++ toolset extension , which consists of C/C++ language support,
-in particular debugger, AutoComplete and IntelliSense support, CMake language support and, very importantly, the CMake Tools extension,
-which handles the configuration of CMake projects as well as building and project support for IntelliSense.
+Before configuring FEAT with <c>VScode</c> for the first time, we need to set up a few things in <c>VScode</c>.
+First of all, you need to install (by Microsoft recommended) the <c>C/C++</c> toolset extension , which consists of <c>C/C++</c> language support,
+in particular debugger, <c>AutoComplete</c> and <c>IntelliSense</c> support, <c>CMake</c> language support and, very importantly, the <c>CMake Tools</c> extension,
+which handles the configuration of <c>CMake</c> projects as well as building and project support for <c>IntelliSense</c>.
 
-Once installed, the first thing you need to do is find your toolchain.
+Once installed, the first thing you need to do is find your compiler toolchain.
 To do this, press
 \verbatim
  CTRL + Shift + P
  \endverbatim
- to activate the VScode commandline and type in
+ to activate the <c>VScode</c> commandline and type in
  \verbatim
  Cmake kit
  \endverbatim
- and choose the option select kit and then scan for kits.
+ and choose the option <c>select kit</c> and then <c>scan for kits</c>.
  Compiler you want/should use.
- Select it, which changes the selected toolkit in the box at the bottom (blue) line of the VScode window.
+ Select it, which changes the selected toolkit in the box at the bottom (blue) line of the <c>VScode</c> window.
 
  \note
  A few things to keep in mind:
- FEAT's ctest does not work with multiple threads. For this reason, with
+ FEAT's ctesting does not work with multiple threads. For this reason, with
  \verbatim
  CTRL + Shift + P   -> Preferences: Open Settings(UI)
  \endverbatim
@@ -106,32 +106,32 @@ To do this, press
  Just use the defaults for now.
 
  \note
- For now, ignore any recommandation prompts VScode gives.
+ For now, ignore any recommandation prompts <c>VScode</c> gives.
 
 
- \section vscode_configuration_setup
- Before we can configure the FEAT CMake project, we need to run the Python script configureVScode.py from our workfolder.
+ \section vscode_configuration_setup Configuration Setup
+ Before we can configure the FEAT <c>CMake</c> project, we need to run the Python script <c>configureVScode.py</c> from our workfolder.
  To do this, open an internal terminal by typing
  \verbatim
  CTRL + Shift + `
  \endverbatim
 
  This configure script works similarly to the "standard" configure script used to configure FEAT under GNU without IDE support,
- but instead of triggering the CMake call itself, it simply edits the \verbatim cmake-variants.json \endverbatim, which is then used to
- to configure and build FEAT in VScode.
+ but instead of triggering the <c>CMake</c> call itself, it simply edits the <c>cmake-variants.json</c> file , which is then used to
+ to configure and build FEAT in <c>VScode</c>.
  The simplest way to do this is to use
- \ verbatim
- python3 configureVScode.py gcc
+ \verbatim
+ python3 configure<c>VScode</c>.py gcc
  \endverbatim
  or
  \verbatim
- python3 configureVScode clang
+ python3 configure<c>VScode</c> clang
  \endverbatim
  which provides the simplest setup of two variants for your chosen compiler, one with debugging enabled and one with run-time optimisations.
 
  \note See
   \verbatim
- python3 configureVScode.py --help
+ python3 configure<c>VScode</c>.py --help
  \endverbatim
  for various options and flags for setting up FEAT variants.
  Importantly, pretty much any option, such as mpi, will result in an additional cross-product of variants with the option enabled and disabled.
@@ -139,7 +139,7 @@ To do this, press
  This behaviour may change in the future.
 
  \attention
- Due to CMakeTools, changes to the variants file are not automatically registered by VScode. After running the configure script, you will need to restart VScode.
+ Due to <c>CMake Tools</c>, changes to the variants file are not automatically registered by <c>VScode</c>. After running the configure script, you will need to restart <c>VScode</c>.
  This can be easily done by using
  \ verbatim
  CTRL + Shift + P -> Reload window
@@ -147,7 +147,7 @@ To do this, press
 
  \attention
  If a third-party library is not found in your third-party folder, it will be downloaded automatically.
- For this reason (and others) you should place your FEAT source somewhere where you do not need root or admin rights to write/modify files.
+ For this reason (and others) you should place your FEAT source directory somewhere where you do not need root or admin rights to write/modify files.
 
  \attention
  Certain combinations of third party libraries, such as no-mpi + SuperLu, will not work.
@@ -157,7 +157,7 @@ To do this, press
 
  \note If you want to change your FEAT build, you will need to re-run the configuration script and repeat the steps above.
 
- \section vscode_cmake_tools Working with CMakeTools
+ \section vscode_cmake_tools Working with CMake Tools
 
  \subsection vscode_cmake_configure Configuring FEAT
   Before configuring, you should first select your build variant by using
@@ -165,7 +165,7 @@ To do this, press
  CTRL + Shift + P -> Cmake variant
  \endverbatim
 
- After choosing your variant, VScode will automatically start a (shallow) CMake configuration and you should be able to build your first programs.
+ After choosing your variant, VScode will automatically start a (shallow) <c>CMake</c> configuration and you should be able to build your first programs.
 
  \attention If something does not work, or you get a configuration warning, you should do a clean configuration using
   \verbatim
@@ -174,7 +174,7 @@ To do this, press
 
  \subsection vscode_cmake_build Building FEAT
  While you can now change to your build directory (by default, just the ./build folder in your working directory) and build from the command line
- (e.g. with make if that is your chosen build system), you can also use CMake Tools to build executables in FEAT.
+ (e.g. with make if that is your chosen build system), you can also use <c>CMake Tools</c> to build executables in FEAT.
  As an example, let us build the first tutorial.
  With
  \verbatim
@@ -193,8 +193,8 @@ To do this, press
  \attention Ctest in combination with MPI is currently broken with the WINMPI implementation.
 
  \section vscode_cmake_run Running FEAT
- You can either run from the command line in your build directory, or via CMake run.
- If you want to provide command line arguments, you need to edit the \verbatim settings.json \endverbatim file with
+ You can either run from the command line in your build directory, or via <c>CMake run</c>.
+ If you want to provide command line arguments, you need to edit the <b>settings.json </b> file with
  \verbatim
  "cmake.debugConfig": {
         "args": [
@@ -202,6 +202,49 @@ To do this, press
         ]
     }
  \endverbatim
+
+ \section vscode_editor Working with VScode
+ For a good introduction, refer to <a href="https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/README.md"><c>CMake Tools'</c> Github page</a>.
+ \subsection intellisense_filediscovery Problems with file discovery
+ The file detection process and subsequent file parsing can be a bit temperamental, especially if the files are not local to the running process (e.g. a shared file system).
+ While there are still a few things to optimise, it helps to wait until the parsing process has finished before opening any <c>C/C++</c> files, to avoid the IntelliSense process
+ from trying to parse the current file, as this seems to interact with the detection/parsing process.
+ You can see if file detection/parsing is currently running by hovering over the "container" icon, which is aligned to the left of the right status icons of the blue CMake tools status bar,
+ see the image.
+ \image html images/vs_code_statusbar.png
+
+ If there is no change or it reports as halted, reload your window and do a clean reconfigure.
+ \note
+ IntelliSense parses every folder in the <c>PATH</c> variable, so it is advisable not to allow discovery of large folders that are not needed to compile FEAT.
+ If detection is slow, it may help to exclude the <c>/usr/include</c> folder (especially on a shared file system).
+ To do this, open the VScode <c>settings</c> menu, select the workspace settings and search for
+ \verbatim
+ C_cpp files: exclude
+ \endverbatim
+ Click on the <c>Edit in settings.json</c> option and add to the list in <c>"C_Cpp.files.exclude"</c>
+ \verbatim
+ "/usr/include": true
+ \endverbatim
+ The entry in the <c>json</c> file should be as follows
+ \verbatim
+ "C_Cpp.files.exclude": {
+        "/usr/include": true,
+        "**/.vscode": true,
+        "**/.vs": true
+    }
+ \endverbatim
+ If you want to see, which folders are included in your <c>PATH</c>, check
+ \verbatim
+ C/Cpp: Log Diagnostics
+ \endverbatim
+
+ \attention
+ If you create a new <c>header file</c> which is not included anywhere in the project, you will see an include error generated by IntelliSense for any <c>header file</c>.
+ To fix this, simply add the new <c>header file</c>, i.e. the file where you see the error, not the include target, to any source list of an executable.
+ While this does not change the build process, it fixes the bug.
+
+ \note
+ You should also add <c> ms-vscode.cmake-tools </c> to the default <c>configuration provider</c> setting of IntelliSense.
 
 
 \author Maximilian Esser
