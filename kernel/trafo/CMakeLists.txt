@@ -10,6 +10,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 SET (test_list
   standard_trafo-test
   inverse_mapping-test
+  isoparam_trafo-test
 )
 
 # create all tests

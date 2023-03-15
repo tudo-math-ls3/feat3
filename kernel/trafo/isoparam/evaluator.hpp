@@ -9,6 +9,10 @@
 
 #include <kernel/trafo/standard/evaluator.hpp>
 #include <kernel/geometry/atlas/chart.hpp>
+#include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
+#include <kernel/cubature/scalar/newton_cotes_closed_driver.hpp>
+#include <kernel/cubature/scalar/newton_cotes_open_driver.hpp>
+#include <kernel/cubature/scalar/gauss_lobatto_driver.hpp>
 
 namespace FEAT
 {
@@ -583,13 +587,74 @@ namespace FEAT
         /**
          * \brief Computes and returns the volume of the current cell.
          *
+         * \attention
+         * This function computes the exact (curved) edge length for degree <= 2, but for any higher degree than that
+         * this function only computes a (lousy) approximation using a 3-point Gauss quadrature rule.
+         *
          * \returns
          * The volume of the current cell.
          */
         DataType volume() const
         {
-          XASSERTM(false, "volume computation not available for isoparametric trafo");
-          return DataType(0);
+          // for higher order, compute edge length by 3-point Gauss
+          if(degree_ > 2)
+            return volume_g3();
+
+          // first, compute the squared distance of the two edge end-points
+          const DataType a2 = (_iso_coeff[degree_] - _iso_coeff[0]).norm_euclid_sqr();
+          const DataType a = Math::sqrt(a2);
+
+          // degree = 1?
+          if(degree_ == 1)
+            return a;
+
+          // we're in the second degree case; so compute the squared distance between the edge midpoint
+          // and the midpoint between the two edge end-points
+          const DataType b2 = (_iso_coeff[1] - DataType(0.5) * (_iso_coeff[2] + _iso_coeff[0])).norm_euclid_sqr();
+
+          // if b2 = 0, then we have a straight edge, so its length is equal to a
+          if(b2 <= DataType(1E-5)*a2)
+            return a;
+
+          // now we have to compute the arc length of the polynomial (b/a^2)*x^2 over the interval [-a/2,+a/2],
+          // which can be computed by using the following magic formula:
+          const DataType b = DataType(4) * Math::sqrt(b2);
+          const DataType q = Math::sqrt(DataType(1) + DataType(16)*b2/a2);
+          return DataType(0.5) * a * (a * Math::log(q + b/a) / b + q);
+        }
+
+        /**
+         * \brief Approximates the edge length using a 3-point Gauss quadrature rule.
+         *
+         * \note
+         * This function is called by the volume() function for any degree > 2.
+         *
+         * \returns
+         * The volume of the current cell.
+         */
+        DataType volume_g3() const
+        {
+          // 3-point Gauss-Legendre coordinate
+          static const DataType G = DataType(FEAT_F128C(0.77459666924148337703585307995647992216658434105));
+
+          DataType v = DataType(0);
+          JacobianMatrixType jac_mat;
+          DomainPointType dom_point;
+
+          // use 2x2 Gauss-Legendre rule to integrate the area/volume
+          dom_point[0] = DataType(0);
+          this->calc_jac_mat(jac_mat, dom_point);
+          v += DataType(8) * jac_mat.vol();
+
+          dom_point[0] = -G;
+          this->calc_jac_mat(jac_mat, dom_point);
+          v += DataType(5) * jac_mat.vol();
+
+          dom_point[0] = +G;
+          this->calc_jac_mat(jac_mat, dom_point);
+          v += DataType(5) * jac_mat.vol();
+
+          return v / DataType(9);
         }
 
         /**
@@ -605,8 +670,8 @@ namespace FEAT
          */
         DataType width_directed(const ImagePointType&) const
         {
-          XASSERTM(false, "cell width computation not available for isoparametric trafo");
-          return volume();
+          XABORTM("cell width computation not available for isoparametric trafo");
+          return DataType(0);
         }
       }; // class Evaluator<Hypercube<1>,...>
 
@@ -919,8 +984,26 @@ namespace FEAT
          */
         DataType volume() const
         {
-          XASSERTM(false, "volume computation not available for isoparametric trafo");
-          return DataType(0);
+          //XASSERTM(false, "volume computation not available for isoparametric trafo");
+          // 2-point Gauss-Legendre coordinate
+          static const DataType G = DataType(FEAT_F128C(0.57735026918962576450914878050195745564760175127));
+
+          DataType v = DataType(0);
+          JacobianMatrixType jac_mat;
+          DomainPointType dom_point;
+
+          // use 2x2 Gauss-Legendre rule to integrate the area/volume
+          for(int i(0); i < 2; ++i)
+          {
+            dom_point[0] = DataType(2*i-1) * G;
+            for(int j(0); j < 2; ++j)
+            {
+              dom_point[1] = DataType(2*j-1) * G;
+              this->calc_jac_mat(jac_mat, dom_point);
+              v += jac_mat.vol();
+            }
+          }
+          return v;
         }
 
         /**
