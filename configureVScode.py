@@ -181,15 +181,23 @@ cxxflags = ""
 ldflags = ""
 cmake_flags = {'BUILD_ID':buildid_string}
 
+noop_cmake = {'FEAT_DEBUG_MODE':'ON'}
 debug_cmake = {'FEAT_DEBUG_MODE':'ON'}
 opt_cmake = {'FEAT_DEBUG_MODE':'OFF'}
+fast_cmake = {'FEAT_DEBUG_MODE':'OFF'}
 
 debug_flags= ""
 opt_flags = ""
+noop_flags= ""
+fast_flags = ""
 opt_c_flags = ""
 debug_c_flags = ""
+noop_c_flags = ""
+fast_c_flags = ""
 debug_ldf_flags = ""
 opt_ldf_flags = ""
+fast_ldf_flags = ""
+noop_ldf_flags = ""
 
 dic_json = dict()
 # parallelisation selection
@@ -360,6 +368,12 @@ if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
   cxxflags_temp, cmake_temp = configure_gcc (cputype, ['opt',buildid] , compiler_cxx, restrict_errors)
   opt_flags = cxxflags + cxxflags_temp
   add_to_dict(opt_cmake, cmake_temp)
+  cxxflags_temp, cmake_temp = configure_gcc (cputype, ['noop',buildid] , compiler_cxx, restrict_errors)
+  noop_flags = cxxflags + cxxflags_temp
+  add_to_dict(noop_cmake, cmake_temp)
+  cxxflags_temp, cmake_temp = configure_gcc (cputype, ['fast',buildid] , compiler_cxx, restrict_errors)
+  fast_flags = cxxflags + cxxflags_temp
+  add_to_dict(fast_cmake, cmake_temp)
   if "coverage" in buildid:
     remove_string(unused_tokens, "coverage")
     ldflags += " -fprofile-arcs -ftest-coverage"
@@ -380,10 +394,10 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CC"] = compiler_cc
   os.environ["CXX"] = compiler_cxx
   os.environ["LD"] = compiler_cxx
-  #if(platform.system() != "Windows"):
-  #  cxxflags += " -pthreads"
   debug_flags = cxxflags + " " + configure_clang (cputype, ['debug',buildid], compiler_cxx, system_host_compiler, restrict_errors)
   opt_flags = cxxflags + " " + configure_clang (cputype, ['opt',buildid], compiler_cxx, system_host_compiler, restrict_errors)
+  noop_flags = cxxflags + " " + configure_clang (cputype, ['noop',buildid], compiler_cxx, system_host_compiler, restrict_errors)
+  fast_flags = cxxflags + " " + configure_clang (cputype, ['fast',buildid], compiler_cxx, system_host_compiler, restrict_errors)
   cmake_flags["FEAT_COMPILER_ID"] = "clang"
 elif "pgi" in buildid:
   if not compiler_cxx:
@@ -402,6 +416,8 @@ elif "pgi" in buildid:
   os.environ["LD"] = compiler_cxx
   debug_flags = cxxflags + " " + configure_pgi (cputype, ['debug',buildid], compiler_cxx, restrict_errors)
   opt_flags = cxxflags + " " + configure_pgi (cputype, ['opt',buildid], compiler_cxx, restrict_errors)
+  fast_flags = cxxflags + " " + configure_pgi (cputype, ['fast',buildid], compiler_cxx, restrict_errors)
+  noop_flags = cxxflags + " " + configure_pgi (cputype, ['noop',buildid], compiler_cxx, restrict_errors)
   cmake_flags["FEAT_COMPILER_ID"] = "pgi"
 else:
   print ("Error: No supported compiler found in build id:")
@@ -433,8 +449,8 @@ if "cuda" in buildid:
   dic_json['cuda'] = {
     'default':'cuda',
     'choices':{
-        'no-cuda':{
-            'short':'no-cuda',
+        'cuda-off':{
+            'short':'cuda-off',
             'long':'Does not compile with cuda support',
         },
         'cuda':{
@@ -473,35 +489,61 @@ if ("mpi" not in buildid) and ("superlu" in buildid):
   print("Error: SuperLU can only be used in combination with MPI!")
   sys.exit()
 
-# SuperLU needs MPI, because we only use SuperLU_DIST
+# Zoltan needs MPI
 if ("mpi" not in buildid) and ("zoltan" in buildid):
   print("Error: Zoltan can only be used in combination with MPI!")
   sys.exit()
 
+# Add mpi thirdparties to mpi variant
+mpi_libs = ["zoltan", "superlu", "parmetis", "metis"]
+for name in mpi_libs:
+  if(name in buildid):
+    dic_json['mpi']['choices']['mpi-thirdparty'] = {
+      'short':'mpi-thirdparty',
+      'long':'Mpi with chosen thirdparty:',
+      'settings':{'FEAT_HAVE_MPI':'TRUE'}
+    }
+    break
 
+for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
+  for name in [names for names in package.names if names in mpi_libs and names in buildid]:
+    package.add() ##for now the package should be added beforehand
+    cmake_flags_tmp = package.cmake_flags
+    tmp_dict = dict()
+    add_to_dict(tmp_dict, cmake_flags_tmp)
+    dic_json['mpi']['choices']['mpi-thirdparty']['settings'].update(tmp_dict)
+    dic_json['mpi']['choices']['mpi-thirdparty']['long'] = dic_json['mpi']['choices']['mpi-thirdparty']['long'] + f" {name},"
+    remove_string(unused_tokens, name)
+
+
+first_added_package = True
 
 # optional third party libraries
 for package in available_packages(trunk_dirname+os.sep+"build_system",trunk_dirname+os.sep+"thirdparty"):
   for name in package.names:
-    if name in buildid:
+    if name in buildid and name not in mpi_libs:
+      if first_added_package:
+        dic_json['thirdparty'] = {
+          'default':'thirdparty',
+          'choices':{
+              'thirdparty-off':{
+                  'short':'thirdparty-off',
+                  'long':'Does not compile with thirdparty support',
+              },
+              'thirdparty':{
+                  'short':'thirdparty',
+                  'long':'Compiles with:',
+                  'settings':{}
+              }
+          }
+        }
+        first_added_package = False
       package.add() ##for now the package should be added beforehand
       cmake_flags_tmp = package.cmake_flags
       tmp_dict = dict()
       add_to_dict(tmp_dict, cmake_flags_tmp)
-      dic_json[name] = {
-        'default':name,
-        'choices':{
-            "no_"+name:{
-                'short':"no_"+name,
-                'long':'Does not compile with '+ name +' support',
-            },
-            name:{
-                'short':name,
-                'long':'Does compile with ' + name + ' support',
-                'settings':tmp_dict
-            }
-        }
-      }
+      dic_json['thirdparty']['choices']['thirdparty']['settings'].update(tmp_dict)
+      dic_json['thirdparty']['choices']['thirdparty']['long'] = dic_json['thirdparty']['choices']['thirdparty']['long'] + f" {name},"
       remove_string(unused_tokens, name)
       continue
 
@@ -532,16 +574,23 @@ os.environ["CXXFLAGS"] = cxxflags
 if "lto" in buildid:
   remove_string(unused_tokens, "lto")
   opt_ldf_flags = ldflags + opt_flags
+  fast_ldf_flags = ldflags + fast_flags
 else:
   opt_ldf_flags = ldflags
+  fast_ldf_flags = ldflags
 debug_ldf_flags = ldflags
+noop_ldf_flags = ldflags
 opt_c_flags = "-O3"
+fast_c_flags = "-O3"
+noop_c_flags = "-O3"
 debug_c_flags = "-O3"
 # set system host compiler in cflags to pass cmake's c compiler check
 if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if system_host_compiler:
     opt_c_flags = "-O3  -gcc-name=" + system_host_compiler
     debug_c_flags = "-O3  -gcc-name=" + system_host_compiler
+    fast_c_flags = "-O3  -gcc-name=" + system_host_compiler
+    noop_c_flags = "-O3  -gcc-name=" + system_host_compiler
 
 #for now we do not allow to add or retrieve packages through cmake...
 #to do add variants for packages
@@ -568,12 +617,26 @@ dic_json['buildType']['choices']['debug']['env'] = {'CXXFLAGS':debug_flags,
                                                     'LDFLAGS':debug_ldf_flags,
                                                     'CFLAGS':debug_c_flags}
 dic_json['buildType']['choices']['opt'] = {'short':'Opt',
-                                             'long':'Build without debugging info',
+                                             'long':'Build Optimized',
                                              'buildType':'Release'}
 dic_json['buildType']['choices']['opt']['settings'] = opt_cmake
 dic_json['buildType']['choices']['opt']['env'] = {'CXXFLAGS':opt_flags,
                                                   'LDFLAGS':opt_ldf_flags,
                                                   'CFLAGS':opt_c_flags}
+dic_json['buildType']['choices']['noop'] = {'short':'Noop',
+                                             'long':'Build with no optimization',
+                                             'buildType':'RelWithDebInfo'}
+dic_json['buildType']['choices']['noop']['settings'] = noop_cmake
+dic_json['buildType']['choices']['noop']['env'] = {'CXXFLAGS':noop_flags,
+                                                    'LDFLAGS':noop_ldf_flags,
+                                                    'CFLAGS':noop_c_flags}
+dic_json['buildType']['choices']['fast'] = {'short':'Fast',
+                                             'long':'Build with opt with fast math',
+                                             'buildType':'Release'}
+dic_json['buildType']['choices']['fast']['settings'] = fast_cmake
+dic_json['buildType']['choices']['fast']['env'] = {'CXXFLAGS':fast_flags,
+                                                    'LDFLAGS':fast_ldf_flags,
+                                                    'CFLAGS':fast_c_flags}
 
 # print out choosen configuration
 print ("============== configure_feat ===========")
@@ -600,6 +663,10 @@ print ("")
 print ("cxxflags_opt: " + opt_flags)
 print ("")
 print ("cxxflags_debug: " + debug_flags)
+print ("")
+print ("cxxflags_noop: " + noop_flags)
+print ("")
+print ("cxxflags_fast: " + fast_flags)
 print ("")
 print ("ldflags: " + opt_ldf_flags)
 print ("")
