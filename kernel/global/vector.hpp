@@ -186,8 +186,8 @@ namespace FEAT
        * This function performs a type-0 synchronization, i.e. sums up all local DOF contributions
        * for each DOF, by exchanging the DOF values of each shared DOF among all nearest neighbors.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       void sync_0()
       {
@@ -203,8 +203,8 @@ namespace FEAT
        *
        * \returns A SynchVectorTicket object that waits for the operation to complete.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       auto sync_0_async() -> decltype(_gate->sync_0_async(_vector))
       //decltype(_gate->sync_0(_vector)) sync_0_async()
@@ -218,8 +218,8 @@ namespace FEAT
        * This function performs a type-1 synchronization, i.e. averages all local DOF contributions
        * for each DOF, by exchanging the DOF values of each shared DOF among all nearest neighbors.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       void sync_1()
       {
@@ -235,8 +235,8 @@ namespace FEAT
        *
        * \returns A SynchVectorTicket object that waits for the operation to complete.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       auto sync_1_async() -> decltype(_gate->sync_1_async(_vector))
       //decltype(_gate->sync_1(_vector)) sync_1_async()
@@ -245,23 +245,19 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the total number of elements in this distributed vector
+       * \brief Returns the total number of entries in this distributed vector
        *
        * \warning In parallel, this requires communication and is very expensive, so use sparingly!
-       * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        *
-       * \returns The number of elements
+       * \returns The number of entries
        */
+      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
       Index size() const
       {
-        // Compute total number of rows
-        auto vec_l = clone();
-        vec_l.format(DataType(1));
-
-        return Index(vec_l.norm2sqr());
+        return _gate->template get_num_global_dofs<perspective_>();
       }
 
       /**
@@ -321,8 +317,8 @@ namespace FEAT
        * \note This function automatically synchronizes the resulting vector to ensure that the
        * shared DOFs are consistent over all processes.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       void format(Random & rng, DataType min, DataType max)
       {
@@ -381,8 +377,8 @@ namespace FEAT
        *
        * \returns The dot-product of this and \p x
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType dot(const Vector& x) const
       {
@@ -399,8 +395,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> dot_async(const Vector& x) const
       {
@@ -412,8 +408,8 @@ namespace FEAT
        *
        * \returns The squared Euclid norm of this vector
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType norm2sqr() const
       {
@@ -425,8 +421,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> norm2sqr_async() const
       {
@@ -438,8 +434,8 @@ namespace FEAT
        *
        * \returns The Euclid norm of this vector
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType norm2() const
       {
@@ -451,8 +447,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> norm2_async() const
       {
@@ -493,8 +489,8 @@ namespace FEAT
        *
        * \returns The largest absolute value of this vector.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType max_abs_element() const
       {
@@ -508,8 +504,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> max_abs_element_async() const
       {
@@ -521,8 +517,8 @@ namespace FEAT
        *
        * \returns The smallest absolute value of this vector.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType min_abs_element() const
       {
@@ -536,8 +532,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> min_abs_element_async() const
       {
@@ -549,8 +545,8 @@ namespace FEAT
        *
        * \returns The largest value of this vector.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType max_element() const
       {
@@ -564,8 +560,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> max_element_async() const
       {
@@ -577,8 +573,8 @@ namespace FEAT
        *
        * \returns The smallest value of this vector.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType min_element() const
       {
@@ -592,8 +588,8 @@ namespace FEAT
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       SynchScalarTicket<DataType> min_element_async() const
       {

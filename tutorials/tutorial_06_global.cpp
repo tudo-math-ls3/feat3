@@ -460,6 +460,14 @@ namespace Tutorial06
 
     // Alright, our gate is ready to go!
 
+    // Now let's print the total number of local and global DOFs to the console. In this tutorial,
+    // the number of local DOFs is equal on all processes, since we have created our patches by the
+    // unit cube patch generator, but in a real world application the number of local DOFs may be
+    // different on each process, of course.
+
+    comm.print("Number of local/global DOFs: " + stringify(space.get_num_dofs()) +
+      " / " + stringify(gate.get_num_global_dofs()));
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
     comm.print("Allocating matrix and vectors...");

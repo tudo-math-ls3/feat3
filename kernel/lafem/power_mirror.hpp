@@ -38,6 +38,13 @@ namespace FEAT
         {
           return sm.buffer_size(pv.first()) + PowerMirrorHelper<i_-1>::buffer_size(sm, pv.rest());
         }
+        template<Perspective perspective_, typename SM_, typename Pv_>
+        static Index mask_scatter(const SM_& sm, const Pv_& pv, std::vector<int>& mask, const int value, const Index offset)
+        {
+          Index nf = sm.template mask_scatter<perspective_>(pv.first(), mask, value, offset);
+          Index nr = PowerMirrorHelper<i_-1>::template mask_scatter<perspective_>(sm, pv.rest(), mask, value, offset + nf);
+          return nf + nr;
+        }
       };
 
       template<>
@@ -57,6 +64,11 @@ namespace FEAT
         static Index buffer_size(const SM_& sm, PV_& pv)
         {
           return sm.buffer_size(pv.first());
+        }
+        template<Perspective perspective_, typename SM_, typename Pv_>
+        static Index mask_scatter(const SM_& sm, const Pv_& pv, std::vector<int>& mask, const int value, const Index offset)
+        {
+          return sm.template mask_scatter<perspective_>(pv.first(), mask, value, offset);
         }
       };
     } // namespace Intern
@@ -263,6 +275,15 @@ namespace FEAT
       {
         Intern::PowerMirrorHelper<count_>::scatter_axpy(_sub_mirror, vector, buffer, alpha, buffer_offset);
       }
+
+      /** \copydoc VectorMirror::mask_scatter() */
+      template<Perspective perspective_, typename Tv_>
+      Index mask_scatter(const LAFEM::PowerVector<Tv_, count_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        return Intern::PowerMirrorHelper<count_>::template mask_scatter<perspective_>(_sub_mirror, vector, mask, value, offset);
+      }
+
     }; // class PowerMirror<...>
   } // namespace LAFEM
 } // namespace FEAT

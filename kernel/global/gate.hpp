@@ -190,6 +190,10 @@ namespace FEAT
        *
        * \param[in] mode
        * The clone-mode to be used for cloning the mirrors. Defaults to shallow clone.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
+       *
        */
       template<typename LVT2_>
       void convert(const Gate<LVT2_, Mirror_>& other, LocalVector_&& vector, LAFEM::CloneMode mode = LAFEM::CloneMode::Shallow)
@@ -256,6 +260,9 @@ namespace FEAT
        * \param[in] vector
        * A temporary vector allocated to the correct size which is used for initialization
        * of the internal frequencies vector. Its numerical contents are ignored.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       void compile(LocalVector_&& vector)
       {
@@ -276,6 +283,67 @@ namespace FEAT
 
         // invert frequencies
         _freqs.component_invert(_freqs);
+      }
+
+      /**
+       * \brief Returns the number of local DOFs
+       *
+       * \tparam perspective_
+       * Specifies whether to compute the native or POD DOF count
+       *
+       * \returns The number of local DOFS; either in native or POD size
+       */
+      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
+      Index get_num_local_dofs() const
+      {
+        return _freqs.template size<perspective_>();
+      }
+
+      /**
+      * \brief Returns the number of global DOFs
+      *
+      * \tparam perspective_
+      * Specifies whether to compute the native or POD DOF count
+      *
+      * \attention This function is collective, i.e. it must be called by all processes participating
+      * in the gate's communicator, otherwise the application will deadlock.
+      *
+      * \returns The number of global DOFS; either in native or POD size
+      */
+      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
+      Index get_num_global_dofs() const
+      {
+        XASSERT(this->_comm != nullptr);
+        if(this->_comm->size() <= 1)
+          return this->template get_num_local_dofs<perspective_>();
+
+        // get my rank
+        const int my_rank = this->_comm->rank();
+
+        // get local number of DOFs
+        const Index loc_dofs = this->template get_num_local_dofs<perspective_>();
+
+        // create a local mask vector and format it to 1
+        std::vector<int> mask(std::size_t(loc_dofs), 1);
+
+        // set all DOFs, which are shared with a lower rank neighbor, to 0
+        for(std::size_t i(0); i < _mirrors.size(); ++i)
+        {
+          if(this->_ranks.at(i) < my_rank)
+            this->_mirrors.at(i).template mask_scatter<perspective_>(this->_freqs, mask, 0);
+        }
+
+        // count the number of DOFs that are still 1 and thus not owned by a lower rank neighbor
+        Index owned_dofs(0u);
+        for(const auto& k : mask)
+          owned_dofs += Index(k);
+
+        // now sum up the number of owned DOFs over all processes
+        Index global_dofs(0u);
+        this->_comm->allreduce(&owned_dofs, &global_dofs, std::size_t(1), Dist::op_sum);
+
+        // done!
+        return global_dofs;
       }
 
       /**
@@ -304,6 +372,9 @@ namespace FEAT
        * \param[inout] vector
        * On entry, the type-0 vector to be synchronized.\n
        * On exit, the synchronized type-1 vector.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       void sync_0(LocalVector_& vector) const
       {
@@ -325,6 +396,9 @@ namespace FEAT
        * On exit, the synchronized type-1 vector.
        *
        * \returns A ticket that has to be waited upon to complete the sync operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       VectorTicketType sync_0_async(LocalVector_& vector) const
       {
@@ -347,6 +421,9 @@ namespace FEAT
        * \note
        * This function effectively applies the from_1_to_0() and sync_0()
        * functions onto the input vector.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       void sync_1(LocalVector_& vector) const
       {
@@ -372,6 +449,9 @@ namespace FEAT
        *
        * \note
        * This function effectively applies the from_1_to_0() and sync_0() functions onto the input vector.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       VectorTicketType sync_1_async(LocalVector_& vector) const
       {
@@ -390,6 +470,9 @@ namespace FEAT
        *
        * \returns
        * The dot-product of \p x and \p y.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType dot(const LocalVector_& x, const LocalVector_& y) const
       {
@@ -417,6 +500,9 @@ namespace FEAT
        * The two type-1 vector whose dot-product is to be computed.
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       ScalarTicketType dot_async(const LocalVector_& x, const LocalVector_& y, bool sqrt = false) const
       {
@@ -431,6 +517,9 @@ namespace FEAT
        *
        * \returns
        * The reduced sum of all \p x.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType sum(DataType x) const
       {
@@ -444,6 +533,9 @@ namespace FEAT
        * The value that is to be summed over all processes.
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       ScalarTicketType sum_async(DataType x, bool sqrt = false) const
       {
@@ -458,6 +550,9 @@ namespace FEAT
        *
        * \returns
        * The minimum of all \p x.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType min(DataType x) const
       {
@@ -471,6 +566,9 @@ namespace FEAT
        * What we want to compute the minimum over all processes of.
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       ScalarTicketType min_async(DataType x) const
       {
@@ -485,6 +583,9 @@ namespace FEAT
        *
        * \returns
        * The maximum of all \p x.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType max(DataType x) const
       {
@@ -498,6 +599,9 @@ namespace FEAT
        * What we want to compute the maximum over all processes of.
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       ScalarTicketType max_async(DataType x) const
       {
@@ -515,6 +619,9 @@ namespace FEAT
        *
        * \returns
        * The reduced 2-norm of all \p x.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       DataType norm2(DataType x) const
       {
@@ -531,6 +638,9 @@ namespace FEAT
        * The value that is to be summarized over all processes.
        *
        * \returns A scalar ticket that has to be waited upon to complete the operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        */
       ScalarTicketType norm2_async(DataType x) const
       {

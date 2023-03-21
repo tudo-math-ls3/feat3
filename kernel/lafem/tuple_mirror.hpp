@@ -235,6 +235,16 @@ namespace FEAT
         _first.scatter_axpy(vector.first(), buffer, alpha, buffer_offset);
         _rest.scatter_axpy(vector.rest(), buffer, alpha, buffer_offset + _first.buffer_size(vector.first()));
       }
+
+      /** \copydoc VectorMirror::mask_scatter() */
+      template<Perspective perspective_, typename Tv_, typename... Tw_>
+      Index mask_scatter(const LAFEM::TupleVector<Tv_, Tw_...>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        Index nf = _first.mask_scatter(vector.first(), mask, value, offset);
+        Index nr = _rest.mask_scatter(vector.rest(), mask, value, offset + nf);
+        return nf + nr;
+      }
     }; // class TupleMirror<...>
 
     /// \cond internal
@@ -366,7 +376,14 @@ namespace FEAT
       {
         _first.scatter_axpy(vector.first(), buffer, alpha, buffer_offset);
       }
-    };
+
+      template<Perspective perspective_, typename Tv_>
+      Index mask_scatter(const LAFEM::TupleVector<Tv_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        return _first.mask_scatter(vector.first(), mask, value, offset);
+      }
+    }; // class TupleMirror<First_>
     /// \endcond
   } // namespace LAFEM
 } // namespace FEAT

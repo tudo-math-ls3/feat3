@@ -521,6 +521,93 @@ namespace FEAT
           vector.used_elements(), vector.template elements<Perspective::pod>(), vector.indices(), alpha);
       }
 
+      /**
+       * \brief Updates a scatter mask vector for this mirror
+       *
+       * This function is used to create a so-called "scatter mask vector", i.e. a vector, in which each entry, that
+       * belongs to a DOF that is shared with other processes, is set to 1, and all other entries are set to 0
+       * (or vice versa). This mask vector can then be used to determine the number of local and/or shared DOFs for
+       * this process.
+       *
+       * \param[in] vector
+       * A template vector to be used to determine the POD size; must be allocated to correct size but its contents are ignored.
+       *
+       * \param[inout] mask
+       * The mask vector to be updated.
+       *
+       * \param[in] value
+       * The value that is to be used to set the mask vector entries referenced by this mirror.
+       *
+       * \param[in] offset
+       * The offset of the first native/POD DOF in the mask vector.
+       *
+       * \returns The size of the input template vector.
+       */
+      template<Perspective perspective_, typename Mem2_, typename DT2_, typename IT2_>
+      Index mask_scatter(const DenseVector<Mem2_, DT2_, IT2_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        XASSERT(Index(mask.size()) >= vector.template size<perspective_>());
+        XASSERT(Index(mask.size()) >= this->size() + offset);
+        const Index n = this->num_indices();
+        const IT_* idx = this->indices();
+
+        for(Index i(0); i < n; ++i)
+          mask[offset + idx[i]] = value;
+
+        return vector.template size<perspective_>();
+      }
+
+      /**
+       * \brief Updates a scatter mask vector for this mirror
+       *
+       * This function is used to create a so-called "scatter mask vector", i.e. a vector, in which each entry, that
+       * belongs to a DOF that is shared with other processes, is set to 1, and all other entries are set to 0
+       * (or vice versa). This mask vector can then be used to determine the number of local and/or shared DOFs for
+       * this process.
+       *
+       * \param[in] vector
+       * A template vector to be used to determine the POD size; must be allocated to correct size but its contents are ignored.
+       *
+       * \param[inout] mask
+       * The mask vector to be updated.
+       *
+       * \param[in] value
+       * The value that is to be used to set the mask vector entries referenced by this mirror.
+       *
+       * \param[in] offset
+       * The offset of the first native/POD DOF in the mask vector.
+       *
+       * \returns The size of the input template vector.
+       */
+      template<Perspective perspective_, typename Mem2_, typename DT2_, typename IT2_, int block_size_>
+      void mask_scatter(const DenseVectorBlocked<Mem2_, DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        XASSERT(Index(mask.size()) >= vector.template size<perspective_>());
+        const Index n = this->num_indices();
+        const IT_* idx = this->indices();
+
+        if(perspective_ == LAFEM::Perspective::native)
+        {
+          XASSERT(Index(mask.size()) >= this->size() + offset);
+          for(Index i(0); i < n; ++i)
+            mask[offset + idx[i]] = value;
+        }
+        else // POD
+        {
+          XASSERT(Index(mask.size()) >= Index(block_size_)*this->size() + offset);
+          for(Index i(0); i < n; ++i)
+          {
+            const Index ibs = idx[i] * Index(block_size_);
+            for(int k(0); k < block_size_; ++k)
+              mask[offset + ibs + Index(k)] = value;
+          }
+        }
+        return vector.template size<perspective_>();
+      }
+
+
       friend std::ostream & operator<< (std::ostream & lhs, const VectorMirror & b)
       {
         Index n = b.num_indices();
