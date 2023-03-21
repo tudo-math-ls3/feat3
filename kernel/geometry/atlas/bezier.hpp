@@ -931,6 +931,8 @@ namespace FEAT
           os << sind2 << 0;
             for(int j(0); j < BaseClass::world_dim; ++j)
               os << " " << _world[_vtx_ptr.front()][j];
+          os << std::endl;
+
           // write remaining points
           for(std::size_t i(1); i < _vtx_ptr.size(); ++i)
           {
