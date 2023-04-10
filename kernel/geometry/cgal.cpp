@@ -25,6 +25,8 @@ FEAT_DISABLE_WARNINGS
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 #include <CGAL/algorithm.h>
 #include <CGAL/Side_of_triangle_mesh.h>
+#include <CGAL/boost/graph/IO/OBJ.h>
+#include <CGAL/boost/graph/IO/OFF.h>
 FEAT_RESTORE_WARNINGS
 
 
@@ -71,20 +73,19 @@ struct CGALWrapperData
   }
 };
 
-FEAT::Geometry::CGALWrapper::CGALWrapper(String filename) :
+FEAT::Geometry::CGALWrapper::CGALWrapper(std::istream & file, CGALFileMode file_mode) :
+  _cgal_data(nullptr)
+{
+  _parse_mesh(file, file_mode);
+}
+
+FEAT::Geometry::CGALWrapper::CGALWrapper(const String & filename, CGALFileMode file_mode) :
   _cgal_data(nullptr)
 {
   std::ifstream file(filename.c_str());
-  XASSERTM(file.is_open(), "CGAL::read_off: file read error!");
-
-  _parse_off_data(file);
+  XASSERTM(file.is_open(), "CGALWrapper: file read error: " + filename + " !");
+  _parse_mesh(file, file_mode);
   file.close();
-}
-
-FEAT::Geometry::CGALWrapper::CGALWrapper(std::istream & file) :
-  _cgal_data(nullptr)
-{
-  _parse_off_data(file);
 }
 
 FEAT::Geometry::CGALWrapper::~CGALWrapper()
@@ -110,7 +111,7 @@ double FEAT::Geometry::CGALWrapper::squared_distance(double x, double y, double 
   return (double)cd->_tree->squared_distance(query);
 }
 
-void FEAT::Geometry::CGALWrapper::_parse_off_data(std::istream & file)
+void FEAT::Geometry::CGALWrapper::_parse_mesh(std::istream & file, CGALFileMode file_mode)
 {
   delete (CGALWrapperData*)_cgal_data;
 
@@ -119,14 +120,20 @@ void FEAT::Geometry::CGALWrapper::_parse_off_data(std::istream & file)
 
   cd->_polyhedron = new Polyhedron_;
 
-  // note: 'read_off' wandered into CGAL::IO namespace in version 5.3
-#if (CGAL_VERSION_NR < 1050301000)
-  bool status = CGAL::read_off(file, *(cd->_polyhedron));
-  XASSERTM(status == true, "CGAL::read_off: read error!");
-#else
-  bool status = CGAL::IO::read_OFF(file, *(cd->_polyhedron));
-  XASSERTM(status, "CGAL::IO::read_OFF: read error!");
-#endif // (CGAL_VERSION_NR < 1050000000)
+  bool status(false);
+  switch(file_mode)
+  {
+    case CGALFileMode::fm_off:
+      status = CGAL::IO::read_OFF(file, *(cd->_polyhedron));
+      XASSERTM(status == true, "CGAL::IO::read_OFF: read/parse error !");
+      break;
+    case CGALFileMode::fm_obj:
+      status = CGAL::IO::read_OBJ(file, *(cd->_polyhedron));
+      XASSERTM(status == true, "CGAL::IO::read_OBJ: read/parse error !");
+      break;
+    default:
+      XASSERTM(false, "CGAL FileMode not supported!");
+  }
 
   // Construct AABB tree with a KdTree
   cd->_tree = new Tree_(faces(*(cd->_polyhedron)).first, faces(*(cd->_polyhedron)).second, *(cd->_polyhedron));

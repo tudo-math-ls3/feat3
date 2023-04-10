@@ -16,6 +16,13 @@ namespace FEAT
 {
   namespace Geometry
   {
+
+    enum class CGALFileMode
+    {
+      fm_off = 0, /**< OFF */
+      fm_obj /**< OBJ */
+    };
+
     /**
      * \brief Wrapper for the CGAL Library
      *
@@ -30,15 +37,15 @@ namespace FEAT
     private:
       void * _cgal_data;
 
-      /// read in stream in off file format and preprocess search tree for in/out test
-      void _parse_off_data(std::istream & file);
+      /// read in stream in prescibed file format and preprocess search tree for in/out test
+      void _parse_mesh(std::istream & file, CGALFileMode file_mode);
 
     public:
-      /// Create a new CGALWrapper Instance and open the provided off file.
-      explicit CGALWrapper(String filename);
+      /// Create a new CGALWrapper Instance and open the provided file in given format.
+      explicit CGALWrapper(const String & filename, CGALFileMode file_mode);
 
-      /// Create a new CGALWrapper Instance and open the provided off (file-) stream.
-      explicit CGALWrapper(std::istream & file);
+      /// Create a new CGALWrapper Instance and open the provided file stream in given format.
+      explicit CGALWrapper(std::istream & file, CGALFileMode file_mode);
 
       /// Destructor
       virtual ~CGALWrapper();

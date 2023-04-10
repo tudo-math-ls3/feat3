@@ -43,7 +43,7 @@ public:
     mts<<"3 3 0 2"<<std::endl;
     mts<<"3 3 2 1"<<std::endl;
 
-    CGALWrapper cw(mts);
+    CGALWrapper cw(mts, CGALFileMode::fm_off);
     TEST_CHECK_EQUAL(cw.point_inside(50, 50, 50), false);
     TEST_CHECK_EQUAL(cw.point_inside(0.1, 0.1, 0.1), true);
   }
