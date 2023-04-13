@@ -1,4 +1,4 @@
-# CmakeLists for directory "tools"
+# CMakeLists for directory "tools"
 
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
