@@ -223,11 +223,11 @@ nlcg_sw_bs_q(__float128(1), Index(23), Index(74), "MQCLinesearch", "none", NLCGD
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
-NLCGTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlcg_sw_hb_f_cuda(float(0.9), Index(11), Index(23), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves, PreferredBackend::generic);
+NLCGTest<float, unsigned int, Analytic::Common::HimmelblauFunction>
+nlcg_sw_hb_f_cuda(float(0.9), Index(11), Index(23), "MQCLinesearch", "Hessian", NLCGDirectionUpdate::FletcherReeves, PreferredBackend::cuda);
 
-NLCGTest<Mem::CUDA, double, unsigned int, Analytic::Common::BazaraaShettyFunction>
-nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none", NLCGDirectionUpdate::PolakRibiere, PreferredBackend::generic);
+NLCGTest<double, unsigned int, Analytic::Common::BazaraaShettyFunction>
+nlcg_s_bs_d_cuda(double(0.18), Index(77), Index(261), "SecantLinesearch", "none", NLCGDirectionUpdate::PolakRibiere, PreferredBackend::cuda);
 #endif
 
 /**

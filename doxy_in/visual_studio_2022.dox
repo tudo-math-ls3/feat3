@@ -60,8 +60,10 @@ sc config MsMpiLaunchSvc start= auto
 Once you have installed MS-MPI and setup the launch service, there is nothing more to do, as the build-system will
 automatically detect that a MPI implementation is available.
 
-\subsection win_vs17_prereqs_cuda Nvidia CUDA
-Nvidia CUDA is currently  not supported by the FEAT Visual Studio build system. This will be enabled at a later time.
+\subsection win_vs17_prereqs_cuda Nvidia CUDA v11.8
+Currently, the only supported version of Nvidia CUDA is version 11.8, which must be installed including its integration
+into Visual Studio 2022, of course. There is nothing else that has to be done manually to enable CUDA in FEAT; simply
+select an build configuration that contains the <c>cuda</c> tag to enable CUDA in FEAT.
 
 \subsection win_vs17_prereqs_imkl Intel MKL
 Intel MKL is currently not supported by the FEAT Visual Studio build system. This will be enabled at a later time.
@@ -209,7 +211,7 @@ The list of all supported (and currently disabled) features is:
 - <c>dbg</c>: generate a debug binary (mutually exclusive with <c>opt</c>)
 - <c>opt</c>: generate an optimized binary (mutually exclusive with <c>dbg</c>)
 - <c>mpi</c>: build with MPI support (requires MS-MPI to be installed)
-- <c>cuda</c> build with Nvidia CUDA support (currently not available)
+- <c>cuda</c> build with Nvidia CUDA support (required Nvidia CUDA 11.8 to be installed)
 - <c>mkl</c>: build with Intel MKL support (currently not available)
 - <c>omp</c>: build with OpenMP support
 

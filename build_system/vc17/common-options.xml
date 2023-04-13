@@ -88,32 +88,25 @@
   </ItemDefinitionGroup>
 
   <!-- CUDA Settings -->
-  <!--<ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true'">
+  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true'">
     <CudaCompile>
       <GPUDebugInfo>$(DebugMode)</GPUDebugInfo>
       <HostDebugInfo>$(DebugMode)</HostDebugInfo>
-      <CodeGeneration>compute_30,sm_30</CodeGeneration>
-      <AdditionalCompilerOptions>/FS /wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>
-    </CudaCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='Win32'">
-    <CudaCompile>
-      <TargetMachinePlatform>32</TargetMachinePlatform>
-    </CudaCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(FeatHaveCuda)'=='true' And '$(Platform)'=='x64'">
-    <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_60,sm_60</CodeGeneration>
+      <!--<AdditionalCompilerOptions>/FS /wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>-->
+      <!--<AdditionalCompilerOptions>/FS %(AdditionalOptions)</AdditionalCompilerOptions>-->
+      <AdditionalOptions>--std=c++17 %(AdditionalOptions)</AdditionalOptions>
     </CudaCompile>
-  </ItemDefinitionGroup>-->
+  </ItemDefinitionGroup>
 
   <!-- ************************************************************************************************************* -->
   <!-- Visual Studio Import Mumbo-Jumbo -->
   <!-- ************************************************************************************************************* -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <!--<ImportGroup Label="ExtensionSettings">
+  <ImportGroup Label="ExtensionSettings">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA $(FeatCudaVersion).targets" Condition="'$(FeatHaveCuda)'=='true'"/>
-  </ImportGroup>-->
+  </ImportGroup>
 
   <Target Name="Dump">
     <Message Importance="High" Text="Project File Name = $(MSBuildProjectFile)" />
@@ -135,7 +128,6 @@
     <Message Importance="High" Text="VersionZfp.........: $(VersionZfp)" />
     <Message Importance="High" Text="VersionZlib........: $(VersionZlib)" />
     <Message Importance="High" Text="VersionZoltan......: $(VersionZoltan)" />
-    <Message Importance="High" Text="FeatHaveBoost......: '$(FeatHaveBoost)'" />
     <Message Importance="High" Text="FeatHaveBoost......: '$(FeatHaveBoost)'" />
     <Message Importance="High" Text="FeatHaveCGAL.......: '$(FeatHaveCGAL)'" />
     <Message Importance="High" Text="FeatHaveFParser....: '$(FeatHaveFParser)'" />

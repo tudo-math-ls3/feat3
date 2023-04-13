@@ -26,14 +26,14 @@ def modeline(bm, tag, mode):
 
 # build tags
 build_tags = [
-  #'cuda',
+  'cuda',
   'omp',
   #'mkl',
   'mpi',
 ]
 
 # enabled build modes
-build_modes = ['dbg', 'opt', 'dbg-omp', 'opt-omp', 'dbg-mpi', 'opt-mpi']
+build_modes = ['dbg', 'opt', 'dbg-omp', 'opt-omp', 'dbg-mpi', 'opt-mpi', 'dbg-cuda', 'opt-cuda']
 platforms = ['x64']
 
 

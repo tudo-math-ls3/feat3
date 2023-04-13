@@ -14,11 +14,11 @@ using namespace FEAT::Solver;
 using namespace FEAT::TestSystem;
 
 class CuSolverLUTest :
-  public TestSystem::TaggedTest<Mem::CUDA, double>
+  public TestSystem::UnitTest
 {
 public:
   CuSolverLUTest() :
-    TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverQRTest")
+    TestSystem::UnitTest("CuSolverQRTest", "none", "none", PreferredBackend::cuda)
   {
   }
 
@@ -28,8 +28,8 @@ public:
 
   virtual void run() const override
   {
-    typedef SparseMatrixCSR<Mem::Main, double, unsigned int> MatrixType;
-    typedef DenseVector<Mem::Main, double, unsigned int> VectorType;
+    typedef SparseMatrixCSR<double, unsigned int> MatrixType;
+    typedef DenseVector<double, unsigned int> VectorType;
 
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
@@ -70,10 +70,13 @@ public:
 CuSolverLUTest cusolverlu_test;
 
 class CuSolverQRTest :
-  public TestSystem::TaggedTest<Mem::CUDA, double>
+  public TestSystem::UnitTest
 {
 public:
-  CuSolverQRTest() : TestSystem::TaggedTest<Mem::CUDA, double>("CuSolverLUTest") {}
+  CuSolverQRTest() :
+    TestSystem::UnitTest("CuSolverLUTest", "none", "none", PreferredBackend::cuda)
+  {
+  }
 
   virtual ~CuSolverQRTest()
   {
@@ -81,8 +84,8 @@ public:
 
   virtual void run() const override
   {
-    typedef SparseMatrixCSR<Mem::CUDA, double, unsigned int> MatrixType;
-    typedef DenseVector<Mem::CUDA, double, unsigned int> VectorType;
+    typedef SparseMatrixCSR<double, unsigned int> MatrixType;
+    typedef DenseVector<double, unsigned int> VectorType;
 
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 

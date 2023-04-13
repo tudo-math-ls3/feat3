@@ -11,11 +11,11 @@
   <!-- ********************************************************************* -->
   <!-- CUDA Backend Detection -->
   <!-- ********************************************************************* -->
-  <!--<PropertyGroup Condition="'$(BackendCUDA)'=='true' And '$(FeatHaveCuda)'=='' And '$(CUDA_PATH_V10_2)'!=''">
+  <PropertyGroup Condition="'$(EnableCUDA)'=='true' And '$(FeatHaveCuda)'=='' And '$(CUDA_PATH_V11_8)'!=''">
     <FeatHaveCuda>true</FeatHaveCuda>
-    <FeatCudaVersion>10.2</FeatCudaVersion>
-    <FeatCudaPath>$(CUDA_PATH_V10_2)</FeatCudaPath>
-  </PropertyGroup>-->
+    <FeatCudaVersion>11.8</FeatCudaVersion>
+    <FeatCudaPath>$(CUDA_PATH_V11_8)</FeatCudaPath>
+  </PropertyGroup>
 
   <!-- ********************************************************************* -->
   <!-- Visual Studio Import Mumbo-Jumbo -->
@@ -25,9 +25,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
 
-  <!--<ImportGroup Label="ExtensionSettings">
+  <ImportGroup Label="ExtensionSettings">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA $(FeatCudaVersion).props" Condition="'$(FeatHaveCuda)'=='true'"/>
-  </ImportGroup>-->
+  </ImportGroup>
 
   <!-- ********************************************************************* -->
   <!-- FEAT Paths and Names -->
@@ -123,7 +123,7 @@
     <FeatLibDep Condition="'$(EnableMPI)'=='true'"
       Include="msmpi.lib" />
     <FeatLibDep Condition="'$(EnableCuda)'=='true'"
-      Include="cudart.lib;cublas.lib;cusparse.lib" />
+      Include="cudart_static.lib;cublas.lib;cublasLt.lib;cusparse.lib;cusolver.lib;cusolverMg.lib" />
     <!--<FeatLibDep Condition="'$(EnableMKL)'=='true'"
       Include="mkl_core.lib;mkl_sequential.lib" />
     <FeatLibDep Condition="'$(EnableMKL)'=='true' And '$(Platform)'=='Win32'"
