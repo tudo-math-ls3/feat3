@@ -1,8 +1,5 @@
 # CMakeLists for directory "area51/ccnd_fiber"
 
-# this needs to be set again for each directory
-cmake_minimum_required (VERSION 3.9)
-
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 

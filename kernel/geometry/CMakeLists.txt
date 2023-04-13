@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 3.9)
-
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -12,6 +10,10 @@ SET(kernel-geometry-list
   parti_parmetis.cpp
   parti_zoltan.cpp
 )
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set_source_files_properties(cgal.cpp PROPERTIES COMPILE_OPTIONS "-Wno-maybe-uninitialized")
+endif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 if (FEAT_EICKT)
   SET (kernel-geometry-list

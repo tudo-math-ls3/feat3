@@ -7,7 +7,7 @@ see the file 'copyright.txt' in the top level directory for details.
 
 === DEPENDECIES ===
 FEAT depends on:
-cmake 3.9 or greater
+cmake 3.15.5 or greater
 python 2.6 or greater
 gcc 7+ or icc 16+ or clang 3.6+ or MSVC++ 2015+ or AOCC 1.3+
 
