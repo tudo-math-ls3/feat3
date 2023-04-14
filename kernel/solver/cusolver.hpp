@@ -8,7 +8,6 @@
 #define KERNEL_SOLVER_CUSOLVER_HPP 1
 #include <kernel/base_header.hpp>
 
-#if defined(FEAT_HAVE_CUSOLVER) || defined(DOXYGEN)
 #include <kernel/solver/base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -123,5 +122,4 @@ namespace FEAT
   } // namespace LAFEM
 } // namespace FEAT
 
-#endif // FEAT_HAVE_CUSOLVER
 #endif // KERNEL_SOLVER_CUSOLVER_HPP

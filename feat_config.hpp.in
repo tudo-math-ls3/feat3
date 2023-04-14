@@ -36,9 +36,6 @@
 /// Do we have CUDA support enabled?
 #cmakedefine FEAT_HAVE_CUDA
 
-/// Do we have CuSolver support enabled?
-#cmakedefine FEAT_HAVE_CUSOLVER
-
 /// Do we have MKL support enabled?
 #cmakedefine FEAT_HAVE_MKL
 

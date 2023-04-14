@@ -47,12 +47,7 @@ if (FEAT_HAVE_CUDA)
     ssor_precond.cu
     STATIC
   )
-  if (FEAT_HAVE_CUSOLVER)
-    if (CMAKE_MAJOR_VERSION LESS 3)
-      find_library(CUDA_cusolver_LIBRARY NAMES cusolver PATHS "${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-    endif (CMAKE_MAJOR_VERSION LESS 3)
-    target_link_libraries(kernel-solver-cuda ${CUDA_cusolver_LIBRARY})
-  endif (FEAT_HAVE_CUSOLVER)
+  target_link_libraries(kernel-solver-cuda ${CUDA_cusolver_LIBRARY})
   target_link_libraries(kernel-solver-cuda ${CUDA_cusparse_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-solver kernel-solver-cuda)
 endif(FEAT_HAVE_CUDA)

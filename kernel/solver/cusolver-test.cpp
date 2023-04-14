@@ -4,7 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <test_system/test_system.hpp>
-#ifdef FEAT_HAVE_CUSOLVER
 #include <kernel/lafem/pointstar_factory.hpp>
 #include <kernel/solver/cusolver.hpp>
 
@@ -124,5 +123,3 @@ public:
   }
 };
 CuSolverQRTest cusolverqr_test;
-
-#endif // FEAT_HAVE_CUSOLVER

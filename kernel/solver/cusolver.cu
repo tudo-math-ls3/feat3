@@ -6,7 +6,6 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 
-#ifdef FEAT_HAVE_CUSOLVER
 #include <kernel/util/exception.hpp>
 
 #include <cusolverSp.h>
@@ -80,4 +79,3 @@ namespace FEAT
     }
   }
 }
-#endif // FEAT_HAVE_CUSOLVER
