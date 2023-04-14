@@ -119,9 +119,8 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparse_csrv_analysis failed with status code: " + stringify(status));
 
-
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -162,8 +161,8 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsr2_solve failed with status code: " + stringify(status));
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -288,9 +287,8 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrv2_analysis failed with status code: " + stringify(status));
 
-
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -351,8 +349,8 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrsv2_solve failed with status code: " + stringify(status));
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

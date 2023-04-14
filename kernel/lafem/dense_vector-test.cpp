@@ -54,7 +54,6 @@ public:
     TEST_CHECK_EQUAL(MemoryPool::allocated_memory(), a.bytes() - sizeof(Index));
     DenseVector<DT_, IT_> b(16, DT_(5));
     b(7, DT_(42));
-    MemoryPool::synchronize();
     TEST_CHECK_EQUAL(b(7), DT_(42));
     TEST_CHECK_EQUAL(b(3), DT_(5));
 
@@ -311,12 +310,10 @@ public:
 
       DenseVector<DT_, IT_> c(size);
       c.axpy(a, b, s); //a != b != r
-      MemoryPool::synchronize();
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(c(i), ref(i), DT_(eps));
 
       a.axpy(a, b, s); //r == a
-      MemoryPool::synchronize();
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(a(i), ref(i), DT_(eps));
 
@@ -326,7 +323,6 @@ public:
       }
 
       b.axpy(a, b, s); //r == b
-      MemoryPool::synchronize();
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(b(i), ref(i), DT_(eps));
     }
@@ -554,7 +550,6 @@ public:
 
       DenseVector<DT_, IT_> c(size);
       c.component_product(a, b);
-      MemoryPool::synchronize();
       for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
@@ -562,7 +557,6 @@ public:
       //TEST_CHECK_EQUAL(c, ref);
 
       b.component_product(a, b);
-      MemoryPool::synchronize();
       for (Index i(0); i < b.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
@@ -570,7 +564,6 @@ public:
       //TEST_CHECK_EQUAL(b, ref);
 
       a.component_product(a, a);
-      MemoryPool::synchronize();
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
@@ -637,11 +630,9 @@ public:
 
       DenseVector<DT_, IT_> b(size);
       b.scale(a, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(b, ref);
 
       a.scale(a, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(a, ref);
     }
   }

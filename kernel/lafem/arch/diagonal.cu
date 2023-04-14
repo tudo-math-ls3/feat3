@@ -52,8 +52,9 @@ void Diagonal::csr_cuda(IT_ * diag, const IT_ * const col_ind, const IT_ * const
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_diagonal_csr<<<grid, block>>>(diag, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

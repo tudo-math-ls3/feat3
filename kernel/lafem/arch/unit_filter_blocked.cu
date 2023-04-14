@@ -58,8 +58,9 @@ void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, 
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_unit_filter_blocked_rhs<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -93,8 +94,9 @@ void UnitFilterBlocked::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, c
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_unit_filter_blocked_def<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_indices, ue);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

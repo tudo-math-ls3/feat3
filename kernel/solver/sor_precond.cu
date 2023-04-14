@@ -269,8 +269,8 @@ namespace FEAT
         MemoryPool::release_memory(host_irp);
         MemoryPool::release_memory(host_crp);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -283,8 +283,8 @@ namespace FEAT
         cudaFree(inverse_row_ptr);
         MemoryPool::release_memory(rows_per_color);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -309,8 +309,8 @@ namespace FEAT
           row_offset += rows_per_color[i];
         }
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -338,8 +338,8 @@ namespace FEAT
           row_offset += rows_per_color[i];
         }
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

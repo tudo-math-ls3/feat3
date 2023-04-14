@@ -49,8 +49,8 @@ DT_ DotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const Index
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 
-#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -72,8 +72,9 @@ DT_ TripleDotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const
   ComponentProduct::value_cuda(temp, y, z, size);
   DT_ result = DotProduct::value_cuda(x, temp, size);
   cudaFree(temp);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

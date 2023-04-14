@@ -95,8 +95,9 @@ void Lumping::csr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_lumping_csr<<<grid, block>>>(lump, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -117,8 +118,9 @@ void Lumping::bcsr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_lumping_bcsr<<<grid, block>>>(lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

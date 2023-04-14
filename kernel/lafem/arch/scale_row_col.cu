@@ -65,8 +65,9 @@ void ScaleRows::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_i
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_scale_rows_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -87,8 +88,9 @@ void ScaleCols::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_i
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_scale_cols_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

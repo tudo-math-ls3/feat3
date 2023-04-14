@@ -308,7 +308,6 @@ public:
 
       // apply-test for alpha = 0.0
       a.apply(result, x, y, DT_(0.0));
-      MemoryPool::synchronize();
       for (Index i(0); i < result.size(); ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(y(i), result(i), DT_(_eps));
 
@@ -323,7 +322,6 @@ public:
         }
         ref(i, sum);
       }
-      MemoryPool::synchronize();
       for (Index i(0); i < result.size(); ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
 
@@ -339,7 +337,6 @@ public:
         ref(i, y(i) - sum);
       }
 
-      MemoryPool::synchronize();
       for (Index i(0); i < result.size(); ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
 
@@ -350,7 +347,6 @@ public:
       a.apply(ref, x);
       ref.axpy(ref, y, s);
 
-      MemoryPool::synchronize();
       for (Index i(0); i < result.size(); ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
     }
@@ -418,7 +414,7 @@ public:
       for (Index i(0); i < x.size(); ++i)
       {
         x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
-	y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
       }
 
       for (Index i(0); i < ref.rows(); ++i)
@@ -431,7 +427,6 @@ public:
 
       result.axpy(x, y, alpha);
 
-      MemoryPool::synchronize();
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
@@ -526,7 +521,6 @@ public:
 
       result.multiply(x, y);
 
-      MemoryPool::synchronize();
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
@@ -621,7 +615,6 @@ public:
 
       ref.multiply(x_dense, y);
       result.multiply(x, y);
-      MemoryPool::synchronize();
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
@@ -724,7 +717,6 @@ public:
 
       result.multiply(x, y, z, alpha, beta);
 
-      MemoryPool::synchronize();
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
@@ -840,7 +832,6 @@ public:
 
       z.multiply(x, y, alpha, beta);
 
-      MemoryPool::synchronize();
       for (Index i(0); i < z.rows(); ++i)
       {
         for (Index j(0); j < z.columns(); ++j)

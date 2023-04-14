@@ -43,8 +43,9 @@ void ComponentInvert::value_cuda(DT_ * r, const DT_ * const x, const DT_ s, cons
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_component_invert<<<grid, block>>>(r, x, s, size);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

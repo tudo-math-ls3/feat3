@@ -38,8 +38,8 @@ namespace FEAT
         cusparseDestroyMatDescr(descr);
         cusolverSpDestroy(handle);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -67,8 +67,9 @@ namespace FEAT
 
         cusparseDestroyMatDescr(descr);
         cusolverSpDestroy(handle);
-#ifdef FEAT_DEBUG_MODE
+
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

@@ -251,8 +251,8 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
   cusparseDestroyDnVec(dr);
   cudaFree(buffer);
 
-#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -290,8 +290,8 @@ void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT
 
   cusparseDestroyMatDescr(descr);
 
-#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -317,8 +317,9 @@ void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT
   }
 
   FEAT::LAFEM::Intern::cuda_apply_bcsr<DT_, IT_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -364,8 +365,9 @@ void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, c
   }
 
   FEAT::LAFEM::Intern::cuda_apply_csrsb<DT_, IT_, BlockSize_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -431,8 +433,8 @@ void Apply::dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * con
 
   FEAT::LAFEM::Intern::cublas_apply_dense(CUBLAS_OP_T, (int)rows, (int)columns, &alpha, val, x, &beta, r);
 
-#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

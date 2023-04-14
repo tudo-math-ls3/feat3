@@ -159,8 +159,9 @@ void RowNorm::csr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ *
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2_csr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -181,8 +182,9 @@ void RowNorm::csr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const IT
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_csr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -203,8 +205,9 @@ void RowNorm::csr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal, 
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_scaled_csr<<<grid, block>>>(row_norms, scal, val, col_ind, row_ptr, rows);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -225,8 +228,9 @@ void RowNorm::bcsr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ 
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2_bcsr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -247,8 +251,9 @@ void RowNorm::bcsr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const I
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_bcsr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -269,8 +274,9 @@ void RowNorm::bcsr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal,
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_scaled_bcsr<<<grid, block>>>(row_norms, scal, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
-#ifdef FEAT_DEBUG_MODE
+
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

@@ -400,7 +400,6 @@ public:
       // apply-test for alpha = 0.0
       a.apply(r, x, y, DT_(0.0));
       ref.copy(y);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
 
@@ -409,14 +408,12 @@ public:
       a.apply(ref, x);
       ref.scale(ref, DT_(-1.0));
       ref.axpy(ref, y);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
 
       // apply-test for alpha = -1.0 and &r==&y
       r.copy(y);
       a.apply(r, x, r, DT_(-1.0));
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
 
@@ -427,20 +424,17 @@ public:
       a.apply(ref, x);
       ref.scale(ref, s);
       ref.axpy(ref, y);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(5e-2));
 
       // apply-test for alpha = 4711.1 and &r==&y
       r.copy(y);
       a.apply(r, x, r, s);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(5e-2));
 
       a.apply(r, x);
       ref.copy(ax);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
 
@@ -453,7 +447,6 @@ public:
         at.apply(ref, x);
         ref.scale(ref, s);
         ref.axpy(ref, y);
-        MemoryPool::synchronize();
         for (Index i(0); i < size; ++i)
           TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(7e-2));
       }
@@ -564,7 +557,6 @@ public:
       DenseVectorBlocked<DT_, IT_, 3> r(size);
 
       a.apply(r, x);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], aref_x(i), DT_(1e-5));
@@ -573,7 +565,6 @@ public:
       }
 
       a.apply(r, x, y, DT_(-1));
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], y(i)[0] - aref_x(i), DT_(1e-4));
@@ -583,7 +574,6 @@ public:
 
       DT_ alpha(0.75);
       a.apply(r, x, y, alpha);
-      MemoryPool::synchronize();
       for (Index i(0); i < size; ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], y(i)[0] + alpha * aref_x(i), DT_(1e-5));
@@ -663,11 +653,9 @@ public:
       b.clone(a);
 
       b.scale(a, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(b, ref);
 
       a.scale(a, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(a, ref);
     }
   }
@@ -741,7 +729,6 @@ public:
         s1(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
       }
       b.scale_rows(b, s1);
-      MemoryPool::synchronize();
       for (Index row(0); row < a.rows(); ++row)
       {
         for (Index col(0); col < a.columns(); ++col)
@@ -757,7 +744,6 @@ public:
         s2(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
       }
       b.scale_cols(a, s2);
-      MemoryPool::synchronize();
       for (Index row(0); row < a.rows(); ++row)
       {
         for (Index col(0); col < a.columns(); ++col)
@@ -833,7 +819,6 @@ public:
       SparseMatrixCSR<DT_, IT_> b;
       b.transpose(a);
 
-      MemoryPool::synchronize();
       for (Index i(0); i < a.rows(); ++i)
       {
         for (Index j(0); j < a.columns(); ++j)
@@ -844,7 +829,6 @@ public:
 
       b = b.transpose();
 
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(a, b);
     }
   }
@@ -1105,32 +1089,26 @@ public:
 
       c.clone(a);
       c.axpy(c, b, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(c, ref);
 
       c.clone(b);
       c.axpy(a, c, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(c, ref);
 
       c.axpy(a, b, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(c, ref);
 
       s = DT_(0);
       ref.clone(b);
       c.axpy(a, b, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(c, ref);
 
       s = DT_(1);
       c.axpy(a, b, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(c, ref_plus);
 
       s = DT_(-1);
       c.axpy(a, b, s);
-      MemoryPool::synchronize();
       TEST_CHECK_EQUAL(c, ref_minus);
     }
   }

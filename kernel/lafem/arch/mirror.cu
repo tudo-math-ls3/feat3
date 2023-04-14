@@ -76,8 +76,8 @@ namespace FEAT
 
         FEAT::LAFEM::Intern::cuda_mirror_gather_dv<<<grid, block>>>(boff, nidx, idx, buf, vec);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -100,8 +100,8 @@ namespace FEAT
 
         FEAT::LAFEM::Intern::cuda_mirror_scatter_dv<<<grid, block>>>(boff, nidx, idx, buf, vec, alpha);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -124,8 +124,8 @@ namespace FEAT
 
         FEAT::LAFEM::Intern::cuda_mirror_gather_dvb<<<grid, block>>>(bs, boff, nidx, idx, buf, vec);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -148,8 +148,8 @@ namespace FEAT
 
         FEAT::LAFEM::Intern::cuda_mirror_scatter_dvb<<<grid, block>>>(bs, boff, nidx, idx, buf, vec, alpha);
 
-#ifdef FEAT_DEBUG_MODE
         cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

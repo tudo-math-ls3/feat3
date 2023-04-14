@@ -548,14 +548,12 @@ public:
       DenseVectorBlocked<DT_, IT_, BS_> c(size);
 
       c.component_product(a, b);
-      MemoryPool::synchronize();
       for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
 
       a.component_product(a, b);
-      MemoryPool::synchronize();
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
@@ -563,14 +561,12 @@ public:
 
       a.copy(a_tmp);
       b.component_product(a, b);
-      MemoryPool::synchronize();
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
 
       a.component_product(a, a);
-      MemoryPool::synchronize();
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
         TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
