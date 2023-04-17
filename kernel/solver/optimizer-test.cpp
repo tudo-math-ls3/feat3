@@ -414,8 +414,8 @@ nlsd_rb_q(__float128(0.55), Index(96), Index(158), "SecantLinesearch", "Hessian"
 // Running this in CUDA is really nonsensical because all operator evaluations use Tiny::Vectors which reside in
 // Mem::Main anyway, so apart from the occasional axpy nothing is done on the GPU. It should work nonetheless.
 #ifdef FEAT_HAVE_CUDA
-NLSDTest<Mem::CUDA, float, unsigned int, Analytic::Common::HimmelblauFunction>
-nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian", PreferredBackend::generic);
+NLSDTest<float, unsigned int, Analytic::Common::HimmelblauFunction>
+nlsd_hb_f_cuda(float(0.75), Index(8), Index(37), "MQCLinesearch", "Hessian", PreferredBackend::cuda);
 #endif
 
 #ifdef FEAT_HAVE_ALGLIB

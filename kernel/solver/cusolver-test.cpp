@@ -17,7 +17,7 @@ class CuSolverLUTest :
 {
 public:
   CuSolverLUTest() :
-    TestSystem::UnitTest("CuSolverQRTest", "none", "none", PreferredBackend::cuda)
+    TestSystem::UnitTest("CuSolverQRTest", "double", "unsigned int", PreferredBackend::cuda)
   {
   }
 
@@ -33,7 +33,7 @@ public:
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
     // create a pointstar factory
-    PointstarFactoryFD<double> psf(17);
+    PointstarFactoryFD<double, unsigned int> psf(17);
 
     // create a CSR matrix
     MatrixType mat_sys;
@@ -73,7 +73,7 @@ class CuSolverQRTest :
 {
 public:
   CuSolverQRTest() :
-    TestSystem::UnitTest("CuSolverLUTest", "none", "none", PreferredBackend::cuda)
+    TestSystem::UnitTest("CuSolverLUTest", "double", "unsigned int", PreferredBackend::cuda)
   {
   }
 
@@ -89,7 +89,7 @@ public:
     const double tol = Math::pow(Math::eps<double>(), 0.6);
 
     // create a pointstar factory
-    PointstarFactoryFD<double> psf(17);
+    PointstarFactoryFD<double, unsigned int> psf(17);
 
     // create a CSR matrix
     MatrixType mat_sys;
