@@ -10,6 +10,7 @@ set(benchmarks
   dot_product-bench
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
+  pcg-bench
   product_matmat-bench
   product_matcsrmat-bench
   product_matcsrmat-file-bench
