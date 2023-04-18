@@ -24,6 +24,7 @@ namespace FEAT
         r[idx] = s / x[idx];
       }
 
+#ifdef FEAT_HAVE_HALFMATH
       __global__ void cuda_component_invert(Half * r, const Half * x, const Half s, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
@@ -32,6 +33,7 @@ namespace FEAT
         ///\todo skip conversion step
         r[idx] = __half2float(s / x[idx]);
       }
+#endif
     }
   }
 }
