@@ -21,8 +21,16 @@ namespace FEAT
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
+        r[idx] = s / x[idx];
+      }
+
+      __global__ void cuda_component_invert(Half * r, const Half * x, const Half s, const Index count)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= count)
+          return;
         ///\todo skip conversion step
-        r[idx] = float(s / x[idx]);
+        r[idx] = __half2float(s / x[idx]);
       }
     }
   }
