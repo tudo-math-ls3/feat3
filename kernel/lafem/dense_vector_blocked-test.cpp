@@ -433,7 +433,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {

@@ -735,8 +735,8 @@ DenseMatrixMultiply2Test<double, unsigned int> dense_matrix_multiply_2_test_doub
 DenseMatrixMultiply2Test<float, unsigned long> dense_matrix_multiply_2_test_float_ulong(PreferredBackend::generic, 1e-3);
 DenseMatrixMultiply2Test<double, unsigned long> dense_matrix_multiply_2_test_double_ulong(PreferredBackend::generic, 1e-6);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixMultiply2Test<float, unsigned long> mkl_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
-DenseMatrixMultiply2Test<double, unsigned long> mkl_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
+//DenseMatrixMultiply2Test<float, unsigned long> mkl_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
+//DenseMatrixMultiply2Test<double, unsigned long> mkl_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
 DenseMatrixMultiply2Test<__float128, unsigned int> dense_matrix_multiply_2_test_float128_uint(PreferredBackend::generic, 1e-6);

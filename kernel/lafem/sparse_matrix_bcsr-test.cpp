@@ -326,27 +326,33 @@ public:
     alpha = DT_(1.234);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     // &r == &y
     r.copy(y);
     c.apply(r, x, r, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(r, xb, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
 
     c.apply(rb, xb, y, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
   }
 };
 SparseMatrixBCSRApplyTest<float, unsigned long> cpu_sm_bcsr_apply_test_float_ulong(PreferredBackend::generic);

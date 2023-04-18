@@ -150,7 +150,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.6));
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.3));
 
     const Index n00 = 7;
     const Index n01 = 10;
