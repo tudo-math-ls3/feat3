@@ -14,7 +14,6 @@
 
 using namespace FEAT;
 
-#ifdef FEAT_HAVE_CUSOLVER
 
 #include "cusparse_v2.h"
 
@@ -355,45 +354,3 @@ namespace FEAT
     }
   }
 }
-
-#else // FEAT_HAVE_CUSOLVER
-
-namespace FEAT
-{
-  namespace Solver
-  {
-    namespace Intern
-    {
-      void cuda_sor_init_symbolic(int m, int nnz, const double * csrVal, const int * csrRowPtr, const int * csrColInd, int & ncolors, int* & colored_row_ptr, int* & rows_per_color, int* & inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
-      }
-
-      void cuda_sor_done_symbolic(int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
-      }
-
-      int cuda_sor_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
-        //return 0;
-      }
-
-      template<int BlockSize_>
-      int cuda_sor_bcsr_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SOR not supported in cuda before version 7!\n");
-        //return 0;
-      }
-      // cuda_sor_bcsr_apply_kernel is hardcoded for BS_ == 2 && BS_ == 3
-      template int cuda_sor_bcsr_apply<2>(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-      template int cuda_sor_bcsr_apply<3>(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-    }
-  }
-}
-#endif // FEAT_HAVE_CUSOLVER
