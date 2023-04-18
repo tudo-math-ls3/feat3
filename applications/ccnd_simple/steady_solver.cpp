@@ -87,9 +87,9 @@ namespace CCNDSimple
 
     // use UMPFACK as coarse grid solver?
 #ifdef FEAT_HAVE_UMFPACK
-    umf_cgs = (domain.back_layer().comm().size() == 1) && (args.check("no-umfpack") < 0);
+    direct_coarse_solver = (domain.back_layer().comm().size() == 1) && (args.check("no-umfpack") < 0);
 #else
-    umf_cgs = false;
+    direct_coarse_solver = false;
 #endif
 
     return true;
@@ -110,7 +110,7 @@ namespace CCNDSimple
     print_pad(comm, "Min Multigrid Iterations", stringify(min_mg_iter));
     print_pad(comm, "Max Multigrid Iterations", stringify(max_mg_iter));
     print_pad(comm, "Max Nonlinear Iterations", stringify(max_nl_iter));
-    print_pad(comm, "Coarse Solver", (umf_cgs ? "UMFPACK" : "BiCGStab-AmaVanka"));
+    print_pad(comm, "Coarse Solver", (direct_coarse_solver ? "UMFPACK" : "BiCGStab-AmaVanka"));
     if(load_joined_filename.empty())
       print_pad(comm, "Load Joined Solution", "- N/A -");
     else
@@ -299,6 +299,62 @@ namespace CCNDSimple
     stokes_levels.front()->base_splitter_sys.join_write_out(vec_sol, save_joined_filename);
   }
 
+  void SteadySolver::compute_body_forces(const String& body_mesh_part, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
+  {
+    // our local body forces
+    Tiny::Vector<DataType, dim> body_forces;
+    body_forces.format();
+
+    // fetch the body mesh part
+    DomainLevel& the_domain_level = *domain.front();
+    const auto* body_part = the_domain_level.get_mesh_node()->find_mesh_part(body_mesh_part);
+    if(body_part != nullptr)
+    {
+      // assemble a unit filter on that mesh-part
+      LAFEM::UnitFilter<DataType, IndexType> filter_char;
+      Assembly::UnitFilterAssembler<MeshType> unit_asm;
+      unit_asm.add_mesh_part(*body_part);
+      unit_asm.assemble(filter_char, the_domain_level.space_velo);
+      LAFEM::SparseVector<DataType, IndexType>& vec_char = filter_char.get_filter_vector();
+
+      // clone the RHS and convert to type 0
+      GlobalStokesVector vec_def = vec_rhs.clone(LAFEM::CloneMode::Deep);
+      vec_def.from_1_to_0();
+
+      // set up Burgers assembly job for our defect vector
+      Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
+        vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
+        vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature);
+
+      // call the setup function to set the parameters
+      this->setup_defect_burgers_job(burgers_def_job);
+
+      // assemble burgers operator defect
+      the_domain_level.domain_asm.assemble(burgers_def_job);
+
+      // compute remainder of velocity defect vector by using matrix B
+      stokes_levels.front()->matrix_sys.local().block_b().apply(
+        vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -DataType(1));
+
+      // compute dot product of char vector and defect vector
+      const auto* velo_def = vec_def.local().first().elements();
+      const IndexType* idx = vec_char.indices();
+      for(Index i(0); i < vec_char.used_elements(); ++i)
+        body_forces += velo_def[idx[i]];
+    }
+
+    // synchronize body forces by summing them up
+    domain.front().layer().comm().allreduce(body_forces.v, body_forces.v, std::size_t(dim), Dist::op_sum);
+
+    // stringify our body forces
+    String out;
+    for(int i(0); i < dim; ++i)
+      out += stringify_fp_sci(body_forces[i], 16, 25);
+
+    // print body forces
+    print_pad(comm, "Body Forces on " + body_mesh_part, out);
+  }
+
   void SteadySolver::create_multigrid_solver()
   {
     // create a multigrid hierarchy
@@ -325,7 +381,7 @@ namespace CCNDSimple
         multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
       }
 #ifdef FEAT_HAVE_UMFPACK
-      else if(umf_cgs)
+      else if(direct_coarse_solver)
       {
         auto cgsolver = Solver::new_direct_stokes_solver(lvl.matrix_sys, lvl.filter_sys);
         multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
@@ -452,19 +508,19 @@ namespace CCNDSimple
         if(def_nl < nl_tol_abs)
         {
           if(plot_navier)
-            comm.print(line + "\n\nNonlinear solver converged!");
+            comm.print(line + "\n\nNonlinear solver converged!\n");
           break;
         }
         else if(nl_step >= max_nl_iter)
         {
           if(plot_navier)
-            comm.print(line + "\n\nMaximum iterations reached!");
+            comm.print(line + "\n\nMaximum iterations reached!\n");
           break;
         }
         else if((nl_step >= 3) && (nl_stag_rate*def_prev < def_nl))
         {
           if(plot_navier)
-            comm.print(line + "\n\nNonlinear solver stagnated!");
+            comm.print(line + "\n\nNonlinear solver stagnated!\n");
           break;
         }
       }
@@ -527,7 +583,7 @@ namespace CCNDSimple
     return true;
   }
 
-  void SteadySolver::assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
+  void SteadySolver::assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs, bool filter_def)
   {
     // fetch our finest levels
     DomainLevel& the_domain_level = *domain.front();
@@ -556,7 +612,8 @@ namespace CCNDSimple
 
     // sync and filter
     vec_def.sync_0();
-    the_stokes_level.filter_sys.filter_def(vec_def);
+    if(filter_def)
+      the_stokes_level.filter_sys.filter_def(vec_def);
   }
 
   void SteadySolver::setup_defect_burgers_job(Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType>& burgers_def_job)

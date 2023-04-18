@@ -17,7 +17,8 @@
 // Specifies which benchmark problem to solve; must be one of the following:
 // * "simple"     Solves a simple parabolic Poiseuille flow on a 2D/3D unit-square/-cube domain.
 // * "dricav"     Solves a lid-driven cavity problem on a 2D/3D unit-square/-cube domain.
-// * "dfg95"      Solves a DFG95 flow-around-a-cylinder problem on a flowbench_c2d/c3d domain.
+// * "bench1"     Solves a DFG95 flow-around-a-cylinder problem on a flowbench_c2d/c3d domain.
+// * "bench7"     Solves a flow-around-a-sphere-inside-a-cylinder problem on a flowbench_p3d domain.
 // * "taygre"     Solves a 2D Taylor-Green vortex problem on a unit-square domain.
 //                This is the only benchmark which also computes H^k velocity and pressure errors
 //                against an analytic reference solution, which can be used to verify the correct
@@ -58,7 +59,7 @@ namespace CCNDSimple
     Dist::Comm comm(Dist::Comm::world());
 
     // print number of processes
-    comm.print("Number of Processes: " + stringify(comm.size()));
+    print_pad(comm, "Number of MPI Processes", stringify(comm.size()));
 
     // create argument parser
     SimpleArgParser args(argc, argv);
@@ -72,8 +73,9 @@ namespace CCNDSimple
       "<type>\nSpecifies the problem to solve; valid options are:\n"
       "simple   Simulate a simple Poiseuille flow.\n"
       "dricav   Simulate a Driven Cavity flow.\n"
-      "dfg95    Simulate a Flow Around A Cylinder.\n"
-      "taygre   Simulate a 2D Taylor-Green vortex."
+      "bench1   Simulate a Flow Around A Cylinder.\n"
+      "bench7   Simulate a Flow Inside A Cylinder (3D only).\n"
+      "taygre   Simulate a Taylor-Green vortex (2D only)."
     );
 
     // no arguments given?
@@ -98,12 +100,18 @@ namespace CCNDSimple
       }
     }
 
+
     // query and verify our problem type
     String problem("simple");
     args.parse("problem", problem);
-    if((problem != "simple") && (problem != "dricav") && (problem != "dfg95") && (problem != "taygre"))
+    if(!problem.is_one_of("simple dricav bench1 bench7 taygre"))
     {
       comm.print("ERROR: invalid problem type: '" + problem + "'");
+      return 1;
+    }
+    if((problem == "bench7") && (dim != 3))
+    {
+      comm.print("ERROR: bench7 simulation is only available in 3D");
       return 1;
     }
     if((problem == "taygre") && (dim != 2))
@@ -152,13 +160,18 @@ namespace CCNDSimple
       else
         solver.assemble_boundary_conditions("bnd:t bnd:b", "", "bnd:l", "4*y*(1-y) ' 0", false);
     }
-    else if(problem == "dfg95")
+    else if(problem == "bench1")
     {
       // Flow Around A Cylinder: inflow, no-flow and outflow
       if(dim == 3)
         solver.assemble_boundary_conditions("bnd:t bnd:b bnd:n bnd:f bnd:c", "", "bnd:l", "72/0.2825761*y*(0.41-y)*z*(0.41-z) ' 0 ' 0", false);
       else
         solver.assemble_boundary_conditions("bnd:t bnd:b bnd:c", "", "bnd:l", "12/1.681*y*(0.41-y) ' 0", false);
+    }
+    else if(problem == "bench7")
+    {
+      // Flow Inside A Cylinder: inflow, no-flow and outflow
+      solver.assemble_boundary_conditions("bnd:pipe bnd:sphere", "", "bnd:in", "40000/1681*(0.205^2-(y-0.2)^2-(z-0.205)^2) ' 0 ' 0", false);
     }
     else if(problem == "dricav")
     {
@@ -223,6 +236,16 @@ namespace CCNDSimple
       // compute errors against reference solution
       solver.compute_errors(vec_sol, taylor_green_velo, taylor_green_pres);
 #endif
+    }
+    if(problem == "bench1")
+    {
+      // compute body forces on circle/cylinder
+      solver.compute_body_forces("bnd:c", vec_sol, vec_rhs);
+    }
+    if(problem == "bench7")
+    {
+      // compute body forces on sphere
+      solver.compute_body_forces("bnd:sphere", vec_sol, vec_rhs);
     }
 
     // write joined solution vector if desired

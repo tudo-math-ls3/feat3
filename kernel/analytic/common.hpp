@@ -2031,7 +2031,7 @@ namespace FEAT
        * by the coordinates (x_0, y_0) and (x_1, y_1).
        *
        * More precisely: For a given point (x,y) let \f$ t\in(0,1) \f$ denote the interpolation
-       * parameter of the orthonal projection of (x,y) onto the line segment, then the
+       * parameter of the orthogonal projection of (x,y) onto the line segment, then the
        * parabolic profile function value is given by \f$4 v_{max} t (t-1)\f$.
        *
        * \author Peter Zajac
@@ -3663,6 +3663,139 @@ namespace FEAT
           }
         }; // class TaylorGreenVortexPres::Evaluator<...>
       }; // class TaylorGreenVortexPres<...>
+
+      /**
+       * \brief Parabolic Poiseuille Pipe-Flow velocity field
+       *
+       * This function is effectively a 3D equivalent of the ParProfileVector function, which represents a
+       * parabolic flow inside a 3D cylinder. This function is an analytic steady state solution to the
+       * 3D incompressible Navier-Stokes equations in a cylinder domain (with constant radius) and thus
+       * represent a Poiseuille flow in this domain.
+       *
+       * This function is parameterized in the rotational axis and the radius of the cylinder domain as
+       * well as the maximum flow velocity in the center of the cylinder.
+       *
+       * \author Peter Zajac
+       */
+      template<typename DataType_, int dim_>
+      class PoiseuillePipeFlow :
+        public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DataType_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = dim_;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can't compute the Hessian
+        static constexpr bool can_hess = true;
+        /// Type to map from
+        typedef Tiny::Vector<DataType, domain_dim> PointType;
+
+        /// The flow origin
+        PointType origin;
+        /// The flow axis
+        PointType axis;
+        /// The pipe radius
+        DataType radius;
+        /// the maximum flow velocity
+        DataType v_max;
+
+        /**
+         * \brief Creates this function
+         *
+         * \param[in] origin_
+         * Specifies the origin of the cylinder domain, i.e. some arbitrary point along the rotational axis
+         *
+         * \param[in] axis_
+         * Specifies the rotational axis of the cylinder domain. Must not be the null vector.
+         *
+         * param[in] radius_
+         * Specifies the radius of the cylinder domain. Must be > 0.
+         *
+         * \param[in] v_max_
+         * Specifies the maximum flow velocity in the center of the cylinder. Should be > 0.
+         */
+        explicit PoiseuillePipeFlow(PointType origin_, PointType axis_, DataType radius_ = DataType(1), DataType v_max_ = DataType(1)) :
+          origin(origin_),
+          axis(axis_),
+          radius(radius_),
+          v_max(v_max_)
+        {
+        }
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const PointType _origin;
+          const PointType _axis;
+          const DataType _v_max;
+          const DataType _radius_s;
+
+        public:
+          explicit Evaluator(const PoiseuillePipeFlow& function) :
+            _origin(function.origin),
+            _axis(PointType(function.axis).normalize()),
+            _v_max(function.v_max),
+            _radius_s(DataType(1) / Math::sqr(function.radius))
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            // compute ray to project point onto axis
+            const PointType q = _origin + Tiny::dot(point - _origin, _axis) * _axis - point;
+            // compute velocity based on distance to axis and in direction of axis
+            return _v_max * (DataType(1) - q.norm_euclid_sqr()*_radius_s) * _axis;
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            // compute ray to project point onto axis
+            const PointType q = _origin + Tiny::dot(point - _origin, _axis) * _axis - point;
+            // compute gradient
+            GradientType grad = GradientType::null();
+            //grad.add_outer_product(_axis, Tiny::dot(_axis, q)*_axis - q, -DataType(2) * _radius_s * _v_max);
+            grad.set_outer_product(_axis, q);
+            grad.add_outer_product(_axis, _axis, -Tiny::dot(_axis, q));
+            return DataType(2) * _radius_s * _v_max * grad;
+          }
+
+          HessianType hessian(const PointType&) const
+          {
+            // seriously, getting this mumbo jumbo below right was mostly a lucky guess...
+            GradientType grad_q = GradientType::null();
+            grad_q.set_outer_product(_axis, _axis);
+            grad_q.add_scalar_main_diag(-DataType(1));
+            GradientType at_x_a;
+            at_x_a.set_outer_product(_axis, _axis);
+            HessianType hess = HessianType::null();
+            hess.add_vec_mat_outer_product(_axis, grad_q);
+            hess.add_vec_mat_outer_product(_axis * grad_q, at_x_a, -DataType(1));
+            return DataType(2) * _radius_s * _v_max * hess;
+          }
+        }; // class PoiseuillePipeFlow::Evaluator<...>
+      }; // class PoiseuillePipeFlow
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

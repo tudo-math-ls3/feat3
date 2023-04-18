@@ -1690,6 +1690,68 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.91175590476836093505), tol);
   }
 
+  void test_poiseuille_pipe_flow_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol2 = Math::pow(Math::eps<DT_>(), DT_(0.6));
+
+    Tiny::Vector<DT_, 3> ori{DT_(0.1), DT_(0.2), DT_(0.3)};
+    Tiny::Vector<DT_, 3> axis{DT_(2),DT_(3),DT_(4)};
+    axis.normalize();
+
+    Analytic::Common::PoiseuillePipeFlow<DT_, 3> func(ori, axis, DT_(2.3), DT_(1.7));
+
+    // evaluate function
+    Tiny::Vector<DT_, 3> val_1 = Analytic::eval_value_x(func, DT_(0.7), DT_(1.7), DT_(2.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_(0.59580593160049614744), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(0.89370889740074422114), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[2], DT_(1.1916118632009922948), tol);
+
+    // evaluate gradient
+    Tiny::Matrix<DT_, 3, 3> grad_1 = Analytic::eval_gradient_x(func, DT_(0.7), DT_(1.7), DT_(2.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_(0.10865011117118946116), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], DT_(0.019754565667488992928), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][2], DT_(-0.069140979836211475279), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_(0.16297516675678419174), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(0.029631848501233489392), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][2], DT_(-0.10371146975431721292), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2][0], DT_(0.21730022234237892233), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2][1], DT_(0.039509131334977985857), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2][2], DT_(-0.13828195967242295055), tol);
+
+    // evaluate hessian
+    Tiny::Tensor3<DT_, 3, 3, 3> hess_1 = Analytic::eval_hessian_x(func, DT_(0.7), DT_(1.7), DT_(2.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][0], DT_(-0.20577672567667092222), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][1], DT_(0.049386414162401021332), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][2], DT_(0.065848552216534695113), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][0], DT_(0.049386414162401021332), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][1], DT_(-0.16462138054133673778), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][2], DT_(0.098772828324802042661), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][2][0], DT_(0.065848552216534695113), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][2][1], DT_(0.098772828324802042661), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][2][2], DT_(-0.10700389735186887955), tol2);
+
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][0], DT_(-0.30866508851500638331), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][1], DT_(0.074079621243601531993), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][2], DT_(0.098772828324802042661), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][0], DT_(0.074079621243601531993), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][1], DT_(-0.24693207081200510665), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][2], DT_(0.14815924248720306399), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][2][0], DT_(0.098772828324802042661), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][2][1], DT_(0.14815924248720306399), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][2][2], DT_(-0.16050584602780331932), tol2);
+
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][0][0], DT_(-0.41155345135334184442), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][0][1], DT_(0.098772828324802042661), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][0][2], DT_(0.13169710443306939021), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][1][0], DT_(0.098772828324802042661), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][1][1], DT_(-0.32924276108267347554), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][1][2], DT_(0.19754565664960408532), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][2][0], DT_(0.13169710443306939021), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][2][1], DT_(0.19754565664960408532), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][2][2], DT_(-0.21400779470373775910), tol2);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1742,6 +1804,7 @@ public:
     test_standing_vortex_function_2d();
     test_taylor_green_vortex_velo_2d();
     test_taylor_green_vortex_pres_2d();
+    test_poiseuille_pipe_flow_3d();
   }
 };
 

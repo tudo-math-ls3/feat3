@@ -67,7 +67,7 @@ if (FEAT_HAVE_MPI)
     --build-target dfg95-ccnd-steady
     --build-nocmake
     --build-noclean
-    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-steady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0:1 0 --test-mode ${MPIEXEC_POSTFLAGS})
+    --test-command ${MPIEXEC} --map-by node ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-steady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0:1 0 --bench 1 --test-mode ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST dfg95-ccnd-steady-test-mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST dfg95-ccnd-steady-test-mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAT_HAVE_MPI)
@@ -78,7 +78,7 @@ else (FEAT_HAVE_MPI)
     --build-target dfg95-ccnd-steady
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-steady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0 --test-mode)
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-steady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0 --bench 1 --test-mode)
   SET_PROPERTY(TEST dfg95-ccnd-steady-test-serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST dfg95-ccnd-steady-test-serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

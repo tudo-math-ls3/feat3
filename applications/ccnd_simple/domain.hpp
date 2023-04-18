@@ -60,6 +60,10 @@ namespace CCNDSimple
 
     /// destructor
     virtual ~DomainLevel();
+
+    virtual bool add_isoparam_part(const String& part_name);
+
+    virtual std::deque<String> add_all_isoparam_parts();
   }; // class DomainLevel<...>
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +86,12 @@ namespace CCNDSimple
     /// our base class
     typedef Control::Domain::PartiDomainControl<DomainLevel> BaseClass;
 
+    /// the names of the mesh files
+    std::deque<String> mesh_file_names;
+
+    /// the iso-parametric parts to be added
+    std::deque<String> isoparam_part_names;
+
   public:
     /**
      * \brief Constructor
@@ -95,7 +105,10 @@ namespace CCNDSimple
     virtual ~DomainControl();
 
     /// adds all supported arguments to the argument parser
-    static void add_supported_args(SimpleArgParser& args_);
+    static void add_supported_args(SimpleArgParser& args);
+
+    /// parses the arguments
+    virtual bool parse_args(SimpleArgParser& args);
 
     /// creates the domain controller based on the arguments
     virtual void create(SimpleArgParser& args);

@@ -795,6 +795,37 @@ namespace FEAT
     }
 
     /**
+     * \brief Checks whether this string is equal to one in a set of strings
+     *
+     * \param[in] set
+     * The set of strings that this string is to be checked against, separated by \p sep.
+     *
+     * \param[in] sep
+     * The separator string.
+     *
+     * \param[in] case_insensitive
+     * Specifies whether to perform a case sensitive or case insensitive comparison.
+     *
+     * \returns
+     * \c true, if \c this is equal to at least one of the substrings in \p set, otherwise \c false.
+     */
+    bool is_one_of(const String& set, const String& sep = " ", bool case_insensitive = false) const
+    {
+      std::deque<String> sset = set.split_by_string(sep);
+      for(const auto& s : sset)
+      {
+        if(case_insensitive)
+        {
+          if(this->compare_no_case(s) == 0)
+            return true;
+        }
+        else if(this->compare(s) == 0)
+          return true;
+      }
+      return false;
+    }
+
+    /**
      * \brief Parses the string and stores its value in the provided variable.
      *
      * \param[out] t

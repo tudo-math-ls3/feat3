@@ -351,7 +351,7 @@ namespace DFG95
     DT_ drag_coeff_line, lift_coeff_line, drag_err_line, lift_err_line;
 
     // drag/lift forces by volume integration
-    DT_ drag_coeff_vol, lift_coeff_vol, drag_err_vol, lift_err_vol;
+    DT_ drag_coeff_vol, lift_coeff_vol, side_coeff_vol, drag_err_vol, lift_err_vol, side_err_vol;
 
     // pressure values
     DT_ pres_diff, pres_err;
@@ -366,7 +366,7 @@ namespace DFG95
 
     BenchmarkSummary() :
       drag_coeff_line(0.0), lift_coeff_line(0.0), drag_err_line(0.0), lift_err_line(0.0),
-      drag_coeff_vol(0.0), lift_coeff_vol(0.0), drag_err_vol(0.0), lift_err_vol(0.0),
+      drag_coeff_vol(0.0), lift_coeff_vol(0.0), side_coeff_vol(0.0), drag_err_vol(0.0), lift_err_vol(0.0), side_err_vol(0.0),
       pres_diff(0.0), pres_err(0.0),
       flux_upper(0.0), flux_lower(0.0)
     {
@@ -380,12 +380,14 @@ namespace DFG95
       s += "Solution Analysis:\n";
       s += String("Drag Coefficient (Line)").pad_back(padlen, pc) + ": " + stringify_fp_fix(drag_coeff_line, prec)
         + "   [ Error: " + stringify_fp_sci(drag_err_line, prec) + " ]\n";
-      s += String("Drag Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(drag_coeff_vol, prec)
-        + "   [ Error: " + stringify_fp_sci(drag_err_vol, prec) + " ]\n";
       s += String("Lift Coefficient (Line)").pad_back(padlen, pc) + ": " + stringify_fp_fix(lift_coeff_line, prec)
         + "   [ Error: " + stringify_fp_sci(lift_err_line, prec) + " ]\n";
+      s += String("Drag Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(drag_coeff_vol, prec)
+        + "   [ Error: " + stringify_fp_sci(drag_err_vol, prec) + " ]\n";
       s += String("Lift Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(lift_coeff_vol, prec)
         + "   [ Error: " + stringify_fp_sci(lift_err_vol, prec) + " ]\n";
+      s += String("Side Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(side_coeff_vol, prec)
+        + "   [ Error: " + stringify_fp_sci(side_err_vol, prec) + " ]\n";
       s += String("Pressure Difference").pad_back(padlen, pc) + ": " + stringify_fp_fix(pres_diff, prec)
         + "   [ Error: " + stringify_fp_sci(pres_err, prec) + " ]\n";
       s += String("Upper Flux").pad_back(padlen, pc) + ": " + stringify_fp_fix(flux_upper, prec) + "\n";
@@ -398,9 +400,9 @@ namespace DFG95
     String format_compact(String prefix, int prec = fp_num_digs) const
     {
       String s;
-      s += prefix + "DC/LC/PD: ";
-      s += stringify_fp_fix(drag_coeff_line, prec) + " " + stringify_fp_fix(drag_coeff_vol, prec) + " ";
-      s += stringify_fp_fix(lift_coeff_line, prec) + " " + stringify_fp_fix(lift_coeff_vol, prec) + " ";
+      s += prefix + "DCL/LCL/DC/LC/SC/PD: ";
+      s += stringify_fp_fix(drag_coeff_line, prec) + " " + stringify_fp_fix(lift_coeff_line, prec) + " ";
+      s += stringify_fp_fix(drag_coeff_vol, prec) + " " + stringify_fp_fix(lift_coeff_vol, prec) + " " + stringify_fp_fix(side_coeff_vol, prec) + " ";
       s += stringify_fp_fix(pres_diff, prec) + "\n";
       s += prefix + "FX/H0/H1: ";
       s += stringify_fp_fix(flux_upper, prec) + " " + stringify_fp_fix(flux_lower, prec) + " ";
@@ -695,17 +697,16 @@ namespace DFG95
   }; // class XFluxAccumulator
 
   // computes the body forces by the volumetric 'defect vector' approach
-  template<
-    typename DataType_,
-    int dim_,
-    typename VectorTypeV_,
-    typename VectorTypeC_>
-    void assemble_bdforces_vol(
-      Tiny::Vector<DataType_, dim_>& forces,
-      const VectorTypeV_& vec_def_v, // unsync'ed and unfiltered !!
-      const VectorTypeC_& vec_char)
+  template<typename DT_, typename IT_, int dim_>
+  void assemble_bdforces_vol(
+    Tiny::Vector<DT_, 3>& forces,
+    const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vec_def_v,
+    const LAFEM::DenseVector<DT_, IT_>& vec_char)
   {
+    static_assert(dim_ <= 3, "invalid forces size");
+
     forces.format();
+    Tiny::Vector<DT_, dim_, 3>& frc = forces.template size_cast<dim_>();
 
     XASSERT(vec_def_v.size() == vec_char.size());
 
@@ -715,7 +716,7 @@ namespace DFG95
     const auto* vchr = vec_char.elements();
     for(Index i(0); i < n; ++i)
     {
-      forces.axpy(vchr[i], vdef[i]);
+      frc.axpy(vchr[i], vdef[i]);
     }
   }
 

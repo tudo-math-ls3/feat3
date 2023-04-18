@@ -77,9 +77,9 @@ namespace CCNDSimple
     /// max. multigrid iterations
     Index max_mg_iter = Index(25);
     /// number of smoothing steps
-    Index smooth_steps = Index(8);
+    Index smooth_steps = Index(16);
     /// damping parameter for smoother
-    DataType smooth_damp = DataType(0.5);
+    DataType smooth_damp = DataType(0.3);
     /// relative tolerance for linear solver
     DataType mg_tol_rel = DataType(1E-3);
     /// absolute tolerance for nonlinear solver
@@ -87,7 +87,7 @@ namespace CCNDSimple
     /// non-linear stagnation rate
     DataType nl_stag_rate = DataType(0.95);
     /// use UMPFACK as coarse grid solver?
-    bool umf_cgs = true;
+    bool direct_coarse_solver = true;
 
     /// the cubature rule used for assembly
     String cubature = "gauss-legendre:3";
@@ -298,11 +298,35 @@ namespace CCNDSimple
       ret[3] = Math::sqrt(err_p.norm_h0_sqr);
       ret[4] = Math::sqrt(err_p.norm_h1_sqr);
 
-      String line = "\nVelocity [H0/H1,H2] / Pressure Errors [H0/H1]:";
+      String line = "Velocity [H0/H1,H2] / Pressure Errors [H0/H1]:";
       for(int i(0); i < 5; ++i)
         line += stringify_fp_sci(ret[i], 7, 15);
       comm.print(line);
     }
+
+    /**
+     * \brief Computes and prints the body forces of the final solution on a mesh part
+     *
+     * \note This function prints out the \em raw body forces and not the drag/lift \em coefficients, which are
+     * typically used in the DFG95 benchmarks. To obtain these DFG95 drag/lift coefficients,one has to multiply
+     * the raw body forces by 2/(rho*U^2*D) in 2D and by 2/(rho*U^2*D*H) in 3D; the factors for the standard benchmarks
+     * are given here:
+     * - 2D bench1 (steady): 500
+     * - 3D bench1 (steady): 50000 / 41
+     * - 3D bench7 (steady): 800
+     * - 2D bench2 (unsteady): 20
+     * - 3D bench2 (unsteady): 2000 / 41
+     *
+     * \param[in] body_mesh_part
+     * The name of the mesh part that represents the body on which the forces are to be computed
+     *
+     * \param[in] vec_sol
+     * A \transient reference to the solution vector whose error is to be computed.
+     *
+     * \param[in] vec_rhs
+     * A \transient reference to the right-hand-side vector.
+     */
+    void compute_body_forces(const String& body_mesh_part, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
 
     /// creates the linear multigrid-Vanka solver
     virtual void create_multigrid_solver();
@@ -346,8 +370,11 @@ namespace CCNDSimple
      *
      * \param[in] vec_rhs
      * The right-hand-side vector to compute the defect from.
+     *
+     * \param[in] filter_def
+     * Specifies whether the defect vector is to be filtered or not.
      */
-    virtual void assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
+    virtual void assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs, bool filter_def = true);
 
     /**
      * \brief Sets up the Burgers assembly job for the nonlinear defect assembly.

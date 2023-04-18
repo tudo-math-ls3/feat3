@@ -70,7 +70,6 @@ namespace CCNDSimple
   typedef Space::Lagrange2::Element<TrafoType> SpaceTypeQ2;
 
 
-
   /// local scalar vector type
   typedef LAFEM::DenseVector<DataType, IndexType> LocalScalarVectorType;
 

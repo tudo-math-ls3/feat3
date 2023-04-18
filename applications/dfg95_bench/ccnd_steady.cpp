@@ -23,6 +23,12 @@
 // This application defines default values for most of its parameters, however, three parameters
 // are mandatory and always have to be specified explicitly:
 //
+// --bench <1|7>
+// Specifies which of the 2 steady benchmarks is to be solved:
+//   --bench 1 corresponds to the test cases 2D-1 and 3D-1Z of flow-around-a-cylinder
+//   --bench 7 corresponds to the 3D flow-around-a-sphere-inside-cylinder benchmark that is
+//             analogous to the bench 1 simulation
+//
 // --mesh <meshfiles...>
 // Specifies the input mesh file(s).
 //
@@ -143,11 +149,12 @@
 // from a single binary output file, which was written by a --save-sol from a previous run.
 // If specified, the solving of the Stokes system to obtain an initial guess is skipped.
 //
-// --load-joined-sol <filename>
+// --load-joined-sol <filename> [<scale>]
 // Specifies that the application should read in the initial joined solution guess from a
 // single binary output file, which was written by a --save-joined-sol from a previous run.
+// The second option argument <scale> is given, then the loaded solution is scaled by that factor,
+// which can be used if the loaded solution was computed with a different inflow velocity.
 // If specified, the solving of the Stokes system to obtain an initial guess is skipped.
-//
 //
 // ------------------------
 // Miscellaneous Parameters
@@ -214,10 +221,18 @@ namespace DFG95
     const bool ext_stats = (args.check("ext-stats") >= 0);
     const bool plot_mg_iter = (args.check("plot-mg-iter") >= 0);
 
+    // which benchmark?
+    const int bench = parse(args, "bench", 0);
+    if((bench != 1) && (bench != 7))
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--bench <1|7>' is missing!");
+      FEAT::Runtime::abort();
+    }
+
     // viscosity parameter
     const DataType nu = parse(args, "nu", DataType(1e-3));
-    // maximum velocity, default: 2D: 0.3, 3D: 0.45
-    const DataType v_max = parse(args, "v-max", DataType(dim) * DataType(0.15));
+    // maximum velocity, default: 2D: 0.3, 3D: 0.45; for bench7: 1.0
+    const DataType v_max = parse(args, "v-max", (bench == 7 ? DataType(1) : DataType(dim) * DataType(0.15)));
     // streamline diffusion parameter
     const DataType upsam = parse(args, "upsam", DataType(0));
     // max. nonlinear solver iterations
@@ -355,6 +370,12 @@ namespace DFG95
     // our inflow BC function
     SteadyInflowFunction<dim> inflow_func(v_max);
 
+    Tiny::Vector<DataType, dim> pipe_origin, pipe_axis;
+    pipe_origin = DataType(0.205);
+    pipe_axis = DataType(0);
+    pipe_axis[0] = DataType(1);
+    Analytic::Common::PoiseuillePipeFlow<DataType, dim> pipe_inflow_func(pipe_origin, pipe_axis, DataType(0.205), v_max);
+
     // the names of the mesh parts on which to assemble
     std::deque<String> part_names = domain.front()->get_mesh_node()->get_mesh_part_names(true);
 
@@ -364,7 +385,7 @@ namespace DFG95
       auto& fil_loc_v = system_levels.at(i)->filter_velo.local();
 
       // create unit-filter assembler
-      Assembly::UnitFilterAssembler<MeshType> unit_asm_inflow, unit_asm_noflow;
+      Assembly::UnitFilterAssembler<MeshType> unit_asm_inflow_1, unit_asm_inflow_2, unit_asm_noflow;
 
       // loop over all boundary parts except for the right one, which is outflow
       for(const auto& name : part_names)
@@ -383,9 +404,14 @@ namespace DFG95
           if(name == "bnd:l")
           {
             // inflow
-            unit_asm_inflow.add_mesh_part(*mesh_part);
+            unit_asm_inflow_1.add_mesh_part(*mesh_part);
           }
-          else if(name != "bnd:r")
+          else if(name == "bnd:in")
+          {
+            // inflow
+            unit_asm_inflow_2.add_mesh_part(*mesh_part);
+          }
+          else if((name != "bnd:r") && (name != "bnd:out"))
           {
             // outflow
             unit_asm_noflow.add_mesh_part(*mesh_part);
@@ -394,7 +420,8 @@ namespace DFG95
       }
 
       // assemble the filters
-      unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow_func);
+      unit_asm_inflow_1.assemble(fil_loc_v, domain.at(i)->space_velo, inflow_func);
+      unit_asm_inflow_2.assemble(fil_loc_v, domain.at(i)->space_velo, pipe_inflow_func);
       unit_asm_noflow.assemble(fil_loc_v, domain.at(i)->space_velo);
 
       // finally, compile the system filter
@@ -473,9 +500,10 @@ namespace DFG95
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
-    auto* mesh_part_bnd_c = the_domain_level.get_mesh_node()->find_mesh_part("bnd:c");
-    auto* mesh_part_inner_u = the_domain_level.get_mesh_node()->find_mesh_part("inner:u");
-    auto* mesh_part_inner_l = the_domain_level.get_mesh_node()->find_mesh_part("inner:l");
+    const auto* mesh_part_bnd_c = the_domain_level.get_mesh_node()->find_mesh_part("bnd:c");
+    const auto* mesh_part_bnd_s = the_domain_level.get_mesh_node()->find_mesh_part("bnd:sphere");
+    const auto* mesh_part_inner_u = the_domain_level.get_mesh_node()->find_mesh_part("inner:u");
+    const auto* mesh_part_inner_l = the_domain_level.get_mesh_node()->find_mesh_part("inner:l");
 
     // reference values for benchmark values
     const DataType ref_drag = DataType(dim == 2 ? 5.57953523384 : 6.18533);
@@ -486,6 +514,8 @@ namespace DFG95
     Assembly::TraceAssembler<typename SpaceVeloType::TrafoType> body_force_asm(the_domain_level.trafo);
     if(mesh_part_bnd_c != nullptr)
       body_force_asm.add_mesh_part(*mesh_part_bnd_c);
+    if(mesh_part_bnd_s != nullptr)
+      body_force_asm.add_mesh_part(*mesh_part_bnd_s);
     body_force_asm.compile();
 
     // create trace assembler for upper flux
@@ -536,6 +566,15 @@ namespace DFG95
       LAFEM::UnitFilter<DataType, IndexType> filter_char;
       Assembly::UnitFilterAssembler<MeshType> unit_asm;
       unit_asm.add_mesh_part(*mesh_part_bnd_c);
+      unit_asm.assemble(filter_char, the_domain_level.space_velo);
+      filter_char.get_filter_vector().format(DataType(1));
+      filter_char.filter_sol(vec_char);
+    }
+    if(mesh_part_bnd_s != nullptr)
+    {
+      LAFEM::UnitFilter<DataType, IndexType> filter_char;
+      Assembly::UnitFilterAssembler<MeshType> unit_asm;
+      unit_asm.add_mesh_part(*mesh_part_bnd_s);
       unit_asm.assemble(filter_char, the_domain_level.space_velo);
       filter_char.get_filter_vector().format(DataType(1));
       filter_char.filter_sol(vec_char);
@@ -663,11 +702,19 @@ namespace DFG95
       watch_checkpoint.start();
 
       String save_name;
-      args.parse("load-joined-sol", save_name);
+      DataType load_scale = DataType(1);
+      args.parse("load-joined-sol", save_name, load_scale);
       comm.print("\nReading joined initial solution from '" + save_name + "'...");
 
       // parse vector from file
       the_system_level.base_splitter_sys.split_read_from(vec_sol, save_name);
+
+      // scale vector if desired
+      if(Math::abs(load_scale - DataType(1)) > DataType(1E-8))
+      {
+        comm.print("\nScaling joined initial solution by " + stringify(load_scale));
+        vec_sol.scale(vec_sol, load_scale);
+      }
 
       // apply our solution filter in case the BCs have changed
       the_system_level.filter_sys.filter_sol(vec_sol);
@@ -990,6 +1037,7 @@ namespace DFG95
     watch_sol_analysis.start();
 
     // compute drag & lift coefficients by line integration using the trace assembler
+    if(bench == 1)
     {
       BenchBodyForceAccumulator<DataType> body_force_accum(defo, nu, v_max);
       body_force_asm.assemble_flow_accum(
@@ -1009,18 +1057,32 @@ namespace DFG95
 
     // compute drag & lift coefficients via volume integration from unsynchronized final defect
     {
-      Tiny::Vector<DataType, dim> bdf;
-      assemble_bdforces_vol<DataType, dim>(bdf, vec_def_unsynced.local().first(), vec_char);
+      Tiny::Vector<DataType, 3> bdf;
+      assemble_bdforces_vol(bdf, vec_def_unsynced.local().first(), vec_char);
 
-      const DataType dpf2 = DataType(2) / (dim == 2 ?
-        DataType(0.100)*Math::sqr(v_max*(DataType(2)/DataType(3))) : // = 2 / (rho * U^2 * D)
-        DataType(0.041)*Math::sqr(v_max*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
+      if(bench == 7)
+      {
+        const DataType dpf2 = DataType(2) / (DataType(0.01)*Math::sqr(v_max*(DataType(0.5)))); // = 2 / (rho * U^2 * D^2)
 
-      summary.drag_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[0]);
-      summary.lift_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[1]);
+        summary.drag_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[0]);
+        summary.lift_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[1]);
+        summary.side_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[2]);
 
-      summary.drag_err_vol = Math::abs((summary.drag_coeff_vol - ref_drag) / ref_drag);
-      summary.lift_err_vol = Math::abs((summary.lift_coeff_vol - ref_lift) / ref_lift);
+        summary.drag_err_vol = Math::abs((summary.drag_coeff_vol - ref_drag) / ref_drag);
+        summary.lift_err_vol = Math::abs((summary.lift_coeff_vol - ref_lift) / ref_lift);
+      }
+      else
+      {
+        const DataType dpf2 = DataType(2) / (dim == 2 ?
+          DataType(0.100)*Math::sqr(v_max*(DataType(2)/DataType(3))) : // = 2 / (rho * U^2 * D)
+          DataType(0.041)*Math::sqr(v_max*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
+
+        summary.drag_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[0]);
+        summary.lift_coeff_vol = the_system_level.gate_sys.sum(dpf2 * bdf[1]);
+
+        summary.drag_err_vol = Math::abs((summary.drag_coeff_vol - ref_drag) / ref_drag);
+        summary.lift_err_vol = Math::abs((summary.lift_coeff_vol - ref_lift) / ref_lift);
+      }
     }
 
     // compute pressure difference
@@ -1042,6 +1104,7 @@ namespace DFG95
     }
 
     // compute flow through upper region
+    if(bench == 1)
     {
       XFluxAccumulator<DataType> flux_accum_u;
       flux_asm_u.assemble_flow_accum(
@@ -1057,6 +1120,7 @@ namespace DFG95
     }
 
     // compute flow through lower region
+    if(bench == 1)
     {
       XFluxAccumulator<DataType> flux_accum_l;
       flux_asm_l.assemble_flow_accum(
@@ -1095,7 +1159,7 @@ namespace DFG95
       String save_name;
       if(args.parse("save-sol", save_name) < 1)
       {
-        save_name = String("dfg95-cc") + stringify(dim) + "d-bench1";
+        save_name = String("dfg95-cc") + stringify(dim) + "d-bench" + stringify(bench);
         save_name += "-lvl" + stringify(the_domain_level.get_level_index());
         save_name += "-n" + stringify(comm.size()) + ".sol";
       }
@@ -1128,7 +1192,7 @@ namespace DFG95
       String save_name;
       if(args.parse("save-joined-sol", save_name) < 1)
       {
-        save_name = String("dfg95-cc") + stringify(dim) + "d-bench1";
+        save_name = String("dfg95-cc") + stringify(dim) + "d-bench" + stringify(bench);
         save_name += "-joined-lvl" + stringify(the_domain_level.get_level_index()) + ".bin";
         // don't include number of processes, because its invariant
       }
@@ -1156,7 +1220,7 @@ namespace DFG95
       int npars = args.parse("vtk", vtk_name, vtk_name2);
       if(npars < 1)
       {
-        vtk_name = String("dfg95-cc") + stringify(dim) + "d-bench1";
+        vtk_name = String("dfg95-cc") + stringify(dim) + "d-bench" + stringify(bench);
         vtk_name += "-lvl" + stringify(the_domain_level.get_level_index());
         vtk_name += "-n" + stringify(comm.size());
       }
@@ -1256,7 +1320,7 @@ namespace DFG95
       comm.print("\nTest-Mode: PASSED");
   }
 
-  /*template<int dim_>
+  template<int dim_>
   void run_dim(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
   {
     // define our mesh type
@@ -1275,6 +1339,11 @@ namespace DFG95
 
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
+
+    // if we want to write/read a joined solution, we also need to tell the domain control to keep the base levels
+    if((args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0))
+    domain.keep_base_levels();
+
     domain.create(mesh_reader);
 
     // print partitioning info
@@ -1290,7 +1359,7 @@ namespace DFG95
 
     // print elapsed runtime
     comm.print("Run-Time: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
-  }*/
+  }
 
   template<int dim_>
   void run_dim_iso(SimpleArgParser& args, Dist::Comm& comm, Geometry::MeshFileReader& mesh_reader)
@@ -1327,15 +1396,23 @@ namespace DFG95
     comm.print("Transformation: Isoparametric:2");
 
     // get circle chart
-    auto chart = domain.get_atlas().find_mesh_chart("circle");
+    auto chart_c = domain.get_atlas().find_mesh_chart("circle");
+    auto chart_s = domain.get_atlas().find_mesh_chart("sphere");
+    auto chart_p = domain.get_atlas().find_mesh_chart("pipe");   // bench7 only
 
     // loop over all physical levels and add meshpart charts
     for(Index ilvl(0); ilvl < domain.size_physical(); ++ilvl)
     {
       auto mesh_node = domain.at(ilvl)->get_mesh_node();
-      const auto mpart = mesh_node->find_mesh_part("bnd:c");
-      if((chart != nullptr) && (mpart != nullptr))
-        domain.at(ilvl)->trafo.add_meshpart_chart(*mpart, *chart);
+      const auto mpart_c = mesh_node->find_mesh_part("bnd:c");
+      if((chart_c != nullptr) && (mpart_c != nullptr))
+        domain.at(ilvl)->trafo.add_meshpart_chart(*mpart_c, *chart_c);
+      const auto mpart_s = mesh_node->find_mesh_part("bnd:sphere");
+      if((chart_s != nullptr) && (mpart_s != nullptr))
+        domain.at(ilvl)->trafo.add_meshpart_chart(*mpart_s, *chart_s);
+      const auto mpart_p = mesh_node->find_mesh_part("bnd:pipe");
+      if((chart_p != nullptr) && (mpart_p != nullptr))
+        domain.at(ilvl)->trafo.add_meshpart_chart(*mpart_p, *chart_p);
     }
 
     // run our application
@@ -1384,6 +1461,7 @@ namespace DFG95
     args.support("load-joined-sol");
     args.support("save-sol");
     args.support("save-joined-sol");
+    args.support("bench");
     //args.support("isoparam");
 
     // check for unsupported options
@@ -1398,6 +1476,11 @@ namespace DFG95
       FEAT::Runtime::abort();
     }
 
+    if(args.check("bench") < 1)
+    {
+      comm.print(std::cerr, "ERROR: Mandatory option '--bench <1|7>' is missing!");
+      FEAT::Runtime::abort();
+    }
     if(args.check("mesh") < 1)
     {
       comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
