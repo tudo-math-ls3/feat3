@@ -12,6 +12,8 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::Solver;
 using namespace FEAT::TestSystem;
 
+#ifdef FEAT_HAVE_CUDA
+
 class CuSolverLUTest :
   public TestSystem::UnitTest
 {
@@ -123,3 +125,5 @@ public:
   }
 };
 CuSolverQRTest cusolverqr_test;
+
+#endif //FEAT_HAVE_CUDA
