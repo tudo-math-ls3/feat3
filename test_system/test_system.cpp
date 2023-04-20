@@ -101,6 +101,19 @@ int main(int argc, char** argv)
       result = EXIT_FAILURE;
       ++tests_failed;
     }
+    catch(std::exception& e)
+    {
+      std::cout << "CRASHED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
+      result = EXIT_FAILURE;
+      ++tests_failed;
+    }
+    catch(...)
+    {
+      std::cout << "CRASHED: " << (*i)->id() << std::endl << "caught unknown exception" << std::endl;
+      result = EXIT_FAILURE;
+      ++tests_failed;
+    }
+
     i = TestList::instance()->erase(i);
     iterator_index++;
   }

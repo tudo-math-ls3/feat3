@@ -80,7 +80,7 @@
   <ItemGroup Label="FEAT Defines">
     <FeatDef Include="FEAT_INDEX_ULL" />
     <FeatDef Condition="'$(DebugMode)'=='true'"
-      Include="DEBUG" />
+      Include="FEAT_DEBUG_MODE;DEBUG" />
     <FeatDef Condition="'$(EnableMPI)'=='true'"
       Include="FEAT_HAVE_MPI" />
     <FeatDef Condition="'$(EnableOMP)'=='true'"
