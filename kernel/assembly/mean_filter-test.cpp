@@ -106,25 +106,25 @@ public:
   }
 };
 
-MeanFilterTest<float, unsigned int> mean_filter_test_float_uint(PreferredBackend::generic);
-MeanFilterTest<double, unsigned int> mean_filter_test_double_uint(PreferredBackend::generic);
-MeanFilterTest<float, unsigned long> mean_filter_test_float_ulong(PreferredBackend::generic);
-MeanFilterTest<double, unsigned long> mean_filter_test_double_ulong(PreferredBackend::generic);
+MeanFilterTest <float, std::uint32_t> mean_filter_test_float_uint32(PreferredBackend::generic);
+MeanFilterTest <double, std::uint32_t> mean_filter_test_double_uint32(PreferredBackend::generic);
+MeanFilterTest <float, std::uint64_t> mean_filter_test_float_uint64(PreferredBackend::generic);
+MeanFilterTest <double, std::uint64_t> mean_filter_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MeanFilterTest<float, unsigned long> mkl_mean_filter_test_float_ulong(PreferredBackend::mkl);
-MeanFilterTest<double, unsigned long> mkl_mean_filter_test_double_ulong(PreferredBackend::mkl);
+MeanFilterTest <float, std::uint64_t> mkl_mean_filter_test_float_uint64(PreferredBackend::mkl);
+MeanFilterTest <double, std::uint64_t> mkl_mean_filter_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MeanFilterTest<__float128, unsigned int> mean_filter_test_float128_uint(PreferredBackend::generic);
-MeanFilterTest<__float128, unsigned long> mean_filter_test_float128_ulong(PreferredBackend::generic);
+MeanFilterTest <__float128, std::uint32_t> mean_filter_test_float128_uint32(PreferredBackend::generic);
+MeanFilterTest <__float128, std::uint64_t> mean_filter_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MeanFilterTest<Half, unsigned int> mean_filter_test_half_uint(PreferredBackend::generic);
-MeanFilterTest<Half, unsigned long> mean_filter_test_half_ulong(PreferredBackend::generic);
+MeanFilterTest <Half, std::uint32_t> mean_filter_test_half_uint32(PreferredBackend::generic);
+MeanFilterTest <Half, std::uint64_t> mean_filter_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MeanFilterTest<float, unsigned int> cuda_mean_filter_test_float_uint(PreferredBackend::cuda);
-MeanFilterTest<double, unsigned int> cuda_mean_filter_test_double_uint(PreferredBackend::cuda);
-MeanFilterTest<float, unsigned long> cuda_mean_filter_test_float_ulong(PreferredBackend::cuda);
-MeanFilterTest<double, unsigned long> cuda_mean_filter_test_double_ulong(PreferredBackend::cuda);
+MeanFilterTest <float, std::uint32_t> cuda_mean_filter_test_float_uint32(PreferredBackend::cuda);
+MeanFilterTest <double, std::uint32_t> cuda_mean_filter_test_double_uint32(PreferredBackend::cuda);
+MeanFilterTest <float, std::uint64_t> cuda_mean_filter_test_float_uint64(PreferredBackend::cuda);
+MeanFilterTest <double, std::uint64_t> cuda_mean_filter_test_double_uint64(PreferredBackend::cuda);
 #endif

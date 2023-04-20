@@ -164,27 +164,27 @@ public:
   }
 };
 
-MatrixMultTest<float, unsigned int> matrix_mult_test_float_uint(PreferredBackend::generic);
-MatrixMultTest<double, unsigned int> matrix_mult_test_double_uint(PreferredBackend::generic);
-MatrixMultTest<float, unsigned long> matrix_mult_test_float_ulong(PreferredBackend::generic);
-MatrixMultTest<double, unsigned long> matrix_mult_test_double_ulong(PreferredBackend::generic);
+MatrixMultTest <float, std::uint32_t> matrix_mult_test_float_uint32(PreferredBackend::generic);
+MatrixMultTest <double, std::uint32_t> matrix_mult_test_double_uint32(PreferredBackend::generic);
+MatrixMultTest <float, std::uint64_t> matrix_mult_test_float_uint64(PreferredBackend::generic);
+MatrixMultTest <double, std::uint64_t> matrix_mult_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MatrixMultTest<float, unsigned long> mkl_matrix_mult_test_float_ulong(PreferredBackend::mkl);
-MatrixMultTest<double, unsigned long> mkl_matrix_mult_test_double_ulong(PreferredBackend::mkl);
+MatrixMultTest <float, std::uint64_t> mkl_matrix_mult_test_float_uint64(PreferredBackend::mkl);
+MatrixMultTest <double, std::uint64_t> mkl_matrix_mult_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MatrixMultTest<__float128, unsigned long> matrix_mult_test_float128_ulong(PreferredBackend::generic);
-MatrixMultTest<__float128, unsigned int> matrix_mult_test_float128_uint(PreferredBackend::generic);
+MatrixMultTest <__float128, std::uint64_t> matrix_mult_test_float128_uint64(PreferredBackend::generic);
+MatrixMultTest <__float128, std::uint32_t> matrix_mult_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MatrixMultTest<Half, unsigned int> matrix_mult_test_half_uint(PreferredBackend::generic);
-MatrixMultTest<Half, unsigned long> matrix_mult_test_half_ulong(PreferredBackend::generic);
+MatrixMultTest <Half, std::uint32_t> matrix_mult_test_half_uint32(PreferredBackend::generic);
+MatrixMultTest <Half, std::uint64_t> matrix_mult_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MatrixMultTest<float, unsigned long> cuda_matrix_mult_test_float_ulong(PreferredBackend::cuda);
-MatrixMultTest<double, unsigned long> cuda_matrix_mult_test_double_ulong(PreferredBackend::cuda);
-MatrixMultTest<float, unsigned int> cuda_matrix_mult_test_float_uint(PreferredBackend::cuda);
-MatrixMultTest<double, unsigned int> cuda_matrix_mult_test_double_uint(PreferredBackend::cuda);
+MatrixMultTest <float, std::uint64_t> cuda_matrix_mult_test_float_uint64(PreferredBackend::cuda);
+MatrixMultTest <double, std::uint64_t> cuda_matrix_mult_test_double_uint64(PreferredBackend::cuda);
+MatrixMultTest <float, std::uint32_t> cuda_matrix_mult_test_float_uint32(PreferredBackend::cuda);
+MatrixMultTest <double, std::uint32_t> cuda_matrix_mult_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -266,25 +266,25 @@ public:
   }
 };
 
-MatrixMultTest2<float, unsigned int> matrix_mult_test2_float_uint(PreferredBackend::generic);
-MatrixMultTest2<double, unsigned int> matrix_mult_test2_double_uint(PreferredBackend::generic);
-MatrixMultTest2<float, unsigned long> matrix_mult_test2_float_ulong(PreferredBackend::generic);
-MatrixMultTest2<double, unsigned long> matrix_mult_test2_double_ulong(PreferredBackend::generic);
+MatrixMultTest2 <float, std::uint32_t> matrix_mult_test2_float_uint32(PreferredBackend::generic);
+MatrixMultTest2 <double, std::uint32_t> matrix_mult_test2_double_uint32(PreferredBackend::generic);
+MatrixMultTest2 <float, std::uint64_t> matrix_mult_test2_float_uint64(PreferredBackend::generic);
+MatrixMultTest2 <double, std::uint64_t> matrix_mult_test2_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MatrixMultTest2<float, unsigned long> mkl_matrix_mult_test2_float_ulong(PreferredBackend::mkl);
-MatrixMultTest2<double, unsigned long> mkl_matrix_mult_test2_double_ulong(PreferredBackend::mkl);
+MatrixMultTest2 <float, std::uint64_t> mkl_matrix_mult_test2_float_uint64(PreferredBackend::mkl);
+MatrixMultTest2 <double, std::uint64_t> mkl_matrix_mult_test2_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MatrixMultTest2<__float128, unsigned long> matrix_mult_test2_float128_ulong(PreferredBackend::generic);
-MatrixMultTest2<__float128, unsigned int> matrix_mult_test2_float128_uint(PreferredBackend::generic);
+MatrixMultTest2 <__float128, std::uint64_t> matrix_mult_test2_float128_uint64(PreferredBackend::generic);
+MatrixMultTest2 <__float128, std::uint32_t> matrix_mult_test2_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MatrixMultTest2<Half, unsigned int> matrix_mult_test2_half_uint(PreferredBackend::generic);
-MatrixMultTest2<Half, unsigned long> matrix_mult_test2_half_ulong(PreferredBackend::generic);
+MatrixMultTest2 <Half, std::uint32_t> matrix_mult_test2_half_uint32(PreferredBackend::generic);
+MatrixMultTest2 <Half, std::uint64_t> matrix_mult_test2_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MatrixMultTest2<float, unsigned long> cuda_matrix_mult_test2_float_ulong(PreferredBackend::cuda);
-MatrixMultTest2<double, unsigned long> cuda_matrix_mult_test2_double_ulong(PreferredBackend::cuda);
-MatrixMultTest2<float, unsigned int> cuda_matrix_mult_test2_float_uint(PreferredBackend::cuda);
-MatrixMultTest2<double, unsigned int> cuda_matrix_mult_test2_double_uint(PreferredBackend::cuda);
+MatrixMultTest2 <float, std::uint64_t> cuda_matrix_mult_test2_float_uint64(PreferredBackend::cuda);
+MatrixMultTest2 <double, std::uint64_t> cuda_matrix_mult_test2_double_uint64(PreferredBackend::cuda);
+MatrixMultTest2 <float, std::uint32_t> cuda_matrix_mult_test2_float_uint32(PreferredBackend::cuda);
+MatrixMultTest2 <double, std::uint32_t> cuda_matrix_mult_test2_double_uint32(PreferredBackend::cuda);
 #endif

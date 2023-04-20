@@ -145,25 +145,25 @@ public:
   }
 }; // class DiscreteEvaluatorTest<...>
 
-DiscreteEvaluatorTest<double, unsigned int> discrete_evaluator_test_main_double_uint(PreferredBackend::generic);
-DiscreteEvaluatorTest<float, unsigned int> discrete_evaluator_test_main_float_uint(PreferredBackend::generic);
-DiscreteEvaluatorTest<double, unsigned long> discrete_evaluator_test_main_double_ulong(PreferredBackend::generic);
-DiscreteEvaluatorTest<float, unsigned long> discrete_evaluator_test_main_float_ulong(PreferredBackend::generic);
+DiscreteEvaluatorTest <double, std::uint32_t> discrete_evaluator_test_main_double_uint32(PreferredBackend::generic);
+DiscreteEvaluatorTest <float, std::uint32_t> discrete_evaluator_test_main_float_uint32(PreferredBackend::generic);
+DiscreteEvaluatorTest <double, std::uint64_t> discrete_evaluator_test_main_double_uint64(PreferredBackend::generic);
+DiscreteEvaluatorTest <float, std::uint64_t> discrete_evaluator_test_main_float_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DiscreteEvaluatorTest<float, unsigned long> mkl_discrete_evaluator_test_float_ulong(PreferredBackend::mkl);
-DiscreteEvaluatorTest<double, unsigned long> mkl_discrete_evaluator_test_double_ulong(PreferredBackend::mkl);
+DiscreteEvaluatorTest <float, std::uint64_t> mkl_discrete_evaluator_test_float_uint64(PreferredBackend::mkl);
+DiscreteEvaluatorTest <double, std::uint64_t> mkl_discrete_evaluator_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DiscreteEvaluatorTest<__float128, unsigned long> discrete_evaluator_test_float128_ulong(PreferredBackend::generic);
-DiscreteEvaluatorTest<__float128, unsigned int> discrete_evaluator_test_float128_uint(PreferredBackend::generic);
+DiscreteEvaluatorTest <__float128, std::uint64_t> discrete_evaluator_test_float128_uint64(PreferredBackend::generic);
+DiscreteEvaluatorTest <__float128, std::uint32_t> discrete_evaluator_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DiscreteEvaluatorTest<Half, unsigned int> discrete_evaluator_test_half_uint(PreferredBackend::generic);
-DiscreteEvaluatorTest<Half, unsigned long> discrete_evaluator_test_half_ulong(PreferredBackend::generic);
+DiscreteEvaluatorTest <Half, std::uint32_t> discrete_evaluator_test_half_uint32(PreferredBackend::generic);
+DiscreteEvaluatorTest <Half, std::uint64_t> discrete_evaluator_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DiscreteEvaluatorTest<float, unsigned int> cuda_discrete_evaluator_test_float_uint(PreferredBackend::cuda);
-DiscreteEvaluatorTest<double, unsigned int> cuda_discrete_evaluator_test_double_uint(PreferredBackend::cuda);
-DiscreteEvaluatorTest<float, unsigned long> cuda_discrete_evaluator_test_float_ulong(PreferredBackend::cuda);
-DiscreteEvaluatorTest<double, unsigned long> cuda_discrete_evaluator_test_double_ulong(PreferredBackend::cuda);
+DiscreteEvaluatorTest <float, std::uint32_t> cuda_discrete_evaluator_test_float_uint32(PreferredBackend::cuda);
+DiscreteEvaluatorTest <double, std::uint32_t> cuda_discrete_evaluator_test_double_uint32(PreferredBackend::cuda);
+DiscreteEvaluatorTest <float, std::uint64_t> cuda_discrete_evaluator_test_float_uint64(PreferredBackend::cuda);
+DiscreteEvaluatorTest <double, std::uint64_t> cuda_discrete_evaluator_test_double_uint64(PreferredBackend::cuda);
 #endif

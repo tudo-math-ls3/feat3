@@ -146,27 +146,27 @@ public:
   }
 };
 
-MetaToScalarTest<SparseMatrixCSR<float, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float_uint(PreferredBackend::generic);
-MetaToScalarTest<SparseMatrixCSR<double, unsigned int> > cpu_meta_matrix_to_csr_test_generic_double_uint(PreferredBackend::generic);
-MetaToScalarTest<SparseMatrixCSR<float, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float_ulong(PreferredBackend::generic);
-MetaToScalarTest<SparseMatrixCSR<double, unsigned long> > cpu_meta_matrix_to_csr_test_generic_double_ulong(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<float, std::uint32_t> > cpu_meta_matrix_to_csr_test_generic_float_uint32(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<double, std::uint32_t> > cpu_meta_matrix_to_csr_test_generic_double_uint32(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<float, std::uint64_t> > cpu_meta_matrix_to_csr_test_generic_float_uint64(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<double, std::uint64_t> > cpu_meta_matrix_to_csr_test_generic_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaToScalarTest<SparseMatrixCSR<float, unsigned long> > mkl_meta_matrix_to_csr_test_float_ulong(PreferredBackend::mkl);
-MetaToScalarTest<SparseMatrixCSR<double, unsigned long> > mkl_meta_matrix_to_csr_test_double_ulong(PreferredBackend::mkl);
+MetaToScalarTest <SparseMatrixCSR<float, std::uint64_t> > mkl_meta_matrix_to_csr_test_float_uint64(PreferredBackend::mkl);
+MetaToScalarTest <SparseMatrixCSR<double, std::uint64_t> > mkl_meta_matrix_to_csr_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaToScalarTest<SparseMatrixCSR<__float128, unsigned int> > cpu_meta_matrix_to_csr_test_generic_float128_uint(PreferredBackend::generic);
-MetaToScalarTest<SparseMatrixCSR<__float128, unsigned long> > cpu_meta_matrix_to_csr_test_generic_float128_ulong(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<__float128, std::uint32_t> > cpu_meta_matrix_to_csr_test_generic_float128_uint32(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<__float128, std::uint64_t> > cpu_meta_matrix_to_csr_test_generic_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaToScalarTest<SparseMatrixCSR<Half, unsigned int> > meta_matrix_to_csr_test_half_uint(PreferredBackend::generic);
-MetaToScalarTest<SparseMatrixCSR<Half, unsigned long> > meta_matrix_to_csr_test_half_ulong(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<Half, std::uint32_t> > meta_matrix_to_csr_test_half_uint32(PreferredBackend::generic);
+MetaToScalarTest <SparseMatrixCSR<Half, std::uint64_t> > meta_matrix_to_csr_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaToScalarTest<SparseMatrixCSR<float, unsigned int> > cuda_meta_matrix_to_csr_test_generic_float_uint(PreferredBackend::cuda);
-MetaToScalarTest<SparseMatrixCSR<double, unsigned int> > cuda_meta_matrix_to_csr_test_generic_double_uint(PreferredBackend::cuda);
-MetaToScalarTest<SparseMatrixCSR<float, unsigned long> > cuda_meta_matrix_to_csr_test_generic_float_ulong(PreferredBackend::cuda);
-MetaToScalarTest<SparseMatrixCSR<double, unsigned long> > cuda_meta_matrix_to_csr_test_generic_double_ulong(PreferredBackend::cuda);
+MetaToScalarTest <SparseMatrixCSR<float, std::uint32_t> > cuda_meta_matrix_to_csr_test_generic_float_uint32(PreferredBackend::cuda);
+MetaToScalarTest <SparseMatrixCSR<double, std::uint32_t> > cuda_meta_matrix_to_csr_test_generic_double_uint32(PreferredBackend::cuda);
+MetaToScalarTest <SparseMatrixCSR<float, std::uint64_t> > cuda_meta_matrix_to_csr_test_generic_float_uint64(PreferredBackend::cuda);
+MetaToScalarTest <SparseMatrixCSR<double, std::uint64_t> > cuda_meta_matrix_to_csr_test_generic_double_uint64(PreferredBackend::cuda);
 #endif
 
 
@@ -272,27 +272,27 @@ public:
   }
 };
 
-MetaBCSRToScalarTest<SparseMatrixCSR<float, unsigned int> > cpu_meta_bcsr_matrix_to_csr_test_generic_float_uint(PreferredBackend::generic);
-MetaBCSRToScalarTest<SparseMatrixCSR<double, unsigned int> > cpu_meta_bcsr_matrix_to_csr_test_generic_double_uint(PreferredBackend::generic);
-MetaBCSRToScalarTest<SparseMatrixCSR<float, unsigned long> > cpu_meta_bcsr_matrix_to_csr_test_generic_float_ulong(PreferredBackend::generic);
-MetaBCSRToScalarTest<SparseMatrixCSR<double, unsigned long> > cpu_meta_bcsr_matrix_to_csr_test_generic_double_ulong(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<float, std::uint32_t> > cpu_meta_bcsr_matrix_to_csr_test_generic_float_uint32(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<double, std::uint32_t> > cpu_meta_bcsr_matrix_to_csr_test_generic_double_uint32(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<float, std::uint64_t> > cpu_meta_bcsr_matrix_to_csr_test_generic_float_uint64(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<double, std::uint64_t> > cpu_meta_bcsr_matrix_to_csr_test_generic_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaBCSRToScalarTest<SparseMatrixCSR<float, unsigned long> > mkl_meta_bcsr_matrix_to_csr_test_float_ulong(PreferredBackend::mkl);
-MetaBCSRToScalarTest<SparseMatrixCSR<double, unsigned long> > mkl_meta_bcsr_matrix_to_csr_test_double_ulong(PreferredBackend::mkl);
+MetaBCSRToScalarTest <SparseMatrixCSR<float, std::uint64_t> > mkl_meta_bcsr_matrix_to_csr_test_float_uint64(PreferredBackend::mkl);
+MetaBCSRToScalarTest <SparseMatrixCSR<double, std::uint64_t> > mkl_meta_bcsr_matrix_to_csr_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaBCSRToScalarTest<SparseMatrixCSR<__float128, unsigned int> > cpu_meta_bcsr_matrix_to_csr_test_generic_float128_uint(PreferredBackend::generic);
-MetaBCSRToScalarTest<SparseMatrixCSR<__float128, unsigned long> > cpu_meta_bcsr_matrix_to_csr_test_generic_float128_ulong(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<__float128, std::uint32_t> > cpu_meta_bcsr_matrix_to_csr_test_generic_float128_uint32(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<__float128, std::uint64_t> > cpu_meta_bcsr_matrix_to_csr_test_generic_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaBCSRToScalarTest<SparseMatrixCSR<Half, unsigned int> > meta_bcsr_matrix_to_csr_test_half_uint(PreferredBackend::generic);
-MetaBCSRToScalarTest<SparseMatrixCSR<Half, unsigned long> > meta_bcsr_matrix_to_csr_test_half_ulong(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<Half, std::uint32_t> > meta_bcsr_matrix_to_csr_test_half_uint32(PreferredBackend::generic);
+MetaBCSRToScalarTest <SparseMatrixCSR<Half, std::uint64_t> > meta_bcsr_matrix_to_csr_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaBCSRToScalarTest<SparseMatrixCSR<float, unsigned int> > cuda_meta_bcsr_matrix_to_csr_test_generic_float_uint(PreferredBackend::cuda);
-MetaBCSRToScalarTest<SparseMatrixCSR<double, unsigned int> > cuda_meta_bcsr_matrix_to_csr_test_generic_double_uint(PreferredBackend::cuda);
-MetaBCSRToScalarTest<SparseMatrixCSR<float, unsigned long> > cuda_meta_bcsr_matrix_to_csr_test_generic_float_ulong(PreferredBackend::cuda);
-MetaBCSRToScalarTest<SparseMatrixCSR<double, unsigned long> > cuda_meta_bcsr_matrix_to_csr_test_generic_double_ulong(PreferredBackend::cuda);
+MetaBCSRToScalarTest <SparseMatrixCSR<float, std::uint32_t> > cuda_meta_bcsr_matrix_to_csr_test_generic_float_uint32(PreferredBackend::cuda);
+MetaBCSRToScalarTest <SparseMatrixCSR<double, std::uint32_t> > cuda_meta_bcsr_matrix_to_csr_test_generic_double_uint32(PreferredBackend::cuda);
+MetaBCSRToScalarTest <SparseMatrixCSR<float, std::uint64_t> > cuda_meta_bcsr_matrix_to_csr_test_generic_float_uint64(PreferredBackend::cuda);
+MetaBCSRToScalarTest <SparseMatrixCSR<double, std::uint64_t> > cuda_meta_bcsr_matrix_to_csr_test_generic_double_uint64(PreferredBackend::cuda);
 #endif
 
 /**
@@ -439,25 +439,25 @@ public:
     }
   }
 };
-VecMetaToScalarTest<float, unsigned int> vec_meta_to_scalar_test_generic_float_uint(PreferredBackend::generic);
-VecMetaToScalarTest<float, unsigned long> vec_meta_to_scalar_test_generic_float_ulong(PreferredBackend::generic);
-VecMetaToScalarTest<double, unsigned int> vec_meta_to_scalar_test_generic_double_uint(PreferredBackend::generic);
-VecMetaToScalarTest<double, unsigned long> vec_meta_to_scalar_test_generic_double_ulong(PreferredBackend::generic);
+VecMetaToScalarTest <float, std::uint32_t> vec_meta_to_scalar_test_generic_float_uint32(PreferredBackend::generic);
+VecMetaToScalarTest <float, std::uint64_t> vec_meta_to_scalar_test_generic_float_uint64(PreferredBackend::generic);
+VecMetaToScalarTest <double, std::uint32_t> vec_meta_to_scalar_test_generic_double_uint32(PreferredBackend::generic);
+VecMetaToScalarTest <double, std::uint64_t> vec_meta_to_scalar_test_generic_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-VecMetaToScalarTest<float, unsigned long> mkl_vec_meta_to_scalar_test_float_ulong(PreferredBackend::mkl);
-VecMetaToScalarTest<double, unsigned long> mkl_vec_meta_to_scalar_test_double_ulong(PreferredBackend::mkl);
+VecMetaToScalarTest <float, std::uint64_t> mkl_vec_meta_to_scalar_test_float_uint64(PreferredBackend::mkl);
+VecMetaToScalarTest <double, std::uint64_t> mkl_vec_meta_to_scalar_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-VecMetaToScalarTest<__float128, unsigned int> vec_meta_to_scalar_test_generic_float128_uint(PreferredBackend::generic);
-VecMetaToScalarTest<__float128, unsigned long> vec_meta_to_scalar_test_generic_float128_ulong(PreferredBackend::generic);
+VecMetaToScalarTest <__float128, std::uint32_t> vec_meta_to_scalar_test_generic_float128_uint32(PreferredBackend::generic);
+VecMetaToScalarTest <__float128, std::uint64_t> vec_meta_to_scalar_test_generic_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-VecMetaToScalarTest<Half, unsigned int> vec_meta_to_scalar_test_half_uint(PreferredBackend::generic);
-VecMetaToScalarTest<Half, unsigned long> vec_meta_to_scalar_test_half_ulong(PreferredBackend::generic);
+VecMetaToScalarTest <Half, std::uint32_t> vec_meta_to_scalar_test_half_uint32(PreferredBackend::generic);
+VecMetaToScalarTest <Half, std::uint64_t> vec_meta_to_scalar_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-VecMetaToScalarTest<float, unsigned int> cuda_vec_meta_to_scalar_test_generic_float_uint(PreferredBackend::cuda);
-VecMetaToScalarTest<float, unsigned long> cuda_vec_meta_to_scalar_test_generic_float_ulong(PreferredBackend::cuda);
-VecMetaToScalarTest<double, unsigned int> cuda_vec_meta_to_scalar_test_generic_double_uint(PreferredBackend::cuda);
-VecMetaToScalarTest<double, unsigned long> cuda_vec_meta_to_scalar_test_generic_double_ulong(PreferredBackend::cuda);
+VecMetaToScalarTest <float, std::uint32_t> cuda_vec_meta_to_scalar_test_generic_float_uint32(PreferredBackend::cuda);
+VecMetaToScalarTest <float, std::uint64_t> cuda_vec_meta_to_scalar_test_generic_float_uint64(PreferredBackend::cuda);
+VecMetaToScalarTest <double, std::uint32_t> cuda_vec_meta_to_scalar_test_generic_double_uint32(PreferredBackend::cuda);
+VecMetaToScalarTest <double, std::uint64_t> cuda_vec_meta_to_scalar_test_generic_double_uint64(PreferredBackend::cuda);
 #endif

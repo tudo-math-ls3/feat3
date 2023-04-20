@@ -479,29 +479,29 @@ public:
   }
 };
 
-VectorMirrorTest<double, unsigned int> vector_mirror_test_main_double_uint(PreferredBackend::generic);
-VectorMirrorTest<float, unsigned int> vector_mirror_test_main_float_uint(PreferredBackend::generic);
-VectorMirrorTest<double, unsigned long> vector_mirror_test_main_double_ulong(PreferredBackend::generic);
-VectorMirrorTest<float, unsigned long> vector_mirror_test_main_float_ulong(PreferredBackend::generic);
+VectorMirrorTest <double, std::uint32_t> vector_mirror_test_main_double_uint32(PreferredBackend::generic);
+VectorMirrorTest <float, std::uint32_t> vector_mirror_test_main_float_uint32(PreferredBackend::generic);
+VectorMirrorTest <double, std::uint64_t> vector_mirror_test_main_double_uint64(PreferredBackend::generic);
+VectorMirrorTest <float, std::uint64_t> vector_mirror_test_main_float_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-VectorMirrorTest<float, unsigned long> mkl_vector_mirror_test_float_ulong(PreferredBackend::mkl);
-VectorMirrorTest<double, unsigned long> mkl_vector_mirror_test_double_ulong(PreferredBackend::mkl);
+VectorMirrorTest <float, std::uint64_t> mkl_vector_mirror_test_float_uint64(PreferredBackend::mkl);
+VectorMirrorTest <double, std::uint64_t> mkl_vector_mirror_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-VectorMirrorTest<__float128, unsigned long> vector_mirror_test_float128_ulong(PreferredBackend::generic);
-VectorMirrorTest<__float128, unsigned int> vector_mirror_test_float128_uint(PreferredBackend::generic);
+VectorMirrorTest <__float128, std::uint64_t> vector_mirror_test_float128_uint64(PreferredBackend::generic);
+VectorMirrorTest <__float128, std::uint32_t> vector_mirror_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-VectorMirrorTest<Half, unsigned int> vector_mirror_test_half_uint(PreferredBackend::generic);
-VectorMirrorTest<Half, unsigned long> vector_mirror_test_half_ulong(PreferredBackend::generic);
+VectorMirrorTest <Half, std::uint32_t> vector_mirror_test_half_uint32(PreferredBackend::generic);
+VectorMirrorTest <Half, std::uint64_t> vector_mirror_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-VectorMirrorTest<float, unsigned int> cuda_vector_mirror_test_float_uint(PreferredBackend::cuda);
-VectorMirrorTest<double, unsigned int> cuda_vector_mirror_test_double_uint(PreferredBackend::cuda);
-VectorMirrorTest<float, unsigned long> cuda_vector_mirror_test_float_ulong(PreferredBackend::cuda);
-VectorMirrorTest<double, unsigned long> cuda_vector_mirror_test_double_ulong(PreferredBackend::cuda);
+VectorMirrorTest <float, std::uint32_t> cuda_vector_mirror_test_float_uint32(PreferredBackend::cuda);
+VectorMirrorTest <double, std::uint32_t> cuda_vector_mirror_test_double_uint32(PreferredBackend::cuda);
+VectorMirrorTest <float, std::uint64_t> cuda_vector_mirror_test_float_uint64(PreferredBackend::cuda);
+VectorMirrorTest <double, std::uint64_t> cuda_vector_mirror_test_double_uint64(PreferredBackend::cuda);
 #ifdef FEAT_HAVE_HALFMATH
-VectorMirrorTest<Half, unsigned int> cuda_vector_mirror_test_half_uint(PreferredBackend::cuda);
-VectorMirrorTest<Half, unsigned long> cuda_vector_mirror_test_half_ulong(PreferredBackend::cuda);
+VectorMirrorTest <Half, std::uint32_t> cuda_vector_mirror_test_half_uint32(PreferredBackend::cuda);
+VectorMirrorTest <Half, std::uint64_t> cuda_vector_mirror_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif

@@ -315,18 +315,18 @@ public:
   }
 };
 
-BasicSolverTest<double, unsigned int> basic_solver_test_double_uint(PreferredBackend::generic);
-BasicSolverTest<double, unsigned long> basic_solver_test_double_ulong(PreferredBackend::generic);
+BasicSolverTest <double, std::uint32_t> basic_solver_test_double_uint32(PreferredBackend::generic);
+BasicSolverTest <double, std::uint64_t> basic_solver_test_double_uint64(PreferredBackend::generic);
 //BasicSolverTest<float, unsigned int> basic_solver_test_float_uint(PreferredBackend::generic);
 //BasicSolverTest<float, unsigned long> basic_solver_test_float_ulong(PreferredBackend::generic);
 
 #ifdef FEAT_HAVE_MKL
 //BasicSolverTest<float, unsigned long> mkl_basic_solver_test_float_ulong(PreferredBackend::mkl);
-BasicSolverTest<double, unsigned long> mkl_basic_solver_test_double_ulong(PreferredBackend::mkl);
+BasicSolverTest <double, std::uint64_t> mkl_basic_solver_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BasicSolverTest<__float128, unsigned int> basic_solver_test_float128_uint(PreferredBackend::generic);
-BasicSolverTest<__float128, unsigned long> basic_solver_test_float128_ulong(PreferredBackend::generic);
+BasicSolverTest <__float128, std::uint32_t> basic_solver_test_float128_uint32(PreferredBackend::generic);
+BasicSolverTest <__float128, std::uint64_t> basic_solver_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
 //BasicSolverTest<Half, unsigned int> basic_solver_test_half_uint(PreferredBackend::generic);
@@ -334,7 +334,7 @@ BasicSolverTest<__float128, unsigned long> basic_solver_test_float128_ulong(Pref
 #endif
 #ifdef FEAT_HAVE_CUDA
 //BasicSolverTest<float, unsigned int> cuda_basic_solver_test_float_uint(PreferredBackend::cuda);
-BasicSolverTest<double, unsigned int> cuda_basic_solver_test_double_uint(PreferredBackend::cuda);
+BasicSolverTest <double, std::uint32_t> cuda_basic_solver_test_double_uint32(PreferredBackend::cuda);
 //BasicSolverTest<float, unsigned long> cuda_basic_solver_test_float_ulong(PreferredBackend::cuda);
 //BasicSolverTest<double, unsigned long> cuda_basic_solver_test_double_ulong(PreferredBackend::cuda);
 #endif
@@ -560,8 +560,8 @@ public:
 };
 
 #ifdef FEAT_HAVE_CUDA
-//CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned long> cuda_solver_csr_generic_double_ulong;
-CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, unsigned int> cuda_solver_csr_generic_double_uint;
+//CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, std::uint64_t> cuda_solver_csr_generic_double_uint64;
+CUDASolverTest<SparseMatrixCSR, Mem::CUDA, double, std::uint32_t> cuda_solver_csr_generic_double_uint32;
 #endif
 
 template<

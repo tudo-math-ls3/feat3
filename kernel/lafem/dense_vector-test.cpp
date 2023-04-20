@@ -144,31 +144,31 @@ public:
     TEST_CHECK_EQUAL(clone5.size(), a.size());
   }
 };
-DenseVectorTest<float, unsigned int> dv_test_float_uint(PreferredBackend::generic);
-DenseVectorTest<double, unsigned int> dv_test_double_uint(PreferredBackend::generic);
-DenseVectorTest<float, unsigned long> dv_test_float_ulong(PreferredBackend::generic);
-DenseVectorTest<double, unsigned long> dv_test_double_ulong(PreferredBackend::generic);
+DenseVectorTest <float, std::uint32_t> dv_test_float_uint32(PreferredBackend::generic);
+DenseVectorTest <double, std::uint32_t> dv_test_double_uint32(PreferredBackend::generic);
+DenseVectorTest <float, std::uint64_t> dv_test_float_uint64(PreferredBackend::generic);
+DenseVectorTest <double, std::uint64_t> dv_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorTest<__float128, unsigned int> dv_test_float128_uint(PreferredBackend::generic);
-DenseVectorTest<__float128, unsigned long> dv_test_float128_ulong(PreferredBackend::generic);
+DenseVectorTest <__float128, std::uint32_t> dv_test_float128_uint32(PreferredBackend::generic);
+DenseVectorTest <__float128, std::uint64_t> dv_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorTest<float, unsigned long> mkl_dv_test_float_ulong(PreferredBackend::mkl);
-DenseVectorTest<double, unsigned long> mkl_dv_test_double_ulong(PreferredBackend::mkl);
+DenseVectorTest <float, std::uint64_t> mkl_dv_test_float_uint64(PreferredBackend::mkl);
+DenseVectorTest <double, std::uint64_t> mkl_dv_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorTest<Half, unsigned int> dv_test_half_uint(PreferredBackend::generic);
-DenseVectorTest<Half, unsigned long> dv_test_half_ulong(PreferredBackend::generic);
+DenseVectorTest <Half, std::uint32_t> dv_test_half_uint32(PreferredBackend::generic);
+DenseVectorTest <Half, std::uint64_t> dv_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorTest<Half, unsigned int> cuda_dv_test_half_uint(PreferredBackend::cuda);
-DenseVectorTest<Half, unsigned long> cuda_dv_test_half_ulong(PreferredBackend::cuda);
+DenseVectorTest <Half, std::uint32_t> cuda_dv_test_half_uint32(PreferredBackend::cuda);
+DenseVectorTest <Half, std::uint64_t> cuda_dv_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorTest<float, unsigned int> cuda_dv_test_float_uint(PreferredBackend::cuda);
-DenseVectorTest<double, unsigned int> cuda_dv_test_double_uint(PreferredBackend::cuda);
-DenseVectorTest<float, unsigned long> cuda_dv_test_float_ulong(PreferredBackend::cuda);
-DenseVectorTest<double, unsigned long> cuda_dv_test_double_ulong(PreferredBackend::cuda);
+DenseVectorTest <float, std::uint32_t> cuda_dv_test_float_uint32(PreferredBackend::cuda);
+DenseVectorTest <double, std::uint32_t> cuda_dv_test_double_uint32(PreferredBackend::cuda);
+DenseVectorTest <float, std::uint64_t> cuda_dv_test_float_uint64(PreferredBackend::cuda);
+DenseVectorTest <double, std::uint64_t> cuda_dv_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -242,31 +242,31 @@ public:
   }
 };
 
-DenseVectorSerializeTest<float, unsigned int> dv_serialize_test_float_uint(PreferredBackend::generic);
-DenseVectorSerializeTest<double, unsigned int> dv_serialize_test_double_uint(PreferredBackend::generic);
-DenseVectorSerializeTest<float, unsigned long> dv_serialize_test_float_ulong(PreferredBackend::generic);
-DenseVectorSerializeTest<double, unsigned long> dv_serialize_test_double_ulong(PreferredBackend::generic);
+DenseVectorSerializeTest <float, std::uint32_t> dv_serialize_test_float_uint32(PreferredBackend::generic);
+DenseVectorSerializeTest <double, std::uint32_t> dv_serialize_test_double_uint32(PreferredBackend::generic);
+DenseVectorSerializeTest <float, std::uint64_t> dv_serialize_test_float_uint64(PreferredBackend::generic);
+DenseVectorSerializeTest <double, std::uint64_t> dv_serialize_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorSerializeTest<__float128, unsigned int> dv_serialize_test_float128_uint(PreferredBackend::generic);
-DenseVectorSerializeTest<__float128, unsigned long> dv_serialize_test_float128_ulong(PreferredBackend::generic);
+DenseVectorSerializeTest <__float128, std::uint32_t> dv_serialize_test_float128_uint32(PreferredBackend::generic);
+DenseVectorSerializeTest <__float128, std::uint64_t> dv_serialize_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorSerializeTest<float, unsigned long> mkl_dv_serialize_test_float_ulong(PreferredBackend::mkl);
-DenseVectorSerializeTest<double, unsigned long> mkl_dv_serialize_test_double_ulong(PreferredBackend::mkl);
+DenseVectorSerializeTest <float, std::uint64_t> mkl_dv_serialize_test_float_uint64(PreferredBackend::mkl);
+DenseVectorSerializeTest <double, std::uint64_t> mkl_dv_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorSerializeTest<Half, unsigned int> dv_serialize_test_half_uint(PreferredBackend::generic);
-DenseVectorSerializeTest<Half, unsigned long> dv_serialize_test_half_ulong(PreferredBackend::generic);
+DenseVectorSerializeTest <Half, std::uint32_t> dv_serialize_test_half_uint32(PreferredBackend::generic);
+DenseVectorSerializeTest <Half, std::uint64_t> dv_serialize_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorSerializeTest<Half, unsigned int> cuda_dv_serialize_test_half_uint(PreferredBackend::cuda);
-DenseVectorSerializeTest<Half, unsigned long> cuda_dv_serialize_test_half_ulong(PreferredBackend::cuda);
+DenseVectorSerializeTest <Half, std::uint32_t> cuda_dv_serialize_test_half_uint32(PreferredBackend::cuda);
+DenseVectorSerializeTest <Half, std::uint64_t> cuda_dv_serialize_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorSerializeTest<float, unsigned int> cuda_dv_serialize_test_float_uint(PreferredBackend::cuda);
-DenseVectorSerializeTest<double, unsigned int> cuda_dv_serialize_test_double_uint(PreferredBackend::cuda);
-DenseVectorSerializeTest<float, unsigned long> cuda_dv_serialize_test_float_ulong(PreferredBackend::cuda);
-DenseVectorSerializeTest<double, unsigned long> cuda_dv_serialize_test_double_ulong(PreferredBackend::cuda);
+DenseVectorSerializeTest <float, std::uint32_t> cuda_dv_serialize_test_float_uint32(PreferredBackend::cuda);
+DenseVectorSerializeTest <double, std::uint32_t> cuda_dv_serialize_test_double_uint32(PreferredBackend::cuda);
+DenseVectorSerializeTest <float, std::uint64_t> cuda_dv_serialize_test_float_uint64(PreferredBackend::cuda);
+DenseVectorSerializeTest <double, std::uint64_t> cuda_dv_serialize_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -328,31 +328,31 @@ public:
     }
   }
 };
-DenseVectorAxpyTest<float, unsigned int> dv_axpy_test_float_uint(PreferredBackend::generic);
-DenseVectorAxpyTest<double, unsigned int> dv_axpy_test_double_uint(PreferredBackend::generic);
-DenseVectorAxpyTest<float, unsigned long> dv_axpy_test_float_ulong(PreferredBackend::generic);
-DenseVectorAxpyTest<double, unsigned long> dv_axpy_test_double_ulong(PreferredBackend::generic);
+DenseVectorAxpyTest <float, std::uint32_t> dv_axpy_test_float_uint32(PreferredBackend::generic);
+DenseVectorAxpyTest <double, std::uint32_t> dv_axpy_test_double_uint32(PreferredBackend::generic);
+DenseVectorAxpyTest <float, std::uint64_t> dv_axpy_test_float_uint64(PreferredBackend::generic);
+DenseVectorAxpyTest <double, std::uint64_t> dv_axpy_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorAxpyTest<__float128, unsigned int> dv_axpy_test_float128_uint(PreferredBackend::generic);
-DenseVectorAxpyTest<__float128, unsigned long> dv_axpy_test_float128_ulong(PreferredBackend::generic);
+DenseVectorAxpyTest <__float128, std::uint32_t> dv_axpy_test_float128_uint32(PreferredBackend::generic);
+DenseVectorAxpyTest <__float128, std::uint64_t> dv_axpy_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorAxpyTest<float, unsigned long> mkl_dv_axpy_test_float_ulong(PreferredBackend::mkl);
-DenseVectorAxpyTest<double, unsigned long> mkl_dv_axpy_test_double_ulong(PreferredBackend::mkl);
+DenseVectorAxpyTest <float, std::uint64_t> mkl_dv_axpy_test_float_uint64(PreferredBackend::mkl);
+DenseVectorAxpyTest <double, std::uint64_t> mkl_dv_axpy_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorAxpyTest<Half, unsigned int> dv_axpy_test_half_uint(PreferredBackend::generic);
-DenseVectorAxpyTest<Half, unsigned long> dv_axpy_test_half_ulong(PreferredBackend::generic);
+DenseVectorAxpyTest <Half, std::uint32_t> dv_axpy_test_half_uint32(PreferredBackend::generic);
+DenseVectorAxpyTest <Half, std::uint64_t> dv_axpy_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorAxpyTest<Half, unsigned int> cuda_dv_axpy_test_half_uint(PreferredBackend::cuda);
-DenseVectorAxpyTest<Half, unsigned long> cuda_dv_axpy_test_half_ulong(PreferredBackend::cuda);
+DenseVectorAxpyTest <Half, std::uint32_t> cuda_dv_axpy_test_half_uint32(PreferredBackend::cuda);
+DenseVectorAxpyTest <Half, std::uint64_t> cuda_dv_axpy_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorAxpyTest<float, unsigned int> cuda_dv_axpy_test_float_uint(PreferredBackend::cuda);
-DenseVectorAxpyTest<double, unsigned int> cuda_dv_axpy_test_double_uint(PreferredBackend::cuda);
-DenseVectorAxpyTest<float, unsigned long> cuda_dv_axpy_test_float_ulong(PreferredBackend::cuda);
-DenseVectorAxpyTest<double, unsigned long> cuda_dv_axpy_test_double_ulong(PreferredBackend::cuda);
+DenseVectorAxpyTest <float, std::uint32_t> cuda_dv_axpy_test_float_uint32(PreferredBackend::cuda);
+DenseVectorAxpyTest <double, std::uint32_t> cuda_dv_axpy_test_double_uint32(PreferredBackend::cuda);
+DenseVectorAxpyTest <float, std::uint64_t> cuda_dv_axpy_test_float_uint64(PreferredBackend::cuda);
+DenseVectorAxpyTest <double, std::uint64_t> cuda_dv_axpy_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -399,31 +399,31 @@ public:
     }
   }
 };
-DenseVectorDotTest<float, unsigned int> dv_dot_product_test_float_uint(PreferredBackend::generic);
-DenseVectorDotTest<double, unsigned int> dv_dot_product_test_double_uint(PreferredBackend::generic);
-DenseVectorDotTest<float, unsigned long> dv_dot_product_test_float_ulong(PreferredBackend::generic);
-DenseVectorDotTest<double, unsigned long> dv_dot_product_test_double_ulong(PreferredBackend::generic);
+DenseVectorDotTest <float, std::uint32_t> dv_dot_product_test_float_uint32(PreferredBackend::generic);
+DenseVectorDotTest <double, std::uint32_t> dv_dot_product_test_double_uint32(PreferredBackend::generic);
+DenseVectorDotTest <float, std::uint64_t> dv_dot_product_test_float_uint64(PreferredBackend::generic);
+DenseVectorDotTest <double, std::uint64_t> dv_dot_product_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorDotTest<__float128, unsigned int> dv_dot_product_test_float128_uint(PreferredBackend::generic);
-DenseVectorDotTest<__float128, unsigned long> dv_dot_product_test_float128_ulong(PreferredBackend::generic);
+DenseVectorDotTest <__float128, std::uint32_t> dv_dot_product_test_float128_uint32(PreferredBackend::generic);
+DenseVectorDotTest <__float128, std::uint64_t> dv_dot_product_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorDotTest<float, unsigned long> mkl_dv_dot_product_test_float_ulong(PreferredBackend::mkl);
-DenseVectorDotTest<double, unsigned long> mkl_dv_dot_product_test_double_ulong(PreferredBackend::mkl);
+DenseVectorDotTest <float, std::uint64_t> mkl_dv_dot_product_test_float_uint64(PreferredBackend::mkl);
+DenseVectorDotTest <double, std::uint64_t> mkl_dv_dot_product_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorDotTest<Half, unsigned int> dv_dot_product_test_half_uint(PreferredBackend::generic);
-DenseVectorDotTest<Half, unsigned long> dv_dot_product_test_half_ulong(PreferredBackend::generic);
+DenseVectorDotTest <Half, std::uint32_t> dv_dot_product_test_half_uint32(PreferredBackend::generic);
+DenseVectorDotTest <Half, std::uint64_t> dv_dot_product_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorDotTest<Half, unsigned int> cuda_dv_dot_product_test_half_uint(PreferredBackend::cuda);
-DenseVectorDotTest<Half, unsigned long> cuda_dv_dot_product_test_half_ulong(PreferredBackend::cuda);
+DenseVectorDotTest <Half, std::uint32_t> cuda_dv_dot_product_test_half_uint32(PreferredBackend::cuda);
+DenseVectorDotTest <Half, std::uint64_t> cuda_dv_dot_product_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorDotTest<float, unsigned int> cuda_dv_dot_product_test_float_uint(PreferredBackend::cuda);
-DenseVectorDotTest<double, unsigned int> cuda_dv_dot_product_test_double_uint(PreferredBackend::cuda);
-DenseVectorDotTest<float, unsigned long> cuda_dv_dot_product_test_float_ulong(PreferredBackend::cuda);
-DenseVectorDotTest<double, unsigned long> cuda_dv_dot_product_test_double_ulong(PreferredBackend::cuda);
+DenseVectorDotTest <float, std::uint32_t> cuda_dv_dot_product_test_float_uint32(PreferredBackend::cuda);
+DenseVectorDotTest <double, std::uint32_t> cuda_dv_dot_product_test_double_uint32(PreferredBackend::cuda);
+DenseVectorDotTest <float, std::uint64_t> cuda_dv_dot_product_test_float_uint64(PreferredBackend::cuda);
+DenseVectorDotTest <double, std::uint64_t> cuda_dv_dot_product_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -485,31 +485,31 @@ public:
     }
   }
 };
-DenseVectorTripleDotTest<float, unsigned int> dv_triple_dot_product_test_float_uint(PreferredBackend::generic);
-DenseVectorTripleDotTest<double, unsigned int> dv_triple_dot_product_test_double_uint(PreferredBackend::generic);
-DenseVectorTripleDotTest<float, unsigned long> dv_triple_dot_product_test_float_ulong(PreferredBackend::generic);
-DenseVectorTripleDotTest<double, unsigned long> dv_triple_dot_product_test_double_ulong(PreferredBackend::generic);
+DenseVectorTripleDotTest <float, std::uint32_t> dv_triple_dot_product_test_float_uint32(PreferredBackend::generic);
+DenseVectorTripleDotTest <double, std::uint32_t> dv_triple_dot_product_test_double_uint32(PreferredBackend::generic);
+DenseVectorTripleDotTest <float, std::uint64_t> dv_triple_dot_product_test_float_uint64(PreferredBackend::generic);
+DenseVectorTripleDotTest <double, std::uint64_t> dv_triple_dot_product_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorTripleDotTest<__float128, unsigned int> dv_triple_dot_product_test_float128_uint(PreferredBackend::generic);
-DenseVectorTripleDotTest<__float128, unsigned long> dv_triple_dot_product_test_float128_ulong(PreferredBackend::generic);
+DenseVectorTripleDotTest <__float128, std::uint32_t> dv_triple_dot_product_test_float128_uint32(PreferredBackend::generic);
+DenseVectorTripleDotTest <__float128, std::uint64_t> dv_triple_dot_product_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorTripleDotTest<float, unsigned long> mkl_dv_triple_dot_product_test_float_ulong(PreferredBackend::mkl);
-DenseVectorTripleDotTest<double, unsigned long> mkl_dv_triple_dot_product_test_double_ulong(PreferredBackend::mkl);
+DenseVectorTripleDotTest <float, std::uint64_t> mkl_dv_triple_dot_product_test_float_uint64(PreferredBackend::mkl);
+DenseVectorTripleDotTest <double, std::uint64_t> mkl_dv_triple_dot_product_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorTripleDotTest<Half, unsigned int> dv_triple_dot_product_test_half_uint(PreferredBackend::generic);
-DenseVectorTripleDotTest<Half, unsigned long> dv_triple_dot_product_test_half_ulong(PreferredBackend::generic);
+DenseVectorTripleDotTest <Half, std::uint32_t> dv_triple_dot_product_test_half_uint32(PreferredBackend::generic);
+DenseVectorTripleDotTest <Half, std::uint64_t> dv_triple_dot_product_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorTripleDotTest<Half, unsigned int> cuda_dv_triple_dot_product_test_half_uint(PreferredBackend::cuda);
-DenseVectorTripleDotTest<Half, unsigned long> cuda_dv_triple_dot_product_test_half_ulong(PreferredBackend::cuda);
+DenseVectorTripleDotTest <Half, std::uint32_t> cuda_dv_triple_dot_product_test_half_uint32(PreferredBackend::cuda);
+DenseVectorTripleDotTest <Half, std::uint64_t> cuda_dv_triple_dot_product_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorTripleDotTest<float, unsigned int> cuda_dv_triple_dot_product_test_float_uint(PreferredBackend::cuda);
-DenseVectorTripleDotTest<double, unsigned int> cuda_dv_triple_dot_product_test_double_uint(PreferredBackend::cuda);
-DenseVectorTripleDotTest<float, unsigned long> cuda_dv_triple_dot_product_test_float_ulong(PreferredBackend::cuda);
-DenseVectorTripleDotTest<double, unsigned long> cuda_dv_triple_dot_product_test_double_ulong(PreferredBackend::cuda);
+DenseVectorTripleDotTest <float, std::uint32_t> cuda_dv_triple_dot_product_test_float_uint32(PreferredBackend::cuda);
+DenseVectorTripleDotTest <double, std::uint32_t> cuda_dv_triple_dot_product_test_double_uint32(PreferredBackend::cuda);
+DenseVectorTripleDotTest <float, std::uint64_t> cuda_dv_triple_dot_product_test_float_uint64(PreferredBackend::cuda);
+DenseVectorTripleDotTest <double, std::uint64_t> cuda_dv_triple_dot_product_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -572,31 +572,31 @@ public:
     }
   }
 };
-DenseVectorComponentProductTest<float, unsigned int> dv_component_product_test_float_uint(PreferredBackend::generic);
-DenseVectorComponentProductTest<double, unsigned int> dv_component_product_test_double_uint(PreferredBackend::generic);
-DenseVectorComponentProductTest<float, unsigned long> dv_component_product_test_float_ulong(PreferredBackend::generic);
-DenseVectorComponentProductTest<double, unsigned long> dv_component_product_test_double_ulong(PreferredBackend::generic);
+DenseVectorComponentProductTest <float, std::uint32_t> dv_component_product_test_float_uint32(PreferredBackend::generic);
+DenseVectorComponentProductTest <double, std::uint32_t> dv_component_product_test_double_uint32(PreferredBackend::generic);
+DenseVectorComponentProductTest <float, std::uint64_t> dv_component_product_test_float_uint64(PreferredBackend::generic);
+DenseVectorComponentProductTest <double, std::uint64_t> dv_component_product_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorComponentProductTest<__float128, unsigned int> dv_component_product_test_float128_uint(PreferredBackend::generic);
-DenseVectorComponentProductTest<__float128, unsigned long> dv_component_product_test_float128_ulong(PreferredBackend::generic);
+DenseVectorComponentProductTest <__float128, std::uint32_t> dv_component_product_test_float128_uint32(PreferredBackend::generic);
+DenseVectorComponentProductTest <__float128, std::uint64_t> dv_component_product_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorComponentProductTest<float, unsigned long> mkl_dv_component_product_test_float_ulong(PreferredBackend::mkl);
-DenseVectorComponentProductTest<double, unsigned long> mkl_dv_component_product_test_double_ulong(PreferredBackend::mkl);
+DenseVectorComponentProductTest <float, std::uint64_t> mkl_dv_component_product_test_float_uint64(PreferredBackend::mkl);
+DenseVectorComponentProductTest <double, std::uint64_t> mkl_dv_component_product_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorComponentProductTest<Half, unsigned int> dv_component_product_test_half_uint(PreferredBackend::generic);
-DenseVectorComponentProductTest<Half, unsigned long> dv_component_product_test_half_ulong(PreferredBackend::generic);
+DenseVectorComponentProductTest <Half, std::uint32_t> dv_component_product_test_half_uint32(PreferredBackend::generic);
+DenseVectorComponentProductTest <Half, std::uint64_t> dv_component_product_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorComponentProductTest<Half, unsigned int> cuda_dv_component_product_test_half_uint(PreferredBackend::cuda);
-DenseVectorComponentProductTest<Half, unsigned long> cuda_dv_component_product_test_half_ulong(PreferredBackend::cuda);
+DenseVectorComponentProductTest <Half, std::uint32_t> cuda_dv_component_product_test_half_uint32(PreferredBackend::cuda);
+DenseVectorComponentProductTest <Half, std::uint64_t> cuda_dv_component_product_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorComponentProductTest<float, unsigned int> cuda_dv_component_product_test_float_uint(PreferredBackend::cuda);
-DenseVectorComponentProductTest<double, unsigned int> cuda_dv_component_product_test_double_uint(PreferredBackend::cuda);
-DenseVectorComponentProductTest<float, unsigned long> cuda_dv_component_product_test_float_ulong(PreferredBackend::cuda);
-DenseVectorComponentProductTest<double, unsigned long> cuda_dv_component_product_test_double_ulong(PreferredBackend::cuda);
+DenseVectorComponentProductTest <float, std::uint32_t> cuda_dv_component_product_test_float_uint32(PreferredBackend::cuda);
+DenseVectorComponentProductTest <double, std::uint32_t> cuda_dv_component_product_test_double_uint32(PreferredBackend::cuda);
+DenseVectorComponentProductTest <float, std::uint64_t> cuda_dv_component_product_test_float_uint64(PreferredBackend::cuda);
+DenseVectorComponentProductTest <double, std::uint64_t> cuda_dv_component_product_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -637,31 +637,31 @@ public:
     }
   }
 };
-DenseVectorScaleTest<float, unsigned int> dv_scale_test_float_uint(PreferredBackend::generic);
-DenseVectorScaleTest<double, unsigned int> dv_scale_test_double_uint(PreferredBackend::generic);
-DenseVectorScaleTest<float, unsigned long> dv_scale_test_float_ulong(PreferredBackend::generic);
-DenseVectorScaleTest<double, unsigned long> dv_scale_test_double_ulong(PreferredBackend::generic);
+DenseVectorScaleTest <float, std::uint32_t> dv_scale_test_float_uint32(PreferredBackend::generic);
+DenseVectorScaleTest <double, std::uint32_t> dv_scale_test_double_uint32(PreferredBackend::generic);
+DenseVectorScaleTest <float, std::uint64_t> dv_scale_test_float_uint64(PreferredBackend::generic);
+DenseVectorScaleTest <double, std::uint64_t> dv_scale_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorScaleTest<__float128, unsigned int> dv_scale_test_float128_uint(PreferredBackend::generic);
-DenseVectorScaleTest<__float128, unsigned long> dv_scale_test_float128_ulong(PreferredBackend::generic);
+DenseVectorScaleTest <__float128, std::uint32_t> dv_scale_test_float128_uint32(PreferredBackend::generic);
+DenseVectorScaleTest <__float128, std::uint64_t> dv_scale_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorScaleTest<float, unsigned long> mkl_dv_scale_product_test_float_ulong(PreferredBackend::mkl);
-DenseVectorScaleTest<double, unsigned long> mkl_dv_scale_product_test_double_ulong(PreferredBackend::mkl);
+DenseVectorScaleTest <float, std::uint64_t> mkl_dv_scale_product_test_float_uint64(PreferredBackend::mkl);
+DenseVectorScaleTest <double, std::uint64_t> mkl_dv_scale_product_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorScaleTest<Half, unsigned int> dv_scale_product_test_half_uint(PreferredBackend::generic);
-DenseVectorScaleTest<Half, unsigned long> dv_scale_product_test_half_ulong(PreferredBackend::generic);
+DenseVectorScaleTest <Half, std::uint32_t> dv_scale_product_test_half_uint32(PreferredBackend::generic);
+DenseVectorScaleTest <Half, std::uint64_t> dv_scale_product_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorScaleTest<Half, unsigned int> cuda_dv_scale_product_test_half_uint(PreferredBackend::cuda);
-DenseVectorScaleTest<Half, unsigned long> cuda_dv_scale_product_test_half_ulong(PreferredBackend::cuda);
+DenseVectorScaleTest <Half, std::uint32_t> cuda_dv_scale_product_test_half_uint32(PreferredBackend::cuda);
+DenseVectorScaleTest <Half, std::uint64_t> cuda_dv_scale_product_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorScaleTest<float, unsigned int> cuda_dv_scale_test_float_uint(PreferredBackend::cuda);
-DenseVectorScaleTest<double, unsigned int> cuda_dv_scale_test_double_uint(PreferredBackend::cuda);
-DenseVectorScaleTest<float, unsigned long> cuda_dv_scale_test_float_ulong(PreferredBackend::cuda);
-DenseVectorScaleTest<double, unsigned long> cuda_dv_scale_test_double_ulong(PreferredBackend::cuda);
+DenseVectorScaleTest <float, std::uint32_t> cuda_dv_scale_test_float_uint32(PreferredBackend::cuda);
+DenseVectorScaleTest <double, std::uint32_t> cuda_dv_scale_test_double_uint32(PreferredBackend::cuda);
+DenseVectorScaleTest <float, std::uint64_t> cuda_dv_scale_test_float_uint64(PreferredBackend::cuda);
+DenseVectorScaleTest <double, std::uint64_t> cuda_dv_scale_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -704,31 +704,31 @@ public:
     }
   }
 };
-DenseVectorNorm2Test<float, unsigned int> dv_norm2_test_float_uint(PreferredBackend::generic);
-DenseVectorNorm2Test<double, unsigned int> dv_norm2_test_double_uint(PreferredBackend::generic);
-DenseVectorNorm2Test<float, unsigned long> dv_norm2_test_float_ulong(PreferredBackend::generic);
-DenseVectorNorm2Test<double, unsigned long> dv_norm2_test_double_ulong(PreferredBackend::generic);
+DenseVectorNorm2Test <float, std::uint32_t> dv_norm2_test_float_uint32(PreferredBackend::generic);
+DenseVectorNorm2Test <double, std::uint32_t> dv_norm2_test_double_uint32(PreferredBackend::generic);
+DenseVectorNorm2Test <float, std::uint64_t> dv_norm2_test_float_uint64(PreferredBackend::generic);
+DenseVectorNorm2Test <double, std::uint64_t> dv_norm2_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorNorm2Test<__float128, unsigned int> dv_norm2_test_float128_uint(PreferredBackend::generic);
-DenseVectorNorm2Test<__float128, unsigned long> dv_norm2_test_float128_ulong(PreferredBackend::generic);
+DenseVectorNorm2Test <__float128, std::uint32_t> dv_norm2_test_float128_uint32(PreferredBackend::generic);
+DenseVectorNorm2Test <__float128, std::uint64_t> dv_norm2_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorNorm2Test<float, unsigned long> mkl_dv_norm2_test_float_ulong(PreferredBackend::mkl);
-DenseVectorNorm2Test<double, unsigned long> mkl_dv_norm2_test_double_ulong(PreferredBackend::mkl);
+DenseVectorNorm2Test <float, std::uint64_t> mkl_dv_norm2_test_float_uint64(PreferredBackend::mkl);
+DenseVectorNorm2Test <double, std::uint64_t> mkl_dv_norm2_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorNorm2Test<Half, unsigned int> dv_norm2_test_half_uint(PreferredBackend::generic);
-DenseVectorNorm2Test<Half, unsigned long> dv_norm2_test_half_ulong(PreferredBackend::generic);
+DenseVectorNorm2Test <Half, std::uint32_t> dv_norm2_test_half_uint32(PreferredBackend::generic);
+DenseVectorNorm2Test <Half, std::uint64_t> dv_norm2_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorNorm2Test<Half, unsigned int> cuda_dv_norm2_test_half_uint(PreferredBackend::cuda);
-DenseVectorNorm2Test<Half, unsigned long> cuda_dv_norm2_test_half_ulong(PreferredBackend::cuda);
+DenseVectorNorm2Test <Half, std::uint32_t> cuda_dv_norm2_test_half_uint32(PreferredBackend::cuda);
+DenseVectorNorm2Test <Half, std::uint64_t> cuda_dv_norm2_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorNorm2Test<float, unsigned int> cuda_dv_norm2_test_float_uint(PreferredBackend::cuda);
-DenseVectorNorm2Test<double, unsigned int> cuda_dv_norm2_test_double_uint(PreferredBackend::cuda);
-DenseVectorNorm2Test<float, unsigned long> cuda_dv_norm2_test_float_ulong(PreferredBackend::cuda);
-DenseVectorNorm2Test<double, unsigned long> cuda_dv_norm2_test_double_ulong(PreferredBackend::cuda);
+DenseVectorNorm2Test <float, std::uint32_t> cuda_dv_norm2_test_float_uint32(PreferredBackend::cuda);
+DenseVectorNorm2Test <double, std::uint32_t> cuda_dv_norm2_test_double_uint32(PreferredBackend::cuda);
+DenseVectorNorm2Test <float, std::uint64_t> cuda_dv_norm2_test_float_uint64(PreferredBackend::cuda);
+DenseVectorNorm2Test <double, std::uint64_t> cuda_dv_norm2_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -840,31 +840,31 @@ public:
     }
   }
 };
-DenseVectorMaxAbsElementTest<float, unsigned int> dv_max_abs_element_test_float_uint(PreferredBackend::generic);
-DenseVectorMaxAbsElementTest<double, unsigned int> dv_max_abs_element_test_double_uint(PreferredBackend::generic);
-DenseVectorMaxAbsElementTest<float, unsigned long> dv_max_abs_element_test_float_ulong(PreferredBackend::generic);
-DenseVectorMaxAbsElementTest<double, unsigned long> dv_max_abs_element_test_double_ulong(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <float, std::uint32_t> dv_max_abs_element_test_float_uint32(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <double, std::uint32_t> dv_max_abs_element_test_double_uint32(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <float, std::uint64_t> dv_max_abs_element_test_float_uint64(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <double, std::uint64_t> dv_max_abs_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMaxAbsElementTest<__float128, unsigned int> dv_max_abs_element_test_float128_uint(PreferredBackend::generic);
-DenseVectorMaxAbsElementTest<__float128, unsigned long> dv_max_abs_element_test_float128_ulong(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <__float128, std::uint32_t> dv_max_abs_element_test_float128_uint32(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <__float128, std::uint64_t> dv_max_abs_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorMaxAbsElementTest<float, unsigned long> mkl_dv_max_abs_test_float_ulong(PreferredBackend::mkl);
-DenseVectorMaxAbsElementTest<double, unsigned long> mkl_dv_max_abs_test_double_ulong(PreferredBackend::mkl);
+DenseVectorMaxAbsElementTest <float, std::uint64_t> mkl_dv_max_abs_test_float_uint64(PreferredBackend::mkl);
+DenseVectorMaxAbsElementTest <double, std::uint64_t> mkl_dv_max_abs_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorMaxAbsElementTest<Half, unsigned int> dv_max_abs_test_half_uint(PreferredBackend::generic);
-DenseVectorMaxAbsElementTest<Half, unsigned long> dv_max_abs_test_half_ulong(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <Half, std::uint32_t> dv_max_abs_test_half_uint32(PreferredBackend::generic);
+DenseVectorMaxAbsElementTest <Half, std::uint64_t> dv_max_abs_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMaxAbsElementTest<Half, unsigned int> cuda_dv_max_abs_test_half_uint(PreferredBackend::cuda);
-DenseVectorMaxAbsElementTest<Half, unsigned long> cuda_dv_max_abs_test_half_ulong(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest <Half, std::uint32_t> cuda_dv_max_abs_test_half_uint32(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest <Half, std::uint64_t> cuda_dv_max_abs_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMaxAbsElementTest<float, unsigned int> cuda_dv_max_abs_element_test_float_uint(PreferredBackend::cuda);
-DenseVectorMaxAbsElementTest<double, unsigned int> cuda_dv_max_abs_element_test_double_uint(PreferredBackend::cuda);
-DenseVectorMaxAbsElementTest<float, unsigned long> cuda_dv_max_abs_element_test_float_ulong(PreferredBackend::cuda);
-DenseVectorMaxAbsElementTest<double, unsigned long> cuda_dv_max_abs_element_test_double_ulong(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest <float, std::uint32_t> cuda_dv_max_abs_element_test_float_uint32(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest <double, std::uint32_t> cuda_dv_max_abs_element_test_double_uint32(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest <float, std::uint64_t> cuda_dv_max_abs_element_test_float_uint64(PreferredBackend::cuda);
+DenseVectorMaxAbsElementTest <double, std::uint64_t> cuda_dv_max_abs_element_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -905,31 +905,31 @@ public:
     }
   }
 };
-DenseVectorMinAbsElementTest<float, unsigned int> dv_min_abs_element_test_float_uint(PreferredBackend::generic);
-DenseVectorMinAbsElementTest<double, unsigned int> dv_min_abs_element_test_double_uint(PreferredBackend::generic);
-DenseVectorMinAbsElementTest<float, unsigned long> dv_min_abs_element_test_float_ulong(PreferredBackend::generic);
-DenseVectorMinAbsElementTest<double, unsigned long> dv_min_abs_element_test_double_ulong(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <float, std::uint32_t> dv_min_abs_element_test_float_uint32(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <double, std::uint32_t> dv_min_abs_element_test_double_uint32(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <float, std::uint64_t> dv_min_abs_element_test_float_uint64(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <double, std::uint64_t> dv_min_abs_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMinAbsElementTest<__float128, unsigned int> dv_min_abs_element_test_float128_uint(PreferredBackend::generic);
-DenseVectorMinAbsElementTest<__float128, unsigned long> dv_min_abs_element_test_float128_ulong(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <__float128, std::uint32_t> dv_min_abs_element_test_float128_uint32(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <__float128, std::uint64_t> dv_min_abs_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorMinAbsElementTest<float, unsigned long> mkl_dv_min_abs_test_float_ulong(PreferredBackend::mkl);
-DenseVectorMinAbsElementTest<double, unsigned long> mkl_dv_min_abs_test_double_ulong(PreferredBackend::mkl);
+DenseVectorMinAbsElementTest <float, std::uint64_t> mkl_dv_min_abs_test_float_uint64(PreferredBackend::mkl);
+DenseVectorMinAbsElementTest <double, std::uint64_t> mkl_dv_min_abs_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorMinAbsElementTest<Half, unsigned int> dv_min_abs_test_half_uint(PreferredBackend::generic);
-DenseVectorMinAbsElementTest<Half, unsigned long> dv_min_abs_test_half_ulong(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <Half, std::uint32_t> dv_min_abs_test_half_uint32(PreferredBackend::generic);
+DenseVectorMinAbsElementTest <Half, std::uint64_t> dv_min_abs_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMinAbsElementTest<Half, unsigned int> cuda_dv_min_abs_test_half_uint(PreferredBackend::cuda);
-DenseVectorMinAbsElementTest<Half, unsigned long> cuda_dv_min_abs_test_half_ulong(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest <Half, std::uint32_t> cuda_dv_min_abs_test_half_uint32(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest <Half, std::uint64_t> cuda_dv_min_abs_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMinAbsElementTest<float, unsigned int> cuda_dv_min_abs_element_test_float_uint(PreferredBackend::cuda);
-DenseVectorMinAbsElementTest<double, unsigned int> cuda_dv_min_abs_element_test_double_uint(PreferredBackend::cuda);
-DenseVectorMinAbsElementTest<float, unsigned long> cuda_dv_min_abs_element_test_float_ulong(PreferredBackend::cuda);
-DenseVectorMinAbsElementTest<double, unsigned long> cuda_dv_min_abs_element_test_double_ulong(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest <float, std::uint32_t> cuda_dv_min_abs_element_test_float_uint32(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest <double, std::uint32_t> cuda_dv_min_abs_element_test_double_uint32(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest <float, std::uint64_t> cuda_dv_min_abs_element_test_float_uint64(PreferredBackend::cuda);
+DenseVectorMinAbsElementTest <double, std::uint64_t> cuda_dv_min_abs_element_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -971,31 +971,31 @@ public:
     }
   }
 };
-DenseVectorMaxElementTest<float, unsigned int> dv_max_element_test_float_uint(PreferredBackend::generic);
-DenseVectorMaxElementTest<double, unsigned int> dv_max_element_test_double_uint(PreferredBackend::generic);
-DenseVectorMaxElementTest<float, unsigned long> dv_max_element_test_float_ulong(PreferredBackend::generic);
-DenseVectorMaxElementTest<double, unsigned long> dv_max_element_test_double_ulong(PreferredBackend::generic);
+DenseVectorMaxElementTest <float, std::uint32_t> dv_max_element_test_float_uint32(PreferredBackend::generic);
+DenseVectorMaxElementTest <double, std::uint32_t> dv_max_element_test_double_uint32(PreferredBackend::generic);
+DenseVectorMaxElementTest <float, std::uint64_t> dv_max_element_test_float_uint64(PreferredBackend::generic);
+DenseVectorMaxElementTest <double, std::uint64_t> dv_max_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMaxElementTest<__float128, unsigned int> dv_max_element_test_float128_uint(PreferredBackend::generic);
-DenseVectorMaxElementTest<__float128, unsigned long> dv_max_element_test_float128_ulong(PreferredBackend::generic);
+DenseVectorMaxElementTest <__float128, std::uint32_t> dv_max_element_test_float128_uint32(PreferredBackend::generic);
+DenseVectorMaxElementTest <__float128, std::uint64_t> dv_max_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorMaxElementTest<float, unsigned long> mkl_dv_max_test_float_ulong(PreferredBackend::mkl);
-DenseVectorMaxElementTest<double, unsigned long> mkl_dv_max_test_double_ulong(PreferredBackend::mkl);
+DenseVectorMaxElementTest <float, std::uint64_t> mkl_dv_max_test_float_uint64(PreferredBackend::mkl);
+DenseVectorMaxElementTest <double, std::uint64_t> mkl_dv_max_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorMaxElementTest<Half, unsigned int> dv_max_test_half_uint(PreferredBackend::generic);
-DenseVectorMaxElementTest<Half, unsigned long> dv_max_test_half_ulong(PreferredBackend::generic);
+DenseVectorMaxElementTest <Half, std::uint32_t> dv_max_test_half_uint32(PreferredBackend::generic);
+DenseVectorMaxElementTest <Half, std::uint64_t> dv_max_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMaxElementTest<Half, unsigned int> cuda_dv_max_test_half_uint(PreferredBackend::cuda);
-DenseVectorMaxElementTest<Half, unsigned long> cuda_dv_max_test_half_ulong(PreferredBackend::cuda);
+DenseVectorMaxElementTest <Half, std::uint32_t> cuda_dv_max_test_half_uint32(PreferredBackend::cuda);
+DenseVectorMaxElementTest <Half, std::uint64_t> cuda_dv_max_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMaxElementTest<float, unsigned int> cuda_dv_max_element_test_float_uint(PreferredBackend::cuda);
-DenseVectorMaxElementTest<double, unsigned int> cuda_dv_max_element_test_double_uint(PreferredBackend::cuda);
-DenseVectorMaxElementTest<float, unsigned long> cuda_dv_max_element_test_float_ulong(PreferredBackend::cuda);
-DenseVectorMaxElementTest<double, unsigned long> cuda_dv_max_element_test_double_ulong(PreferredBackend::cuda);
+DenseVectorMaxElementTest <float, std::uint32_t> cuda_dv_max_element_test_float_uint32(PreferredBackend::cuda);
+DenseVectorMaxElementTest <double, std::uint32_t> cuda_dv_max_element_test_double_uint32(PreferredBackend::cuda);
+DenseVectorMaxElementTest <float, std::uint64_t> cuda_dv_max_element_test_float_uint64(PreferredBackend::cuda);
+DenseVectorMaxElementTest <double, std::uint64_t> cuda_dv_max_element_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1036,29 +1036,29 @@ public:
     }
   }
 };
-DenseVectorMinElementTest<float, unsigned int> dv_min_element_test_float_uint(PreferredBackend::generic);
-DenseVectorMinElementTest<double, unsigned int> dv_min_element_test_double_uint(PreferredBackend::generic);
-DenseVectorMinElementTest<float, unsigned long> dv_min_element_test_float_ulong(PreferredBackend::generic);
-DenseVectorMinElementTest<double, unsigned long> dv_min_element_test_double_ulong(PreferredBackend::generic);
+DenseVectorMinElementTest <float, std::uint32_t> dv_min_element_test_float_uint32(PreferredBackend::generic);
+DenseVectorMinElementTest <double, std::uint32_t> dv_min_element_test_double_uint32(PreferredBackend::generic);
+DenseVectorMinElementTest <float, std::uint64_t> dv_min_element_test_float_uint64(PreferredBackend::generic);
+DenseVectorMinElementTest <double, std::uint64_t> dv_min_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorMinElementTest<__float128, unsigned int> dv_min_element_test_float128_uint(PreferredBackend::generic);
-DenseVectorMinElementTest<__float128, unsigned long> dv_min_element_test_float128_ulong(PreferredBackend::generic);
+DenseVectorMinElementTest <__float128, std::uint32_t> dv_min_element_test_float128_uint32(PreferredBackend::generic);
+DenseVectorMinElementTest <__float128, std::uint64_t> dv_min_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_MKL
-DenseVectorMinElementTest<float, unsigned long> mkl_dv_min_test_float_ulong(PreferredBackend::mkl);
-DenseVectorMinElementTest<double, unsigned long> mkl_dv_min_test_double_ulong(PreferredBackend::mkl);
+DenseVectorMinElementTest <float, std::uint64_t> mkl_dv_min_test_float_uint64(PreferredBackend::mkl);
+DenseVectorMinElementTest <double, std::uint64_t> mkl_dv_min_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorMinElementTest<Half, unsigned int> dv_min_test_half_uint(PreferredBackend::generic);
-DenseVectorMinElementTest<Half, unsigned long> dv_min_test_half_ulong(PreferredBackend::generic);
+DenseVectorMinElementTest <Half, std::uint32_t> dv_min_test_half_uint32(PreferredBackend::generic);
+DenseVectorMinElementTest <Half, std::uint64_t> dv_min_test_half_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMinElementTest<Half, unsigned int> cuda_dv_min_test_half_uint(PreferredBackend::cuda);
-DenseVectorMinElementTest<Half, unsigned long> cuda_dv_min_test_half_ulong(PreferredBackend::cuda);
+DenseVectorMinElementTest <Half, std::uint32_t> cuda_dv_min_test_half_uint32(PreferredBackend::cuda);
+DenseVectorMinElementTest <Half, std::uint64_t> cuda_dv_min_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorMinElementTest<float, unsigned int> cuda_dv_min_element_test_float_uint(PreferredBackend::cuda);
-DenseVectorMinElementTest<double, unsigned int> cuda_dv_min_element_test_double_uint(PreferredBackend::cuda);
-DenseVectorMinElementTest<float, unsigned long> cuda_dv_min_element_test_float_ulong(PreferredBackend::cuda);
-DenseVectorMinElementTest<double, unsigned long> cuda_dv_min_element_test_double_ulong(PreferredBackend::cuda);
+DenseVectorMinElementTest <float, std::uint32_t> cuda_dv_min_element_test_float_uint32(PreferredBackend::cuda);
+DenseVectorMinElementTest <double, std::uint32_t> cuda_dv_min_element_test_double_uint32(PreferredBackend::cuda);
+DenseVectorMinElementTest <float, std::uint64_t> cuda_dv_min_element_test_float_uint64(PreferredBackend::cuda);
+DenseVectorMinElementTest <double, std::uint64_t> cuda_dv_min_element_test_double_uint64(PreferredBackend::cuda);
 #endif

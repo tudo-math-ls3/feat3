@@ -224,25 +224,25 @@ public:
   }
 };
 
-GridTransferTest<float, unsigned int> grid_transfer_test_csr_float_uint(PreferredBackend::generic);
-GridTransferTest<float, unsigned long> grid_transfer_test_csr_float_ulong(PreferredBackend::generic);
-GridTransferTest<double, unsigned int> grid_transfer_test_csr_double_uint(PreferredBackend::generic);
-GridTransferTest<double, unsigned long> grid_transfer_test_csr_double_ulong(PreferredBackend::generic);
+GridTransferTest <float, std::uint32_t> grid_transfer_test_csr_float_uint32(PreferredBackend::generic);
+GridTransferTest <float, std::uint64_t> grid_transfer_test_csr_float_uint64(PreferredBackend::generic);
+GridTransferTest <double, std::uint32_t> grid_transfer_test_csr_double_uint32(PreferredBackend::generic);
+GridTransferTest <double, std::uint64_t> grid_transfer_test_csr_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-GridTransferTest<float, unsigned long> mkl_grid_transfer_test_csr_float_ulong(PreferredBackend::mkl);
-GridTransferTest<double, unsigned long> mkl_grid_transfer_test_csr_double_ulong(PreferredBackend::mkl);
+GridTransferTest <float, std::uint64_t> mkl_grid_transfer_test_csr_float_uint64(PreferredBackend::mkl);
+GridTransferTest <double, std::uint64_t> mkl_grid_transfer_test_csr_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-GridTransferTest<__float128, unsigned int> grid_transfer_test_csr_float128_uint(PreferredBackend::generic);
-GridTransferTest<__float128, unsigned long> grid_transfer_test_csr_float128_ulong(PreferredBackend::generic);
+GridTransferTest <__float128, std::uint32_t> grid_transfer_test_csr_float128_uint32(PreferredBackend::generic);
+GridTransferTest <__float128, std::uint64_t> grid_transfer_test_csr_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-GridTransferTest<Half, unsigned int> grid_transfer_test_csr_half_uint(PreferredBackend::generic);
-GridTransferTest<Half, unsigned long> grid_transfer_test_csr_half_ulong(PreferredBackend::generic);
+GridTransferTest <Half, std::uint32_t> grid_transfer_test_csr_half_uint32(PreferredBackend::generic);
+GridTransferTest <Half, std::uint64_t> grid_transfer_test_csr_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-GridTransferTest<float, unsigned int> cuda_grid_transfer_test_csr_float_uint(PreferredBackend::cuda);
-GridTransferTest<double, unsigned int> cuda_grid_transfer_test_csr_double_uint(PreferredBackend::cuda);
-GridTransferTest<float, unsigned long> cuda_grid_transfer_test_csr_float_ulong(PreferredBackend::cuda);
-GridTransferTest<double, unsigned long> cuda_grid_transfer_test_csr_double_ulong(PreferredBackend::cuda);
+GridTransferTest <float, std::uint32_t> cuda_grid_transfer_test_csr_float_uint32(PreferredBackend::cuda);
+GridTransferTest <double, std::uint32_t> cuda_grid_transfer_test_csr_double_uint32(PreferredBackend::cuda);
+GridTransferTest <float, std::uint64_t> cuda_grid_transfer_test_csr_float_uint64(PreferredBackend::cuda);
+GridTransferTest <double, std::uint64_t> cuda_grid_transfer_test_csr_double_uint64(PreferredBackend::cuda);
 #endif

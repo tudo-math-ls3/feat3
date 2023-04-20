@@ -121,25 +121,25 @@ public:
   }
 };
 
-MetaMatrixApplyTest<float, unsigned long> meta_matrix_apply_test_generic_float_ulong(PreferredBackend::generic);
-MetaMatrixApplyTest<double, unsigned long> meta_matrix_apply_test_generic_double_ulong(PreferredBackend::generic);
-MetaMatrixApplyTest<float, unsigned int> meta_matrix_apply_test_generic_float_uint(PreferredBackend::generic);
-MetaMatrixApplyTest<double, unsigned int> meta_matrix_apply_test_generic_double_uint(PreferredBackend::generic);
+MetaMatrixApplyTest <float, std::uint64_t> meta_matrix_apply_test_generic_float_uint64(PreferredBackend::generic);
+MetaMatrixApplyTest <double, std::uint64_t> meta_matrix_apply_test_generic_double_uint64(PreferredBackend::generic);
+MetaMatrixApplyTest <float, std::uint32_t> meta_matrix_apply_test_generic_float_uint32(PreferredBackend::generic);
+MetaMatrixApplyTest <double, std::uint32_t> meta_matrix_apply_test_generic_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaMatrixApplyTest<float, unsigned long> mkl_meta_matrix_apply_test_float_ulong(PreferredBackend::mkl);
-MetaMatrixApplyTest<double, unsigned long> mkl_meta_matrix_apply_test_double_ulong(PreferredBackend::mkl);
+MetaMatrixApplyTest <float, std::uint64_t> mkl_meta_matrix_apply_test_float_uint64(PreferredBackend::mkl);
+MetaMatrixApplyTest <double, std::uint64_t> mkl_meta_matrix_apply_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaMatrixApplyTest<__float128, unsigned long> meta_matrix_apply_test_float128_ulong(PreferredBackend::generic);
-MetaMatrixApplyTest<__float128, unsigned int> meta_matrix_apply_test_float128_uint(PreferredBackend::generic);
+MetaMatrixApplyTest <__float128, std::uint64_t> meta_matrix_apply_test_float128_uint64(PreferredBackend::generic);
+MetaMatrixApplyTest <__float128, std::uint32_t> meta_matrix_apply_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaMatrixApplyTest<Half, unsigned int> meta_matrix_apply_test_half_uint(PreferredBackend::generic);
-MetaMatrixApplyTest<Half, unsigned long> meta_matrix_apply_test_half_ulong(PreferredBackend::generic);
+MetaMatrixApplyTest <Half, std::uint32_t> meta_matrix_apply_test_half_uint32(PreferredBackend::generic);
+MetaMatrixApplyTest <Half, std::uint64_t> meta_matrix_apply_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaMatrixApplyTest<float, unsigned long> cuda_meta_matrix_apply_test_float_ulong(PreferredBackend::cuda);
-MetaMatrixApplyTest<double, unsigned long> cuda_meta_matrix_apply_test_double_ulong(PreferredBackend::cuda);
-MetaMatrixApplyTest<float, unsigned int> cuda_meta_matrix_apply_test_float_uint(PreferredBackend::cuda);
-MetaMatrixApplyTest<double, unsigned int> cuda_meta_matrix_apply_test_double_uint(PreferredBackend::cuda);
+MetaMatrixApplyTest <float, std::uint64_t> cuda_meta_matrix_apply_test_float_uint64(PreferredBackend::cuda);
+MetaMatrixApplyTest <double, std::uint64_t> cuda_meta_matrix_apply_test_double_uint64(PreferredBackend::cuda);
+MetaMatrixApplyTest <float, std::uint32_t> cuda_meta_matrix_apply_test_float_uint32(PreferredBackend::cuda);
+MetaMatrixApplyTest <double, std::uint32_t> cuda_meta_matrix_apply_test_double_uint32(PreferredBackend::cuda);
 #endif

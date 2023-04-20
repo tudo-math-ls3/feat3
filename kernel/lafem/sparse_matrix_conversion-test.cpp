@@ -80,27 +80,27 @@ public:
     TEST_CHECK_EQUAL(csr_m1, csr_m3);
   }
 };
-SparseMatrixConversionTest<float, unsigned int> sparse_matrix_conversion_test_float_uint(PreferredBackend::generic);
-SparseMatrixConversionTest<double, unsigned int> sparse_matrix_conversion_test_double_uint(PreferredBackend::generic);
-SparseMatrixConversionTest<float, unsigned long> sparse_matrix_conversion_test_float_ulong(PreferredBackend::generic);
-SparseMatrixConversionTest<double, unsigned long> sparse_matrix_conversion_test_double_ulong(PreferredBackend::generic);
+SparseMatrixConversionTest <float, std::uint32_t> sparse_matrix_conversion_test_float_uint32(PreferredBackend::generic);
+SparseMatrixConversionTest <double, std::uint32_t> sparse_matrix_conversion_test_double_uint32(PreferredBackend::generic);
+SparseMatrixConversionTest <float, std::uint64_t> sparse_matrix_conversion_test_float_uint64(PreferredBackend::generic);
+SparseMatrixConversionTest <double, std::uint64_t> sparse_matrix_conversion_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixConversionTest<float, unsigned long> mkl_sparse_matrix_conversion_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixConversionTest<double, unsigned long> mkl_sparse_matrix_conversion_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixConversionTest <float, std::uint64_t> mkl_sparse_matrix_conversion_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixConversionTest <double, std::uint64_t> mkl_sparse_matrix_conversion_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixConversionTest<__float128, unsigned long> sparse_matrix_conversion_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixConversionTest<__float128, unsigned int> sparse_matrix_conversion_test_float128_uint(PreferredBackend::generic);
+SparseMatrixConversionTest <__float128, std::uint64_t> sparse_matrix_conversion_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixConversionTest <__float128, std::uint32_t> sparse_matrix_conversion_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixConversionTest<Half, unsigned int> sparse_matrix_conversion_test_half_uint(PreferredBackend::generic);
-SparseMatrixConversionTest<Half, unsigned long> sparse_matrix_conversion_test_half_ulong(PreferredBackend::generic);
+SparseMatrixConversionTest <Half, std::uint32_t> sparse_matrix_conversion_test_half_uint32(PreferredBackend::generic);
+SparseMatrixConversionTest <Half, std::uint64_t> sparse_matrix_conversion_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixConversionTest<float, unsigned long> cuda_sparse_matrix_conversion_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixConversionTest<double, unsigned long> cuda_sparse_matrix_conversion_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixConversionTest<float, unsigned int> cuda_sparse_matrix_conversion_test_float_uint(PreferredBackend::cuda);
-SparseMatrixConversionTest<double, unsigned int> cuda_sparse_matrix_conversion_test_double_uint(PreferredBackend::cuda);
+SparseMatrixConversionTest <float, std::uint64_t> cuda_sparse_matrix_conversion_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixConversionTest <double, std::uint64_t> cuda_sparse_matrix_conversion_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixConversionTest <float, std::uint32_t> cuda_sparse_matrix_conversion_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixConversionTest <double, std::uint32_t> cuda_sparse_matrix_conversion_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 /**
@@ -177,25 +177,25 @@ public:
   }
 };
 
-SparseMatrixBandedConversionTest<SparseMatrixCSR<float, unsigned int> > sparse_matrix_banded_csr_conversion_test_float_uint(PreferredBackend::generic);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<double, unsigned int> > sparse_matrix_banded_csr_conversion_test_double_uint(PreferredBackend::generic);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<float, unsigned long> > sparse_matrix_banded_csr_conversion_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<double, unsigned long> > sparse_matrix_banded_csr_conversion_test_double_ulong(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<float, std::uint32_t> > sparse_matrix_banded_csr_conversion_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<double, std::uint32_t> > sparse_matrix_banded_csr_conversion_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<float, std::uint64_t> > sparse_matrix_banded_csr_conversion_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<double, std::uint64_t> > sparse_matrix_banded_csr_conversion_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBandedConversionTest<SparseMatrixCSR<float, unsigned long> > mkl_sparse_matrix_banded_csr_conversion_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<double, unsigned long> > mkl_sparse_matrix_banded_csr_conversion_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<float, std::uint64_t> > mkl_sparse_matrix_banded_csr_conversion_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<double, std::uint64_t> > mkl_sparse_matrix_banded_csr_conversion_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBandedConversionTest<SparseMatrixCSR<__float128, unsigned long> > sparse_matrix_banded_csr_conversion_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<__float128, unsigned int> > sparse_matrix_banded_csr_conversion_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<__float128, std::uint64_t> > sparse_matrix_banded_csr_conversion_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<__float128, std::uint32_t> > sparse_matrix_banded_csr_conversion_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBandedConversionTest<SparseMatrixCSR<Half, unsigned int> > sparse_matrix_banded_csr_conversion_test_half_uint(PreferredBackend::generic);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<Half, unsigned long> > sparse_matrix_banded_csr_conversion_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<Half, std::uint32_t> > sparse_matrix_banded_csr_conversion_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<Half, std::uint64_t> > sparse_matrix_banded_csr_conversion_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedConversionTest<SparseMatrixCSR<float, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<double, unsigned int> > cuda_sparse_matrix_banded_csr_conversion_test_double_uint(PreferredBackend::cuda);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<float, unsigned long> > cuda_sparse_matrix_banded_csr_conversion_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBandedConversionTest<SparseMatrixCSR<double, unsigned long> > cuda_sparse_matrix_banded_csr_conversion_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<float, std::uint32_t> > cuda_sparse_matrix_banded_csr_conversion_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<double, std::uint32_t> > cuda_sparse_matrix_banded_csr_conversion_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<float, std::uint64_t> > cuda_sparse_matrix_banded_csr_conversion_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedConversionTest <SparseMatrixCSR<double, std::uint64_t> > cuda_sparse_matrix_banded_csr_conversion_test_double_uint64(PreferredBackend::cuda);
 #endif

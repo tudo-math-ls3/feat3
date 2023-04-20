@@ -249,25 +249,25 @@ public:
   }
 };
 
-AlgDofPartiTest<float, unsigned int> alg_dof_parti_test_float_uint(PreferredBackend::generic);
-AlgDofPartiTest<double, unsigned int> alg_dof_parti_test_double_uint(PreferredBackend::generic);
-AlgDofPartiTest<float, unsigned long> alg_dof_parti_test_float_ulong(PreferredBackend::generic);
-AlgDofPartiTest<double, unsigned long> alg_dof_parti_test_double_ulong(PreferredBackend::generic);
+AlgDofPartiTest <float, std::uint32_t> alg_dof_parti_test_float_uint32(PreferredBackend::generic);
+AlgDofPartiTest <double, std::uint32_t> alg_dof_parti_test_double_uint32(PreferredBackend::generic);
+AlgDofPartiTest <float, std::uint64_t> alg_dof_parti_test_float_uint64(PreferredBackend::generic);
+AlgDofPartiTest <double, std::uint64_t> alg_dof_parti_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-AlgDofPartiTest<float, unsigned long> mkl_alg_dof_parti_test_float_ulong(PreferredBackend::mkl);
-AlgDofPartiTest<double, unsigned long> mkl_alg_dof_parti_test_double_ulong(PreferredBackend::mkl);
+AlgDofPartiTest <float, std::uint64_t> mkl_alg_dof_parti_test_float_uint64(PreferredBackend::mkl);
+AlgDofPartiTest <double, std::uint64_t> mkl_alg_dof_parti_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-AlgDofPartiTest<__float128, unsigned int> alg_dof_parti_test_float128_uint(PreferredBackend::generic);
-AlgDofPartiTest<__float128, unsigned long> alg_dof_parti_test_float128_ulong(PreferredBackend::generic);
+AlgDofPartiTest <__float128, std::uint32_t> alg_dof_parti_test_float128_uint32(PreferredBackend::generic);
+AlgDofPartiTest <__float128, std::uint64_t> alg_dof_parti_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-AlgDofPartiTest<Half, unsigned int> alg_dof_parti_test_half_uint(PreferredBackend::generic);
-AlgDofPartiTest<Half, unsigned long> alg_dof_parti_test_half_ulong(PreferredBackend::generic);
+AlgDofPartiTest <Half, std::uint32_t> alg_dof_parti_test_half_uint32(PreferredBackend::generic);
+AlgDofPartiTest <Half, std::uint64_t> alg_dof_parti_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-AlgDofPartiTest<float, unsigned int> cuda_alg_dof_parti_test_float_uint(PreferredBackend::cuda);
-AlgDofPartiTest<double, unsigned int> cuda_alg_dof_parti_test_double_uint(PreferredBackend::cuda);
-AlgDofPartiTest<float, unsigned long> cuda_alg_dof_parti_test_float_ulong(PreferredBackend::cuda);
-AlgDofPartiTest<double, unsigned long> cuda_alg_dof_parti_test_double_ulong(PreferredBackend::cuda);
+AlgDofPartiTest <float, std::uint32_t> cuda_alg_dof_parti_test_float_uint32(PreferredBackend::cuda);
+AlgDofPartiTest <double, std::uint32_t> cuda_alg_dof_parti_test_double_uint32(PreferredBackend::cuda);
+AlgDofPartiTest <float, std::uint64_t> cuda_alg_dof_parti_test_float_uint64(PreferredBackend::cuda);
+AlgDofPartiTest <double, std::uint64_t> cuda_alg_dof_parti_test_double_uint64(PreferredBackend::cuda);
 #endif

@@ -68,25 +68,25 @@ public:
   }
 };
 
-MetaMatrixIOTest<float, unsigned long> meta_matrix_io_test_generic_float_ulong(PreferredBackend::generic);
-MetaMatrixIOTest<double, unsigned long> meta_matrix_io_test_generic_double_ulong(PreferredBackend::generic);
-MetaMatrixIOTest<float, unsigned int> meta_matrix_io_test_generic_float_uint(PreferredBackend::generic);
-MetaMatrixIOTest<double, unsigned int> meta_matrix_io_test_generic_double_uint(PreferredBackend::generic);
+MetaMatrixIOTest <float, std::uint64_t> meta_matrix_io_test_generic_float_uint64(PreferredBackend::generic);
+MetaMatrixIOTest <double, std::uint64_t> meta_matrix_io_test_generic_double_uint64(PreferredBackend::generic);
+MetaMatrixIOTest <float, std::uint32_t> meta_matrix_io_test_generic_float_uint32(PreferredBackend::generic);
+MetaMatrixIOTest <double, std::uint32_t> meta_matrix_io_test_generic_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaMatrixIOTest<float, unsigned long> mkl_meta_matrix_io_test_float_ulong(PreferredBackend::mkl);
-MetaMatrixIOTest<double, unsigned long> mkl_meta_matrix_io_test_double_ulong(PreferredBackend::mkl);
+MetaMatrixIOTest <float, std::uint64_t> mkl_meta_matrix_io_test_float_uint64(PreferredBackend::mkl);
+MetaMatrixIOTest <double, std::uint64_t> mkl_meta_matrix_io_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaMatrixIOTest<__float128, unsigned long> meta_matrix_io_test_float128_ulong(PreferredBackend::generic);
-MetaMatrixIOTest<__float128, unsigned int> meta_matrix_io_test_float128_uint(PreferredBackend::generic);
+MetaMatrixIOTest <__float128, std::uint64_t> meta_matrix_io_test_float128_uint64(PreferredBackend::generic);
+MetaMatrixIOTest <__float128, std::uint32_t> meta_matrix_io_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaMatrixIOTest<Half, unsigned int> meta_matrix_io_test_half_uint(PreferredBackend::generic);
-MetaMatrixIOTest<Half, unsigned long> meta_matrix_io_test_half_ulong(PreferredBackend::generic);
+MetaMatrixIOTest <Half, std::uint32_t> meta_matrix_io_test_half_uint32(PreferredBackend::generic);
+MetaMatrixIOTest <Half, std::uint64_t> meta_matrix_io_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaMatrixIOTest<float, unsigned long> cuda_meta_matrix_io_test_float_ulong(PreferredBackend::cuda);
-MetaMatrixIOTest<double, unsigned long> cuda_meta_matrix_io_test_double_ulong(PreferredBackend::cuda);
-MetaMatrixIOTest<float, unsigned int> cuda_meta_matrix_io_test_float_uint(PreferredBackend::cuda);
-MetaMatrixIOTest<double, unsigned int> cuda_meta_matrix_io_test_double_uint(PreferredBackend::cuda);
+MetaMatrixIOTest <float, std::uint64_t> cuda_meta_matrix_io_test_float_uint64(PreferredBackend::cuda);
+MetaMatrixIOTest <double, std::uint64_t> cuda_meta_matrix_io_test_double_uint64(PreferredBackend::cuda);
+MetaMatrixIOTest <float, std::uint32_t> cuda_meta_matrix_io_test_float_uint32(PreferredBackend::cuda);
+MetaMatrixIOTest <double, std::uint32_t> cuda_meta_matrix_io_test_double_uint32(PreferredBackend::cuda);
 #endif

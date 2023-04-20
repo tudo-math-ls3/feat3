@@ -160,25 +160,25 @@ public:
   }
 };
 
-LinearFunctionalTest<float, unsigned int> linear_functional_test_float_uint(PreferredBackend::generic);
-LinearFunctionalTest<double, unsigned int> linear_functional_test_double_uint(PreferredBackend::generic);
-LinearFunctionalTest<float, unsigned long> linear_functional_test_float_ulong(PreferredBackend::generic);
-LinearFunctionalTest<double, unsigned long> linear_functional_test_double_ulong(PreferredBackend::generic);
+LinearFunctionalTest <float, std::uint32_t> linear_functional_test_float_uint32(PreferredBackend::generic);
+LinearFunctionalTest <double, std::uint32_t> linear_functional_test_double_uint32(PreferredBackend::generic);
+LinearFunctionalTest <float, std::uint64_t> linear_functional_test_float_uint64(PreferredBackend::generic);
+LinearFunctionalTest <double, std::uint64_t> linear_functional_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-LinearFunctionalTest<float, unsigned long> mkl_linear_functional_test_float_ulong(PreferredBackend::mkl);
-LinearFunctionalTest<double, unsigned long> mkl_linear_functional_test_double_ulong(PreferredBackend::mkl);
+LinearFunctionalTest <float, std::uint64_t> mkl_linear_functional_test_float_uint64(PreferredBackend::mkl);
+LinearFunctionalTest <double, std::uint64_t> mkl_linear_functional_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-LinearFunctionalTest<__float128, unsigned int> linear_functional_test_float128_uint(PreferredBackend::generic);
-LinearFunctionalTest<__float128, unsigned long> linear_functional_test_float128_ulong(PreferredBackend::generic);
+LinearFunctionalTest <__float128, std::uint32_t> linear_functional_test_float128_uint32(PreferredBackend::generic);
+LinearFunctionalTest <__float128, std::uint64_t> linear_functional_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-LinearFunctionalTest<Half, unsigned int> linear_functional_test_half_uint(PreferredBackend::generic);
-LinearFunctionalTest<Half, unsigned long> linear_functional_test_half_ulong(PreferredBackend::generic);
+LinearFunctionalTest <Half, std::uint32_t> linear_functional_test_half_uint32(PreferredBackend::generic);
+LinearFunctionalTest <Half, std::uint64_t> linear_functional_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-LinearFunctionalTest<float, unsigned int> cuda_linear_functional_test_float_uint(PreferredBackend::cuda);
-LinearFunctionalTest<double, unsigned int> cuda_linear_functional_test_double_uint(PreferredBackend::cuda);
-LinearFunctionalTest<float, unsigned long> cuda_linear_functional_test_float_ulong(PreferredBackend::cuda);
-LinearFunctionalTest<double, unsigned long> cuda_linear_functional_test_double_ulong(PreferredBackend::cuda);
+LinearFunctionalTest <float, std::uint32_t> cuda_linear_functional_test_float_uint32(PreferredBackend::cuda);
+LinearFunctionalTest <double, std::uint32_t> cuda_linear_functional_test_double_uint32(PreferredBackend::cuda);
+LinearFunctionalTest <float, std::uint64_t> cuda_linear_functional_test_float_uint64(PreferredBackend::cuda);
+LinearFunctionalTest <double, std::uint64_t> cuda_linear_functional_test_double_uint64(PreferredBackend::cuda);
 #endif

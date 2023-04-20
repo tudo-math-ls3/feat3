@@ -18,13 +18,12 @@ using namespace FEAT::Adjacency;
  *
  * \author Constantin Christof
  */
-template<typename DT_>
 class ColoringTest
   : public UnitTest
 {
 public:
   ColoringTest(PreferredBackend backend) :
-    UnitTest("coloring_test", Type::Traits<DT_>::name(), "none", backend)
+    UnitTest("coloring_test", "none", "none", backend)
   {
   }
 
@@ -119,4 +118,4 @@ public:
   }
 };
 
-ColoringTest<double> coloring_test_double_ulong(PreferredBackend::generic);
+ColoringTest coloring_test(PreferredBackend::generic);

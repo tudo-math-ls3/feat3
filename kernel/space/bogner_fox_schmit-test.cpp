@@ -169,19 +169,19 @@ public:
   }
 };
 
-BognerFoxSchmitTest<double, unsigned int> bogner_fox_schmit_test_double_uint(PreferredBackend::generic);
-BognerFoxSchmitTest<float, unsigned int> bogner_fox_schmit_test_float_uint(PreferredBackend::generic);
+BognerFoxSchmitTest <double, std::uint32_t> bogner_fox_schmit_test_double_uint32(PreferredBackend::generic);
+BognerFoxSchmitTest <float, std::uint32_t> bogner_fox_schmit_test_float_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-BognerFoxSchmitTest<float, unsigned long> mkl_bogner_fox_schmit_test_float_ulong(PreferredBackend::mkl);
-BognerFoxSchmitTest<double, unsigned long> mkl_bogner_fox_schmit_test_double_ulong(PreferredBackend::mkl);
+BognerFoxSchmitTest <float, std::uint64_t> mkl_bogner_fox_schmit_test_float_uint64(PreferredBackend::mkl);
+BognerFoxSchmitTest <double, std::uint64_t> mkl_bogner_fox_schmit_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BognerFoxSchmitTest<__float128, unsigned int> bogner_fox_schmit_test_float128_uint(PreferredBackend::generic);
+BognerFoxSchmitTest <__float128, std::uint32_t> bogner_fox_schmit_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-BognerFoxSchmitTest<Half, unsigned int> bogner_fox_schmit_test_half_uint(PreferredBackend::generic);
+BognerFoxSchmitTest <Half, std::uint32_t> bogner_fox_schmit_test_half_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-BognerFoxSchmitTest<float, unsigned int> cuda_bogner_fox_schmit_test_float_uint(PreferredBackend::cuda);
-BognerFoxSchmitTest<double, unsigned int> cuda_bogner_fox_schmit_test_double_uint(PreferredBackend::cuda);
+BognerFoxSchmitTest <float, std::uint32_t> cuda_bogner_fox_schmit_test_float_uint32(PreferredBackend::cuda);
+BognerFoxSchmitTest <double, std::uint32_t> cuda_bogner_fox_schmit_test_double_uint32(PreferredBackend::cuda);
 #endif

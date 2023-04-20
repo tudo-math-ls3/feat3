@@ -157,25 +157,25 @@ public:
   }
 };
 
-InterpolatorTest<float, unsigned int> interpolator_test_float_uint(PreferredBackend::generic);
-InterpolatorTest<double, unsigned int> interpolator_test_double_uint(PreferredBackend::generic);
-InterpolatorTest<float, unsigned long> interpolator_test_float_ulong(PreferredBackend::generic);
-InterpolatorTest<double, unsigned long> interpolator_test_double_ulong(PreferredBackend::generic);
+InterpolatorTest <float, std::uint32_t> interpolator_test_float_uint32(PreferredBackend::generic);
+InterpolatorTest <double, std::uint32_t> interpolator_test_double_uint32(PreferredBackend::generic);
+InterpolatorTest <float, std::uint64_t> interpolator_test_float_uint64(PreferredBackend::generic);
+InterpolatorTest <double, std::uint64_t> interpolator_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-InterpolatorTest<float, unsigned long> mkl_interpolator_test_float_ulong(PreferredBackend::mkl);
-InterpolatorTest<double, unsigned long> mkl_interpolator_test_double_ulong(PreferredBackend::mkl);
+InterpolatorTest <float, std::uint64_t> mkl_interpolator_test_float_uint64(PreferredBackend::mkl);
+InterpolatorTest <double, std::uint64_t> mkl_interpolator_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-InterpolatorTest<__float128, unsigned int> interpolator_test_float128_uint(PreferredBackend::generic);
-InterpolatorTest<__float128, unsigned long> interpolator_test_float128_ulong(PreferredBackend::generic);
+InterpolatorTest <__float128, std::uint32_t> interpolator_test_float128_uint32(PreferredBackend::generic);
+InterpolatorTest <__float128, std::uint64_t> interpolator_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-InterpolatorTest<Half, unsigned int> interpolator_test_half_uint(PreferredBackend::generic);
-InterpolatorTest<Half, unsigned long> interpolator_test_half_ulong(PreferredBackend::generic);
+InterpolatorTest <Half, std::uint32_t> interpolator_test_half_uint32(PreferredBackend::generic);
+InterpolatorTest <Half, std::uint64_t> interpolator_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-InterpolatorTest<float, unsigned int> cuda_interpolator_test_float_uint(PreferredBackend::cuda);
-InterpolatorTest<double, unsigned int> cuda_interpolator_test_double_uint(PreferredBackend::cuda);
-InterpolatorTest<float, unsigned long> cuda_interpolator_test_float_ulong(PreferredBackend::cuda);
-InterpolatorTest<double, unsigned long> cuda_interpolator_test_double_ulong(PreferredBackend::cuda);
+InterpolatorTest <float, std::uint32_t> cuda_interpolator_test_float_uint32(PreferredBackend::cuda);
+InterpolatorTest <double, std::uint32_t> cuda_interpolator_test_double_uint32(PreferredBackend::cuda);
+InterpolatorTest <float, std::uint64_t> cuda_interpolator_test_float_uint64(PreferredBackend::cuda);
+InterpolatorTest <double, std::uint64_t> cuda_interpolator_test_double_uint64(PreferredBackend::cuda);
 #endif

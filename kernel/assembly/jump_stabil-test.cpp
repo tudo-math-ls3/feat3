@@ -205,5 +205,5 @@ public:
   }
 }; // class JumpStabilTest
 
-JumpStabilTest<double, unsigned int> jump_stabil_test_double_uint(PreferredBackend::generic);
-JumpStabilTest<double, unsigned long> jump_stabil_test_double_ulong(PreferredBackend::generic);
+JumpStabilTest <double, std::uint32_t> jump_stabil_test_double_uint32(PreferredBackend::generic);
+JumpStabilTest <double, std::uint64_t> jump_stabil_test_double_uint64(PreferredBackend::generic);

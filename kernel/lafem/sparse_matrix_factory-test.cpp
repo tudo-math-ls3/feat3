@@ -114,25 +114,25 @@ public:
   }
 }; // class SparseMatrixFactoryTest<...>
 
-SparseMatrixFactoryTest<float, unsigned long> sparse_matrix_factory_test_float_ulong(PreferredBackend::generic);
-SparseMatrixFactoryTest<double, unsigned long> sparse_matrix_factory_test_double_ulong(PreferredBackend::generic);
-SparseMatrixFactoryTest<float, unsigned int> sparse_matrix_factory_test_float_uint(PreferredBackend::generic);
-SparseMatrixFactoryTest<double, unsigned int> sparse_matrix_factory_test_double_uint(PreferredBackend::generic);
+SparseMatrixFactoryTest <float, std::uint64_t> sparse_matrix_factory_test_float_uint64(PreferredBackend::generic);
+SparseMatrixFactoryTest <double, std::uint64_t> sparse_matrix_factory_test_double_uint64(PreferredBackend::generic);
+SparseMatrixFactoryTest <float, std::uint32_t> sparse_matrix_factory_test_float_uint32(PreferredBackend::generic);
+SparseMatrixFactoryTest <double, std::uint32_t> sparse_matrix_factory_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixFactoryTest<float, unsigned long> mkl_cpu_sparse_matrix_factory_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixFactoryTest<double, unsigned long> mkl_cpu_sparse_matrix_factory_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixFactoryTest <float, std::uint64_t> mkl_cpu_sparse_matrix_factory_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixFactoryTest <double, std::uint64_t> mkl_cpu_sparse_matrix_factory_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixFactoryTest<__float128, unsigned long> sparse_matrix_factory_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixFactoryTest<__float128, unsigned int> sparse_matrix_factory_test_float128_uint(PreferredBackend::generic);
+SparseMatrixFactoryTest <__float128, std::uint64_t> sparse_matrix_factory_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixFactoryTest <__float128, std::uint32_t> sparse_matrix_factory_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixFactoryTest<Half, unsigned int> sparse_matrix_factory_test_half_uint(PreferredBackend::generic);
-SparseMatrixFactoryTest<Half, unsigned long> sparse_matrix_factory_test_half_ulong(PreferredBackend::generic);
+SparseMatrixFactoryTest <Half, std::uint32_t> sparse_matrix_factory_test_half_uint32(PreferredBackend::generic);
+SparseMatrixFactoryTest <Half, std::uint64_t> sparse_matrix_factory_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixFactoryTest<float, unsigned long> cuda_sparse_matrix_factory_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixFactoryTest<double, unsigned long> cuda_sparse_matrix_factory_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixFactoryTest<float, unsigned int> cuda_sparse_matrix_factory_test_float_uint(PreferredBackend::cuda);
-SparseMatrixFactoryTest<double, unsigned int> cuda_sparse_matrix_factory_test_double_uint(PreferredBackend::cuda);
+SparseMatrixFactoryTest <float, std::uint64_t> cuda_sparse_matrix_factory_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixFactoryTest <double, std::uint64_t> cuda_sparse_matrix_factory_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixFactoryTest <float, std::uint32_t> cuda_sparse_matrix_factory_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixFactoryTest <double, std::uint32_t> cuda_sparse_matrix_factory_test_double_uint32(PreferredBackend::cuda);
 #endif

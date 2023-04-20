@@ -120,25 +120,25 @@ public:
   }
 };
 
-MetaMirrorTest<float, unsigned long> meta_mirror_test_generic_float_ulong(PreferredBackend::generic);
-MetaMirrorTest<double, unsigned long> meta_mirror_test_generic_double_ulong(PreferredBackend::generic);
-MetaMirrorTest<float, unsigned int> meta_mirror_test_generic_float_uint(PreferredBackend::generic);
-MetaMirrorTest<double, unsigned int> meta_mirror_test_generic_double_unit(PreferredBackend::generic);
+MetaMirrorTest <float, std::uint64_t> meta_mirror_test_generic_float_uint64(PreferredBackend::generic);
+MetaMirrorTest <double, std::uint64_t> meta_mirror_test_generic_double_uint64(PreferredBackend::generic);
+MetaMirrorTest <float, std::uint32_t> meta_mirror_test_generic_float_uint32(PreferredBackend::generic);
+MetaMirrorTest<double, std::uint32_t> meta_mirror_test_generic_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaMirrorTest<float, unsigned long> mkl_meta_mirror_test_float_ulong(PreferredBackend::mkl);
-MetaMirrorTest<double, unsigned long> mkl_cmeta_mirror_test_double_ulong(PreferredBackend::mkl);
+MetaMirrorTest <float, std::uint64_t> mkl_meta_mirror_test_float_uint64(PreferredBackend::mkl);
+MetaMirrorTest <double, std::uint64_t> mkl_cmeta_mirror_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaMirrorTest<__float128, unsigned long> meta_mirror_test_float128_ulong(PreferredBackend::generic);
-MetaMirrorTest<__float128, unsigned int> meta_mirror_test_float128_uint(PreferredBackend::generic);
+MetaMirrorTest <__float128, std::uint64_t> meta_mirror_test_float128_uint64(PreferredBackend::generic);
+MetaMirrorTest <__float128, std::uint32_t> meta_mirror_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaMirrorTest<Half, unsigned int> meta_mirror_test_half_uint(PreferredBackend::generic);
-MetaMirrorTest<Half, unsigned long> meta_mirror_test_half_ulong(PreferredBackend::generic);
+MetaMirrorTest <Half, std::uint32_t> meta_mirror_test_half_uint32(PreferredBackend::generic);
+MetaMirrorTest <Half, std::uint64_t> meta_mirror_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaMirrorTest<float, unsigned long> cuda_meta_mirror_test_float_ulong(PreferredBackend::cuda);
-MetaMirrorTest<double, unsigned long> cuda_meta_mirror_test_double_ulong(PreferredBackend::cuda);
-MetaMirrorTest<float, unsigned int> cuda_meta_mirror_test_float_uint(PreferredBackend::cuda);
-MetaMirrorTest<double, unsigned int> cuda_meta_mirror_test_double_uint(PreferredBackend::cuda);
+MetaMirrorTest <float, std::uint64_t> cuda_meta_mirror_test_float_uint64(PreferredBackend::cuda);
+MetaMirrorTest <double, std::uint64_t> cuda_meta_mirror_test_double_uint64(PreferredBackend::cuda);
+MetaMirrorTest <float, std::uint32_t> cuda_meta_mirror_test_float_uint32(PreferredBackend::cuda);
+MetaMirrorTest <double, std::uint32_t> cuda_meta_mirror_test_double_uint32(PreferredBackend::cuda);
 #endif

@@ -94,25 +94,25 @@ public:
   }
 };
 
-MetaVectorScaleTest<float, unsigned int> meta_vector_scale_test_generic_float_uint(PreferredBackend::generic);
-MetaVectorScaleTest<double, unsigned int> meta_vector_scale_test_generic_double_uint(PreferredBackend::generic);
-MetaVectorScaleTest<float, unsigned long> meta_vector_scale_test_generic_float_ulong(PreferredBackend::generic);
-MetaVectorScaleTest<double, unsigned long> meta_vector_scale_test_generic_double_ulong(PreferredBackend::generic);
+MetaVectorScaleTest <float, std::uint32_t> meta_vector_scale_test_generic_float_uint32(PreferredBackend::generic);
+MetaVectorScaleTest <double, std::uint32_t> meta_vector_scale_test_generic_double_uint32(PreferredBackend::generic);
+MetaVectorScaleTest <float, std::uint64_t> meta_vector_scale_test_generic_float_uint64(PreferredBackend::generic);
+MetaVectorScaleTest <double, std::uint64_t> meta_vector_scale_test_generic_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaVectorScaleTest<float, unsigned long> mkl_meta_vector_scale_test_float_ulong(PreferredBackend::mkl);
-MetaVectorScaleTest<double, unsigned long> mkl_meta_vector_scale_test_double_ulong(PreferredBackend::mkl);
+MetaVectorScaleTest <float, std::uint64_t> mkl_meta_vector_scale_test_float_uint64(PreferredBackend::mkl);
+MetaVectorScaleTest <double, std::uint64_t> mkl_meta_vector_scale_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaVectorScaleTest<__float128, unsigned int> meta_vector_scale_test_generic_float128_uint(PreferredBackend::generic);
-MetaVectorScaleTest<__float128, unsigned long> meta_vector_scale_test_generic_float128_ulong(PreferredBackend::generic);
+MetaVectorScaleTest <__float128, std::uint32_t> meta_vector_scale_test_generic_float128_uint32(PreferredBackend::generic);
+MetaVectorScaleTest <__float128, std::uint64_t> meta_vector_scale_test_generic_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaVectorScaleTest<Half, unsigned int> meta_vector_scale_test_half_uint(PreferredBackend::generic);
-MetaVectorScaleTest<Half, unsigned long> meta_vector_scale_test_half_ulong(PreferredBackend::generic);
+MetaVectorScaleTest <Half, std::uint32_t> meta_vector_scale_test_half_uint32(PreferredBackend::generic);
+MetaVectorScaleTest <Half, std::uint64_t> meta_vector_scale_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorScaleTest<float, unsigned int> meta_vector_scale_test_cuda_float_uint(PreferredBackend::cuda);
-MetaVectorScaleTest<double, unsigned int> meta_vector_scale_test_cuda_double_uint(PreferredBackend::cuda);
-MetaVectorScaleTest<float, unsigned long> meta_vector_scale_test_cuda_float_ulong(PreferredBackend::cuda);
-MetaVectorScaleTest<double, unsigned long> meta_vector_scale_test_cuda_double_ulong(PreferredBackend::cuda);
+MetaVectorScaleTest <float, std::uint32_t> meta_vector_scale_test_cuda_float_uint32(PreferredBackend::cuda);
+MetaVectorScaleTest <double, std::uint32_t> meta_vector_scale_test_cuda_double_uint32(PreferredBackend::cuda);
+MetaVectorScaleTest <float, std::uint64_t> meta_vector_scale_test_cuda_float_uint64(PreferredBackend::cuda);
+MetaVectorScaleTest <double, std::uint64_t> meta_vector_scale_test_cuda_double_uint64(PreferredBackend::cuda);
 #endif

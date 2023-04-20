@@ -163,25 +163,25 @@ public:
   }
 };
 
-MetaFilterTest<float, unsigned long> meta_filter_test_float_ulong(PreferredBackend::generic);
-MetaFilterTest<double, unsigned long> meta_filter_test_double_ulong(PreferredBackend::generic);
-MetaFilterTest<float, unsigned int> meta_filter_test_float_uint(PreferredBackend::generic);
-MetaFilterTest<double, unsigned int> meta_filter_test_double_uint(PreferredBackend::generic);
+MetaFilterTest <float, std::uint64_t> meta_filter_test_float_uint64(PreferredBackend::generic);
+MetaFilterTest <double, std::uint64_t> meta_filter_test_double_uint64(PreferredBackend::generic);
+MetaFilterTest <float, std::uint32_t> meta_filter_test_float_uint32(PreferredBackend::generic);
+MetaFilterTest <double, std::uint32_t> meta_filter_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaFilterTest<float, unsigned long> mkl_meta_filter_test_float_ulong(PreferredBackend::mkl);
-MetaFilterTest<double, unsigned long> mkl_meta_filter_test_double_ulong(PreferredBackend::mkl);
+MetaFilterTest <float, std::uint64_t> mkl_meta_filter_test_float_uint64(PreferredBackend::mkl);
+MetaFilterTest <double, std::uint64_t> mkl_meta_filter_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaFilterTest<__float128, unsigned long> meta_filter_test_float128_ulong(PreferredBackend::generic);
-MetaFilterTest<__float128, unsigned int> meta_filter_test_float128_uint(PreferredBackend::generic);
+MetaFilterTest <__float128, std::uint64_t> meta_filter_test_float128_uint64(PreferredBackend::generic);
+MetaFilterTest <__float128, std::uint32_t> meta_filter_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaFilterTest<Half, unsigned int> meta_filter_test_half_uint(PreferredBackend::generic);
-MetaFilterTest<Half, unsigned long> meta_filter_test_half_ulong(PreferredBackend::generic);
+MetaFilterTest <Half, std::uint32_t> meta_filter_test_half_uint32(PreferredBackend::generic);
+MetaFilterTest <Half, std::uint64_t> meta_filter_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaFilterTest<float, unsigned long> cuda_meta_filter_test_float_ulong(PreferredBackend::cuda);
-MetaFilterTest<double, unsigned long> cuda_meta_filter_test_double_ulong(PreferredBackend::cuda);
-MetaFilterTest<float, unsigned int> cuda_meta_filter_test_float_uint(PreferredBackend::cuda);
-MetaFilterTest<double, unsigned int> cuda_meta_filter_test_double_uint(PreferredBackend::cuda);
+MetaFilterTest <float, std::uint64_t> cuda_meta_filter_test_float_uint64(PreferredBackend::cuda);
+MetaFilterTest <double, std::uint64_t> cuda_meta_filter_test_double_uint64(PreferredBackend::cuda);
+MetaFilterTest <float, std::uint32_t> cuda_meta_filter_test_float_uint32(PreferredBackend::cuda);
+MetaFilterTest <double, std::uint32_t> cuda_meta_filter_test_double_uint32(PreferredBackend::cuda);
 #endif

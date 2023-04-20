@@ -162,19 +162,19 @@ public:
   }
 };
 
-RannacherTurekTest<double, unsigned long> rannacher_turek_test_double_ulong(PreferredBackend::generic);
-RannacherTurekTest<float, unsigned long> rannacher_turek_test_float_ulong(PreferredBackend::generic);
+RannacherTurekTest <double, std::uint64_t> rannacher_turek_test_double_uint64(PreferredBackend::generic);
+RannacherTurekTest <float, std::uint64_t> rannacher_turek_test_float_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-RannacherTurekTest<float, unsigned long> mkl_rannacher_turek_test_float_ulong(PreferredBackend::mkl);
-RannacherTurekTest<double, unsigned long> mkl_rannacher_turek_test_double_ulong(PreferredBackend::mkl);
+RannacherTurekTest <float, std::uint64_t> mkl_rannacher_turek_test_float_uint64(PreferredBackend::mkl);
+RannacherTurekTest <double, std::uint64_t> mkl_rannacher_turek_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-RannacherTurekTest<__float128, unsigned long> rannacher_turek_test_float128_ulong(PreferredBackend::generic);
+RannacherTurekTest <__float128, std::uint64_t> rannacher_turek_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-RannacherTurekTest<Half, unsigned long> rannacher_turek_test_half_ulong(PreferredBackend::generic);
+RannacherTurekTest <Half, std::uint64_t> rannacher_turek_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-RannacherTurekTest<float, unsigned long> cuda_rannacher_turek_test_float_ulong(PreferredBackend::cuda);
-RannacherTurekTest<double, unsigned long> cuda_rannacher_turek_test_double_ulong(PreferredBackend::cuda);
+RannacherTurekTest <float, std::uint64_t> cuda_rannacher_turek_test_float_uint64(PreferredBackend::cuda);
+RannacherTurekTest <double, std::uint64_t> cuda_rannacher_turek_test_double_uint64(PreferredBackend::cuda);
 #endif

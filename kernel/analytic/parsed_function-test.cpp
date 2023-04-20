@@ -104,27 +104,27 @@ public:
 
 };
 
-ParsedFunctionTest<double, unsigned int> parsed_function_test_double_uint(PreferredBackend::generic);
-ParsedFunctionTest<float, unsigned int> parsed_function_test_float_uint(PreferredBackend::generic);
-ParsedFunctionTest<double, unsigned long> parsed_function_test_double_ulong(PreferredBackend::generic);
-ParsedFunctionTest<float, unsigned long> parsed_function_test_float_ulong(PreferredBackend::generic);
+ParsedFunctionTest <double, std::uint32_t> parsed_function_test_double_uint32(PreferredBackend::generic);
+ParsedFunctionTest <float, std::uint32_t> parsed_function_test_float_uint32(PreferredBackend::generic);
+ParsedFunctionTest <double, std::uint64_t> parsed_function_test_double_uint64(PreferredBackend::generic);
+ParsedFunctionTest <float, std::uint64_t> parsed_function_test_float_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-ParsedFunctionTest<float, unsigned long> mkl_parsed_function_test_float_ulong(PreferredBackend::mkl);
-ParsedFunctionTest<double, unsigned long> mkl_parsed_function_test_double_ulong(PreferredBackend::mkl);
+ParsedFunctionTest <float, std::uint64_t> mkl_parsed_function_test_float_uint64(PreferredBackend::mkl);
+ParsedFunctionTest <double, std::uint64_t> mkl_parsed_function_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-ParsedFunctionTest<__float128, unsigned long> parsed_function_test_float128_ulong(PreferredBackend::generic);
-ParsedFunctionTest<__float128, unsigned int> parsed_function_test_float128_uint(PreferredBackend::generic);
+ParsedFunctionTest <__float128, std::uint64_t> parsed_function_test_float128_uint64(PreferredBackend::generic);
+ParsedFunctionTest <__float128, std::uint32_t> parsed_function_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-ParsedFunctionTest<Half, unsigned int> parsed_function_test_half_uint(PreferredBackend::generic);
-ParsedFunctionTest<Half, unsigned long> parsed_function_test_half_ulong(PreferredBackend::generic);
+ParsedFunctionTest <Half, std::uint32_t> parsed_function_test_half_uint32(PreferredBackend::generic);
+ParsedFunctionTest <Half, std::uint64_t> parsed_function_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-ParsedFunctionTest<float, unsigned int> cuda_parsed_function_test_float_uint(PreferredBackend::cuda);
-ParsedFunctionTest<double, unsigned int> cuda_parsed_function_test_double_uint(PreferredBackend::cuda);
-ParsedFunctionTest<float, unsigned long> cuda_parsed_function_test_float_ulong(PreferredBackend::cuda);
-ParsedFunctionTest<double, unsigned long> cuda_parsed_function_test_double_ulong(PreferredBackend::cuda);
+ParsedFunctionTest <float, std::uint32_t> cuda_parsed_function_test_float_uint32(PreferredBackend::cuda);
+ParsedFunctionTest <double, std::uint32_t> cuda_parsed_function_test_double_uint32(PreferredBackend::cuda);
+ParsedFunctionTest <float, std::uint64_t> cuda_parsed_function_test_float_uint64(PreferredBackend::cuda);
+ParsedFunctionTest <double, std::uint64_t> cuda_parsed_function_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 #endif // FEAT_HAVE_FPARSER

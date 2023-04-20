@@ -331,27 +331,27 @@ public:
 
 };
 
-BilinearOperatorTest<float, unsigned int> bilinear_operator_test_float_uint(PreferredBackend::generic);
-BilinearOperatorTest<float, unsigned long> bilinear_operator_test_float_ulong(PreferredBackend::generic);
-BilinearOperatorTest<double, unsigned int> bilinear_operator_test_double_uint(PreferredBackend::generic);
-BilinearOperatorTest<double, unsigned long> bilinear_operator_test_double_ulong(PreferredBackend::generic);
+BilinearOperatorTest <float, std::uint32_t> bilinear_operator_test_float_uint32(PreferredBackend::generic);
+BilinearOperatorTest <float, std::uint64_t> bilinear_operator_test_float_uint64(PreferredBackend::generic);
+BilinearOperatorTest <double, std::uint32_t> bilinear_operator_test_double_uint32(PreferredBackend::generic);
+BilinearOperatorTest <double, std::uint64_t> bilinear_operator_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-BilinearOperatorTest<float, unsigned long> mkl_bilinear_operator_test_float_ulong(PreferredBackend::mkl);
-BilinearOperatorTest<double, unsigned long> mkl_bilinear_operator_test_double_ulong(PreferredBackend::mkl);
+BilinearOperatorTest <float, std::uint64_t> mkl_bilinear_operator_test_float_uint64(PreferredBackend::mkl);
+BilinearOperatorTest <double, std::uint64_t> mkl_bilinear_operator_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BilinearOperatorTest<__float128, unsigned int> bilinear_operator_test_float128_uint(PreferredBackend::generic);
-BilinearOperatorTest<__float128, unsigned long> bilinear_operator_test_float128_ulong(PreferredBackend::generic);
+BilinearOperatorTest <__float128, std::uint32_t> bilinear_operator_test_float128_uint32(PreferredBackend::generic);
+BilinearOperatorTest <__float128, std::uint64_t> bilinear_operator_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-BilinearOperatorTest<Half, unsigned int> bilinear_operator_test_half_uint(PreferredBackend::generic);
-BilinearOperatorTest<Half, unsigned long> bilinear_operator_test_half_ulong(PreferredBackend::generic);
+BilinearOperatorTest <Half, std::uint32_t> bilinear_operator_test_half_uint32(PreferredBackend::generic);
+BilinearOperatorTest <Half, std::uint64_t> bilinear_operator_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-BilinearOperatorTest<float, unsigned int> cuda_bilinear_operator_test_float_uint(PreferredBackend::cuda);
-BilinearOperatorTest<double, unsigned int> cuda_bilinear_operator_test_double_uint(PreferredBackend::cuda);
-BilinearOperatorTest<float, unsigned long> cuda_bilinear_operator_test_float_ulong(PreferredBackend::cuda);
-BilinearOperatorTest<double, unsigned long> cuda_bilinear_operator_test_double_ulong(PreferredBackend::cuda);
+BilinearOperatorTest <float, std::uint32_t> cuda_bilinear_operator_test_float_uint32(PreferredBackend::cuda);
+BilinearOperatorTest <double, std::uint32_t> cuda_bilinear_operator_test_double_uint32(PreferredBackend::cuda);
+BilinearOperatorTest <float, std::uint64_t> cuda_bilinear_operator_test_float_uint64(PreferredBackend::cuda);
+BilinearOperatorTest <double, std::uint64_t> cuda_bilinear_operator_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<typename DataType_, typename IndexType_>
@@ -548,25 +548,25 @@ public:
   }
 };
 
-BandedBilinearOperatorTest<float, unsigned int> banded_bilinear_operator_test_float_uint(PreferredBackend::generic);
-BandedBilinearOperatorTest<float, unsigned long> banded_bilinear_operator_test_float_ulong(PreferredBackend::generic);
-BandedBilinearOperatorTest<double, unsigned int> banded_bilinear_operator_test_double_uint(PreferredBackend::generic);
-BandedBilinearOperatorTest<double, unsigned long> banded_bilinear_operator_test_double_ulong(PreferredBackend::generic);
+BandedBilinearOperatorTest <float, std::uint32_t> banded_bilinear_operator_test_float_uint32(PreferredBackend::generic);
+BandedBilinearOperatorTest <float, std::uint64_t> banded_bilinear_operator_test_float_uint64(PreferredBackend::generic);
+BandedBilinearOperatorTest <double, std::uint32_t> banded_bilinear_operator_test_double_uint32(PreferredBackend::generic);
+BandedBilinearOperatorTest <double, std::uint64_t> banded_bilinear_operator_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-BandedBilinearOperatorTest<float, unsigned long> mkl_banded_bilinear_operator_test_float_ulong(PreferredBackend::mkl);
-BandedBilinearOperatorTest<double, unsigned long> mkl_banded_bilinear_operator_test_double_ulong(PreferredBackend::mkl);
+BandedBilinearOperatorTest <float, std::uint64_t> mkl_banded_bilinear_operator_test_float_uint64(PreferredBackend::mkl);
+BandedBilinearOperatorTest <double, std::uint64_t> mkl_banded_bilinear_operator_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BandedBilinearOperatorTest<__float128, unsigned int> banded_bilinear_operator_test_float128_uint(PreferredBackend::generic);
-BandedBilinearOperatorTest<__float128, unsigned long> banded_bilinear_operator_test_float128_ulong(PreferredBackend::generic);
+BandedBilinearOperatorTest <__float128, std::uint32_t> banded_bilinear_operator_test_float128_uint32(PreferredBackend::generic);
+BandedBilinearOperatorTest <__float128, std::uint64_t> banded_bilinear_operator_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-BandedBilinearOperatorTest<Half, unsigned int> banded_bilinear_operator_test_half_uint(PreferredBackend::generic);
-BandedBilinearOperatorTest<Half, unsigned long> banded_bilinear_operator_test_half_ulong(PreferredBackend::generic);
+BandedBilinearOperatorTest <Half, std::uint32_t> banded_bilinear_operator_test_half_uint32(PreferredBackend::generic);
+BandedBilinearOperatorTest <Half, std::uint64_t> banded_bilinear_operator_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-BandedBilinearOperatorTest<float, unsigned int> cuda_banded_bilinear_operator_test_float_uint(PreferredBackend::cuda);
-BandedBilinearOperatorTest<double, unsigned int> cuda_banded_bilinear_operator_test_double_uint(PreferredBackend::cuda);
-BandedBilinearOperatorTest<float, unsigned long> cuda_banded_bilinear_operator_test_float_ulong(PreferredBackend::cuda);
-BandedBilinearOperatorTest<double, unsigned long> cuda_banded_bilinear_operator_test_double_ulong(PreferredBackend::cuda);
+BandedBilinearOperatorTest <float, std::uint32_t> cuda_banded_bilinear_operator_test_float_uint32(PreferredBackend::cuda);
+BandedBilinearOperatorTest <double, std::uint32_t> cuda_banded_bilinear_operator_test_double_uint32(PreferredBackend::cuda);
+BandedBilinearOperatorTest <float, std::uint64_t> cuda_banded_bilinear_operator_test_float_uint64(PreferredBackend::cuda);
+BandedBilinearOperatorTest <double, std::uint64_t> cuda_banded_bilinear_operator_test_double_uint64(PreferredBackend::cuda);
 #endif

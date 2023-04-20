@@ -88,27 +88,27 @@ public:
   }
 };
 
-PointstarFactoryTest<float, unsigned int> pointstar_factory_test_float_uint(PreferredBackend::generic);
-PointstarFactoryTest<float, unsigned long> pointstar_factory_test_float_ulong(PreferredBackend::generic);
-PointstarFactoryTest<double, unsigned int> pointstar_factory_test_double_uint(PreferredBackend::generic);
-PointstarFactoryTest<double, unsigned long> pointstar_factory_test_double_ulong(PreferredBackend::generic);
+PointstarFactoryTest <float, std::uint32_t> pointstar_factory_test_float_uint32(PreferredBackend::generic);
+PointstarFactoryTest <float, std::uint64_t> pointstar_factory_test_float_uint64(PreferredBackend::generic);
+PointstarFactoryTest <double, std::uint32_t> pointstar_factory_test_double_uint32(PreferredBackend::generic);
+PointstarFactoryTest <double, std::uint64_t> pointstar_factory_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-PointstarFactoryTest<float, unsigned long> mkl_pointstar_factory_test_float_ulong(PreferredBackend::mkl);
-PointstarFactoryTest<double, unsigned long> mkl_pointstar_factory_test_double_ulong(PreferredBackend::mkl);
+PointstarFactoryTest <float, std::uint64_t> mkl_pointstar_factory_test_float_uint64(PreferredBackend::mkl);
+PointstarFactoryTest <double, std::uint64_t> mkl_pointstar_factory_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-PointstarFactoryTest<__float128, unsigned long> pointstar_factory_test_float128_ulong(PreferredBackend::generic);
-PointstarFactoryTest<__float128, unsigned int> pointstar_factory_test_float128_uint(PreferredBackend::generic);
+PointstarFactoryTest <__float128, std::uint64_t> pointstar_factory_test_float128_uint64(PreferredBackend::generic);
+PointstarFactoryTest <__float128, std::uint32_t> pointstar_factory_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-PointstarFactoryTest<Half, unsigned int> pointstar_factory_test_half_uint(PreferredBackend::generic);
-PointstarFactoryTest<Half, unsigned long> pointstar_factory_test_half_ulong(PreferredBackend::generic);
+PointstarFactoryTest <Half, std::uint32_t> pointstar_factory_test_half_uint32(PreferredBackend::generic);
+PointstarFactoryTest <Half, std::uint64_t> pointstar_factory_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-PointstarFactoryTest<float, unsigned long> cuda_pointstar_factory_test_float_ulong(PreferredBackend::cuda);
-PointstarFactoryTest<double, unsigned long> cuda_pointstar_factory_test_double_ulong(PreferredBackend::cuda);
-PointstarFactoryTest<float, unsigned int> cuda_pointstar_factory_test_float_uint(PreferredBackend::cuda);
-PointstarFactoryTest<double, unsigned int> cuda_pointstar_factory_test_double_uint(PreferredBackend::cuda);
+PointstarFactoryTest <float, std::uint64_t> cuda_pointstar_factory_test_float_uint64(PreferredBackend::cuda);
+PointstarFactoryTest <double, std::uint64_t> cuda_pointstar_factory_test_double_uint64(PreferredBackend::cuda);
+PointstarFactoryTest <float, std::uint32_t> cuda_pointstar_factory_test_float_uint32(PreferredBackend::cuda);
+PointstarFactoryTest <double, std::uint32_t> cuda_pointstar_factory_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -175,29 +175,29 @@ public:
   }
 };
 
-PointstarStructureTest<float, unsigned int> pointstar_structure_test_float_uint(PreferredBackend::generic);
-PointstarStructureTest<float, unsigned long> pointstar_structure_test_float_ulong(PreferredBackend::generic);
-PointstarStructureTest<double, unsigned int> pointstar_structure_test_double_uint(PreferredBackend::generic);
-PointstarStructureTest<double, unsigned long> pointstar_structure_test_double_ulong(PreferredBackend::generic);
+PointstarStructureTest <float, std::uint32_t> pointstar_structure_test_float_uint32(PreferredBackend::generic);
+PointstarStructureTest <float, std::uint64_t> pointstar_structure_test_float_uint64(PreferredBackend::generic);
+PointstarStructureTest <double, std::uint32_t> pointstar_structure_test_double_uint32(PreferredBackend::generic);
+PointstarStructureTest <double, std::uint64_t> pointstar_structure_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-PointstarStructureTest<float, unsigned long> mkl_pointstar_structure_test_float_ulong(PreferredBackend::mkl);
-PointstarStructureTest<double, unsigned long> mkl_pointstar_structure_test_double_ulong(PreferredBackend::mkl);
+PointstarStructureTest <float, std::uint64_t> mkl_pointstar_structure_test_float_uint64(PreferredBackend::mkl);
+PointstarStructureTest <double, std::uint64_t> mkl_pointstar_structure_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-PointstarStructureTest<__float128, unsigned long> pointstar_structure_test_float128_ulong(PreferredBackend::generic);
-PointstarStructureTest<__float128, unsigned int> pointstar_structure_test_float128_uint(PreferredBackend::generic);
+PointstarStructureTest <__float128, std::uint64_t> pointstar_structure_test_float128_uint64(PreferredBackend::generic);
+PointstarStructureTest <__float128, std::uint32_t> pointstar_structure_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-PointstarStructureTest<Half, unsigned int> pointstar_structure_test_half_uint(PreferredBackend::generic);
-PointstarStructureTest<Half, unsigned long> pointstar_structure_test_half_ulong(PreferredBackend::generic);
+PointstarStructureTest <Half, std::uint32_t> pointstar_structure_test_half_uint32(PreferredBackend::generic);
+PointstarStructureTest <Half, std::uint64_t> pointstar_structure_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-PointstarStructureTest<float, unsigned long> cuda_pointstar_structure_test_float_ulong(PreferredBackend::cuda);
-PointstarStructureTest<double, unsigned long> cuda_pointstar_structure_test_double_ulong(PreferredBackend::cuda);
-PointstarStructureTest<float, unsigned int> cuda_pointstar_structure_test_float_uint(PreferredBackend::cuda);
-PointstarStructureTest<double, unsigned int> cuda_pointstar_structure_test_double_uint(PreferredBackend::cuda);
+PointstarStructureTest <float, std::uint64_t> cuda_pointstar_structure_test_float_uint64(PreferredBackend::cuda);
+PointstarStructureTest <double, std::uint64_t> cuda_pointstar_structure_test_double_uint64(PreferredBackend::cuda);
+PointstarStructureTest <float, std::uint32_t> cuda_pointstar_structure_test_float_uint32(PreferredBackend::cuda);
+PointstarStructureTest <double, std::uint32_t> cuda_pointstar_structure_test_double_uint32(PreferredBackend::cuda);
 #ifdef FEAT_HAVE_HALFMATH
-PointstarStructureTest<Half, unsigned int> cuda_pointstar_structure_test_half_uint(PreferredBackend::cuda);
-PointstarStructureTest<Half, unsigned long> cuda_pointstar_structure_test_half_ulong(PreferredBackend::cuda);
+PointstarStructureTest <Half, std::uint32_t> cuda_pointstar_structure_test_half_uint32(PreferredBackend::cuda);
+PointstarStructureTest <Half, std::uint64_t> cuda_pointstar_structure_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif

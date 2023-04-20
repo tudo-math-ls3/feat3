@@ -67,25 +67,25 @@ public:
     TEST_CHECK_EQUAL(c.row_ptr(), a.row_ptr());
   }
 };
-MatrixMirrorBufferTest<float, unsigned int> cpu_matrix_mirror_buffer_test_float_uint(PreferredBackend::generic);
-MatrixMirrorBufferTest<double, unsigned int> cpu_matrix_mirror_buffer_test_double_uint(PreferredBackend::generic);
-MatrixMirrorBufferTest<float, unsigned long> cpu_matrix_mirror_buffer_test_float_ulong(PreferredBackend::generic);
-MatrixMirrorBufferTest<double, unsigned long> cpu_matrix_mirror_buffer_test_double_ulong(PreferredBackend::generic);
+MatrixMirrorBufferTest <float, std::uint32_t> cpu_matrix_mirror_buffer_test_float_uint32(PreferredBackend::generic);
+MatrixMirrorBufferTest <double, std::uint32_t> cpu_matrix_mirror_buffer_test_double_uint32(PreferredBackend::generic);
+MatrixMirrorBufferTest <float, std::uint64_t> cpu_matrix_mirror_buffer_test_float_uint64(PreferredBackend::generic);
+MatrixMirrorBufferTest <double, std::uint64_t> cpu_matrix_mirror_buffer_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MatrixMirrorBufferTest<float, unsigned long> mkl_matrix_mirror_buffer_test_float_ulong(PreferredBackend::mkl);
-MatrixMirrorBufferTest<double, unsigned long> mkl_matrix_mirror_buffer_test_double_ulong(PreferredBackend::mkl);
+MatrixMirrorBufferTest <float, std::uint64_t> mkl_matrix_mirror_buffer_test_float_uint64(PreferredBackend::mkl);
+MatrixMirrorBufferTest <double, std::uint64_t> mkl_matrix_mirror_buffer_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MatrixMirrorBufferTest<__float128, unsigned int> matrix_mirror_buffer_test_float128_uint(PreferredBackend::generic);
-MatrixMirrorBufferTest<__float128, unsigned long> matrix_mirror_buffer_test_float128_ulong(PreferredBackend::generic);
+MatrixMirrorBufferTest <__float128, std::uint32_t> matrix_mirror_buffer_test_float128_uint32(PreferredBackend::generic);
+MatrixMirrorBufferTest <__float128, std::uint64_t> matrix_mirror_buffer_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MatrixMirrorBufferTest<Half, unsigned int> matrix_mirror_buffer_test_half_uint(PreferredBackend::generic);
-MatrixMirrorBufferTest<Half, unsigned long> matrix_mirror_buffer_test_half_ulong(PreferredBackend::generic);
+MatrixMirrorBufferTest <Half, std::uint32_t> matrix_mirror_buffer_test_half_uint32(PreferredBackend::generic);
+MatrixMirrorBufferTest <Half, std::uint64_t> matrix_mirror_buffer_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MatrixMirrorBufferTest<float, unsigned int> cuda_matrix_mirror_buffer_test_float_uint(PreferredBackend::cuda);
-MatrixMirrorBufferTest<double, unsigned int> cuda_matrix_mirror_buffer_test_double_uint(PreferredBackend::cuda);
-MatrixMirrorBufferTest<float, unsigned long> cuda_matrix_mirror_buffer_test_float_ulong(PreferredBackend::cuda);
-MatrixMirrorBufferTest<double, unsigned long> cuda_matrix_mirror_buffer_test_double_ulong(PreferredBackend::cuda);
+MatrixMirrorBufferTest <float, std::uint32_t> cuda_matrix_mirror_buffer_test_float_uint32(PreferredBackend::cuda);
+MatrixMirrorBufferTest <double, std::uint32_t> cuda_matrix_mirror_buffer_test_double_uint32(PreferredBackend::cuda);
+MatrixMirrorBufferTest <float, std::uint64_t> cuda_matrix_mirror_buffer_test_float_uint64(PreferredBackend::cuda);
+MatrixMirrorBufferTest <double, std::uint64_t> cuda_matrix_mirror_buffer_test_double_uint64(PreferredBackend::cuda);
 #endif

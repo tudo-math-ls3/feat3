@@ -132,27 +132,27 @@ public:
   }
 };
 
-SparseMatrixBandedTest<float, unsigned long> cpu_sparse_matrix_banded_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBandedTest<double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBandedTest<float, unsigned int> cpu_sparse_matrix_banded_test_float_uint(PreferredBackend::generic);
-SparseMatrixBandedTest<double, unsigned int> cpu_sparse_matrix_banded_test_double_uint(PreferredBackend::generic);
+SparseMatrixBandedTest <float, std::uint64_t> cpu_sparse_matrix_banded_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedTest <double, std::uint64_t> cpu_sparse_matrix_banded_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedTest <float, std::uint32_t> cpu_sparse_matrix_banded_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedTest <double, std::uint32_t> cpu_sparse_matrix_banded_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBandedTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBandedTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBandedTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBandedTest<__float128, unsigned long> cpu_sparse_matrix_banded_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBandedTest<__float128, unsigned int> cpu_sparse_matrix_banded_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBandedTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBandedTest<Half, unsigned int> cpu_sparse_matrix_banded_test_half_uint(PreferredBackend::generic);
-SparseMatrixBandedTest<Half, unsigned long> cpu_sparse_matrix_banded_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBandedTest <Half, std::uint32_t> cpu_sparse_matrix_banded_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedTest <Half, std::uint64_t> cpu_sparse_matrix_banded_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedTest<float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBandedTest<double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBandedTest<float, unsigned int> cuda_sparse_matrix_banded_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBandedTest<double, unsigned int> cuda_sparse_matrix_banded_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBandedTest <float, std::uint64_t> cuda_sparse_matrix_banded_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedTest <double, std::uint64_t> cuda_sparse_matrix_banded_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedTest <float, std::uint32_t> cuda_sparse_matrix_banded_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedTest <double, std::uint32_t> cuda_sparse_matrix_banded_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -227,27 +227,27 @@ public:
 #endif
   }
 };
-SparseMatrixBandedSerializeTest<float, unsigned long> cpu_sparse_matrix_banded_serialize_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBandedSerializeTest<double, unsigned long> cpu_sparse_matrix_banded_serialize_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBandedSerializeTest<float, unsigned int> cpu_sparse_matrix_banded_serialize_test_float_uint(PreferredBackend::generic);
-SparseMatrixBandedSerializeTest<double, unsigned int> cpu_sparse_matrix_banded_serialize_test_double_uint(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <float, std::uint64_t> cpu_sparse_matrix_banded_serialize_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <double, std::uint64_t> cpu_sparse_matrix_banded_serialize_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <float, std::uint32_t> cpu_sparse_matrix_banded_serialize_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <double, std::uint32_t> cpu_sparse_matrix_banded_serialize_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBandedSerializeTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_serialize_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBandedSerializeTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_serialize_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBandedSerializeTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_serialize_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedSerializeTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBandedSerializeTest<__float128, unsigned long> cpu_sparse_matrix_banded_serialize_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBandedSerializeTest<__float128, unsigned int> cpu_sparse_matrix_banded_serialize_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_serialize_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_serialize_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBandedSerializeTest<Half, unsigned int> cpu_sparse_matrix_banded_serialize_test_half_uint(PreferredBackend::generic);
-SparseMatrixBandedSerializeTest<Half, unsigned long> cpu_sparse_matrix_banded_serialize_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <Half, std::uint32_t> cpu_sparse_matrix_banded_serialize_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedSerializeTest <Half, std::uint64_t> cpu_sparse_matrix_banded_serialize_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedSerializeTest<float, unsigned long> cuda_sparse_matrix_banded_serialize_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBandedSerializeTest<double, unsigned long> cuda_sparse_matrix_banded_serialize_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBandedSerializeTest<float, unsigned int> cuda_sparse_matrix_banded_serialize_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBandedSerializeTest<double, unsigned int> cuda_sparse_matrix_banded_serialize_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest <float, std::uint64_t> cuda_sparse_matrix_banded_serialize_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest <double, std::uint64_t> cuda_sparse_matrix_banded_serialize_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest <float, std::uint32_t> cuda_sparse_matrix_banded_serialize_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedSerializeTest <double, std::uint32_t> cuda_sparse_matrix_banded_serialize_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -379,32 +379,32 @@ public:
   }
 };
 
-SparseMatrixBandedApplyTest<float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBandedApplyTest<double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBandedApplyTest<float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint(PreferredBackend::generic);
-SparseMatrixBandedApplyTest<double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <float, std::uint64_t> cpu_sparse_matrix_banded_apply_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <double, std::uint64_t> cpu_sparse_matrix_banded_apply_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <float, std::uint32_t> cpu_sparse_matrix_banded_apply_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <double, std::uint32_t> cpu_sparse_matrix_banded_apply_test_double_uint32(PreferredBackend::generic);
 
-SparseMatrixBandedApplyTest<float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong_9(PreferredBackend::generic,9);
-SparseMatrixBandedApplyTest<double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong_9(PreferredBackend::generic,9);
-SparseMatrixBandedApplyTest<float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint_9(PreferredBackend::generic,9);
-SparseMatrixBandedApplyTest<double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest <float, std::uint64_t> cpu_sparse_matrix_banded_apply_test_float_uint64_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest <double, std::uint64_t> cpu_sparse_matrix_banded_apply_test_double_uint64_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest <float, std::uint32_t> cpu_sparse_matrix_banded_apply_test_float_uint32_9(PreferredBackend::generic,9);
+SparseMatrixBandedApplyTest <double, std::uint32_t> cpu_sparse_matrix_banded_apply_test_double_uint32_9(PreferredBackend::generic,9);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBandedApplyTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_apply_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBandedApplyTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_apply_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBandedApplyTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_apply_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedApplyTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_apply_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBandedApplyTest<__float128, unsigned long> cpu_sparse_matrix_banded_apply_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBandedApplyTest<__float128, unsigned int> cpu_sparse_matrix_banded_apply_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_apply_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_apply_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBandedApplyTest<Half, unsigned int> cpu_sparse_matrix_banded_apply_test_half_uint(PreferredBackend::generic);
-SparseMatrixBandedApplyTest<Half, unsigned long> cpu_sparse_matrix_banded_apply_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <Half, std::uint32_t> cpu_sparse_matrix_banded_apply_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedApplyTest <Half, std::uint64_t> cpu_sparse_matrix_banded_apply_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedApplyTest<float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBandedApplyTest<double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBandedApplyTest<float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBandedApplyTest<double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest <float, std::uint64_t> cuda_sparse_matrix_banded_apply_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest <double, std::uint64_t> cuda_sparse_matrix_banded_apply_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest <float, std::uint32_t> cuda_sparse_matrix_banded_apply_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedApplyTest <double, std::uint32_t> cuda_sparse_matrix_banded_apply_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -473,25 +473,25 @@ public:
   }
 };
 
-SparseMatrixBandedScaleTest<float, unsigned long> cpu_sparse_matrix_banded_scale_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBandedScaleTest<double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBandedScaleTest<float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint(PreferredBackend::generic);
-SparseMatrixBandedScaleTest<double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <float, std::uint64_t> cpu_sparse_matrix_banded_scale_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <double, std::uint64_t> cpu_sparse_matrix_banded_scale_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <float, std::uint32_t> cpu_sparse_matrix_banded_scale_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <double, std::uint32_t> cpu_sparse_matrix_banded_scale_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBandedScaleTest<float, unsigned long> mkl_cpu_sparse_matrix_banded_scale_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBandedScaleTest<double, unsigned long> mkl_cpu_sparse_matrix_banded_scale_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBandedScaleTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_scale_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedScaleTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_scale_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBandedScaleTest<__float128, unsigned long> cpu_sparse_matrix_banded_scale_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBandedScaleTest<__float128, unsigned int> cpu_sparse_matrix_banded_scale_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_scale_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_scale_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBandedScaleTest<Half, unsigned int> cpu_sparse_matrix_banded_scale_test_half_uint(PreferredBackend::generic);
-SparseMatrixBandedScaleTest<Half, unsigned long> cpu_sparse_matrix_banded_scale_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <Half, std::uint32_t> cpu_sparse_matrix_banded_scale_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedScaleTest <Half, std::uint64_t> cpu_sparse_matrix_banded_scale_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBandedScaleTest<float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBandedScaleTest<double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBandedScaleTest<float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBandedScaleTest<double, unsigned int> cuda_sparse_matrix_banded_scale_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest <float, std::uint64_t> cuda_sparse_matrix_banded_scale_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest <double, std::uint64_t> cuda_sparse_matrix_banded_scale_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest <float, std::uint32_t> cuda_sparse_matrix_banded_scale_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedScaleTest <double, std::uint32_t> cuda_sparse_matrix_banded_scale_test_double_uint32(PreferredBackend::cuda);
 #endif

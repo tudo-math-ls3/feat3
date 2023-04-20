@@ -65,25 +65,25 @@ public:
   }
 };
 
-MetaVectorCompInvertTest<float, unsigned int> meta_vector_comp_invert_test_float_uint(PreferredBackend::generic);
-MetaVectorCompInvertTest<double, unsigned int> meta_vector_comp_invert_test_double_uint(PreferredBackend::generic);
-MetaVectorCompInvertTest<float, unsigned long> meta_vector_comp_invert_test_float_ulong(PreferredBackend::generic);
-MetaVectorCompInvertTest<double, unsigned long> meta_vector_comp_invert_test_double_ulong(PreferredBackend::generic);
+MetaVectorCompInvertTest <float, std::uint32_t> meta_vector_comp_invert_test_float_uint32(PreferredBackend::generic);
+MetaVectorCompInvertTest <double, std::uint32_t> meta_vector_comp_invert_test_double_uint32(PreferredBackend::generic);
+MetaVectorCompInvertTest <float, std::uint64_t> meta_vector_comp_invert_test_float_uint64(PreferredBackend::generic);
+MetaVectorCompInvertTest <double, std::uint64_t> meta_vector_comp_invert_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaVectorCompInvertTest<float, unsigned long> mkl_meta_vector_comp_invert_test_float_ulong(PreferredBackend::mkl);
-MetaVectorCompInvertTest<double, unsigned long> mkl_meta_vector_comp_invert_test_double_ulong(PreferredBackend::mkl);
+MetaVectorCompInvertTest <float, std::uint64_t> mkl_meta_vector_comp_invert_test_float_uint64(PreferredBackend::mkl);
+MetaVectorCompInvertTest <double, std::uint64_t> mkl_meta_vector_comp_invert_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaVectorCompInvertTest<__float128, unsigned int> meta_vector_comp_invert_test_generic_float128_uint(PreferredBackend::generic);
-MetaVectorCompInvertTest<__float128, unsigned long> meta_vector_comp_invert_test_generic_float128_ulong(PreferredBackend::generic);
+MetaVectorCompInvertTest <__float128, std::uint32_t> meta_vector_comp_invert_test_generic_float128_uint32(PreferredBackend::generic);
+MetaVectorCompInvertTest <__float128, std::uint64_t> meta_vector_comp_invert_test_generic_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaVectorCompInvertTest<Half, unsigned int> meta_vector_comp_invert_test_half_uint(PreferredBackend::generic);
-MetaVectorCompInvertTest<Half, unsigned long> meta_vector_comp_invert_test_half_ulong(PreferredBackend::generic);
+MetaVectorCompInvertTest <Half, std::uint32_t> meta_vector_comp_invert_test_half_uint32(PreferredBackend::generic);
+MetaVectorCompInvertTest <Half, std::uint64_t> meta_vector_comp_invert_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorCompInvertTest<float, unsigned int> meta_vector_comp_invert_test_cuda_float_uint(PreferredBackend::cuda);
-MetaVectorCompInvertTest<double, unsigned int> meta_vector_comp_invert_test_cuda_double_uint(PreferredBackend::cuda);
-MetaVectorCompInvertTest<float, unsigned long> meta_vector_comp_invert_test_cuda_float_ulong(PreferredBackend::cuda);
-MetaVectorCompInvertTest<double, unsigned long> meta_vector_comp_invert_test_cuda_double_ulong(PreferredBackend::cuda);
+MetaVectorCompInvertTest <float, std::uint32_t> meta_vector_comp_invert_test_cuda_float_uint32(PreferredBackend::cuda);
+MetaVectorCompInvertTest <double, std::uint32_t> meta_vector_comp_invert_test_cuda_double_uint32(PreferredBackend::cuda);
+MetaVectorCompInvertTest <float, std::uint64_t> meta_vector_comp_invert_test_cuda_float_uint64(PreferredBackend::cuda);
+MetaVectorCompInvertTest <double, std::uint64_t> meta_vector_comp_invert_test_cuda_double_uint64(PreferredBackend::cuda);
 #endif

@@ -118,19 +118,19 @@ public:
   }
 };
 
-DiscontinuousTest<double, unsigned int> discontinuous_test_double_uint(PreferredBackend::generic);
-DiscontinuousTest<float, unsigned int> discontinuous_test_float_uint(PreferredBackend::generic);
+DiscontinuousTest <double, std::uint32_t> discontinuous_test_double_uint32(PreferredBackend::generic);
+DiscontinuousTest <float, std::uint32_t> discontinuous_test_float_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DiscontinuousTest<float, unsigned long> mkl_discontinuous_schmit_test_float_ulong(PreferredBackend::mkl);
-DiscontinuousTest<double, unsigned long> mkl_discontinuous_schmit_test_double_ulong(PreferredBackend::mkl);
+DiscontinuousTest <float, std::uint64_t> mkl_discontinuous_schmit_test_float_uint64(PreferredBackend::mkl);
+DiscontinuousTest <double, std::uint64_t> mkl_discontinuous_schmit_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DiscontinuousTest<__float128, unsigned int> discontinuous_schmit_test_float128_uint(PreferredBackend::generic);
+DiscontinuousTest <__float128, std::uint32_t> discontinuous_schmit_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DiscontinuousTest<Half, unsigned int> discontinuous_schmit_test_half_uint(PreferredBackend::generic);
+DiscontinuousTest <Half, std::uint32_t> discontinuous_schmit_test_half_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DiscontinuousTest<float, unsigned int> cuda_discontinuous_schmit_test_float_uint(PreferredBackend::cuda);
-DiscontinuousTest<double, unsigned int> cuda_discontinuous_schmit_test_double_uint(PreferredBackend::cuda);
+DiscontinuousTest <float, std::uint32_t> cuda_discontinuous_schmit_test_float_uint32(PreferredBackend::cuda);
+DiscontinuousTest <double, std::uint32_t> cuda_discontinuous_schmit_test_double_uint32(PreferredBackend::cuda);
 #endif

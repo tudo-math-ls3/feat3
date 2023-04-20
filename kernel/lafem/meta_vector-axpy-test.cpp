@@ -110,25 +110,25 @@ public:
   }
 };
 
-MetaVectorAxpyTest<float, unsigned int> meta_vector_axpy_test_generic_float_uint(PreferredBackend::generic);
-MetaVectorAxpyTest<double, unsigned int> meta_vector_axpy_test_generic_double_uint(PreferredBackend::generic);
-MetaVectorAxpyTest<float, unsigned long> meta_vector_axpy_test_generic_float_ulong(PreferredBackend::generic);
-MetaVectorAxpyTest<double, unsigned long> meta_vector_axpy_test_generic_double_ulong(PreferredBackend::generic);
+MetaVectorAxpyTest <float, std::uint32_t> meta_vector_axpy_test_generic_float_uint32(PreferredBackend::generic);
+MetaVectorAxpyTest <double, std::uint32_t> meta_vector_axpy_test_generic_double_uint32(PreferredBackend::generic);
+MetaVectorAxpyTest <float, std::uint64_t> meta_vector_axpy_test_generic_float_uint64(PreferredBackend::generic);
+MetaVectorAxpyTest <double, std::uint64_t> meta_vector_axpy_test_generic_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaVectorAxpyTest<float, unsigned long> mkl_meta_vector_axpy_test_float_ulong(PreferredBackend::mkl);
-MetaVectorAxpyTest<double, unsigned long> mkl_meta_vector_axpy_test_double_ulong(PreferredBackend::mkl);
+MetaVectorAxpyTest <float, std::uint64_t> mkl_meta_vector_axpy_test_float_uint64(PreferredBackend::mkl);
+MetaVectorAxpyTest <double, std::uint64_t> mkl_meta_vector_axpy_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaVectorAxpyTest<__float128, unsigned int> meta_vector_axpy_test_generic_float128_uint(PreferredBackend::generic);
-MetaVectorAxpyTest<__float128, unsigned long> meta_vector_axpy_test_generic_float128_ulong(PreferredBackend::generic);
+MetaVectorAxpyTest <__float128, std::uint32_t> meta_vector_axpy_test_generic_float128_uint32(PreferredBackend::generic);
+MetaVectorAxpyTest <__float128, std::uint64_t> meta_vector_axpy_test_generic_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaVectorAxpyTest<Half, unsigned int> meta_vector_axpy_test_half_uint(PreferredBackend::generic);
-MetaVectorAxpyTest<Half, unsigned long> meta_vector_axpy_test_half_ulong(PreferredBackend::generic);
+MetaVectorAxpyTest <Half, std::uint32_t> meta_vector_axpy_test_half_uint32(PreferredBackend::generic);
+MetaVectorAxpyTest <Half, std::uint64_t> meta_vector_axpy_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaVectorAxpyTest<float, unsigned int> meta_vector_axpy_test_cuda_float_uint(PreferredBackend::cuda);
-MetaVectorAxpyTest<double, unsigned int> meta_vector_axpy_test_cuda_double_uint(PreferredBackend::cuda);
-MetaVectorAxpyTest<float, unsigned long> meta_vector_axpy_test_cuda_float_ulong(PreferredBackend::cuda);
-MetaVectorAxpyTest<double, unsigned long> meta_vector_axpy_test_cuda_double_ulong(PreferredBackend::cuda);
+MetaVectorAxpyTest <float, std::uint32_t> meta_vector_axpy_test_cuda_float_uint32(PreferredBackend::cuda);
+MetaVectorAxpyTest <double, std::uint32_t> meta_vector_axpy_test_cuda_double_uint32(PreferredBackend::cuda);
+MetaVectorAxpyTest <float, std::uint64_t> meta_vector_axpy_test_cuda_float_uint64(PreferredBackend::cuda);
+MetaVectorAxpyTest <double, std::uint64_t> meta_vector_axpy_test_cuda_double_uint64(PreferredBackend::cuda);
 #endif

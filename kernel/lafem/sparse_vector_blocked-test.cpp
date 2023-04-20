@@ -82,27 +82,27 @@ public:
     TEST_CHECK_EQUAL(ap.used_elements(), Index(4));
   }
 };
-SparseVectorBlockedTest<float, unsigned int> cpu_sparse_vector_blocked_test_float_uint(PreferredBackend::generic);
-SparseVectorBlockedTest<double, unsigned int> cpu_sparse_vector_blocked_test_double_uint(PreferredBackend::generic);
-SparseVectorBlockedTest<float, unsigned long> cpu_sparse_vector_blocked_test_float_ulong(PreferredBackend::generic);
-SparseVectorBlockedTest<double, unsigned long> cpu_sparse_vector_blocked_test_double_ulong(PreferredBackend::generic);
+SparseVectorBlockedTest <float, std::uint32_t> cpu_sparse_vector_blocked_test_float_uint32(PreferredBackend::generic);
+SparseVectorBlockedTest <double, std::uint32_t> cpu_sparse_vector_blocked_test_double_uint32(PreferredBackend::generic);
+SparseVectorBlockedTest <float, std::uint64_t> cpu_sparse_vector_blocked_test_float_uint64(PreferredBackend::generic);
+SparseVectorBlockedTest <double, std::uint64_t> cpu_sparse_vector_blocked_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorBlockedTest<float, unsigned long> mkl_cpu_sparse_vector_blocked_test_float_ulong(PreferredBackend::mkl);
-SparseVectorBlockedTest<double, unsigned long> mkl_cpu_sparse_vector_blocked_test_double_ulong(PreferredBackend::mkl);
+SparseVectorBlockedTest <float, std::uint64_t> mkl_cpu_sparse_vector_blocked_test_float_uint64(PreferredBackend::mkl);
+SparseVectorBlockedTest <double, std::uint64_t> mkl_cpu_sparse_vector_blocked_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorBlockedTest<__float128, unsigned long> cpu_sparse_vector_blocked_test_float128_ulong(PreferredBackend::generic);
-SparseVectorBlockedTest<__float128, unsigned int> cpu_sparse_vector_blocked_test_float128_uint(PreferredBackend::generic);
+SparseVectorBlockedTest <__float128, std::uint64_t> cpu_sparse_vector_blocked_test_float128_uint64(PreferredBackend::generic);
+SparseVectorBlockedTest <__float128, std::uint32_t> cpu_sparse_vector_blocked_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorBlockedTest<Half, unsigned int> cpu_sparse_vector_blocked_test_half_uint(PreferredBackend::generic);
-SparseVectorBlockedTest<Half, unsigned long> cpu_sparse_vector_blocked_test_half_ulong(PreferredBackend::generic);
+SparseVectorBlockedTest <Half, std::uint32_t> cpu_sparse_vector_blocked_test_half_uint32(PreferredBackend::generic);
+SparseVectorBlockedTest <Half, std::uint64_t> cpu_sparse_vector_blocked_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorBlockedTest<float, unsigned int> cuda_sparse_vector_blocked_test_float_uint(PreferredBackend::cuda);
-SparseVectorBlockedTest<double, unsigned int> cuda_sparse_vector_blocked_test_double_uint(PreferredBackend::cuda);
-SparseVectorBlockedTest<float, unsigned long> cuda_sparse_vector_blocked_test_float_ulong(PreferredBackend::cuda);
-SparseVectorBlockedTest<double, unsigned long> cuda_sparse_vector_blocked_test_double_ulong(PreferredBackend::cuda);
+SparseVectorBlockedTest <float, std::uint32_t> cuda_sparse_vector_blocked_test_float_uint32(PreferredBackend::cuda);
+SparseVectorBlockedTest <double, std::uint32_t> cuda_sparse_vector_blocked_test_double_uint32(PreferredBackend::cuda);
+SparseVectorBlockedTest <float, std::uint64_t> cuda_sparse_vector_blocked_test_float_uint64(PreferredBackend::cuda);
+SparseVectorBlockedTest <double, std::uint64_t> cuda_sparse_vector_blocked_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -161,25 +161,25 @@ public:
 #endif
   }
 };
-SparseVectorBlockedSerializeTest<float, unsigned int> cpu_sparse_vector_blocked_serialize_test_float_uint(PreferredBackend::generic);
-SparseVectorBlockedSerializeTest<double, unsigned int> cpu_sparse_vector_blocked_serialize_test_double_uint(PreferredBackend::generic);
-SparseVectorBlockedSerializeTest<float, unsigned long> cpu_sparse_vector_blocked_serialize_test_float_ulong(PreferredBackend::generic);
-SparseVectorBlockedSerializeTest<double, unsigned long> cpu_sparse_vector_blocked_serialize_test_double_ulong(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <float, std::uint32_t> cpu_sparse_vector_blocked_serialize_test_float_uint32(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <double, std::uint32_t> cpu_sparse_vector_blocked_serialize_test_double_uint32(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <float, std::uint64_t> cpu_sparse_vector_blocked_serialize_test_float_uint64(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <double, std::uint64_t> cpu_sparse_vector_blocked_serialize_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorBlockedSerializeTest<float, unsigned long> mkl_cpu_sparse_vector_blocked_serialize_test_float_ulong(PreferredBackend::mkl);
-SparseVectorBlockedSerializeTest<double, unsigned long> mkl_cpu_sparse_vector_blocked_serialize_test_double_ulong(PreferredBackend::mkl);
+SparseVectorBlockedSerializeTest <float, std::uint64_t> mkl_cpu_sparse_vector_blocked_serialize_test_float_uint64(PreferredBackend::mkl);
+SparseVectorBlockedSerializeTest <double, std::uint64_t> mkl_cpu_sparse_vector_blocked_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorBlockedSerializeTest<__float128, unsigned long> cpu_sparse_vector_blocked_serialize_test_float128_ulong(PreferredBackend::generic);
-SparseVectorBlockedSerializeTest<__float128, unsigned int> cpu_sparse_vector_blocked_serialize_test_float128_uint(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <__float128, std::uint64_t> cpu_sparse_vector_blocked_serialize_test_float128_uint64(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <__float128, std::uint32_t> cpu_sparse_vector_blocked_serialize_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorBlockedSerializeTest<Half, unsigned int> cpu_sparse_vector_blocked_serialize_test_half_uint(PreferredBackend::generic);
-SparseVectorBlockedSerializeTest<Half, unsigned long> cpu_sparse_vector_blocked_serialize_test_half_ulong(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <Half, std::uint32_t> cpu_sparse_vector_blocked_serialize_test_half_uint32(PreferredBackend::generic);
+SparseVectorBlockedSerializeTest <Half, std::uint64_t> cpu_sparse_vector_blocked_serialize_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorBlockedSerializeTest<float, unsigned int> cuda_sparse_vector_blocked_serialize_test_float_uint(PreferredBackend::cuda);
-SparseVectorBlockedSerializeTest<double, unsigned int> cuda_sparse_vector_blocked_serialize_test_double_uint(PreferredBackend::cuda);
-SparseVectorBlockedSerializeTest<float, unsigned long> cuda_sparse_vector_blocked_serialize_test_float_ulong(PreferredBackend::cuda);
-SparseVectorBlockedSerializeTest<double, unsigned long> cuda_sparse_vector_blocked_serialize_test_double_ulong(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest <float, std::uint32_t> cuda_sparse_vector_blocked_serialize_test_float_uint32(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest <double, std::uint32_t> cuda_sparse_vector_blocked_serialize_test_double_uint32(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest <float, std::uint64_t> cuda_sparse_vector_blocked_serialize_test_float_uint64(PreferredBackend::cuda);
+SparseVectorBlockedSerializeTest <double, std::uint64_t> cuda_sparse_vector_blocked_serialize_test_double_uint64(PreferredBackend::cuda);
 #endif

@@ -103,27 +103,27 @@ public:
     }
   }
 };
-SparseVectorTest<float, unsigned int> dv_test_float_uint(PreferredBackend::generic);
-SparseVectorTest<double, unsigned int> cpu_sparse_vector_test_double_uint(PreferredBackend::generic);
-SparseVectorTest<float, unsigned long> cpu_sparse_vector_test_float_ulong(PreferredBackend::generic);
-SparseVectorTest<double, unsigned long> cpu_sparse_vector_test_double_ulong(PreferredBackend::generic);
+SparseVectorTest <float, std::uint32_t> dv_test_float_uint32(PreferredBackend::generic);
+SparseVectorTest <double, std::uint32_t> cpu_sparse_vector_test_double_uint32(PreferredBackend::generic);
+SparseVectorTest <float, std::uint64_t> cpu_sparse_vector_test_float_uint64(PreferredBackend::generic);
+SparseVectorTest <double, std::uint64_t> cpu_sparse_vector_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorTest<float, unsigned long> mkl_cpu_sparse_vector_test_float_ulong(PreferredBackend::mkl);
-SparseVectorTest<double, unsigned long> mkl_cpu_sparse_vector_test_double_ulong(PreferredBackend::mkl);
+SparseVectorTest <float, std::uint64_t> mkl_cpu_sparse_vector_test_float_uint64(PreferredBackend::mkl);
+SparseVectorTest <double, std::uint64_t> mkl_cpu_sparse_vector_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorTest<__float128, unsigned long> cpu_sparse_vector_test_float128_ulong(PreferredBackend::generic);
-SparseVectorTest<__float128, unsigned int> cpu_sparse_vector_test_float128_uint(PreferredBackend::generic);
+SparseVectorTest <__float128, std::uint64_t> cpu_sparse_vector_test_float128_uint64(PreferredBackend::generic);
+SparseVectorTest <__float128, std::uint32_t> cpu_sparse_vector_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorTest<Half, unsigned int> sparse_vector_test_half_uint(PreferredBackend::generic);
-SparseVectorTest<Half, unsigned long> sparse_vector_test_half_ulong(PreferredBackend::generic);
+SparseVectorTest <Half, std::uint32_t> sparse_vector_test_half_uint32(PreferredBackend::generic);
+SparseVectorTest <Half, std::uint64_t> sparse_vector_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorTest<float, unsigned int> cuda_sparse_vector_test_float_uint(PreferredBackend::cuda);
-SparseVectorTest<double, unsigned int> cuda_sparse_vector_test_double_uint(PreferredBackend::cuda);
-SparseVectorTest<float, unsigned long> cuda_sparse_vector_test_float_ulong(PreferredBackend::cuda);
-SparseVectorTest<double, unsigned long> cuda_sparse_vector_test_double_ulong(PreferredBackend::cuda);
+SparseVectorTest <float, std::uint32_t> cuda_sparse_vector_test_float_uint32(PreferredBackend::cuda);
+SparseVectorTest <double, std::uint32_t> cuda_sparse_vector_test_double_uint32(PreferredBackend::cuda);
+SparseVectorTest <float, std::uint64_t> cuda_sparse_vector_test_float_uint64(PreferredBackend::cuda);
+SparseVectorTest <double, std::uint64_t> cuda_sparse_vector_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -180,25 +180,25 @@ public:
 #endif
   }
 };
-SparseVectorSerializeTest<float, unsigned int> cpu_sparse_vector_serialize_test_float_uint(PreferredBackend::generic);
-SparseVectorSerializeTest<double, unsigned int> cpu_sparse_vector_serialize_test_double_uint(PreferredBackend::generic);
-SparseVectorSerializeTest<float, unsigned long> cpu_sparse_vector_serialize_test_float_ulong(PreferredBackend::generic);
-SparseVectorSerializeTest<double, unsigned long> cpu_sparse_vector_serialize_test_double_ulong(PreferredBackend::generic);
+SparseVectorSerializeTest <float, std::uint32_t> cpu_sparse_vector_serialize_test_float_uint32(PreferredBackend::generic);
+SparseVectorSerializeTest <double, std::uint32_t> cpu_sparse_vector_serialize_test_double_uint32(PreferredBackend::generic);
+SparseVectorSerializeTest <float, std::uint64_t> cpu_sparse_vector_serialize_test_float_uint64(PreferredBackend::generic);
+SparseVectorSerializeTest <double, std::uint64_t> cpu_sparse_vector_serialize_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorSerializeTest<float, unsigned long> mkl_cpu_sparse_vector_serialize_test_float_ulong(PreferredBackend::mkl);
-SparseVectorSerializeTest<double, unsigned long> mkl_cpu_sparse_vector_serialize_test_double_ulong(PreferredBackend::mkl);
+SparseVectorSerializeTest <float, std::uint64_t> mkl_cpu_sparse_vector_serialize_test_float_uint64(PreferredBackend::mkl);
+SparseVectorSerializeTest <double, std::uint64_t> mkl_cpu_sparse_vector_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorSerializeTest<__float128, unsigned long> cpu_sparse_vector_serialize_test_float128_ulong(PreferredBackend::generic);
-SparseVectorSerializeTest<__float128, unsigned int> cpu_sparse_vector_serialize_test_float128_uint(PreferredBackend::generic);
+SparseVectorSerializeTest <__float128, std::uint64_t> cpu_sparse_vector_serialize_test_float128_uint64(PreferredBackend::generic);
+SparseVectorSerializeTest <__float128, std::uint32_t> cpu_sparse_vector_serialize_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorSerializeTest<Half, unsigned int> sparse_vector_serialize_test_half_uint(PreferredBackend::generic);
-SparseVectorSerializeTest<Half, unsigned long> sparse_vector_serialize_test_half_ulong(PreferredBackend::generic);
+SparseVectorSerializeTest <Half, std::uint32_t> sparse_vector_serialize_test_half_uint32(PreferredBackend::generic);
+SparseVectorSerializeTest <Half, std::uint64_t> sparse_vector_serialize_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorSerializeTest<float, unsigned int> cuda_sparse_vector_serialize_test_float_uint(PreferredBackend::cuda);
-SparseVectorSerializeTest<double, unsigned int> cuda_sparse_vector_serialize_test_double_uint(PreferredBackend::cuda);
-SparseVectorSerializeTest<float, unsigned long> cuda_sparse_vector_serialize_test_float_ulong(PreferredBackend::cuda);
-SparseVectorSerializeTest<double, unsigned long> cuda_sparse_vector_serialize_test_double_ulong(PreferredBackend::cuda);
+SparseVectorSerializeTest <float, std::uint32_t> cuda_sparse_vector_serialize_test_float_uint32(PreferredBackend::cuda);
+SparseVectorSerializeTest <double, std::uint32_t> cuda_sparse_vector_serialize_test_double_uint32(PreferredBackend::cuda);
+SparseVectorSerializeTest <float, std::uint64_t> cuda_sparse_vector_serialize_test_float_uint64(PreferredBackend::cuda);
+SparseVectorSerializeTest <double, std::uint64_t> cuda_sparse_vector_serialize_test_double_uint64(PreferredBackend::cuda);
 #endif

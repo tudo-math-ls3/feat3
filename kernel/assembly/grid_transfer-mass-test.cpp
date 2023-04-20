@@ -102,120 +102,120 @@ public:
 };
 
 // Lagrange-1 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, unsigned int> grid_transfer_mass_test_hy1_lagrange1_double_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, unsigned int> grid_transfer_mass_test_hy2_lagrange1_float_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, unsigned int> grid_transfer_mass_test_hy3_lagrange1_double_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, unsigned int> grid_transfer_mass_test_sx2_lagrange1_double_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, unsigned int> grid_transfer_mass_test_sx3_lagrange1_float_uint(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint32_t> grid_transfer_mass_test_hy1_lagrange1_double_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint32_t> grid_transfer_mass_test_hy2_lagrange1_float_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint32_t> grid_transfer_mass_test_hy3_lagrange1_double_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint32_t> grid_transfer_mass_test_sx2_lagrange1_double_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint32_t> grid_transfer_mass_test_sx3_lagrange1_float_uint32(PreferredBackend::generic);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, unsigned long> grid_transfer_mass_test_hy1_lagrange1_double_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, unsigned long> grid_transfer_mass_test_hy2_lagrange1_float_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, unsigned long> grid_transfer_mass_test_hy3_lagrange1_double_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, unsigned long> grid_transfer_mass_test_sx2_lagrange1_double_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, unsigned long> grid_transfer_mass_test_sx3_lagrange1_float_ulong(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t> grid_transfer_mass_test_hy1_lagrange1_double_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t> grid_transfer_mass_test_hy2_lagrange1_float_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t> grid_transfer_mass_test_hy3_lagrange1_double_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t> grid_transfer_mass_test_sx2_lagrange1_double_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t> grid_transfer_mass_test_sx3_lagrange1_float_uint64(PreferredBackend::generic);
 
 // Lagrange-2 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, unsigned int> grid_transfer_mass_test_hy1_lagrange2_double_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, unsigned int> grid_transfer_mass_test_hy2_lagrange2_double_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, unsigned int> grid_transfer_mass_test_hy3_lagrange2_float_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, unsigned int> grid_transfer_mass_test_sx2_lagrange2_float_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, unsigned int> grid_transfer_mass_test_sx3_lagrange2_double_uint(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint32_t> grid_transfer_mass_test_hy1_lagrange2_double_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint32_t> grid_transfer_mass_test_hy2_lagrange2_double_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint32_t> grid_transfer_mass_test_hy3_lagrange2_float_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint32_t> grid_transfer_mass_test_sx2_lagrange2_float_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint32_t> grid_transfer_mass_test_sx3_lagrange2_double_uint32(PreferredBackend::generic);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, unsigned long> grid_transfer_mass_test_hy1_lagrange2_double_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, unsigned long> grid_transfer_mass_test_hy2_lagrange2_double_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, unsigned long> grid_transfer_mass_test_hy3_lagrange2_float_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, unsigned long> grid_transfer_mass_test_sx2_lagrange2_float_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, unsigned long> grid_transfer_mass_test_sx3_lagrange2_double_ulong(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t> grid_transfer_mass_test_hy1_lagrange2_double_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t> grid_transfer_mass_test_hy2_lagrange2_double_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t> grid_transfer_mass_test_hy3_lagrange2_float_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t> grid_transfer_mass_test_sx2_lagrange2_float_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t> grid_transfer_mass_test_sx3_lagrange2_double_uint64(PreferredBackend::generic);
 
 #ifdef FEAT_HAVE_MKL
 // Lagrange-1 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, unsigned long> mkl_grid_transfer_mass_test_hy1_lagrange1_double_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, unsigned long> mkl_grid_transfer_mass_test_hy2_lagrange1_float_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, unsigned long> mkl_grid_transfer_mass_test_hy3_lagrange1_double_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, unsigned long> mkl_grid_transfer_mass_test_sx2_lagrange1_double_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, unsigned long> mkl_grid_transfer_mass_test_sx3_lagrange1_float_ulong(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t> mkl_grid_transfer_mass_test_hy1_lagrange1_double_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t> mkl_grid_transfer_mass_test_hy2_lagrange1_float_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t> mkl_grid_transfer_mass_test_hy3_lagrange1_double_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t> mkl_grid_transfer_mass_test_sx2_lagrange1_double_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t> mkl_grid_transfer_mass_test_sx3_lagrange1_float_uint64(PreferredBackend::mkl);
 // Lagrange-2 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, unsigned long> mkl_grid_transfer_mass_test_hy1_lagrange2_double_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, unsigned long> mkl_grid_transfer_mass_test_hy2_lagrange2_double_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, unsigned long> mkl_grid_transfer_mass_test_hy3_lagrange2_float_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, unsigned long> mkl_grid_transfer_mass_test_sx2_lagrange2_float_ulong(PreferredBackend::mkl);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, unsigned long> mkl_grid_transfer_mass_test_sx3_lagrange2_double_ulong(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t> mkl_grid_transfer_mass_test_hy1_lagrange2_double_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t> mkl_grid_transfer_mass_test_hy2_lagrange2_double_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t> mkl_grid_transfer_mass_test_hy3_lagrange2_float_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t> mkl_grid_transfer_mass_test_sx2_lagrange2_float_uint64(PreferredBackend::mkl);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t> mkl_grid_transfer_mass_test_sx3_lagrange2_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
 // Lagrange-1 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, unsigned int> grid_transfer_mass_test_hy1_lagrange1_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, unsigned int> grid_transfer_mass_test_hy2_lagrange1_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, unsigned int> grid_transfer_mass_test_hy3_lagrange1_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, unsigned int> grid_transfer_mass_test_sx2_lagrange1_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, unsigned int> grid_transfer_mass_test_sx3_lagrange1_float128_uint(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, std::uint32_t> grid_transfer_mass_test_hy1_lagrange1_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, std::uint32_t> grid_transfer_mass_test_hy2_lagrange1_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, std::uint32_t> grid_transfer_mass_test_hy3_lagrange1_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, std::uint32_t> grid_transfer_mass_test_sx2_lagrange1_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, std::uint32_t> grid_transfer_mass_test_sx3_lagrange1_float128_uint32(PreferredBackend::generic);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, unsigned long> grid_transfer_mass_test_hy1_lagrange1_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, unsigned long> grid_transfer_mass_test_hy2_lagrange1_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, unsigned long> grid_transfer_mass_test_hy3_lagrange1_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, unsigned long> grid_transfer_mass_test_sx2_lagrange1_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, unsigned long> grid_transfer_mass_test_sx3_lagrange1_float128_ulong(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, std::uint64_t> grid_transfer_mass_test_hy1_lagrange1_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, std::uint64_t> grid_transfer_mass_test_hy2_lagrange1_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, std::uint64_t> grid_transfer_mass_test_hy3_lagrange1_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, std::uint64_t> grid_transfer_mass_test_sx2_lagrange1_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, std::uint64_t> grid_transfer_mass_test_sx3_lagrange1_float128_uint64(PreferredBackend::generic);
 // Lagrange-2 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, unsigned int> grid_transfer_mass_test_hy1_lagrange2_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, unsigned int> grid_transfer_mass_test_hy2_lagrange2_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, unsigned int> grid_transfer_mass_test_hy3_lagrange2_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, unsigned int> grid_transfer_mass_test_sx2_lagrange2_float128_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, unsigned int> grid_transfer_mass_test_sx3_lagrange2_float128_uint(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, std::uint32_t> grid_transfer_mass_test_hy1_lagrange2_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, std::uint32_t> grid_transfer_mass_test_hy2_lagrange2_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, std::uint32_t> grid_transfer_mass_test_hy3_lagrange2_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, std::uint32_t> grid_transfer_mass_test_sx2_lagrange2_float128_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, std::uint32_t> grid_transfer_mass_test_sx3_lagrange2_float128_uint32(PreferredBackend::generic);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, unsigned long> grid_transfer_mass_test_hy1_lagrange2_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, unsigned long> grid_transfer_mass_test_hy2_lagrange2_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, unsigned long> grid_transfer_mass_test_hy3_lagrange2_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, unsigned long> grid_transfer_mass_test_sx2_lagrange2_float128_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, unsigned long> grid_transfer_mass_test_sx3_lagrange2_float128_ulong(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, std::uint64_t> grid_transfer_mass_test_hy1_lagrange2_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, std::uint64_t> grid_transfer_mass_test_hy2_lagrange2_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, std::uint64_t> grid_transfer_mass_test_hy3_lagrange2_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, std::uint64_t> grid_transfer_mass_test_sx2_lagrange2_float128_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, std::uint64_t> grid_transfer_mass_test_sx3_lagrange2_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
 // Lagrange-1 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, unsigned int> grid_transfer_mass_test_hy1_lagrange1_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, unsigned int> grid_transfer_mass_test_hy2_lagrange1_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, unsigned int> grid_transfer_mass_test_hy3_lagrange1_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, unsigned int> grid_transfer_mass_test_sx2_lagrange1_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, unsigned int> grid_transfer_mass_test_sx3_lagrange1_half_uint(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, std::uint32_t> grid_transfer_mass_test_hy1_lagrange1_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, std::uint32_t> grid_transfer_mass_test_hy2_lagrange1_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, std::uint32_t> grid_transfer_mass_test_hy3_lagrange1_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, std::uint32_t> grid_transfer_mass_test_sx2_lagrange1_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, std::uint32_t> grid_transfer_mass_test_sx3_lagrange1_half_uint32(PreferredBackend::generic);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, unsigned long> grid_transfer_mass_test_hy1_lagrange1_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, unsigned long> grid_transfer_mass_test_hy2_lagrange1_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, unsigned long> grid_transfer_mass_test_hy3_lagrange1_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, unsigned long> grid_transfer_mass_test_sx2_lagrange1_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, unsigned long> grid_transfer_mass_test_sx3_lagrange1_half_ulong(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, std::uint64_t> grid_transfer_mass_test_hy1_lagrange1_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, std::uint64_t> grid_transfer_mass_test_hy2_lagrange1_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, std::uint64_t> grid_transfer_mass_test_hy3_lagrange1_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, std::uint64_t> grid_transfer_mass_test_sx2_lagrange1_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, std::uint64_t> grid_transfer_mass_test_sx3_lagrange1_half_uint64(PreferredBackend::generic);
 // Lagrange-2 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, unsigned int> grid_transfer_mass_test_hy1_lagrange2_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, unsigned int> grid_transfer_mass_test_hy2_lagrange2_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, unsigned int> grid_transfer_mass_test_hy3_lagrange2_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, unsigned int> grid_transfer_mass_test_sx2_lagrange2_half_uint(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, unsigned int> grid_transfer_mass_test_sx3_lagrange2_half_uint(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, std::uint32_t> grid_transfer_mass_test_hy1_lagrange2_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, std::uint32_t> grid_transfer_mass_test_hy2_lagrange2_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, std::uint32_t> grid_transfer_mass_test_hy3_lagrange2_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, std::uint32_t> grid_transfer_mass_test_sx2_lagrange2_half_uint32(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, std::uint32_t> grid_transfer_mass_test_sx3_lagrange2_half_uint32(PreferredBackend::generic);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, unsigned long> grid_transfer_mass_test_hy1_lagrange2_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, unsigned long> grid_transfer_mass_test_hy2_lagrange2_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, unsigned long> grid_transfer_mass_test_hy3_lagrange2_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, unsigned long> grid_transfer_mass_test_sx2_lagrange2_half_ulong(PreferredBackend::generic);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, unsigned long> grid_transfer_mass_test_sx3_lagrange2_half_ulong(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, std::uint64_t> grid_transfer_mass_test_hy1_lagrange2_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, std::uint64_t> grid_transfer_mass_test_hy2_lagrange2_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, std::uint64_t> grid_transfer_mass_test_hy3_lagrange2_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, std::uint64_t> grid_transfer_mass_test_sx2_lagrange2_half_uint64(PreferredBackend::generic);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, std::uint64_t> grid_transfer_mass_test_sx3_lagrange2_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
 // Lagrange-1 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, unsigned int> cuda_grid_transfer_mass_test_hy1_lagrange1_double_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, unsigned int> cuda_grid_transfer_mass_test_hy2_lagrange1_float_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, unsigned int> cuda_grid_transfer_mass_test_hy3_lagrange1_double_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, unsigned int> cuda_grid_transfer_mass_test_sx2_lagrange1_double_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, unsigned int> cuda_grid_transfer_mass_test_sx3_lagrange1_float_uint(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint32_t> cuda_grid_transfer_mass_test_hy1_lagrange1_double_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint32_t> cuda_grid_transfer_mass_test_hy2_lagrange1_float_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint32_t> cuda_grid_transfer_mass_test_hy3_lagrange1_double_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint32_t> cuda_grid_transfer_mass_test_sx2_lagrange1_double_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint32_t> cuda_grid_transfer_mass_test_sx3_lagrange1_float_uint32(PreferredBackend::cuda);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, unsigned long> cuda_grid_transfer_mass_test_hy1_lagrange1_double_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, unsigned long> cuda_grid_transfer_mass_test_hy2_lagrange1_float_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, unsigned long> cuda_grid_transfer_mass_test_hy3_lagrange1_double_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, unsigned long> cuda_grid_transfer_mass_test_sx2_lagrange1_double_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, unsigned long> cuda_grid_transfer_mass_test_sx3_lagrange1_float_ulong(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t> cuda_grid_transfer_mass_test_hy1_lagrange1_double_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t> cuda_grid_transfer_mass_test_hy2_lagrange1_float_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t> cuda_grid_transfer_mass_test_hy3_lagrange1_double_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t> cuda_grid_transfer_mass_test_sx2_lagrange1_double_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t> cuda_grid_transfer_mass_test_sx3_lagrange1_float_uint64(PreferredBackend::cuda);
 // Lagrange-2 element
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, unsigned int> cuda_grid_transfer_mass_test_hy1_lagrange2_double_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, unsigned int> cuda_grid_transfer_mass_test_hy2_lagrange2_double_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, unsigned int> cuda_grid_transfer_mass_test_hy3_lagrange2_float_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, unsigned int> cuda_grid_transfer_mass_test_sx2_lagrange2_float_uint(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, unsigned int> cuda_grid_transfer_mass_test_sx3_lagrange2_double_uint(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint32_t> cuda_grid_transfer_mass_test_hy1_lagrange2_double_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint32_t> cuda_grid_transfer_mass_test_hy2_lagrange2_double_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint32_t> cuda_grid_transfer_mass_test_hy3_lagrange2_float_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint32_t> cuda_grid_transfer_mass_test_sx2_lagrange2_float_uint32(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint32_t> cuda_grid_transfer_mass_test_sx3_lagrange2_double_uint32(PreferredBackend::cuda);
 
-GridTransferMassTest<Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, unsigned long> cuda_grid_transfer_mass_test_hy1_lagrange2_double_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, unsigned long> cuda_grid_transfer_mass_test_hy2_lagrange2_double_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, unsigned long> cuda_grid_transfer_mass_test_hy3_lagrange2_float_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, unsigned long> cuda_grid_transfer_mass_test_sx2_lagrange2_float_ulong(PreferredBackend::cuda);
-GridTransferMassTest<Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, unsigned long> cuda_grid_transfer_mass_test_sx3_lagrange2_double_ulong(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t> cuda_grid_transfer_mass_test_hy1_lagrange2_double_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t> cuda_grid_transfer_mass_test_hy2_lagrange2_double_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t> cuda_grid_transfer_mass_test_hy3_lagrange2_float_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t> cuda_grid_transfer_mass_test_sx2_lagrange2_float_uint64(PreferredBackend::cuda);
+GridTransferMassTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t> cuda_grid_transfer_mass_test_sx3_lagrange2_double_uint64(PreferredBackend::cuda);
 #endif

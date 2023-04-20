@@ -417,7 +417,7 @@ public:
   }
 };
 
-MatrixInvertTest<double, unsigned int> matrix_invert_test_double_ushort;
+MatrixInvertTest<double, std::uint32_t> matrix_invert_test_double_uint32;
 #ifdef FEAT_HAVE_QUADMATH
 MatrixInvertTest<__float128, int> matrix_invert_test_float128_int;
 #endif // FEAT_HAVE_QUADMATH

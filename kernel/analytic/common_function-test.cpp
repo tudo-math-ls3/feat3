@@ -1745,25 +1745,25 @@ public:
   }
 };
 
-CommonFunctionTest<double, unsigned int> common_function_test_double_uint(PreferredBackend::generic);
-CommonFunctionTest<float, unsigned int> common_function_test_float_uint(PreferredBackend::generic);
-CommonFunctionTest<double, unsigned long> common_function_test_double_ulong(PreferredBackend::generic);
-CommonFunctionTest<float, unsigned long> common_function_test_float_ulong(PreferredBackend::generic);
+CommonFunctionTest <double, std::uint32_t> common_function_test_double_uint32(PreferredBackend::generic);
+CommonFunctionTest <float, std::uint32_t> common_function_test_float_uint32(PreferredBackend::generic);
+CommonFunctionTest <double, std::uint64_t> common_function_test_double_uint64(PreferredBackend::generic);
+CommonFunctionTest <float, std::uint64_t> common_function_test_float_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-CommonFunctionTest<float, unsigned long> mkl_common_function_test_float_ulong(PreferredBackend::mkl);
-CommonFunctionTest<double, unsigned long> mkl_common_function_test_double_ulong(PreferredBackend::mkl);
+CommonFunctionTest <float, std::uint64_t> mkl_common_function_test_float_uint64(PreferredBackend::mkl);
+CommonFunctionTest <double, std::uint64_t> mkl_common_function_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-CommonFunctionTest<__float128, unsigned long> common_function_test_float128_ulong(PreferredBackend::generic);
-CommonFunctionTest<__float128, unsigned int> common_function_test_float128_uint(PreferredBackend::generic);
+CommonFunctionTest <__float128, std::uint64_t> common_function_test_float128_uint64(PreferredBackend::generic);
+CommonFunctionTest <__float128, std::uint32_t> common_function_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-CommonFunctionTest<Half, unsigned int> common_function_test_half_uint(PreferredBackend::generic);
-CommonFunctionTest<Half, unsigned long> common_function_test_half_ulong(PreferredBackend::generic);
+CommonFunctionTest <Half, std::uint32_t> common_function_test_half_uint32(PreferredBackend::generic);
+CommonFunctionTest <Half, std::uint64_t> common_function_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-CommonFunctionTest<float, unsigned int> cuda_common_function_test_float_uint(PreferredBackend::cuda);
-CommonFunctionTest<double, unsigned int> cuda_common_function_test_double_uint(PreferredBackend::cuda);
-CommonFunctionTest<float, unsigned long> cuda_common_function_test_float_ulong(PreferredBackend::cuda);
-CommonFunctionTest<double, unsigned long> cuda_common_function_test_double_ulong(PreferredBackend::cuda);
+CommonFunctionTest <float, std::uint32_t> cuda_common_function_test_float_uint32(PreferredBackend::cuda);
+CommonFunctionTest <double, std::uint32_t> cuda_common_function_test_double_uint32(PreferredBackend::cuda);
+CommonFunctionTest <float, std::uint64_t> cuda_common_function_test_float_uint64(PreferredBackend::cuda);
+CommonFunctionTest <double, std::uint64_t> cuda_common_function_test_double_uint64(PreferredBackend::cuda);
 #endif

@@ -144,27 +144,27 @@ class SlipFilterVectorTest
   }
 };
 
-SlipFilterVectorTest<float, Index, 2> slip_filter_vector_test_fi_2(PreferredBackend::generic);
-SlipFilterVectorTest<double, unsigned int, 2> slip_filter_vector_test_di_2(PreferredBackend::generic);
-SlipFilterVectorTest<float, unsigned int, 3> slip_filter_vector_test_fi_3(PreferredBackend::generic);
-SlipFilterVectorTest<double, Index, 3> slip_filter_vector_test_di_3(PreferredBackend::generic);
+SlipFilterVectorTest<float, std::uint32_t, 3> slip_filter_vector_test_float_uint32_3(PreferredBackend::generic);
+SlipFilterVectorTest<float, std::uint64_t, 2> slip_filter_vector_test_float_uint64_2(PreferredBackend::generic);
+SlipFilterVectorTest<double, std::uint32_t, 2> slip_filter_vector_test_double_uint32_2(PreferredBackend::generic);
+SlipFilterVectorTest<double, std::uint64_t, 3> slip_filter_vector_test_double_uint64_3(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SlipFilterVectorTest<float, unsigned long, 2> mkl_slip_filter_vector_test_float_ulong(PreferredBackend::mkl);
-SlipFilterVectorTest<double, unsigned long, 3> mkl_slip_filter_vector_test_double_ulong(PreferredBackend::mkl);
+SlipFilterVectorTest <float, std::uint64_t, 2> mkl_slip_filter_vector_test_float_uint64(PreferredBackend::mkl);
+SlipFilterVectorTest <double, std::uint64_t, 3> mkl_slip_filter_vector_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SlipFilterVectorTest<__float128, unsigned int, 2> slip_filter_vector_test_q_2(PreferredBackend::generic);
-SlipFilterVectorTest<__float128, Index, 3> slip_filter_vector_test_q_3(PreferredBackend::generic);
+SlipFilterVectorTest<__float128, std::uint32_t, 2> slip_filter_vector_test_float128_uint32_2(PreferredBackend::generic);
+SlipFilterVectorTest<__float128, std::uint64_t, 3> slip_filter_vector_test_float128_uint64_3(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-//SlipFilterVectorTest<Half, unsigned int, 2> slip_filter_vector_test_half_uint(PreferredBackend::generic);
-//SlipFilterVectorTest<Half, unsigned long, 3> slip_filter_vector_test_half_ulong(PreferredBackend::generic);
+//SlipFilterVectorTest<Half, std::uint32_t, 2> slip_filter_vector_test_half_uint(PreferredBackend::generic);
+//SlipFilterVectorTest<Half, std::uint64_t, 3> slip_filter_vector_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SlipFilterVectorTest<float, unsigned int, 2> slip_filter_vector_test_cuda_fi_2(PreferredBackend::cuda);
-SlipFilterVectorTest<float, Index, 3> slip_filter_vector_test_cuda_fi_3(PreferredBackend::cuda);
-SlipFilterVectorTest<double, Index, 2> slip_filter_vector_test_cuda_di_2(PreferredBackend::cuda);
-SlipFilterVectorTest<double, unsigned int, 3> slip_filter_vector_test_cuda_di_3(PreferredBackend::cuda);
+SlipFilterVectorTest<float, std::uint32_t, 2> slip_filter_vector_test_cuda_float_uint32_2(PreferredBackend::cuda);
+SlipFilterVectorTest<float, std::uint64_t, 3> slip_filter_vector_test_cuda_float_uint64_3(PreferredBackend::cuda);
+SlipFilterVectorTest<double, std::uint32_t, 3> slip_filter_vector_test_cuda_double_uint32_3(PreferredBackend::cuda);
+SlipFilterVectorTest<double, std::uint64_t, 2> slip_filter_vector_test_cuda_double_uint64_2(PreferredBackend::cuda);
 #endif
 
 /**
@@ -458,25 +458,25 @@ class SlipFilterAssemblyTest
 
 };
 
-SlipFilterAssemblyTest<float, unsigned int> slip_filter_assembly_test_float_uint(PreferredBackend::generic);
-SlipFilterAssemblyTest<float, unsigned long> slip_filter_assembly_test_float_ulong(PreferredBackend::generic);
-SlipFilterAssemblyTest<double, unsigned int> slip_filter_assembly_test_double_uint(PreferredBackend::generic);
-SlipFilterAssemblyTest<double, unsigned long> slip_filter_assembly_test_double_ulong(PreferredBackend::generic);
+SlipFilterAssemblyTest <float, std::uint32_t> slip_filter_assembly_test_float_uint32(PreferredBackend::generic);
+SlipFilterAssemblyTest <float, std::uint64_t> slip_filter_assembly_test_float_uint64(PreferredBackend::generic);
+SlipFilterAssemblyTest <double, std::uint32_t> slip_filter_assembly_test_double_uint32(PreferredBackend::generic);
+SlipFilterAssemblyTest <double, std::uint64_t> slip_filter_assembly_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SlipFilterAssemblyTest<float, unsigned long> mkl_slip_filter_assembly_test_float_ulong(PreferredBackend::mkl);
-SlipFilterAssemblyTest<double, unsigned long> mkl_slip_filter_assembly_test_double_ulong(PreferredBackend::mkl);
+SlipFilterAssemblyTest <float, std::uint64_t> mkl_slip_filter_assembly_test_float_uint64(PreferredBackend::mkl);
+SlipFilterAssemblyTest <double, std::uint64_t> mkl_slip_filter_assembly_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SlipFilterAssemblyTest<__float128, unsigned long> slip_filter_assembly_test_float128_ulong(PreferredBackend::generic);
-SlipFilterAssemblyTest<__float128, unsigned int> slip_filter_assembly_test_float128_uint(PreferredBackend::generic);
+SlipFilterAssemblyTest <__float128, std::uint64_t> slip_filter_assembly_test_float128_uint64(PreferredBackend::generic);
+SlipFilterAssemblyTest <__float128, std::uint32_t> slip_filter_assembly_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-//SlipFilterAssemblyTest<Half, unsigned int> slip_filter_assembly_test_half_uint(PreferredBackend::generic);
-//SlipFilterAssemblyTest<Half, unsigned long> slip_filter_assembly_test_half_ulong(PreferredBackend::generic);
+//SlipFilterAssemblyTest<Half, std::uint32_t> slip_filter_assembly_test_half_uint32(PreferredBackend::generic);
+//SlipFilterAssemblyTest<Half, std::uint64_t> slip_filter_assembly_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SlipFilterAssemblyTest<float, unsigned long> cuda_slip_filter_assembly_test_float_ulong(PreferredBackend::cuda);
-SlipFilterAssemblyTest<double, unsigned long> cuda_slip_filter_assembly_test_double_ulong(PreferredBackend::cuda);
-SlipFilterAssemblyTest<float, unsigned int> cuda_slip_filter_assembly_test_float_uint(PreferredBackend::cuda);
-SlipFilterAssemblyTest<double, unsigned int> cuda_slip_filter_assembly_test_double_uint(PreferredBackend::cuda);
+SlipFilterAssemblyTest <float, std::uint64_t> cuda_slip_filter_assembly_test_float_uint64(PreferredBackend::cuda);
+SlipFilterAssemblyTest <double, std::uint64_t> cuda_slip_filter_assembly_test_double_uint64(PreferredBackend::cuda);
+SlipFilterAssemblyTest <float, std::uint32_t> cuda_slip_filter_assembly_test_float_uint32(PreferredBackend::cuda);
+SlipFilterAssemblyTest <double, std::uint32_t> cuda_slip_filter_assembly_test_double_uint32(PreferredBackend::cuda);
 #endif

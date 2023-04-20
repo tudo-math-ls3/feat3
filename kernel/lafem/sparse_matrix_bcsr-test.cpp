@@ -107,27 +107,27 @@ public:
 
   }
 };
-SparseMatrixBCSRTest<float, unsigned long> cpu_sparse_matrix_bcsr_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRTest<double, unsigned long> cpu_sparse_matrix_bcsr_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRTest<float, unsigned int> cpu_sparse_matrix_bcsr_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRTest<double, unsigned int> cpu_sparse_matrix_bcsr_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRTest <float, std::uint64_t> cpu_sparse_matrix_bcsr_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRTest <double, std::uint64_t> cpu_sparse_matrix_bcsr_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRTest <float, std::uint32_t> cpu_sparse_matrix_bcsr_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRTest <double, std::uint32_t> cpu_sparse_matrix_bcsr_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRTest<float, unsigned long> mkl_cpu_sparse_matrix_bcsr_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRTest<double, unsigned long> mkl_cpu_sparse_matrix_bcsr_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRTest <float, std::uint64_t> mkl_cpu_sparse_matrix_bcsr_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRTest <double, std::uint64_t> mkl_cpu_sparse_matrix_bcsr_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRTest<__float128, unsigned long> cpu_sparse_matrix_bcsr_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRTest<__float128, unsigned int> cpu_sparse_matrix_bcsr_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRTest <__float128, std::uint64_t> cpu_sparse_matrix_bcsr_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRTest <__float128, std::uint32_t> cpu_sparse_matrix_bcsr_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRTest<Half, unsigned int> cpu_sparse_matrix_bcsr_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRTest<Half, unsigned long> cpu_sparse_matrix_bcsr_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRTest <Half, std::uint32_t> cpu_sparse_matrix_bcsr_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRTest <Half, std::uint64_t> cpu_sparse_matrix_bcsr_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRTest<float, unsigned long> cuda_sparse_matrix_bcsr_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRTest<double, unsigned long> cuda_sparse_matrix_bcsr_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRTest<float, unsigned int> cuda_sparse_matrix_bcsr_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRTest<double, unsigned int> cuda_sparse_matrix_bcsr_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRTest <float, std::uint64_t> cuda_sparse_matrix_bcsr_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRTest <double, std::uint64_t> cuda_sparse_matrix_bcsr_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRTest <float, std::uint32_t> cuda_sparse_matrix_bcsr_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRTest <double, std::uint32_t> cuda_sparse_matrix_bcsr_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -204,27 +204,27 @@ public:
   }
 };
 
-SparseMatrixBCSRSerializeTest<float, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRSerializeTest<double, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRSerializeTest<float, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRSerializeTest<double, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <float, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <double, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <float, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <double, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRSerializeTest<float, unsigned long> mkl_cpu_sparse_matrix_bcsr_serialize_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRSerializeTest<double, unsigned long> mkl_cpu_sparse_matrix_bcsr_serialize_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRSerializeTest <float, std::uint64_t> mkl_cpu_sparse_matrix_bcsr_serialize_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRSerializeTest <double, std::uint64_t> mkl_cpu_sparse_matrix_bcsr_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRSerializeTest<__float128, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRSerializeTest<__float128, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <__float128, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <__float128, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRSerializeTest<Half, unsigned int> cpu_sparse_matrix_bcsr_serialize_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRSerializeTest<Half, unsigned long> cpu_sparse_matrix_bcsr_serialize_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <Half, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRSerializeTest <Half, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRSerializeTest<float, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRSerializeTest<double, unsigned long> cuda_sparse_matrix_bcsr_serialize_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRSerializeTest<float, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRSerializeTest<double, unsigned int> cuda_sparse_matrix_bcsr_serialize_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest <float, std::uint64_t> cuda_sparse_matrix_bcsr_serialize_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest <double, std::uint64_t> cuda_sparse_matrix_bcsr_serialize_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest <float, std::uint32_t> cuda_sparse_matrix_bcsr_serialize_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRSerializeTest <double, std::uint32_t> cuda_sparse_matrix_bcsr_serialize_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 /**
@@ -355,27 +355,27 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
   }
 };
-SparseMatrixBCSRApplyTest<float, unsigned long> cpu_sm_bcsr_apply_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRApplyTest<double, unsigned long> cpu_sm_bcsr_apply_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRApplyTest<float, unsigned int> cpu_sm_bcsr_apply_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRApplyTest<double, unsigned int> cpu_sm_bcsr_apply_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <float, std::uint64_t> cpu_sm_bcsr_apply_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <double, std::uint64_t> cpu_sm_bcsr_apply_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <float, std::uint32_t> cpu_sm_bcsr_apply_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <double, std::uint32_t> cpu_sm_bcsr_apply_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRApplyTest<float, unsigned long> mkl_cpu_sm_bcsr_apply_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRApplyTest<double, unsigned long> mkl_cpu_sm_bcsr_apply_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRApplyTest <float, std::uint64_t> mkl_cpu_sm_bcsr_apply_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRApplyTest <double, std::uint64_t> mkl_cpu_sm_bcsr_apply_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRApplyTest<__float128, unsigned long> cpu_sm_bcsr_apply_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRApplyTest<__float128, unsigned int> cpu_sm_bcsr_apply_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <__float128, std::uint64_t> cpu_sm_bcsr_apply_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <__float128, std::uint32_t> cpu_sm_bcsr_apply_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRApplyTest<Half, unsigned int> cpu_sm_bcsr_apply_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRApplyTest<Half, unsigned long> cpu_sm_bcsr_apply_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <Half, std::uint32_t> cpu_sm_bcsr_apply_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRApplyTest <Half, std::uint64_t> cpu_sm_bcsr_apply_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRApplyTest<float, unsigned long> cuda_sm_bcsr_apply_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRApplyTest<double, unsigned long> cuda_sm_bcsr_apply_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRApplyTest<float, unsigned int> cuda_sm_bcsr_apply_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRApplyTest<double, unsigned int> cuda_sm_bcsr_apply_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest <float, std::uint64_t> cuda_sm_bcsr_apply_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest <double, std::uint64_t> cuda_sm_bcsr_apply_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest <float, std::uint32_t> cuda_sm_bcsr_apply_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTest <double, std::uint32_t> cuda_sm_bcsr_apply_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 /**
@@ -510,27 +510,27 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
   }
 };
-SparseMatrixBCSRApplySquareTest<float, unsigned long> cpu_sm_bcsr_apply_square_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRApplySquareTest<double, unsigned long> cpu_sm_bcsr_apply_square_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRApplySquareTest<float, unsigned int> cpu_sm_bcsr_apply_square_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRApplySquareTest<double, unsigned int> cpu_sm_bcsr_apply_square_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <float, std::uint64_t> cpu_sm_bcsr_apply_square_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <double, std::uint64_t> cpu_sm_bcsr_apply_square_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <float, std::uint32_t> cpu_sm_bcsr_apply_square_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <double, std::uint32_t> cpu_sm_bcsr_apply_square_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRApplySquareTest<float, unsigned long> mkl_cpu_sm_bcsr_apply_square_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRApplySquareTest<double, unsigned long> mkl_cpu_sm_bcsr_apply_square_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRApplySquareTest <float, std::uint64_t> mkl_cpu_sm_bcsr_apply_square_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRApplySquareTest <double, std::uint64_t> mkl_cpu_sm_bcsr_apply_square_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRApplySquareTest<__float128, unsigned long> cpu_sm_bcsr_apply_square_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRApplySquareTest<__float128, unsigned int> cpu_sm_bcsr_apply_square_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <__float128, std::uint64_t> cpu_sm_bcsr_apply_square_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <__float128, std::uint32_t> cpu_sm_bcsr_apply_square_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRApplySquareTest<Half, unsigned int> cpu_sm_bcsr_apply_square_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRApplySquareTest<Half, unsigned long> cpu_sm_bcsr_apply_square_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <Half, std::uint32_t> cpu_sm_bcsr_apply_square_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRApplySquareTest <Half, std::uint64_t> cpu_sm_bcsr_apply_square_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRApplySquareTest<float, unsigned int> gpu_sm_bcsr_apply_square_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRApplySquareTest<double, unsigned int> gpu_sm_bcsr_apply_square_test_double_uint(PreferredBackend::cuda);
-SparseMatrixBCSRApplySquareTest<float, unsigned long> gpu_sm_bcsr_apply_square_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRApplySquareTest<double, unsigned long> gpu_sm_bcsr_apply_square_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest <float, std::uint32_t> gpu_sm_bcsr_apply_square_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest <double, std::uint32_t> gpu_sm_bcsr_apply_square_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest <float, std::uint64_t> gpu_sm_bcsr_apply_square_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRApplySquareTest <double, std::uint64_t> gpu_sm_bcsr_apply_square_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 
@@ -574,27 +574,27 @@ public:
     TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[5], 18);
   }
 };
-SparseMatrixBCSRDiagTest<float, unsigned long> cpu_sm_bcsr_diag_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRDiagTest<double, unsigned long> cpu_sm_bcsr_diag_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRDiagTest<float, unsigned int> cpu_sm_bcsr_diag_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRDiagTest<double, unsigned int> cpu_sm_bcsr_diag_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <float, std::uint64_t> cpu_sm_bcsr_diag_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <double, std::uint64_t> cpu_sm_bcsr_diag_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <float, std::uint32_t> cpu_sm_bcsr_diag_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <double, std::uint32_t> cpu_sm_bcsr_diag_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRDiagTest<float, unsigned long> mkl_cpu_sm_bcsr_diag_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRDiagTest<double, unsigned long> mkl_cpu_sm_bcsr_diag_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRDiagTest <float, std::uint64_t> mkl_cpu_sm_bcsr_diag_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRDiagTest <double, std::uint64_t> mkl_cpu_sm_bcsr_diag_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRDiagTest<__float128, unsigned long> cpu_sm_bcsr_diag_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRDiagTest<__float128, unsigned int> cpu_sm_bcsr_diag_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <__float128, std::uint64_t> cpu_sm_bcsr_diag_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <__float128, std::uint32_t> cpu_sm_bcsr_diag_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRDiagTest<Half, unsigned int> cpu_sm_bcsr_diag_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRDiagTest<Half, unsigned long> cpu_sm_bcsr_diag_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <Half, std::uint32_t> cpu_sm_bcsr_diag_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRDiagTest <Half, std::uint64_t> cpu_sm_bcsr_diag_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRDiagTest<float, unsigned long> cuda_sm_bcsr_diag_test_float_ulong_cuda(PreferredBackend::cuda);
-SparseMatrixBCSRDiagTest<double, unsigned long> cuda_sm_bcsr_diag_test_double_ulong_cuda(PreferredBackend::cuda);
-SparseMatrixBCSRDiagTest<float, unsigned int> cuda_sm_bcsr_diag_test_float_uint_cuda(PreferredBackend::cuda);
-SparseMatrixBCSRDiagTest<double, unsigned int> cuda_sm_bcsr_diag_test_double_uint_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest <float, std::uint64_t> cuda_sm_bcsr_diag_test_float_uint64_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest <double, std::uint64_t> cuda_sm_bcsr_diag_test_double_uint64_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest <float, std::uint32_t> cuda_sm_bcsr_diag_test_float_uint32_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRDiagTest <double, std::uint32_t> cuda_sm_bcsr_diag_test_double_uint32_cuda(PreferredBackend::cuda);
 #endif
 
 
@@ -655,27 +655,27 @@ public:
     TEST_CHECK_EQUAL(result_csr, ref);
   }
 };
-SparseMatrixBCSRScaleTest<float, unsigned long> cpu_sm_bcsr_scale_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRScaleTest<double, unsigned long> cpu_sm_bcsr_scale_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRScaleTest<float, unsigned int> cpu_sm_bcsr_scale_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRScaleTest<double, unsigned int> cpu_sm_bcsr_scale_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <float, std::uint64_t> cpu_sm_bcsr_scale_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <double, std::uint64_t> cpu_sm_bcsr_scale_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <float, std::uint32_t> cpu_sm_bcsr_scale_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <double, std::uint32_t> cpu_sm_bcsr_scale_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRScaleTest<float, unsigned long> mkl_cpu_sm_bcsr_scale_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRScaleTest<double, unsigned long> mkl_cpu_sm_bcsr_scale_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRScaleTest <float, std::uint64_t> mkl_cpu_sm_bcsr_scale_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRScaleTest <double, std::uint64_t> mkl_cpu_sm_bcsr_scale_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRScaleTest<__float128, unsigned long> cpu_sparse_matrix_bcsr_scale_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRScaleTest<__float128, unsigned int> cpu_sparse_matrix_bcsr_scale_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <__float128, std::uint64_t> cpu_sparse_matrix_bcsr_scale_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <__float128, std::uint32_t> cpu_sparse_matrix_bcsr_scale_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRScaleTest<Half, unsigned int> cpu_sm_bcsr_scale_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRScaleTest<Half, unsigned long> cpu_sm_bcsr_scale_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <Half, std::uint32_t> cpu_sm_bcsr_scale_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRScaleTest <Half, std::uint64_t> cpu_sm_bcsr_scale_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRScaleTest<float, unsigned long> cuda_sm_bcsr_scale_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRScaleTest<double, unsigned long> cuda_sm_bcsr_scale_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRScaleTest<float, unsigned int> cuda_sm_bcsr_scale_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRScaleTest<double, unsigned int> cuda_sm_bcsr_scale_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest <float, std::uint64_t> cuda_sm_bcsr_scale_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest <double, std::uint64_t> cuda_sm_bcsr_scale_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest <float, std::uint32_t> cuda_sm_bcsr_scale_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRScaleTest <double, std::uint32_t> cuda_sm_bcsr_scale_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 /**
@@ -725,27 +725,27 @@ public:
     TEST_CHECK_EQUAL(result, ref);
   }
 };
-SparseMatrixBCSRNormTest<float, unsigned long> cpu_sm_bcsr_norm_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRNormTest<double, unsigned long> cpu_sm_bcsr_norm_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRNormTest<float, unsigned int> cpu_sm_bcsr_norm_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRNormTest<double, unsigned int> cpu_sm_bcsr_norm_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <float, std::uint64_t> cpu_sm_bcsr_norm_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <double, std::uint64_t> cpu_sm_bcsr_norm_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <float, std::uint32_t> cpu_sm_bcsr_norm_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <double, std::uint32_t> cpu_sm_bcsr_norm_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRNormTest<float, unsigned long> mkl_cpu_sm_bcsr_norm_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRNormTest<double, unsigned long> mkl_cpu_sm_bcsr_norm_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRNormTest <float, std::uint64_t> mkl_cpu_sm_bcsr_norm_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRNormTest <double, std::uint64_t> mkl_cpu_sm_bcsr_norm_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRNormTest<__float128, unsigned long> cpu_sm_bcsr_norm_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRNormTest<__float128, unsigned int> cpu_sm_bcsr_norm_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <__float128, std::uint64_t> cpu_sm_bcsr_norm_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <__float128, std::uint32_t> cpu_sm_bcsr_norm_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRNormTest<Half, unsigned int> cpu_sm_bcsr_norm_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRNormTest<Half, unsigned long> cpu_sm_bcsr_norm_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <Half, std::uint32_t> cpu_sm_bcsr_norm_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRNormTest <Half, std::uint64_t> cpu_sm_bcsr_norm_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRNormTest<float, unsigned long> cuda_sm_bcsr_norm_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRNormTest<double, unsigned long> cuda_sm_bcsr_norm_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRNormTest<float, unsigned int> cuda_sm_bcsr_norm_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRNormTest<double, unsigned int> cuda_sm_bcsr_norm_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest <float, std::uint64_t> cuda_sm_bcsr_norm_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest <double, std::uint64_t> cuda_sm_bcsr_norm_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest <float, std::uint32_t> cuda_sm_bcsr_norm_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRNormTest <double, std::uint32_t> cuda_sm_bcsr_norm_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 
@@ -836,27 +836,27 @@ public:
     TEST_CHECK_EQUAL(c, ref);
   }
 };
-SparseMatrixBCSRAxpyTest<float, unsigned long> cpu_sm_bcsr_axpy_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRAxpyTest<double, unsigned long> cpu_sm_bcsr_axpy_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRAxpyTest<float, unsigned int> cpu_sm_bcsr_axpy_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRAxpyTest<double, unsigned int> cpu_sm_bcsr_axpy_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <float, std::uint64_t> cpu_sm_bcsr_axpy_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <double, std::uint64_t> cpu_sm_bcsr_axpy_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <float, std::uint32_t> cpu_sm_bcsr_axpy_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <double, std::uint32_t> cpu_sm_bcsr_axpy_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRAxpyTest<float, unsigned long> mkl_cpu_sm_bcsr_axpy_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRAxpyTest<double, unsigned long> mkl_cpu_sm_bcsr_axpy_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRAxpyTest <float, std::uint64_t> mkl_cpu_sm_bcsr_axpy_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRAxpyTest <double, std::uint64_t> mkl_cpu_sm_bcsr_axpy_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRAxpyTest<__float128, unsigned long> cpu_sm_bcsr_axpy_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRAxpyTest<__float128, unsigned int> cpu_sm_bcsr_axpy_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <__float128, std::uint64_t> cpu_sm_bcsr_axpy_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <__float128, std::uint32_t> cpu_sm_bcsr_axpy_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRAxpyTest<Half, unsigned int> cpu_sm_bcsr_axpy_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRAxpyTest<Half, unsigned long> cpu_sm_bcsr_axpy_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <Half, std::uint32_t> cpu_sm_bcsr_axpy_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRAxpyTest <Half, std::uint64_t> cpu_sm_bcsr_axpy_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRAxpyTest<float, unsigned long> cuda_sm_bcsr_axpy_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRAxpyTest<double, unsigned long> cuda_sm_bcsr_axpy_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixBCSRAxpyTest<float, unsigned int> cuda_sm_bcsr_axpy_test_float_uint(PreferredBackend::cuda);
-SparseMatrixBCSRAxpyTest<double, unsigned int> cuda_sm_bcsr_axpy_test_double_uint(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest <float, std::uint64_t> cuda_sm_bcsr_axpy_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest <double, std::uint64_t> cuda_sm_bcsr_axpy_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest <float, std::uint32_t> cuda_sm_bcsr_axpy_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRAxpyTest <double, std::uint32_t> cuda_sm_bcsr_axpy_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 /**
@@ -933,25 +933,25 @@ public:
     TEST_CHECK_EQUAL(a, a_backup);
   }
 };
-SparseMatrixBCSRPermuteTest<float, unsigned long> cpu_sm_bcsr_permute_test_float_ulong(PreferredBackend::generic);
-SparseMatrixBCSRPermuteTest<double, unsigned long> cpu_sm_bcsr_permute_test_double_ulong(PreferredBackend::generic);
-SparseMatrixBCSRPermuteTest<float, unsigned int> cpu_sm_bcsr_permute_test_float_uint(PreferredBackend::generic);
-SparseMatrixBCSRPermuteTest<double, unsigned int> cpu_sm_bcsr_permute_test_double_uint(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <float, std::uint64_t> cpu_sm_bcsr_permute_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <double, std::uint64_t> cpu_sm_bcsr_permute_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <float, std::uint32_t> cpu_sm_bcsr_permute_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <double, std::uint32_t> cpu_sm_bcsr_permute_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixBCSRPermuteTest<float, unsigned long> mkl_cpu_sm_bcsr_permute_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixBCSRPermuteTest<double, unsigned long> mkl_cpu_sm_bcsr_permute_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixBCSRPermuteTest <float, std::uint64_t> mkl_cpu_sm_bcsr_permute_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRPermuteTest <double, std::uint64_t> mkl_cpu_sm_bcsr_permute_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRPermuteTest<__float128, unsigned long> cpu_sm_bcsr_permute_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixBCSRPermuteTest<__float128, unsigned int> cpu_sm_bcsr_permute_test_float128_uint(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <__float128, std::uint64_t> cpu_sm_bcsr_permute_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <__float128, std::uint32_t> cpu_sm_bcsr_permute_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixBCSRPermuteTest<Half, unsigned int> cpu_sm_bcsr_permute_test_half_uint(PreferredBackend::generic);
-SparseMatrixBCSRPermuteTest<Half, unsigned long> cpu_sm_bcsr_permute_test_half_ulong(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <Half, std::uint32_t> cpu_sm_bcsr_permute_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRPermuteTest <Half, std::uint64_t> cpu_sm_bcsr_permute_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixBCSRPermuteTest<float, unsigned long> cuda_sm_bcsr_permute_test_float_ulong_cuda(PreferredBackend::cuda);
-SparseMatrixBCSRPermuteTest<double, unsigned long> cuda_sm_bcsr_permute_test_double_ulong_cuda(PreferredBackend::cuda);
-SparseMatrixBCSRPermuteTest<float, unsigned int> cuda_sm_bcsr_permute_test_float_uint_cuda(PreferredBackend::cuda);
-SparseMatrixBCSRPermuteTest<double, unsigned int> cuda_sm_bcsr_permute_test_double_uint_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest <float, std::uint64_t> cuda_sm_bcsr_permute_test_float_uint64_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest <double, std::uint64_t> cuda_sm_bcsr_permute_test_double_uint64_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest <float, std::uint32_t> cuda_sm_bcsr_permute_test_float_uint32_cuda(PreferredBackend::cuda);
+SparseMatrixBCSRPermuteTest <double, std::uint32_t> cuda_sm_bcsr_permute_test_double_uint32_cuda(PreferredBackend::cuda);
 #endif

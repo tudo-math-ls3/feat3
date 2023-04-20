@@ -119,12 +119,12 @@ UnitFilterBlockedVectorTest<double, Index, 3> unit_filter_blocked_vector_test_ge
 UnitFilterBlockedVectorTest<float, Index, 4> unit_filter_blocked_vector_test_generic_fi_4(PreferredBackend::generic);
 UnitFilterBlockedVectorTest<double, Index, 4> unit_filter_blocked_vector_test_generic_di_4(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-UnitFilterBlockedVectorTest<float, unsigned long, 2> mkl_unit_filter_blocked_vector_test_float_ulong_2(PreferredBackend::mkl);
-UnitFilterBlockedVectorTest<double, unsigned long, 2> mkl_unit_filter_blocked_vector_test_double_ulong_2(PreferredBackend::mkl);
-UnitFilterBlockedVectorTest<float, unsigned long, 3> mkl_unit_filter_blocked_vector_test_float_ulong_3(PreferredBackend::mkl);
-UnitFilterBlockedVectorTest<double, unsigned long, 3> mkl_unit_filter_blocked_vector_test_double_ulong_3(PreferredBackend::mkl);
-UnitFilterBlockedVectorTest<float, unsigned long, 4> mkl_unit_filter_blocked_vector_test_float_ulong_4(PreferredBackend::mkl);
-UnitFilterBlockedVectorTest<double, unsigned long, 4> mkl_unit_filter_blocked_vector_test_double_ulong_4(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest <float, std::uint64_t, 2> mkl_unit_filter_blocked_vector_test_float_uint64_2(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest <double, std::uint64_t, 2> mkl_unit_filter_blocked_vector_test_double_uint64_2(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest <float, std::uint64_t, 3> mkl_unit_filter_blocked_vector_test_float_uint64_3(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest <double, std::uint64_t, 3> mkl_unit_filter_blocked_vector_test_double_uint64_3(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest <float, std::uint64_t, 4> mkl_unit_filter_blocked_vector_test_float_uint64_4(PreferredBackend::mkl);
+UnitFilterBlockedVectorTest <double, std::uint64_t, 4> mkl_unit_filter_blocked_vector_test_double_uint64_4(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
 UnitFilterBlockedVectorTest<__float128, Index, 2> unit_filter_blocked_vector_test_float128_index_2(PreferredBackend::generic);
@@ -278,17 +278,17 @@ UnitFilterBlockedMatrixTest<double, Index, 4, 4> unit_filter_matrix_test_generic
 UnitFilterBlockedMatrixTest<double, Index, 3, 2> unit_filter_matrix_test_generic_di_32(PreferredBackend::generic);
 UnitFilterBlockedMatrixTest<double, Index, 3, 4> unit_filter_matrix_test_generic_di_34(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-UnitFilterBlockedMatrixTest<float, unsigned long, 2, 2> mkl_unit_filter_blocked_matrix_test_float_ulong_22(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<float, unsigned long, 3, 3> mkl_unit_filter_blocked_matrix_test_float_ulong_33(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<float, unsigned long, 4, 4> mkl_unit_filter_blocked_matrix_test_float_ulong_44(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<float, unsigned long, 2, 3> mkl_unit_filter_blocked_matrix_test_float_ulong_23(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<float, unsigned long, 4, 3> mkl_unit_filter_blocked_matrix_test_float_ulong_43(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <float, std::uint64_t, 2, 2> mkl_unit_filter_blocked_matrix_test_float_uint64_22(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <float, std::uint64_t, 3, 3> mkl_unit_filter_blocked_matrix_test_float_uint64_33(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <float, std::uint64_t, 4, 4> mkl_unit_filter_blocked_matrix_test_float_uint64_44(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <float, std::uint64_t, 2, 3> mkl_unit_filter_blocked_matrix_test_float_uint64_23(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <float, std::uint64_t, 4, 3> mkl_unit_filter_blocked_matrix_test_float_uint64_43(PreferredBackend::mkl);
 
-UnitFilterBlockedMatrixTest<double, unsigned long, 2, 2> mkl_unit_filter_blocked_matrix_test_double_ulong_22(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<double, unsigned long, 3, 3> mkl_unit_filter_blocked_matrix_test_double_ulong_33(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<double, unsigned long, 4, 4> mkl_unit_filter_blocked_matrix_test_double_ulong_44(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<double, unsigned long, 2, 3> mkl_unit_filter_blocked_matrix_test_double_ulong_23(PreferredBackend::mkl);
-UnitFilterBlockedMatrixTest<double, unsigned long, 4, 3> mkl_unit_filter_blocked_matrix_test_double_ulong_43(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <double, std::uint64_t, 2, 2> mkl_unit_filter_blocked_matrix_test_double_uint64_22(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <double, std::uint64_t, 3, 3> mkl_unit_filter_blocked_matrix_test_double_uint64_33(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <double, std::uint64_t, 4, 4> mkl_unit_filter_blocked_matrix_test_double_uint64_44(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <double, std::uint64_t, 2, 3> mkl_unit_filter_blocked_matrix_test_double_uint64_23(PreferredBackend::mkl);
+UnitFilterBlockedMatrixTest <double, std::uint64_t, 4, 3> mkl_unit_filter_blocked_matrix_test_double_uint64_43(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
 UnitFilterBlockedMatrixTest<__float128, Index, 2, 2> unit_filter_blocked_matrix_test_float128_index_22(PreferredBackend::generic);

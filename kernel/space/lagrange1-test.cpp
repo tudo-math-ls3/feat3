@@ -445,21 +445,21 @@ public:
   }
 };
 
-Lagrange1Test<double, unsigned long> lagrange1_test_double_ulong(PreferredBackend::generic);
-Lagrange1Test<float, unsigned long> lagrange1_test_float_ulong(PreferredBackend::generic);
+Lagrange1Test <double, std::uint64_t> lagrange1_test_double_uint64(PreferredBackend::generic);
+Lagrange1Test <float, std::uint64_t> lagrange1_test_float_uint64(PreferredBackend::generic);
 //Lagrange1Test<double, unsigned int> lagrange1_test_double_uint(PreferredBackend::generic);
 //Lagrange1Test<float, unsigned int> lagrange1_test_float_uint(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-Lagrange1Test<float, unsigned long> mkl_lagrange1_test_float_ulong(PreferredBackend::mkl);
-Lagrange1Test<double, unsigned long> mkl_lagrange1_test_double_ulong(PreferredBackend::mkl);
+Lagrange1Test <float, std::uint64_t> mkl_lagrange1_test_float_uint64(PreferredBackend::mkl);
+Lagrange1Test <double, std::uint64_t> mkl_lagrange1_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-Lagrange1Test<__float128, unsigned long> lagrange1_test_float128_ulong(PreferredBackend::generic);
+Lagrange1Test <__float128, std::uint64_t> lagrange1_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-Lagrange1Test<Half, unsigned long> lagrange1_test_half_ulong(PreferredBackend::generic);
+Lagrange1Test <Half, std::uint64_t> lagrange1_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-Lagrange1Test<float, unsigned long> cuda_lagrange1_test_float_ulong(PreferredBackend::cuda);
-Lagrange1Test<double, unsigned long> cuda_lagrange1_test_double_ulong(PreferredBackend::cuda);
+Lagrange1Test <float, std::uint64_t> cuda_lagrange1_test_float_uint64(PreferredBackend::cuda);
+Lagrange1Test <double, std::uint64_t> cuda_lagrange1_test_double_uint64(PreferredBackend::cuda);
 #endif

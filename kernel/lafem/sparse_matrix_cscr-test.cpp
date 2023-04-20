@@ -154,27 +154,27 @@ public:
   }
 };
 
-SparseMatrixCSCRTest<float, unsigned long> cpu_sparse_matrix_cscr_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSCRTest<double, unsigned long> cpu_sparse_matrix_cscr_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSCRTest<float, unsigned int> cpu_sparse_matrix_cscr_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSCRTest<double, unsigned int> cpu_sparse_matrix_cscr_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSCRTest <float, std::uint64_t> cpu_sparse_matrix_cscr_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSCRTest <double, std::uint64_t> cpu_sparse_matrix_cscr_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSCRTest <float, std::uint32_t> cpu_sparse_matrix_cscr_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSCRTest <double, std::uint32_t> cpu_sparse_matrix_cscr_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSCRTest<float, unsigned long> mkl_sparse_matrix_cscr_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSCRTest<double, unsigned long> mkl_sparse_matrix_cscr_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSCRTest <float, std::uint64_t> mkl_sparse_matrix_cscr_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSCRTest <double, std::uint64_t> mkl_sparse_matrix_cscr_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSCRTest<__float128, unsigned long> sparse_matrix_cscr_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSCRTest<__float128, unsigned int> sparse_matrix_cscr_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSCRTest <__float128, std::uint64_t> sparse_matrix_cscr_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSCRTest <__float128, std::uint32_t> sparse_matrix_cscr_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSCRTest<Half, unsigned int> sparse_matrix_cscr_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSCRTest<Half, unsigned long> sparse_matrix_cscr_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSCRTest <Half, std::uint32_t> sparse_matrix_cscr_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSCRTest <Half, std::uint64_t> sparse_matrix_cscr_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSCRTest<float, unsigned long> cuda_sparse_matrix_cscr_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSCRTest<double, unsigned long> cuda_sparse_matrix_cscr_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSCRTest<float, unsigned int> cuda_sparse_matrix_cscr_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSCRTest<double, unsigned int> cuda_sparse_matrix_cscr_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSCRTest <float, std::uint64_t> cuda_sparse_matrix_cscr_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRTest <double, std::uint64_t> cuda_sparse_matrix_cscr_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRTest <float, std::uint32_t> cuda_sparse_matrix_cscr_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSCRTest <double, std::uint32_t> cuda_sparse_matrix_cscr_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -278,27 +278,27 @@ public:
 
   }
 };
-SparseMatrixCSCRSerializeTest<float, unsigned long> cpu_sparse_matrix_cscr_serialize_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSCRSerializeTest<double, unsigned long> cpu_sparse_matrix_cscr_serialize_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSCRSerializeTest<float, unsigned int> cpu_sparse_matrix_cscr_serialize_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSCRSerializeTest<double, unsigned int> cpu_sparse_matrix_cscr_serialize_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <float, std::uint64_t> cpu_sparse_matrix_cscr_serialize_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <double, std::uint64_t> cpu_sparse_matrix_cscr_serialize_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <float, std::uint32_t> cpu_sparse_matrix_cscr_serialize_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <double, std::uint32_t> cpu_sparse_matrix_cscr_serialize_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSCRSerializeTest<float, unsigned long> mkl_sparse_matrix_cscr_serialize_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSCRSerializeTest<double, unsigned long> mkl_sparse_matrix_cscr_serialize_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSCRSerializeTest <float, std::uint64_t> mkl_sparse_matrix_cscr_serialize_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSCRSerializeTest <double, std::uint64_t> mkl_sparse_matrix_cscr_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSCRSerializeTest<__float128, unsigned long> sparse_matrix_cscr_serialize_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSCRSerializeTest<__float128, unsigned int> sparse_matrix_cscr_serialize_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <__float128, std::uint64_t> sparse_matrix_cscr_serialize_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <__float128, std::uint32_t> sparse_matrix_cscr_serialize_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSCRSerializeTest<Half, unsigned int> sparse_matrix_cscr_serialize_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSCRSerializeTest<Half, unsigned long> sparse_matrix_cscr_serialize_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <Half, std::uint32_t> sparse_matrix_cscr_serialize_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSCRSerializeTest <Half, std::uint64_t> sparse_matrix_cscr_serialize_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSCRSerializeTest<float, unsigned long> cuda_sparse_matrix_cscr_serialize_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSCRSerializeTest<double, unsigned long> cuda_sparse_matrix_cscr_serialize_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSCRSerializeTest<float, unsigned int> cuda_sparse_matrix_cscr_serialize_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSCRSerializeTest<double, unsigned int> cuda_sparse_matrix_cscr_serialize_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSCRSerializeTest <float, std::uint64_t> cuda_sparse_matrix_cscr_serialize_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRSerializeTest <double, std::uint64_t> cuda_sparse_matrix_cscr_serialize_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRSerializeTest <float, std::uint32_t> cuda_sparse_matrix_cscr_serialize_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSCRSerializeTest <double, std::uint32_t> cuda_sparse_matrix_cscr_serialize_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -403,25 +403,25 @@ public:
   }
 };
 
-SparseMatrixCSCRApplyTest<float, unsigned long> sm_cscr_apply_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSCRApplyTest<double, unsigned long> sm_cscr_apply_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSCRApplyTest<float, unsigned int> sm_cscr_apply_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSCRApplyTest<double, unsigned int> sm_cscr_apply_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <float, std::uint64_t> sm_cscr_apply_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <double, std::uint64_t> sm_cscr_apply_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <float, std::uint32_t> sm_cscr_apply_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <double, std::uint32_t> sm_cscr_apply_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSCRApplyTest<float, unsigned long> mkl_sm_cscr_apply_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSCRApplyTest<double, unsigned long> mkl_sm_cscr_apply_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSCRApplyTest <float, std::uint64_t> mkl_sm_cscr_apply_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSCRApplyTest <double, std::uint64_t> mkl_sm_cscr_apply_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSCRApplyTest<__float128, unsigned long> sm_cscr_apply_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSCRApplyTest<__float128, unsigned int> sm_cscr_apply_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <__float128, std::uint64_t> sm_cscr_apply_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <__float128, std::uint32_t> sm_cscr_apply_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSCRApplyTest<Half, unsigned int> sm_cscr_apply_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSCRApplyTest<Half, unsigned long> sm_cscr_apply_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <Half, std::uint32_t> sm_cscr_apply_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSCRApplyTest <Half, std::uint64_t> sm_cscr_apply_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSCRApplyTest<float, unsigned long> cuda_sm_cscr_apply_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSCRApplyTest<double, unsigned long> cuda_sm_cscr_apply_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSCRApplyTest<float, unsigned int> cuda_sm_cscr_apply_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSCRApplyTest<double, unsigned int> cuda_sm_cscr_apply_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSCRApplyTest <float, std::uint64_t> cuda_sm_cscr_apply_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRApplyTest <double, std::uint64_t> cuda_sm_cscr_apply_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRApplyTest <float, std::uint32_t> cuda_sm_cscr_apply_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSCRApplyTest <double, std::uint32_t> cuda_sm_cscr_apply_test_double_uint32(PreferredBackend::cuda);
 #endif

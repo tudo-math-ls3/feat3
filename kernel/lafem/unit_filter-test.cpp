@@ -93,27 +93,27 @@ public:
   }
 };
 
-UnitFilterVectorTest<float, unsigned int> unit_filter_vector_test_generic_float_uint(PreferredBackend::generic);
-UnitFilterVectorTest<double, unsigned int> unit_filter_vector_test_generic_double_uint(PreferredBackend::generic);
-UnitFilterVectorTest<float, unsigned long> unit_filter_vector_test_generic_float_ulong(PreferredBackend::generic);
-UnitFilterVectorTest<double, unsigned long> unit_filter_vector_test_generic_double_ulong(PreferredBackend::generic);
+UnitFilterVectorTest <float, std::uint32_t> unit_filter_vector_test_generic_float_uint32(PreferredBackend::generic);
+UnitFilterVectorTest <double, std::uint32_t> unit_filter_vector_test_generic_double_uint32(PreferredBackend::generic);
+UnitFilterVectorTest <float, std::uint64_t> unit_filter_vector_test_generic_float_uint64(PreferredBackend::generic);
+UnitFilterVectorTest <double, std::uint64_t> unit_filter_vector_test_generic_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-UnitFilterVectorTest<float, unsigned long> mkl_unit_filter_vector_test_float_ulong(PreferredBackend::mkl);
-UnitFilterVectorTest<double, unsigned long> mkl_unit_filter_vector_test_double_ulong(PreferredBackend::mkl);
+UnitFilterVectorTest <float, std::uint64_t> mkl_unit_filter_vector_test_float_uint64(PreferredBackend::mkl);
+UnitFilterVectorTest <double, std::uint64_t> mkl_unit_filter_vector_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-UnitFilterVectorTest<__float128, unsigned long> unit_filter_vector_test_float128_ulong(PreferredBackend::generic);
-UnitFilterVectorTest<__float128, unsigned int> unit_filter_vector_test_float128_uint(PreferredBackend::generic);
+UnitFilterVectorTest <__float128, std::uint64_t> unit_filter_vector_test_float128_uint64(PreferredBackend::generic);
+UnitFilterVectorTest <__float128, std::uint32_t> unit_filter_vector_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-UnitFilterVectorTest<Half, unsigned int> unit_filter_vector_test_half_uint(PreferredBackend::generic);
-UnitFilterVectorTest<Half, unsigned long> unit_filter_vector_test_half_ulong(PreferredBackend::generic);
+UnitFilterVectorTest <Half, std::uint32_t> unit_filter_vector_test_half_uint32(PreferredBackend::generic);
+UnitFilterVectorTest <Half, std::uint64_t> unit_filter_vector_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-UnitFilterVectorTest<float, unsigned int> unit_filter_vector_test_cuda_float_uint(PreferredBackend::cuda);
-UnitFilterVectorTest<double, unsigned int> unit_filter_vector_test_cuda_double_uint(PreferredBackend::cuda);
-UnitFilterVectorTest<float, unsigned long> unit_filter_vector_test_cuda_float_ulong(PreferredBackend::cuda);
-UnitFilterVectorTest<double, unsigned long> unit_filter_vector_test_cuda_double_ulong(PreferredBackend::cuda);
+UnitFilterVectorTest <float, std::uint32_t> unit_filter_vector_test_cuda_float_uint32(PreferredBackend::cuda);
+UnitFilterVectorTest <double, std::uint32_t> unit_filter_vector_test_cuda_double_uint32(PreferredBackend::cuda);
+UnitFilterVectorTest <float, std::uint64_t> unit_filter_vector_test_cuda_float_uint64(PreferredBackend::cuda);
+UnitFilterVectorTest <double, std::uint64_t> unit_filter_vector_test_cuda_double_uint64(PreferredBackend::cuda);
 #endif
 
 /**
@@ -207,25 +207,25 @@ public:
   }
 };
 
-UnitFilterMatrixTest<float, unsigned long> unit_filter_matrix_test_generic_float_ulong(PreferredBackend::generic);
-UnitFilterMatrixTest<double, unsigned long> unit_filter_matrix_test_generic_double_ulong(PreferredBackend::generic);
-UnitFilterMatrixTest<float, unsigned int> unit_filter_matrix_test_generic_float_uint(PreferredBackend::generic);
-UnitFilterMatrixTest<double, unsigned int> unit_filter_matrix_test_generic_double_uint(PreferredBackend::generic);
+UnitFilterMatrixTest <float, std::uint64_t> unit_filter_matrix_test_generic_float_uint64(PreferredBackend::generic);
+UnitFilterMatrixTest <double, std::uint64_t> unit_filter_matrix_test_generic_double_uint64(PreferredBackend::generic);
+UnitFilterMatrixTest <float, std::uint32_t> unit_filter_matrix_test_generic_float_uint32(PreferredBackend::generic);
+UnitFilterMatrixTest <double, std::uint32_t> unit_filter_matrix_test_generic_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-UnitFilterMatrixTest<float, unsigned long> mkl_unit_filter_matrix_test_float_ulong(PreferredBackend::mkl);
-UnitFilterMatrixTest<double, unsigned long> mkl_unit_filter_matrix_test_double_ulong(PreferredBackend::mkl);
+UnitFilterMatrixTest <float, std::uint64_t> mkl_unit_filter_matrix_test_float_uint64(PreferredBackend::mkl);
+UnitFilterMatrixTest <double, std::uint64_t> mkl_unit_filter_matrix_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-UnitFilterMatrixTest<__float128, unsigned long> unit_filter_matrix_test_float128_ulong(PreferredBackend::generic);
-UnitFilterMatrixTest<__float128, unsigned int> unit_filter_matrix_test_float128_uint(PreferredBackend::generic);
+UnitFilterMatrixTest <__float128, std::uint64_t> unit_filter_matrix_test_float128_uint64(PreferredBackend::generic);
+UnitFilterMatrixTest <__float128, std::uint32_t> unit_filter_matrix_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-UnitFilterMatrixTest<Half, unsigned int> unit_filter_matrix_test_half_uint(PreferredBackend::generic);
-UnitFilterMatrixTest<Half, unsigned long> unit_filter_matrix_test_half_ulong(PreferredBackend::generic);
+UnitFilterMatrixTest <Half, std::uint32_t> unit_filter_matrix_test_half_uint32(PreferredBackend::generic);
+UnitFilterMatrixTest <Half, std::uint64_t> unit_filter_matrix_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-UnitFilterMatrixTest<float, unsigned long> cuda_unit_filter_matrix_test_float_ulong(PreferredBackend::cuda);
-UnitFilterMatrixTest<double, unsigned long> cuda_unit_filter_matrix_test_double_ulong(PreferredBackend::cuda);
-UnitFilterMatrixTest<float, unsigned int> cuda_unit_filter_matrix_test_float_uint(PreferredBackend::cuda);
-UnitFilterMatrixTest<double, unsigned int> cuda_unit_filter_matrix_test_double_uint(PreferredBackend::cuda);
+UnitFilterMatrixTest <float, std::uint64_t> cuda_unit_filter_matrix_test_float_uint64(PreferredBackend::cuda);
+UnitFilterMatrixTest <double, std::uint64_t> cuda_unit_filter_matrix_test_double_uint64(PreferredBackend::cuda);
+UnitFilterMatrixTest <float, std::uint32_t> cuda_unit_filter_matrix_test_float_uint32(PreferredBackend::cuda);
+UnitFilterMatrixTest <double, std::uint32_t> cuda_unit_filter_matrix_test_double_uint32(PreferredBackend::cuda);
 #endif

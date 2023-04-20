@@ -113,25 +113,25 @@ public:
 
 };
 
-RewProjectorTest<float, unsigned int> rew_projector_test_float_uint(PreferredBackend::generic);
-RewProjectorTest<double, unsigned int> rew_projector_test_double_uint(PreferredBackend::generic);
-RewProjectorTest<float, unsigned long> rew_projector_test_float_ulong(PreferredBackend::generic);
-RewProjectorTest<double, unsigned long> rew_projector_test_double_ulong(PreferredBackend::generic);
+RewProjectorTest <float, std::uint32_t> rew_projector_test_float_uint32(PreferredBackend::generic);
+RewProjectorTest <double, std::uint32_t> rew_projector_test_double_uint32(PreferredBackend::generic);
+RewProjectorTest <float, std::uint64_t> rew_projector_test_float_uint64(PreferredBackend::generic);
+RewProjectorTest <double, std::uint64_t> rew_projector_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-RewProjectorTest<float, unsigned long> mkl_rew_projector_test_float_ulong(PreferredBackend::mkl);
-RewProjectorTest<double, unsigned long> mkl_rew_projector_test_double_ulong(PreferredBackend::mkl);
+RewProjectorTest <float, std::uint64_t> mkl_rew_projector_test_float_uint64(PreferredBackend::mkl);
+RewProjectorTest <double, std::uint64_t> mkl_rew_projector_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-RewProjectorTest<__float128, unsigned int> rew_projector_test_float128_uint(PreferredBackend::generic);
-RewProjectorTest<__float128, unsigned long> rew_projector_test_float128_ulong(PreferredBackend::generic);
+RewProjectorTest <__float128, std::uint32_t> rew_projector_test_float128_uint32(PreferredBackend::generic);
+RewProjectorTest <__float128, std::uint64_t> rew_projector_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-RewProjectorTest<Half, unsigned int> rew_projector_test_half_uint(PreferredBackend::generic);
-RewProjectorTest<Half, unsigned long> rew_projector_test_half_ulong(PreferredBackend::generic);
+RewProjectorTest <Half, std::uint32_t> rew_projector_test_half_uint32(PreferredBackend::generic);
+RewProjectorTest <Half, std::uint64_t> rew_projector_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-RewProjectorTest<float, unsigned int> cuda_rew_projector_test_float_uint(PreferredBackend::cuda);
-RewProjectorTest<double, unsigned int> cuda_rew_projector_test_double_uint(PreferredBackend::cuda);
-RewProjectorTest<float, unsigned long> cuda_rew_projector_test_float_ulong(PreferredBackend::cuda);
-RewProjectorTest<double, unsigned long> cuda_rew_projector_test_double_ulong(PreferredBackend::cuda);
+RewProjectorTest <float, std::uint32_t> cuda_rew_projector_test_float_uint32(PreferredBackend::cuda);
+RewProjectorTest <double, std::uint32_t> cuda_rew_projector_test_double_uint32(PreferredBackend::cuda);
+RewProjectorTest <float, std::uint64_t> cuda_rew_projector_test_float_uint64(PreferredBackend::cuda);
+RewProjectorTest <double, std::uint64_t> cuda_rew_projector_test_double_uint64(PreferredBackend::cuda);
 #endif

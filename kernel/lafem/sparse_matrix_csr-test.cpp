@@ -223,27 +223,27 @@ public:
 
 };
 
-SparseMatrixCSRTest<float, unsigned long> cpu_sparse_matrix_csr_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRTest<double, unsigned long> cpu_sparse_matrix_csr_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSRTest<float, unsigned int> cpu_sparse_matrix_csr_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRTest<double, unsigned int> cpu_sparse_matrix_csr_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSRTest <float, std::uint64_t> cpu_sparse_matrix_csr_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRTest <double, std::uint64_t> cpu_sparse_matrix_csr_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSRTest <float, std::uint32_t> cpu_sparse_matrix_csr_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRTest <double, std::uint32_t> cpu_sparse_matrix_csr_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRTest<float, unsigned long> mkl_cpu_sparse_matrix_csr_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRTest<double, unsigned long> mkl_cpu_sparse_matrix_csr_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRTest <float, std::uint64_t> mkl_cpu_sparse_matrix_csr_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRTest <double, std::uint64_t> mkl_cpu_sparse_matrix_csr_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRTest<__float128, unsigned long> cpu_sparse_matrix_csr_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSRTest<__float128, unsigned int> cpu_sparse_matrix_csr_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSRTest <__float128, std::uint64_t> cpu_sparse_matrix_csr_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSRTest <__float128, std::uint32_t> cpu_sparse_matrix_csr_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRTest<Half, unsigned int> sparse_matrix_csr_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRTest<Half, unsigned long> sparse_matrix_csr_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRTest <Half, std::uint32_t> sparse_matrix_csr_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRTest <Half, std::uint64_t> sparse_matrix_csr_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRTest<float, unsigned long> cuda_sparse_matrix_csr_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRTest<double, unsigned long> cuda_sparse_matrix_csr_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSRTest<float, unsigned int> cuda_sparse_matrix_csr_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRTest<double, unsigned int> cuda_sparse_matrix_csr_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSRTest <float, std::uint64_t> cuda_sparse_matrix_csr_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRTest <double, std::uint64_t> cuda_sparse_matrix_csr_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSRTest <float, std::uint32_t> cuda_sparse_matrix_csr_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRTest <double, std::uint32_t> cuda_sparse_matrix_csr_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -316,27 +316,27 @@ public:
 #endif
   }
 };
-SparseMatrixCSRSerializeTest<float, unsigned long> cpu_sparse_matrix_csr_serialize_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest<double, unsigned long> cpu_sparse_matrix_csr_serialize_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest<float, unsigned int> cpu_sparse_matrix_csr_serialize_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest<double, unsigned int> cpu_sparse_matrix_csr_serialize_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <float, std::uint64_t> cpu_sparse_matrix_csr_serialize_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <double, std::uint64_t> cpu_sparse_matrix_csr_serialize_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <float, std::uint32_t> cpu_sparse_matrix_csr_serialize_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <double, std::uint32_t> cpu_sparse_matrix_csr_serialize_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRSerializeTest<float, unsigned long> mkl_cpu_sparse_matrix_csr_serialize_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRSerializeTest<double, unsigned long> mkl_cpu_sparse_matrix_csr_serialize_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRSerializeTest <float, std::uint64_t> mkl_cpu_sparse_matrix_csr_serialize_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRSerializeTest <double, std::uint64_t> mkl_cpu_sparse_matrix_csr_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRSerializeTest<__float128, unsigned long> cpu_sparse_matrix_csr_serialize_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest<__float128, unsigned int> cpu_sparse_matrix_csr_serialize_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <__float128, std::uint64_t> cpu_sparse_matrix_csr_serialize_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <__float128, std::uint32_t> cpu_sparse_matrix_csr_serialize_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRSerializeTest<Half, unsigned int> sparse_matrix_csr_serialize_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest<Half, unsigned long> sparse_matrix_csr_serialize_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <Half, std::uint32_t> sparse_matrix_csr_serialize_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRSerializeTest <Half, std::uint64_t> sparse_matrix_csr_serialize_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRSerializeTest<float, unsigned long> cuda_sparse_matrix_csr_serialize_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRSerializeTest<double, unsigned long> cuda_sparse_matrix_csr_serialize_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSRSerializeTest<float, unsigned int> cuda_sparse_matrix_csr_serialize_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRSerializeTest<double, unsigned int> cuda_sparse_matrix_csr_serialize_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSRSerializeTest <float, std::uint64_t> cuda_sparse_matrix_csr_serialize_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRSerializeTest <double, std::uint64_t> cuda_sparse_matrix_csr_serialize_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSRSerializeTest <float, std::uint32_t> cuda_sparse_matrix_csr_serialize_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRSerializeTest <double, std::uint32_t> cuda_sparse_matrix_csr_serialize_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -451,30 +451,30 @@ public:
   }
 };
 
-SparseMatrixCSRApplyTest<float, unsigned long> sm_csr_apply_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRApplyTest<double, unsigned long> sm_csr_apply_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSRApplyTest<float, unsigned int> sm_csr_apply_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRApplyTest<double, unsigned int> sm_csr_apply_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <float, std::uint64_t> sm_csr_apply_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <double, std::uint64_t> sm_csr_apply_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <float, std::uint32_t> sm_csr_apply_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <double, std::uint32_t> sm_csr_apply_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRApplyTest<float, unsigned long> mkl_sm_csr_apply_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRApplyTest<double, unsigned long> mkl_sm_csr_apply_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRApplyTest <float, std::uint64_t> mkl_sm_csr_apply_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRApplyTest <double, std::uint64_t> mkl_sm_csr_apply_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRApplyTest<__float128, unsigned long> sm_csr_apply_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSRApplyTest<__float128, unsigned int> sm_csr_apply_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <__float128, std::uint64_t> sm_csr_apply_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <__float128, std::uint32_t> sm_csr_apply_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRApplyTest<Half, unsigned int> sm_csr_apply_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRApplyTest<Half, unsigned long> sm_csr_apply_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <Half, std::uint32_t> sm_csr_apply_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRApplyTest <Half, std::uint64_t> sm_csr_apply_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRApplyTest<float, unsigned long> cuda_sm_csr_apply_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest<double, unsigned long> cuda_sm_csr_apply_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest<float, unsigned int> cuda_sm_csr_apply_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest<double, unsigned int> cuda_sm_csr_apply_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSRApplyTest <float, std::uint64_t> cuda_sm_csr_apply_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRApplyTest <double, std::uint64_t> cuda_sm_csr_apply_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSRApplyTest <float, std::uint32_t> cuda_sm_csr_apply_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRApplyTest <double, std::uint32_t> cuda_sm_csr_apply_test_double_uint32(PreferredBackend::cuda);
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRApplyTest<Half, unsigned int> cuda_sm_csr_apply_test_half_uint(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest<Half, unsigned long> cuda_sm_csr_apply_test_half_ulong(PreferredBackend::cuda);
+SparseMatrixCSRApplyTest <Half, std::uint32_t> cuda_sm_csr_apply_test_half_uint32(PreferredBackend::cuda);
+SparseMatrixCSRApplyTest <Half, std::uint64_t> cuda_sm_csr_apply_test_half_uint64(PreferredBackend::cuda);
 #endif
 #endif
 
@@ -581,27 +581,27 @@ public:
   }
 };
 
-SparseMatrixCSRBApplyTest<float, unsigned long> sm_csrib_apply_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest<double, unsigned long> sm_csrib_apply_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest<float, unsigned int> sm_csrib_apply_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest<double, unsigned int> sm_csrib_apply_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <float, std::uint64_t> sm_csrib_apply_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <double, std::uint64_t> sm_csrib_apply_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <float, std::uint32_t> sm_csrib_apply_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <double, std::uint32_t> sm_csrib_apply_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRBApplyTest<float, unsigned long> mkl_sm_csrib_apply_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRBApplyTest<double, unsigned long> mkl_sm_csrib_apply_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRBApplyTest <float, std::uint64_t> mkl_sm_csrib_apply_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRBApplyTest <double, std::uint64_t> mkl_sm_csrib_apply_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRBApplyTest<__float128, unsigned long> sm_csrib_apply_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest<__float128, unsigned int> sm_csrib_apply_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <__float128, std::uint64_t> sm_csrib_apply_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <__float128, std::uint32_t> sm_csrib_apply_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRBApplyTest<Half, unsigned int> sm_csrib_apply_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest<Half, unsigned long> sm_csrib_apply_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <Half, std::uint32_t> sm_csrib_apply_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRBApplyTest <Half, std::uint64_t> sm_csrib_apply_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRBApplyTest<float, unsigned long> cuda_sm_csrib_apply_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRBApplyTest<double, unsigned long> cuda_sm_csrib_apply_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSRBApplyTest<float, unsigned int> cuda_sm_csrib_apply_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRBApplyTest<double, unsigned int> cuda_sm_csrib_apply_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSRBApplyTest <float, std::uint64_t> cuda_sm_csrib_apply_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRBApplyTest <double, std::uint64_t> cuda_sm_csrib_apply_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSRBApplyTest <float, std::uint32_t> cuda_sm_csrib_apply_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRBApplyTest <double, std::uint32_t> cuda_sm_csrib_apply_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -658,27 +658,27 @@ public:
   }
 };
 
-SparseMatrixCSRScaleTest<float, unsigned int> sm_csr_scale_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleTest<double, unsigned int> sm_csr_scale_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleTest<float, unsigned long> sm_csr_scale_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRScaleTest<double, unsigned long> sm_csr_scale_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <float, std::uint32_t> sm_csr_scale_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <double, std::uint32_t> sm_csr_scale_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <float, std::uint64_t> sm_csr_scale_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <double, std::uint64_t> sm_csr_scale_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRScaleTest<float, unsigned long> mkl_sm_csr_scale_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRScaleTest<double, unsigned long> mkl_sm_csr_scale_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRScaleTest <float, std::uint64_t> mkl_sm_csr_scale_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRScaleTest <double, std::uint64_t> mkl_sm_csr_scale_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRScaleTest<__float128, unsigned int> sm_csr_scale_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleTest<__float128, unsigned long> sm_csr_scale_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <__float128, std::uint32_t> sm_csr_scale_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <__float128, std::uint64_t> sm_csr_scale_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRScaleTest<Half, unsigned int> sm_csr_scale_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleTest<Half, unsigned long> sm_csr_scale_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <Half, std::uint32_t> sm_csr_scale_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleTest <Half, std::uint64_t> sm_csr_scale_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRScaleTest<float, unsigned int> cuda_sm_csr_scale_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRScaleTest<double, unsigned int> cuda_sm_csr_scale_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRScaleTest<float, unsigned long> cuda_sm_csr_scale_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRScaleTest<double, unsigned long> cuda_sm_csr_scale_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRScaleTest <float, std::uint32_t> cuda_sm_csr_scale_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRScaleTest <double, std::uint32_t> cuda_sm_csr_scale_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRScaleTest <float, std::uint64_t> cuda_sm_csr_scale_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRScaleTest <double, std::uint64_t> cuda_sm_csr_scale_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -752,27 +752,27 @@ public:
   }
 };
 
-SparseMatrixCSRScaleRowColTest<float, unsigned int> sm_csr_scale_row_col_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest<double, unsigned int> sm_csr_scale_row_col_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest<float, unsigned long> sm_csr_scale_row_col_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest<double, unsigned long> sm_csr_scale_row_col_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <float, std::uint32_t> sm_csr_scale_row_col_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <double, std::uint32_t> sm_csr_scale_row_col_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <float, std::uint64_t> sm_csr_scale_row_col_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <double, std::uint64_t> sm_csr_scale_row_col_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRScaleRowColTest<float, unsigned long> mkl_sm_csr_scale_row_col_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRScaleRowColTest<double, unsigned long> mkl_sm_csr_scale_row_col_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRScaleRowColTest <float, std::uint64_t> mkl_sm_csr_scale_row_col_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRScaleRowColTest <double, std::uint64_t> mkl_sm_csr_scale_row_col_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRScaleRowColTest<__float128, unsigned int> sm_csr_scale_row_col_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest<__float128, unsigned long> sm_csr_scale_row_col_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <__float128, std::uint32_t> sm_csr_scale_row_col_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <__float128, std::uint64_t> sm_csr_scale_row_col_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRScaleRowColTest<Half, unsigned int> sm_csr_scale_row_col_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest<Half, unsigned long> sm_csr_scale_row_col_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <Half, std::uint32_t> sm_csr_scale_row_col_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRScaleRowColTest <Half, std::uint64_t> sm_csr_scale_row_col_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRScaleRowColTest<float, unsigned int> cuda_sm_csr_scale_row_col_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRScaleRowColTest<double, unsigned int> cuda_sm_csr_scale_row_col_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRScaleRowColTest<float, unsigned long> cuda_sm_csr_scale_row_col_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRScaleRowColTest<double, unsigned long> cuda_sm_csr_scale_row_col_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRScaleRowColTest <float, std::uint32_t> cuda_sm_csr_scale_row_col_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRScaleRowColTest <double, std::uint32_t> cuda_sm_csr_scale_row_col_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRScaleRowColTest <float, std::uint64_t> cuda_sm_csr_scale_row_col_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRScaleRowColTest <double, std::uint64_t> cuda_sm_csr_scale_row_col_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -831,27 +831,27 @@ public:
   }
 };
 
-SparseMatrixCSRTranspositionTest<float, unsigned int> sm_csr_transposition_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest<double, unsigned int> sm_csr_transposition_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest<float, unsigned long> sm_csr_transposition_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest<double, unsigned long> sm_csr_transposition_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <float, std::uint32_t> sm_csr_transposition_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <double, std::uint32_t> sm_csr_transposition_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <float, std::uint64_t> sm_csr_transposition_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <double, std::uint64_t> sm_csr_transposition_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRTranspositionTest<float, unsigned long> mkl_sm_csr_transposition_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRTranspositionTest<double, unsigned long> mkl_sm_csr_transposition_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRTranspositionTest <float, std::uint64_t> mkl_sm_csr_transposition_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRTranspositionTest <double, std::uint64_t> mkl_sm_csr_transposition_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRTranspositionTest<__float128, unsigned int> sm_csr_transposition_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest<__float128, unsigned long> sm_csr_transposition_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <__float128, std::uint32_t> sm_csr_transposition_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <__float128, std::uint64_t> sm_csr_transposition_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRTranspositionTest<Half, unsigned int> sm_csr_transposition_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest<Half, unsigned long> sm_csr_transposition_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <Half, std::uint32_t> sm_csr_transposition_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRTranspositionTest <Half, std::uint64_t> sm_csr_transposition_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRTranspositionTest<float, unsigned int> cuda_sm_csr_transposition_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRTranspositionTest<double, unsigned int> cuda_sm_csr_transposition_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRTranspositionTest<float, unsigned long> cuda_sm_csr_transposition_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRTranspositionTest<double, unsigned long> cuda_sm_csr_transposition_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRTranspositionTest <float, std::uint32_t> cuda_sm_csr_transposition_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRTranspositionTest <double, std::uint32_t> cuda_sm_csr_transposition_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRTranspositionTest <float, std::uint64_t> cuda_sm_csr_transposition_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRTranspositionTest <double, std::uint64_t> cuda_sm_csr_transposition_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -934,27 +934,27 @@ public:
   }
 };
 
-SparseMatrixCSRPermuteTest<float, unsigned long> sm_csr_permute_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest<double, unsigned long> sm_csr_permute_test_double_ulong(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest<float, unsigned int> sm_csr_permute_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest<double, unsigned int> sm_csr_permute_test_double_uint(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <float, std::uint64_t> sm_csr_permute_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <double, std::uint64_t> sm_csr_permute_test_double_uint64(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <float, std::uint32_t> sm_csr_permute_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <double, std::uint32_t> sm_csr_permute_test_double_uint32(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRPermuteTest<float, unsigned long> mkl_sm_csr_permute_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRPermuteTest<double, unsigned long> mkl_sm_csr_permute_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRPermuteTest <float, std::uint64_t> mkl_sm_csr_permute_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRPermuteTest <double, std::uint64_t> mkl_sm_csr_permute_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRPermuteTest<__float128, unsigned long> sm_csr_permute_test_float128_ulong(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest<__float128, unsigned int> sm_csr_permute_test_float128_uint(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <__float128, std::uint64_t> sm_csr_permute_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <__float128, std::uint32_t> sm_csr_permute_test_float128_uint32(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRPermuteTest<Half, unsigned int> sm_csr_permute_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest<Half, unsigned long> sm_csr_permute_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <Half, std::uint32_t> sm_csr_permute_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRPermuteTest <Half, std::uint64_t> sm_csr_permute_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRPermuteTest<float, unsigned long> cuda_sm_csr_permute_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRPermuteTest<double, unsigned long> cuda_sm_csr_permute_test_double_ulong(PreferredBackend::cuda);
-SparseMatrixCSRPermuteTest<float, unsigned int> cuda_sm_csr_permute_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRPermuteTest<double, unsigned int> cuda_sm_csr_permute_test_double_uint(PreferredBackend::cuda);
+SparseMatrixCSRPermuteTest <float, std::uint64_t> cuda_sm_csr_permute_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRPermuteTest <double, std::uint64_t> cuda_sm_csr_permute_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixCSRPermuteTest <float, std::uint32_t> cuda_sm_csr_permute_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRPermuteTest <double, std::uint32_t> cuda_sm_csr_permute_test_double_uint32(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1003,27 +1003,27 @@ public:
   }
 };
 
-SparseMatrixCSRDiagTest<float, unsigned int> sm_csr_diag_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRDiagTest<double, unsigned int> sm_csr_diag_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRDiagTest<float, unsigned long> sm_csr_diag_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRDiagTest<double, unsigned long> sm_csr_diag_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <float, std::uint32_t> sm_csr_diag_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <double, std::uint32_t> sm_csr_diag_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <float, std::uint64_t> sm_csr_diag_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <double, std::uint64_t> sm_csr_diag_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRDiagTest<float, unsigned long> mkl_sm_csr_diag_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRDiagTest<double, unsigned long> mkl_sm_csr_diag_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRDiagTest <float, std::uint64_t> mkl_sm_csr_diag_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRDiagTest <double, std::uint64_t> mkl_sm_csr_diag_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRDiagTest<__float128, unsigned int> sm_csr_diag_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRDiagTest<__float128, unsigned long> sm_csr_diag_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <__float128, std::uint32_t> sm_csr_diag_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <__float128, std::uint64_t> sm_csr_diag_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRDiagTest<Half, unsigned int> sm_csr_diag_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRDiagTest<Half, unsigned long> sm_csr_diag_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <Half, std::uint32_t> sm_csr_diag_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRDiagTest <Half, std::uint64_t> sm_csr_diag_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRDiagTest<float, unsigned int> cuda_sm_csr_diag_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRDiagTest<double, unsigned int> cuda_sm_csr_diag_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRDiagTest<float, unsigned long> cuda_sm_csr_diag_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRDiagTest<double, unsigned long> cuda_sm_csr_diag_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRDiagTest <float, std::uint32_t> cuda_sm_csr_diag_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRDiagTest <double, std::uint32_t> cuda_sm_csr_diag_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRDiagTest <float, std::uint64_t> cuda_sm_csr_diag_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRDiagTest <double, std::uint64_t> cuda_sm_csr_diag_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1111,27 +1111,27 @@ public:
   }
 };
 
-SparseMatrixCSRAxpyTest<float, unsigned int> sm_csr_axpy_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest<double, unsigned int> sm_csr_axpy_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest<float, unsigned long> sm_csr_axpy_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest<double, unsigned long> sm_csr_axpy_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <float, std::uint32_t> sm_csr_axpy_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <double, std::uint32_t> sm_csr_axpy_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <float, std::uint64_t> sm_csr_axpy_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <double, std::uint64_t> sm_csr_axpy_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRAxpyTest<float, unsigned long> mkl_sm_csr_axpy_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRAxpyTest<double, unsigned long> mkl_sm_csr_axpy_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRAxpyTest <float, std::uint64_t> mkl_sm_csr_axpy_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRAxpyTest <double, std::uint64_t> mkl_sm_csr_axpy_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRAxpyTest<__float128, unsigned int> sm_csr_axpy_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest<__float128, unsigned long> sm_csr_axpy_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <__float128, std::uint32_t> sm_csr_axpy_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <__float128, std::uint64_t> sm_csr_axpy_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRAxpyTest<Half, unsigned int> sm_csr_axpy_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest<Half, unsigned long> sm_csr_axpy_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <Half, std::uint32_t> sm_csr_axpy_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRAxpyTest <Half, std::uint64_t> sm_csr_axpy_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRAxpyTest<float, unsigned int> cuda_sm_csr_axpy_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRAxpyTest<double, unsigned int> cuda_sm_csr_axpy_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRAxpyTest<float, unsigned long> cuda_sm_csr_axpy_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRAxpyTest<double, unsigned long> cuda_sm_csr_axpy_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRAxpyTest <float, std::uint32_t> cuda_sm_csr_axpy_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRAxpyTest <double, std::uint32_t> cuda_sm_csr_axpy_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRAxpyTest <float, std::uint64_t> cuda_sm_csr_axpy_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRAxpyTest <double, std::uint64_t> cuda_sm_csr_axpy_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1176,27 +1176,27 @@ public:
   }
 };
 
-SparseMatrixCSRFrobeniusTest<float, unsigned int> sm_csr_frobenius_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest<double, unsigned int> sm_csr_frobenius_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest<float, unsigned long> sm_csr_frobenius_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest<double, unsigned long> sm_csr_frobenius_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <float, std::uint32_t> sm_csr_frobenius_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <double, std::uint32_t> sm_csr_frobenius_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <float, std::uint64_t> sm_csr_frobenius_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <double, std::uint64_t> sm_csr_frobenius_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRFrobeniusTest<float, unsigned long> mkl_sm_csr_frobenius_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRFrobeniusTest<double, unsigned long> mkl_sm_csr_frobenius_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRFrobeniusTest <float, std::uint64_t> mkl_sm_csr_frobenius_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRFrobeniusTest <double, std::uint64_t> mkl_sm_csr_frobenius_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRFrobeniusTest<__float128, unsigned int> sm_csr_frobenius_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest<__float128, unsigned long> sm_csr_frobenius_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <__float128, std::uint32_t> sm_csr_frobenius_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <__float128, std::uint64_t> sm_csr_frobenius_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRFrobeniusTest<Half, unsigned int> sm_csr_frobenius_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest<Half, unsigned long> sm_csr_frobenius_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <Half, std::uint32_t> sm_csr_frobenius_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRFrobeniusTest <Half, std::uint64_t> sm_csr_frobenius_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRFrobeniusTest<float, unsigned int> cuda_sm_csr_frobenius_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRFrobeniusTest<double, unsigned int> cuda_sm_csr_frobenius_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRFrobeniusTest<float, unsigned long> cuda_sm_csr_frobenius_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRFrobeniusTest<double, unsigned long> cuda_sm_csr_frobenius_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRFrobeniusTest <float, std::uint32_t> cuda_sm_csr_frobenius_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRFrobeniusTest <double, std::uint32_t> cuda_sm_csr_frobenius_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRFrobeniusTest <float, std::uint64_t> cuda_sm_csr_frobenius_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRFrobeniusTest <double, std::uint64_t> cuda_sm_csr_frobenius_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1245,27 +1245,27 @@ public:
   }
 };
 
-SparseMatrixCSRLumpTest<float, unsigned int> sm_csr_lump_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRLumpTest<double, unsigned int> sm_csr_lump_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRLumpTest<float, unsigned long> sm_csr_lump_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRLumpTest<double, unsigned long> sm_csr_lump_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <float, std::uint32_t> sm_csr_lump_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <double, std::uint32_t> sm_csr_lump_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <float, std::uint64_t> sm_csr_lump_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <double, std::uint64_t> sm_csr_lump_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRLumpTest<float, unsigned long> mkl_sm_csr_lump_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRLumpTest<double, unsigned long> mkl_sm_csr_lump_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRLumpTest <float, std::uint64_t> mkl_sm_csr_lump_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRLumpTest <double, std::uint64_t> mkl_sm_csr_lump_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRLumpTest<__float128, unsigned int> sm_csr_lump_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRLumpTest<__float128, unsigned long> sm_csr_lump_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <__float128, std::uint32_t> sm_csr_lump_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <__float128, std::uint64_t> sm_csr_lump_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRLumpTest<Half, unsigned int> sm_csr_lump_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRLumpTest<Half, unsigned long> sm_csr_lump_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <Half, std::uint32_t> sm_csr_lump_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRLumpTest <Half, std::uint64_t> sm_csr_lump_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRLumpTest<float, unsigned int> cuda_sm_csr_lump_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRLumpTest<double, unsigned int> cuda_sm_csr_lump_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRLumpTest<float, unsigned long> cuda_sm_csr_lump_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRLumpTest<double, unsigned long> cuda_sm_csr_lump_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRLumpTest <float, std::uint32_t> cuda_sm_csr_lump_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRLumpTest <double, std::uint32_t> cuda_sm_csr_lump_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRLumpTest <float, std::uint64_t> cuda_sm_csr_lump_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRLumpTest <double, std::uint64_t> cuda_sm_csr_lump_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1339,27 +1339,27 @@ public:
   }
 };
 
-SparseMatrixCSRCompressionTest<float, unsigned int> sm_csr_comp_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest<double, unsigned int> sm_csr_comp_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest<float, unsigned long> sm_csr_comp_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest<double, unsigned long> sm_csr_comp_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <float, std::uint32_t> sm_csr_comp_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <double, std::uint32_t> sm_csr_comp_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <float, std::uint64_t> sm_csr_comp_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <double, std::uint64_t> sm_csr_comp_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRCompressionTest<float, unsigned long> mkl_sm_csr_comp_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRCompressionTest<double, unsigned long> mkl_sm_csr_comp_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRCompressionTest <float, std::uint64_t> mkl_sm_csr_comp_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRCompressionTest <double, std::uint64_t> mkl_sm_csr_comp_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRCompressionTest<__float128, unsigned int> sm_csr_comp_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest<__float128, unsigned long> sm_csr_comp_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <__float128, std::uint32_t> sm_csr_comp_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <__float128, std::uint64_t> sm_csr_comp_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRCompressionTest<Half, unsigned int> sm_csr_comp_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest<Half, unsigned long> sm_csr_comp_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <Half, std::uint32_t> sm_csr_comp_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRCompressionTest <Half, std::uint64_t> sm_csr_comp_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRCompressionTest<float, unsigned int> cuda_sm_csr_comp_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRCompressionTest<double, unsigned int> cuda_sm_csr_comp_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRCompressionTest<float, unsigned long> cuda_sm_csr_comp_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRCompressionTest<double, unsigned long> cuda_sm_csr_comp_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRCompressionTest <float, std::uint32_t> cuda_sm_csr_comp_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRCompressionTest <double, std::uint32_t> cuda_sm_csr_comp_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRCompressionTest <float, std::uint64_t> cuda_sm_csr_comp_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRCompressionTest <double, std::uint64_t> cuda_sm_csr_comp_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1419,27 +1419,27 @@ public:
   }
 };
 
-SparseMatrixCSRMaxAbsElementTest<float, unsigned int> sm_csr_max_abs_element_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest<double, unsigned int> sm_csr_max_abs_element_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest<float, unsigned long> sm_csr_max_abs_element_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest<double, unsigned long> sm_csr_max_abs_element_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <float, std::uint32_t> sm_csr_max_abs_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <double, std::uint32_t> sm_csr_max_abs_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <float, std::uint64_t> sm_csr_max_abs_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <double, std::uint64_t> sm_csr_max_abs_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMaxAbsElementTest<float, unsigned long> mkl_sm_csr_max_abs_element_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRMaxAbsElementTest<double, unsigned long> mkl_sm_csr_max_abs_element_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRMaxAbsElementTest <float, std::uint64_t> mkl_sm_csr_max_abs_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRMaxAbsElementTest <double, std::uint64_t> mkl_sm_csr_max_abs_element_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMaxAbsElementTest<__float128, unsigned int> sm_csr_max_abs_element_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest<__float128, unsigned long> sm_csr_max_abs_element_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <__float128, std::uint32_t> sm_csr_max_abs_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <__float128, std::uint64_t> sm_csr_max_abs_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMaxAbsElementTest<Half, unsigned int> sm_csr_max_abs_element_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest<Half, unsigned long> sm_csr_max_abs_element_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <Half, std::uint32_t> sm_csr_max_abs_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxAbsElementTest <Half, std::uint64_t> sm_csr_max_abs_element_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMaxAbsElementTest<float, unsigned int> cuda_sm_csr_max_abs_element_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRMaxAbsElementTest<double, unsigned int> cuda_sm_csr_max_abs_element_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRMaxAbsElementTest<float, unsigned long> cuda_sm_csr_max_abs_element_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRMaxAbsElementTest<double, unsigned long> cuda_sm_csr_max_abs_element_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRMaxAbsElementTest <float, std::uint32_t> cuda_sm_csr_max_abs_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMaxAbsElementTest <double, std::uint32_t> cuda_sm_csr_max_abs_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMaxAbsElementTest <float, std::uint64_t> cuda_sm_csr_max_abs_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRMaxAbsElementTest <double, std::uint64_t> cuda_sm_csr_max_abs_element_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1499,27 +1499,27 @@ public:
   }
 };
 
-SparseMatrixCSRMinAbsElementTest<float, unsigned int> sm_csr_min_abs_element_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest<double, unsigned int> sm_csr_min_abs_element_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest<float, unsigned long> sm_csr_min_abs_element_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest<double, unsigned long> sm_csr_min_abs_element_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <float, std::uint32_t> sm_csr_min_abs_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <double, std::uint32_t> sm_csr_min_abs_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <float, std::uint64_t> sm_csr_min_abs_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <double, std::uint64_t> sm_csr_min_abs_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMinAbsElementTest<float, unsigned long> mkl_sm_csr_min_abs_element_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRMinAbsElementTest<double, unsigned long> mkl_sm_csr_min_abs_element_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRMinAbsElementTest <float, std::uint64_t> mkl_sm_csr_min_abs_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRMinAbsElementTest <double, std::uint64_t> mkl_sm_csr_min_abs_element_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMinAbsElementTest<__float128, unsigned int> sm_csr_min_abs_element_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest<__float128, unsigned long> sm_csr_min_abs_element_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <__float128, std::uint32_t> sm_csr_min_abs_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <__float128, std::uint64_t> sm_csr_min_abs_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMinAbsElementTest<Half, unsigned int> sm_csr_min_abs_element_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest<Half, unsigned long> sm_csr_min_abs_element_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <Half, std::uint32_t> sm_csr_min_abs_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinAbsElementTest <Half, std::uint64_t> sm_csr_min_abs_element_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMinAbsElementTest<float, unsigned int> cuda_sm_csr_min_abs_element_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRMinAbsElementTest<double, unsigned int> cuda_sm_csr_min_abs_element_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRMinAbsElementTest<float, unsigned long> cuda_sm_csr_min_abs_element_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRMinAbsElementTest<double, unsigned long> cuda_sm_csr_min_abs_element_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRMinAbsElementTest <float, std::uint32_t> cuda_sm_csr_min_abs_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMinAbsElementTest <double, std::uint32_t> cuda_sm_csr_min_abs_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMinAbsElementTest <float, std::uint64_t> cuda_sm_csr_min_abs_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRMinAbsElementTest <double, std::uint64_t> cuda_sm_csr_min_abs_element_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1579,27 +1579,27 @@ public:
   }
 };
 
-SparseMatrixCSRMaxElementTest<float, unsigned int> sm_csr_max_element_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest<double, unsigned int> sm_csr_max_element_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest<float, unsigned long> sm_csr_max_element_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest<double, unsigned long> sm_csr_max_element_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <float, std::uint32_t> sm_csr_max_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <double, std::uint32_t> sm_csr_max_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <float, std::uint64_t> sm_csr_max_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <double, std::uint64_t> sm_csr_max_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMaxElementTest<float, unsigned long> mkl_sm_csr_max_element_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRMaxElementTest<double, unsigned long> mkl_sm_csr_max_element_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRMaxElementTest <float, std::uint64_t> mkl_sm_csr_max_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRMaxElementTest <double, std::uint64_t> mkl_sm_csr_max_element_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMaxElementTest<__float128, unsigned int> sm_csr_max_element_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest<__float128, unsigned long> sm_csr_max_element_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <__float128, std::uint32_t> sm_csr_max_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <__float128, std::uint64_t> sm_csr_max_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMaxElementTest<Half, unsigned int> sm_csr_max_element_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest<Half, unsigned long> sm_csr_max_element_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <Half, std::uint32_t> sm_csr_max_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxElementTest <Half, std::uint64_t> sm_csr_max_element_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMaxElementTest<float, unsigned int> cuda_sm_csr_max_element_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRMaxElementTest<double, unsigned int> cuda_sm_csr_max_element_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRMaxElementTest<float, unsigned long> cuda_sm_csr_max_element_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRMaxElementTest<double, unsigned long> cuda_sm_csr_max_element_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRMaxElementTest <float, std::uint32_t> cuda_sm_csr_max_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMaxElementTest <double, std::uint32_t> cuda_sm_csr_max_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMaxElementTest <float, std::uint64_t> cuda_sm_csr_max_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRMaxElementTest <double, std::uint64_t> cuda_sm_csr_max_element_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<
@@ -1659,25 +1659,25 @@ public:
   }
 };
 
-SparseMatrixCSRMinElementTest<float, unsigned int> sm_csr_min_element_test_float_uint(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest<double, unsigned int> sm_csr_min_element_test_double_uint(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest<float, unsigned long> sm_csr_min_element_test_float_ulong(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest<double, unsigned long> sm_csr_min_element_test_double_ulong(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <float, std::uint32_t> sm_csr_min_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <double, std::uint32_t> sm_csr_min_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <float, std::uint64_t> sm_csr_min_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <double, std::uint64_t> sm_csr_min_element_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMinElementTest<float, unsigned long> mkl_sm_csr_min_element_test_float_ulong(PreferredBackend::mkl);
-SparseMatrixCSRMinElementTest<double, unsigned long> mkl_sm_csr_min_element_test_double_ulong(PreferredBackend::mkl);
+SparseMatrixCSRMinElementTest <float, std::uint64_t> mkl_sm_csr_min_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRMinElementTest <double, std::uint64_t> mkl_sm_csr_min_element_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMinElementTest<__float128, unsigned int> sm_csr_min_element_test_float128_uint(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest<__float128, unsigned long> sm_csr_min_element_test_float128_ulong(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <__float128, std::uint32_t> sm_csr_min_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <__float128, std::uint64_t> sm_csr_min_element_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMinElementTest<Half, unsigned int> sm_csr_min_element_test_half_uint(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest<Half, unsigned long> sm_csr_min_element_test_half_ulong(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <Half, std::uint32_t> sm_csr_min_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRMinElementTest <Half, std::uint64_t> sm_csr_min_element_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMinElementTest<float, unsigned int> cuda_sm_csr_min_element_test_float_uint(PreferredBackend::cuda);
-SparseMatrixCSRMinElementTest<double, unsigned int> cuda_sm_csr_min_element_test_double_uint(PreferredBackend::cuda);
-SparseMatrixCSRMinElementTest<float, unsigned long> cuda_sm_csr_min_element_test_float_ulong(PreferredBackend::cuda);
-SparseMatrixCSRMinElementTest<double, unsigned long> cuda_sm_csr_min_element_test_double_ulong(PreferredBackend::cuda);
+SparseMatrixCSRMinElementTest <float, std::uint32_t> cuda_sm_csr_min_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMinElementTest <double, std::uint32_t> cuda_sm_csr_min_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMinElementTest <float, std::uint64_t> cuda_sm_csr_min_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRMinElementTest <double, std::uint64_t> cuda_sm_csr_min_element_test_double_uint64(PreferredBackend::cuda);
 #endif

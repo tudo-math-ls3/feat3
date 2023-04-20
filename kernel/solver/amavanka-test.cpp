@@ -198,22 +198,22 @@ public:
 //AmaVankaTest<float, unsigned int> amavanka_test_float_uint(PreferredBackend::generic);
 //AmaVankaTest<double, unsigned int> amavanka_test_double_uint(PreferredBackend::generic);
 //AmaVankaTest<float, unsigned long> amavanka_test_float_ulong(PreferredBackend::generic);
-AmaVankaTest<double, unsigned long> amavanka_test_double_ulong(PreferredBackend::generic);
+AmaVankaTest <double, std::uint64_t> amavanka_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-AmaVankaTest<float, unsigned long> mkl_amavanka_test_float_ulong(PreferredBackend::mkl);
-AmaVankaTest<double, unsigned long> mkl_amavanka_test_double_ulong(PreferredBackend::mkl);
+AmaVankaTest <float, std::uint64_t> mkl_amavanka_test_float_uint64(PreferredBackend::mkl);
+AmaVankaTest <double, std::uint64_t> mkl_amavanka_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-AmaVankaTest<__float128, unsigned int> amavanka_test_float128_uint(PreferredBackend::generic);
-AmaVankaTest<__float128, unsigned long> amavanka_test_float128_ulong(PreferredBackend::generic);
+AmaVankaTest <__float128, std::uint32_t> amavanka_test_float128_uint32(PreferredBackend::generic);
+AmaVankaTest <__float128, std::uint64_t> amavanka_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-AmaVankaTest<Half, unsigned int> amavanka_test_half_uint(PreferredBackend::generic);
-AmaVankaTest<Half, unsigned long> amavanka_test_half_ulong(PreferredBackend::generic);
+AmaVankaTest <Half, std::uint32_t> amavanka_test_half_uint32(PreferredBackend::generic);
+AmaVankaTest <Half, std::uint64_t> amavanka_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-AmaVankaTest<float, unsigned int> cuda_amavanka_test_float_uint(PreferredBackend::cuda);
-AmaVankaTest<double, unsigned int> cuda_amavanka_test_double_uint(PreferredBackend::cuda);
-AmaVankaTest<float, unsigned long> cuda_amavanka_test_float_ulong(PreferredBackend::cuda);
-AmaVankaTest<double, unsigned long> cuda_amavanka_test_double_ulong(PreferredBackend::cuda);
+AmaVankaTest <float, std::uint32_t> cuda_amavanka_test_float_uint32(PreferredBackend::cuda);
+AmaVankaTest <double, std::uint32_t> cuda_amavanka_test_double_uint32(PreferredBackend::cuda);
+AmaVankaTest <float, std::uint64_t> cuda_amavanka_test_float_uint64(PreferredBackend::cuda);
+AmaVankaTest <double, std::uint64_t> cuda_amavanka_test_double_uint64(PreferredBackend::cuda);
 #endif
