@@ -439,17 +439,14 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
 
       // transposed apply-test for alpha = 4711.1
-      if (!(Runtime::get_preferred_backend() == PreferredBackend::cuda && typeid(IT_) == typeid(unsigned long)))
-      {
-        a.apply(r, x, y, s, true);
+      a.apply(r, x, y, s, true);
 
-        SparseMatrixCSR<DT_, IT_> at = a.transpose();
-        at.apply(ref, x);
-        ref.scale(ref, s);
-        ref.axpy(ref, y);
-        for (Index i(0); i < size; ++i)
-          TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(7e-2));
-      }
+      SparseMatrixCSR<DT_, IT_> at = a.transpose();
+      at.apply(ref, x);
+      ref.scale(ref, s);
+      ref.axpy(ref, y);
+      for (Index i(0); i < size; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(7e-2));
     }
   }
 };

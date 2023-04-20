@@ -330,7 +330,7 @@ template <typename DT_, typename IT_>
 void Apply::bcsr_wrapper_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth)
 {
   //CUSPARSE
-  if (BlockHeight == BlockWidth && typeid(unsigned int) == typeid(IT_))
+  if ((BlockHeight == BlockWidth) && (sizeof(IT_) == 4u))
   {
     bcsr_intern_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight);
   }
