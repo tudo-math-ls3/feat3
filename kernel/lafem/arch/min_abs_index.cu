@@ -23,7 +23,7 @@ namespace FEAT
       {
         int result;
         cublasStatus_t status;
-        status = cublasIsamin(Util::Intern::cublas_handle, size, x, 1, &result);
+        status = cublasIsamin(Util::Intern::cublas_handle, int(size), x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
         return (Index)result - 1;
@@ -33,7 +33,7 @@ namespace FEAT
       {
         int result;
         cublasStatus_t status;
-        status = cublasIdamin(Util::Intern::cublas_handle, size, x, 1, &result);
+        status = cublasIdamin(Util::Intern::cublas_handle, int(size), x, 1, &result);
         if (status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
         return (Index)result - 1;

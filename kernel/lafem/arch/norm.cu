@@ -44,7 +44,7 @@ DT_ Norm2::value_cuda(const DT_ * const x, const Index size)
   cublasStatus_t status;
   DT_ result(42.);
 
-  status = cublasNrm2Ex(Util::Intern::cublas_handle, size, x, dt, 1, &result, dt, et);
+  status = cublasNrm2Ex(Util::Intern::cublas_handle, int(size), x, dt, 1, &result, dt, et);
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 

@@ -54,7 +54,7 @@ void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, 
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_unit_filter_blocked_rhs<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
@@ -90,7 +90,7 @@ void UnitFilterBlocked::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, c
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_unit_filter_blocked_def<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_indices, ue);

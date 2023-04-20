@@ -204,10 +204,10 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
     throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
 
   cusparseIndexType_t it;
-  if (typeid(IT_) == typeid(unsigned int))
-      it = CUSPARSE_INDEX_32I;
-  else if (typeid(IT_) == typeid(unsigned long))
-      it = CUSPARSE_INDEX_64I;
+  if(sizeof(IT_) == 4u)
+    it = CUSPARSE_INDEX_32I;
+  else if(sizeof(IT_) == 8u)
+    it = CUSPARSE_INDEX_64I;
   else
     throw InternalError(__func__, __FILE__, __LINE__, "unsupported index type!");
 
@@ -299,12 +299,12 @@ void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT
 }
 
 template <typename DT_, typename IT_>
-void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockHeight, const int BlockWidth)
+void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index /*columns*/, const Index /*used_elements*/, const int BlockHeight, const int BlockWidth)
 {
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   if (Math::abs(b) < Math::eps<DT_>())
@@ -347,12 +347,12 @@ template void Apply::bcsr_wrapper_cuda<double, unsigned long>(double *, const do
 
 template <typename DT_, typename IT_, int BlockSize_>
 void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows,
-    const Index columns, const Index used_elements)
+    const Index /*columns*/, const Index /*used_elements*/)
 {
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   if (Math::abs(b) < Math::eps<DT_>())
@@ -404,7 +404,7 @@ void Apply::banded_cuda(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   if (Math::abs(beta) < Math::eps<DT_>())

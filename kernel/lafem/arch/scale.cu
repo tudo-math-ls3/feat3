@@ -44,7 +44,7 @@ void Scale::value_cuda(DT_ * r, const DT_ * const x, const DT_ s, const Index si
 
   cublasStatus_t status;
 
-  status = cublasScalEx(Util::Intern::cublas_handle, size, &s, et, r, dt, 1, et);
+  status = cublasScalEx(Util::Intern::cublas_handle, int(size), &s, et, r, dt, 1, et);
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 

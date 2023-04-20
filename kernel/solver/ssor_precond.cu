@@ -192,7 +192,7 @@ namespace FEAT
           Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
-          block.x = blocksize;
+          block.x = (unsigned)blocksize;
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_forward_apply_kernel<<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
@@ -209,7 +209,7 @@ namespace FEAT
         return 0;
       }
 
-      int cuda_ssor_backward_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
+      int cuda_ssor_backward_apply(int /*m*/, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
       {
         int row_offset(0);
@@ -218,7 +218,7 @@ namespace FEAT
           Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
-          block.x = blocksize;
+          block.x = (unsigned)blocksize;
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_backward_apply_kernel<<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
@@ -247,7 +247,7 @@ namespace FEAT
           Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
-          block.x = blocksize;
+          block.x = (unsigned)blocksize;
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_forward_bcsr_apply_kernel<BlockSize_><<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
@@ -270,7 +270,7 @@ namespace FEAT
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
 
       template <int BlockSize_>
-      int cuda_ssor_backward_bcsr_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
+      int cuda_ssor_backward_bcsr_apply(int /*m*/, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
       {
         int row_offset(0);
@@ -279,7 +279,7 @@ namespace FEAT
           Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
-          block.x = blocksize;
+          block.x = (unsigned)blocksize;
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_backward_bcsr_apply_kernel<BlockSize_><<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);

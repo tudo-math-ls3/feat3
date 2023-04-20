@@ -49,7 +49,7 @@ void ComponentInvert::value_cuda(DT_ * r, const DT_ * const x, const DT_ s, cons
   Index blocksize = Util::cuda_blocksize_axpy;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((size)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_component_invert<<<grid, block>>>(r, x, s, size);

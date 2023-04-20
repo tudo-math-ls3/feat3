@@ -45,7 +45,7 @@ DT_ DotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const Index
   cublasStatus_t status;
   DT_ result(0.);
 
-  status = cublasDotEx(Util::Intern::cublas_handle, size, x, dt, 1, y, dt, 1, &result, dt, et);
+  status = cublasDotEx(Util::Intern::cublas_handle, int(size), x, dt, 1, y, dt, 1, &result, dt, et);
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 

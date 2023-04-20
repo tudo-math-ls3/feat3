@@ -76,7 +76,7 @@ void SlipFilter::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const I
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_slip_filter_rhs<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);
@@ -104,7 +104,7 @@ void SlipFilter::filter_def_cuda(DT_ * v, const DT_ * const sv_elements, const I
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_slip_filter_def<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue);

@@ -71,7 +71,7 @@ namespace FEAT
         Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
-        block.x = blocksize;
+        block.x = (unsigned)blocksize;
         grid.x = (unsigned)ceil((nidx)/(double)(block.x));
 
         FEAT::LAFEM::Intern::cuda_mirror_gather_dv<<<grid, block>>>(boff, nidx, idx, buf, vec);
@@ -95,7 +95,7 @@ namespace FEAT
         Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
-        block.x = blocksize;
+        block.x = (unsigned)blocksize;
         grid.x = (unsigned)ceil((nidx)/(double)(block.x));
 
         FEAT::LAFEM::Intern::cuda_mirror_scatter_dv<<<grid, block>>>(boff, nidx, idx, buf, vec, alpha);
@@ -119,7 +119,7 @@ namespace FEAT
         Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
-        block.x = blocksize;
+        block.x = (unsigned)blocksize;
         grid.x = (unsigned)ceil((nidx)/(double)(block.x));
 
         FEAT::LAFEM::Intern::cuda_mirror_gather_dvb<<<grid, block>>>(bs, boff, nidx, idx, buf, vec);
@@ -143,7 +143,7 @@ namespace FEAT
         Index blocksize = Util::cuda_blocksize_misc;
         dim3 grid;
         dim3 block;
-        block.x = blocksize;
+        block.x = (unsigned)blocksize;
         grid.x = (unsigned)ceil((nidx)/(double)(block.x));
 
         FEAT::LAFEM::Intern::cuda_mirror_scatter_dvb<<<grid, block>>>(bs, boff, nidx, idx, buf, vec, alpha);

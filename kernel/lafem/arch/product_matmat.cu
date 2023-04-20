@@ -163,14 +163,10 @@ void ProductMatMat::dsd_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_
   }
 
   cusparseIndexType_t it;
-  if (typeid(IT_) == typeid(unsigned int))
-  {
-      it = CUSPARSE_INDEX_32I;
-  }
-  else if (typeid(IT_) == typeid(unsigned long))
-  {
-      it = CUSPARSE_INDEX_64I;
-  }
+  if(sizeof(IT_) == 4u)
+    it = CUSPARSE_INDEX_32I;
+  else if(sizeof(IT_) == 8u)
+    it = CUSPARSE_INDEX_64I;
   else
   {
     throw InternalError(__func__, __FILE__, __LINE__, "unsupported index type!");

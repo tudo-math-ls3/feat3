@@ -48,7 +48,7 @@ void UnitFilter::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const I
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_unit_filter_rhs<<<grid, block>>>(v, sv_elements, sv_indices, ue);
@@ -72,7 +72,7 @@ void UnitFilter::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, const In
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_unit_filter_def<<<grid, block>>>(v, sv_indices, ue);

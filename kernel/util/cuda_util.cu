@@ -204,7 +204,7 @@ void FEAT::Util::cuda_set_memory(DT_ * address, const DT_ val, const Index count
   Index blocksize = FEAT::Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
   FEAT::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
 
@@ -230,7 +230,7 @@ void FEAT::Util::cuda_convert(DT1_ * dest, const DT2_ * src, const Index count)
   Index blocksize = FEAT::Util::cuda_blocksize_misc;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
   FEAT::Util::Intern::cuda_convert<<<grid, block>>>(dest, src, count);
 

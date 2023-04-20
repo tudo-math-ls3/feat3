@@ -38,14 +38,12 @@ namespace FEAT
         if (idx >= count)
           return;
 
-        DT_ sum(0);
         const Index end(row_ptr[idx + 1]);
         for (Index i(row_ptr[idx]) ; i < end ; ++i)
         {
           r[i] = val[i] * b[col_ind[i]];
         }
       }
-
     }
   }
 }
@@ -56,12 +54,12 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_, typename IT_>
-void ScaleRows::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+void ScaleRows::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index /*columns*/, const Index /*used_elements*/)
 {
   Index blocksize = Util::cuda_blocksize_axpy;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_scale_rows_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);
@@ -79,12 +77,12 @@ template void ScaleRows::csr_cuda(float *, const float * const, const unsigned i
 template void ScaleRows::csr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_>
-void ScaleCols::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+void ScaleCols::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index /*columns*/, const Index /*used_elements*/)
 {
   Index blocksize = Util::cuda_blocksize_axpy;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_scale_cols_csr<<<grid, block>>>(r, x, val, col_ind, row_ptr, rows);

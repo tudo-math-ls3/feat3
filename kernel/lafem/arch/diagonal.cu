@@ -48,7 +48,7 @@ void Diagonal::csr_cuda(IT_ * diag, const IT_ * const col_ind, const IT_ * const
   Index blocksize = Util::cuda_blocksize_axpy;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_diagonal_csr<<<grid, block>>>(diag, col_ind, row_ptr, rows);

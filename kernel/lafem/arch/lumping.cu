@@ -91,7 +91,7 @@ void Lumping::csr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_lumping_csr<<<grid, block>>>(lump, val, col_ind, row_ptr, rows);
@@ -114,7 +114,7 @@ void Lumping::bcsr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_lumping_bcsr<<<grid, block>>>(lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);

@@ -24,11 +24,11 @@ void Transpose::value_cuda(float * r, const float * const x, Index rows_x, Index
     float * temp;
     cudaMalloc((void**)&temp, rows_x * columns_x * sizeof(float));
     cudaMemcpy(temp, x, rows_x * columns_x * sizeof(float), cudaMemcpyDeviceToDevice);
-    status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, rows_x, columns_x, &one, temp, columns_x, &zero, nullptr, columns_x, r, rows_x);
+    status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, int(rows_x), int(columns_x), &one, temp, int(columns_x), &zero, nullptr, int(columns_x), r, int(rows_x));
   }
   else
   {
-    status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, rows_x, columns_x, &one, x, columns_x, &zero, nullptr, columns_x, r, rows_x);
+    status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, int(rows_x), int(columns_x), &one, x, int(columns_x), &zero, nullptr, int(columns_x), r, int(rows_x));
   }
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
@@ -52,11 +52,11 @@ void Transpose::value_cuda(double * r, const double * const x, Index rows_x, Ind
     double * temp;
     cudaMalloc((void**)&temp, rows_x * columns_x * sizeof(double));
     cudaMemcpy(temp, x, rows_x * columns_x * sizeof(double), cudaMemcpyDefault);
-    status = cublasDgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, rows_x, columns_x, &one, temp, columns_x, &zero, nullptr, columns_x, r, rows_x);
+    status = cublasDgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, int(rows_x), int(columns_x), &one, temp, int(columns_x), &zero, nullptr, int(columns_x), r, int(rows_x));
   }
   else
   {
-    status = cublasDgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, rows_x, columns_x, &one, x, columns_x, &zero, nullptr, columns_x, r, rows_x);
+    status = cublasDgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, int(rows_x), int(columns_x), &one, x, int(columns_x), &zero, nullptr, int(columns_x), r, int(rows_x));
   }
 
   if (status != CUBLAS_STATUS_SUCCESS)

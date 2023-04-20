@@ -155,7 +155,7 @@ void RowNorm::csr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ *
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2_csr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows);
@@ -178,7 +178,7 @@ void RowNorm::csr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const IT
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_csr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows);
@@ -201,7 +201,7 @@ void RowNorm::csr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal, 
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_scaled_csr<<<grid, block>>>(row_norms, scal, val, col_ind, row_ptr, rows);
@@ -224,7 +224,7 @@ void RowNorm::bcsr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ 
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2_bcsr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
@@ -247,7 +247,7 @@ void RowNorm::bcsr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const I
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_bcsr<<<grid, block>>>(row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
@@ -270,7 +270,7 @@ void RowNorm::bcsr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal,
   Index blocksize = Util::cuda_blocksize_spmv;
   dim3 grid;
   dim3 block;
-  block.x = blocksize;
+  block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((rows * BlockHeight)/(double)(block.x));
 
   FEAT::LAFEM::Intern::cuda_norm2sqr_scaled_bcsr<<<grid, block>>>(row_norms, scal, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);

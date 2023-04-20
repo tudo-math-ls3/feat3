@@ -301,7 +301,7 @@ namespace FEAT
           Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
-          block.x = blocksize;
+          block.x = (unsigned)blocksize;
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_sor_apply_kernel<<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
@@ -330,7 +330,7 @@ namespace FEAT
           Index blocksize = Util::cuda_blocksize_spmv;
           dim3 grid;
           dim3 block;
-          block.x = blocksize;
+          block.x = (unsigned)blocksize;
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_sor_bcsr_apply_kernel<BlockSize_><<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);

@@ -58,7 +58,7 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * con
     cudaMemcpy(r, y, size * sizeof(DT_), cudaMemcpyDefault);
   }
 
-  status = cublasAxpyEx(Util::Intern::cublas_handle, size, &a, et, temp_x, dt, 1, r, dt, 1, et);
+  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, temp_x, dt, 1, r, dt, 1, et);
   if (r == x)
     cudaFree (temp_x);
 
