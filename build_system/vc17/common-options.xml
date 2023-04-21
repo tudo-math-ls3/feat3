@@ -98,6 +98,9 @@
       <!--<AdditionalCompilerOptions>/FS %(AdditionalOptions)</AdditionalCompilerOptions>-->
       <AdditionalOptions>--std=c++17 %(AdditionalOptions)</AdditionalOptions>
     </CudaCompile>
+    <Link>
+      <IgnoreSpecificDefaultLibraries>libcmt</IgnoreSpecificDefaultLibraries>
+    </Link>
   </ItemDefinitionGroup>
 
   <!-- ************************************************************************************************************* -->
