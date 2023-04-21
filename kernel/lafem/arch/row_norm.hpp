@@ -30,26 +30,26 @@ namespace FEAT
           csr_generic_norm2(row_norms, val, col_ind, row_ptr, rows);
         }
 
-        static void csr_norm2(float* row_norms, const float* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows)
+        static void csr_norm2(float* row_norms, const float* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2, csr_generic_norm2, csr_generic_norm2, row_norms, val, col_ind, row_ptr, rows)
         }
 
-        static void csr_norm2(double* row_norms, const double* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows)
+        static void csr_norm2(double* row_norms, const double* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2, csr_generic_norm2, csr_generic_norm2, row_norms, val, col_ind, row_ptr, rows)
         }
 
-        static void csr_norm2(float* row_norms, const float* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows)
+        static void csr_norm2(float* row_norms, const float* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2, csr_generic_norm2, csr_generic_norm2, row_norms, val, col_ind, row_ptr, rows)
         }
 
-        static void csr_norm2(double* row_norms, const double* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows)
+        static void csr_norm2(double* row_norms, const double* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2, csr_generic_norm2, csr_generic_norm2, row_norms, val, col_ind, row_ptr, rows)
         }
@@ -65,26 +65,26 @@ namespace FEAT
           bcsr_generic_norm2(row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
         }
 
-        static void bcsr_norm2(float* row_norms, const float* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2(float* row_norms, const float* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2, bcsr_generic_norm2, bcsr_generic_norm2, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr_norm2(double* row_norms, const double* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2(double* row_norms, const double* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2, bcsr_generic_norm2, bcsr_generic_norm2, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr_norm2(float* row_norms, const float* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2(float* row_norms, const float* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2, bcsr_generic_norm2, bcsr_generic_norm2, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr_norm2(double* row_norms, const double* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2(double* row_norms, const double* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2, bcsr_generic_norm2, bcsr_generic_norm2, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
@@ -109,26 +109,26 @@ namespace FEAT
           csr_generic_norm2sqr(row_norms, val, col_ind, row_ptr, rows);
         }
 
-        static void csr_norm2sqr(float* row_norms, const float* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows)
+        static void csr_norm2sqr(float* row_norms, const float* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2sqr, csr_generic_norm2sqr, csr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows)
         }
 
-        static void csr_norm2sqr(double* row_norms, const double* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows)
+        static void csr_norm2sqr(double* row_norms, const double* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2sqr, csr_generic_norm2sqr, csr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows)
         }
 
-        static void csr_norm2sqr(float* row_norms, const float* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows)
+        static void csr_norm2sqr(float* row_norms, const float* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2sqr, csr_generic_norm2sqr, csr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows)
         }
 
-        static void csr_norm2sqr(double* row_norms, const double* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows)
+        static void csr_norm2sqr(double* row_norms, const double* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_norm2sqr, csr_generic_norm2sqr, csr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows)
         }
@@ -144,26 +144,26 @@ namespace FEAT
           bcsr_generic_norm2sqr(row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
         }
 
-        static void bcsr_norm2sqr(float* row_norms, const float* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2sqr(float* row_norms, const float* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2sqr, bcsr_generic_norm2sqr, bcsr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr_norm2sqr(double* row_norms, const double* const val, const unsigned long* const col_ind,
-        const unsigned long* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2sqr(double* row_norms, const double* const val, const std::uint64_t* const col_ind,
+        const std::uint64_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2sqr, bcsr_generic_norm2sqr, bcsr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr_norm2sqr(float* row_norms, const float* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2sqr(float* row_norms, const float* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2sqr, bcsr_generic_norm2sqr, bcsr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr_norm2sqr(double* row_norms, const double* const val, const unsigned int* const col_ind,
-        const unsigned int* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr_norm2sqr(double* row_norms, const double* const val, const std::uint32_t* const col_ind,
+        const std::uint32_t* const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_norm2sqr, bcsr_generic_norm2sqr, bcsr_generic_norm2sqr, row_norms, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
@@ -189,25 +189,25 @@ namespace FEAT
         }
 
         static void csr_scaled_norm2sqr(float* row_norms, const float* const scal, const float* const val,
-        const unsigned long* const col_ind, const unsigned long* const row_ptr, const Index rows)
+        const std::uint64_t* const col_ind, const std::uint64_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_scaled_norm2sqr, csr_generic_scaled_norm2sqr, csr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows)
         }
 
         static void csr_scaled_norm2sqr(double* row_norms, const double* const scal, const double* const val,
-        const unsigned long* const col_ind, const unsigned long* const row_ptr, const Index rows)
+        const std::uint64_t* const col_ind, const std::uint64_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_scaled_norm2sqr, csr_generic_scaled_norm2sqr, csr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows)
         }
 
         static void csr_scaled_norm2sqr(float* row_norms, const float* const scal, const float* const val,
-        const unsigned int* const col_ind, const unsigned int* const row_ptr, const Index rows)
+        const std::uint32_t* const col_ind, const std::uint32_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_scaled_norm2sqr, csr_generic_scaled_norm2sqr, csr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows)
         }
 
         static void csr_scaled_norm2sqr(double* row_norms, const double* const scal, const double* const val,
-        const unsigned int* const col_ind, const unsigned int* const row_ptr, const Index rows)
+        const std::uint32_t* const col_ind, const std::uint32_t* const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda_scaled_norm2sqr, csr_generic_scaled_norm2sqr, csr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows)
         }
@@ -225,28 +225,28 @@ namespace FEAT
         }
 
         static void bcsr_scaled_norm2sqr(float* row_norms, const float* const scal, const float* const val,
-        const unsigned long* const col_ind, const unsigned long* const row_ptr, const Index rows,
+        const std::uint64_t* const col_ind, const std::uint64_t* const row_ptr, const Index rows,
         const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
         static void bcsr_scaled_norm2sqr(double* row_norms, const double* const scal, const double* const val,
-        const unsigned long* const col_ind, const unsigned long* const row_ptr, const Index rows,
+        const std::uint64_t* const col_ind, const std::uint64_t* const row_ptr, const Index rows,
         const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
         static void bcsr_scaled_norm2sqr(float* row_norms, const float* const scal, const float* const val,
-        const unsigned int* const col_ind, const unsigned int* const row_ptr, const Index rows,
+        const std::uint32_t* const col_ind, const std::uint32_t* const row_ptr, const Index rows,
         const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
         static void bcsr_scaled_norm2sqr(double* row_norms, const double* const scal, const double* const val,
-        const unsigned int* const col_ind, const unsigned int* const row_ptr, const Index rows,
+        const std::uint32_t* const col_ind, const std::uint32_t* const row_ptr, const Index rows,
         const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, bcsr_generic_scaled_norm2sqr, row_norms, scal, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)

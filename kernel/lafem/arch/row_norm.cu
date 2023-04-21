@@ -167,10 +167,10 @@ void RowNorm::csr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ *
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void RowNorm::csr_cuda_norm2(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index);
-template void RowNorm::csr_cuda_norm2(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index);
-template void RowNorm::csr_cuda_norm2(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index);
-template void RowNorm::csr_cuda_norm2(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index);
+template void RowNorm::csr_cuda_norm2(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void RowNorm::csr_cuda_norm2(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void RowNorm::csr_cuda_norm2(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
+template void RowNorm::csr_cuda_norm2(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_>
 void RowNorm::csr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
@@ -190,10 +190,10 @@ void RowNorm::csr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const IT
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void RowNorm::csr_cuda_norm2sqr(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index);
-template void RowNorm::csr_cuda_norm2sqr(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index);
-template void RowNorm::csr_cuda_norm2sqr(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index);
-template void RowNorm::csr_cuda_norm2sqr(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index);
+template void RowNorm::csr_cuda_norm2sqr(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void RowNorm::csr_cuda_norm2sqr(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void RowNorm::csr_cuda_norm2sqr(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
+template void RowNorm::csr_cuda_norm2sqr(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_>
 void RowNorm::csr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
@@ -213,10 +213,10 @@ void RowNorm::csr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal, 
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void RowNorm::csr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index);
-template void RowNorm::csr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index);
-template void RowNorm::csr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index);
-template void RowNorm::csr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index);
+template void RowNorm::csr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void RowNorm::csr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void RowNorm::csr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
+template void RowNorm::csr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_>
 void RowNorm::bcsr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
@@ -236,10 +236,10 @@ void RowNorm::bcsr_cuda_norm2(DT_ * row_norms, const DT_ * const val, const IT_ 
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void RowNorm::bcsr_cuda_norm2(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_norm2(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_norm2(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_norm2(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);
 
 template <typename DT_, typename IT_>
 void RowNorm::bcsr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
@@ -259,10 +259,10 @@ void RowNorm::bcsr_cuda_norm2sqr(DT_ * row_norms, const DT_ * const val, const I
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void RowNorm::bcsr_cuda_norm2sqr(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_norm2sqr(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_norm2sqr(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_norm2sqr(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2sqr(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2sqr(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2sqr(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_norm2sqr(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);
 
 template <typename DT_, typename IT_>
 void RowNorm::bcsr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
@@ -282,7 +282,7 @@ void RowNorm::bcsr_cuda_scaled_norm2sqr(DT_ * row_norms, const DT_ * const scal,
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void RowNorm::bcsr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
-template void RowNorm::bcsr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_scaled_norm2sqr(float *, const float * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);
+template void RowNorm::bcsr_cuda_scaled_norm2sqr(double *, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);

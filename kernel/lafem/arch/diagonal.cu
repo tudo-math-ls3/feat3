@@ -61,5 +61,5 @@ void Diagonal::csr_cuda(IT_ * diag, const IT_ * const col_ind, const IT_ * const
 #endif
 }
 
-template void Diagonal::csr_cuda(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
-template void Diagonal::csr_cuda(unsigned int *,const unsigned int * const, const unsigned int * const, const Index);
+template void Diagonal::csr_cuda(std::uint64_t *, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void Diagonal::csr_cuda(std::uint32_t *, const std::uint32_t * const, const std::uint32_t * const, const Index);

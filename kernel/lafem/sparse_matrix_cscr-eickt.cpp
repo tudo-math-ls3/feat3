@@ -11,9 +11,9 @@ namespace FEAT
 {
   namespace LAFEM
   {
-     template class SparseMatrixCSCR<float, unsigned int>;
-     template class SparseMatrixCSCR<double, unsigned int>;
-     template class SparseMatrixCSCR<float, unsigned long>;
-     template class SparseMatrixCSCR<double, unsigned long>;
+     template class SparseMatrixCSCR<float, std::uint32_t>;
+     template class SparseMatrixCSCR<double, std::uint32_t>;
+     template class SparseMatrixCSCR<float, std::uint64_t>;
+     template class SparseMatrixCSCR<double, std::uint64_t>;
   }
 }

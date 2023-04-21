@@ -25,22 +25,22 @@ namespace FEAT
           csr_generic(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
         }
 
-        static void csr(float * r, const float * const a, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(float * r, const float * const a, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
 
-        static void csr(double * r, const double * const a, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(double * r, const double * const a, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
 
-        static void csr(float * r, const float * const a, const unsigned int * const col_ind, const unsigned int * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(float * r, const float * const a, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
 
-        static void csr(double * r, const double * const a, const unsigned int * const col_ind, const unsigned int * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(double * r, const double * const a, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
@@ -53,10 +53,10 @@ namespace FEAT
       };
 
 #ifdef FEAT_EICKT
-      extern template void ScaleRows::csr_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleRows::csr_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-      extern template void ScaleRows::csr_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleRows::csr_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleRows::csr_generic(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleRows::csr_generic(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleRows::csr_generic(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleRows::csr_generic(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const double * const, const Index, const Index, const Index);
 #endif
 
 
@@ -70,22 +70,22 @@ namespace FEAT
           csr_generic(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
         }
 
-        static void csr(float * r, const float * const a, const unsigned long * const col_ind, const unsigned long * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(float * r, const float * const a, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
 
-        static void csr(double * r, const double * const a, const unsigned long * const col_ind, const unsigned long * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(double * r, const double * const a, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
 
-        static void csr(float * r, const float * const a, const unsigned int * const col_ind, const unsigned int * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(float * r, const float * const a, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const float * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
 
-        static void csr(double * r, const double * const a, const unsigned int * const col_ind, const unsigned int * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(double * r, const double * const a, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const double * const x, const Index rows, const Index columns, const Index used_elements)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
         }
@@ -98,10 +98,10 @@ namespace FEAT
       };
 
 #ifdef FEAT_EICKT
-      extern template void ScaleCols::csr_generic(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleCols::csr_generic(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-      extern template void ScaleCols::csr_generic(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-      extern template void ScaleCols::csr_generic(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleCols::csr_generic(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleCols::csr_generic(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const double * const, const Index, const Index, const Index);
+      extern template void ScaleCols::csr_generic(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const float * const, const Index, const Index, const Index);
+      extern template void ScaleCols::csr_generic(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const double * const, const Index, const Index, const Index);
 #endif
     } // namespace Arch
   } // namespace LAFEM

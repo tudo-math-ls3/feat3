@@ -50,40 +50,40 @@ namespace FEAT
         }
 
 #ifdef FEAT_HAVE_HALFMATH
-        static void dsd(Half * r, const Half alpha, const Half beta, const Half * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index used_elements,
+        static void dsd(Half * r, const Half alpha, const Half beta, const Half * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index used_elements,
                                          const Half * y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 #endif
 
-        static void dsd(float * r, const float alpha, const float beta, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index used_elements,
+        static void dsd(float * r, const float alpha, const float beta, const float * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index used_elements,
                                          const float * y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 
-        static void dsd(double * r, const double alpha, const double beta, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index used_elements,
+        static void dsd(double * r, const double alpha, const double beta, const double * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index used_elements,
                                          const double * y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 
 #ifdef FEAT_HAVE_HALFMATH
-        static void dsd(Half * r, const Half alpha, const Half beta, const Half * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index used_elements,
+        static void dsd(Half * r, const Half alpha, const Half beta, const Half * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index used_elements,
                                          const Half * y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 #endif
 
-        static void dsd(float * r, const float alpha, const float beta, const float * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index used_elements,
+        static void dsd(float * r, const float alpha, const float beta, const float * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index used_elements,
                                          const float * y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 
-        static void dsd(double * r, const double alpha, const double beta, const double * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index used_elements,
+        static void dsd(double * r, const double alpha, const double beta, const double * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index used_elements,
                                          const double * y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)

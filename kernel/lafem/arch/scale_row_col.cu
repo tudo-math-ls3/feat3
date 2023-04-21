@@ -71,10 +71,10 @@ void ScaleRows::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_i
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void ScaleRows::csr_cuda(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-template void ScaleRows::csr_cuda(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-template void ScaleRows::csr_cuda(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-template void ScaleRows::csr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void ScaleRows::csr_cuda(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const float * const, const Index, const Index, const Index);
+template void ScaleRows::csr_cuda(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const double * const, const Index, const Index, const Index);
+template void ScaleRows::csr_cuda(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const float * const, const Index, const Index, const Index);
+template void ScaleRows::csr_cuda(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const double * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_>
 void ScaleCols::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index /*columns*/, const Index /*used_elements*/)
@@ -94,7 +94,7 @@ void ScaleCols::csr_cuda(DT_ * r, const DT_ * const val, const IT_ * const col_i
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void ScaleCols::csr_cuda(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
-template void ScaleCols::csr_cuda(double *, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
-template void ScaleCols::csr_cuda(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
-template void ScaleCols::csr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+template void ScaleCols::csr_cuda(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const float * const, const Index, const Index, const Index);
+template void ScaleCols::csr_cuda(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const double * const, const Index, const Index, const Index);
+template void ScaleCols::csr_cuda(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const float * const, const Index, const Index, const Index);
+template void ScaleCols::csr_cuda(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const double * const, const Index, const Index, const Index);

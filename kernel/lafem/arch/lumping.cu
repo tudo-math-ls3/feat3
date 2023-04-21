@@ -103,10 +103,10 @@ void Lumping::csr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Lumping::csr_cuda(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index);
-template void Lumping::csr_cuda(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index);
-template void Lumping::csr_cuda(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index);
-template void Lumping::csr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index);
+template void Lumping::csr_cuda(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void Lumping::csr_cuda(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void Lumping::csr_cuda(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
+template void Lumping::csr_cuda(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_>
 void Lumping::bcsr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
@@ -126,7 +126,7 @@ void Lumping::bcsr_cuda(DT_ * lump, const DT_ * const val, const IT_ * const col
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Lumping::bcsr_cuda(float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void Lumping::bcsr_cuda(double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const int, const int);
-template void Lumping::bcsr_cuda(float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
-template void Lumping::bcsr_cuda(double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);
+template void Lumping::bcsr_cuda(double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const int, const int);

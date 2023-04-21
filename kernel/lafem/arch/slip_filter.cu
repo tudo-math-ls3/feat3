@@ -89,14 +89,14 @@ void SlipFilter::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const I
 #endif
 }
 
-template void SlipFilter::filter_rhs_cuda<float, unsigned long, 2>(float *, const float * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_rhs_cuda<double, unsigned long, 2>(double *, const double * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_rhs_cuda<float, unsigned int, 2>(float *, const float * const, const unsigned int * const, const Index);
-template void SlipFilter::filter_rhs_cuda<double, unsigned int, 2>(double *, const double * const, const unsigned int * const, const Index);
-template void SlipFilter::filter_rhs_cuda<float, unsigned long, 3>(float *, const float * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_rhs_cuda<double, unsigned long, 3>(double *, const double * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_rhs_cuda<float, unsigned int, 3>(float *, const float * const, const unsigned int * const, const Index);
-template void SlipFilter::filter_rhs_cuda<double, unsigned int, 3>(double *, const double * const, const unsigned int * const, const Index);
+template void SlipFilter::filter_rhs_cuda<float, std::uint64_t, 2>(float *, const float * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<double, std::uint64_t, 2>(double *, const double * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<float, std::uint32_t, 2>(float *, const float * const, const std::uint32_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<double, std::uint32_t, 2>(double *, const double * const, const std::uint32_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<float, std::uint64_t, 3>(float *, const float * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<double, std::uint64_t, 3>(double *, const double * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<float, std::uint32_t, 3>(float *, const float * const, const std::uint32_t * const, const Index);
+template void SlipFilter::filter_rhs_cuda<double, std::uint32_t, 3>(double *, const double * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_, int BlockSize_>
 void SlipFilter::filter_def_cuda(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
@@ -117,13 +117,13 @@ void SlipFilter::filter_def_cuda(DT_ * v, const DT_ * const sv_elements, const I
 #endif
 }
 
-template void SlipFilter::filter_def_cuda<float, unsigned long, 2>(float *, const float * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_def_cuda<double, unsigned long, 2>(double *, const double * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_def_cuda<float, unsigned int, 2>(float *, const float * const, const unsigned int * const, const Index);
-template void SlipFilter::filter_def_cuda<double, unsigned int, 2>(double *, const double * const, const unsigned int * const, const Index);
-template void SlipFilter::filter_def_cuda<float, unsigned long, 3>(float *, const float * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_def_cuda<double, unsigned long, 3>(double *, const double * const, const unsigned long * const, const Index);
-template void SlipFilter::filter_def_cuda<float, unsigned int, 3>(float *, const float * const, const unsigned int * const, const Index);
-template void SlipFilter::filter_def_cuda<double, unsigned int, 3>(double *, const double * const, const unsigned int * const, const Index);
+template void SlipFilter::filter_def_cuda<float, std::uint64_t, 2>(float *, const float * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_def_cuda<double, std::uint64_t, 2>(double *, const double * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_def_cuda<float, std::uint32_t, 2>(float *, const float * const, const std::uint32_t * const, const Index);
+template void SlipFilter::filter_def_cuda<double, std::uint32_t, 2>(double *, const double * const, const std::uint32_t * const, const Index);
+template void SlipFilter::filter_def_cuda<float, std::uint64_t, 3>(float *, const float * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_def_cuda<double, std::uint64_t, 3>(double *, const double * const, const std::uint64_t * const, const Index);
+template void SlipFilter::filter_def_cuda<float, std::uint32_t, 3>(float *, const float * const, const std::uint32_t * const, const Index);
+template void SlipFilter::filter_def_cuda<double, std::uint32_t, 3>(double *, const double * const, const std::uint32_t * const, const Index);
 
 /// \endcond

@@ -692,7 +692,7 @@ namespace FEAT
             std::string::size_type first_digit(line.find_first_not_of(" "));
             line.erase(0, first_digit);
             std::string::size_type eol(line.length());
-            for (unsigned long i(0); i < eol; ++i)
+            for (std::string::size_type i(0); i < eol; ++i)
             {
               n_z_s.append(1, line[i]);
             }

@@ -33,7 +33,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_HALFMATH
         static void csr(Half * r, const Half a, const Half * const x, const Half b, const Half * const y, const Half * const val,
-                        const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                        const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
@@ -41,14 +41,14 @@ namespace FEAT
 #endif
 
         static void csr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
-                        const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                        const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_mkl, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
         }
 
         static void csr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
-                        const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                        const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_mkl, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
@@ -56,7 +56,7 @@ namespace FEAT
 
 #ifdef FEAT_HAVE_HALFMATH
         static void csr(Half * r, const Half a, const Half * const x, const Half b, const Half * const y, const Half * const val,
-                        const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                        const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
@@ -64,14 +64,14 @@ namespace FEAT
 #endif
 
         static void csr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
-                        const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                        const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
         }
 
         static void csr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
-                        const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                        const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns,
                         const Index used_elements, const bool transposed)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, transposed)
@@ -95,58 +95,58 @@ namespace FEAT
 
         template <int BlockHeight_, int BlockWidth_>
         static void bcsr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
-                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                         const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          constexpr auto bcsr_generic_float_ulong = &bcsr_generic<float, unsigned long, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_mkl_float_ulong = &bcsr_mkl<float, unsigned long, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_cuda_float_ulong = &bcsr_cuda<float, unsigned long, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_generic_float_u64 = &bcsr_generic<float, std::uint64_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_float_u64 = &bcsr_mkl<float, std::uint64_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_float_u64 = &bcsr_cuda<float, std::uint64_t, BlockHeight_, BlockWidth_>;
           if (BlockHeight_ == BlockWidth_)
-            BACKEND_SKELETON_VOID(bcsr_generic_float_ulong, bcsr_mkl_float_ulong, bcsr_cuda_float_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_float_u64, bcsr_mkl_float_u64, bcsr_cuda_float_u64, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
           else
-            BACKEND_SKELETON_VOID(bcsr_generic_float_ulong, bcsr_generic_float_ulong, bcsr_cuda_float_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_float_u64, bcsr_generic_float_u64, bcsr_cuda_float_u64, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
         }
 
         template <int BlockHeight_, int BlockWidth_>
         static void bcsr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
-                         const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const Index columns,
+                         const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          constexpr auto bcsr_generic_double_ulong = &bcsr_generic<double, unsigned long, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_mkl_double_ulong = &bcsr_mkl<double, unsigned long, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_cuda_double_ulong = &bcsr_cuda<double, unsigned long, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_generic_double_u64 = &bcsr_generic<double, std::uint64_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_double_u64 = &bcsr_mkl<double, std::uint64_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_double_u64 = &bcsr_cuda<double, std::uint64_t, BlockHeight_, BlockWidth_>;
           if (BlockHeight_ == BlockWidth_)
-            BACKEND_SKELETON_VOID(bcsr_generic_double_ulong, bcsr_mkl_double_ulong, bcsr_cuda_double_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_double_u64, bcsr_mkl_double_u64, bcsr_cuda_double_u64, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
           else
-            BACKEND_SKELETON_VOID(bcsr_generic_double_ulong, bcsr_generic_double_ulong, bcsr_cuda_double_ulong, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_double_u64, bcsr_generic_double_u64, bcsr_cuda_double_u64, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
         }
 
         template <int BlockHeight_, int BlockWidth_>
         static void bcsr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
-                         const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                         const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          constexpr auto bcsr_generic_float_uint = &bcsr_generic<float, unsigned int, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_mkl_float_uint = &bcsr_mkl<float, unsigned int, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_cuda_float_uint = &bcsr_cuda<float, unsigned int, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_generic_float_u32 = &bcsr_generic<float, std::uint32_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_float_u32 = &bcsr_mkl<float, std::uint32_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_float_u32 = &bcsr_cuda<float, std::uint32_t, BlockHeight_, BlockWidth_>;
           if (BlockHeight_ == BlockWidth_)
-            BACKEND_SKELETON_VOID(bcsr_generic_float_uint, bcsr_mkl_float_uint, bcsr_cuda_float_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_float_u32, bcsr_mkl_float_u32, bcsr_cuda_float_u32, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
           else
-            BACKEND_SKELETON_VOID(bcsr_generic_float_uint, bcsr_generic_float_uint, bcsr_cuda_float_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_float_u32, bcsr_generic_float_u32, bcsr_cuda_float_u32, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
         }
 
         template <int BlockHeight_, int BlockWidth_>
         static void bcsr(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val,
-                         const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const Index columns,
+                         const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns,
                          const Index used_elements)
         {
-          constexpr auto bcsr_generic_double_uint = &bcsr_generic<double, unsigned int, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_mkl_double_uint = &bcsr_mkl<double, unsigned int, BlockHeight_, BlockWidth_>;
-          constexpr auto bcsr_cuda_double_uint = &bcsr_cuda<double, unsigned int, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_generic_double_u32 = &bcsr_generic<double, std::uint32_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_mkl_double_u32 = &bcsr_mkl<double, std::uint32_t, BlockHeight_, BlockWidth_>;
+          constexpr auto bcsr_cuda_double_u32 = &bcsr_cuda<double, std::uint32_t, BlockHeight_, BlockWidth_>;
           if (BlockHeight_ == BlockWidth_)
-            BACKEND_SKELETON_VOID(bcsr_generic_double_uint, bcsr_mkl_double_uint, bcsr_cuda_double_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_double_u32, bcsr_mkl_double_u32, bcsr_cuda_double_u32, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
           else
-            BACKEND_SKELETON_VOID(bcsr_generic_double_uint, bcsr_generic_double_uint, bcsr_cuda_double_uint, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
+            BACKEND_SKELETON_VOID(bcsr_generic_double_u32, bcsr_generic_double_u32, bcsr_cuda_double_u32, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements)
         }
 
         template <typename DT_, typename IT_, int BlockSize_>
@@ -161,22 +161,22 @@ namespace FEAT
           banded_generic(r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns);
         }
 
-        static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const unsigned long * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const std::uint64_t * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
           BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
         }
 
-        static void banded(double * r, const double alpha, const double * const x, const double beta, const double * const y, const double * const val, const unsigned long * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        static void banded(double * r, const double alpha, const double * const x, const double beta, const double * const y, const double * const val, const std::uint64_t * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
           BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
         }
 
-        static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const unsigned int * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const std::uint32_t * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
           BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
         }
 
-        static void banded(double * r, const double alpha, const double * const x, const double beta, const double * const y, const double * const val, const unsigned int * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        static void banded(double * r, const double alpha, const double * const x, const double beta, const double * const y, const double * const val, const std::uint32_t * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
           BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
         }
@@ -283,20 +283,20 @@ namespace FEAT
       };
 
 #ifdef FEAT_EICKT
-      extern template void Apply::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-      extern template void Apply::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
-      extern template void Apply::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-      extern template void Apply::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+      extern template void Apply::csr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
 
-      extern template void Apply::cscr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
-      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const Index, const bool);
-      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
-      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const Index, const bool);
+      extern template void Apply::cscr_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const Index, const bool);
 
-      extern template void Apply::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Apply::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
-      extern template void Apply::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
-      extern template void Apply::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint32_t * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const Index, const Index, const Index);
+      extern template void Apply::banded_generic(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const Index, const Index, const Index);
 
       extern template void Apply::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index);
       extern template void Apply::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index);

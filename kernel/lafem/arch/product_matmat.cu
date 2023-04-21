@@ -215,12 +215,12 @@ void ProductMatMat::dsd_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_
 #endif
 }
 #ifdef FEAT_HAVE_HALFMATH
-template void ProductMatMat::dsd_cuda(Half *, const Half, const Half, const Half * const, const unsigned int * const, const unsigned int * const, const Index, const Half *, const Index, const Index, const Index);
+template void ProductMatMat::dsd_cuda(Half *, const Half, const Half, const Half * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Half *, const Index, const Index, const Index);
 #endif
-template void ProductMatMat::dsd_cuda(float *, const float, const float, const float * const, const unsigned int * const, const unsigned int * const, const Index, const float *, const Index, const Index, const Index);
-template void ProductMatMat::dsd_cuda(double *, const double, const double, const double * const, const unsigned int * const, const unsigned int * const, const Index, const double *, const Index, const Index, const Index);
+template void ProductMatMat::dsd_cuda(float *, const float, const float, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const float *, const Index, const Index, const Index);
+template void ProductMatMat::dsd_cuda(double *, const double, const double, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const double *, const Index, const Index, const Index);
 #ifdef FEAT_HAVE_HALFMATH
-template void ProductMatMat::dsd_cuda(Half *, const Half, const Half, const Half * const, const unsigned long * const, const unsigned long * const, const Index, const Half *, const Index, const Index, const Index);
+template void ProductMatMat::dsd_cuda(Half *, const Half, const Half, const Half * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Half *, const Index, const Index, const Index);
 #endif
-template void ProductMatMat::dsd_cuda(float *, const float, const float, const float * const, const unsigned long * const, const unsigned long * const, const Index, const float *, const Index, const Index, const Index);
-template void ProductMatMat::dsd_cuda(double *, const double, const double, const double * const, const unsigned long * const, const unsigned long * const, const Index, const double *, const Index, const Index, const Index);
+template void ProductMatMat::dsd_cuda(float *, const float, const float, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const float *, const Index, const Index, const Index);
+template void ProductMatMat::dsd_cuda(double *, const double, const double, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const double *, const Index, const Index, const Index);

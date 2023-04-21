@@ -67,22 +67,22 @@ void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, 
 #endif
 }
 
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned long, 1>(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned long, 1>(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned int, 1>(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned int, 1>(double *, const double * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned long, 2>(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned long, 2>(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned int, 2>(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned int, 2>(double *, const double * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned long, 3>(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned long, 3>(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned int, 3>(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned int, 3>(double *, const double * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned long, 4>(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned long, 4>(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<float, unsigned int, 4>(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_rhs_cuda<double, unsigned int, 4>(double *, const double * const, const unsigned int * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint64_t, 1>(float *, const float * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint64_t, 1>(double *, const double * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint32_t, 1>(float *, const float * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint32_t, 1>(double *, const double * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint64_t, 2>(float *, const float * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint64_t, 2>(double *, const double * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint32_t, 2>(float *, const float * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint32_t, 2>(double *, const double * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint64_t, 3>(float *, const float * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint64_t, 3>(double *, const double * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint32_t, 3>(float *, const float * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint32_t, 3>(double *, const double * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint64_t, 4>(float *, const float * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint64_t, 4>(double *, const double * const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint32_t, 4>(float *, const float * const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint32_t, 4>(double *, const double * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_, int BlockSize_>
 void UnitFilterBlocked::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, const Index ue)
@@ -103,21 +103,21 @@ void UnitFilterBlocked::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, c
 #endif
 }
 
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned long, 1>(float *, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned long, 1>(double *,  const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned int, 1>(float *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned int, 1>(double *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned long, 2>(float *, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned long, 2>(double *,  const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned int, 2>(float *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned int, 2>(double *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned long, 3>(float *, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned long, 3>(double *,  const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned int, 3>(float *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned int, 3>(double *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned long, 4>(float *, const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned long, 4>(double *,  const unsigned long * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<float, unsigned int, 4>(float *,  const unsigned int * const, const Index);
-template void UnitFilterBlocked::filter_def_cuda<double, unsigned int, 4>(double *,  const unsigned int * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint64_t, 1>(float *, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint64_t, 1>(double *,  const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint32_t, 1>(float *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint32_t, 1>(double *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint64_t, 2>(float *, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint64_t, 2>(double *,  const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint32_t, 2>(float *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint32_t, 2>(double *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint64_t, 3>(float *, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint64_t, 3>(double *,  const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint32_t, 3>(float *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint32_t, 3>(double *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint64_t, 4>(float *, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint64_t, 4>(double *,  const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint32_t, 4>(float *,  const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint32_t, 4>(double *,  const std::uint32_t * const, const Index);
 
 /// \endcond

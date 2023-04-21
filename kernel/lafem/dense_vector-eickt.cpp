@@ -11,9 +11,9 @@ namespace FEAT
 {
   namespace LAFEM
   {
-    template class DenseVector<float, unsigned int>;
-    template class DenseVector<double, unsigned int>;
-    template class DenseVector<float, unsigned long>;
-    template class DenseVector<double, unsigned long>;
+    template class DenseVector<float, std::uint32_t>;
+    template class DenseVector<double, std::uint32_t>;
+    template class DenseVector<float, std::uint64_t>;
+    template class DenseVector<double, std::uint64_t>;
   }
 }

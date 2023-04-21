@@ -11,5 +11,5 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-template void Diagonal::csr_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
-template void Diagonal::csr_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
+template void Diagonal::csr_generic(std::uint64_t *, const std::uint64_t * const, const std::uint64_t * const, const Index);
+template void Diagonal::csr_generic(std::uint32_t *, const std::uint32_t * const, const std::uint32_t * const, const Index);

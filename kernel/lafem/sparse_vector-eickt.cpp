@@ -11,9 +11,9 @@ namespace FEAT
 {
   namespace LAFEM
   {
-    template class SparseVector<float, unsigned int>;
-    template class SparseVector<double, unsigned int>;
-    template class SparseVector<float, unsigned long>;
-    template class SparseVector<double, unsigned long>;
+    template class SparseVector<float, std::uint32_t>;
+    template class SparseVector<double, std::uint32_t>;
+    template class SparseVector<float, std::uint64_t>;
+    template class SparseVector<double, std::uint64_t>;
   }
 }

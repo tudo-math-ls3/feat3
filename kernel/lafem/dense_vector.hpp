@@ -631,7 +631,7 @@ namespace FEAT
             std::string::size_type first_digit(line.find_first_not_of(" "));
             line.erase(0, first_digit);
             std::string::size_type eol(line.length());
-            for (unsigned long i(0); i < eol; ++i)
+            for (std::string::size_type i(0); i < eol; ++i)
             {
               n_z_s.append(1, line[i]);
             }
@@ -1126,10 +1126,10 @@ namespace FEAT
     }; // class DenseVector<...>
 
   #ifdef FEAT_EICKT
-    extern template class DenseVector<float, unsigned int>;
-    extern template class DenseVector<double, unsigned int>;
-    extern template class DenseVector<float, unsigned long>;
-    extern template class DenseVector<double, unsigned long>;
+    extern template class DenseVector<float, std::uint32_t>;
+    extern template class DenseVector<double, std::uint32_t>;
+    extern template class DenseVector<float, std::uint64_t>;
+    extern template class DenseVector<double, std::uint64_t>;
   #endif
 
   } // namespace LAFEM

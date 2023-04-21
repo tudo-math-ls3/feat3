@@ -1196,10 +1196,10 @@ namespace FEAT
     }; //SparseMatrixCSCR
 
 #ifdef FEAT_EICKT
-    extern template class SparseMatrixCSCR<float, unsigned int>;
-    extern template class SparseMatrixCSCR<double, unsigned int>;
-    extern template class SparseMatrixCSCR<float, unsigned long>;
-    extern template class SparseMatrixCSCR<double, unsigned long>;
+    extern template class SparseMatrixCSCR<float, std::uint32_t>;
+    extern template class SparseMatrixCSCR<double, std::uint32_t>;
+    extern template class SparseMatrixCSCR<float, std::uint64_t>;
+    extern template class SparseMatrixCSCR<double, std::uint64_t>;
 #endif
 
   } // namespace LAFEM

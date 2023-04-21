@@ -26,12 +26,12 @@ namespace FEAT
           csr_generic(diag, col_ind, row_ptr, rows);
         }
 
-        static void csr(unsigned long * diag, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows)
+        static void csr(std::uint64_t * diag, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, diag, col_ind, row_ptr, rows)
         }
 
-        static void csr(unsigned int * diag, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows)
+        static void csr(std::uint32_t * diag, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, diag, col_ind, row_ptr, rows)
         }
@@ -45,8 +45,8 @@ namespace FEAT
       };
 
 #ifdef FEAT_EICKT
-      extern template void Diagonal::csr_generic(unsigned long *, const unsigned long * const, const unsigned long * const, const Index);
-      extern template void Diagonal::csr_generic(unsigned int *, const unsigned int * const, const unsigned int * const, const Index);
+      extern template void Diagonal::csr_generic(std::uint64_t *, const std::uint64_t * const, const std::uint64_t * const, const Index);
+      extern template void Diagonal::csr_generic(std::uint32_t *, const std::uint32_t * const, const std::uint32_t * const, const Index);
 #endif
 
     } // namespace Arch

@@ -61,10 +61,10 @@ void UnitFilter::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const I
 #endif
 }
 
-template void UnitFilter::filter_rhs_cuda(float *, const float * const, const unsigned long * const, const Index);
-template void UnitFilter::filter_rhs_cuda(double *, const double * const, const unsigned long * const, const Index);
-template void UnitFilter::filter_rhs_cuda(float *, const float * const, const unsigned int * const, const Index);
-template void UnitFilter::filter_rhs_cuda(double *, const double * const, const unsigned int * const, const Index);
+template void UnitFilter::filter_rhs_cuda(float *, const float * const, const std::uint64_t * const, const Index);
+template void UnitFilter::filter_rhs_cuda(double *, const double * const, const std::uint64_t * const, const Index);
+template void UnitFilter::filter_rhs_cuda(float *, const float * const, const std::uint32_t * const, const Index);
+template void UnitFilter::filter_rhs_cuda(double *, const double * const, const std::uint32_t * const, const Index);
 
 template <typename DT_, typename IT_>
 void UnitFilter::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, const Index ue)
@@ -85,9 +85,9 @@ void UnitFilter::filter_def_cuda(DT_ * v, const IT_ * const sv_indices, const In
 #endif
 }
 
-template void UnitFilter::filter_def_cuda(float *, const unsigned long * const, const Index);
-template void UnitFilter::filter_def_cuda(double *, const unsigned long * const, const Index);
-template void UnitFilter::filter_def_cuda(float *, const unsigned int * const, const Index);
-template void UnitFilter::filter_def_cuda(double *, const unsigned int * const, const Index);
+template void UnitFilter::filter_def_cuda(float *, const std::uint64_t * const, const Index);
+template void UnitFilter::filter_def_cuda(double *, const std::uint64_t * const, const Index);
+template void UnitFilter::filter_def_cuda(float *, const std::uint32_t * const, const Index);
+template void UnitFilter::filter_def_cuda(double *, const std::uint32_t * const, const Index);
 
 /// \endcond

@@ -26,22 +26,22 @@ namespace FEAT
           csr_generic(lump, val, col_ind, row_ptr, rows);
         }
 
-        static void csr(float * lump, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows)
+        static void csr(float * lump, const float * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
         }
 
-        static void csr(double * lump, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows)
+        static void csr(double * lump, const double * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
         }
 
-        static void csr(float * lump, const float * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows)
+        static void csr(float * lump, const float * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
         }
 
-        static void csr(double * lump, const double * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows)
+        static void csr(double * lump, const double * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows)
         {
           BACKEND_SKELETON_VOID(csr_cuda, csr_generic, csr_generic, lump, val, col_ind, row_ptr, rows)
         }
@@ -55,22 +55,22 @@ namespace FEAT
           bcsr_generic(lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth);
         }
 
-        static void bcsr(float * lump, const float * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr(float * lump, const float * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr(double * lump, const double * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr(double * lump, const double * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr(float * lump, const float * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr(float * lump, const float * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }
 
-        static void bcsr(double * lump, const double * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
+        static void bcsr(double * lump, const double * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const int BlockHeight, const int BlockWidth)
         {
           BACKEND_SKELETON_VOID(bcsr_cuda, bcsr_generic, bcsr_generic, lump, val, col_ind, row_ptr, rows, BlockHeight, BlockWidth)
         }

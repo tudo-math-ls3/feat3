@@ -878,10 +878,10 @@ namespace FEAT
     }; // class SparseVector<...>
 
 #ifdef FEAT_EICKT
-    extern template class SparseVector<float, unsigned int>;
-    extern template class SparseVector<double, unsigned int>;
-    extern template class SparseVector<float, unsigned long>;
-    extern template class SparseVector<double, unsigned long>;
+    extern template class SparseVector<float, std::uint32_t>;
+    extern template class SparseVector<double, std::uint32_t>;
+    extern template class SparseVector<float, std::uint64_t>;
+    extern template class SparseVector<double, std::uint64_t>;
 #endif
 
 

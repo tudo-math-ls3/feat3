@@ -251,8 +251,8 @@ DenseMatrixSerializeTest <__float128, std::uint32_t> cpu_dense_matrix_serialize_
 DenseMatrixSerializeTest <__float128, std::uint64_t> cpu_dense_matrix_serialize_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-//DenseMatrixSerializeTest<__half, unsigned int> cpu_dense_matrix_serialize_test_half_uint(PreferredBackend::generic);
-//DenseMatrixSerializeTest<__half, unsigned long> cpu_dense_matrix_serialize_test_half_ulong(PreferredBackend::generic);
+//DenseMatrixSerializeTest<__half, std::uint32_t> cpu_dense_matrix_serialize_test_half_uint(PreferredBackend::generic);
+//DenseMatrixSerializeTest<__half, std::uint64_t> cpu_dense_matrix_serialize_test_half_ulong(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
 DenseMatrixSerializeTest <float, std::uint32_t> cuda_dense_matrix_serialize_test_float_uint32(PreferredBackend::cuda);
@@ -735,8 +735,8 @@ DenseMatrixMultiply2Test <double, std::uint32_t> dense_matrix_multiply_2_test_do
 DenseMatrixMultiply2Test <float, std::uint64_t> dense_matrix_multiply_2_test_float_uint64(PreferredBackend::generic, 1e-3);
 DenseMatrixMultiply2Test <double, std::uint64_t> dense_matrix_multiply_2_test_double_uint64(PreferredBackend::generic, 1e-6);
 #ifdef FEAT_HAVE_MKL
-//DenseMatrixMultiply2Test<float, unsigned long> mkl_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
-//DenseMatrixMultiply2Test<double, unsigned long> mkl_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
+//DenseMatrixMultiply2Test<float, std::uint64_t> mkl_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
+//DenseMatrixMultiply2Test<double, std::uint64_t> mkl_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
 DenseMatrixMultiply2Test <__float128, std::uint32_t> dense_matrix_multiply_2_test_float128_uint32(PreferredBackend::generic, 1e-6);
@@ -942,8 +942,8 @@ DenseMatrixTranposeTest <__float128, std::uint32_t> dense_matrix_transpose_test_
 DenseMatrixTranposeTest <__float128, std::uint64_t> dense_matrix_transpose_test_float128_uint64(PreferredBackend::generic, 1e-6);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-//DenseMatrixTranposeTest<__half, unsigned int> dense_matrix_transpose_test_half_uint(PreferredBackend::generic, 1e-6);
-//DenseMatrixTranposeTest<__half, unsigned long> dense_matrix_transpose_test_half_ulong(PreferredBackend::generic, 1e-6);
+//DenseMatrixTranposeTest<__half, std::uint32_t> dense_matrix_transpose_test_half_uint(PreferredBackend::generic, 1e-6);
+//DenseMatrixTranposeTest<__half, std::uint64_t> dense_matrix_transpose_test_half_ulong(PreferredBackend::generic, 1e-6);
 #endif
 #ifdef FEAT_HAVE_CUDA
 DenseMatrixTranposeTest <float, std::uint32_t> cuda_dense_matrix_transpose_test_float_uint32(PreferredBackend::cuda, 1e-1);

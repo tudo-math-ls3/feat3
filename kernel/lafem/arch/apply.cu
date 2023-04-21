@@ -147,8 +147,8 @@ namespace FEAT
         {
           bsum[j] = DT_(0);
         }
-        const unsigned long end(row_ptr[idx + 1]);
-        for (unsigned long i(row_ptr[idx]) ; i < end ; ++i)
+        const IT_ end(row_ptr[idx + 1]);
+        for (IT_ i(row_ptr[idx]) ; i < end ; ++i)
         {
           for (int h(0) ; h < BlockHeight ; ++h)
           {
@@ -258,19 +258,19 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply::csr_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
-template void Apply::csr_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
 #ifdef FEAT_HAVE_HALFMATH
-template void Apply::csr_cuda(Half *, const Half, const Half * const, const Half, const Half * const, const Half * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(Half *, const Half, const Half * const, const Half, const Half * const, const Half * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
 #endif
 
-template void Apply::csr_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
-template void Apply::csr_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
 #ifdef FEAT_HAVE_HALFMATH
-template void Apply::csr_cuda(Half *, const Half, const Half * const, const Half, const Half * const, const Half * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const bool);
+template void Apply::csr_cuda(Half *, const Half, const Half * const, const Half, const Half * const, const Half * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
 #endif
 
-//silence the compiler by pretending to accept any IT_ but hopefully only 'unsigned int' calls will be made
+//silence the compiler by pretending to accept any IT_ but hopefully only 'std::uint32_t' calls will be made
 //this circumnavigates the missing static_if in bcsr_wrapper
 template <typename DT_, typename IT_>
 void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index used_elements, const int BlockSize)
@@ -340,10 +340,10 @@ void Apply::bcsr_wrapper_cuda(DT_ * r, const DT_ a, const DT_ * const x, const D
     bcsr_intern_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight, BlockWidth);
   }
 }
-template void Apply::bcsr_wrapper_cuda<float, unsigned int>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int, const int);
-template void Apply::bcsr_wrapper_cuda<double, unsigned int>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index, const int, const int);
-template void Apply::bcsr_wrapper_cuda<float, unsigned long>(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int, const int);
-template void Apply::bcsr_wrapper_cuda<double, unsigned long>(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<float, std::uint32_t>(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<double, std::uint32_t>(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<float, std::uint64_t>(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const int, const int);
+template void Apply::bcsr_wrapper_cuda<double, std::uint64_t>(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const int, const int);
 
 template <typename DT_, typename IT_, int BlockSize_>
 void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows,
@@ -373,30 +373,30 @@ void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, c
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply::csrsb_cuda<float, unsigned long, 1>
-  (float *, const float, const float *, const float, const float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, unsigned long, 1>
-  (double *, const double, const double *, const double, const double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, unsigned int, 1>
-  (float *, const float, const float *, const float, const float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, unsigned int, 1>
-  (double *, const double, const double *, const double, const double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, unsigned long, 2>
-  (float *, const float, const float *, const float, const float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, unsigned long, 2>
-  (double *, const double, const double *, const double, const double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, unsigned int, 2>
-  (float *, const float, const float *, const float, const float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, unsigned int, 2>
-  (double *, const double, const double *, const double, const double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, unsigned long, 3>
-  (float *, const float, const float *, const float, const float *, const float * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, unsigned long, 3>
-  (double *, const double, const double *, const double, const double *, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, unsigned int, 3>
-  (float *, const float, const float *, const float, const float *, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, unsigned int, 3>
-  (double *, const double, const double *, const double, const double *, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<float, std::uint64_t, 1>
+  (float *, const float, const float *, const float, const float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<double, std::uint64_t, 1>
+  (double *, const double, const double *, const double, const double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<float, std::uint32_t, 1>
+  (float *, const float, const float *, const float, const float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<double, std::uint32_t, 1>
+  (double *, const double, const double *, const double, const double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<float, std::uint64_t, 2>
+  (float *, const float, const float *, const float, const float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<double, std::uint64_t, 2>
+  (double *, const double, const double *, const double, const double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<float, std::uint32_t, 2>
+  (float *, const float, const float *, const float, const float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<double, std::uint32_t, 2>
+  (double *, const double, const double *, const double, const double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<float, std::uint64_t, 3>
+  (float *, const float, const float *, const float, const float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<double, std::uint64_t, 3>
+  (double *, const double, const double *, const double, const double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<float, std::uint32_t, 3>
+  (float *, const float, const float *, const float, const float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::csrsb_cuda<double, std::uint32_t, 3>
+  (double *, const double, const double *, const double, const double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_>
 void Apply::banded_cuda(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets, const Index num_of_offsets, const Index rows, const Index columns)
@@ -418,10 +418,10 @@ void Apply::banded_cuda(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_
 
   FEAT::LAFEM::Intern::cuda_apply_banded<<<grid, block>>>(r, alpha, x, beta, val, offsets, num_of_offsets, rows, columns);
 }
-template void Apply::banded_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::banded_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned int * const, const Index, const Index, const Index);
-template void Apply::banded_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const unsigned long * const, const Index, const Index, const Index);
-template void Apply::banded_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const unsigned long * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint32_t * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const Index, const Index, const Index);
+template void Apply::banded_cuda(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const Index, const Index, const Index);
 
 template <typename DT_>
 void Apply::dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
