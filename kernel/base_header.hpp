@@ -94,7 +94,10 @@
 ///\endcond
 // end of block hidden from doxygen
 
-//if cuda supports fp16 arithmetics, include the cuda sdk fp16 header for cpu and gpu computing in datatype __half
+// include integer definition header from C/C++ standard library
+#include <cstdint>
+
+// if cuda supports fp16 arithmetics, include the cuda sdk fp16 header for cpu and gpu computing in datatype __half
 #ifdef FEAT_HAVE_HALFMATH
 #include <cuda_fp16.h>
 #endif // FEAT_HAVE_HALFMATH
@@ -114,10 +117,10 @@ namespace FEAT
   /**
    * \brief Index data type.
    */
-#ifdef FEAT_INDEX_ULL
-  typedef unsigned long long Index;
+#ifdef FEAT_INDEX_U32
+  typedef std::uint32_t Index;
 #else
-  typedef unsigned long Index;
+  typedef std::uint64_t Index;
 #endif
 
   /**

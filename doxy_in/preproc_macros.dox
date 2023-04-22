@@ -191,12 +191,12 @@ This macro can be defined to enable explicit instantiation of all common kernel 
 This macro is defined if the command line option <code>\--eickt</code> is passed to the configure script.
 
 <hr>
-\subsection ppm_feat_index_ull FEAT_INDEX_ULL
+\subsection ppm_feat_index_ull FEAT_INDEX_U32
 This macro can be defined to affect the definition of the <c>FEAT::Index</c> data type in the kernel base-header.
 
 <b>Effects:</b><br>
-If undefined, <c>FEAT::Index</c> is a typedef for <c>unsigned long</c>.<br>
-If defined, <c>FEAT::Index</c> is a typedef for <c>unsigned long long</c>.
+If undefined, <c>FEAT::Index</c> is a typedef for <c>std::uint64_t</c>.<br>
+If defined, <c>FEAT::Index</c> is a typedef for <c>std::uint32_t</c>.
 
 <hr>
 \subsection ppm_feat_no_config FEAT_NO_CONFIG

@@ -78,7 +78,7 @@
 
   <!-- FEAT pre-processor define list -->
   <ItemGroup Label="FEAT Defines">
-    <FeatDef Include="FEAT_INDEX_ULL" />
+    <FeatDef Include="" />
     <FeatDef Condition="'$(DebugMode)'=='true'"
       Include="FEAT_DEBUG_MODE;DEBUG" />
     <FeatDef Condition="'$(EnableMPI)'=='true'"
