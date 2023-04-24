@@ -14,8 +14,6 @@
 
 using namespace FEAT;
 
-#ifdef FEAT_HAVE_CUSOLVER
-
 #include "cusparse_v2.h"
 
 namespace FEAT
@@ -303,56 +301,3 @@ namespace FEAT
     }
   }
 }
-
-#else // FEAT_HAVE_CUSOLVER
-
-namespace FEAT
-{
-  namespace Solver
-  {
-    namespace Intern
-    {
-      int cuda_ssor_forward_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SSOR not supported in cuda before version 7!\n");
-        //return 0;
-      }
-
-      int cuda_ssor_backward_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SSOR not supported in cuda before version 7!\n");
-        //return 0;
-      }
-
-      template<int BlockSize_>
-      int cuda_ssor_forward_bcsr_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SSOR not supported in cuda before version 7!\n");
-        //return 0;
-      }
-      // cuda_sor_bcsr_apply_kernel is hardcoded for BS_ == 2 && BS_ == 3
-      template int cuda_ssor_forward_bcsr_apply<2>(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-      template int cuda_ssor_forward_bcsr_apply<3>(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-
-      template<int BlockSize_>
-      int cuda_ssor_backward_bcsr_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
-      {
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA SSOR not supported in cuda before version 7!\n");
-        //return 0;
-      }
-      // cuda_sor_bcsr_apply_kernel is hardcoded for BS_ == 2 && BS_ == 3
-      template int cuda_ssor_backward_bcsr_apply<2>(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-      template int cuda_ssor_backward_bcsr_apply<3>(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
-          int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-    }
-  }
-}
-
-#endif // FEAT_HAVE_CUSOLVER
