@@ -194,10 +194,10 @@ namespace FEAT
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_forward_apply_kernel<<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
-          cudaDeviceSynchronize(); // rows_per_color is in device memory
           row_offset += rows_per_color[i];
         }
 
+        cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -220,10 +220,10 @@ namespace FEAT
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_backward_apply_kernel<<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
-          cudaDeviceSynchronize(); // rows_per_color is in device memory
           row_offset += rows_per_color[i];
         }
 
+        cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -249,10 +249,10 @@ namespace FEAT
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_forward_bcsr_apply_kernel<BlockSize_><<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
-          cudaDeviceSynchronize(); // rows_per_color is in device memory
           row_offset += rows_per_color[i];
         }
 
+        cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -281,10 +281,10 @@ namespace FEAT
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_ssor_backward_bcsr_apply_kernel<BlockSize_><<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
-          cudaDeviceSynchronize(); // rows_per_color is in device memory
           row_offset += rows_per_color[i];
         }
 
+        cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)

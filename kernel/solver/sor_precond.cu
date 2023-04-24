@@ -150,7 +150,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseDestroyColorInfo failed with status code: " + stringify(status));
 
         //std::cout<<"pre colors: "<<ncolors<<" rows: "<<m<<std::endl;
-        int * coloring = MemoryPool::template allocate_memory<int>(m);
+        int * coloring = new int[m];
         cudaMemcpy(coloring, d_coloring, m * sizeof(int), cudaMemcpyDeviceToHost);
         cudaFree(d_coloring);
 
@@ -191,7 +191,8 @@ namespace FEAT
         //std::cout<<"colors: "<<ncolors<<" rows: "<<m<<std::endl;
 
         // count rows per color
-        rows_per_color = MemoryPool::template allocate_memory<int>(ncolors);
+        //rows_per_color = MemoryPool::template allocate_memory<int>(ncolors);
+        rows_per_color = new int[ncolors];
         for (int i(0) ; i < ncolors ; ++i)
         {
           rows_per_color[i] = 0;
@@ -263,7 +264,7 @@ namespace FEAT
         cudaMalloc(&colored_row_ptr, 2 * m * sizeof(int));
         cudaMemcpy(colored_row_ptr, host_crp, 2 * m * sizeof(int), cudaMemcpyHostToDevice);
 
-        MemoryPool::release_memory(coloring);
+        delete[] coloring;
         MemoryPool::release_memory(colors_ascending);
         MemoryPool::release_memory(host_irp);
         MemoryPool::release_memory(host_crp);
@@ -280,7 +281,8 @@ namespace FEAT
       {
         cudaFree(colored_row_ptr);
         cudaFree(inverse_row_ptr);
-        MemoryPool::release_memory(rows_per_color);
+        //MemoryPool::release_memory(rows_per_color);
+        delete[] rows_per_color;
 
         cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -305,10 +307,10 @@ namespace FEAT
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_sor_apply_kernel<<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
-          cudaDeviceSynchronize(); // rows_per_color is in device memory
           row_offset += rows_per_color[i];
         }
 
+        cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
@@ -334,10 +336,10 @@ namespace FEAT
           grid.x = (unsigned)ceil((rows_per_color[i])/(double)(block.x));
 
           cuda_sor_bcsr_apply_kernel<BlockSize_><<<grid, block>>>(rows_per_color[i], y, x, csrVal, colored_row_ptr + row_offset * 2, csrColInd, omega, inverse_row_ptr + row_offset);
-          cudaDeviceSynchronize(); // rows_per_color is in device memory
           row_offset += rows_per_color[i];
         }
 
+        cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)

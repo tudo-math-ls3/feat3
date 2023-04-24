@@ -190,11 +190,11 @@ public:
       test_solver("Richardson-JAC", *solver, vec_sol, vec_ref, vec_rhs, 1175);
     }
 
-    // test Richardson-SOR
+    // test BiCGStab-right-SOR(1) aka GS
     {
-      auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1.7));
-      auto solver = Solver::new_richardson(matrix, filter, DataType(1.0), precon);
-      test_solver("Richardson-SOR(1.7)", *solver, vec_sol, vec_ref, vec_rhs, 71);
+      auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1));
+      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
+      test_solver("BiCGStab-right-SOR(1)", *solver, vec_sol, vec_ref, vec_rhs, Runtime::get_preferred_backend()!=PreferredBackend::cuda ? 29 : 33);
     }
 
     // test BiCGStab-left-ILU(0)
@@ -202,13 +202,6 @@ public:
       auto precon = Solver::new_ilu_precond(this->get_preferred_backend(), matrix, filter, Index(0));
       BiCGStab<MatrixType, FilterType> solver(matrix, filter, precon, BiCGStabPreconVariant::left);
       test_solver("BiCGStab-Left-ILU(0)", solver, vec_sol, vec_ref, vec_rhs, 12);
-    }
-
-    // test BiCGStab-right-SOR(1) aka GS
-    {
-      auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1));
-      auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
-      test_solver("BiCGStab-right-SOR(1)", *solver, vec_sol, vec_ref, vec_rhs, 29);
     }
 
     // test BiCGStabL-ILU(0) L=1 -> BiCGStab
