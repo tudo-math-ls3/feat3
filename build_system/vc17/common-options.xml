@@ -21,6 +21,11 @@
   <PropertyGroup Condition="'$(DebugMode)'=='false'" Label="Configuration">
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+  <!--<PropertyGroup Condition="'$(EnableMKL)'=='true'">
+    <UseInteloneMKL>Sequential</UseInteloneMKL>
+    <UseILP64Interfaces1A>true</UseILP64Interfaces1A>
+    <UseMpiLibrary1A>MSMPI</UseMpiLibrary1A>
+  </PropertyGroup>-->
 
   <!-- Common Settings -->
   <ItemDefinitionGroup>

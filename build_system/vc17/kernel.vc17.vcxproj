@@ -30,7 +30,7 @@
     <!-- exclude geometry test_aux sources -->
     <FeatKernelExcludeSource Include="kernel\geometry\test_aux\*.cpp" />
     <!-- exclude MKL sources unless the MKL backend is enabled -->
-    <FeatKernelExcludeSource Include="kernel\**\*_mkl.cpp" Condition="'$(BackendMKL)'!='true'" />
+    <FeatKernelExcludeSource Include="kernel\**\*_mkl.cpp" Condition="'$(EnableMKL)'!='true'" />
     <!-- exclude OS Windows utility source (this one is included explicitly below) -->
     <FeatKernelExcludeSource Include="kernel\util\os_windows.cpp" />
   </ItemGroup>

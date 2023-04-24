@@ -10,7 +10,7 @@ you require a x64 Windows operating system, a x64 based Visual Studio installati
 all of which should be standard by now, almost 20 years after AMD first released its Athlon 64 CPU...
 
 \subsection win_vs17_prereqs_vs Microsoft Visual Studio 2022
-To compile and use FEAT under Windows, you will (obviously) require <b>Microsoft Visual Studio 2022</b> (any edition).
+To compile and use FEAT under Windows, you (obviously) require <b>Microsoft Visual Studio 2022</b> (any edition).
 Note that the free <em>Community</em> edition of Visual Studio 202 is perfectly sufficient, which can be obtained
 from here:
 - https://visualstudio.microsoft.com/downloads
@@ -63,10 +63,13 @@ automatically detect that a MPI implementation is available.
 \subsection win_vs17_prereqs_cuda Nvidia CUDA v11.8
 Currently, the only supported version of Nvidia CUDA is version 11.8, which must be installed including its integration
 into Visual Studio 2022, of course. There is nothing else that has to be done manually to enable CUDA in FEAT; simply
-select an build configuration that contains the <c>cuda</c> tag to enable CUDA in FEAT.
+select a build configuration that contains the <c>cuda</c> tag to enable CUDA in FEAT.
 
-\subsection win_vs17_prereqs_imkl Intel MKL
-Intel MKL is currently not supported by the FEAT Visual Studio build system. This will be enabled at a later time.
+\subsection win_vs17_prereqs_imkl Intel oneAPI MKL
+The Visual Studio build system supports the use of Intel oneAPI MKL, assuming that it is installed on the system, of
+course. There is nothing else that has to be done manually to enable MKL in FEAT; simply select a build configuration
+that contains the <c>mkl</c> tag to enable MKL in FEAT. The only version that has been tested to work is 2023.1.0,
+but we expect that any newer version will work as well.
 
 \section win_vs17_thirdparty Additional Third-Party Libraries
 
@@ -211,8 +214,8 @@ The list of all supported (and currently disabled) features is:
 - <c>dbg</c>: generate a debug binary (mutually exclusive with <c>opt</c>)
 - <c>opt</c>: generate an optimized binary (mutually exclusive with <c>dbg</c>)
 - <c>mpi</c>: build with MPI support (requires MS-MPI to be installed)
-- <c>cuda</c> build with Nvidia CUDA support (required Nvidia CUDA 11.8 to be installed)
-- <c>mkl</c>: build with Intel MKL support (currently not available)
+- <c>cuda</c> build with Nvidia CUDA support (requires Nvidia CUDA 11.8 to be installed)
+- <c>mkl</c>: build with Intel MKL support (requires Intel oneAPI MKL 2023 or newer to be installed)
 - <c>omp</c>: build with OpenMP support
 
 So, for example the configuration <c>dbg</c> represents a simple debug build without any additional features such as

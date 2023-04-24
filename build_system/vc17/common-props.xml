@@ -18,6 +18,13 @@
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
+  <!-- MKL Backend Detection -->
+  <!-- ********************************************************************* -->
+  <PropertyGroup Condition="'$(EnableMKL)'=='true' And '$(FeatHaveMKL)'=='' And '($ONEAPI_ROOT)'!=''">
+    <FeatHaveMKL>true</FeatHaveMKL>
+  </PropertyGroup>
+
+  <!-- ********************************************************************* -->
   <!-- Visual Studio Import Mumbo-Jumbo -->
   <!-- ********************************************************************* -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -86,18 +93,18 @@
       Include="FEAT_HAVE_OMP" />
     <FeatDef Condition="'$(EnableCuda)'=='true'"
       Include="FEAT_HAVE_CUDA;FEAT_HAVE_CUSOLVER" />
-    <!--<FeatDef Condition="'$(EnableMKL)'=='true'"
-      Include="FEAT_HAVE_MKL" />-->
+    <FeatDef Condition="'$(EnableMKL)'=='true'"
+      Include="FEAT_HAVE_MKL;MKL_ILP64" />
   </ItemGroup>
 
   <!-- FEAT additional include directory list -->
   <ItemGroup Label="FEAT Include Paths">
     <FeatIncDir Condition="'$(EnableMPI)'=='true'"
       Include="$(MSMPI_INC)" />
-    <!--<FeatIncDir Condition="'$(EnableMKL)'=='true'"
-      Include="$(MKL_PATH)\include" />-->
     <FeatIncDir Condition="'$(EnableCuda)'=='true'"
       Include="$(FeatCudaPath)\include" />
+    <FeatIncDir Condition="'$(EnableMKL)'=='true'"
+      Include="$(ONEAPI_ROOT)\mkl\latest\include" />
   </ItemGroup>
 
   <!-- FEAT additional library search path list -->
@@ -109,10 +116,8 @@
       Include="$(MSMPI_LIB64)" />
     <FeatLibDir Condition="'$(EnableCuda)'=='true'"
       Include="$(CudaToolkitLibDir)" />
-    <!--<FeatLibDir Condition="'$(EnableMKL)'=='true' And '$(Platform)'=='Win32'"
-      Include="$(MKL_PATH)\lib\ia32" />
-    <FeatLibDir Condition="'$(EnableMKL)'=='true' And '$(Platform)'=='x64'"
-      Include="$(MKL_PATH)\lib\intel64" />-->
+    <FeatLibDir Condition="'$(EnableMKL)'=='true'"
+      Include="$(ONEAPI_ROOT)\mkl\latest\lib\intel64" />
   </ItemGroup>
 
   <!-- FEAT additional library dependencies list -->
@@ -123,12 +128,8 @@
       Include="msmpi.lib" />
     <FeatLibDep Condition="'$(EnableCuda)'=='true'"
       Include="cudart_static.lib;cublas.lib;cublasLt.lib;cusparse.lib;cusolver.lib;cusolverMg.lib" />
-    <!--<FeatLibDep Condition="'$(EnableMKL)'=='true'"
-      Include="mkl_core.lib;mkl_sequential.lib" />
-    <FeatLibDep Condition="'$(EnableMKL)'=='true' And '$(Platform)'=='Win32'"
-      Include="mkl_intel_c.lib" />
-    <FeatLibDep Condition="'$(EnableMKL)'=='true' And '$(Platform)'=='x64'"
-      Include="mkl_intel_lp64.lib" />-->
+    <FeatLibDep Condition="'$(EnableMKL)'=='true'"
+      Include="mkl_core.lib;mkl_sequential_dll.lib;mkl_intel_ilp64_dll.lib" />
   </ItemGroup>
 
   <!-- include third-party libaries -->

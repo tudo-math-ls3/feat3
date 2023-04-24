@@ -13,6 +13,12 @@
 #include <mkl.h>
 #include <mkl_spblas.h>
 
+/// \todo remove this pragma once MKL is switched to sparse executor interface
+// disable 'deprecated' warnings for MKL functions, because this file won't compile otherwise
+#ifdef FEAT_COMPILER_MICROSOFT
+#pragma warning(disable: 4996)
+#endif
+
 using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;

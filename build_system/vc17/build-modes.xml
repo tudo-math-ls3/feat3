@@ -34,6 +34,14 @@
   <Configuration>opt-cuda</Configuration>
   <Platform>x64</Platform>
 </ProjectConfiguration>
+<ProjectConfiguration Include="dbg-mkl|x64">
+  <Configuration>dbg-mkl</Configuration>
+  <Platform>x64</Platform>
+</ProjectConfiguration>
+<ProjectConfiguration Include="opt-mkl|x64">
+  <Configuration>opt-mkl</Configuration>
+  <Platform>x64</Platform>
+</ProjectConfiguration>
 </ItemGroup>
 <!-- Configuration to Build-Mode mapping -->
 <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg'">
@@ -91,5 +99,19 @@
   <EnableMPI>false</EnableMPI>
   <EnableMKL>false</EnableMKL>
   <EnableCUDA>true</EnableCUDA>
+</PropertyGroup>
+<PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mkl'">
+  <DebugMode>true</DebugMode>
+  <EnableOMP>false</EnableOMP>
+  <EnableMPI>false</EnableMPI>
+  <EnableMKL>true</EnableMKL>
+  <EnableCUDA>false</EnableCUDA>
+</PropertyGroup>
+<PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mkl'">
+  <DebugMode>false</DebugMode>
+  <EnableOMP>false</EnableOMP>
+  <EnableMPI>false</EnableMPI>
+  <EnableMKL>true</EnableMKL>
+  <EnableCUDA>false</EnableCUDA>
 </PropertyGroup>
 </Project>
