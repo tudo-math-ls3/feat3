@@ -1784,7 +1784,7 @@ namespace FEAT
 
 
         Statistics::add_flops(this->used_elements() * 2 * BlockSize_);
-        Arch::Apply::template csrsb<DT_, IT_, BlockSize_>(
+        Arch::Apply::template csrsb<BlockSize_, DT_, IT_>(
             r.template elements<Perspective::pod>(), DT_(1.), x.template elements<Perspective::pod>(), DT_(0.), r.template elements<Perspective::pod>(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
@@ -1879,7 +1879,7 @@ namespace FEAT
         XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
 
         Statistics::add_flops( (this->used_elements() + this->rows()) * 2 * BlockSize_);
-        Arch::Apply::template csrsb<DT_, IT_, BlockSize_>(
+        Arch::Apply::template csrsb<BlockSize_, DT_, IT_>(
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(),
             this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 

@@ -118,7 +118,7 @@ namespace FEAT
         }
       }
 
-      template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+      template <int BlockHeight_, int BlockWidth_, typename DT_, typename IT_>
       void Apply::bcsr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                                                 const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
@@ -153,7 +153,7 @@ namespace FEAT
         }
       }
 
-      template <typename DT_, typename IT_, int BlockSize_>
+      template <int BlockSize_, typename DT_, typename IT_>
       void Apply::csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
         Tiny::Vector<DT_, BlockSize_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockSize_> *>(r));

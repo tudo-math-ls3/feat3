@@ -20,117 +20,101 @@ namespace FEAT
     {
       struct UnitFilterBlocked
       {
-        template <typename DT_, typename IT_, int BlockSize_>
+        template <int BlockSize_, typename DT_, typename IT_>
         static void filter_rhs(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
         {
-          filter_rhs_generic<DT_, IT_, BlockSize_>(v, sv_elements, sv_indices, ue);
+          filter_rhs_generic<BlockSize_, DT_, IT_>(v, sv_elements, sv_indices, ue);
         }
 
         template <int BlockSize_>
         static void filter_rhs(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_rhs_generic_float_u64 = &filter_rhs_generic<float, std::uint64_t, BlockSize_>;
-          constexpr auto filter_rhs_cuda_float_u64 = &filter_rhs_cuda<float, std::uint64_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_rhs_cuda_float_u64, filter_rhs_generic_float_u64, filter_rhs_generic_float_u64, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_rhs_cuda, filter_rhs_generic, filter_rhs_generic, v, sv_elements, sv_indices, ue)
         }
 
         template <int BlockSize_>
         static void filter_rhs(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_rhs_generic_double_u64 = &filter_rhs_generic<double, std::uint64_t, BlockSize_>;
-          constexpr auto filter_rhs_cuda_double_u64 = &filter_rhs_cuda<double, std::uint64_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_rhs_cuda_double_u64, filter_rhs_generic_double_u64, filter_rhs_generic_double_u64, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_rhs_cuda, filter_rhs_generic, filter_rhs_generic, v, sv_elements, sv_indices, ue)
         }
 
         template <int BlockSize_>
         static void filter_rhs(float * v, const float * const sv_elements, const std::uint32_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_rhs_generic_float_u32 = &filter_rhs_generic<float, std::uint32_t, BlockSize_>;
-          constexpr auto filter_rhs_cuda_float_u32 = &filter_rhs_cuda<float, std::uint32_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_rhs_cuda_float_u32, filter_rhs_generic_float_u32, filter_rhs_generic_float_u32, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_rhs_cuda, filter_rhs_generic, filter_rhs_generic, v, sv_elements, sv_indices, ue)
         }
 
         template <int BlockSize_>
         static void filter_rhs(double * v, const double * const sv_elements, const std::uint32_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_rhs_generic_double_u32 = &filter_rhs_generic<double, std::uint32_t, BlockSize_>;
-          constexpr auto filter_rhs_cuda_double_u32 = &filter_rhs_cuda<double, std::uint32_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_rhs_cuda_double_u32, filter_rhs_generic_double_u32, filter_rhs_generic_double_u32, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_rhs_cuda, filter_rhs_generic, filter_rhs_generic, v, sv_elements, sv_indices, ue)
         }
 
-        template <typename DT_, typename IT_, int BlockSize_>
+        template <int BlockSize_, typename DT_, typename IT_>
         static void filter_def(DT_ * v, const IT_ * const sv_indices, const Index ue)
         {
-          filter_def_generic<DT_, IT_, BlockSize_>(v, sv_indices, ue);
+          filter_def_generic<BlockSize_, DT_, IT_>(v, sv_indices, ue);
         }
 
         template <int BlockSize_>
-        static void filter_def(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue)
+        static void filter_def(float * v, const std::uint64_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_def_generic_float_u64 = &filter_def_generic<float, std::uint64_t, BlockSize_>;
-          constexpr auto filter_def_cuda_float_u64 = &filter_def_cuda<float, std::uint64_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_def_cuda_float_u64, filter_def_generic_float_u64, filter_def_generic_float_u64, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_def_cuda, filter_def_generic, filter_def_generic, v, sv_indices, ue)
         }
 
         template <int BlockSize_>
-        static void filter_def(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue)
+        static void filter_def(double * v, const std::uint64_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_def_generic_double_u64 = &filter_def_generic<double, std::uint64_t, BlockSize_>;
-          constexpr auto filter_def_cuda_double_u64 = &filter_def_cuda<double, std::uint64_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_def_cuda_double_u64, filter_def_generic_double_u64, filter_def_generic_double_u64, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_def_cuda, filter_def_generic, filter_def_generic, v, sv_indices, ue)
         }
 
         template <int BlockSize_>
-        static void filter_def(float * v, const float * const sv_elements, const std::uint32_t * const sv_indices, const Index ue)
+        static void filter_def(float * v, const std::uint32_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_def_generic_float_u32 = &filter_def_generic<float, std::uint32_t, BlockSize_>;
-          constexpr auto filter_def_cuda_float_u32 = &filter_def_cuda<float, std::uint32_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_def_cuda_float_u32, filter_def_generic_float_u32, filter_def_generic_float_u32, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_def_cuda, filter_def_generic, filter_def_generic, v, sv_indices, ue)
         }
 
         template <int BlockSize_>
-        static void filter_def(double * v, const double * const sv_elements, const std::uint32_t * const sv_indices, const Index ue)
+        static void filter_def(double * v, const std::uint32_t * const sv_indices, const Index ue)
         {
-          constexpr auto filter_def_generic_double_u32 = &filter_def_generic<double, std::uint32_t, BlockSize_>;
-          constexpr auto filter_def_cuda_double_u32 = &filter_def_cuda<double, std::uint32_t, BlockSize_>;
-          BACKEND_SKELETON_VOID(filter_def_cuda_double_u32, filter_def_generic_double_u32, filter_def_generic_double_u32, v, sv_elements, sv_indices, ue)
+          BACKEND_SKELETON_VOID_T1(BlockSize_, filter_def_cuda, filter_def_generic, filter_def_generic, v, sv_indices, ue)
         }
 
-        template <typename DT_, typename IT_, int BlockSize_>
+        template <int BlockSize_, typename DT_, typename IT_>
         static void filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);
 
-        template <typename DT_, typename IT_, int BlockSize_>
+        template <int BlockSize_, typename DT_, typename IT_>
         static void filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue);
 
-        template <typename DT_, typename IT_, int BlockSize_>
+        template <int BlockSize_, typename DT_, typename IT_>
         static void filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue);
 
-        template <typename DT_, typename IT_, int BlockSize_>
+        template <int BlockSize_, typename DT_, typename IT_>
         static void filter_def_cuda(DT_ * v, const IT_ * const sv_indices, const Index ue);
       };
 
       // Do not instantiate the following templates as this is done in unit_filter_blocked_generic.cpp and then linked
       // into the shared library
 #ifdef FEAT_EICKT
-      extern template void UnitFilterBlocked::filter_rhs_generic<float, std::uint64_t, 2>(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_rhs_generic<double, std::uint64_t, 2>(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_rhs_generic<float, std::uint32_t, 2>(float * v, const float * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_rhs_generic<double, std::uint32_t, 2>(double * v, const double * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<2, float, std::uint64_t>(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<2, double, std::uint64_t>(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<2, float, std::uint32_t>(float * v, const float * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<2, double, std::uint32_t>(double * v, const double * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
 
-      extern template void UnitFilterBlocked::filter_def_generic<float, std::uint64_t, 2>(float * v, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_def_generic<double, std::uint64_t, 2>(double * v, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_def_generic<float, std::uint32_t, 2>(float * v, const std::uint32_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_def_generic<double, std::uint32_t, 2>(double * v, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<2, float, std::uint64_t>(float * v, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<2, double, std::uint64_t>(double * v, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<2, float, std::uint32_t>(float * v, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<2, double, std::uint32_t>(double * v, const std::uint32_t * const sv_indices, const Index ue);
 
-      extern template void UnitFilterBlocked::filter_rhs_generic<float, std::uint64_t, 3>(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_rhs_generic<double, std::uint64_t, 3>(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_rhs_generic<float, std::uint32_t, 3>(float * v, const float * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_rhs_generic<double, std::uint32_t, 3>(double * v, const double * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<3, float, std::uint64_t>(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<3, double, std::uint64_t>(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<3, float, std::uint32_t>(float * v, const float * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_rhs_generic<3, double, std::uint32_t>(double * v, const double * const sv_elements, const std::uint32_t * const sv_indices, const Index ue);
 
-      extern template void UnitFilterBlocked::filter_def_generic<float, std::uint64_t, 3>(float * v, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_def_generic<double, std::uint64_t, 3>(double * v, const std::uint64_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_def_generic<float, std::uint32_t, 3>(float * v, const std::uint32_t * const sv_indices, const Index ue);
-      extern template void UnitFilterBlocked::filter_def_generic<double, std::uint32_t, 3>(double * v, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<3, float, std::uint64_t>(float * v, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<3, double, std::uint64_t>(double * v, const std::uint64_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<3, float, std::uint32_t>(float * v, const std::uint32_t * const sv_indices, const Index ue);
+      extern template void UnitFilterBlocked::filter_def_generic<3, double, std::uint32_t>(double * v, const std::uint32_t * const sv_indices, const Index ue);
 #endif
 
     } // namespace Arch

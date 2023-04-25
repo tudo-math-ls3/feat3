@@ -12,24 +12,24 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 /// \cond internal
-template void SlipFilter::filter_rhs_generic<float, std::uint64_t, 2>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_rhs_generic<double, std::uint64_t, 2>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_rhs_generic<float, std::uint32_t, 2>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_rhs_generic<double, std::uint32_t, 2>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<2, float, std::uint64_t>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<2, double, std::uint64_t>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<2, float, std::uint32_t>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<2, double, std::uint32_t>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
 
-template void SlipFilter::filter_def_generic<float, std::uint64_t, 2>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_def_generic<double, std::uint64_t, 2>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_def_generic<float, std::uint32_t, 2>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_def_generic<double, std::uint32_t, 2>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<2, float, std::uint64_t>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<2, double, std::uint64_t>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<2, float, std::uint32_t>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<2, double, std::uint32_t>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
 
-template void SlipFilter::filter_rhs_generic<float, std::uint64_t, 3>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_rhs_generic<double, std::uint64_t, 3>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_rhs_generic<float, std::uint32_t, 3>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_rhs_generic<double, std::uint32_t, 3>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<3, float, std::uint64_t>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<3, double, std::uint64_t>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<3, float, std::uint32_t>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_rhs_generic<3, double, std::uint32_t>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
 
-template void SlipFilter::filter_def_generic<float, std::uint64_t, 3>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_def_generic<double, std::uint64_t, 3>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_def_generic<float, std::uint32_t, 3>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
-template void SlipFilter::filter_def_generic<double, std::uint32_t, 3>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<3, float, std::uint64_t>(float * v, const float * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<3, double, std::uint64_t>(double * v, const double * const nu_elements, const std::uint64_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<3, float, std::uint32_t>(float * v, const float * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
+template void SlipFilter::filter_def_generic<3, double, std::uint32_t>(double * v, const double * const nu_elements, const std::uint32_t * const sv_indices, const Index ue);
 
 /// \endcond

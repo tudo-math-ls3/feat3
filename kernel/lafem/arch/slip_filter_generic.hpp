@@ -18,7 +18,7 @@ namespace FEAT
   {
     namespace Arch
     {
-      template <typename DT_, typename IT_, int BlockSize_>
+      template <int BlockSize_, typename DT_, typename IT_>
       void SlipFilter::filter_rhs_generic(DT_ * v, const DT_ * const nu_elements, const IT_ * const sv_indices, const Index ue)
       {
         Index block_size = Index(BlockSize_);
@@ -39,7 +39,7 @@ namespace FEAT
         }
       }
 
-      template <typename DT_, typename IT_, int BlockSize_>
+      template <int BlockSize_, typename DT_, typename IT_>
       void SlipFilter::filter_def_generic(DT_ * v, const DT_* const nu_elements, const IT_ * const sv_indices, const Index ue)
       {
         Index block_size = Index(BlockSize_);

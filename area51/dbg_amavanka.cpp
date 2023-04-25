@@ -612,36 +612,36 @@ namespace DbgAmaVanka
     new_solver->done();
 
 #ifdef FEAT_HAVE_CUDA
-    if(args.check("cuda") >= 0)
-    {
-      std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
-      Runtime::set_preferred_backend(PreferredBackend::cuda);
+    std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
+    Runtime::set_preferred_backend(PreferredBackend::cuda);
 
-      auto cuda_vanka = Solver::new_amavanka(matrix, filter);
-      cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_velo));
-      cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_pres));
-      cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_stress));
-      auto cuda_solver = Solver::new_richardson(matrix, filter, omega, cuda_vanka);
+    auto cuda_vanka = Solver::new_amavanka(matrix, filter);
+    cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_velo));
+    cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_pres));
+    cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_stress));
+    auto cuda_solver = Solver::new_richardson(matrix, filter, omega, cuda_vanka);
 
-      vec_sol.format();
-      filter.filter_sol(vec_sol);
+    vec_sol.format();
+    filter.filter_sol(vec_sol);
 
-      cuda_solver->init();
-      cuda_solver->set_plot_mode(Solver::PlotMode::all);
-      cuda_solver->set_plot_name("CUDA Vanka");
-      cuda_solver->correct(vec_sol, vec_rhs);
-      cuda_solver->done();
-
-      std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
-      std::cout << cuda_solver->get_summary() << std::endl;
-      std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
-      Runtime::set_preferred_backend(PreferredBackend::generic);
-    }
+    cuda_solver->init();
+    cuda_solver->set_plot_mode(Solver::PlotMode::all);
+    cuda_solver->set_plot_name("CUDA Vanka");
+    cuda_solver->correct(vec_sol, vec_rhs);
+    cuda_solver->done();
+    Runtime::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
     std::cout << std::endl << "New Vanka Summary:" << std::endl;
     std::cout << new_solver->get_summary() << std::endl;
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(new_vanka->time_apply(),3) << std::endl;
+
+#ifdef FEAT_HAVE_CUDA
+    std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
+    std::cout << cuda_solver->get_summary() << std::endl;
+    std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
+    Runtime::set_preferred_backend(PreferredBackend::generic);
+#endif // FEAT_HAVE_CUDA
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Analyse velocity field
@@ -861,30 +861,23 @@ namespace DbgAmaVanka
     old_solver->done();
 
 #ifdef FEAT_HAVE_CUDA
-    if(args.check("cuda") >= 0)
-    {
-      std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
-      Runtime::set_preferred_backend(PreferredBackend::cuda);
+    std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
+    Runtime::set_preferred_backend(PreferredBackend::cuda);
 
-      auto cuda_vanka = Solver::new_amavanka(matrix, filter);
-      cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_velo));
-      cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_pres));
-      auto cuda_solver = Solver::new_richardson(matrix, filter, omega, cuda_vanka);
+    auto cuda_vanka = Solver::new_amavanka(matrix, filter);
+    cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_velo));
+    cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_pres));
+    auto cuda_solver = Solver::new_richardson(matrix, filter, omega, cuda_vanka);
 
-      vec_sol.format();
-      filter.filter_sol(vec_sol);
+    vec_sol.format();
+    filter.filter_sol(vec_sol);
 
-      cuda_solver->init();
-      cuda_solver->set_plot_mode(Solver::PlotMode::iter);
-      cuda_solver->set_plot_name("CUDA Vanka");
-      cuda_solver->correct(vec_sol, vec_rhs);
-      cuda_solver->done();
-
-      std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
-      std::cout << cuda_solver->get_summary() << std::endl;
-      std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
-      Runtime::set_preferred_backend(PreferredBackend::generic);
-    }
+    cuda_solver->init();
+    cuda_solver->set_plot_mode(Solver::PlotMode::iter);
+    cuda_solver->set_plot_name("CUDA Vanka");
+    cuda_solver->correct(vec_sol, vec_rhs);
+    cuda_solver->done();
+    Runtime::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
     std::cout << std::endl << "New Vanka Summary:" << std::endl;
@@ -895,8 +888,15 @@ namespace DbgAmaVanka
     std::cout << old_solver->get_summary() << std::endl;
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(old_vanka->time_apply(),3) << std::endl;
 
+#ifdef FEAT_HAVE_CUDA
+    std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
+    std::cout << cuda_solver->get_summary() << std::endl;
+    std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
+#endif // FEAT_HAVE_CUDA
+
+
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Post-Processing: Analyse velocity field
+    // Post-Processing: Analyze velocity field
 
     vec_sol.copy(vec_sol_1);
 

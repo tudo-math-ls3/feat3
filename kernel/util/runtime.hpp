@@ -15,8 +15,18 @@
 #define CUDA_SKELETON_VOID(function_cuda, ...)\
   function_cuda(__VA_ARGS__);\
   return;
+#define CUDA_SKELETON_VOID_T1(t1, function_cuda, ...)\
+  function_cuda<t1>(__VA_ARGS__);\
+  return;
+#define CUDA_SKELETON_VOID_T2(t1, t2, function_cuda, ...)\
+  function_cuda<t1, t2>(__VA_ARGS__);\
+  return;
 #else
 #define CUDA_SKELETON_VOID(function_cuda, ...)\
+  [[fallthrough]];
+#define CUDA_SKELETON_VOID_T1(t1, function_cuda, ...)\
+  [[fallthrough]];
+#define CUDA_SKELETON_VOID_T2(t1, t2, function_cuda, ...)\
   [[fallthrough]];
 #endif
 
@@ -24,8 +34,18 @@
 #define MKL_SKELETON_VOID(function_mkl, ...)\
   function_mkl(__VA_ARGS__);\
   return;
+#define MKL_SKELETON_VOID_T1(t1, function_mkl, ...)\
+  function_mkl<t1>(__VA_ARGS__);\
+  return;
+#define MKL_SKELETON_VOID_T2(t1, t2, function_mkl, ...)\
+  function_mkl<t1, t2 >(__VA_ARGS__);\
+  return;
 #else
 #define MKL_SKELETON_VOID(function_mkl, ...)\
+  [[fallthrough]];
+#define MKL_SKELETON_VOID_T1(t1, function_mkl, ...)\
+  [[fallthrough]];
+#define MKL_SKELETON_VOID_T2(t1, t2, function_mkl, ...)\
   [[fallthrough]];
 #endif
 
@@ -39,6 +59,32 @@
     case PreferredBackend::generic:\
     default:\
       function_generic(__VA_ARGS__);\
+      return;\
+  }
+
+#define BACKEND_SKELETON_VOID_T1(t1, function_cuda, function_mkl, function_generic, ...)\
+  switch(Runtime::get_preferred_backend())\
+  {\
+    case PreferredBackend::cuda:\
+      CUDA_SKELETON_VOID_T1(t1, function_cuda, __VA_ARGS__)\
+    case PreferredBackend::mkl:\
+      MKL_SKELETON_VOID_T1(t1, function_mkl, __VA_ARGS__)\
+    case PreferredBackend::generic:\
+    default:\
+      function_generic<t1>(__VA_ARGS__);\
+      return;\
+  }
+
+#define BACKEND_SKELETON_VOID_T2(t1, t2, function_cuda, function_mkl, function_generic, ...)\
+  switch(Runtime::get_preferred_backend())\
+  {\
+    case PreferredBackend::cuda:\
+      CUDA_SKELETON_VOID_T2(t1, t2, function_cuda, __VA_ARGS__)\
+    case PreferredBackend::mkl:\
+      MKL_SKELETON_VOID_T2(t1, t2, function_mkl, __VA_ARGS__)\
+    case PreferredBackend::generic:\
+    default:\
+      function_generic<t1, t2>(__VA_ARGS__);\
       return;\
   }
 

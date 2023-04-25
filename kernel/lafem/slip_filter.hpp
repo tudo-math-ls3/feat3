@@ -258,7 +258,7 @@ namespace FEAT
             return;
           XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
-            Arch::SlipFilter::template filter_rhs<DT_, IT_, BlockSize_>
+            Arch::SlipFilter::template filter_rhs<BlockSize_>
               (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
         }
 
@@ -288,7 +288,7 @@ namespace FEAT
             return;
           XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
           if(_sv.used_elements() > Index(0))
-            Arch::SlipFilter::template filter_rhs<DT_, IT_, BlockSize_>
+            Arch::SlipFilter::template filter_def<BlockSize_>
               (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
         }
 

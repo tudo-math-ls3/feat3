@@ -56,7 +56,7 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using FilterType = UnitFilterBlocked<DT2_, IT2_, BlockSize_>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with new Datatype and Index types
       template <typename DataType2_, typename IndexType2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
@@ -339,7 +339,7 @@ namespace FEAT
       {
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilterBlocked::template filter_rhs<DT_, IT_, BlockSize_>
+          Arch::UnitFilterBlocked::template filter_rhs<BlockSize_>
             (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
       }
 
@@ -365,7 +365,7 @@ namespace FEAT
       {
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
-          Arch::UnitFilterBlocked::template filter_def<DT_, IT_, BlockSize_>
+          Arch::UnitFilterBlocked::template filter_def<BlockSize_>
             (vector.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
       }
 

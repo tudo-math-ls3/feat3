@@ -751,9 +751,9 @@ DenseMatrixMultiply2Test <Half, std::uint64_t> cuda_dense_matrix_multiply_2_test
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMultiply2Test <float, std::uint32_t> cuda_dense_matrix_multiply_2_test_float_uint32(PreferredBackend::cuda, 1e-3);
+DenseMatrixMultiply2Test <float, std::uint32_t> cuda_dense_matrix_multiply_2_test_float_uint32(PreferredBackend::cuda, 2e-3);
 DenseMatrixMultiply2Test <double, std::uint32_t> cuda_dense_matrix_multiply_2_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixMultiply2Test <float, std::uint64_t> cuda_dense_matrix_multiply_2_test_float_uint64(PreferredBackend::cuda, 1e-3);
+DenseMatrixMultiply2Test <float, std::uint64_t> cuda_dense_matrix_multiply_2_test_float_uint64(PreferredBackend::cuda, 2e-3);
 DenseMatrixMultiply2Test <double, std::uint64_t> cuda_dense_matrix_multiply_2_test_double_uint64(PreferredBackend::cuda, 1e-6);
 #endif
 

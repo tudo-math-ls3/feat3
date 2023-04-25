@@ -104,7 +104,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
       }
 
-      template <typename DT_, typename IT_, int BlockSize_>
+      template <int BlockSize_, typename DT_, typename IT_>
       __global__ void cuda_apply_csrsb(DT_ * r, const DT_ a, const DT_ * x, const DT_ b, const DT_ * val, const IT_ * col_ind,
                                               const IT_ * row_ptr, const Index count)
       {
@@ -332,7 +332,11 @@ void Apply::bcsr_wrapper_cuda(DT_ * r, const DT_ a, const DT_ * const x, const D
   //CUSPARSE
   if ((BlockHeight == BlockWidth) && (sizeof(IT_) == 4u))
   {
-    bcsr_intern_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight);
+    // CUSPARSE BCSR kernel only supports block sizes > 1; call scalar CSR in this case instead
+    if(BlockHeight > 1)
+      bcsr_intern_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, BlockHeight);
+    else
+      csr_cuda<DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements, false);
   }
   //GENERIC
   else
@@ -345,7 +349,7 @@ template void Apply::bcsr_wrapper_cuda<double, std::uint32_t>(double *, const do
 template void Apply::bcsr_wrapper_cuda<float, std::uint64_t>(float *, const float, const float * const, const float, const float * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const int, const int);
 template void Apply::bcsr_wrapper_cuda<double, std::uint64_t>(double *, const double, const double * const, const double, const double * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const int, const int);
 
-template <typename DT_, typename IT_, int BlockSize_>
+template <int BlockSize_, typename DT_, typename IT_>
 void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows,
     const Index /*columns*/, const Index /*used_elements*/)
 {
@@ -364,7 +368,7 @@ void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, c
     MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockSize_);
   }
 
-  FEAT::LAFEM::Intern::cuda_apply_csrsb<DT_, IT_, BlockSize_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows);
+  FEAT::LAFEM::Intern::cuda_apply_csrsb<BlockSize_, DT_, IT_><<<grid, block>>>(r, a, x, b, val, col_ind, row_ptr, rows);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -373,29 +377,29 @@ void Apply::csrsb_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, c
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
 }
-template void Apply::csrsb_cuda<float, std::uint64_t, 1>
+template void Apply::csrsb_cuda<1, float, std::uint64_t>
   (float *, const float, const float *, const float, const float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, std::uint64_t, 1>
+template void Apply::csrsb_cuda<1, double, std::uint64_t>
   (double *, const double, const double *, const double, const double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, std::uint32_t, 1>
+template void Apply::csrsb_cuda<1, float, std::uint32_t>
   (float *, const float, const float *, const float, const float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, std::uint32_t, 1>
+template void Apply::csrsb_cuda<1, double, std::uint32_t>
   (double *, const double, const double *, const double, const double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, std::uint64_t, 2>
+template void Apply::csrsb_cuda<2, float, std::uint64_t>
   (float *, const float, const float *, const float, const float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, std::uint64_t, 2>
+template void Apply::csrsb_cuda<2, double, std::uint64_t>
   (double *, const double, const double *, const double, const double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, std::uint32_t, 2>
+template void Apply::csrsb_cuda<2, float, std::uint32_t>
   (float *, const float, const float *, const float, const float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, std::uint32_t, 2>
+template void Apply::csrsb_cuda<2, double, std::uint32_t>
   (double *, const double, const double *, const double, const double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, std::uint64_t, 3>
+template void Apply::csrsb_cuda<3, float, std::uint64_t>
   (float *, const float, const float *, const float, const float *, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, std::uint64_t, 3>
+template void Apply::csrsb_cuda<3, double, std::uint64_t>
   (double *, const double, const double *, const double, const double *, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<float, std::uint32_t, 3>
+template void Apply::csrsb_cuda<3, float, std::uint32_t>
   (float *, const float, const float *, const float, const float *, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
-template void Apply::csrsb_cuda<double, std::uint32_t, 3>
+template void Apply::csrsb_cuda<3, double, std::uint32_t>
   (double *, const double, const double *, const double, const double *, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index);
 
 template <typename DT_, typename IT_>
