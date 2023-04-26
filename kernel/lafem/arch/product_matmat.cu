@@ -87,8 +87,9 @@ void ProductMatMat::dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta,  const 
     Cdesc = Rdesc;
   }
 
-  cublasLtMatmulAlgo_t * algo = NULL;
-  if (! FEAT::Util::Intern::cublas_lt_algo_matmat_initialized[algo_selector])
+  cublasLtMatmulHeuristicResult_t algo_check_result;
+  if (! FEAT::Util::Intern::cublas_lt_algo_matmat_initialized[algo_selector] ||
+      CUBLAS_STATUS_SUCCESS != cublasLtMatmulAlgoCheck((cublasLtHandle_t)Util::Intern::cublas_handle, operationDesc, Adesc, Bdesc, Cdesc, Rdesc, &(FEAT::Util::Intern::cublas_lt_algo_matmat[algo_selector]), &algo_check_result))
   {
     int num_algos = 0;
     cublasLtMatmulHeuristicResult_t heuristic_algos = {};
@@ -111,7 +112,7 @@ void ProductMatMat::dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta,  const 
     FEAT::Util::Intern::cublas_lt_algo_matmat_initialized[algo_selector] = true;
   }
 
-  algo = &(FEAT::Util::Intern::cublas_lt_algo_matmat[algo_selector]);
+  cublasLtMatmulAlgo_t * algo = &(FEAT::Util::Intern::cublas_lt_algo_matmat[algo_selector]);
 
   //status = cublasLtMatmul((cublasLtHandle_t)Util::Intern::cublas_handle, operationDesc, &alpha, x, Adesc, y, Bdesc, &beta, z, Cdesc, r, Rdesc, algo, FEAT::Util::Intern::cuda_workspace, FEAT::Util::Intern::cuda_workspace_size, 0);
   status = cublasLtMatmul((cublasLtHandle_t)Util::Intern::cublas_handle, operationDesc, &alpha, x, Adesc, y, Bdesc, &beta, z, Cdesc, r, Rdesc, algo, NULL, 0, 0);
