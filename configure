@@ -87,8 +87,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Be aware that icc needs the path to a gcc binary and clang needs the path to folder containing the whole toolchain.")
   print ("--cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
-  print ("--cuda_arch=sm_35")
-  print ("  Selects the cuda architecture target (defaults to sm_35 if not set).")
+  print ("--cuda_arch=sm_60")
+  print ("  Selects the cuda architecture target (defaults to sm_60 if not set).")
   print ("--export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json.")
   print ("--cpu=cputype")
@@ -289,6 +289,7 @@ for option in extra_options:
       print ("Error: multiple cuda_arch parameters in\n" + "\n".join(extra_options))
       exit(1)
     cuda_arch = option.replace("--cuda_arch=", "", 1)
+    cuda_arch_int = int(cuda_arch.split("sm_")[-1])
 
   if option.startswith("--cuda_verbose"):
     unused_extra_options.remove(option)
@@ -544,8 +545,11 @@ if "half" in buildid:
   if "cuda" not in buildid:
     print("Error: Using half without cuda is not supported!")
     sys.exit()
-  remove_string(unused_tokens, "half")
-  cmake_flags += " -DFEAT_HAVE_HALFMATH:BOOL=ON"
+  if (cuda_arch != "") and (cuda_arch_int < 60):
+    print("Warning: cuda arch " + cuda_arch + " is too low for half, which needs at least sm_60!")
+  else:
+    remove_string(unused_tokens, "half")
+    cmake_flags += " -DFEAT_HAVE_HALFMATH:BOOL=ON"
 
 if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
