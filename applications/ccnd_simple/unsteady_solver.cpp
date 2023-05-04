@@ -6,7 +6,7 @@
 #include "unsteady_solver.hpp"
 #include <control/checkpoint_control.hpp>
 
-#include <filesystem>
+//#include <filesystem>
 
 namespace CCNDSimple
 {
@@ -156,12 +156,12 @@ namespace CCNDSimple
   bool UnsteadySolver::start_time_loop(GlobalStokesVector& vec_sol)
   {
     // check for 'STOP' file
-    if(std::filesystem::exists("./STOP"))
+    /*if(std::filesystem::exists("./STOP"))
     {
       //  STOP file found
       comm.print("\nSTOP file found; delete the file 'STOP' and restart program");
       return false;
-    }
+    }*/
 
     // make sure the vectors are allocated
     if(vec_sol_3.local().first().empty())
@@ -259,8 +259,10 @@ namespace CCNDSimple
       return false;
     }
 
+    return true;
+
     // check for 'STOP' file
-    if(!std::filesystem::exists("./STOP"))
+    /*if(!std::filesystem::exists("./STOP"))
       return true; // continue iteration
 
     //  STOP file found
@@ -283,7 +285,7 @@ namespace CCNDSimple
     write_checkpoint(check_fn);
 
     // abort time step loop
-    return false;
+    return false;*/
   }
 
   void UnsteadySolver::initialize_current_sol(GlobalStokesVector& vec_sol)
