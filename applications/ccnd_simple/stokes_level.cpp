@@ -113,7 +113,7 @@ namespace CCNDSimple
 
   void StokesLevel::assemble_slip_bc(const String& mesh_parts)
   {
-    Assembly::SlipFilterAssembler<MeshType> slip_filter_asm(this->domain_level.get_mesh());
+    Assembly::SlipFilterAssembler<TrafoType> slip_filter_asm(this->domain_level.trafo);
 
     // get the filter name
     String filter_name = aux_add_mesh_parts(slip_filter_asm, this->domain_level, mesh_parts);

@@ -65,6 +65,9 @@ TARGET_LINK_LIBRARIES(dbg-pmdcdsc feat)
 ADD_EXECUTABLE(dbg-recursive-parti dbg_recursive_parti.cpp)
 TARGET_LINK_LIBRARIES(dbg-recursive-parti feat)
 
+ADD_EXECUTABLE(dbg-slip-asm dbg_slip_asm.cpp)
+TARGET_LINK_LIBRARIES(dbg-slip-asm feat)
+
 ADD_EXECUTABLE(dbg-sphere-fem dbg_sphere_fem.cpp)
 TARGET_LINK_LIBRARIES(dbg-sphere-fem feat)
 

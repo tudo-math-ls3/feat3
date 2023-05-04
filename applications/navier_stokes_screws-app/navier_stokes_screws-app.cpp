@@ -961,7 +961,7 @@ struct NavierStokesScrewsApp
     std::vector<Assembly::UnitFilterAssembler<ExtrudedMeshType>>
       unit_asm_velo_i(num_levels), unit_asm_velo_o(num_levels);
 
-    std::vector<std::shared_ptr<Assembly::SlipFilterAssembler<ExtrudedMeshType>>>
+    std::vector<std::shared_ptr<Assembly::SlipFilterAssembler<ExtrudedTrafoType>>>
       slip_asm_velo_b(num_levels), slip_asm_velo_t(num_levels);
 
     for(Index i(0); i < num_levels; ++i)
@@ -1004,7 +1004,7 @@ struct NavierStokesScrewsApp
         }
       }
 
-      slip_asm_velo_b.at(i) = std::make_shared<Assembly::SlipFilterAssembler<ExtrudedMeshType>>(extruded_dom_ctrl.at(i)->get_mesh());
+      slip_asm_velo_b.at(i) = std::make_shared<Assembly::SlipFilterAssembler<ExtrudedTrafoType>>(extruded_dom_ctrl.at(i)->trafo);
 
       // Add bottom boundary to assembler
       {
@@ -1023,7 +1023,7 @@ struct NavierStokesScrewsApp
         }
       }
 
-      slip_asm_velo_t.at(i) = std::make_shared<Assembly::SlipFilterAssembler<ExtrudedMeshType>>(extruded_dom_ctrl.at(i)->get_mesh());
+      slip_asm_velo_t.at(i) = std::make_shared<Assembly::SlipFilterAssembler<ExtrudedTrafoType>>(extruded_dom_ctrl.at(i)->trafo);
 
       // Add bottom boundary to assembler
       {

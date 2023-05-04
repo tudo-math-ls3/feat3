@@ -335,7 +335,7 @@ namespace FEAT
         /// our original function evaluator
         typename Function_::template Evaluator<FuncEvalTraits> _func_eval;
 
-        /// 2D vector curl operator
+        /// 2D scalar curl operator
         template<typename T_, int s_, int sn_>
         static Tiny::Vector<T_, 2, s_> compute(const Tiny::Vector<T_, 2, sn_>& grad)
         {
@@ -351,6 +351,27 @@ namespace FEAT
           Tiny::Matrix<T_, 2, 2, sa_, sb_> curl;
           curl[0] = -grad[1];
           curl[1] = +grad[0];
+          return curl;
+        }
+
+        /// 3D scalar curl operator
+        template<typename T_, int s_, int sn_>
+        static Tiny::Vector<T_, 3, s_> compute(const Tiny::Vector<T_, 3, sn_>& grad)
+        {
+          Tiny::Vector<T_, 3, s_> curl;
+          curl[0] = grad[1] - grad[2];
+          curl[1] = grad[2] - grad[0];
+          curl[2] = grad[0] - grad[1];
+          return curl;
+        }
+
+        template<typename T_, int sa_, int sb_, int sm_, int sn_>
+        static Tiny::Matrix<T_, 3, 3, sa_, sb_> compute(const Tiny::Matrix<T_, 3, 3, sm_, sn_>& grad)
+        {
+          Tiny::Matrix<T_, 3, 3, sa_, sb_> curl;
+          curl[0] = grad[1] - grad[2];
+          curl[1] = grad[2] - grad[0];
+          curl[2] = grad[0] - grad[1];
           return curl;
         }
 

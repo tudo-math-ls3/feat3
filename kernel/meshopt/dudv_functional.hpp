@@ -125,7 +125,7 @@ namespace FEAT
         /// Assembler for Dirichlet boundary conditions
         std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> _dirichlet_asm;
         /// Assembler for slip boundary conditions
-        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> _slip_asm;
+        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<TrafoType>>> _slip_asm;
         /// Cubature factory, for P1/Q1 transformations in 2d degree 5 is enough
         Cubature::DynamicFactory _cubature_factory;
 
@@ -192,7 +192,7 @@ namespace FEAT
             for(auto& it : slip_list)
             {
               // Create empty assembler
-              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(*this->get_mesh());
+              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<TrafoType>>(this->_trafo);
 
               // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
               // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart

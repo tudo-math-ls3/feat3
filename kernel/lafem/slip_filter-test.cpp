@@ -318,7 +318,7 @@ class SlipFilterAssemblyTest
       vec.clone(vec_org);
 
       // The assembler
-      Assembly::SlipFilterAssembler<MeshType>slip_filter_assembler(my_trafo.get_mesh());
+      Assembly::SlipFilterAssembler<TrafoType> slip_filter_assembler(my_trafo);
 
       FilterType my_filter;
       slip_filter_assembler.add_mesh_part(*(node->find_mesh_part("outer")));
@@ -413,7 +413,7 @@ class SlipFilterAssemblyTest
 
 
       // The assembler
-      Assembly::SlipFilterAssembler<MeshType>slip_filter_assembler(my_trafo.get_mesh()) ;
+      Assembly::SlipFilterAssembler<TrafoType>slip_filter_assembler(my_trafo) ;
 
       // Create the filter, add 3 of the 6 MeshParts and assemble the filter
       FilterType my_filter;

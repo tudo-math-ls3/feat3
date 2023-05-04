@@ -250,7 +250,7 @@ namespace FEAT
         /// Assembler for Dirichlet boundary conditions
         std::map<String, std::shared_ptr<Assembly::UnitFilterAssembler<MeshType>>> _dirichlet_asm;
         /// Assembler for slip boundary conditions
-        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<MeshType>>> _slip_asm;
+        std::map<String, std::shared_ptr<Assembly::SlipFilterAssembler<TrafoType>>> _slip_asm;
         /// The mesh concentration function (if any)
         std::shared_ptr<MeshConcentrationFunctionBase<Trafo_, RefCellTrafo_>> _mesh_conc;
 
@@ -343,7 +343,7 @@ namespace FEAT
               // Create empty assembler
               auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
 
-              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // Add the MeshPart to the assembler if it is there. There are legitimate reasons for it NOT to be
               // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
               auto* mpp = rmn_->find_mesh_part(it);
               if(mpp != nullptr)
@@ -361,9 +361,9 @@ namespace FEAT
             for(auto& it : slip_list)
             {
               // Create empty assembler
-              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(*this->get_mesh());
+              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<TrafoType>>(this->_trafo);
 
-              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // Add the MeshPart to the assembler if it is there. There are legitimate reasons for it NOT to be
               // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
               auto* mpp = rmn_->find_mesh_part(it);
               if(mpp != nullptr)
@@ -457,7 +457,7 @@ namespace FEAT
               // Create empty assembler
               auto new_asm = std::make_shared<Assembly::UnitFilterAssembler<MeshType>>();
 
-              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // Add the MeshPart to the assembler if it is there. There are legitimate reasons for it NOT to be
               // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
               auto* mpp = rmn_->find_mesh_part(it);
               if(mpp != nullptr)
@@ -475,9 +475,9 @@ namespace FEAT
             for(auto& it : slip_list)
             {
               // Create empty assembler
-              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<MeshType>>(*this->get_mesh());
+              auto new_asm = std::make_shared<Assembly::SlipFilterAssembler<TrafoType>>(this->_trafo);
 
-              // Add the MeshPart to the assembler if it is there. There are legimate reasons for it NOT to be
+              // Add the MeshPart to the assembler if it is there. There are legitimate reasons for it NOT to be
               // there, i.e. we are in parallel and our patch is not adjacent to that MeshPart
               auto* mpp = rmn_->find_mesh_part(it);
               if(mpp != nullptr)

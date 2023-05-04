@@ -259,6 +259,7 @@ namespace PoissonMixed
     typedef typename DomainControlType::LevelType DomainLevelType;
 
     // fetch our mesh and shape types
+    typedef typename DomainLevelType::TrafoType TrafoType;
     typedef typename DomainControlType::MeshType MeshType;
     typedef typename DomainControlType::ShapeType ShapeType;
     static constexpr int dim = ShapeType::dimension;
@@ -363,7 +364,7 @@ namespace PoissonMixed
           auto* mpp = domain.at(i)->get_mesh_node()->find_mesh_part(it.first);
 
           // Create empty assembler
-          Assembly::SlipFilterAssembler<MeshType> neumann_asm(domain.at(i)->get_mesh());
+          Assembly::SlipFilterAssembler<TrafoType> neumann_asm(domain.at(i)->trafo);
           if(mpp != nullptr)
           {
             neumann_asm.add_mesh_part(*mpp);

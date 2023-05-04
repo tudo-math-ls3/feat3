@@ -49,10 +49,6 @@ namespace FEAT
         /// Shape of the facets that make up the boundary we can i.e. compute the normals for,
         /// i.e. Simplex<2> faces for a Simplex<3> mesh
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension - 1>::ShapeType FacetType;
-        /// Number of coefficients of the reference cell transformation is the number of vertices
-        static constexpr int num_coeff = Shape::FaceTraits<ShapeType, 0>::count;
-        /// Number of coefficients of the reference cell transformation for faces is the number of vertices
-        static constexpr int num_coeff_facet = Shape::FaceTraits<FacetType, 0>::count;
 
       public:
         /** \copydoc MappingBase::Evaluator */
@@ -128,61 +124,6 @@ namespace FEAT
 
           return vol;
         }
-
-        /**
-         * \brief Computes all oriented normals on one face
-         *
-         * \param[in] k
-         * Number of the face to compute the normals at
-         *
-         * \returns
-         * A matrix containing the oriented normals in all Lagrange points row-wise
-         *
-         */
-        Tiny::Matrix<CoordType, num_coeff_facet, MeshType::world_dim> compute_oriented_normals(Index k) const
-        {
-          // Evaluator on Faces
-          typedef typename Evaluator<FacetType, CoordType>::Type FaceEvaluator;
-          // Type of the Jacobian it returns
-          typedef typename FaceEvaluator::JacobianMatrixType JacobianMatrixType;
-
-          // Evaluator for the trafo
-          FaceEvaluator trafo_eval(*this);
-          trafo_eval.prepare(k);
-
-          // This will be the coordinates of the Lagrange points on the reference cell the face is parametrized over
-          Tiny::Matrix<CoordType, num_coeff_facet, ShapeType::dimension - 1> xloc(CoordType(0));
-          for(int i(0); i < num_coeff_facet; ++i)
-          {
-            for(int d(0); d < ShapeType::dimension - 1 ; ++d)
-              xloc(i,d) = Shape::ReferenceCell<FacetType>::template vertex<CoordType>(i,d);
-          }
-
-          // The Jacobian matrix of the transformation
-          JacobianMatrixType jac_mat;
-          // This will hold the local tangential surface coordinate system at one Lagrange point of the local face
-          Tiny::Matrix<CoordType, MeshType::world_dim-1, MeshType::world_dim> tau(CoordType(0));
-
-          // This will hold the oriented unit normal vector for all Lagrange points of the face
-          Tiny::Matrix<CoordType, num_coeff_facet, MeshType::world_dim> nu(CoordType(0));
-          for(int i(0); i < num_coeff_facet; ++i)
-          {
-            tau.format();
-
-            // Compute the tangential vectors at the Lagrange points: They are the gradients wrt. the parametrization
-            // of the transformation evaluated in the Lagrange points
-            trafo_eval.calc_jac_mat(jac_mat, xloc[i]);
-
-            // Now write the cross product of the tangentials into nu[i]
-            nu[i] = Tiny::orthogonal(jac_mat);
-            // Normalize nu
-            nu[i].normalize();
-          }
-
-          return nu;
-
-        } // compute_oriented_normals
-
       }; // class Mapping<...>
     } // namespace Standard
   } // namespace Trafo
