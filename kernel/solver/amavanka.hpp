@@ -313,7 +313,7 @@ namespace FEAT
           for(IndexType i(0); i < num_macros; ++i)
           {
             // loop over all pressure dofs in the current block
-            for(IndexType j = p_ptr[i]; j < p_ptr[i+1]; ++j)
+            for(Index j = p_ptr[i]; j < p_ptr[i+1]; ++j)
             {
               // get the pressure dof index
               const Index pix = p_idx[j];
