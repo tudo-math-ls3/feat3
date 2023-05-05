@@ -44,7 +44,9 @@ int main(int argc, char ** argv)
 {
   Runtime::initialize(argc, argv);
 #ifdef FEAT_HAVE_CUDA
+#ifdef FEAT_HAVE_HALFMATH
   run<DenseVector<Half, Index> >(PreferredBackend::cuda);
+#endif
   run<DenseVector<float, Index> >(PreferredBackend::cuda);
   run<DenseVector<double, Index> >(PreferredBackend::cuda);
 #endif
