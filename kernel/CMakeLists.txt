@@ -24,15 +24,15 @@ SET(KERNEL_LIBRARY_FILES
 # add kernel-root library
 ADD_LIBRARY(kernel-root STATIC ${KERNEL_LIBRARY_FILES})
 
-# link against mpi if available
-TARGET_LINK_LIBRARIES(kernel-root ${MPI_C_LIBRARIES})
+# kernel-root and kernel-util have cyclic dependency
+TARGET_LINK_LIBRARIES(kernel-root kernel-util)
+TARGET_LINK_LIBRARIES(kernel-util kernel-root)
 
 # add main feat library
 ADD_LIBRARY(feat INTERFACE)
 
 # list of libraries to include in feat lib
 TARGET_LINK_LIBRARIES (feat INTERFACE
-  kernel-root
   kernel-adjacency
 # kernel-assembly
   kernel-cubature
@@ -43,6 +43,7 @@ TARGET_LINK_LIBRARIES (feat INTERFACE
   kernel-solver
 # kernel-trafo
   kernel-util
+  kernel-root
 )
 
 if (FEAT_HAVE_TRILINOS)
