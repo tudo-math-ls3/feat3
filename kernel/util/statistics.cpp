@@ -50,6 +50,7 @@ std::map<String, std::list<std::vector<double>>> Statistics::_outer_mg_mpi_wait_
 std::map<String, std::list<std::vector<double>>> Statistics::_outer_mg_mpi_wait_collective;
 std::map<String, std::list<double>> Statistics::_outer_schwarz_toe;
 std::map<String, std::list<Index>> Statistics::_outer_schwarz_iters;
+bool Statistics::enable_solver_expressions = false;
 String Statistics::expression_target = "default";
 double Statistics::toe_partition;
 double Statistics::toe_assembly;
@@ -65,7 +66,13 @@ String Statistics::_generate_formatted_solver_tree(String target)
     XABORTM("target "+target+" not present in _solver_expressions");
   }
 
-  if (_solver_expressions[target].front()->get_type() != Solver::ExpressionType::start_solve)
+  if(_solver_expressions[target].empty())
+  {
+    // not an error -- maybe collection of statistics is disabled
+    return String();
+  }
+
+  if(_solver_expressions[target].front()->get_type() != Solver::ExpressionType::start_solve)
   {
     XABORTM("Should never happen - _solver_expressions list did not start with start solve expression!");
   }
@@ -554,6 +561,8 @@ String Statistics::get_formatted_solver_internals(String target)
 
   if (_formatted_solver_trees.count(target) == 0)
     compress_solver_expressions();
+  if(_formatted_solver_trees.at(target).empty())
+    return String();
 
   auto solver_time_mg = FEAT::Statistics::get_time_mg(target);
   auto solver_time_mg_mpi_execute_reduction = FEAT::Statistics::get_time_mg_mpi_execute_reduction(target);
@@ -872,7 +881,11 @@ void Statistics::compress_solver_expressions()
       XABORTM("target "+target+" not present in _solver_expressions");
     }
 
-    if (_solver_expressions[target].front()->get_type() != Solver::ExpressionType::start_solve)
+    // solver expression may be empty if collection is disabled
+    if(_solver_expressions[target].empty())
+      continue;
+
+    if(_solver_expressions[target].front()->get_type() != Solver::ExpressionType::start_solve)
     {
       XABORTM("Should never happen - _solver_expressions list did not start with start solve expression!");
     }

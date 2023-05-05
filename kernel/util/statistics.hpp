@@ -163,6 +163,8 @@ namespace FEAT
 
     public:
 
+      /// specifies whether collection of solver expressions is to be enabled
+      static bool enable_solver_expressions;
       /// time of partitioning in seconds, needs initialization
       static double toe_partition;
       /// time of assembly in seconds, needs initialization
@@ -339,7 +341,8 @@ namespace FEAT
 
       inline static void add_solver_expression(std::shared_ptr<Solver::ExpressionBase> expression)
       {
-        _solver_expressions[expression_target].push_back(expression);
+        if(enable_solver_expressions)
+          _solver_expressions[expression_target].push_back(expression);
       }
 
       static const std::list<std::shared_ptr<Solver::ExpressionBase>> & get_solver_expressions()
@@ -361,7 +364,10 @@ namespace FEAT
       {
         if (_formatted_solver_trees.count(target) == 0)
           compress_solver_expressions();
-        return _formatted_solver_trees.at(target);
+        if (_formatted_solver_trees.count(target) == 0)
+          return String("no solver tree for target '") + target + "' found";
+        else
+          return _formatted_solver_trees.at(target);
       }
 
       /// print out the complete solver expression list
