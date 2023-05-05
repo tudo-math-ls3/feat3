@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/util/type_traits.hpp>
+#include <kernel/util/half.hpp>
 
 // includes, system
 #include <cmath>

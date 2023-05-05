@@ -97,11 +97,6 @@
 // include integer definition header from C/C++ standard library
 #include <cstdint>
 
-// if cuda supports fp16 arithmetics, include the cuda sdk fp16 header for cpu and gpu computing in datatype __half
-#ifdef FEAT_HAVE_HALFMATH
-#include <cuda_fp16.h>
-#endif // FEAT_HAVE_HALFMATH
-
 /**
  * \brief FEAT namespace
  */
@@ -127,79 +122,6 @@ namespace FEAT
    * \brief Real data type.
    */
   typedef double Real;
-
-#ifdef FEAT_HAVE_HALFMATH
-  /**
-   * \brief Half data type.
-   *
-   * Half data type derived from nvidias cuda __half data type.
-   */
-  class Half : public __half
-  {
-    public:
-    // use constructors from __half parent class
-    using __half::__half;
-
-    Half(const int & other) : __half(double(other))
-    {
-    }
-
-    Half(const unsigned int & other) : __half(double(other))
-    {
-    }
-
-    Half(const long & other) : __half(double(other))
-    {
-    }
-
-    Half(const unsigned long & other) : __half(double(other))
-    {
-    }
-
-    Half& operator+=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis += dother;
-      *this = dthis;
-      return *this;
-    }
-
-    Half& operator*=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis *= dother;
-      *this = dthis;
-      return *this;
-    }
-
-    Half& operator/=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis /= dother;
-      *this = dthis;
-      return *this;
-    }
-
-    Half& operator-=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis -= dother;
-      *this = dthis;
-      return *this;
-    }
-
-    Half operator-()
-    {
-      float dthis(*this);
-      dthis = -dthis;
-      return Half(dthis);
-    }
-  };
-#endif
 } // namespace FEAT
 
 #endif // KERNEL_BASE_HEADER_HPP

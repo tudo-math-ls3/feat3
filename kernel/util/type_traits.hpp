@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/util/half.hpp>
 #include <kernel/util/string.hpp>
 
 #include <typeindex>
