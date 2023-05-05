@@ -352,16 +352,15 @@ namespace FEAT
       template<typename DomainLevel_>
       void assemble_base_splitters(const Domain::VirtualLevel<DomainLevel_>& virt_lvl)
       {
-        // does this virtual level have a base-mesh level?
-        if(!virt_lvl.has_base())
-          return;
-
         // get the layer
         const auto& layer = virt_lvl.layer();
 
         // nothing to assemble?
         if(layer.comm().size() <= 1)
           return;
+
+        // ensure that this virtual level has a base-mesh
+        XASSERTM(virt_lvl.has_base(), "cannot assemble base splitter because base level is missing");
 
         // is this the root process?
         if(layer.comm().rank() == 0)
