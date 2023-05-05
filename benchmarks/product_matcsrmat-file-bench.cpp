@@ -8,7 +8,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <benchmarks/benchmark.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/lafem/sparse_matrix_factory.hpp>
 
 #include <iostream>

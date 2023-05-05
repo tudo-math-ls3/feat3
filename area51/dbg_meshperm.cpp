@@ -19,7 +19,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Geometry;

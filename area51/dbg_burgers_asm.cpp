@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/geometry/common_factories.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>

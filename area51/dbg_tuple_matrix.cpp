@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/util/string.hpp>                          // for String
-#include <kernel/util/runtime.hpp>                         // for Runtime
+#include <kernel/runtime.hpp>                         // for Runtime
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory
 #include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
 #include <kernel/geometry/common_factories.hpp>         // for RefinedUnitCubeFactor

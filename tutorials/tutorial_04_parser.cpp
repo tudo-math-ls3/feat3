@@ -106,8 +106,8 @@
 // We start our little tutorial with a batch of includes...
 
 // Misc. FEAT includes
+#include <kernel/runtime.hpp>                              // for Runtime
 #include <kernel/util/string.hpp>                          // for String
-#include <kernel/util/runtime.hpp>                         // for Runtime
 #include <kernel/util/simple_arg_parser.hpp>               // NEW: for SimpleArgParser
 
 // FEAT-Geometry includes

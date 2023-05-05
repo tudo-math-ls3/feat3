@@ -8,7 +8,7 @@
 #include <kernel/geometry/mesh_file_writer.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/parsed_hit_test_factory.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
 #include <iostream>

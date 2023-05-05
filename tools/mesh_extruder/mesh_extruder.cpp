@@ -9,7 +9,7 @@
 #include <kernel/geometry/mesh_file_writer.hpp>
 #include <kernel/geometry/mesh_extruder.hpp>
 #include <kernel/geometry/partition_set.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
 #include <iostream>

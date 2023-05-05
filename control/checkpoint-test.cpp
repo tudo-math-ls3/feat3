@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <control/checkpoint_control.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/binary_stream.hpp>

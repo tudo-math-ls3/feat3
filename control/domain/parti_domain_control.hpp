@@ -11,7 +11,7 @@
 
 #include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/statistics.hpp>

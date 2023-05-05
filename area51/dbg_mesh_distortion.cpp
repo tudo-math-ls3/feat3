@@ -10,7 +10,7 @@
 
 // Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
-#include <kernel/util/runtime.hpp>                         // for Runtime
+#include <kernel/runtime.hpp>                         // for Runtime
 
 // FEAT-Geometry includes
 #include <kernel/geometry/boundary_factory.hpp>            // for BoundaryFactory

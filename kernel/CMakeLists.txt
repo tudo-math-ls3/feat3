@@ -18,6 +18,7 @@ ADD_SUBDIRECTORY( util )
 # list of kernel source files
 SET(KERNEL_LIBRARY_FILES
   backend.cpp
+  runtime.cpp
 )
 
 # add kernel-root library

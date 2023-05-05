@@ -31,7 +31,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/memory_usage.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>

@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 #include <cstdio>
 

@@ -27,7 +27,7 @@
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Geometry;

@@ -19,7 +19,7 @@
 //#include <kernel/meshopt/rumpf_functionals/3d_q1_unrolled.hpp>
 #include <kernel/solver/mqc_linesearch.hpp>
 #include <kernel/solver/nlcg.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 

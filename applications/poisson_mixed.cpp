@@ -27,7 +27,7 @@
 #include <kernel/space/lagrange3/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/dist.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>

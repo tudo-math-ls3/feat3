@@ -6,7 +6,7 @@
 #ifndef APPLICATIONS_DFG95_BENCH_CCND_COMMON_HPP
 #define APPLICATIONS_DFG95_BENCH_CCND_COMMON_HPP 1
 
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/statistics.hpp>

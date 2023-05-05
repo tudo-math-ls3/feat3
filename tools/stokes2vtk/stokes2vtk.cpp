@@ -13,7 +13,7 @@
 // \author Peter Zajac
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/geometry/common_factories.hpp>

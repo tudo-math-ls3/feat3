@@ -11,7 +11,7 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Geometry;

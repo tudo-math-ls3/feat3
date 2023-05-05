@@ -8,7 +8,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <benchmarks/benchmark.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 #include <iostream>
 

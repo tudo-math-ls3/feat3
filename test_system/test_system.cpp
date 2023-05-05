@@ -5,7 +5,7 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/util/memory_pool.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 #include <cstring>
 

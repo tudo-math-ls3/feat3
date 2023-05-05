@@ -12,7 +12,7 @@
 #include <kernel/geometry/parsed_hit_test_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/string.hpp>
 
 using namespace FEAT;

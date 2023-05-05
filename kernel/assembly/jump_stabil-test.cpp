@@ -17,7 +17,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 using namespace FEAT::TestSystem;

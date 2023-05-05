@@ -11,7 +11,7 @@
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/dist.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 
 #include <control/domain/parti_domain_control.hpp>

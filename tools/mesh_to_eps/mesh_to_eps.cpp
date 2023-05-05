@@ -10,7 +10,7 @@
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Geometry;

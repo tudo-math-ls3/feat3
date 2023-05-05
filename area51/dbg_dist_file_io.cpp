@@ -3,7 +3,7 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/random.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>

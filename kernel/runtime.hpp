@@ -7,9 +7,8 @@
 #ifndef KERNEL_RUNTIME_HPP
 #define KERNEL_RUNTIME_HPP 1
 
+// includes, FEAT
 #include <kernel/base_header.hpp>
-
-#include <iostream>
 
 namespace FEAT
 {

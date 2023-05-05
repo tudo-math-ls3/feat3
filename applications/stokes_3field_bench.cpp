@@ -15,7 +15,7 @@
 //
 // \author Peter Zajac
 //
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/memory_usage.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/time_stamp.hpp>

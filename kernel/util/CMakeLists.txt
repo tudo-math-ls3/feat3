@@ -1,19 +1,19 @@
 # enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+SET (CMAKE_VERBOSE_MAKEFILE ON)
 
-set(KERNEL_LIBRARY_FILES assertion.cpp
-dist.cpp
-dist_file_io.cpp
-kahan_summation.cpp
-memory_pool.cpp
-property_map.cpp
-runtime.cpp
-statistics.cpp
-xml_scanner.cpp
+SET(KERNEL_LIBRARY_FILES
+  assertion.cpp
+  dist.cpp
+  dist_file_io.cpp
+  kahan_summation.cpp
+  memory_pool.cpp
+  property_map.cpp
+  statistics.cpp
+  xml_scanner.cpp
 )
 
 if(WIN32)
-    set(KERNEL_LIBRARY_FILES ${KERNEL_LIBRARY_FILES} os_windows.cpp)
+  set(KERNEL_LIBRARY_FILES ${KERNEL_LIBRARY_FILES} os_windows.cpp)
 endif(WIN32)
 
 # list of util source files

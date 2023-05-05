@@ -8,7 +8,7 @@
 #define FEAT_APPLICATIONS_CCND_SIMPLE_BASE_HPP 1
 
 #include <kernel/base_header.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/stop_watch.hpp>

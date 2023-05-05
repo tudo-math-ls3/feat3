@@ -11,7 +11,7 @@
 #include <kernel/util/type_traits.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <benchmarks/benchmark.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/runtime.hpp>
 
 #include <iostream>
 

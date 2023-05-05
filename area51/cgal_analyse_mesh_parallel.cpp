@@ -30,7 +30,7 @@
 #include <kernel/base_header.hpp>
 // Misc. FEAT includes
 #include <kernel/util/string.hpp>                          // for String
-#include <kernel/util/runtime.hpp>                         // for Runtime
+#include <kernel/runtime.hpp>                         // for Runtime
 #include <kernel/util/simple_arg_parser.hpp>               // for SimpleArgParser
 
 // FEAT-Geometry includes
