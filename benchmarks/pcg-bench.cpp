@@ -21,7 +21,7 @@ using namespace FEAT;
 template <typename DT_, typename IT_>
 void run(PreferredBackend backend)
 {
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
 
   std::cout << String(100, '=') << std::endl;
   std::cout << "Backend..: " << backend << std::endl;
@@ -47,7 +47,7 @@ void run(PreferredBackend backend)
   LAFEM::NoneFilter<DT_, IT_> filter;
 
   // switch backend
-  Runtime::set_preferred_backend(backend);
+  Backend::set_preferred_backend(backend);
 
   // create PCG solver
   auto solver = Solver::new_pcg(matrix, filter);
@@ -63,7 +63,7 @@ void run(PreferredBackend backend)
 
   solver->done();
 
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
 
   // compute error to reference solution
   vec_ref.axpy(vec_sol, vec_ref, -DT_(1));

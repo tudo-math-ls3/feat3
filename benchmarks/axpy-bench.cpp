@@ -18,7 +18,7 @@ using namespace FEAT::Benchmark;
 template <typename VT_>
 void run(PreferredBackend backend)
 {
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
   typedef typename VT_::DataType DT_;
   typedef typename VT_::IndexType IT_;
 
@@ -29,7 +29,7 @@ void run(PreferredBackend backend)
   VT_ y(size, DT_(4711));
   DT_ s(23);
 
-  Runtime::set_preferred_backend(backend);
+  Backend::set_preferred_backend(backend);
   double flops = double(size);
   flops *= 2;
 

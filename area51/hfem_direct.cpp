@@ -55,7 +55,7 @@ namespace HFEM_direct
       LAFEM::DenseVector<double, Index> & vref_orig)
   {
     (void)vref_orig; //disable unused warning
-    Runtime::set_preferred_backend(backend);
+    Backend::set_preferred_backend(backend);
     std::cout<<"========================================"<<std::endl;
     std::cout<<"DataType: " << Type::Traits<DT_>::name()<<std::endl;
     std::cout<<"nrhs: "<<nrhs<<std::endl;

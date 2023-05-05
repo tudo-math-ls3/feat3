@@ -343,7 +343,7 @@ public:
       // apply-test for s = 0.123
       a.apply(result, x, y, s);
 
-      Runtime::set_preferred_backend(PreferredBackend::generic);
+      Backend::set_preferred_backend(PreferredBackend::generic);
       a.apply(ref, x);
       ref.axpy(ref, y, s);
 
@@ -913,7 +913,7 @@ public:
         }
       }
 
-      if (Runtime::get_preferred_backend() != PreferredBackend::cuda)
+      if (Backend::get_preferred_backend() != PreferredBackend::cuda)
       {
         result.transpose_inplace();
 

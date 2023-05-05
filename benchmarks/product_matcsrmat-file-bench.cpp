@@ -29,7 +29,7 @@ void run(PreferredBackend backend, const String filename)
   DT_ alpha(1.);
   DT_ beta(0.);
 
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
 
   SparseMatrixCSR<DT_, IT_> x(FileMode::fm_csr, filename);
   std::cout<<"csr loaded "<<x.rows()<< " " <<x.columns()<<std::endl;
@@ -44,7 +44,7 @@ void run(PreferredBackend backend, const String filename)
     }
   }
 
-  Runtime::set_preferred_backend(backend);
+  Backend::set_preferred_backend(backend);
 
 
   std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols: " << size << std::endl;

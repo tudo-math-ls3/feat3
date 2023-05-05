@@ -18,7 +18,7 @@ using namespace FEAT::Benchmark;
 template <typename DM_>
 void run(PreferredBackend backend)
 {
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
   typedef typename DM_::DataType DT_;
 
   //Index size(64);
@@ -42,7 +42,7 @@ void run(PreferredBackend backend)
   DT_ alpha = DT_(1.);
   DT_ beta = DT_(0.);
 
-  Runtime::set_preferred_backend(backend);
+  Backend::set_preferred_backend(backend);
 
   std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << std::endl;
 

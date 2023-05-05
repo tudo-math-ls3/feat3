@@ -20,7 +20,7 @@ using namespace FEAT::Benchmark;
 template <typename DT_, typename IT_>
 void run(PreferredBackend backend)
 {
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
 
   Index size(128);
   if (backend == PreferredBackend::cuda)
@@ -62,7 +62,7 @@ void run(PreferredBackend backend)
   }
   SparseMatrixCSR<DT_, IT_> x(x_fac.make_csr());
 
-  Runtime::set_preferred_backend(backend);
+  Backend::set_preferred_backend(backend);
 
   std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols: " << size << std::endl;
 

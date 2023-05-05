@@ -613,7 +613,7 @@ namespace DbgAmaVanka
 
 #ifdef FEAT_HAVE_CUDA
     std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
-    Runtime::set_preferred_backend(PreferredBackend::cuda);
+    Backend::set_preferred_backend(PreferredBackend::cuda);
 
     auto cuda_vanka = Solver::new_amavanka(matrix, filter);
     cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_velo));
@@ -629,7 +629,7 @@ namespace DbgAmaVanka
     cuda_solver->set_plot_name("CUDA Vanka");
     cuda_solver->correct(vec_sol, vec_rhs);
     cuda_solver->done();
-    Runtime::set_preferred_backend(PreferredBackend::generic);
+    Backend::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
     std::cout << std::endl << "New Vanka Summary:" << std::endl;
@@ -640,7 +640,7 @@ namespace DbgAmaVanka
     std::cout << std::endl << "CUDA Vanka Summary:" << std::endl;
     std::cout << cuda_solver->get_summary() << std::endl;
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << std::endl;
-    Runtime::set_preferred_backend(PreferredBackend::generic);
+    Backend::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -862,7 +862,7 @@ namespace DbgAmaVanka
 
 #ifdef FEAT_HAVE_CUDA
     std::cout << std::endl << "Running this stuff on CUDA..." << std::endl;
-    Runtime::set_preferred_backend(PreferredBackend::cuda);
+    Backend::set_preferred_backend(PreferredBackend::cuda);
 
     auto cuda_vanka = Solver::new_amavanka(matrix, filter);
     cuda_vanka->push_macro_dofs(Space::DofMappingRenderer::render(space_velo));
@@ -877,7 +877,7 @@ namespace DbgAmaVanka
     cuda_solver->set_plot_name("CUDA Vanka");
     cuda_solver->correct(vec_sol, vec_rhs);
     cuda_solver->done();
-    Runtime::set_preferred_backend(PreferredBackend::generic);
+    Backend::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
     std::cout << std::endl << "New Vanka Summary:" << std::endl;

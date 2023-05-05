@@ -90,7 +90,7 @@ int main(int argc, char** argv)
         << " [Precision: "<< (*i)->get_datatype_name() << "]"
         << " [Indexing: "<< (*i)->get_index_name() << "]"
         << std::endl;
-      Runtime::set_preferred_backend((*i)->get_preferred_backend());
+      Backend::set_preferred_backend((*i)->get_preferred_backend());
       (*i)->run();
       std::cout << "PASSED" << std::endl;
       ++tests_passed;

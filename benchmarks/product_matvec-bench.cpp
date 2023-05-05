@@ -21,7 +21,7 @@ using namespace FEAT::Benchmark;
 template <typename SM_>
 void run(PreferredBackend backend)
 {
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
   typedef typename SM_::DataType DT_;
   typedef typename SM_::IndexType IT_;
 
@@ -37,7 +37,7 @@ void run(PreferredBackend backend)
   sys.convert(bm);
   Index size(sys.rows());
 
-  Runtime::set_preferred_backend(backend);
+  Backend::set_preferred_backend(backend);
   std::cout<<backend<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
   DenseVector<DT_, IT_> x(size);

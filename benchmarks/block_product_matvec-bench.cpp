@@ -20,7 +20,7 @@ using namespace FEAT::Benchmark;
 template <typename SM_, int Blocksize_>
 void run(PreferredBackend backend)
 {
-  Runtime::set_preferred_backend(PreferredBackend::generic);
+  Backend::set_preferred_backend(PreferredBackend::generic);
   typedef typename SM_::DataType DT_;
   typedef typename SM_::IndexType IT_;
 
@@ -40,7 +40,7 @@ void run(PreferredBackend backend)
   init_mat.clear();
 
   {
-    Runtime::set_preferred_backend(PreferredBackend::generic);
+    Backend::set_preferred_backend(PreferredBackend::generic);
     SparseMatrixBCSR<DT_, IT_, Blocksize_, Blocksize_> sys;
     sys.convert(sys_main);
 
@@ -66,7 +66,7 @@ void run(PreferredBackend backend)
     bytes += DT_(used_elements * sizeof(IT_));
     bytes += DT_(size * Blocksize_ * sizeof(DT_));
 
-    Runtime::set_preferred_backend(backend);
+    Backend::set_preferred_backend(backend);
     auto func = [&] () { sys.apply(b, x); };
     run_bench(func, flops, bytes);
 
@@ -74,7 +74,7 @@ void run(PreferredBackend backend)
   }
 
   {
-    Runtime::set_preferred_backend(PreferredBackend::generic);
+    Backend::set_preferred_backend(PreferredBackend::generic);
     SparseMatrixCSR<DT_, IT_> sys;
     sys.convert(sys_main);
 

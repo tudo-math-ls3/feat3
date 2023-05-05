@@ -33,9 +33,8 @@ using namespace FEAT;
 // static member initialization
 bool Runtime::_initialized = false;
 bool Runtime::_finished = false;
-PreferredBackend Runtime::_preferred_backend = PreferredBackend::generic;
 
-void Runtime::initialize(int& argc, char**& argv, PreferredBackend preferred_backend)
+void Runtime::initialize(int& argc, char**& argv)
 {
   /// \platformswitch
   /// On Windows, these two function calls MUST come before anything else,
@@ -66,8 +65,6 @@ void Runtime::initialize(int& argc, char**& argv, PreferredBackend preferred_bac
     std::cerr.flush();
     Runtime::abort();
   }
-
-  _preferred_backend = preferred_backend;
 
   // initialize memory pool for main memory
   MemoryPool::initialize();
@@ -148,38 +145,4 @@ int Runtime::finalize()
 
   // return successful exit code
   return EXIT_SUCCESS;
-}
-
-void Runtime::set_preferred_backend(PreferredBackend preferred_backend)
-{
-  _preferred_backend = preferred_backend;
-}
-
-PreferredBackend Runtime::get_preferred_backend()
-{
-  return _preferred_backend;
-}
-
-std::ostream & FEAT::operator<< (std::ostream & left, PreferredBackend value)
-{
-  switch (value)
-  {
-    case PreferredBackend::generic:
-      left << "generic";
-      break;
-
-    case PreferredBackend::mkl:
-      left << "mkl";
-      break;
-
-    case PreferredBackend::cuda:
-      left << "cuda";
-      break;
-
-    default:
-      left << "unknown preferred backend";
-      break;
-  }
-
-  return left;
 }

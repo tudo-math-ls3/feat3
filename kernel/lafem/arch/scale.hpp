@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/backend.hpp>
 
 namespace FEAT
 {

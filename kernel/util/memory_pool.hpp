@@ -12,7 +12,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/cuda_util.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/backend.hpp>
 
 #include <map>
 #include <cstring>
@@ -180,7 +180,7 @@ namespace FEAT
         template <typename DT_>
         static void set_memory(DT_ * address, const DT_ val, const Index count = 1)
         {
-          switch(Runtime::get_preferred_backend())
+          switch(Backend::get_preferred_backend())
           {
 #ifdef FEAT_HAVE_CUDA
             case PreferredBackend::cuda:
@@ -204,7 +204,7 @@ namespace FEAT
           if (dest == src)
             return;
 
-          switch(Runtime::get_preferred_backend())
+          switch(Backend::get_preferred_backend())
           {
 #ifdef FEAT_HAVE_CUDA
             case PreferredBackend::cuda:
@@ -233,7 +233,7 @@ namespace FEAT
         static void convert(DT1_ * dest, const DT2_ * src, const Index count)
         {
 
-          switch(Runtime::get_preferred_backend())
+          switch(Backend::get_preferred_backend())
           {
 #ifdef FEAT_HAVE_CUDA
             case PreferredBackend::cuda:

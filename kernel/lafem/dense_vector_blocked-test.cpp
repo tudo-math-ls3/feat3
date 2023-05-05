@@ -519,7 +519,7 @@ public:
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
-      if (Runtime::get_preferred_backend() == PreferredBackend::cuda)
+      if (Backend::get_preferred_backend() == PreferredBackend::cuda)
         eps = Math::pow(Math::eps<DT_>(), DT_(0.2));
 
       DenseVectorBlocked<DT_, IT_, BS_> a(size);

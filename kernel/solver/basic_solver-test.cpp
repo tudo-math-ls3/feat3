@@ -194,7 +194,7 @@ public:
     {
       auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1));
       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
-      test_solver("BiCGStab-right-SOR(1)", *solver, vec_sol, vec_ref, vec_rhs, Runtime::get_preferred_backend()!=PreferredBackend::cuda ? 29 : 33);
+      test_solver("BiCGStab-right-SOR(1)", *solver, vec_sol, vec_ref, vec_rhs, Backend::get_preferred_backend()!=PreferredBackend::cuda ? 29 : 33);
     }
 
     // test BiCGStab-left-ILU(0)
@@ -258,7 +258,7 @@ public:
       auto precon_r = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_pcgnr(matrix, filter, precon_l, precon_r);
       solver->set_tol_rel(1e-7);
-      test_solver("PCGNR-JAC-JAC", *solver, vec_sol, vec_ref, vec_rhs, Runtime::get_preferred_backend()!=PreferredBackend::cuda ? 42 : 48);
+      test_solver("PCGNR-JAC-JAC", *solver, vec_sol, vec_ref, vec_rhs, Backend::get_preferred_backend()!=PreferredBackend::cuda ? 42 : 48);
     }
 
     // test PCGNRILU
@@ -303,14 +303,14 @@ public:
     {
       auto precon = Solver::new_sor_precond(this->get_preferred_backend(), matrix, filter, DataType(1));
       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::left);
-      test_solver("BiCGStab-left-SOR", *solver, vec_sol, vec_ref, vec_rhs, Runtime::get_preferred_backend()!=PreferredBackend::cuda ? 29 : 37);
+      test_solver("BiCGStab-left-SOR", *solver, vec_sol, vec_ref, vec_rhs, Backend::get_preferred_backend()!=PreferredBackend::cuda ? 29 : 37);
     }
 
     // test BiCGStab-SSOR
     {
       auto precon = Solver::new_ssor_precond(this->get_preferred_backend(), matrix, filter);
       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
-      test_solver("BiCGStab-right-SSOR", *solver, vec_sol, vec_ref, vec_rhs, Runtime::get_preferred_backend()!=PreferredBackend::cuda ? 13 : 20);
+      test_solver("BiCGStab-right-SSOR", *solver, vec_sol, vec_ref, vec_rhs, Backend::get_preferred_backend()!=PreferredBackend::cuda ? 13 : 20);
     }
   }
 };

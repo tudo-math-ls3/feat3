@@ -10,7 +10,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/runtime.hpp>
+#include <kernel/backend.hpp>
 #include <kernel/lafem/arch/product_matmat.hpp>
 
 #include <typeinfo>
@@ -172,7 +172,7 @@ namespace FEAT
 #ifdef FEAT_HAVE_HALFMATH
         static void dense(Half * r, const Half alpha, const Half beta, const Half * const y, const Half * const val, const Half * const x, const Index rows, const Index columns)
         {
-          switch(Runtime::get_preferred_backend())
+          switch(Backend::get_preferred_backend())
           {
             //no cuda half implementation exists, thus we use the gemm version
             case PreferredBackend::cuda:
