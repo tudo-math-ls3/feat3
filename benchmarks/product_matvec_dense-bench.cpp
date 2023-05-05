@@ -69,7 +69,9 @@ int main(int argc, char ** argv)
   run<DenseMatrix<double, Index> >(PreferredBackend::mkl);
 #endif*/
 #ifdef FEAT_HAVE_CUDA
+#ifdef FEAT_HAVE_HALFMATH
   run<DenseMatrix<FEAT::Half, Index> >(PreferredBackend::cuda);
+#endif
   run<DenseMatrix<float, Index> >(PreferredBackend::cuda);
   run<DenseMatrix<double, Index> >(PreferredBackend::cuda);
 #endif
