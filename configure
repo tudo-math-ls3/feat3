@@ -510,7 +510,7 @@ if "cuda" in buildid:
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
   if not cuda_arch:
-    cuda_arch = "sm_60"
+    cuda_arch = "native"
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
 
   if cuda_verbose:
@@ -545,7 +545,7 @@ if "half" in buildid:
   if "cuda" not in buildid:
     print("Error: Using half without cuda is not supported!")
     sys.exit()
-  if (cuda_arch != "") and (cuda_arch_int < 60):
+  if (cuda_arch != "native") and (cuda_arch_int < 60):
     print("Warning: cuda arch " + cuda_arch + " is too low for half, which needs at least sm_60!")
   else:
     remove_string(unused_tokens, "half")
