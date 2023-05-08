@@ -44,7 +44,7 @@ endif (FEAT_HAVE_MKL)
 
 if (FEAT_HAVE_CUDA)
   FIND_PACKAGE(CUDA)
-  set(CUDA_NVCC_FLAGS " -g -arch=${FEAT_CUDA_ARCH} -std=c++17 -O3 --restrict --compiler-options -Wall,-g")
+  set(CUDA_NVCC_FLAGS " -g -arch=${FEAT_CUDA_ARCH} -std=c++17 -O3 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations")
   if(BUILD_ID MATCHES ".*fast.*")
     set(CUDA_NVCC_FLAGS " --use_fast_math ${CUDA_NVCC_FLAGS}")
   endif(BUILD_ID MATCHES ".*fast.*")

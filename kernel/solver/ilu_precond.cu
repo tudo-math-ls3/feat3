@@ -13,7 +13,6 @@
 
 // http://docs.nvidia.com/cuda/cusparse/#cusparse-lt-t-gt-csrilu02_solve
 
-
 using namespace FEAT;
 
 namespace FEAT
