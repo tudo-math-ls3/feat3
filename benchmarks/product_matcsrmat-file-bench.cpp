@@ -18,20 +18,16 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::Benchmark;
 
 template <typename DT_, typename IT_>
-void run(PreferredBackend backend, const String filename)
+void run(PreferredBackend backend, const String filename, bool transpose)
 {
-  Index size(128);
-  if (backend == PreferredBackend::cuda)
-    size *= 8;
-  size *= 16/sizeof(DT_);
-  size=8192;
-
   DT_ alpha(1.);
   DT_ beta(0.);
 
   Backend::set_preferred_backend(PreferredBackend::generic);
 
   SparseMatrixCSR<DT_, IT_> x(FileMode::fm_csr, filename);
+  if (transpose)
+    x=x.transpose();
   std::cout<<"csr loaded "<<x.rows()<< " " <<x.columns()<<std::endl;
 
 
@@ -47,7 +43,7 @@ void run(PreferredBackend backend, const String filename)
   Backend::set_preferred_backend(backend);
 
 
-  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols: " << size << std::endl;
+  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols/dense: " << x.rows()<<" "<<x.columns()<< " "<<r.columns() << std::endl;
 
   double flops = 2. * double(x.used_elements() * y.columns());
   double bytes = 2. * double(2 * x.used_elements() * x.columns() * y.columns() + r.columns() * r.rows());
@@ -82,24 +78,34 @@ void run(PreferredBackend backend, const String filename)
 int main(int argc, char ** argv)
 {
   Runtime::initialize(argc, argv);
-  if (argc != 2)
+  if (!(argc == 2 || argc == 3))
   {
-    throw InternalError("this benchmarks need the path to a csr (binary) matrix file as its single command line parameter");
+    throw InternalError("this benchmarks need the path to a csr (binary) matrix file as its single command line parameter. A following parameter t for transpose is optional");
   }
   String filename = String(argv[1]);
-  /*run<DenseMatrix<Half, Index> >(PreferredBackend::generic, filename);
-  run<DenseMatrix<float, Index> >(PreferredBackend::generic, filename);
-  run<DenseMatrix<double, Index> >(PreferredBackend::generic, filename);
+  bool transpose(false);
+  if (argc == 3)
+  {
+    if (String(argv[2]) == "t")
+      transpose=true;
+    else if (String(argv[2]) == "n")
+      transpose=false;
+    else
+      throw InternalError("second parameter " + String(argv[2]) + " not known! Only t or n for transpose option are accepted.");
+  }
+  /*run<DenseMatrix<Half, Index> >(PreferredBackend::generic, filename, transpose);
+  run<DenseMatrix<float, Index> >(PreferredBackend::generic, filename, transpose);
+  run<DenseMatrix<double, Index> >(PreferredBackend::generic, filename, transpose);
 #ifdef FEAT_HAVE_MKL
-  run<DenseMatrix<float, Index> >(PreferredBackend::mkl, filename);
-  run<DenseMatrix<double, Index> >(PreferredBackend::mkl, filename);
+  run<DenseMatrix<float, Index> >(PreferredBackend::mkl, filename, transpose);
+  run<DenseMatrix<double, Index> >(PreferredBackend::mkl, filename, transpose);
 #endif*/
 #ifdef FEAT_HAVE_CUDA
 #ifdef FEAT_HAVE_HALFMATH
-  run<FEAT::Half, unsigned int>(PreferredBackend::cuda, filename);
+  run<FEAT::Half, unsigned int>(PreferredBackend::cuda, filename, transpose);
 #endif
-  run<float, unsigned int>(PreferredBackend::cuda, filename);
-  run<double, unsigned int>(PreferredBackend::cuda, filename);
+  run<float, unsigned int>(PreferredBackend::cuda, filename, transpose);
+  run<double, unsigned int>(PreferredBackend::cuda, filename, transpose);
 #endif
   Runtime::finalize();
 }
