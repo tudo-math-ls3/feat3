@@ -9,6 +9,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/cuda_util.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/half.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;

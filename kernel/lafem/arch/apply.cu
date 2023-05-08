@@ -11,6 +11,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/half.hpp>
 
 #include "cusparse_v2.h"
 

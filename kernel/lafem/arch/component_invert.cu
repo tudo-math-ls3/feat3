@@ -8,6 +8,7 @@
 #include <kernel/lafem/arch/component_invert.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/half.hpp>
 
 namespace FEAT
 {

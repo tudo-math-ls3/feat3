@@ -9,6 +9,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/util/half.hpp>
 
 namespace FEAT
 {

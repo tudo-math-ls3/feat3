@@ -6,6 +6,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/util/half.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>

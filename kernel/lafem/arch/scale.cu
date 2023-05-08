@@ -8,6 +8,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/util/half.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;

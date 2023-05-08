@@ -12,6 +12,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/backend.hpp>
 #include <kernel/lafem/arch/product_matmat.hpp>
+#include <kernel/util/half.hpp>
 
 #include <typeinfo>
 

@@ -8,6 +8,7 @@
 #include <kernel/lafem/arch/product_matmat.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/half.hpp>
 
 #include <cublas_v2.h>
 #include <cublasLt.h>
