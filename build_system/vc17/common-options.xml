@@ -94,6 +94,7 @@
       <HostDebugInfo>$(DebugMode)</HostDebugInfo>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CodeGeneration>compute_60,sm_60</CodeGeneration>
+      <CompileOut>$(IntDir)\%(Filename)%(Extension).obj</CompileOut>
       <!--<AdditionalCompilerOptions>/FS /wd4100 /wd4201 /wd4296 /wd4324 /wd4365 /wd4458 /wd4464 /wd4515 /wd4574 /wd4668</AdditionalCompilerOptions>-->
       <!--<AdditionalCompilerOptions>/FS %(AdditionalOptions)</AdditionalCompilerOptions>-->
       <AdditionalOptions>--std=c++17 %(AdditionalOptions)</AdditionalOptions>
