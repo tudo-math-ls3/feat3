@@ -43,7 +43,7 @@ _Pragma("warning(disable:2259)")
 using namespace FEAT;
 
 
-#ifdef FEAT_HAVE_FLOATX
+#if defined(FEAT_HAVE_FLOATX) && !defined(FEAT_HAVE_CUDA)
   // IEEE 754-2008 binary16 aka half-precision
   // must use double as backend type because float is not supported
   typedef flx::floatx<5, 10, double> flx_f16;  // half-prec
@@ -89,7 +89,7 @@ namespace MultiPrecHierarchBench
   }
 #endif
 
-#ifdef FEAT_HAVE_FLOATX
+#if defined(FEAT_HAVE_FLOATX) && !defined(FEAT_HAVE_CUDA)
   flx_f16 choose_tol(flx_f16)
   {
     return flx_f16(1E-2);
@@ -570,7 +570,7 @@ int main(int argc, char* argv[])
   if(precs == "dp:dp") MultiPrecHierarchBench::main<double, double>(level_max, level_min, reduce); else
   if(precs == "dp:sp") MultiPrecHierarchBench::main<double, float>(level_max, level_min, reduce); else
   if(precs == "sp:sp") MultiPrecHierarchBench::main<float, float>(level_max, level_min, reduce); else
-#ifdef FEAT_HAVE_FLOATX
+#if defined(FEAT_HAVE_FLOATX) && !defined(FEAT_HAVE_CUDA)
   if(precs == "dp:hp") MultiPrecHierarchBench::main<double, flx_f16>(level_max, level_min, reduce); else
   if(precs == "sp:hp") MultiPrecHierarchBench::main<float, flx_f16>(level_max, level_min, reduce); else
   if(precs == "dp:bp") MultiPrecHierarchBench::main<double, flx_bf16>(level_max, level_min, reduce); else
