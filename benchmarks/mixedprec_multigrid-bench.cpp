@@ -73,7 +73,7 @@ namespace MixedPrecMultiGridBench
   template<> struct Typo<f_sp> {static const char* name() {return "sp";} };
 
   // half precision (requires FloatX third-party library)
-#if defined(FEAT_HAVE_FLOATX) !defined(FEAT_HAVE_CUDA)
+#if defined(FEAT_HAVE_FLOATX) && !defined(FEAT_HAVE_CUDA)
   // Note: 'float' as backend is bugged
   typedef flx::floatx<5, 10, double> f_hp;
   template<> struct Typo<f_hp> {static const char* name() {return "hp";} };
@@ -227,7 +227,7 @@ namespace MixedPrecMultiGridBench
   }
 
   // reduction for floatx type is not omp standard conform
-#if defined(FEAT_HAVE_FLOATX) !defined(FEAT_HAVE_CUDA)
+#if defined(FEAT_HAVE_FLOATX) && !defined(FEAT_HAVE_CUDA)
   template<int e_, int s_, typename DT_>
   flx::floatx<e_, s_, DT_> norm2(const std::vector<flx::floatx<e_, s_, DT_>>& v)
   {
@@ -660,7 +660,7 @@ namespace MixedPrecMultiGridBench
     if(precs == "dp sp") run<f_dp, f_dp, f_sp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
 #endif
     if(precs == "sp sp") run<f_dp, f_sp, f_sp>(level, max_iter, num_inner, num_smooth, omega); else
-#if defined(FEAT_HAVE_FLOATX) !defined(FEAT_HAVE_CUDA)
+#if defined(FEAT_HAVE_FLOATX) && !defined(FEAT_HAVE_CUDA)
     // half prec
     if(precs == "dp hp") run<f_dp, f_dp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else
     if(precs == "sp hp") run<f_dp, f_sp, f_hp>(level, max_iter, num_inner, num_smooth, omega); else
