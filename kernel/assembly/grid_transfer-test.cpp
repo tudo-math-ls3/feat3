@@ -60,6 +60,9 @@ public:
     // run tests
     test_unit_2d_q1(mesh_fine, mesh_coarse);
     test_unit_2d_q1t(mesh_fine, mesh_coarse);
+
+    // test direct prolongation vector assembly
+    test_unit_2d_q1_vec(mesh_fine, mesh_coarse);
   }
 
   void test_unit_2d_q1(QuadMesh& mesh_f, QuadMesh& mesh_c) const
@@ -221,6 +224,40 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS(prol_matrix(i,j), data_ref[i * prol_matrix.columns() + j], eps);
       }
     }
+  }
+
+  void test_unit_2d_q1_vec(QuadMesh& mesh_f, QuadMesh& mesh_c) const
+  {
+    // compute tolerance
+    const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.9));
+
+    // create trafos
+    QuadTrafo trafo_f(mesh_f);
+    QuadTrafo trafo_c(mesh_c);
+
+    // create spaces
+    QuadSpaceQ1 space_f(trafo_f);
+    QuadSpaceQ1 space_c(trafo_c);
+
+    // assemble prolongation matrix
+    MatrixType_ prol_matrix;
+    Assembly::SymbolicAssembler::assemble_matrix_2lvl(prol_matrix, space_f, space_c);
+    prol_matrix.format();
+    Assembly::GridTransfer::assemble_prolongation_direct(prol_matrix, space_f, space_c, "gauss-legendre:2");
+
+    // create a randomized coarse mesh vector
+    Random rng;
+    VectorType vec_c(rng, space_c.get_num_dofs(), -DataType_(1), DataType_(1));
+
+    // assemble prolongated fine mesh vector
+    VectorType vec_f(space_f.get_num_dofs(), DataType_(0));
+    Assembly::GridTransfer::prolongate_vector_direct(vec_f, vec_c, space_f, space_c, "gauss-legendre:2");
+
+    // subtract prolongated vector by matrix product
+    prol_matrix.apply(vec_f, vec_c, vec_f, -DataType_(1));
+
+    // compute error norm
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_f.norm2sqr(), DataType_(0), tol);
   }
 };
 
