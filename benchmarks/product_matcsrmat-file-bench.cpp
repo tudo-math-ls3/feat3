@@ -107,5 +107,6 @@ int main(int argc, char ** argv)
   run<float, unsigned int>(PreferredBackend::cuda, filename, transpose);
   run<double, unsigned int>(PreferredBackend::cuda, filename, transpose);
 #endif
+  (void)transpose; // suppress unused variable warnings
   Runtime::finalize();
 }
