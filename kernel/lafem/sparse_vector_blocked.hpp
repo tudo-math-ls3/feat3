@@ -711,11 +711,15 @@ namespace FEAT
        *
        * \returns Non zero element count.
        */
-      Index used_elements(const Perspective = Perspective::native) const
+      template <Perspective perspective_ = Perspective::native>
+      Index used_elements() const
       {
         if (sorted() == 0)
           const_cast<SparseVectorBlocked *>(this)->sort();
-        return this->_scalar_index.at(1);
+        if (perspective_ == Perspective::pod)
+          return this->_scalar_index.at(1) * Index(BlockSize_);
+        else
+          return this->_scalar_index.at(1);
       }
 
       /**
