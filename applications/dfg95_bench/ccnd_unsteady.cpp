@@ -467,6 +467,10 @@ namespace DFG95
         comm.print(String("Save Final Solution").pad_back(pl, pc) + ": N/A");
     }
 
+    // enable solver expressions if extended statistics are desired
+    if(ext_stats)
+      Statistics::enable_solver_expressions = true;
+
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */

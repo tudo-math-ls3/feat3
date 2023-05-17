@@ -265,6 +265,10 @@ namespace DFG95
         comm.print(String("Coarse Solver").pad_back(pl, pc) + ": BiCGStab-AmaVanka");
     }
 
+    // enable solver expressions if extended statistics are desired
+    if(ext_stats)
+      Statistics::enable_solver_expressions = true;
+
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */

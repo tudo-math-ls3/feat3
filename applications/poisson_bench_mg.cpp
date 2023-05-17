@@ -233,6 +233,9 @@ namespace PoissonDirichlet
 
     const Index num_levels = domain.size_physical();
 
+    // enable solver expressions
+    Statistics::enable_solver_expressions = true;
+
     BenchStats stats(domain.size_virtual());
 
     {
