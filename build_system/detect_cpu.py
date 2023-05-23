@@ -41,6 +41,9 @@ def detect_cpu():
       if cpu_implementer == "0x4e":
         if cpu_part == "0x004":
           cputype = "armv8"
+      if cpu_implementer == "0x46": # Fujitsu
+        if cpu_part == "0x001":
+          cputype = "a64fx"
 
     else:
       print ("detect_cpu: operating system not supported")

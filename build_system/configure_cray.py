@@ -7,10 +7,10 @@ from build_system.feat_util import get_output
 
 def configure_cray(cpu, buildid, compiler, restrict_errors):
 
-  cxxflags = "-h -std=c++17"
+  cxxflags = " -std=c++17"
 
   if "debug" in buildid:
-    cxxflags += "  -O0 -g"
+    cxxflags += " -O0 -g"
 
   elif "opt" in buildid:
     cxxflags += " -O3"
