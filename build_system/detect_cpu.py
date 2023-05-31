@@ -205,6 +205,8 @@ def detect_cpu():
         cputype = "knightslanding"
       elif model == 94:
         cputype = "skylake"
+      elif model == 106:
+        cputype = "icelake"
       elif model == 158:
         cputype = "coffee-lake"
       elif model == 142:
