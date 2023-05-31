@@ -38,7 +38,7 @@ endif (FEAT_COTIRE)
 
 if (FEAT_HAVE_MKL)
   set (BLA_VENDOR Intel10_64ilp_seq)
-  find_package(BLAS)
+  find_package(BLAS REQUIRED)
   ADD_LINK_OPTIONS(${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES})
 endif (FEAT_HAVE_MKL)
 
