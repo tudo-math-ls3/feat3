@@ -83,6 +83,10 @@ This macro is defined by the build system if the FEAT kernel is linked against t
 This macro is defined by the build system if the FEAT kernel is linked against the CGAL library.
 
 <hr>
+\subsection ppm_feat_have_boost FEAT_HAVE_BOOST
+This macro is defined by the build system if the FEAT kernel is linked against the BOOST library.
+
+<hr>
 \subsection ppm_feat_have_deathhandler FEAT_HAVE_DEATH_HANDLER
 This macro is defined by the build system if the FEAT kernel is linked against the DeathHandler library.
 
