@@ -68,7 +68,12 @@ namespace PoissonDirichlet
     static constexpr std::size_t asm_muxer = 2u;
     static constexpr std::size_t asm_transfer = 3u;
     static constexpr std::size_t asm_matrix = 4u;
-    static constexpr std::size_t count = 5u;
+    static constexpr std::size_t gmg_total = 5u;
+    static constexpr std::size_t gmg_defect = 6u;
+    static constexpr std::size_t gmg_smooth = 7u;
+    static constexpr std::size_t gmg_transfer = 8u;
+    static constexpr std::size_t gmg_coarse = 9u;
+    static constexpr std::size_t count = 10u;
   };
 
   template<typename T_>
@@ -101,12 +106,16 @@ namespace PoissonDirichlet
 
     double toe_asm_rhs;
 
+    // final relative defect
+    double mg_final_rel_def;
+
     explicit BenchStats(std::size_t virt_size) :
       counts(virt_size),
       counts_sum(virt_size),
       counts_max(virt_size),
       times(virt_size),
-      toe_asm_rhs(0.0)
+      toe_asm_rhs(0.0),
+      mg_final_rel_def(0.0)
     {
       for(std::size_t i(0u); i < virt_size; ++i)
       {
@@ -129,6 +138,39 @@ namespace PoissonDirichlet
     String format() const
     {
       String s;
+
+      const std::size_t total_elems = counts_sum[0][Counts::num_elems];
+      const std::size_t total_gdofs = counts[0][Counts::num_dofs_g];
+      const double total_asm_time = sum(times, Times::asm_total);
+      const double total_gmg_time = sum(times, Times::gmg_total);
+      const double gmg_mdofs = (total_gmg_time > 1E-5 ? 1E-6 * double(total_gdofs) / total_gmg_time : 0.0);
+
+      s += "\nOverall Performance Summary:";
+      s += "\nTotal Number of Elements...: " + stringify(total_elems).pad_front(15);
+      s += "\nTotal Number of Global DOFs: " + stringify(total_gdofs).pad_front(15);
+      s += "\nTotal Assembly Runtime.....: " + stringify_fp_fix(total_asm_time, 6, 15);
+      s += "\nTotal Multigrid Runtime....: " + stringify_fp_fix(total_gmg_time, 6, 15);
+
+      s += "\n\nOverall Multigrid Performance:" + stringify_fp_fix(gmg_mdofs, 3, 8) + " MDOF/s solved to relative residual of " +
+        stringify_fp_sci(mg_final_rel_def) + "\n";
+
+      s += "\nMultigrid Timings:\n";
+      s += "                Defect /     Smoother /     Transfer /       Coarse /        Total\n";
+      s += "Overall : " +
+        stringify_fp_fix(sum(times, Times::gmg_defect), 6, 12) + " / " +
+        stringify_fp_fix(sum(times, Times::gmg_smooth), 6, 12) + " / " +
+        stringify_fp_fix(sum(times, Times::gmg_transfer), 6, 12) + " / " +
+        stringify_fp_fix(sum(times, Times::gmg_coarse), 6, 12) + " / " +
+        stringify_fp_fix(sum(times, Times::gmg_total), 6, 12) + "\n";
+      for(std::size_t i(0); i < times.size(); ++i)
+      {
+        s += "Level " + stringify(i).pad_front(2) + ": " +
+          stringify_fp_fix(times[i][Times::gmg_defect], 6, 12) + " / " +
+          stringify_fp_fix(times[i][Times::gmg_smooth], 6, 12) + " / " +
+          stringify_fp_fix(times[i][Times::gmg_transfer], 6, 12) + " / " +
+          stringify_fp_fix(times[i][Times::gmg_coarse], 6, 12) + " / " +
+          stringify_fp_fix(times[i][Times::gmg_total], 6, 12) + "\n";
+      }
 
       s += "\nAssembly Timings:\n";
       s += "                Gate        Muxer     Transfer       Matrix        Total        RHS\n";
@@ -173,13 +215,13 @@ namespace PoissonDirichlet
 
       s += "\nMemory Usage Statistics:\n";
       s += String("Peak Physical") +
-        ": " + stringify_fp_fix(double(mem_use_sum[0])/(1024.0*1024.0*1024.0), 6, 15) + " GiB " +
-        "[ " + stringify_fp_fix(double(mem_use_max[0])/(1024.0*1024.0*1024.0), 6, 15) + " GiB ]\n";
+        ": " + stringify_fp_fix(double(mem_use_sum[0])/1073741824.0, 6, 15) + " GiB " +
+        "[ " + stringify_fp_fix(double(mem_use_max[0])/1073741824.0, 6, 15) + " GiB ]\n";
         //": " + stringify(mem_use_sum[0]).pad_front(15) +
         //" [" + stringify(mem_use_max[0]).pad_front(15) + " ]\n";
       s += String("Peak Virtual.") +
-        ": " + stringify_fp_fix(double(mem_use_sum[1])/(1024.0*1024.0*1024.0), 6, 15) + " GiB " +
-        "[ " + stringify_fp_fix(double(mem_use_max[1])/(1024.0*1024.0*1024.0), 6, 15) + " GiB ]\n";
+        ": " + stringify_fp_fix(double(mem_use_sum[1])/1073741824.0, 6, 15) + " GiB " +
+        "[ " + stringify_fp_fix(double(mem_use_max[1])/1073741824.0, 6, 15) + " GiB ]\n";
         //": " + stringify(mem_use_sum[1]).pad_front(15) +
         //" [" + stringify(mem_use_max[1]).pad_front(15) + " ]\n";
 
@@ -263,19 +305,22 @@ namespace PoissonDirichlet
     const bool slu_cgs = false;
 #endif
 
-    Index iters = 3; // mg iterations
-    Index steps = 4; // smoothing steps
+    DataType damp = 0.5;
+    Index iters = 5; // mg iterations
+    Index steps = 5; // smoothing steps
     args.parse("iters", iters);
     args.parse("steps", steps);
+    args.parse("damp", damp);
 
     Solver::MultiGridCycle cycle(Solver::MultiGridCycle::V);
     args.parse("cycle", cycle);
 
-    comm.print(String("Space........: ") + SpaceType::name());
-    comm.print(String("Coarse Solver: ") + (umf_cgs ? "UMFPACK" : (slu_cgs ? "SuperLU" : "Jacobi")));
-    comm.print(String("Smooth Steps.: ") + stringify(steps));
-    comm.print(String("MG Iterations: ") + stringify(iters));
-    comm.print(String("MG Cycle.....: ") + stringify(cycle));
+    comm.print(String("Space.........: ") + SpaceType::name());
+    comm.print(String("Coarse Solver.: ") + (umf_cgs ? "UMFPACK" : (slu_cgs ? "SuperLU" : "Jacobi")));
+    comm.print(String("Smooth Steps..: ") + stringify(steps));
+    comm.print(String("Smooth Damping: ") + stringify(damp));
+    comm.print(String("MG Iterations.: ") + stringify(iters));
+    comm.print(String("MG Cycle......: ") + stringify(cycle));
 
     // create system levels
     for (Index i(0); i < num_levels; ++i)
@@ -402,7 +447,7 @@ namespace PoissonDirichlet
 
       if((i+1) < domain.size_virtual())
       {
-        auto jacobi = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 0.7);
+        auto jacobi = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, damp);
         auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 1.0, jacobi);
         smoother->set_min_iter(steps);
         smoother->set_max_iter(steps);
@@ -463,6 +508,9 @@ namespace PoissonDirichlet
       comm.print("Solver execution FAILED, with status: " + stringify(result));
     }
 
+    // save final relative residual
+    stats.mg_final_rel_def = solver->get_def_final() / solver->get_def_initial();
+
     // release solver
     solver->done();
     multigrid_hierarchy->done();
@@ -474,27 +522,18 @@ namespace PoissonDirichlet
       stats.mem_use[1] = meminfo.get_peak_virtual();
     }
 
-    stats.sync(comm);
-
-    comm.print("\nMultigrid Timings:");
-    comm.print("                Defect /     Smoother /     Transfer /       Coarse /        Total");
-    comm.print("Overall : " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_defect(), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_smooth(), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_transfer(), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_coarse(), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_defect()+multigrid_hierarchy->get_time_smooth()
-          +multigrid_hierarchy->get_time_transfer()+multigrid_hierarchy->get_time_coarse(), 6, 12));
-    for(int i(0); i < int(multigrid_hierarchy->size_physical()); ++i)
+    // set multigrid timings
+    for(std::size_t i(0); i < multigrid_hierarchy->size_physical(); ++i)
     {
-      comm.print("Level " + stringify(i).pad_front(2) + ": " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_defect(i), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_smooth(i), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_transfer(i), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_coarse(i), 6, 12) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_defect(i)+multigrid_hierarchy->get_time_smooth(i)
-          +multigrid_hierarchy->get_time_transfer(i)+multigrid_hierarchy->get_time_coarse(i), 6, 12));
+      stats.times.at(i)[Times::gmg_defect] = multigrid_hierarchy->get_time_defect(int(i));
+      stats.times.at(i)[Times::gmg_smooth] = multigrid_hierarchy->get_time_smooth(int(i));
+      stats.times.at(i)[Times::gmg_transfer] = multigrid_hierarchy->get_time_transfer(int(i));
+      stats.times.at(i)[Times::gmg_coarse] = multigrid_hierarchy->get_time_coarse(int(i));
+      stats.times.at(i)[Times::gmg_total] = stats.times.at(i)[Times::gmg_defect] + stats.times.at(i)[Times::gmg_smooth]
+        + stats.times.at(i)[Times::gmg_transfer] + stats.times.at(i)[Times::gmg_coarse];
     }
+
+    stats.sync(comm);
 
     comm.print(stats.format());
 
@@ -530,7 +569,7 @@ namespace PoissonDirichlet
     comm.print("\nDesired Levels: " + domain.format_desired_levels());
     comm.print(  "Chosen  Levels: " + domain.format_chosen_levels());
 
-    comm.print("\nChosen Partitioning Info:\n" + domain.get_chosen_parti_info());
+    comm.print("\nChosen Partitioning Info: " + domain.get_chosen_parti_info());
 
     // dump domain info if desired
     if(args.check("dump") >= 0)
@@ -651,6 +690,7 @@ namespace PoissonDirichlet
     args.support("mesh");
     args.support("level");
     args.support("dump");
+    args.support("damp");
     args.support("iters");
     args.support("steps");
     args.support("cycle");
