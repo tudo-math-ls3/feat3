@@ -92,8 +92,11 @@ if (FEAT_HAVE_MPI)
     string(REPLACE "\n" " " CMAKE_MPI_VERSION ${CMAKE_MPI_VERSION})
   endif (CMAKE_MPI_VERSION)
 
-  if (MPI_C_INCLUDE_PATH)
-    include_directories(${MPI_C_INCLUDE_PATH})
+  if (MPI_C_COMPILER_INCLUDE_DIRS)
+    INCLUDE_DIRECTORIES(BEFORE "${MPI_C_COMPILER_INCLUDE_DIRS}")
+  endif()
+  if (MPI_CXX_COMPILER_INCLUDE_DIRS)
+    INCLUDE_DIRECTORIES(BEFORE "${MPI_CXX_COMPILER_INCLUDE_DIRS}")
   endif()
 
   ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
@@ -124,7 +127,8 @@ endif (FEAT_VALGRIND)
 
 if (FEAT_TRILINOS_PATH)
   find_package(Trilinos
-      REQUIRED PATHS "${FEAT_TRILINOS_PATH}/"
+      REQUIRED
+      PATHS "${FEAT_TRILINOS_PATH}/"
       COMPONENTS
       Amesos
       AztecOO
@@ -135,11 +139,11 @@ if (FEAT_TRILINOS_PATH)
       Teuchos
       Tpetra
       Thyra
-      ShyLU
+      ShyLU_Node
       Xpetra
       Zoltan
       Zoltan2)
-  INCLUDE_DIRECTORIES(${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
+    INCLUDE_DIRECTORIES(AFTER ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
 endif (FEAT_TRILINOS_PATH)
 
 
@@ -154,7 +158,7 @@ endif (FEAT_HAVE_BOOST)
 if (FEAT_HAVE_CGAL)
   if (NOT FEAT_HAVE_BOOST)
     find_package(Boost REQUIRED COMPONENTS thread)
-    INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+    INCLUDE_DIRECTORIES(BEFORE "${Boost_INCLUDE_DIRS}")
     if (NOT Boost_FOUND)
       message("boost not found on your system! you may add the keyword boost to the build-id-string in your configure statement to install it.")
     endif (NOT Boost_FOUND)

@@ -119,6 +119,8 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Use the intel mkl sparse executor interface.")
   print ("--restrict_errors")
   print ("  Abort compilation after an error is encountered.")
+  print ("--trilinos_path")
+  print ("  Path to a Frosch compatible trilinos installation.")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
