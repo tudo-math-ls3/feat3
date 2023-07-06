@@ -605,7 +605,7 @@ namespace FEAT
         _num_slices[2] = (shape_dim_ >= 3 ? nz : Index(0));
 
         // create structured index set
-        _sish = std::make_unique<StructIndexSetHolder<shape_dim_>>(_num_slices);
+        _sish.reset(new StructIndexSetHolder<shape_dim_>(_num_slices));
 
         // get entity counts
         _num_entities[0] = _sish-> template get_index_set<shape_dim_, 0>().get_index_bound();
@@ -639,6 +639,9 @@ namespace FEAT
             }
           }
         }
+        // silence unused variable warnings in 1D and 2D
+        (void)fy;
+        (void)fz;
       }
 
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
@@ -708,6 +711,9 @@ namespace FEAT
             }
           }
         }
+        // silence unused variable warnings in 1D and 2D
+        (void)fy;
+        (void)fz;
       }
 
       static MeshType make_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)

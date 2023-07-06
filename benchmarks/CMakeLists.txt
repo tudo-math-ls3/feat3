@@ -11,11 +11,13 @@ set(benchmarks
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
   pcg-bench
+  poisson_multigrid-bench
   product_matmat-bench
   product_matcsrmat-bench
   product_matcsrmat-file-bench
   product_matvec-bench
   product_matvec_dense-bench
+  stokes_multigrid-bench
 )
 
 ADD_CUSTOM_TARGET(benchmarks DEPENDS ${benchmarks})

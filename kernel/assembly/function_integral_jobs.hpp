@@ -8,6 +8,7 @@
 #define KERNEL_ASSEMBLY_FUNCTION_INTEGRAL_JOBS_HPP 1
 
 #include <kernel/assembly/base.hpp>
+#include <kernel/assembly/asm_traits.hpp>
 #include <kernel/analytic/function.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
