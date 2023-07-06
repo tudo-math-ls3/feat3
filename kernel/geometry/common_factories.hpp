@@ -564,6 +564,167 @@ namespace FEAT
     using RefinedUnitCubeFactory = RefineFactory<MeshType_, Geometry::UnitCubeFactory >;
 
     /**
+     * \brief Structured unit-cube mesh factory
+     *
+     * This factory creates a unit-cube mesh in a structured fashion with lexicographic vertex and
+     * element numbering.
+     *
+     * This class is specialized for ConformalMesh<Hypercube<dim_>> as well as for StructuredMesh<dim_>
+     *
+     * \author Peter Zajac
+     */
+    template<typename Mesh_>
+    class StructUnitCubeFactory;
+
+    /// \cond internal
+    /// specialization for ConformalMesh<Hypercube>
+    template<int shape_dim_, typename Coord_>
+    class StructUnitCubeFactory<ConformalMesh<Shape::Hypercube<shape_dim_>, shape_dim_, Coord_>> :
+      public Factory<ConformalMesh<Shape::Hypercube<shape_dim_>, shape_dim_, Coord_>>
+    {
+    public:
+      typedef ConformalMesh<Shape::Hypercube<shape_dim_>, shape_dim_, Coord_> MeshType;
+      typedef Factory<MeshType> BaseClass;
+
+      typedef typename BaseClass::VertexSetType VertexSetType;
+      typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
+
+      static_assert(shape_dim_ <= 3, "this class can only be used for dimension <= 3");
+
+    private:
+      Index _num_slices[3];
+      Index _num_entities[4];
+      std::unique_ptr<StructIndexSetHolder<shape_dim_>> _sish;
+
+    public:
+      explicit StructUnitCubeFactory(Index nx = 1u, Index ny = 1u, Index nz = 1u) :
+        _sish()
+      {
+        _num_slices[0] = nx;
+        _num_slices[1] = (shape_dim_ >= 2 ? ny : Index(0));
+        _num_slices[2] = (shape_dim_ >= 3 ? nz : Index(0));
+
+        // create structured index set
+        _sish = std::make_unique<StructIndexSetHolder<shape_dim_>>(_num_slices);
+
+        // get entity counts
+        _num_entities[0] = _sish-> template get_index_set<shape_dim_, 0>().get_index_bound();
+        if constexpr (shape_dim_ >= 2)
+          _num_entities[1] = _sish-> template get_index_set<shape_dim_, 1>().get_index_bound();
+        if constexpr (shape_dim_ >= 3)
+          _num_entities[2] = _sish-> template get_index_set<shape_dim_, 2>().get_index_bound();
+        _num_entities[shape_dim_] = _sish-> template get_index_set<shape_dim_, 0>().get_num_entities();
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        return _num_entities[dim];
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        const Coord_ fx = (_num_slices[0] > 0u ? Coord_(1) / Coord_(_num_slices[0]) : Coord_(0));
+        const Coord_ fy = (_num_slices[1] > 0u ? Coord_(1) / Coord_(_num_slices[1]) : Coord_(0));
+        const Coord_ fz = (_num_slices[2] > 0u ? Coord_(1) / Coord_(_num_slices[2]) : Coord_(0));
+        for(Index i(0u); i <= _num_slices[2]; ++i)
+        {
+          for(Index j(0u); j <= _num_slices[1]; ++j)
+          {
+            for(Index k(0u); k <= _num_slices[0]; ++k)
+            {
+              auto& v =vertex_set[k + (_num_slices[0]+1u) * (j + (_num_slices[1]+1u)*i)];
+              v[0] = Coord_(k) * fx;
+              if constexpr(shape_dim_ >= 2) v[1] = Coord_(j) * fy;
+              if constexpr(shape_dim_ >= 3) v[2] = Coord_(i) * fz;
+            }
+          }
+        }
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        // copy structured index sets
+        _sish->copy_to(index_set_holder);
+      }
+
+      static MeshType make_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        StructUnitCubeFactory factory(nx, ny, nz);
+        return MeshType(factory);
+      }
+
+      static std::unique_ptr<MeshType> make_unique_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        StructUnitCubeFactory factory(nx, ny, nz);
+        return std::unique_ptr<MeshType>(new MeshType(factory));
+      }
+    }; // StructUnitCubeFactory<ConformalMesh<Hypercube>>
+
+    /// specialization for StructuredMesh
+    template<int shape_dim_, typename Coord_>
+    class StructUnitCubeFactory<StructuredMesh<shape_dim_, shape_dim_, Coord_>> :
+      public Factory<StructuredMesh<shape_dim_, shape_dim_, Coord_>>
+    {
+    public:
+      typedef StructuredMesh<shape_dim_, shape_dim_, Coord_> MeshType;
+      typedef Factory<MeshType> BaseClass;
+
+      typedef typename BaseClass::VertexSetType VertexSetType;
+
+      static_assert(shape_dim_ <= 3, "this class can only be used for dimension <= 3");
+
+    private:
+      Index _num_slices[3];
+
+    public:
+      explicit StructUnitCubeFactory(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        _num_slices[0] = nx;
+        _num_slices[1] = (shape_dim_ >= 2 ? ny : Index(0));
+        _num_slices[2] = (shape_dim_ >= 3 ? nz : Index(0));
+      }
+
+      virtual Index get_num_slices(int dir) override
+      {
+        XASSERT((dir >= 0) && (dir <= shape_dim_));
+        return _num_slices[dir];
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        const Coord_ fx = (_num_slices[0] > 0u ? Coord_(1) / Coord_(_num_slices[0]) : Coord_(0));
+        const Coord_ fy = (_num_slices[1] > 0u ? Coord_(1) / Coord_(_num_slices[1]) : Coord_(0));
+        const Coord_ fz = (_num_slices[2] > 0u ? Coord_(1) / Coord_(_num_slices[2]) : Coord_(0));
+        for(Index i(0u); i <= _num_slices[2]; ++i)
+        {
+          for(Index j(0u); j <= _num_slices[1]; ++j)
+          {
+            for(Index k(0u); k <= _num_slices[0]; ++k)
+            {
+              auto& v =vertex_set[k + (_num_slices[0]+1u) * (j + (_num_slices[1]+1u)*i)];
+              v[0] = Coord_(k) * fx;
+              if constexpr(shape_dim_ >= 2) v[1] = Coord_(j) * fy;
+              if constexpr(shape_dim_ >= 3) v[2] = Coord_(i) * fz;
+            }
+          }
+        }
+      }
+
+      static MeshType make_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        StructUnitCubeFactory factory(nx, ny, nz);
+        return MeshType(factory);
+      }
+
+      static std::unique_ptr<MeshType> make_unique_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        StructUnitCubeFactory factory(nx, ny, nz);
+        return std::unique_ptr<MeshType>(new MeshType(factory));
+      }
+    }; // StructUnitCubeFactory<StructuredMesh>
+    /// \endcond
+
+    /**
      * \brief Unit cube factory with star shaped mesh topology
      *
      * 2-------------------------------1------------------------------3

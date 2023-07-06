@@ -22,6 +22,8 @@
 #include <kernel/geometry/parti_iterative.hpp>
 #include <kernel/geometry/parti_parmetis.hpp>
 #include <kernel/geometry/parti_zoltan.hpp>
+#include <kernel/geometry/boundary_factory.hpp>
+#include <kernel/geometry/common_factories.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -697,8 +699,27 @@ namespace FEAT
 
           TimeStamp stamp_create;
 
-          // try to the read the base-mesh
-          std::unique_ptr<MeshNodeType> base_mesh_node = mesh_reader.parse(this->_atlas, &_parti_set);
+          // parse mesh and create control
+          create(mesh_reader.parse(this->_atlas, &_parti_set));
+
+          // collect partition statistics
+          FEAT::Statistics::toe_partition = stamp_create.elapsed_now();
+        }
+
+        /**
+         * \brief Creates a domain control from a base-mesh node
+         *
+         * \param[in] base_mesh_node
+         * The base-mesh node that the domain control is to be created from
+         */
+        void create(std::unique_ptr<MeshNodeType> base_mesh_node)
+        {
+          // ensure that the domain control is still empty
+          XASSERTM(!_was_created, "domain has already been created");
+          XASSERT(this->size_physical() == std::size_t(0));
+          XASSERT(this->size_virtual() == std::size_t(0));
+
+          TimeStamp stamp_create;
 
           // create the domain control
 #ifdef FEAT_HAVE_MPI
@@ -739,6 +760,40 @@ namespace FEAT
 
           // domain created
           _was_created = true;
+        }
+
+        /**
+         * \brief Creates a domain control from a structured rectilinear base mesh
+         *
+         * \note This function also creates a mesh-part named "bnd" that represents the entire domain boundary.
+         *
+         * \param[in] num_elems_x, num_elems_y, num_elems_z
+         * The number of elements in each dimension for the base-mesh
+         */
+        void create_rectilinear(Index num_elems_x, Index num_elems_y = 0u, Index num_elems_z = 0u)
+        {
+          // ensure that the domain control is still empty
+          XASSERTM(!_was_created, "domain has already been created");
+          XASSERT(this->size_physical() == std::size_t(0));
+          XASSERT(this->size_virtual() == std::size_t(0));
+
+          TimeStamp stamp_create;
+
+          // allocate a base-mesh node and create mesh
+          std::unique_ptr<MeshNodeType> base_mesh_node = MeshNodeType::make_unique(
+            Geometry::StructUnitCubeFactory<MeshType>::make_unique_from(num_elems_x, num_elems_y, num_elems_z));
+
+          // get mesh and create boundary
+          {
+            Geometry::BoundaryFactory<MeshType> bnd_factory(*base_mesh_node->get_mesh());
+            base_mesh_node->add_mesh_part("bnd", bnd_factory.make_unique());
+          }
+
+          // create control
+          create(std::move(base_mesh_node));
+
+          // collect partition statistics
+          FEAT::Statistics::toe_partition = stamp_create.elapsed_now();
         }
 
         /**

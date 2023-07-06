@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/shape.hpp>
+#include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/intern/struct_num_entities.hpp>
 #include <kernel/geometry/intern/struct_index_mapping.hpp>
 
@@ -250,6 +251,25 @@ namespace FEAT
         return Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(i, Index(j), _num_slices);
       }
 
+      /**
+       * \brief Copies this index set into a (conformal) index set
+       *
+       * \param[inout]
+       * A \transient reference to the index set that receives the copy. Must be allocated to correct sizes.
+       */
+      void copy_to(IndexSet<num_indices>& idx_set) const
+      {
+        XASSERT(idx_set.get_num_entities() == this->get_num_entities());
+        XASSERT(idx_set.get_index_bound() == this->get_index_bound());
+        for(Index i(0); i < _num_entities; ++i)
+        {
+          for(int j(0); j < num_indices; ++j)
+          {
+            idx_set(i, j) = Intern::StructIndexMapping<shape_dim_, cell_dim_, face_dim_>::compute(i, Index(j), _num_slices);
+          }
+        }
+      }
+
       /* *************************************************************************************** */
       /*          A D J A C T O R     I N T E R F A C E     I M P L E M E N T A T I O N          */
       /* *************************************************************************************** */
@@ -333,6 +353,12 @@ namespace FEAT
       {
         return BaseClass::bytes() + _index_set.bytes();
       }
+
+      void copy_to(IndexSetWrapper<Shape::Hypercube<cell_dim_>, face_dim_>& idx_set_wrp) const
+      {
+        BaseClass::copy_to(idx_set_wrp);
+        _index_set.copy_to(idx_set_wrp.template get_index_set<face_dim_>());
+      }
     };
 
     template<
@@ -374,6 +400,11 @@ namespace FEAT
       std::size_t bytes() const
       {
         return _index_set.bytes();
+      }
+
+      void copy_to(IndexSetWrapper<Shape::Hypercube<cell_dim_>, 0>& idx_set_wrp) const
+      {
+        _index_set.copy_to(idx_set_wrp.template get_index_set<0>());
       }
     };
 
@@ -428,6 +459,12 @@ namespace FEAT
       {
         return BaseClass::bytes() + _index_set_wrapper.bytes();
       }
+
+      void copy_to(IndexSetHolder<Shape::Hypercube<cell_dim_>>& idx_set_hld) const
+      {
+        BaseClass::copy_to(idx_set_hld);
+        _index_set_wrapper.copy_to(idx_set_hld.template get_index_set_wrapper<cell_dim_>());
+      }
     };
 
     template<int shape_dim_>
@@ -450,6 +487,10 @@ namespace FEAT
       std::size_t bytes() const
       {
         return std::size_t(0);
+      }
+
+      void copy_to(IndexSetHolder<Shape::Vertex>&) const
+      {
       }
     };
     /// \endcond
