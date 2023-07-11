@@ -215,55 +215,48 @@ namespace FEAT
        * \brief Gets the total number of columns in this distributed matrix
        *
        * \warning In parallel, this requires communication and is very expensive, so use sparingly!
-       * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        *
        * \returns The number of columns of this matrix
        */
+      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
       Index columns() const
       {
-        // Compute total number of columns
-        auto vec_r = create_vector_r();
-        vec_r.format(DataType(1));
-
-        return Index(vec_r.norm2sqr());
+        return _col_gate->template get_num_global_dofs<perspective_>();
       }
 
       /**
        * \brief Returns the total number of rows in this distributed matrix
        *
        * \warning In parallel, this requires communication and is very expensive, so use sparingly!
-       * \note This always returns the raw (or POD - Plain Old Data) size, as everything else is ambiguous.
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        *
        * \returns The number of rows of this matrix
        */
+      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
       Index rows() const
       {
-        // Compute total number of rows
-        auto vec_l = create_vector_l();
-        vec_l.format(DataType(1));
-
-        return Index(vec_l.norm2sqr());
+        return _row_gate->template get_num_global_dofs<perspective_>();
       }
 
       /**
        * \brief Returns the total number of non-zeros in this distributed matrix
        *
-       * \note This always returns the raw (or POD - Plain Old Data) count, as everything else is ambiguous.
+       * \warning In parallel, this requires communication and is very expensive, so use sparingly!
        *
-       * \attention This function must be called by all processes participating in the gate's
-       * communicator, otherwise the application will deadlock.
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
        *
        * \returns The total number of non-zeros in this matrix
        */
+      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
       Index used_elements() const
       {
-        Index my_used_elements(_matrix.template used_elements<LAFEM::Perspective::pod>());
+        Index my_used_elements(_matrix.template used_elements<perspective_>());
         const Dist::Comm* comm = (_row_gate != nullptr ? _row_gate->get_comm() : (_col_gate != nullptr ? _col_gate->get_comm() : nullptr));
         if((comm != nullptr) && (comm->size() > 1))
           comm->allreduce(&my_used_elements, &my_used_elements, std::size_t(1), Dist::op_sum);

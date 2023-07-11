@@ -576,7 +576,7 @@ namespace FEAT
        * \returns The size of the input template vector.
        */
       template<Perspective perspective_, typename DT2_, typename IT2_, int block_size_>
-      void mask_scatter(const DenseVectorBlocked<DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
+      Index mask_scatter(const DenseVectorBlocked<DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
         XASSERT(Index(mask.size()) >= vector.template size<perspective_>());
