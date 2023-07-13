@@ -139,7 +139,7 @@ if (FEAT_TRILINOS_PATH)
       Teuchos
       Tpetra
       Thyra
-      ShyLU_Node
+      ShyLU
       Xpetra
       Zoltan
       Zoltan2)
