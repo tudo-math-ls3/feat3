@@ -397,7 +397,7 @@ namespace StokesMultigridBench
       Runtime::abort();
 #endif // not FEAT_HAVE_CUDA
     }
-    if(backend.compare_no_case("mkl") == 0)
+    else if(backend.compare_no_case("mkl") == 0)
     {
 #ifndef FEAT_HAVE_MKL
       comm.print(std::cerr, "ERROR: 'mkl' backend is only available when FEAT is configured with MKL support enabled");
