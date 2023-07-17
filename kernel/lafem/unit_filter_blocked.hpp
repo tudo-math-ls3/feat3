@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
@@ -32,7 +33,14 @@ namespace FEAT
      *
      * Mostly c&p from UnitFilter
      *
-     * \author Jordi Paul
+     * \note
+     * This class allows to emulate a "slip-filter-like" behavior by disabling individual filter
+     * components on a per-DOF basis by turning on the "ignore NaNs" functionality and setting all
+     * component values, which should be ignored by the filter, to NaN. Example: if you want to
+     * emulate a 3D slip-filter for the Y-component, then set the filter value (NaN, 0, NaN) for
+     * all DOFs that should be affected by the filter.
+     *
+     * \author Jordi Paul, Peter Zajac
      */
     template<
       typename DT_,
@@ -69,10 +77,14 @@ namespace FEAT
       /// SparseVector, containing all entries of the unit filter
       SparseVectorBlocked<DataType, IndexType, BlockSize> _sv;
 
+      /// ignore NaNs in filter values
+      bool _ignore_nans;
+
     public:
       /// default constructor
       UnitFilterBlocked() :
-        _sv()
+        _sv(),
+        _ignore_nans(false)
       {
       }
 
@@ -81,9 +93,13 @@ namespace FEAT
        *
        * \param[in] num_entries
        * The total number of entries for the unit filter.
+       *
+       * \param[in] ingore_nans
+       * Specifies whether the filter should ignore NaNs filter values
        */
-      explicit UnitFilterBlocked(Index num_entries) :
-        _sv(num_entries)
+      explicit UnitFilterBlocked(Index num_entries, bool ignore_nans = false) :
+        _sv(num_entries),
+        _ignore_nans(ignore_nans)
       {
       }
 
@@ -104,7 +120,8 @@ namespace FEAT
 
       /// move-ctor
       UnitFilterBlocked(UnitFilterBlocked && other) :
-        _sv(std::move(other._sv))
+        _sv(std::move(other._sv)),
+        _ignore_nans(other._ignore_nans)
       {
       }
 
@@ -114,6 +131,7 @@ namespace FEAT
         if(this != &other)
         {
           _sv = std::forward<decltype(other._sv)>(other._sv);
+          _ignore_nans = other._ignore_nans;
         }
         return *this;
       }
@@ -135,6 +153,7 @@ namespace FEAT
       void clone(const UnitFilterBlocked & other, CloneMode clone_mode = CloneMode::Deep)
       {
         _sv.clone(other.get_filter_vector(), clone_mode);
+        _ignore_nans = other._ignore_nans;
       }
 
       /// \brief Converts data from another UnitFilter
@@ -142,6 +161,7 @@ namespace FEAT
       void convert(const UnitFilterBlocked<DT2_, IT2_, BS_>& other)
       {
         _sv.convert(other.get_filter_vector());
+        _ignore_nans = other._ignore_nans;
       }
 
       /// \brief Clears the underlying data (namely the SparseVector)
@@ -166,6 +186,17 @@ namespace FEAT
         return _sv;
       }
       /// \endcond
+
+      /**
+       * \brief Specifies whether the filter should ignore NaN filter values
+       *
+       * \param[in] ingore_nans
+       * Specifies whether the filter should ignore NaNs filter values
+       */
+      void set_ignore_nans(bool ignore_nans)
+      {
+        _ignore_nans = ignore_nans;
+      }
 
       /**
        * \brief Adds one element to the filter
@@ -289,15 +320,22 @@ namespace FEAT
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          IT_ ix(_sv.indices()[i]);
+          const IT_ ix(_sv.indices()[i]);
+          const ValueType vx(_sv.elements()[i]);
+
           // replace by unit row
           for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
-            v[j].format(DT_(0));
-            if(col_idx[j] == ix)
+            // loop over rows in the block
+            for(int k(0); k < BlockSize_; ++k)
             {
-              for(int l(0); l < Math::min(BlockSize_, BlockWidth_); ++l)
-                v[j](l,l) = DT_(1);
+              // possibly skip row if filter value is NaN
+              if(_ignore_nans && Math::isnan(vx[k]))
+                continue;
+              for(int l(0); l < BlockWidth_; ++l)
+                v[j][k][l] = DT_(0);
+              if((col_idx[j] == ix) && (k < BlockWidth_))
+                v[j][k][k] = DT_(1);
             }
           }
         }
@@ -309,15 +347,25 @@ namespace FEAT
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IT_* row_ptr(matrix.row_ptr());
-        auto* v(matrix.val());
+        typename SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
 
         for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          IT_ ix(_sv.indices()[i]);
-          // replace by null row
+          const IT_ ix(_sv.indices()[i]);
+          const ValueType vx(_sv.elements()[i]);
+
+          // replace by unit row
           for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
-            v[j].format(DT_(0));
+            // loop over rows in the block
+            for(int k(0); k < BlockSize_; ++k)
+            {
+              // possibly skip row if filter value is NaN
+              if(_ignore_nans && Math::isnan(vx[k]))
+                continue;
+              for(int l(0); l < BlockWidth_; ++l)
+                v[j][k][l] = DT_(0);
+            }
           }
         }
       }
@@ -340,7 +388,8 @@ namespace FEAT
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilterBlocked::template filter_rhs<BlockSize_>
-            (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
+            (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
+            _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       /**
@@ -366,7 +415,8 @@ namespace FEAT
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
         if(_sv.used_elements() > Index(0))
           Arch::UnitFilterBlocked::template filter_def<BlockSize_>
-            (vector.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
+            (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
+            _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       /**

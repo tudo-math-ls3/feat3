@@ -317,3 +317,93 @@ UnitFilterBlockedMatrixTest<double, Index, 4, 4> unit_filter_blocked_matrix_test
 UnitFilterBlockedMatrixTest<double, Index, 2, 3> unit_filter_blocked_matrix_test_cuda_di_23(PreferredBackend::cuda);
 UnitFilterBlockedMatrixTest<double, Index, 4, 3> unit_filter_blocked_matrix_test_cuda_di_43(PreferredBackend::cuda);
 #endif
+
+
+/**
+ * \brief Test class for UnitFilterBlocked ignore NaNs functionality
+ *
+ * \author Peter Zajac
+ */
+template<typename DT_, typename IT_>
+class UnitFilterBlockedNansTest
+  : public UnitTest
+{
+  static constexpr int BlockSize_ = 3;
+  typedef Tiny::Vector<DT_, BlockSize_> ValueType;
+  typedef DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
+  typedef DenseVectorBlocked<IT_, IT_, BlockSize_> IVectorType;
+  typedef UnitFilterBlocked<DT_, IT_, BlockSize_> FilterType;
+
+public:
+  UnitFilterBlockedNansTest(PreferredBackend backend)
+    : UnitTest("UnitFilterBlockedNansTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~UnitFilterBlockedNansTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ nan = Math::nan<DT_>();
+
+    const Index n = 7;
+
+    VectorType x(n);
+    ValueType* vx = x.elements();
+    for(Index i(0); i < n; ++i)
+    {
+      for(int j(0); j < BlockSize_; ++j)
+        vx[i][j] = DT_(10u*i + Index(j));
+    }
+
+    // create filter with some NaNs in it
+    FilterType filter(n, true);
+
+    ValueType va{DT_(1.0), DT_(2.0), DT_(3.0)};
+    ValueType vb(va);
+    vb[1] = nan;
+
+    filter.add(2u, va);
+    filter.add(5u, vb);
+
+    // filter vector
+    filter.filter_rhs(x);
+
+    // check filtered values
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[2u][0], DT_(1.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[2u][1], DT_(2.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[2u][2], DT_(3.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[5u][0], DT_(1.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[5u][1], DT_(51.0), tol); // ignored because of NaN
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[5u][2], DT_(3.0), tol);
+
+    // filter vector for defect
+    filter.filter_def(x);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[2u][0], DT_(0.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[2u][1], DT_(0.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[2u][2], DT_(0.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[5u][0], DT_(0.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[5u][1], DT_(51.0), tol); // ignored because of NaN
+    TEST_CHECK_EQUAL_WITHIN_EPS(vx[5u][2], DT_(0.0), tol);
+  }
+};
+
+UnitFilterBlockedNansTest<float, Index> unit_filter_blocked_nans_test_generic_fi(PreferredBackend::generic);
+UnitFilterBlockedNansTest<double, Index> unit_filter_blocked_nans_test_generic_di(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+UnitFilterBlockedNansTest <float, std::uint64_t> mkl_unit_filter_blocked_nans_test_float_uint64(PreferredBackend::mkl);
+UnitFilterBlockedNansTest <double, std::uint64_t> mkl_unit_filter_blocked_nans_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+UnitFilterBlockedNansTest<__float128, Index> unit_filter_blocked_nans_test_float128_index(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+UnitFilterBlockedNansTest<Half, Index> unit_filter_blocked_nans_test_half_index(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+UnitFilterBlockedNansTest<float, Index> unit_filter_blocked_nans_test_cuda_fi(PreferredBackend::cuda);
+UnitFilterBlockedNansTest<double, Index> unit_filter_blocked_nans_test_cuda_di(PreferredBackend::cuda);
+#endif

@@ -11,6 +11,8 @@
 #error "Do not include this implementation-only header file directly!"
 #endif
 
+#include <kernel/util/math.hpp>
+
 /// \cond internal
 namespace FEAT
 {
@@ -19,24 +21,54 @@ namespace FEAT
     namespace Arch
     {
       template <int BlockSize_, typename DT_, typename IT_>
-      void UnitFilterBlocked::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+      void UnitFilterBlocked::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
       {
         Index block_size = Index(BlockSize_);
-        for(Index i(0); i < ue; ++i)
+        if(ign_nans)
         {
-          for(Index j(0) ; j < block_size ; ++j)
-            v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
+          for(Index i(0); i < ue; ++i)
+          {
+            for(Index j(0) ; j < block_size ; ++j)
+            {
+              if(!Math::isnan(sv_elements[block_size * i + Index(j)]))
+                v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
+            }
+          }
+        }
+        else
+        {
+          for(Index i(0); i < ue; ++i)
+          {
+            for(Index j(0) ; j < block_size ; ++j)
+            {
+              v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
+            }
+          }
         }
       }
 
       template <int BlockSize_, typename DT_, typename IT_>
-      void UnitFilterBlocked::filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue)
+      void UnitFilterBlocked::filter_def_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
       {
         Index block_size = Index(BlockSize_);
-        for(Index i(0); i < ue; ++i)
+        if(ign_nans)
         {
-          for(Index j(0) ; j < BlockSize_ ; ++j)
-            v[block_size * sv_indices[i] + j] = DT_(0);
+          for(Index i(0); i < ue; ++i)
+          {
+            for(Index j(0) ; j < block_size ; ++j)
+            {
+              if(!Math::isnan(sv_elements[block_size * i + Index(j)]))
+                v[block_size * sv_indices[i] + j] = DT_(0);
+            }
+          }
+        }
+        else
+        {
+          for(Index i(0); i < ue; ++i)
+          {
+            for(Index j(0) ; j < BlockSize_ ; ++j)
+              v[block_size * sv_indices[i] + j] = DT_(0);
+          }
         }
       }
 
