@@ -214,7 +214,10 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
       cxxflags += " -march=a53"
     elif cpu == "armv8":
       cxxflags += " -m64 -march=v8.2a"
-
+    elif cpu == "a64fx":
+      cxxflags += " -mcpu=a64fx"
+    elif cpu == "thunderx2":
+      cxxflags += " -mcpu=thunderx2t99"
     else:
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_clang.py, using -march=native instead.")

@@ -9,7 +9,7 @@ from build_system.feat_util import is_found
 def detect_cpu():
   cputype = "unknown"
 
-# detect arm architecture
+  # detect arm architecture
   if "arm" in platform.machine() or "aarch64" in platform.machine():
     if platform.system() == "Linux":
       d = {}
@@ -38,12 +38,15 @@ def detect_cpu():
           cputype = "cortexa15"
         elif cpu_part == "0xd03":
           cputype = "cortexa53"
-      if cpu_implementer == "0x4e":
-        if cpu_part == "0x004":
-          cputype = "armv8"
+      if cpu_implementer == "0x43": # Cavium/Marvell
+        if cpu_part == "0x0af":
+          cputype = "thunderx2"
       if cpu_implementer == "0x46": # Fujitsu
         if cpu_part == "0x001":
           cputype = "a64fx"
+      if cpu_implementer == "0x4e":
+        if cpu_part == "0x004":
+          cputype = "armv8"
 
     else:
       print ("detect_cpu: operating system not supported")
@@ -51,7 +54,7 @@ def detect_cpu():
 
     return cputype
 
-# detect power architecture
+  # detect power architecture
   if "ppc64" in platform.machine():
     if platform.system() == "Linux":
       d = {}
@@ -80,8 +83,8 @@ def detect_cpu():
 
     return cputype
 
-#no special arch detected, assume x86 from now
-# read int cpu information
+  #no special arch detected, assume x86 from now
+  # read int cpu information
   if platform.system() == "Linux":
     d = {}
     f = open("/proc/cpuinfo")
@@ -149,7 +152,7 @@ def detect_cpu():
     print ("detect_cpu: operating system not supported")
     return cputype
 
-#map cpu information to cpu string
+  #map cpu information to cpu string
   # INTEL
   if vendor_id == "GenuineIntel":
     if cpu_family == 4:
