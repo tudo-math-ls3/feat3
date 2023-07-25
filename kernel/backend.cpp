@@ -4,6 +4,9 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/backend.hpp>
+#ifdef FEAT_HAVE_CUDA
+#include <kernel/util/cuda_util.hpp>
+#endif
 
 namespace FEAT
 {
@@ -13,6 +16,12 @@ namespace FEAT
   void Backend::set_preferred_backend(PreferredBackend preferred_backend)
   {
     _preferred_backend = preferred_backend;
+    if (preferred_backend != PreferredBackend::cuda)
+    {
+#ifdef FEAT_HAVE_CUDA
+      FEAT::Util::cuda_synchronize();
+#endif
+    }
   }
 
   PreferredBackend Backend::get_preferred_backend()

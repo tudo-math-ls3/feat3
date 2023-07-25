@@ -253,7 +253,9 @@ namespace FEAT
         NOINLINE static void synchronize()
         {
 #ifdef FEAT_HAVE_CUDA
-          FEAT::Util::cuda_synchronize();
+          //avoid calling expensive synchronize if cuda is not actively used
+          if (Backend::get_preferred_backend() == PreferredBackend::cuda)
+            FEAT::Util::cuda_synchronize();
 #endif
         }
 
