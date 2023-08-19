@@ -258,14 +258,14 @@ namespace FEAT
           for (Index i(0) ; i < _indices.size() ; ++i)
           {
             XASSERTM(_indices_size.at(i) == other.get_indices_size().at(i), "Container size mismatch!");
-            MemoryPool::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+            MemoryPool::copy(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
           }
         }
 
         for (Index i(0) ; i < _elements.size() ; ++i)
         {
           XASSERTM(_elements_size.at(i) == other.get_elements_size().at(i), "Container size mismatch!");
-          MemoryPool::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+          MemoryPool::copy(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
         }
 
       }
