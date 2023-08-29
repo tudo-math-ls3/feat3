@@ -620,8 +620,8 @@ namespace Tutorial03
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
-  Runtime::initialize(argc, argv);
+  // Initialize the runtime
+  Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #03: Andicore" << std::endl;
@@ -649,6 +649,5 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial03::main(level);
 
-  // Finalize the runtime
-  return Runtime::finalize();
+  return 0;
 }

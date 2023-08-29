@@ -3,6 +3,7 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+#include <kernel/runtime.hpp>
 #include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/unit_cube_patch_generator.hpp>
@@ -271,8 +272,10 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
     << std::endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+
   int lvl = 2;
   //*
   test_poiseuille<SpaceRTQ0>(lvl, false, Solver::VankaType::nodal_diag_mult);

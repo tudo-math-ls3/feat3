@@ -201,8 +201,6 @@ int run(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialize(argc, argv);
-  int ret = run(argc, argv);
-  Runtime::finalize();
-  return ret;
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+  return run(argc, argv);
 }

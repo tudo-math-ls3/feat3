@@ -593,8 +593,6 @@ namespace MeshIndexerTool
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialize(argc, argv);
-  int rtn = MeshIndexerTool::main(argc, argv);
-  FEAT::Runtime::finalize();
-  return rtn;
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+  return MeshIndexerTool::main(argc, argv);
 }

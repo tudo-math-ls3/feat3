@@ -253,11 +253,11 @@ using MyQualityFunctional = Meshopt::HyperelasticityFunctional<A, B, C, D>;
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   ResizeApp<double, Shape::Hypercube<3>, MyLocalFunctional, MyQualityFunctional>::run();
 
-  return FEAT::Runtime::finalize();
+  return 0;
 }
 
 /// \brief Specialization for hypercubes

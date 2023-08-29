@@ -561,8 +561,9 @@ namespace Tutorial01
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
-  Runtime::initialize(argc, argv);
+  // Before we can do anything else, we first need to initialize the FEAT runtime environment by
+  // creating a scope guard object, which will take care of releasing the runtime once we're done:
+  Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #01: Poisson" << std::endl;
@@ -600,7 +601,6 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial01::main(level);
 
-  // And finally, finalize our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
-  // so we can simply return this as the result of our main function to indicate a successful run.
-  return Runtime::finalize();
+  // And finally, return the exit code 0 to indicate a successful run.
+  return 0;
 }

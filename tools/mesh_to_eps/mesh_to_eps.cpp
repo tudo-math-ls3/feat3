@@ -138,8 +138,10 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   return 0;
 }
 
-int run(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+
   // This is the list of all supported meshes that could appear in the mesh file
   typedef Geometry::ConformalMesh<Shape::Simplex<2>, 2, Real> S2M2D;
   typedef Geometry::ConformalMesh<Shape::Hypercube<2>, 2, Real> H2M2D;
@@ -150,7 +152,7 @@ int run(int argc, char* argv[])
   if(args.check("help") > -1)
   {
     display_help();
-    return Runtime::finalize();
+    return 0;
   }
 
   args.support("mesh");
@@ -211,12 +213,4 @@ int run(int argc, char* argv[])
   std::cout << "ERROR: unsupported mesh type!" << std::endl;
 
   return 1;
-}
-
-int main(int argc, char* argv[])
-{
-  Runtime::initialize(argc, argv);
-  int ret = run(argc, argv);
-  Runtime::finalize();
-  return ret;
 }

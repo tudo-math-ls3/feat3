@@ -77,7 +77,7 @@ void run(PreferredBackend backend, const String filename, bool transpose)
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   if (!(argc == 2 || argc == 3))
   {
     throw InternalError("this benchmarks need the path to a csr (binary) matrix file as its single command line parameter. A following parameter t for transpose is optional");
@@ -108,5 +108,5 @@ int main(int argc, char ** argv)
   run<double, unsigned int>(PreferredBackend::cuda, filename, transpose);
 #endif
   (void)transpose; // suppress unused variable warnings
-  Runtime::finalize();
+  return 0;
 }

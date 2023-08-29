@@ -748,7 +748,7 @@ namespace Tutorial07
 int main(int argc, char* argv[])
 {
   // Before we can do anything else, we first need to initialize the FEAT runtime environment:
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #07: Stokes" << std::endl;
@@ -788,5 +788,5 @@ int main(int argc, char* argv[])
 
   // And finally, finalize our runtime environment. This function returns the 'EXIT_SUCCESS' return code,
   // so we can simply return this as the result of our main function to indicate a successful run.
-  return Runtime::finalize();
+  return 0;
 }

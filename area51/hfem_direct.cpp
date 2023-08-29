@@ -328,7 +328,7 @@ namespace HFEM_direct
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   HFEM_direct::main(argc, argv);
-  return Runtime::finalize();
+  return 0;
 }

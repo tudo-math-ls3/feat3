@@ -398,7 +398,7 @@ namespace Tutorial02
 int main(int argc, char* argv[])
 {
   // Initialize the runtime
-  Runtime::initialize(argc, argv);
+  Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #02: Laplace" << std::endl;
@@ -425,6 +425,5 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial02::main(level);
 
-  // Finalize the runtime
-  return Runtime::finalize();
+  return 0;
 }

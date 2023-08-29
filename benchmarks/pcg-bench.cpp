@@ -91,7 +91,7 @@ void run(PreferredBackend backend)
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 #ifdef FEAT_HAVE_CUDA
 #ifdef FEAT_HAVE_HALFMATH
   run<Half, unsigned int>(PreferredBackend::cuda);
@@ -100,5 +100,5 @@ int main(int argc, char ** argv)
   run<double, unsigned int>(PreferredBackend::cuda);
 #endif
   run<double, unsigned int>(PreferredBackend::generic);
-  Runtime::finalize();
+  return 0;
 }

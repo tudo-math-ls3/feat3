@@ -15,7 +15,7 @@ using namespace FEAT::TestSystem;
 int main(int argc, char** argv)
 {
   // Initialse FEAT runtime
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
 
@@ -133,8 +133,6 @@ int main(int argc, char** argv)
     std::cout << tests_passed << " of " << list_size << " tests PASSED, "
       << tests_failed << " tests FAILED!" << std::endl;
   }
-
-  Runtime::finalize();
 
   return result;
 }

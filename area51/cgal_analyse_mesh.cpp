@@ -28,20 +28,21 @@
 // We start our application with a batch of includes...
 
 #include <kernel/base_header.hpp>
+#include <kernel/runtime.hpp>
+
 // Misc. FEAT includes
-#include <kernel/util/string.hpp>                          // for String
-#include <kernel/runtime.hpp>                         // for Runtime
-#include <kernel/util/simple_arg_parser.hpp>               // for SimpleArgParser
+#include <kernel/util/string.hpp>
+#include <kernel/util/simple_arg_parser.hpp>
 
 // FEAT-Geometry includes
-#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
-#include <kernel/geometry/mesh_node.hpp>                   // for RootMeshNode
-#include <kernel/geometry/mesh_file_reader.hpp>            // for MeshFileReader
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 
 
 // FEAT-LAFEM includes
-#include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
+#include <kernel/lafem/dense_vector.hpp>
 
 // we need to have cgal to be able to include it
 #ifdef FEAT_HAVE_CGAL
@@ -491,13 +492,13 @@ namespace AnalyseMeshCGAL
 int main(int argc, char* argv[])
 {
   // Initialize the runtime
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // call the tutorial's main function
   AnalyseMeshCGAL::main(argc, argv);
 
   // Finalize the runtime
-  return Runtime::finalize();
+  return 0;
 }
 
 #else // not defined(FEAT_HAVE_CGAL)

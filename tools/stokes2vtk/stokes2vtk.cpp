@@ -589,8 +589,6 @@ namespace Stokes2Vtk
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialize(argc, argv);
-  int ret = Stokes2Vtk::run(argc, argv);
-  FEAT::Runtime::finalize();
-  return ret;
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+  return Stokes2Vtk::run(argc, argv);
 }

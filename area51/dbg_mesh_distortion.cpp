@@ -76,7 +76,7 @@ namespace DbgMeshDistortion
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   Index level(3);
 
   if(argc > 1)
@@ -96,5 +96,5 @@ int main(int argc, char* argv[])
 
   DbgMeshDistortion::main(level);
 
-  return Runtime::finalize();
+  return 0;
 }

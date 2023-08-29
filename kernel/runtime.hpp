@@ -12,7 +12,11 @@
 
 namespace FEAT
 {
-  /// The class Runtime encapsulates various settings and functionality needed to run FEAT properly
+  /**
+   * \brief FEAT Runtime management class
+   *
+   * \author Peter Zajac, Dirk Ribbrock
+   */
   class Runtime
   {
   private:
@@ -20,9 +24,39 @@ namespace FEAT
     static bool _initialized;
 
     /// signals, if finalize was called
-    static bool _finished;
+    static bool _finalized;
 
   public:
+    /**
+     * \brief Runtime scope guard class
+     */
+    class ScopeGuard
+    {
+    public:
+      /**
+       * \brief Runtime scope guard constructor
+       *
+       * This constructor effectively calls Runtime::initialize().
+       *
+       * \param[in] argc, argv
+       * The argument parameters of the calling \p main function.
+       */
+      explicit ScopeGuard(int& argc, char**& argv)
+      {
+        Runtime::initialize(argc, argv);
+      }
+
+      /**
+       * \brief Runtime scope guard destructor
+       *
+       * This destructor effectively calls Runtime::finalize().
+       */
+      ~ScopeGuard()
+      {
+        Runtime::finalize();
+      }
+    }; // class Runtime::Guard
+
     /**
      * \brief FEAT initialization
      *

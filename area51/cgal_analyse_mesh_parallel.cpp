@@ -28,16 +28,17 @@
 // We start our application with a batch of includes...
 
 #include <kernel/base_header.hpp>
+#include <kernel/runtime.hpp>
+
 // Misc. FEAT includes
-#include <kernel/util/string.hpp>                          // for String
-#include <kernel/runtime.hpp>                         // for Runtime
-#include <kernel/util/simple_arg_parser.hpp>               // for SimpleArgParser
+#include <kernel/util/string.hpp>
+#include <kernel/util/simple_arg_parser.hpp>
 
 // FEAT-Geometry includes
-#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
-#include <kernel/geometry/mesh_node.hpp>                   // for RootMeshNode
-#include <kernel/geometry/mesh_file_reader.hpp>            // for MeshFileReader
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/stop_watch.hpp>
@@ -45,7 +46,7 @@
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
 
-#include <kernel/util/dist_file_io.hpp>                   // to read the mesh in parallel
+#include <kernel/util/dist_file_io.hpp>
 
 // not exactly neccesary because we will not do any calculations,
 // but the domain control requires a mapping and a space
@@ -418,7 +419,7 @@ namespace AnalyseMeshCGALParallel
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   try
   {
     AnalyseMeshCGALParallel::main(argc, argv);
@@ -433,7 +434,7 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalize();
+  return 0;
 }
 
 #else // not defined(FEAT_HAVE_CGAL)

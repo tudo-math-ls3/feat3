@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_node.hpp>
@@ -61,11 +62,12 @@ void add_mesh_part(RMESH * rmesh, String & file)
 
 int main(int argc, char ** argv)
 {
+    FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
     if (argc < 3)
     {
-        std::cout<<"Usage 'otto2mesh file.prj mesh.xml [coord-scaling-factor]'"<<std::endl;
-        std::cout<<"Must be executed in the file.prj directory, as no folder vodoo takes place internally."<<std::endl;
-        exit(EXIT_FAILURE);
+        std::cout << "Usage 'tri2mesh file.prj mesh.xml [coord-scaling-factor]'" << std::endl;
+        std::cout << "Must be executed in the file.prj directory, as no folder vodoo takes place internally." << std::endl;
+        FEAT::Runtime::abort();
     }
 
     String input(argv[1]);

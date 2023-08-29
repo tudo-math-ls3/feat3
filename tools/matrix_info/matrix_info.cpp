@@ -20,7 +20,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
+#include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -553,5 +553,6 @@ namespace MatrixInfo
 
 int main(int argc, char* argv[])
 {
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   return MatrixInfo::main(argc, argv);
 }

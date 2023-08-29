@@ -536,8 +536,8 @@ namespace Tutorial05
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Initialize our runtime environment
-  Runtime::initialize(argc, argv);
+  // Initialize the runtime
+  Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
   std::cout << "Welcome to FEAT's tutorial #05: Geometric Multigrid" << std::endl;
@@ -594,6 +594,5 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial05::main(level_max, level_min);
 
-  // Finalize our runtime environment
-  return Runtime::finalize();
+  return 0;
 }

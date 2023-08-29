@@ -62,7 +62,7 @@ void run(PreferredBackend backend)
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<SparseMatrixCSR<double, Index> >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, unsigned int> >(PreferredBackend::cuda);
@@ -84,5 +84,5 @@ int main(int argc, char ** argv)
 #endif
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, unsigned int> >();*/
-  Runtime::finalize();
+  return 0;
 }

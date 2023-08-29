@@ -5,6 +5,8 @@
 
 #define FEAT_CUBATURE_TENSOR_PREFIX 1
 #define FEAT_CUBATURE_SCALAR_PREFIX 1
+
+#include <kernel/runtime.hpp>
 #include <kernel/cubature/scalar/dynamic_factory.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
@@ -229,6 +231,7 @@ void print_avail_all()
 
 int main(int argc, char* argv[])
 {
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   if(argc < 2)
   {
     // print help message

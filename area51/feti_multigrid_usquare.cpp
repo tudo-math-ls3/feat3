@@ -4,70 +4,70 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 // Misc. FEAT includes
-#include <kernel/util/string.hpp>                          // for String
-#include <kernel/runtime.hpp>                         // for Runtime
-#include <kernel/util/dist.hpp>                            // NEW: for Dist::Comm
-#include <kernel/util/simple_arg_parser.hpp>               // NEW: for SimpleArgParser
+#include <kernel/runtime.hpp>
+#include <kernel/util/string.hpp>
+#include <kernel/util/dist.hpp>
+#include <kernel/util/simple_arg_parser.hpp>
 
 // FEAT-Geometry includes
-#include <kernel/geometry/conformal_mesh.hpp>              // for ConformalMesh
-#include <kernel/geometry/export_vtk.hpp>                  // for ExportVTK
-#include <kernel/geometry/mesh_part.hpp>                   // for MeshPart
-#include <kernel/geometry/mesh_node.hpp>                   // NEW: for RootMeshNode, MeshNode
-#include <kernel/geometry/unit_cube_patch_generator.hpp>   // NEW: for UnitCubePatchGenerator
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/unit_cube_patch_generator.hpp>
 
 // FEAT-Trafo includes
-#include <kernel/trafo/standard/mapping.hpp>               // the standard Trafo mapping
+#include <kernel/trafo/standard/mapping.hpp>
 
 // FEAT-Space includes
-#include <kernel/space/lagrange1/element.hpp>              // the Lagrange-1 Element (aka "Q1")
-#include <kernel/space/lagrange2/element.hpp>              // the Lagrange-2 Element (aka "Q2")
-#include <kernel/space/lagrange3/element.hpp>              // the Lagrange-3 Element (aka "Q3")
+#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/lagrange3/element.hpp>
 
 // FEAT-Cubature includes
-#include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
+#include <kernel/cubature/dynamic_factory.hpp>
 
 // FEAT-Analytic includes
-#include <kernel/analytic/common.hpp>                      // for SineBubbleFunction
+#include <kernel/analytic/common.hpp>
 
 // FEAT-Assembly includes
-#include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
-#include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
+#include <kernel/assembly/symbolic_assembler.hpp>
+#include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
-#include <kernel/assembly/error_computer.hpp>              // for L2/H1-error computation
-#include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
-#include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
-#include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
-#include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
-#include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional
-#include <kernel/assembly/mirror_assembler.hpp>            // NEW: for MirrorAssembler
-#include <kernel/assembly/grid_transfer.hpp>               // NEW: for GridTransfer
+#include <kernel/assembly/error_computer.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/common_functionals.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
+#include <kernel/assembly/grid_transfer.hpp>
 
 // FEAT-LAFEM includes
-#include <kernel/lafem/dense_vector.hpp>                   // for DenseVector
-#include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
-#include <kernel/lafem/unit_filter.hpp>                    // for UnitFilter
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/filter_chain.hpp>
 #include <kernel/lafem/mean_filter.hpp>
-#include <kernel/lafem/vector_mirror.hpp>                  // NEW: for VectorMirror
-#include <kernel/lafem/sparse_matrix_factory.hpp>          // for SparseMatrixFactory
-#include <kernel/lafem/transfer.hpp>                       // NEW: for Transfer
+#include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/sparse_matrix_factory.hpp>
+#include <kernel/lafem/transfer.hpp>
 
 // not needed, really needed, only for res analysis
 // FEAT-Global includes
-#include <kernel/global/gate.hpp>                          // NEW: for Global::Gate
-#include <kernel/global/filter.hpp>                        // NEW: for Global::Filter
-#include <kernel/global/matrix.hpp>                        // NEW: for Global::Matrix
-#include <kernel/global/vector.hpp>                        // NEW: for Global::Vector
+#include <kernel/global/gate.hpp>
+#include <kernel/global/filter.hpp>
+#include <kernel/global/matrix.hpp>
+#include <kernel/global/vector.hpp>
 
 // FEAT-Solver includes
-#include <kernel/solver/umfpack.hpp>                          // for umfpack
-#include <kernel/solver/pcg.hpp>                           // for PCG
-// #include <kernel/solver/schwarz_precond.hpp>               // NEW: for SchwarzPrecond
-// #include <kernel/solver/ilu_precond.hpp>                   // NEW: for ILUPrecond
-#include <kernel/solver/richardson.hpp>                    // NEW: for Richardson
-#include <kernel/solver/jacobi_precond.hpp>                // NEW: for JacobiPrecond
-#include <kernel/solver/multigrid.hpp>                     // NEW: for MultiGrid
+#include <kernel/solver/umfpack.hpp>
+#include <kernel/solver/pcg.hpp>
+// #include <kernel/solver/schwarz_precond.hpp>
+// #include <kernel/solver/ilu_precond.hpp>
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/jacobi_precond.hpp>
+#include <kernel/solver/multigrid.hpp>
 
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/time_stamp.hpp>
@@ -2161,7 +2161,7 @@ namespace FETI{
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   FETI::main(argc, argv);
 
@@ -2170,5 +2170,5 @@ int main(int argc, char* argv[])
 
 
 
-  return Runtime::finalize();
+  return 0;
 }

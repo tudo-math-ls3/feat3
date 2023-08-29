@@ -87,7 +87,7 @@ void run(PreferredBackend backend)
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   /*run<DenseMatrix<Half, Index> >(PreferredBackend::generic);
   run<DenseMatrix<float, Index> >(PreferredBackend::generic);
   run<DenseMatrix<double, Index> >(PreferredBackend::generic);
@@ -104,5 +104,5 @@ int main(int argc, char ** argv)
   //Util::cuda_reset_algos();
   run<DenseMatrix<double, Index> >(PreferredBackend::cuda);
 #endif
-  Runtime::finalize();
+  return 0;
 }

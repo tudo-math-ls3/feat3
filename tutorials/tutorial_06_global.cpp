@@ -790,8 +790,8 @@ namespace Tutorial06
 // Here's our main function
 int main(int argc, char* argv[])
 {
-  // Before we can do anything else, we first need to initialize the FEAT runtime environment:
-  Runtime::initialize(argc, argv);
+  // Initialize the runtime
+  Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Specify the desired mesh refinement level, defaulted to 5.
   Index level(5);
@@ -818,6 +818,5 @@ int main(int argc, char* argv[])
   // call the tutorial's main function
   Tutorial06::main(level);
 
-  // And finally, finalize our runtime environment.
-  return Runtime::finalize();
+  return 0;
 }

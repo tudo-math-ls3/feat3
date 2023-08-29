@@ -221,8 +221,8 @@ namespace DbgSlipAsm
 
 int main(int argc, char** argv)
 {
-  FEAT::Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   DbgSlipAsm::main_2d();
   DbgSlipAsm::main_3d();
-  return FEAT::Runtime::finalize();
+  return 0;
 }

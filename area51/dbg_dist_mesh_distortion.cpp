@@ -202,7 +202,7 @@ namespace DbgDistMeshDisto
 
 int main(int argc, char* argv [])
 {
-  FEAT::Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   try
   {
     DbgDistMeshDisto::main(argc, argv);
@@ -217,5 +217,5 @@ int main(int argc, char* argv [])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  return FEAT::Runtime::finalize();
+  return 0;
 }

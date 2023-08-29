@@ -273,7 +273,7 @@ namespace CCNDSimple
 
 int main(int argc, char* argv[])
 {
-  FEAT::Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   int rtn = 1;
   try
   {
@@ -289,6 +289,5 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: unknown exception" << std::endl;
     FEAT::Runtime::abort();
   }
-  FEAT::Runtime::finalize();
   return rtn;
 }

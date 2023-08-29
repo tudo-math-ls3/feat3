@@ -107,7 +107,7 @@ void run(PreferredBackend backend)
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<SparseMatrixCSR<double, unsigned int>, 2 >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, unsigned long>, 2 >(PreferredBackend::cuda);
@@ -117,5 +117,5 @@ int main(int argc, char ** argv)
 #ifdef FEAT_HAVE_MKL
   run<SparseMatrixCSR<double, unsigned long>, 2 >(PreferredBackend::mkl);
 #endif
-  Runtime::finalize();
+  return 0;
 }

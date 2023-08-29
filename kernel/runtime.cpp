@@ -32,7 +32,7 @@ using namespace FEAT;
 
 // static member initialization
 bool Runtime::_initialized = false;
-bool Runtime::_finished = false;
+bool Runtime::_finalized = false;
 
 void Runtime::initialize(int& argc, char**& argv)
 {
@@ -51,7 +51,7 @@ void Runtime::initialize(int& argc, char**& argv)
     std::cerr.flush();
     Runtime::abort();
   }
-  if (_finished)
+  if (_finalized)
   {
     std::cerr << "ERROR: Runtime::initialize called after Runtime::finalize!" << std::endl;
     std::cerr.flush();
@@ -126,7 +126,7 @@ int Runtime::finalize()
     std::cerr.flush();
     Runtime::abort();
   }
-  if (_finished)
+  if (_finalized)
   {
     std::cerr << "ERROR: Runtime::finalize called twice!" << std::endl;
     std::cerr.flush();
@@ -141,7 +141,7 @@ int Runtime::finalize()
   // finalize Dist operations
   Dist::finalize();
 
-  _finished = true;
+  _finalized = true;
 
   // return successful exit code
   return EXIT_SUCCESS;

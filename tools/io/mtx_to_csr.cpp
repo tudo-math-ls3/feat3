@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <iostream>
 
@@ -12,15 +13,17 @@ using namespace FEAT::LAFEM;
 
 int main(int argc, char ** argv)
 {
-    if (argc != 3)
-    {
-        std::cout<<"Usage 'mtx2csr mtx-file csr-file'"<<std::endl;
-        exit(EXIT_FAILURE);
-    }
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+  if (argc != 3)
+  {
+    std::cout<<"Usage 'mtx2csr mtx-file csr-file'"<<std::endl;
+    FEAT::Runtime::abort();
+  }
 
-    String input(argv[1]);
-    String output(argv[2]);
+  String input(argv[1]);
+  String output(argv[2]);
 
-    SparseMatrixCSR<double, Index> csr(FileMode::fm_mtx, input);
-    csr.write_out(FileMode::fm_csr, output);
+  SparseMatrixCSR<double, Index> csr(FileMode::fm_mtx, input);
+  csr.write_out(FileMode::fm_csr, output);
+  return 0;
 }

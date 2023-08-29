@@ -262,7 +262,7 @@ static void display_help()
 
 int main(int argc, char* argv[])
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   typedef double DataType;
   typedef unsigned int IndexType;
@@ -385,7 +385,6 @@ int main(int argc, char* argv[])
 
     // Clean up
     my_solver.reset();
-    Runtime::finalize();
     return ret;
   }
   else if(solver_name == "NLSD")
@@ -437,7 +436,6 @@ int main(int argc, char* argv[])
 
     // Clean up
     my_solver.reset();
-    Runtime::finalize();
     return ret;
   }
 #ifdef FEAT_HAVE_ALGLIB
@@ -448,7 +446,6 @@ int main(int argc, char* argv[])
     int ret = run(my_solver, my_op);
 
     my_solver.reset();
-    Runtime::finalize();
     return ret;
   }
   else if (solver_name == "ALGLIBMinCG")
@@ -471,7 +468,6 @@ int main(int argc, char* argv[])
     int ret = run(my_solver, my_op);
 
     my_solver.reset();
-    Runtime::finalize();
     return ret;
   }
 #endif // FEAT_HAVE_ALGLIB

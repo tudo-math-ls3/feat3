@@ -43,7 +43,7 @@ void run(PreferredBackend backend)
 
 int main(int argc, char ** argv)
 {
-  Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 #ifdef FEAT_HAVE_CUDA
 #ifdef FEAT_HAVE_HALFMATH
   run<DenseVector<Half, Index> >(PreferredBackend::cuda);
@@ -57,5 +57,5 @@ int main(int argc, char ** argv)
   run<Algo::MKL, DenseVector<Mem::Main, float, Index> >();
   run<Algo::MKL, DenseVector<Mem::Main, double, Index> >();
 #endif*/
-  Runtime::finalize();
+  return 0;
 }

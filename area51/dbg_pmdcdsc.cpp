@@ -597,9 +597,9 @@ namespace PoissonMixed
 int main(int argc, char* argv [])
 {
   // initialize
-  FEAT::Runtime::initialize(argc, argv);
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   PoissonMixed::main(argc, argv);
   // okay
-  return FEAT::Runtime::finalize();
+  return 0;
 }

@@ -477,8 +477,10 @@ struct MeshoptRefinementApp
   }
 }; // struct MeshoptRefinementApp
 
-int run_app(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+
   // Floating point type
   typedef double DataType;
   // Index type
@@ -670,14 +672,6 @@ int run_app(int argc, char* argv[])
     XABORTM("Unhandled mesh type "+mesh_type);
   }
 
-  return ret;
-}
-
-int main(int argc, char* argv[])
-{
-  FEAT::Runtime::initialize(argc, argv);
-  int ret = run_app(argc, argv);
-  FEAT::Runtime::finalize();
   return ret;
 }
 

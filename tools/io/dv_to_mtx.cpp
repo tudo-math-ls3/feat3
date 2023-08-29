@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
+#include <kernel/runtime.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <iostream>
 
@@ -12,15 +13,17 @@ using namespace FEAT::LAFEM;
 
 int main(int argc, char ** argv)
 {
-    if (argc != 3)
-    {
-        std::cout<<"Usage 'dv2mtx dv-file mtx-file'"<<std::endl;
-        exit(EXIT_FAILURE);
-    }
+  FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+  if (argc != 3)
+  {
+    std::cout<<"Usage 'dv2mtx dv-file mtx-file'"<<std::endl;
+    FEAT::Runtime::abort();
+  }
 
-    String input(argv[1]);
-    String output(argv[2]);
+  String input(argv[1]);
+  String output(argv[2]);
 
-    DenseVector<double, Index> dv(FileMode::fm_dv, input);
-    dv.write_out(FileMode::fm_mtx, output);
+  DenseVector<double, Index> dv(FileMode::fm_dv, input);
+  dv.write_out(FileMode::fm_mtx, output);
+  return 0;
 }
