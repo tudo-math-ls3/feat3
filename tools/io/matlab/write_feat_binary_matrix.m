@@ -32,8 +32,8 @@ header    = uint64([gsize,        ... %% outputstream size
                     lm,           ... %% length of _elements[0]
                     lm*8,         ... %% size (bytes) of _elements[0]
                     lm,           ... %% length of _indices[0]
-                    lm*8,         ... %% size (bytes) of _indices[0]
                     (m+1),        ... %% length of _indices[1]
+                    lm*8,         ... %% size (bytes) of _indices[0]
                     (m+1)*8,      ... %% size (bytes) of _indices[1]
                     m*n,          ... %% _scalar_index[0] -> size
                     m,            ... %% _scalar_index[1] -> rows
