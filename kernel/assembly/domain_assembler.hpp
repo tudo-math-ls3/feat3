@@ -1206,6 +1206,10 @@ namespace FEAT
         XASSERTM(_compiled, "assembler has not been compiled yet");
         XASSERTM(_threads.empty(), "already executing a job");
 
+        // no elements to assemble on?
+        if(this->_element_indices.empty())
+          return;
+
         // no worker threads?
         if(this->_num_worker_threads <= 0)
         {
@@ -1313,6 +1317,10 @@ namespace FEAT
       {
         XASSERTM(_compiled, "assembler has not been compiled yet");
         XASSERTM(_threads.empty(), "already executing a job");
+
+        // no elements to assemble on?
+        if(this->_element_indices.empty())
+          return;
 
         // reset all fences
         for(auto& s : this->_thread_fences)
