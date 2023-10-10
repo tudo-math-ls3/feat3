@@ -11,7 +11,7 @@ import copy
 import platform
 
 __author__ = "Maximilian Esser"
-__date__   = "February 2023"
+__date__   = "October 2023"
 
 #This script initializes and configures the enviroment for visual studio code.
 #The idea is to uses this with the automated configure process of CMakeTools and therefore
@@ -429,6 +429,12 @@ else:
   print (buildid_string)
   sys.exit(1)
 
+##replace -0 by ""
+debug_flags = debug_flags.replace("-O0", "")
+debug_flags = debug_flags.replace("-O1", "")
+debug_flags = debug_flags.replace("-Og", "")
+print(f"Debug flags are: {debug_flags}")
+
 if "cuda" in buildid:
   if not is_found("nvcc"):
     print ("Error: Choosen backend compiler binary nvcc not found!")
@@ -588,15 +594,17 @@ noop_ldf_flags = ldflags
 opt_c_flags = "-O3"
 fast_c_flags = "-O3"
 noop_c_flags = "-O3"
-debug_c_flags = "-O3"
+debug_c_flags = "-Og"
 # set system host compiler in cflags to pass cmake's c compiler check
 if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
   if system_host_compiler:
     opt_c_flags = "-O3  -gcc-name=" + system_host_compiler
-    debug_c_flags = "-O3  -gcc-name=" + system_host_compiler
+    debug_c_flags = "-Og -gcc-name=" + system_host_compiler
     fast_c_flags = "-O3  -gcc-name=" + system_host_compiler
     noop_c_flags = "-O3  -gcc-name=" + system_host_compiler
 
+#We want to overwrite the default config build flags
+cmake_flags["FEAT_DELETE_BUILD_FLAGS"] = "ON"
 #for now we do not allow to add or retrieve packages through cmake...
 #to do add variants for packages
 dic_json["cmakeFlags"] = {'default':'generic',

@@ -15,6 +15,15 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT( FEAT )
 
+#if required, overwrite internal cxx flags
+if(FEAT_DELETE_BUILD_FLAGS)
+  message(STATUS "Delete internal build-config flags")
+  set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "Opt Cxx flag" FORCE)
+  set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "Debug Cxx flag" FORCE)
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "" CACHE STRING "RelDeb Cxx flag" FORCE)
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "MinSize Cxx flag" FORCE)
+endif(FEAT_DELETE_BUILD_FLAGS)
+
 site_name( FEAT_HOSTNAME )
 
 include (CTest)
