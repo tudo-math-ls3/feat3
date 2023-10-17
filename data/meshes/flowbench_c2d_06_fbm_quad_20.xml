@@ -1,0 +1,217 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This is an unaligned FBM mesh for the 2D "flow around a cylinder" benchmark.
+    This mesh consists of 20 quadrilateral cells.
+  </Info>
+  <!-- Note: This chart is not used directly by the mesh in this file. -->
+  <Chart name="circle">
+    <Circle radius="0.05" midpoint="0.2 0.2" domain="0.5 -0.5" />
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="33 52 20">
+    <Vertices>
+      0 0
+      0.2 0
+      0.4 0
+      0.6 0
+      0.8 0
+      1 0
+      1.2 0
+      1.4 0
+      1.6 0
+      1.9 0
+      2.2 0
+      0 0.2
+      0.2 0.2
+      0.4 0.2
+      0.6 0.2
+      0.8 0.2
+      1 0.2
+      1.2 0.2
+      1.4 0.2
+      1.6 0.2
+      1.9 0.2
+      2.2 0.2
+      0 0.41
+      0.2 0.41
+      0.4 0.41
+      0.6 0.41
+      0.8 0.41
+      1 0.41
+      1.2 0.41
+      1.4 0.41
+      1.6 0.41
+      1.9 0.41
+      2.2 0.41
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+      4 5
+      5 6
+      6 7
+      7 8
+      8 9
+      9 10
+      11 12
+      12 13
+      13 14
+      14 15
+      15 16
+      16 17
+      17 18
+      18 19
+      19 20
+      20 21
+      22 23
+      23 24
+      24 25
+      25 26
+      26 27
+      27 28
+      28 29
+      29 30
+      30 31
+      31 32
+      0 11
+      11 22
+      1 12
+      12 23
+      2 13
+      13 24
+      3 14
+      14 25
+      4 15
+      15 26
+      5 16
+      16 27
+      6 17
+      17 28
+      7 18
+      18 29
+      8 19
+      19 30
+      9 20
+      20 31
+      10 21
+      21 32
+    </Topology>
+    <Topology dim="2">
+      0 1 11 12
+      1 2 12 13
+      2 3 13 14
+      3 4 14 15
+      4 5 15 16
+      5 6 16 17
+      6 7 17 18
+      7 8 18 19
+      8 9 19 20
+      9 10 20 21
+      11 12 22 23
+      12 13 23 24
+      13 14 24 25
+      14 15 25 26
+      15 16 26 27
+      16 17 27 28
+      17 18 28 29
+      18 19 29 30
+      19 20 30 31
+      20 21 31 32
+    </Topology>
+  </Mesh>
+  <MeshPart name="bnd:l" parent="root" topology="none" size="3 2">
+    <Mapping dim="0">
+      0
+      11
+      22
+    </Mapping>
+    <Mapping dim="1">
+      30
+      31
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:r" parent="root" topology="none" size="3 2">
+    <Mapping dim="0">
+      10
+      21
+      32
+    </Mapping>
+    <Mapping dim="1">
+      50
+      51
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:b" parent="root" topology="none" size="11 10">
+    <Mapping dim="0">
+      0
+      1
+      2
+      3
+      4
+      5
+      6
+      7
+      8
+      9
+      10
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+      2
+      3
+      4
+      5
+      6
+      7
+      8
+      9
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:t" parent="root" topology="none" size="11 10">
+    <Mapping dim="0">
+      22
+      23
+      24
+      25
+      26
+      27
+      28
+      29
+      30
+      31
+      32
+    </Mapping>
+    <Mapping dim="1">
+      20
+      21
+      22
+      23
+      24
+      25
+      26
+      27
+      28
+      29
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:u" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      12
+      23
+    </Mapping>
+    <Mapping dim="1">
+      33
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:l" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      1
+      12
+    </Mapping>
+    <Mapping dim="1">
+      32
+    </Mapping>
+  </MeshPart>
+</FeatMeshFile>
