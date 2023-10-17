@@ -278,6 +278,8 @@ namespace FEAT
       template <Perspective = Perspective::native>
       DT_ * elements()
       {
+        if(this->_elements.empty())
+          return nullptr;
         if (sorted() == 0)
           const_cast<SparseVector *>(this)->sort();
         return this->_elements.at(0);
@@ -286,6 +288,8 @@ namespace FEAT
       template <Perspective = Perspective::native>
       DT_ const * elements() const
       {
+        if(this->_elements.empty())
+          return nullptr;
         if (sorted() == 0)
           const_cast<SparseVector *>(this)->sort();
         return this->_elements.at(0);
@@ -298,6 +302,8 @@ namespace FEAT
        */
       IT_ * indices()
       {
+        if(this->_indices.empty())
+          return nullptr;
         if (sorted() == 0)
           const_cast<SparseVector *>(this)->sort();
         return this->_indices.at(0);
@@ -305,6 +311,8 @@ namespace FEAT
 
       IT_ const * indices() const
       {
+        if(this->_indices.empty())
+          return nullptr;
         if (sorted() == 0)
           const_cast<SparseVector *>(this)->sort();
         return this->_indices.at(0);
@@ -323,7 +331,7 @@ namespace FEAT
 
         MemoryPool::synchronize();
 
-        if (this->_elements.size() == 0)
+        if (this->_elements.empty())
           return DT_(0.);
 
         if (sorted() == 0)
@@ -359,7 +367,7 @@ namespace FEAT
         _sorted() = 0;
 
         // vector is empty, no arrays allocated
-        if (this->_elements.size() == 0)
+        if (this->_elements.empty())
         {
           this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(alloc_increment()));
           this->_elements_size.push_back(alloc_increment());
@@ -733,6 +741,8 @@ namespace FEAT
       template <Perspective = Perspective::native>
       Index used_elements() const
       {
+        if(this->_scalar_index.empty())
+          return Index(0);
         if (sorted() == 0)
           const_cast<SparseVector *>(this)->sort();
         return this->_scalar_index.at(1);
@@ -745,6 +755,8 @@ namespace FEAT
        */
       Index allocated_elements() const
       {
+        if(this->_scalar_index.empty())
+          return Index(0);
         return this->_scalar_index.at(2);
       }
 
@@ -755,6 +767,8 @@ namespace FEAT
        */
       Index alloc_increment() const
       {
+        if(this->_scalar_index.empty())
+          return Index(0);
         return this->_scalar_index.at(3);
       }
 
@@ -765,6 +779,8 @@ namespace FEAT
        */
       Index sorted() const
       {
+        if(this->_scalar_index.empty())
+          return Index(0);
         return this->_scalar_index.at(4);
       }
 
@@ -818,6 +834,9 @@ namespace FEAT
           return false;
 
         Index n = this->used_elements();
+        if(n == Index(0))
+          return true; // both vectors are empty
+
         const IT_* a = this->indices();
         const IT_* b = this->indices();
 
