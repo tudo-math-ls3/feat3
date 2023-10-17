@@ -166,4 +166,19 @@
 /// Shall we use sanitizer features of our compilers?
 #cmakedefine FEAT_SANITIZER
 
+/// Activate perfmon?
+#cmakedefine LIKWID_PERFMON
+
+/// Use marker likwid API?
+#cmakedefine FEAT_USE_LIKWID
+
+/// Activate application markers
+#cmakedefine FEAT_APPLICATION_MARKER_ACTIVATED
+
+/// Activate kernel markers
+#cmakedefine FEAT_KERNEL_MARKER_ACTIVATED
+
+/// Activate special markers
+#cmakedefine FEAT_SPECIAL_MARKER_ACTIVATED
+
 #endif // FEAT_CONFIG_HPP

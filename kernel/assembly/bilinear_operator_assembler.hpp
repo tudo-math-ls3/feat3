@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/util/likwid_marker.hpp>
 
 namespace FEAT
 {
@@ -122,7 +123,7 @@ namespace FEAT
 
         // create matrix scatter-axpy
         typename MatrixType::ScatterAxpy scatter_axpy(matrix);
-
+        FEAT_APPLICATION_MARKER_START("bilin_op_asm_mat2");
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
@@ -171,6 +172,7 @@ namespace FEAT
             }
             // continue with next cubature point
           }
+          FEAT_APPLICATION_MARKER_STOP("bilin_op_asm_mat2");
 
           // finish operator evaluator
           oper_eval.finish();
@@ -283,6 +285,7 @@ namespace FEAT
 
         // create matrix scatter-axpy
         typename MatrixType::ScatterAxpy scatter_axpy(matrix);
+        FEAT_APPLICATION_MARKER_START("bilin_op_asm:matrix1");
 
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -329,7 +332,7 @@ namespace FEAT
             }
             // continue with next cubature point
           }
-
+        FEAT_APPLICATION_MARKER_STOP("bilin_op_asm:matrix1");
           // finish operator evaluator
           oper_eval.finish();
 
@@ -448,7 +451,7 @@ namespace FEAT
         typename VectorType::ScatterAxpy scatter_axpy(ret);
         // create vector gather axpy for picking the local values from the global vector
         typename VectorType::GatherAxpy gather_axpy(coeff_vector);
-
+        FEAT_APPLICATION_MARKER_START("bilin_op_asm:apply1");
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
@@ -502,7 +505,7 @@ namespace FEAT
             }
             // continue with next cubature point
           }
-
+        FEAT_APPLICATION_MARKER_STOP("bilin_op_asm:apply1");
           // finish operator evaluator
           oper_eval.finish();
 
@@ -632,6 +635,7 @@ namespace FEAT
         // create vector gather axpy for picking the local values from the global vector
         typename VectorType::GatherAxpy gather_axpy(coeff_vector);
 
+        FEAT_APPLICATION_MARKER_START("bilin_op_asm:apply2");
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
@@ -688,6 +692,7 @@ namespace FEAT
             }
             // continue with next cubature point
           }
+        FEAT_KERNEL_MARKER_STOP("bilin_op_asm:apply2");
 
           // finish operator evaluator
           oper_eval.finish();

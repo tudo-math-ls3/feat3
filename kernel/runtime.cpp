@@ -9,6 +9,7 @@
 #include <kernel/util/dist.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/os_windows.hpp>
+#include <kernel/util/likwid_marker.hpp>
 #ifdef FEAT_HAVE_DEATH_HANDLER
 #include <death_handler.h>
 #endif
@@ -66,6 +67,8 @@ void Runtime::initialize(int& argc, char**& argv)
     Runtime::abort();
   }
 
+  // initialize likwid marker api
+  FEAT_MARKER_INIT;
   // initialize memory pool for main memory
   MemoryPool::initialize();
 
@@ -133,6 +136,8 @@ int Runtime::finalize()
 
   // finalize Dist operations
   Dist::finalize();
+  // finalize Likwid markerAPI
+  FEAT_MARKER_CLOSE;
 
   _finalized = true;
 

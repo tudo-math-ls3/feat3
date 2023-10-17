@@ -25,6 +25,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/util/likwid_marker.hpp>
 
 #include <fstream>
 
@@ -1271,6 +1272,7 @@ namespace FEAT
         XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
 
         TimeStamp ts_start;
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
 
         if (this->used_elements() == 0)
         {
@@ -1285,6 +1287,7 @@ namespace FEAT
             r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
       }
@@ -1304,6 +1307,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0)
         {
           r.format();
@@ -1318,6 +1322,7 @@ namespace FEAT
             r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1337,6 +1342,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0)
         {
           r.format();
@@ -1351,6 +1357,7 @@ namespace FEAT
             r.elements(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1370,6 +1377,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0)
         {
           r.format();
@@ -1384,6 +1392,7 @@ namespace FEAT
             r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1411,6 +1420,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
@@ -1426,6 +1436,7 @@ namespace FEAT
             r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1453,6 +1464,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
@@ -1467,6 +1479,7 @@ namespace FEAT
             r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1494,6 +1507,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
@@ -1508,6 +1522,7 @@ namespace FEAT
             r.elements(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1535,6 +1550,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.copy(y);
@@ -1549,6 +1565,7 @@ namespace FEAT
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
@@ -1576,6 +1593,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
         if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
         {
           r.convert(y);
@@ -1590,6 +1608,7 @@ namespace FEAT
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }

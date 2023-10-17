@@ -50,6 +50,18 @@ endif (FEAT_COTIRE)
 #link against mpi if available
 TARGET_LINK_LIBRARIES(kernel-util ${MPI_C_LIBRARIES})
 
+if(FEAT_USE_LIKWID)
+  find_package(likwid)
+  if(likwid_FOUND)
+    # set(LIKWID_LIBRARIES -L/sfw/likwid/git230818/lib -llikwid)
+    target_link_libraries(kernel-util ${LIKWID_LIBRARIES})
+    target_include_directories(kernel-util PUBLIC ${LIKWID_INCLUDES})
+
+  else(likwid_FOUND)
+    message(STATUS "Could not find likwid cmake path, consider specifing it with likwid_DIR")
+  endif(likwid_FOUND)
+endif(FEAT_USE_LIKWID)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
   TARGET_LINK_LIBRARIES(kernel-util -lexecinfo)
 endif()

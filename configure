@@ -67,7 +67,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Compiler frontends: ccache")
   print ("  Backends: cuda, mkl")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
-  print ("  Instrumentation: scorep")
+  print ("  Instrumentation: scorep, likwid")
   print ("  Debugging: valgrind, cudamemcheck, deathhandler, sanitizer")
   print ("  Precision extensions: quadmath, floatx, half")
   print ("  Compilation process optimisations: cotire")
@@ -121,6 +121,9 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Abort compilation after an error is encountered.")
   print ("--trilinos_path")
   print ("  Path to a Frosch compatible trilinos installation.")
+  print ("--likwid_markers=mark1,mark2,mark3")
+  print ("  Decide in a comma seperated list, which performance markers are activated.")
+  print ("  Current choices: kernel app special cuda . Defaults to app.")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
@@ -238,6 +241,7 @@ cuda_arch = ""
 cuda_verbose = False
 restrict_errors = False
 trilinos_path = ""
+marker_options = ""
 
 unused_extra_options = copy.copy(extra_options)
 for option in extra_options:
@@ -348,6 +352,34 @@ for option in extra_options:
     if not os.path.exists(trilinos_path):
       print ("Error: trilinos_path " + trilinos_path + " does not exist!")
     cmake_flags += " -DFEAT_TRILINOS_PATH:FILEPATH=" + trilinos_path
+
+  if option.startswith("--likwid_markers="):
+    unused_extra_options.remove(option)
+    if marker_options:
+      print ("Error: multiple likwid_markers parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    tmp_marker = option.replace("--likwid_markers=", "", 1)
+    if(tmp_marker == ""):
+      print ("Error: No options given in " + option)
+      exit(1)
+    if(len(tmp_marker.split(",")) > 3):
+      print ("Error: Too many marker options in " + option)
+      exit(1)
+    marker_options = ""
+    for marker in tmp_marker.split(","):
+      if(marker == "app"):
+        marker_options += " -DFEAT_APPLICATION_MARKER_ACTIVATED:BOOL=ON"
+      if(marker == "kernel"):
+        marker_options += " -DFEAT_KERNEL_MARKER_ACTIVATED:BOOL=ON"
+      if(marker == "special"):
+        marker_options += " -DFEAT_SPECIAL_MARKER_ACTIVATED:BOOL=ON"
+      if(marker == "cuda"):
+        marker_options += " -DLIKWID_NVMON:BOOL=ON"
+    if(not marker_options):
+      print ("Error: No valid marker options in " + option)
+      print ("Valid options are: kernel app special")
+      exit(1)
+
 
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
@@ -499,6 +531,13 @@ if "scorep" in buildid:
   os.environ["CC"] = "scorep " + os.environ["CC"]
   os.environ["CXX"] = "scorep " + os.environ["CXX"]
   cmake_flags += " -DFEAT_USE_COMPILER_WRAPPER:BOOL=ON"
+
+if "likwid" in buildid:
+  remove_string(unused_tokens, "likwid")
+  cmake_flags += " -DFEAT_USE_LIKWID:BOOL=ON -DLIKWID_PERFMON:BOOL=ON"
+  if(not marker_options):
+    marker_options = " -DFEAT_APPLICATION_MARKER_ACTIVATED:BOOL=ON"
+  cmake_flags += marker_options
 
 
 if "cudamemcheck" in buildid:

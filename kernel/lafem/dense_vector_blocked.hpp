@@ -30,6 +30,7 @@
   #include <kernel/util/statistics.hpp>
   #include <kernel/util/time_stamp.hpp>
   #include <kernel/adjacency/permutation.hpp>
+  #include <kernel/util/likwid_marker.hpp>
 
   #include <iostream>
   #include <fstream>
@@ -804,6 +805,8 @@ namespace FEAT
         XASSERTM(x.size() == y.size(), "Vector size does not match!");
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
+        FEAT_KERNEL_MARKER_START("DV_axpy");
+
         if (Math::abs(alpha) < Math::eps<DT_>())
         {
           this->copy(y);
@@ -816,6 +819,7 @@ namespace FEAT
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
         Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
+        FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }

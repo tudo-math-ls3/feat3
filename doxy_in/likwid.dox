@@ -1,0 +1,45 @@
+/** \page likwid_for_feat <c>LIKWID</c> marker API with FEAT
+This pages describes the use of the <c>LIKWID</c> marker API within FEAT.
+
+\tableofcontents
+
+\section LIKWID_descr LIKWID General Information
+<c>LIKWID</c> (like i know what im doing) is a toolset of command line applications intended for performance measuring of sequential and parallel code.
+It can be build on most architectures under Linux operating systems and additonally supports Nvidia and AMD GPUs.
+Besides providing micro benchmarks and pinning capabilities, it also provides hardware performance counters, allowing for a more empirical reasoning about code performance.
+It works in multithreaded and MPI based parallization setups.
+
+For information on how to generally install and use <c>LIKWID</c>, see <a href="https://github.com/RRZE-HPC/likwid/wiki"><c>LIKWID</c> wiki</a>.
+The following text expects the reader to know how to use <c>LIKWID</c> and only handles the specifics for FEAT.
+
+\section LIKWID_prereques Prerequisites for using LIWWID
+<c>LIKWID</c> should be installed and findable by standard libarary lookups, else set the PATH variable or the <c>likwid_ROOT</c> accordingly.
+If you want to use <c>LIKWID</c>, you should provide the likwid configure flag when configuring FEAT, for example
+\verbatim
+/path/to/feat3/configure gcc-opt-likwid
+\endverbatim
+which activates the <c>LIKWID_PERFOM</c> enviroment variable and activates the actual marker API.
+
+\section LIKWID_use Using the LIKWID marker API
+In general, all marker api calls described henceforth are always defined, i.e. always be called without breaking your code, but if not activated by the corresponding flag are empty definition, hence do not change your actual application.
+The <c>LIKWID_MARKER_INIT</c> and <c>LIKWID_MARKER_CLOSE</c> call is automatically done in the runtime header guard.
+You could know use the standard <c>LIKWID_MARKER_<..></c> calls, but in the <c>likwid_marker.hpp</c> additional <c>MARKER</c> calls are defined:
+\verbatim
+FEAT_KERNEL_MARKER_*
+FEAT_APPLICATION_MARKER_*
+FEAT_SPECIAL_MARKER_*
+FEAT_NVMARKER_*
+\endverbatim
+where each marker variant provides <c>REGISTER, START, STOP</c> and <c>GET</c> calls.
+These flags can be explicitly activated by defining the <c>--likwid_markers=</c> configure flag.
+Possible values are <c>kernel, app, special, cuda</c>.
+Multiple flags can be activated by seperating them with a <c>','</c> without whitespaces.
+For example, if you want to activate kernel and application flags, provide
+\verbatim
+--likwid_markers=kernel,app
+\endverbatim
+addtionally to the <c>likwid</c> configure flag.
+
+By default, only the application flag is enabled.
+All deactivated api calls are empty definition, thus do not lead to any unexpected behavior.
+**/

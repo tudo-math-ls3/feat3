@@ -12,6 +12,7 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/coloring.hpp>
 #include <kernel/util/thread.hpp>
+#include <kernel/util/likwid_marker.hpp>
 
 // includes, system
 #include <algorithm>
@@ -558,6 +559,7 @@ namespace FEAT
          */
         void operator()()
         {
+          FEAT_KERNEL_MARKER_START("dom_asm:worker_run");
           bool okay = false;
 
           TimeStamp stamp_total;
@@ -604,6 +606,7 @@ namespace FEAT
 
           // update timing statistics
           this->_thread_stats.micros_total += stamp_total.elapsed_micros_now();
+          FEAT_KERNEL_MARKER_STOP("dom_asm:worker_run");
         }
 
       protected:
@@ -1203,6 +1206,7 @@ namespace FEAT
       template<typename Job_>
       void assemble(Job_& job)
       {
+        FEAT_KERNEL_MARKER_START("dom_asm:assemble");
         XASSERTM(_compiled, "assembler has not been compiled yet");
         XASSERTM(_threads.empty(), "already executing a job");
 
@@ -1215,6 +1219,7 @@ namespace FEAT
         {
           // assemble on master thread instead
           assemble_master(job);
+          FEAT_KERNEL_MARKER_STOP("dom_asm:assemble");
           return;
         }
 
@@ -1298,6 +1303,7 @@ namespace FEAT
 
         // clear thread vector
         this->_threads.clear();
+        FEAT_KERNEL_MARKER_STOP("dom_asm:assemble");
       }
 
       /**
@@ -1422,10 +1428,12 @@ namespace FEAT
        */
       void _compile()
       {
+        FEAT_KERNEL_MARKER_START("dom_asm:compile");
         // nothing to do?
         if(this->_element_indices.empty())
         {
           _compiled = true;
+          FEAT_KERNEL_MARKER_STOP("dom_asm:compile");
           return;
         }
 
@@ -1487,6 +1495,7 @@ namespace FEAT
         _thread_stats = std::vector<ThreadStats>(this->_max_worker_threads + 1u);
 
         _compiled = true;
+        FEAT_KERNEL_MARKER_STOP("dom_asm:compile");
       }
 
       /**

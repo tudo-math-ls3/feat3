@@ -8,6 +8,7 @@
 #include <kernel/util/type_traits.hpp>
 #include <benchmarks/benchmark.hpp>
 #include <kernel/runtime.hpp>
+#include <kernel/util/likwid_marker.hpp>
 
 #include <iostream>
 
