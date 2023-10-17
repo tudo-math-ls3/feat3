@@ -218,10 +218,20 @@ public:
 
     VectorType a_data(IT_(BlockHeight)*IT_(BlockWidth)*IT_(18), DT_(7));
     VectorType b_data(IT_(BlockHeight)*IT_(BlockWidth)*IT_(18), DT_(7));
+    VectorType c_data(IT_(BlockHeight)*IT_(BlockWidth)*IT_(18), DT_(7));
+    for(IT_ i(0); i < IT_(18); ++i)
+    {
+      a_data(i, DT_(i+1u));
+      b_data(i, DT_(i+1u));
+      c_data(i, DT_(i+1u));
+    }
 
     // create a CSR matrix
-    MatrixType matrix_a(Index(7), Index(7), col_idx, a_data, row_ptr);
+    VectorType a_data2 = a_data.clone();
+    MatrixType matrix_a1(Index(7), Index(7), col_idx, a_data, row_ptr);
+    MatrixType matrix_a2(Index(7), Index(7), col_idx, a_data2, row_ptr);
     MatrixType matrix_b(Index(7), Index(7), col_idx, b_data, row_ptr);
+    MatrixType matrix_c(Index(7), Index(7), col_idx, c_data, row_ptr);
 
     // Manually correct values in the reference matrix b
     typename MatrixType::ValueType b_tmp(DT_(0));
@@ -231,7 +241,6 @@ public:
     // Row 3
     matrix_b.val()[4] = b_tmp;
     matrix_b.val()[6] = b_tmp;
-
     // Row 6
     matrix_b.val()[15] = b_tmp;
     matrix_b.val()[16] = b_tmp;
@@ -256,13 +265,34 @@ public:
     filter.add(IT_(6), tmp);
 
     // apply filter onto a
-    filter.filter_mat(matrix_a);
+    filter.filter_mat(matrix_a1);
 
     // subtract reference
-    matrix_a.axpy(matrix_b, matrix_a, -DT_(1));
+    matrix_a1.axpy(matrix_b, matrix_a1, -DT_(1));
 
     // check difference
-    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.norm_frobenius(), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a1.norm_frobenius(), DT_(0), tol);
+
+
+    // Manually correct values in the reference matrix c
+    // Row 1
+    matrix_c.val()[0] = DT_(3) * matrix_a2.val()[0];
+    matrix_c.val()[1] = DT_(3) * matrix_a2.val()[1];
+    // Row 3
+    matrix_c.val()[4] = DT_(-17) * matrix_a2.val()[4];
+    matrix_c.val()[5] = DT_(-17) * matrix_a2.val()[5];
+    matrix_c.val()[6] = DT_(-17) * matrix_a2.val()[6];
+    // Row 6
+    matrix_c.val()[15] = DT_(-1) * matrix_a2.val()[15];
+    matrix_c.val()[16] = DT_(-1) * matrix_a2.val()[16];
+    matrix_c.val()[17] = DT_(-1) * matrix_a2.val()[17];
+
+    // apply weak filter onto a2
+    filter.filter_weak_matrix_rows(matrix_a2, matrix_a2);
+
+    // subtract reference
+    matrix_a2.axpy(matrix_c, matrix_a2, -DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a2.norm_frobenius(), DT_(0), tol);
   }
 };
 

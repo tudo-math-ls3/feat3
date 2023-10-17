@@ -177,6 +177,13 @@ public:
 
     VectorType a_data(IT_(18), DT_(7));
     VectorType b_data(IT_(18), DT_(7));
+    VectorType c_data(IT_(18), DT_(7));
+    for(IT_ i(0); i < IT_(18); ++i)
+    {
+      a_data(i, DT_(i+1u));
+      b_data(i, DT_(i+1u));
+      c_data(i, DT_(i+1u));
+    }
     b_data(IT_( 0), DT_(1));
     b_data(IT_( 1), DT_(0));
     b_data(IT_( 4), DT_(0));
@@ -185,10 +192,21 @@ public:
     b_data(IT_(15), DT_(0));
     b_data(IT_(16), DT_(0));
     b_data(IT_(17), DT_(1));
+    c_data(IT_( 0), DT_(3*1));
+    c_data(IT_( 1), DT_(3*2));
+    c_data(IT_( 4), DT_(5*5));
+    c_data(IT_( 5), DT_(5*6));
+    c_data(IT_( 6), DT_(5*7));
+    c_data(IT_(15), DT_(9*16));
+    c_data(IT_(16), DT_(9*17));
+    c_data(IT_(17), DT_(9*18));
 
-    // create a CSR matrix
-    MatrixType matrix_a(Index(7), Index(7), col_idx, a_data, row_ptr);
+    // create a pair of CSR matrices
+    VectorType a_data2 = a_data.clone();
+    MatrixType matrix_a1(Index(7), Index(7), col_idx, a_data, row_ptr);
+    MatrixType matrix_a2(Index(7), Index(7), col_idx, a_data2, row_ptr);
     MatrixType matrix_b(Index(7), Index(7), col_idx, b_data, row_ptr);
+    MatrixType matrix_c(Index(7), Index(7), col_idx, c_data, row_ptr);
 
     // create filter
     FilterType filter(IT_(7));
@@ -196,14 +214,19 @@ public:
     filter.add(IT_(2), DT_(5));
     filter.add(IT_(6), DT_(9));
 
-    // apply filter onto a
-    filter.filter_mat(matrix_a);
+    // apply filter onto a1
+    filter.filter_mat(matrix_a1);
 
     // subtract reference
-    matrix_a.axpy(matrix_b, matrix_a, -DT_(1));
+    matrix_a1.axpy(matrix_b, matrix_a1, -DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a1.norm_frobenius(), DT_(0), tol);
 
-    // check difference
-    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a.norm_frobenius(), DT_(0), tol);
+    // apply weak filter onto a2
+    filter.filter_weak_matrix_rows(matrix_a2, matrix_a2);
+
+    // subtract reference
+    matrix_a2.axpy(matrix_c, matrix_a2, -DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a2.norm_frobenius(), DT_(0), tol);
   }
 };
 

@@ -312,6 +312,9 @@ namespace FEAT
       template<int BlockWidth_>
       void filter_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
+        if(_sv.used_elements() == Index(0))
+          return;
+
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IT_* row_ptr(matrix.row_ptr());
@@ -344,6 +347,9 @@ namespace FEAT
       template<int BlockWidth_>
       void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
       {
+        if(_sv.used_elements() == Index(0))
+          return;
+
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IT_* row_ptr(matrix.row_ptr());
@@ -377,6 +383,63 @@ namespace FEAT
       }
       /// \endcond
 
+
+      /**
+       * \brief Replaces the rows of the system matrix by scaled rows of another matrix
+       *
+       * This function replaces all rows of the system matrix A, whose row index is included in this filter's
+       * indices, by the corresponding rows of a given donor matrix M, which is typically a mass matrix, scaled
+       * by the values which are stored in this filter.
+       * This functionality can be used to implement a weak form of Dirichlet boundary conditions, which is also
+       * used to employ mass-conserving fictitious boundary conditions in a Stokes system.
+       *
+       * \param[inout] matrix_a
+       * The system matrix whose rows are to be replaced
+       *
+       * \param[in] matrix_m
+       * The donor matrix whose rows are to be copied into the system matrix
+       */
+      template<int BlockWidth_>
+      void filter_weak_matrix_rows(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix_a,
+        const SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_>& matrix_m) const
+      {
+        if(_sv.used_elements() == Index(0))
+          return;
+
+        XASSERTM(_sv.size() == matrix_a.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix_m.rows(), "Matrix size does not match!");
+
+        const IndexType* row_ptr(matrix_a.row_ptr());
+        const IndexType* col_idx(matrix_m.col_ind());
+        XASSERTM(row_ptr == matrix_m.row_ptr(), "matrix A and M must share their layout");
+        XASSERTM(col_idx == matrix_m.col_ind(), "matrix A and M must share their layout");
+
+        Tiny::Matrix<DataType, BlockSize_, BlockWidth_>* val_a(matrix_a.val());
+        const Tiny::Matrix<DataType, BlockSize_, BlockWidth_>* val_m(matrix_m.val());
+
+        const IT_* idx = get_indices();
+        const Tiny::Vector<DataType, BlockSize_>* val = get_values();
+
+        // loop over all filter entries
+        for(Index i(0); i < _sv.used_elements(); ++i)
+        {
+          // replace row of A by scaled row of M
+          Index row(idx[i]);
+          for(IndexType j(row_ptr[row]); j < row_ptr[row + 1]; ++j)
+          {
+            //val_a[j] = val[i] * val_m[j];
+            for(int k(0); k < BlockSize_; ++k)
+            {
+              for(int l(0); l < BlockWidth_; ++l)
+              {
+                val_a[j][k][l] = val[i][k] * val_m[j][k][l];
+              }
+            }
+          }
+        }
+      }
+
+
       /**
        * \brief Applies the filter onto the right-hand-side vector.
        *
@@ -385,11 +448,13 @@ namespace FEAT
        */
       void filter_rhs(VectorType& vector) const
       {
+        if(_sv.used_elements() == Index(0))
+          return;
+
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        if(_sv.used_elements() > Index(0))
-          Arch::UnitFilterBlocked::template filter_rhs<BlockSize_>
-            (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
-            _sv.indices(), _sv.used_elements(), _ignore_nans);
+        Arch::UnitFilterBlocked::template filter_rhs<BlockSize_>
+          (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
+          _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       /**
@@ -412,11 +477,13 @@ namespace FEAT
        */
       void filter_def(VectorType& vector) const
       {
+        if(_sv.used_elements() == Index(0))
+          return;
+
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        if(_sv.used_elements() > Index(0))
-          Arch::UnitFilterBlocked::template filter_def<BlockSize_>
-            (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
-            _sv.indices(), _sv.used_elements(), _ignore_nans);
+        Arch::UnitFilterBlocked::template filter_def<BlockSize_>
+          (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
+          _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       /**
