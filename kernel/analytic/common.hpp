@@ -3796,6 +3796,478 @@ namespace FEAT
           }
         }; // class PoiseuillePipeFlow::Evaluator<...>
       }; // class PoiseuillePipeFlow
+
+      /**
+       * \brief Rigid-Body Vortex velocity field
+       *
+       * This class implements the Rigid-Body vortex velocity field,
+       * which is the velocity field of an analytical solution to the
+       * incompressible 2D Navier-Stokes equations on the unit-circle.
+       * The compatible pressure function is RigidBodyVortexPres2D.
+       *
+       * \f[v(x,y) := \begin{bmatrix}-y\\x\end{bmatrix}\f]
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class RigidBodyVortexVelo2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<2> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can't compute the Hessian
+        static constexpr bool can_hess = true;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        public:
+          explicit Evaluator(const RigidBodyVortexVelo2D&)
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            ValueType val = ValueType::null();
+            val[0] = -point[1];
+            val[1] =  point[0];
+            return val;
+          }
+
+          GradientType gradient(const PointType& DOXY(point)) const
+          {
+            GradientType grad = GradientType::null();
+            grad[0][1] = -DataType(1);
+            grad[1][0] =  DataType(1);
+            return grad;
+          }
+
+          HessianType hessian(const PointType& DOXY(point)) const
+          {
+            return HessianType::null();
+          }
+        }; // class RigidBodyVortexVelo2D::Evaluator<...>
+      }; // class RigidBodyVortexVelo2D<...>
+
+      /**
+       * \brief Rigid-Body Vortex pressure function
+       *
+       * This class implements the Rigid-Body vortex pressure function,
+       * which is the pressure function of an analytical solution to the
+       * incompressible 2D Navier-Stokes equations on the unit-square.
+       * The compatible pressure function is RigidBodyVortexVelo2D.
+       *
+       * \f[p(x,y) := \frac{1}{2}\Big(x^2 + y^2\Big) - \frac{1}{4}\f]
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class RigidBodyVortexPres2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Scalar ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        public:
+          explicit Evaluator(const RigidBodyVortexPres2D&)
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            return DataType(0.5) * (point[0]*point[0] + point[1]*point[1]) - DataType(0.25);
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            GradientType grad = GradientType::null();
+            grad[0] = point[0];
+            grad[1] = point[1];
+            return grad;
+          }
+
+          HessianType hessian(const PointType& DOXY(point)) const
+          {
+            HessianType hess = HessianType::null();
+            hess[0][0] = DataType(1);
+            hess[1][1] = DataType(1);
+            return hess;
+          }
+        }; // class RigidBodyVortexPres2D::Evaluator<...>
+      }; // class RigidBodyVortexPres2D<...>
+
+      /**
+       * \brief Sine-Vortex velocity field on the 2D ring domain with distance [1/2,1] around (0,0)
+       *
+       * This function can be used as an analytic solution to the steady-state Stokes or Navier-Stokes
+       * equations on the 2D ring domain with distance [1/2,1] around the origin (0,0) when used in
+       * combination with the SineRingVortexPres2D and SineRingVortexRHS2D functions for pressure and
+       * right-hand-side, respectively.
+       *
+       * The velocity field is defined as
+       *
+       * \f[v(x,y) := \frac{1}{d(x,y)} \begin{bmatrix}\hphantom{-}y\sin(2\pi d(x,y))\\ -x\sin(2\pi d(x,y))\end{bmatrix}\f]
+       *
+       * where \f$d(x,y) := \sqrt{x^2+y^2}\f$ is the euclidean distance to the origin.
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class SineRingVortexVelo2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<2> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can't compute the Hessian
+        static constexpr bool can_hess = true;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// 2*pi
+          const DataType _pi2;
+
+        public:
+          explicit Evaluator(const SineRingVortexVelo2D&) :
+            _pi2(DataType(2) * Math::pi<DataType>())
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            ValueType val = ValueType::null();
+            const DataType d = point.norm_euclid();
+            if(d < DataType(1E-3))
+              return val;
+
+            const DataType s2pdi = Math::sin(_pi2 * d) / d;
+
+            val[0] =  point[1]*s2pdi;
+            val[1] = -point[0]*s2pdi;
+            return val;
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            GradientType grad = GradientType::null();
+            const DataType d = point.norm_euclid();
+            if(d < DataType(1E-3))
+              return grad;
+
+            const DataType x(point[0]), y(point[1]);
+            const DataType di2 = DataType(1) / (d*d);
+            const DataType s2pdi = Math::sin(_pi2 * d) / d;
+            const DataType c2pdi2 = Math::cos(_pi2 * d) * di2;
+
+            grad[0][0] = -y*x*s2pdi*di2 + _pi2*y*x*c2pdi2;
+            grad[0][1] = -y*y*s2pdi*di2 + _pi2*y*y*c2pdi2 + s2pdi;
+            grad[1][0] =  x*x*s2pdi*di2 - _pi2*x*x*c2pdi2 - s2pdi;
+            grad[1][1] =  x*y*s2pdi*di2 - _pi2*y*x*c2pdi2;
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            HessianType hess = HessianType::null();
+            const DataType d = point.norm_euclid();
+            if(d < DataType(1E-3))
+              return hess;
+
+            const DataType x(point[0]), y(point[1]);
+            const DataType di2 = DataType(1) / (d*d);
+            const DataType s2pdi3 = Math::sin(_pi2 * d) * di2 / d;
+            const DataType c2pdi2 = Math::cos(_pi2 * d) * di2;
+            const DataType t3 = DataType(3);
+
+            hess[0][0][0] =  t3*y*x*x*s2pdi3*di2 - t3*_pi2*y*x*x*c2pdi2*di2 - y*s2pdi3 + _pi2*y*c2pdi2 - _pi2*_pi2*y*x*x*s2pdi3;
+            hess[0][0][1] =
+            hess[0][1][0] =  t3*y*y*x*s2pdi3*di2 - x*s2pdi3 - t3*_pi2*y*y*x*c2pdi2*di2 + _pi2*x*c2pdi2 - _pi2*_pi2*y*y*x*s2pdi3;
+            hess[0][1][1] =  t3*y*y*y*s2pdi3*di2 - t3*y*s2pdi3 - t3*_pi2*y*y*y*c2pdi2*di2 + t3*_pi2*y*c2pdi2 - _pi2*_pi2*y*y*y*s2pdi3;
+            hess[1][0][0] = -t3*x*x*x*s2pdi3*di2 + t3*x*s2pdi3 + t3*_pi2*x*x*x*c2pdi2*di2 - t3*_pi2*x*c2pdi2 + _pi2*_pi2*x*x*x*s2pdi3;
+            hess[1][0][1] =
+            hess[1][1][0] = -t3*y*x*x*s2pdi3*di2 + t3*_pi2*y*x*x*c2pdi2*di2 + y*s2pdi3 - _pi2*y*c2pdi2 + _pi2*_pi2*y*x*x*s2pdi3;
+            hess[1][1][1] = -t3*y*y*x*s2pdi3*di2 + x*s2pdi3 + t3*_pi2*y*y*x*c2pdi2*di2 - _pi2*x*c2pdi2 + _pi2*_pi2*y*y*x*s2pdi3;
+            return hess;
+          }
+        }; // class SineRingVortexVelo2D::Evaluator<...>
+      }; // class SineRingVortexVelo2D<...>
+
+      /**
+       * \brief Sine-Vortex pressure function on the 2D ring domain with distance [1/2,1] around (0,0)
+       *
+       * This function can be used as an analytic solution to the steady-state Stokes or Navier-Stokes
+       * equations on the 2D ring domain with distance [1/2,1] around the origin (0,0) when used in
+       * combination with the SineRingVortexVelo2D and SineRingVortexRHS2D functions for velocity and
+       * right-hand-side, respectively.
+       *
+       * The pressure function is defined as
+       *
+       * \f[p(x,y) := \frac{\sin(2\pi d(x,y))}{2\pi}\f]
+       *
+       * where \f$d(x,y) := \sqrt{x^2+y^2}\f$ is the euclidean distance to the origin.
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class SineRingVortexPres2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Scalar ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = true;
+        /// We can compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /// the shift of the mean value; defaults to that the pressure has integral mean equal to 0
+        DataType mean_shift = DataType(1) / Math::sqr(Math::pi<DataType>());
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// 2*pi and 1/pi^2
+          const DataType _pi2, _spi;
+
+        public:
+          explicit Evaluator(const SineRingVortexPres2D& func) :
+            _pi2(DataType(2) * Math::pi<DataType>()),
+            _spi(func.mean_shift)
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            const DataType d = point.norm_euclid();
+            return -Math::sin(_pi2*d) / _pi2 - _spi;
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            GradientType grad = GradientType::null();
+            const DataType d = point.norm_euclid();
+            if(d < DataType(1E-3))
+              return grad;
+
+            const DataType c2pdi = Math::cos(_pi2 * d)  / d;
+
+            grad[0] = -point[0]*c2pdi;
+            grad[1] = -point[1]*c2pdi;
+            return grad;
+          }
+
+          HessianType hessian(const PointType& DOXY(point)) const
+          {
+            return HessianType::null();
+          }
+        }; // class SineRingVortexPres2D::Evaluator<...>
+      }; // class SineRingVortexPres2D<...>
+
+      /**
+       * \brief Sine-Vortex RHS field on the 2D ring domain with distance [1/2,1] around (0,0)
+       *
+       * This function can be used as the right-hand-side for the momentum equation to the steady-state Stokes or
+       * Navier-Stokes equations on the 2D ring domain with distance [1/2,1] around the origin (0,0) which results
+       * in a system whose analytical solution is given by the SineRingVortexVelo2D and SineRingVortexPres2D functions,
+       * respectively.
+       *
+       * \todo check whether this is still the correct RHS if using deformation tensor formulation (should be the case)
+       *
+       * \author Peter Zajac
+       */
+      template<typename DT_>
+      class SineRingVortexRHS2D : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Vector<2> ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 2;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = false;
+        /// We can't compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+        /// coefficients
+        DataType nu, beta, theta, sigma;
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] nu_
+         * The viscosity parameter for the velocity diffusion term
+         *
+         * \param[in] beta_
+         * The convection coefficient; 0 for Stokes and 1 for Navier-Stokes
+         *
+         * \param[in] theta_
+         * The reaction coefficient; 0 for steady-state, but may be set > 0 for a quasi-Stokes RHS
+         *
+         * \param[in] sigma_
+         * The factor for the pressure gradient; should be 1
+         */
+        explicit SineRingVortexRHS2D(DataType nu_ = DataType(1), DataType beta_ = DataType(0), DataType theta_ = DataType(0), DataType sigma_ = DataType(1)) :
+          nu(nu_),
+          beta(beta_),
+          theta(theta_),
+          sigma(sigma_)
+        {
+        }
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const DataType _pi2, _nu, _beta, _theta, _sigma;
+
+        public:
+          explicit Evaluator(const SineRingVortexRHS2D& function) :
+            _pi2(DataType(2) * Math::pi<DataType>()),
+            _nu(function.nu),
+            _beta(function.beta),
+            _theta(function.theta),
+            _sigma(function.sigma)
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            ValueType val = ValueType::null();
+            const DataType d = point.norm_euclid();
+            if(d < DataType(1E-3))
+              return val;
+
+            const DataType x(point[0]), y(point[1]);
+            const DataType q = DataType(1) / d;
+            const DataType s2pdq = Math::sin(_pi2 * d) * q;
+            const DataType c2pdq = Math::cos(_pi2 * d) * q;
+
+            val[0] = -_nu*q*y*( _pi2*c2pdq - (_pi2*_pi2*d + q)*s2pdq) - _beta*x*s2pdq*s2pdq + _theta*y*s2pdq - _sigma*x*c2pdq;
+            val[1] = -_nu*q*x*(-_pi2*c2pdq + (_pi2*_pi2*d + q)*s2pdq) - _beta*y*s2pdq*s2pdq - _theta*x*s2pdq - _sigma*y*c2pdq;
+            return val;
+          }
+        }; // class SineRingVortexRHS2D::Evaluator<...>
+      }; // class SineRingVortexRHS2D<...>
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

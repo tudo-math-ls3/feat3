@@ -1752,6 +1752,65 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][2][2], DT_(-0.21400779470373775910), tol2);
   }
 
+
+  void test_sine_ring_vortex_velo_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+
+    Analytic::Common::SineRingVortexVelo2D<DT_> func;
+
+    // evaluate function
+    Tiny::Vector<DT_, 2> val_1 = Analytic::eval_value_x(func, DT_(0.9), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_( 0.47348043213632444483), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-0.60876055560384571479), tol);
+
+    // evaluate gradient
+    Tiny::Matrix<DT_, 2, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.9), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][0], DT_( 1.6105289973850738860), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0][1], DT_( 1.9290342819704415944), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][0], DT_(-2.7470807568327013460), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1][1], DT_(-1.6105289973850738860), tol);
+
+    // evaluate hessian
+    Tiny::Tensor3<DT_, 2, 2, 2> hess_1 = Analytic::eval_hessian_x(func, DT_(0.9), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][0], DT_(-13.202182918630301466), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0][1], DT_(-9.3594239646432791943), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][0], DT_(-9.3594239646432791943), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1][1], DT_(-3.7005986449779418496), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][0], DT_(12.372723759995890782), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0][1], DT_(13.202182918630301466), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][0], DT_(13.202182918630301466), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1][1], DT_(9.3594239646432791943), tol);
+  }
+
+  void test_sine_ring_vortex_pres_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+
+    Analytic::Common::SineRingVortexPres2D<DT_> func;
+
+    // evaluate function
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.9), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(-0.22406392059917757436), tol);
+
+    // evaluate gradient
+    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.9), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(-0.50248135191051632366), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.39081882926373491839), tol);
+  }
+
+  void test_sine_ring_vortex_rhs_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+
+    Analytic::Common::SineRingVortexRHS2D<DT_> func(DT_(1.0), DT_(1.2), DT_(1.5), DT_(1.7));
+
+    // evaluate function
+    Tiny::Vector<DT_, 2> val_1 = Analytic::eval_value_x(func, DT_(0.9), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[0], DT_( 16.264664694819381659), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-23.693995515706431689), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1805,6 +1864,9 @@ public:
     test_taylor_green_vortex_velo_2d();
     test_taylor_green_vortex_pres_2d();
     test_poiseuille_pipe_flow_3d();
+    test_sine_ring_vortex_velo_2d();
+    test_sine_ring_vortex_pres_2d();
+    test_sine_ring_vortex_rhs_2d();
   }
 };
 
