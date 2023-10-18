@@ -11,7 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/dist.hpp>
-#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/geometry/mesh_node.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>

@@ -1017,6 +1017,169 @@ namespace FEAT
       }
 
       /**
+       * \brief Assembles the surface integral of a discrete function
+       *
+       * \param[in] vector
+       * A \transient reference to the vector that represents the function to be integrated
+       *
+       * \param[in] space
+       * A \transient reference to the finite element space
+       *
+       * \param[in] cubature_factory
+       * The cubature factory
+       *
+       * \returns The surface integral of the discrete function
+       */
+      template<typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_, int dim_>
+      Tiny::Vector<DataType_, dim_> assemble_discrete_integral(
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const Space_& space,
+        const CubatureFactory_& cubature_factory)
+      {
+        // validate vector dimensions
+        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
+
+        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
+
+        // assembly traits
+        typedef Assembly::AsmTraits1<DataType_, Space_, TrafoTags::none, SpaceTags::value> AsmTraits;
+
+        typedef typename AsmTraits::DataType DataType;
+
+        // shape types
+        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
+
+        // fetch the trafo
+        const TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a trafo facet evaluator
+        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
+        TrafoFacetEvaluator trafo_facet_eval(trafo);
+
+        // trafo facet evaluation data
+        typedef typename TrafoFacetEvaluator::template ConfigTraits <TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::TrialEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::TrialDofMapping dof_mapping(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+        TrafoFacetEvalData trafo_facet_data;
+
+        // create space evaluation data
+        typename AsmTraits::TrialEvalData space_data;
+
+        // create cubature rule
+        typename Assembly::Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // create matrix scatter-axpy
+        typename VectorType::GatherAxpy gather(vector);
+
+        // get maximum number of local dofs
+        static constexpr int max_local_dofs = AsmTraits::max_local_trial_dofs;
+
+        // create local vector data
+        typedef Tiny::Vector<DataType, dim_> VectorValue;
+        typedef Tiny::Vector<VectorValue, max_local_dofs> LocalVectorType;
+        LocalVectorType local_vector;
+
+        // our local velocity gradient
+        Tiny::Vector<DataType, dim_> loc_value;
+
+        // trafo matrices and vectors
+        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
+        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
+        Tiny::Vector<DataType, shape_dim> face_vec;
+        Tiny::Vector<DataType, facet_dim> ori_vec;
+
+        face_mat.format();
+        ori_mat.format();
+        face_vec.format();
+        ori_vec.format();
+
+        // the computed flux
+        Tiny::Vector<DataType_, dim_> flux;
+        flux.format();
+
+        // loop over all cells of the mesh
+        for(Index f(0); f < Index(this->_facets.size()); ++f)
+        {
+          // get facet index
+          const Index face = this->_facets[f];
+          const Index cell = this->_cells[f];
+
+          // compute facet trafos
+          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, this->_cell_facet[f]);
+
+          // compute orientation trafos
+          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, this->_facet_ori[f]);
+
+          // prepare trafo evaluators
+          trafo_facet_eval.prepare(face);
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluators
+          space_eval.prepare(trafo_eval);
+
+          // initialize dof-mappings
+          dof_mapping.prepare(cell);
+
+          // fetch number of local dofs
+          const int num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // gather our local velocity dofs
+          local_vector.format();
+          gather(local_vector, dof_mapping);
+
+          // finish dof-mapping
+          dof_mapping.finish();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // get cubature point
+            auto cub_pt = cubature_rule.get_point(k);
+
+            // transform to local facet
+            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
+
+            // compute trafo data
+            trafo_facet_eval(trafo_facet_data, cub_pt);
+            trafo_eval(trafo_data, cub_cf);
+
+            // compute test basis function data
+            space_eval(space_data, trafo_data);
+
+            // compute local velocity value
+            loc_value.format();
+            for(int i(0); i < num_loc_dofs; ++i)
+              loc_value.axpy(space_data.phi[i].value, local_vector[i]);
+
+            // compute flux
+            flux.axpy(trafo_facet_data.jac_det * cubature_rule.get_weight(k), loc_value);
+
+            // continue with next basis function
+          }
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+          trafo_facet_eval.finish();
+
+          // continue with next cell
+        }
+
+        // done
+        return flux;
+      }
+
+      /**
        * \brief Assembles the jump-stabilization operator onto a matrix.
        *
        * This function assembles the jump stabilization operator:

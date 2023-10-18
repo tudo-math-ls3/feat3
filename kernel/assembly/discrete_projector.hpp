@@ -386,6 +386,126 @@ namespace FEAT
           // continue with next cell
         }
       }
+
+      /**
+       * \brief Projects a discrete function into the cells of a once refined mesh.
+       *
+       * \param[out] vector
+       * A \transient reference to a vector object that shall receive the refined cell interpolation of the discrete function.
+       *
+       * \param[in] coeff
+       * A \transient reference to the coefficient vector of the finite-element function.
+       *
+       * \param[in] space
+       * A \transient reference to the finite-element space.
+       */
+      template<typename VectorOut_, typename VectorIn_, typename Space_>
+      static void project_refined(VectorOut_& vector, const VectorIn_& coeff, const Space_& space)
+      {
+        typedef Space_ SpaceType;
+        typedef typename SpaceType::TrafoType TrafoType;
+        typedef typename TrafoType::MeshType MeshType;
+        typedef typename MeshType::ShapeType ShapeType;
+
+        // define assembly traits
+        typedef AsmTraits1<typename VectorOut_::DataType, SpaceType, TrafoTags::jac_det, SpaceTags::value> AsmTraits;
+        typedef typename AsmTraits::DataType DataType;
+
+        // get our value type
+        typedef typename VectorOut_::ValueType ValueType;
+
+        // define the cubature rule
+        Cubature::DynamicFactory cubature_factory("refine:midpoint");
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // fetch the trafo and the mesh
+        const TrafoType& trafo(space.get_trafo());
+        const MeshType& mesh(space.get_mesh());
+
+        // fetch the cell count
+        const Index num_cells(mesh.get_num_entities(ShapeType::dimension));
+        const int num_points = cubature_rule.get_num_points();
+
+        // create a clear output vector
+        vector = VectorOut_(num_cells * Index(num_points), DataType(0));
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // create local vector data
+        typename AsmTraits::template TLocalVector<ValueType> loc_vec;
+
+        // create a vector gather-axpy
+        typename VectorIn_::GatherAxpy gather_axpy(coeff);
+
+        // loop over all cells of the mesh
+        for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
+        {
+          // format local matrix
+          loc_vec.format();
+
+          // initialize dof-mapping
+          dof_mapping.prepare(cell);
+
+          // fetch local vector
+          gather_axpy(loc_vec, dof_mapping);
+
+          // finish dof-mapping
+          dof_mapping.finish();
+
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+
+          // fetch number of local dofs
+          int num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
+
+            // compute basis function data
+            space_eval(space_data, trafo_data);
+
+            ValueType value(DataType(0));
+
+            // basis function loop
+            for(int i(0); i < num_loc_dofs; ++i)
+            {
+              // evaluate functor and integrate
+              Tiny::axpy(value, loc_vec[i], space_data.phi[i].value);
+              // continue with next basis function
+            }
+
+            // save value
+            vector(cell*Index(num_points) + Index(k), value);
+
+            // continue with next vertex
+          }
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+
+          // continue with next cell
+        }
+      }
     }; // class DiscreteCellProjector<...>
   } // namespace Assembly
 } // namespace FEAT

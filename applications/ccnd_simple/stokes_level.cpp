@@ -159,7 +159,7 @@ namespace CCNDSimple
   void StokesLevel::assemble_pressure_mean_filter(const String& cubature)
   {
     // check if the filter has already been assembled
-    if(this->filter_pres.local().empty())
+    if(this->get_local_pres_mean_filter().empty())
       BaseClass::assemble_pressure_mean_filter(this->domain_level.space_pres, cubature);
   }
 } // namespace CCNDSimple

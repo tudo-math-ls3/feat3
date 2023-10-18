@@ -1173,9 +1173,8 @@ namespace FEAT
 
       // define local pressure filter chain
       typedef Global::MeanFilter<DataType_, IndexType_> LocalPresMeanFilter;
-      //typedef LAFEM::UnitFilter<DataType_, IndexType_> LocalPresUnitFilter;
-      //typedef LAFEM::FilterChain<LocalPresMeanFilter, LocalPresUnitFilter> LocalPresFilter;
-      typedef LocalPresMeanFilter LocalPresFilter;
+      typedef LAFEM::UnitFilter<DataType_, IndexType_> LocalPresUnitFilter;
+      typedef LAFEM::FilterChain<LocalPresMeanFilter, LocalPresUnitFilter> LocalPresFilter;
 
       // define local system filter
       typedef LAFEM::TupleFilter<LocalVeloFilter, LocalPresFilter> LocalSystemFilter;
@@ -1224,13 +1223,13 @@ namespace FEAT
 
       LocalPresMeanFilter& get_local_pres_mean_filter()
       {
-        return this->filter_pres.local()/*.at<0>()*/;
+        return this->filter_pres.local().template at<0>();
       }
 
-      /*LocalPresUnitFilter& get_local_pres_unit_filter()
+      LocalPresUnitFilter& get_local_pres_unit_filter()
       {
-        return this->filter_pres.local().at<1>();
-      }*/
+        return this->filter_pres.local().template at<1>();
+      }
 
       template<typename SpacePres_>
       void assemble_pressure_mean_filter(const SpacePres_& space_pres, const String& cubature_name)
@@ -1253,7 +1252,7 @@ namespace FEAT
         vec_glob_w.sync_0();
 
         // build the mean filter
-        this->filter_pres.local() = LocalPresMeanFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
+        this->get_local_pres_mean_filter() = LocalPresMeanFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
       }
 
       void sync_velocity_slip_filters()
@@ -1299,7 +1298,7 @@ namespace FEAT
           }
         }
       }
-    };
+    }; // class StokesBlockedCombinedSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
 
