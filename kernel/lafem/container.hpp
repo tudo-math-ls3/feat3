@@ -1006,7 +1006,7 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
-      std::uint64_t get_checkpoint_size(LAFEM::SerialConfig& config)
+      std::uint64_t get_checkpoint_size(const LAFEM::SerialConfig& config)
       {
         return this->template _serialized_size<>(config);
       }
@@ -1018,7 +1018,7 @@ namespace FEAT
       }
 
       /// \copydoc FEAT::Control::Checkpointable::set_checkpoint_data(std::vector<char>&)
-      std::uint64_t set_checkpoint_data(std::vector<char>& data, LAFEM::SerialConfig& config)
+      std::uint64_t set_checkpoint_data(std::vector<char>& data, const LAFEM::SerialConfig& config)
       {
         auto buffer = this->template _serialize<>(FileMode::fm_binary, config);
         data.insert(std::end(data), std::begin(buffer), std::end(buffer));
