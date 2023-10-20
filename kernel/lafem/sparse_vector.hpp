@@ -546,7 +546,7 @@ namespace FEAT
        * See \ref FEAT::LAFEM::Container::_serialize for details.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialize(const LAFEM::SerialConfig& config = SerialConfig())
+      std::vector<char> serialize(const LAFEM::SerialConfig& config = SerialConfig()) const
       {
         return this->template _serialize<DT2_, IT2_>(FileMode::fm_sv, config);
       }
