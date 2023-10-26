@@ -11,17 +11,11 @@
 //
 //     M. Schaefer and S. Turek: Benchmark Computations of Laminar Flow Around a Cylinder
 //
-// The system is discretized using an isoparametric Q2/P1dc finite element discretization.
-// The monolithic nonlinear Oseen systems are solved using an adaptive Newton-Multigrid solver
-// with an additive matrix-based Vanka smoother ("AmaVanka") and using UMFPACK (if available)
-// as a coarse grid solver. This application supports recursive partitioning.
+// This application supports all parameters from the CCND::SteadyAppBase class, so please refer to
+// the documentation of the ccnd_steady_appbase.hpp header file for an up-to-date list of all
+// command line parameters supported by that base class.
 //
-//
-// ------------------------------------
-// Basic Setup and Mandatory Parameters
-// ------------------------------------
-// This application defines default values for most of its parameters, however, three parameters
-// are mandatory and always have to be specified explicitly:
+// In addition, this application adds support for the following parameters:
 //
 // --bench <1|7>
 // Specifies which of the 2 steady benchmarks is to be solved:
@@ -29,154 +23,13 @@
 //   --bench 7 corresponds to the 3D flow-around-a-sphere-inside-cylinder benchmark that is
 //             analogous to the bench 1 simulation
 //
-// --mesh <meshfiles...>
-// Specifies the input mesh file(s).
-//
-// --level <level-max> [levels...] <level-min>
-// Specifies the mesh refinement levels in the syntax according to Control::PartiDomainControl.
-//
-//
-// ----------------------------
-// System Definition Parameters
-// ----------------------------
-// Some of the basic parameters of the underlying system can be configured by the following
-// parameters.
-//
-// --nu <nu>
-// Specifies the viscosity parameter nu for the diffusion operator. Defaults to 1E-3.
-//
-// --defo
-// If specified, the deformation tensor formulation is used for the diffusion operator,
-// otherwise the gradient tensor formulation is used. Defaults to gradient tensor.
-//
 // --v-max <vmax>
 // Specifies the maximum velocity of the inflow boundary condition.
 // Defaults to 1.5 in 2D and 2.25 in 3D.
 //
-// --upsam <ups>
-// Specifies the stabilization parameter <ups> for the streamline diffusion stabilization.
-// Defaults to 0, i.e. unstabilized.
-//
-// --stokes
-// If specified, only the steady-state Stokes equations are solved and the nonlinear iteration
-// for solving the Navier-Stokes equations is skipped entirely.
-//
-//
-// -------------------------------
-// Solver Configuration Parameters
-// -------------------------------
-// This section describes the parameters that control the non-linear Newton/Picard solver
-// as well as its multigrid preconditioner and its smoother component.
-//
-// --picard
-// If specified, the nonlinear system in each time step will be solved using a simple
-// Picard iteration instead of the Newton iteration.
-//
-// --plot-mg-iter
-// If specified, the convergence plot of the multigrid solver in each nonlinear solver iteration
-// is printed.
-//
-// --min-nl-iter <N>
-// Specifies the minimum number of nonlinear (Newton/Picard) solver iterations per time step.
-// Defaults to 1.
-//
-// --max-nl-iter <N>
-// Specifies the maximum number of nonlinear (Newton/Picard) solver iterations per time step.
-// Defaults to 10.
-//
-// --min-mg-iter <N>
-// Specifies the minimum number of multigrid iterations per nonlinear solver iteration.
-// Defaults to 1.
-//
-// --max-mg-iter <N>
-// Specifies the maximum number of multigrid iterations per nonlinear solver iteration.
-// Defaults to 5.
-//
-// --smooth-steps <N>
-// Specifies the number of pre- and post-smoothing AmaVanka steps. Defaults to 8.
-//
-// --smooth-damp <omega>
-// Specifies the damping parameter for the AmaVanka smoother. Defaults to 0.7.
-//
-// --no-umfpack
-// If specified, the multigrid solver will use a BiCGStab-AmaVanka solver as the coarse grid solver
-// instead of the UMFPACK direct solver. Note that UMFPACK is only used if it is included in the
-// build id and if the coarse system is solved on a single process.
-//
-// --nl-tol-abs <tol>
-// Specifies the absolute tolerance for the nonlinear solver. Defaults to 1E-8.
-//
-// --mg-tol-rel <tol>
-// If given, specifies the relative tolerance for the multigrid solver.
-// If not given, then the tolerance for the multigrid solver is chosen in an adaptive
-// manner depending on the two previous nonlinear solver defects, which is the default case.
-// The adaptive tolerance is chosen in each nonlinear iteration by analyzing the nonlinear
-// defect improvement in the previous nonlinear (Newton/Picard) solver iteration in the
-// following manner: Let def_{j} and def_{j-1} denote the two previous nonlinear defect norms,
-// then the next nonlinear defect norm def_{j+1} should approximately fulfill the equation
-//
-//        (def_{j+1} / def_{j}) \approx (def_{j} / def_{j+1})^C
-//
-// where C \in {1,2} is the convergence speed of the nonlinear solver, i.e. C=2 for Newton
-// and C=1 for Picard iteration. Multiplying the above equation by def_{j} gives us an
-// estimate for the next nonlinear defect norm def_{j+1}:
-//
-//        def_{j+1} \approx def_{j} * (def_{j} / def_{j+1})^C
-//
-// To obtain an absolute tolerance for the next multigrid solver application, we simply
-// multiply the above estimate by 0.1.
-//
-//
-// -----------------------------------------------------
-// Initial Solution Read-In and Final Solution Write-Out
-// -----------------------------------------------------
-//
-// --save-sol <filename>
-// Specifies that the application should write the final (partitioned) solution (and the
-// partitioning) to a single binary output file. The output file can be loaded by the --load-sol
-// option if the input mesh, the refinement level as well as the partitioning (and thus the
-// process count) are identical.
-//
-// --save-joined-sol <filename>
-// Specifies that the application should write the final solution into a joined binary output
-// file by utilizing the base splitter. The output file can be loaded by the --load-joined-sol
-// option if the input mesh and refinement level are identical, however, the process count
-// and/or partitioning may differ. This feature should only be used with at most one parallel
-// domain layer and moderate process counts.
-//
-// --load-sol <filename>
-// Specifies that the application should read in the initial (partitioned) solution guess
-// from a single binary output file, which was written by a --save-sol from a previous run.
-// If specified, the solving of the Stokes system to obtain an initial guess is skipped.
-//
-// --load-joined-sol <filename> [<scale>]
-// Specifies that the application should read in the initial joined solution guess from a
-// single binary output file, which was written by a --save-joined-sol from a previous run.
-// The second option argument <scale> is given, then the loaded solution is scaled by that factor,
-// which can be used if the loaded solution was computed with a different inflow velocity.
-// If specified, the solving of the Stokes system to obtain an initial guess is skipped.
-//
-// ------------------------
-// Miscellaneous Parameters
-// ------------------------
-// This section describes miscellaneous parameters that do not fit into any other section and
-// which do not deserve a custom section of their own.
-//
-// --vtk <filename> [<refined-filename>]
-// Specifies that the application should write a VTK visualization output file. The second
-// optional parameter specifies the filename for a VTK output file on a once refined mesh,
-// if given. Note: it is possible to output only the refined VTKs by passing a whitespace
-// string as the first filename, e.g.: --vtk " " myvtk
-//
-// --ext-stats
-// If given, specifies that the application should output extensive statistics at the end of the
-// program run, including detailed MPI timings.
-//
-// --test-mode
-// If given, specifies that the application should run in test-mode rather than its normal mode.
-// In test mode, the application only perform 3 time steps and writes some additional output which
-// is parsed by the test system.
-//
+// --fbm
+// Enables the fictitious boundary method (FBM) to enforce the boundary conditions for the circular
+// or cylindrical obstacle.
 //
 // \author Peter Zajac
 //
