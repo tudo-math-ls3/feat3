@@ -1751,7 +1751,8 @@ class ThirdPartySuperLU(ThirdPartyPackage):
     self.url = "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v" + self.version + ".zip"
     self.page = "https://github.com/xiaoyeli/superlu_dist"
     self.baseflags += ' /wd"4996" /wd"4005" /wd"4013" /wd"4068" /wd"4101" /wd"4146" /wd"4244" /wd"4267" /wd"4305" /wd"4334" /wd"4477" /wd"4700" /wd"4715"'
-    self.baseflags += ' /I"' + os.path.join(path_mpi, "Include") + '"'
+    if(path_mpi != None):
+      self.baseflags += ' /I"' + os.path.join(path_mpi, "Include") + '"'
     self.baseflags += ' /I"./' + self.dir + '/CBLAS"'
     self.baseflags += ' /I"./' + self.dir + '/SRC"'
 
@@ -2086,7 +2087,8 @@ class ThirdPartyZoltan(ThirdPartyPackage):
     self.url = "https://github.com/sandialabs/Zoltan/archive/refs/tags/v" + self.version + ".zip"
     self.page = "https://sandialabs.github.io/Zoltan"
     self.baseflags += ' /wd"4028" /wd"4018" /wd"4090" /wd"4101" /wd"4102" /wd"4113" /wd"4244" /wd"4267" /wd"4305" /wd"4311" /wd"4477" /wd"4716" /wd"4996"'
-    self.baseflags += ' /I"' + os.path.join(path_mpi, "Include") + '"'
+    if(path_mpi != None):
+      self.baseflags += ' /I"' + os.path.join(path_mpi, "Include") + '"'
     self.baseflags += ' /I"./' + self.dir + '/src"'
     self.baseflags += ' /I"./' + self.dir + '/src/all"'
     self.baseflags += ' /I"./' + self.dir + '/src/coloring"'
