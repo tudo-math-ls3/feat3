@@ -212,32 +212,7 @@ namespace CCND
 
         // assemble FBM filters?
         if(enable_fbm)
-        {
-          auto& fbm_asm = *domain.at(i)->fbm_assembler;
-          auto& filter_fbm_p = system.at(i)->get_local_pres_unit_filter();
-          auto& filter_fbm_v = system.at(i)->get_local_velo_unit_filter_seq().find_or_add("fbm");
-          auto& filter_fbm_int_v = system.at(i)->filter_interface_fbm;
-
-          // assemble velocity unit filter
-          fbm_asm.assemble_inside_filter(filter_fbm_v, domain.at(i)->space_velo);
-          fbm_asm.assemble_inside_filter(filter_fbm_p, domain.at(i)->space_pres);
-
-          // assemble interface filter
-          fbm_asm.assemble_interface_filter(filter_fbm_int_v, domain.at(i)->space_velo, system.at(i)->matrix_a, system.at(i)->velo_mass_matrix);
-
-          // assemble mask vectors on finest level
-          if(i == 0u)
-          {
-            auto& mask_v = system.at(i)->fbm_mask_velo;
-            mask_v.reserve(domain.at(i)->space_velo.get_num_dofs());
-            for(int d(0); d <= dim; ++d)
-            {
-              for(auto k : fbm_asm.get_fbm_mask_vector(d))
-                mask_v.push_back(k);
-            }
-            system.at(i)->fbm_mask_pres = fbm_asm.get_fbm_mask_vector(dim);
-          }
-        }
+          system.at(i)->assemble_fbm_filters(*domain.at(i)->fbm_assembler, domain.at(i)->space_velo, domain.at(i)->space_pres, i == 0u);
 
         // compile system filter
         system.at(i)->compile_system_filter();
@@ -373,7 +348,7 @@ namespace CCND
     // initialize solver
     app.init_solver_symbolic();
 
-    // todo: restart from checkpoint?
+    // restart from checkpoint?
     if(app.load_checkpoint())
     {
       // ok, application restarted from checkpoint

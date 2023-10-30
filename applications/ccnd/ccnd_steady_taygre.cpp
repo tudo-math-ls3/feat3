@@ -138,7 +138,7 @@ namespace CCND
         }
 
         // assemble pressure mean filter
-        system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, "gauss-legendre:2");
+        system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, false);
 
         // compile system filter
         system.at(i)->compile_system_filter();

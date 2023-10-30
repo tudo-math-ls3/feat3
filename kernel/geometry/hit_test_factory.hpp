@@ -10,6 +10,7 @@
 // includes, FEAT
 #include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/mesh_part.hpp>
+#include <kernel/geometry/atlas/chart.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
 namespace FEAT
@@ -321,6 +322,110 @@ namespace FEAT
         return (point - _midpoint).norm_euclid() <= _radius;
       }
     }; // class SphereHitTestFunction<...>
+
+
+    /**
+     * \brief Chart-based Hit-Test Factory class template
+     *
+     * This class template can be used to create a MeshPart for a particular mesh, which consists of
+     * all entities that are inside or outside the region characterized by a given chart.
+     *
+     * \tparam Mesh_
+     * The type of the mesh for which the cell sub-set is to be computed.
+     *
+     * \tparam Chart_
+     * The type of the chart that is to be tested; typically Atlas::ChartBase.
+     *
+     * \author Peter Zajac, Stefan Wahlers
+     */
+    template<typename Mesh_, typename Chart_ = Atlas::ChartBase<Mesh_>>
+    class ChartHitTestFactory :
+      public Factory< MeshPart<Mesh_> >
+    {
+    public:
+      /// The shape type of the mesh
+      typedef typename Mesh_::ShapeType ShapeType;
+      /// mesh part type
+      typedef MeshPart<Mesh_> MeshType;
+      /// target set holder type
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
+      class ChartHitFunction
+      {
+        typedef typename Mesh_::CoordType CoordType;
+        typedef typename Mesh_::VertexType WorldPointType;
+
+      protected:
+        const Geometry::Atlas::ChartBase<Mesh_>& _chart;
+        const CoordType _inv;
+
+      public:
+        explicit ChartHitFunction(const Geometry::Atlas::ChartBase<Mesh_>& chart, bool invert) :
+          _chart(chart),
+          _inv(CoordType(invert ? -1 : 1))
+        {
+        }
+
+        bool operator()(const WorldPointType& point) const
+        {
+          return _inv * _chart.signed_dist(point) <= CoordType(0);
+        }
+      };
+
+    protected:
+      /// reference to the input mesh
+      const Mesh_& _mesh;
+      /// our hit function
+      ChartHitFunction _hit_func;
+      /// internal data storing the indices
+      std::vector<std::vector<Index>> _target_data;
+
+    public:
+      /**
+       * \brief Creates the factory.
+       *
+       * \param[in] mesh
+       * A \resident reference to the mesh for which the cell sub-set is to be computed.
+       *
+       * \param[in] chart
+       * A \resident reference to the chart for which the mesh part is to be created.
+       *
+       * \param[in] invert
+       * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
+       * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
+       * the chart, i.e. have a signed distance <= 0.
+       */
+      explicit ChartHitTestFactory(const Mesh_& mesh, const Chart_& chart, bool invert = false) :
+        _mesh(mesh),
+        _hit_func(chart, invert),
+        _target_data(std::size_t(_mesh.shape_dim+1))
+      {
+        // call wrapper
+        Intern::HitTestCompute<ChartHitFunction, Mesh_, ShapeType>::wrap(_target_data, _mesh, _hit_func);
+      }
+
+      /// \copydoc Factory::get_num_entities()
+      virtual Index get_num_entities(int dim) override
+      {
+        return Index(_target_data.at(std::size_t(dim)).size());
+      }
+
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
+      {
+        // call wrapper
+        Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
+      }
+
+      virtual void fill_attribute_sets(typename MeshType::AttributeSetContainer&) override
+      {
+        // do nothing as the object has no attribute sets
+      }
+
+      virtual void fill_index_sets(std::unique_ptr<typename MeshType::IndexSetHolderType>&) override
+      {
+        // do nothing as the object has no index sets
+      }
+    }; // class ChartHitTestFactory
   } // namespace Geometry
 } // namespace FEAT
 

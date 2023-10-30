@@ -4,28 +4,12 @@
 // see the file 'copyright.txt' in the top level directory for details.
 //
 // ------------------------------------------------------------------------------------------------
-// Steady CCnD solver for DFG95 Flow-Around-A-Cylinder Benchmarks
+// Steady CCnD solver for Y-Pipe Benchmark
 // ------------------------------------------------------------------------------------------------
 // This application implements a parallel steady CCND solver, which is pre-configured to solve
-// the infamous unsteady "flow-around-a-cylinder" benchmark problem, which is defined in
-//
-//     M. Schaefer and S. Turek: Benchmark Computations of Laminar Flow Around a Cylinder
-//
-// This application supports all parameters from the CCND::SteadyAppBase class, so please refer to
-// the documentation of the ccnd_steady_appbase.hpp header file for an up-to-date list of all
-// command line parameters supported by that base class.
-//
-// In addition, this application adds support for the following parameters:
-//
-// --bench <1|7>
-// Specifies which of the 2 steady benchmarks is to be solved:
-//   --bench 1 corresponds to the test cases 2D-1 and 3D-1Z of flow-around-a-cylinder
-//   --bench 7 corresponds to the 3D flow-around-a-sphere-inside-cylinder benchmark that is
-//             analogous to the bench 1 simulation
 //
 // --v-max <vmax>
-// Specifies the maximum velocity of the inflow boundary condition.
-// Defaults to 1.5 in 2D and 2.25 in 3D.
+// Specifies the maximum velocity of the inflow boundary condition. Defaults to 1.
 //
 // --fbm
 // Enables the fictitious boundary method (FBM) to enforce the boundary conditions for the circular
@@ -34,9 +18,16 @@
 // \author Peter Zajac
 //
 
+#ifdef FEAT_CCND_APP_DIM
+#if FEAT_CCND_APP_DIM != 2
+#error FEAT_CCND_APP_DIM must be equal to 2 for this application
+#endif
+#else
+#define FEAT_CCND_APP_DIM 2
+#endif
+
 // include common CCND header
 #include "ccnd_common.hpp"
-#include "ccnd_common_dfg95.hpp"
 
 // open the namespace and define the DomainLevel and SystemLevel classes
 namespace CCND
@@ -62,19 +53,16 @@ namespace CCND
     /// our base class
     typedef SteadyAppBase BaseClass;
 
-    /// which benchmark to solve? 1 or 7?
-    int bench = 1;
-
     /// maximum inflow velocity: 0.3 for 2D bench 1, 0.45 for 3D bench 1; 1 for bench 7
     DataType v_max = DataType(1);
 
-    /// DFG95 benchmark summary
-    DFG95::BenchmarkAnalysis bench_analysis;
+    /// trace assemblers for inflow and outflows
+    std::unique_ptr<Assembly::TraceAssembler<TrafoType>> flux_asm_in, flux_asm_out_b, flux_asm_out_t;
+
 
     explicit Application(const Dist::Comm& comm_, SimpleArgParser& args_) :
       BaseClass(comm_, args_)
     {
-      args.support("bench");
       args.support("v-max");
       args.support("fbm");
 
@@ -84,30 +72,14 @@ namespace CCND
 
     virtual void parse_args() override
     {
-      args.parse("bench", bench);
-      if((bench != 1) && (bench != 7))
-      {
-        comm.print("ERROR: invalid benchmark specified: " + stringify(bench));
-        Runtime::abort();
-      }
-      if((bench == 7) && (dim != 3))
-      {
-        comm.print("ERROR: bench 7 is only valid for 3D");
-        Runtime::abort();
-      }
-
       // enable FBM if desired
       enable_fbm = (args.check("fbm") >= 0);
 
-      // pre-define default parameters
-      nu = DataType(0.001);
-      if(bench == 1)
-        v_max = DataType(dim) * DataType(0.15);
-
+      // v-max given?
       args.parse("v-max", v_max);
 
       // set default filename
-      default_filename = String("cc") + stringify(dim) + "d-steady-dfg95-bench" + stringify(bench);
+      default_filename = String("cc") + stringify(dim) + "d-steady-ypipe";
       if(enable_fbm)
         default_filename += "-fbm";
 
@@ -118,8 +90,7 @@ namespace CCND
     virtual void print_problem() override
     {
       BaseClass::print_problem();
-      comm.print("\nDFG95 Benchmark Parameters:");
-      comm.print(String("Benchmark").pad_back(pad_len, pad_char) + ": bench " + stringify(bench));
+      comm.print("\nY-Pipe Benchmark Parameters:");
       comm.print(String("V-Max").pad_back(pad_len, pad_char) + ": " + stringify(v_max));
     }
 
@@ -127,48 +98,62 @@ namespace CCND
     {
       BaseClass::create_domain();
 
+      // add all isoparametric mesh-parts
+      BaseClass::add_all_isoparam_parts();
+
       // create FBM meshpart?
       if(enable_fbm)
       {
-        // obstacle midpoint: 2D: (0.2,0.2)
-        Tiny::Vector<DataType, dim> mp(DataType(0.2));
-        if constexpr (dim == 3)
-          mp[0] = DataType(0.5);
-
-        Geometry::SphereHitTestFunction<DataType, dim> fbm_hit_func(mp, 0.05);
+        ChartBaseType* chart = domain.get_atlas().find_mesh_chart("ypipe:fbm");
+        if(chart == nullptr)
+        {
+          comm.print("ERROR: chart 'ypipe:fbm' not found in mesh!");
+          Runtime::abort();
+        }
 
         // create meshparts on all levels
         for(std::size_t i(0); i < domain.size_physical(); ++i)
         {
-          auto* mesh_node = domain.at(i)->get_mesh_node();
-          Geometry::HitTestFactory<decltype(fbm_hit_func), MeshType> hit_factory(fbm_hit_func, *mesh_node->get_mesh());
-          mesh_node->add_mesh_part("fbm", hit_factory.make_unique());
+          // create mesh-part from chart by using a hit-test factory
+          Geometry::ChartHitTestFactory<MeshType> factory(domain.at(i)->get_mesh(), *chart);
+          domain.at(i)->get_mesh_node()->add_mesh_part("fbm", factory.make_unique());
 
           // create FBM assembler
           domain.at(i)->create_fbm_assembler(domain.at(i).layer().comm(), "fbm");
         }
       }
 
-      // add all isoparametric mesh-parts
-      BaseClass::add_all_isoparam_parts();
-    }
+      // create trace assemblers on finest level
+      {
+        flux_asm_in.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
+        flux_asm_out_t.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
+        flux_asm_out_b.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
 
-    virtual void create_benchmark_analysis()
-    {
-      // let the analysis get its mesh parts and charts
-      bench_analysis.create(domain.get_atlas(), *domain.front()->get_mesh_node(), domain.front()->space_velo);
+        const MeshNodeType& mesh_node = *domain.front()->get_mesh_node();
+        const MeshPartType* mesh_part_bnd_l = mesh_node.find_mesh_part("bnd:l");
+        const MeshPartType* mesh_part_bnd_in = mesh_node.find_mesh_part("bnd:in");
+        const MeshPartType* mesh_part_bnd_out_t = mesh_node.find_mesh_part("bnd:out:t");
+        const MeshPartType* mesh_part_bnd_out_b = mesh_node.find_mesh_part("bnd:out:b");
+
+        if(mesh_part_bnd_l)
+          flux_asm_in->add_mesh_part(*mesh_part_bnd_l);
+        if(mesh_part_bnd_in)
+          flux_asm_in->add_mesh_part(*mesh_part_bnd_in);
+        if(mesh_part_bnd_out_t)
+          flux_asm_out_t->add_mesh_part(*mesh_part_bnd_out_t);
+        if(mesh_part_bnd_out_b)
+          flux_asm_out_b->add_mesh_part(*mesh_part_bnd_out_b);
+
+        flux_asm_in->compile();
+        flux_asm_out_t->compile();
+        flux_asm_out_b->compile();
+      }
     }
 
     virtual void assemble_filters()
     {
       // our inflow BC function
-      DFG95::SteadyInflowFunction<dim> inflow_func(v_max);
-
-      Tiny::Vector<DataType, dim> pipe_origin, pipe_axis;
-      pipe_origin = DataType(0.205);
-      pipe_axis = DataType(0);
-      pipe_axis[0] = DataType(1);
-      Analytic::Common::PoiseuillePipeFlow<DataType, dim> pipe_inflow_func(pipe_origin, pipe_axis, DataType(0.205), v_max);
+      Analytic::Common::ParProfileVector<DataType> inflow_func(0.0, -0.45, 0.0, 0.45, v_max);
 
       // the names of the mesh parts on which to assemble
       std::deque<String> part_names = domain.front()->get_mesh_node()->get_mesh_part_names(true);
@@ -180,7 +165,7 @@ namespace CCND
         auto& filter_v_inflow = system.at(i)->get_local_velo_unit_filter_seq().find_or_add("inflow");
 
         // create unit-filter assembler
-        Assembly::UnitFilterAssembler<MeshType> unit_asm_inflow_1, unit_asm_inflow_2, unit_asm_noflow;
+        Assembly::UnitFilterAssembler<MeshType> unit_asm_inflow, unit_asm_noflow;
 
         // loop over all boundary parts except for the right one, which is outflow
         for(const auto& name : part_names)
@@ -196,27 +181,21 @@ namespace CCND
           auto* mesh_part = mesh_part_node->get_mesh();
           if (mesh_part != nullptr)
           {
-            if(name == "bnd:l")
+            if((name == "bnd:l") || (name == "bnd:in"))
             {
               // inflow
-              unit_asm_inflow_1.add_mesh_part(*mesh_part);
+              unit_asm_inflow.add_mesh_part(*mesh_part);
             }
-            else if(name == "bnd:in")
+            else if((name != "bnd:r") && !name.starts_with("bnd:out"))
             {
-              // inflow
-              unit_asm_inflow_2.add_mesh_part(*mesh_part);
-            }
-            else if((name != "bnd:r") && (name != "bnd:out"))
-            {
-              // outflow
+              // not outflow
               unit_asm_noflow.add_mesh_part(*mesh_part);
             }
           }
         }
 
         // assemble the filters
-        unit_asm_inflow_1.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_func);
-        unit_asm_inflow_2.assemble(filter_v_inflow, domain.at(i)->space_velo, pipe_inflow_func);
+        unit_asm_inflow.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_func);
         unit_asm_noflow.assemble(filter_v_noflow, domain.at(i)->space_velo);
 
         // assemble FBM filters?
@@ -245,25 +224,25 @@ namespace CCND
     {
       watch_sol_analysis.start();
 
-      // compute drag & lift by line integration
-      if(bench == 1)
-        bench_analysis.compute_body_forces_line(comm, vec_sol.local().at<0>(), vec_sol.local().at<1>(),
-          domain.front()->space_velo, domain.front()->space_pres, nu, v_max);
+      Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
 
-      // compute drag & lift coefficients via volume integration from unsynchronized final defect
-      bench_analysis.compute_body_forces_vol(comm, vec_def_unsynced.local().first(), nu, v_max, bench);
+      const LocalVeloVector& vec_sol_v = this->vec_sol.local().first();
+      const SpaceVeloType& space_v = domain.front()->space_velo;
 
-      // compute pressure difference
-      bench_analysis.compute_pressure_difference(comm, vec_sol.local().at<1>(), domain.front()->space_pres);
+      DataType fx[3] =
+      {
+        flux_asm_in->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
+        flux_asm_out_t->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
+        flux_asm_out_b->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0]
+      };
 
-      // compute fluxes
-      bench_analysis.compute_fluxes(comm, vec_sol.local().first(), domain.front()->space_velo);
+      comm.allreduce(fx, fx, 3u, Dist::op_sum);
 
-      // perform analysis of velocity field
-      bench_analysis.compute_velocity_info(comm, vec_sol.local().first(), domain.front()->space_velo);
-
-      // print analysis
-      comm.print(bench_analysis.format(bench == 1));
+      comm.print("Solution Analysis:");
+      comm.print("Flux In...: " + stringify_fp_fix(fx[0], fp_num_digs));
+      comm.print("Flux Out T: " + stringify_fp_fix(fx[1], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[1]/fx[0],3,7) + "%]");
+      comm.print("Flux Out B: " + stringify_fp_fix(fx[2], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[2]/fx[0],3,7) + "%]");
+      comm.print("Mass Loss.: " + stringify_fp_fix(100.0*(1.0 - (fx[1]+fx[2])/fx[0]), 5) + "%\n");
 
       watch_sol_analysis.stop();
     }
@@ -297,9 +276,6 @@ namespace CCND
     // print problem parameters
     app.print_problem();
 
-    // create benchmark analysis stuff
-    app.create_benchmark_analysis();
-
     // create system
     app.create_system();
 
@@ -328,8 +304,6 @@ namespace CCND
     // solve Navier-Stokes if desired
     if(app.navier)
       app.solve_navier_stokes();
-    else // compute unsynchronized defect for body forces computation
-      app.compute_unsynced_defect();
 
     // collect statistics
     app.collect_solver_statistics();
@@ -343,7 +317,7 @@ namespace CCND
     // write VTK files if desired
     app.write_vtk();
 
-    // perform solution analysis
+    // analyze solution
     app.perform_solution_analysis();
 
     // collect final statistics

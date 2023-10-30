@@ -138,7 +138,7 @@ namespace CCND
     // inherit constructor
     using BaseClass::BaseClass;
 
-    void create_fbm_assembler(const Dist::Comm& comm, const String& fbm_meshpart_name)
+    void create_fbm_assembler(const Dist::Comm& comm, const String& fbm_meshpart_names)
     {
       // get out mesh node
       const MeshNodeType& mesh_node = *this->get_mesh_node();
@@ -146,15 +146,19 @@ namespace CCND
       // allocate assembler
       fbm_assembler.reset(new Assembly::StokesFBMAssembler<MeshType>(*mesh_node.get_mesh()));
 
-      // find meshpart node
-      const auto* part_node = mesh_node.find_mesh_part_node(fbm_meshpart_name);
-      XASSERTM(part_node != nullptr, "FBM meshpart node not found");
+      // loop over all FBM meshparts
+      std::deque<String> fbm_name_deque = fbm_meshpart_names.split_by_whitespaces();
+      for(const String& name : fbm_name_deque)
+      {
+        // find meshpart node
+        const auto* part_node = mesh_node.find_mesh_part_node(name);
+        XASSERTM(part_node != nullptr, "FBM meshpart node '" + name + "'not found");
 
-      // get the meshpart if it exists
-      const MeshPartType* fbm_meshpart = part_node->get_mesh();
-      if(fbm_meshpart)
-        fbm_assembler->add_fbm_meshpart(*fbm_meshpart);
-
+        // get the meshpart if it exists
+        const MeshPartType* fbm_meshpart = part_node->get_mesh();
+        if(fbm_meshpart)
+          fbm_assembler->add_fbm_meshpart(*fbm_meshpart);
+      }
       // synchronize over comm
       fbm_assembler->sync(mesh_node, comm);
 
@@ -230,6 +234,99 @@ namespace CCND
       {
         filter.second.filter_mat(this->local_matrix_sys.block_a());
         filter.second.filter_offdiag_row_mat(this->local_matrix_sys.block_b());
+      }
+    }
+
+    void assemble_fbm_filters(Assembly::StokesFBMAssembler<MeshType>& fbm_asm, const SpaceVeloType& space_velo, const SpacePresType& space_pres, bool asm_mask)
+    {
+      // assemble velocity and pressure unit filters
+      fbm_asm.assemble_inside_filter(get_local_velo_unit_filter_seq().find_or_add("fbm"), space_velo);
+      fbm_asm.assemble_inside_filter(get_local_pres_unit_filter(), space_pres);
+
+      // assemble interface filter for velocity
+      fbm_asm.assemble_interface_filter(filter_interface_fbm, space_velo, matrix_a, velo_mass_matrix);
+
+      // assemble mask vectors on finest level
+      if(asm_mask)
+      {
+        fbm_mask_velo.reserve(space_velo.get_num_dofs());
+        for(int d(0); d <= dim; ++d)
+        {
+          for(auto k : fbm_asm.get_fbm_mask_vector(d))
+            fbm_mask_velo.push_back(k);
+        }
+        fbm_mask_pres = fbm_asm.get_fbm_mask_vector(dim);
+      }
+    }
+
+    void assemble_pressure_mean_filter(const SpacePresType& space_pres, bool enable_fbm)
+    {
+      GlobalPresVector  vec_glob_v(&gate_pres), vec_glob_w(&gate_pres);
+
+      // fetch the local vectors
+      LocalPresVector& vec_loc_v = vec_glob_v.local();
+      LocalPresVector& vec_loc_w = vec_glob_w.local();
+
+      // fetch the frequency vector of the pressure gate
+      LocalPresVector& vec_loc_f = gate_pres._freqs;
+
+      // assemble the mean filter
+      Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space_pres, "gauss-legendre:2");
+
+      // synchronize the vectors
+      vec_glob_v.sync_1();
+      vec_glob_w.sync_0();
+
+      // apply pressure unit filter if FBM is enabled
+      if(enable_fbm)
+      {
+        const auto& fil_p = this->get_local_pres_unit_filter();
+        fil_p.filter_cor(vec_loc_v);
+        fil_p.filter_def(vec_loc_w);
+      }
+
+      // create mean filter
+      this->get_local_pres_mean_filter() = LocalPresMeanFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), gate_pres.get_comm());
+    }
+
+    void apply_fbm_filter_to_rhs(GlobalSystemVector& vec_rhs) const
+    {
+      this->apply_fbm_filter_to_rhs(vec_rhs.local().first());
+    }
+
+    void apply_fbm_filter_to_rhs(LocalVeloVector& vec_rhs_v) const
+    {
+      this->filter_interface_fbm.filter_def(vec_rhs_v);
+    }
+
+    void apply_fbm_filter_to_def(GlobalSystemVector& vec_def_v, const GlobalSystemVector& vec_sol_v, const DataType factor) const
+    {
+      this->apply_fbm_filter_to_def(vec_def_v.local().first(), vec_sol_v.local().first(), factor);
+    }
+
+    void apply_fbm_filter_to_def(LocalVeloVector& vec_def_v, const LocalVeloVector& vec_sol_v, const DataType factor) const
+    {
+      if(this->filter_interface_fbm.used_elements() == Index(0))
+        return;
+
+      auto* vdef = vec_def_v.elements();
+      const auto* vsol = vec_sol_v.elements();
+      const IndexType* fidx = this->filter_interface_fbm.get_indices();
+      const auto* fval = this->filter_interface_fbm.get_values();
+      const IndexType* row_ptr = this->velo_mass_matrix.local().row_ptr();
+      const IndexType* col_idx = this->velo_mass_matrix.local().col_ind();
+      const auto* mval = this->velo_mass_matrix.local().val();
+
+      IndexType n = this->filter_interface_fbm.used_elements();
+      for(IndexType i(0); i < n; ++i)
+      {
+        IndexType row = fidx[i];
+        vdef[row] = DataType(0);
+        for(IndexType j(row_ptr[row]); j < row_ptr[row+1]; ++j)
+        {
+          vdef[row] += mval[j] * vsol[col_idx[j]];
+        }
+        vdef[row] *= fval[i][0] * factor;
       }
     }
   }; // class SystemLevelBase

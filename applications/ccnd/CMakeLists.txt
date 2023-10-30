@@ -7,6 +7,7 @@ SET (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_EXECUTABLE(ccnd-steady-dfg95-2d ccnd_steady_dfg95.cpp)
 ADD_EXECUTABLE(ccnd-steady-dfg95-3d ccnd_steady_dfg95.cpp)
 ADD_EXECUTABLE(ccnd-steady-taygre-2d ccnd_steady_taygre.cpp)
+ADD_EXECUTABLE(ccnd-steady-ypipe-2d ccnd_steady_ypipe.cpp)
 ADD_EXECUTABLE(ccnd-unsteady-dfg95-2d ccnd_unsteady_dfg95.cpp)
 ADD_EXECUTABLE(ccnd-unsteady-dfg95-3d ccnd_unsteady_dfg95.cpp)
 
@@ -15,6 +16,7 @@ SET(app_list_2d
   ccnd-steady-dfg95-2d
   ccnd-unsteady-dfg95-2d
   ccnd-steady-taygre-2d
+  ccnd-steady-ypipe-2d
 )
 
 # define 3D app list

@@ -131,4 +131,22 @@
       8
     </Mapping>
   </MeshPart>
+  <MeshPart name="bnd:out:b" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      3
+      7
+    </Mapping>
+    <Mapping dim="1">
+      15
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="bnd:out:t" parent="root" topology="none" size="2 1">
+    <Mapping dim="0">
+      7
+      11
+    </Mapping>
+    <Mapping dim="1">
+      16
+    </Mapping>
+  </MeshPart>
 </FeatMeshFile>

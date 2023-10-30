@@ -184,6 +184,8 @@ namespace CCND
   typedef typename SystemLevel::LocalSystemMatrix LocalSystemMatrix;
   typedef typename SystemLevel::LocalSystemVector LocalSystemVector;
   typedef typename SystemLevel::LocalSystemFilter LocalSystemFilter;
+  typedef typename SystemLevel::LocalVeloVector LocalVeloVector;
+  typedef typename SystemLevel::LocalPresVector LocalPresVector;
 
   class SteadyAppBase
   {
@@ -285,7 +287,7 @@ namespace CCND
     std::deque<String> mesh_file_names;
     String mesh_file_type;
 
-    /// a hand ful of stopwatches
+    /// a handful of stopwatches
     StopWatch watch_create_domain, watch_create_system, watch_create_solver;
     StopWatch watch_stokes_solve, watch_nonlin_loop, watch_nonlin_def_asm, watch_nonlin_mat_asm, watch_nonlin_solver_init, watch_nonlin_solver_apply;
     StopWatch watch_sol_init_read, watch_sol_final_write, watch_sol_analysis, watch_total_run, watch_vtk;
@@ -789,6 +791,41 @@ namespace CCND
     {
       watch_create_solver.start();
 
+      const GlobalSystemMatrix& matrix_sys = system.front()->matrix_sys;
+      const GlobalSystemFilter& filter_sys = system.front()->filter_sys;
+
+      // do we have just a single level?
+      if(domain.size_virtual() == std::size_t(1))
+      {
+        // create direct solver or FMGRES?
+#ifdef FEAT_HAVE_UMFPACK
+        if(!coarse_gmres)
+        {
+          comm.print("\nINFO: only 1 level chosen; creating single grid solver: DirectStokesSolver");
+          solver = Solver::new_direct_stokes_solver(matrix_sys, filter_sys);
+        }
+        else
+#endif //  FEAT_HAVE_UMFPACK
+        {
+          comm.print("\nINFO: only 1 level chosen; creating single grid solver: FGMRES-AmaVanka");
+          auto vanka = Solver::new_amavanka(system.front()->local_matrix_sys, filter_sys.local());
+          vanka->set_skip_singular(true);
+          ama_vankas.push_back(vanka);
+          auto schwarz = Solver::new_schwarz_precond(vanka, filter_sys);
+          solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, 16, 0.0, schwarz);
+
+          // configure solver
+          solver_iterative->set_plot_name("FGMRES-AmaVanka");
+          solver_iterative->set_min_iter(min_mg_iter);
+          solver_iterative->set_max_iter(max_mg_iter);
+          solver_iterative->set_tol_rel(mg_tol_rel);
+          solver_iterative->set_min_stag_iter(Index(3));
+        }
+
+        watch_create_solver.stop();
+        return;
+      }
+
       // create new hierarchy
       multigrid_hierarchy =
         std::make_shared<Solver::MultiGridHierarchy<GlobalSystemMatrix, GlobalSystemFilter, GlobalSystemTransfer>>(domain.size_virtual());
@@ -827,7 +864,7 @@ namespace CCND
 #endif //  FEAT_HAVE_UMFPACK
         else
         {
-          // create BiCGStab-AmaVanka coarse grid solver
+          // create FGMRES-AmaVanka coarse grid solver
           auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
           vanka->set_skip_singular(true);
           ama_vankas.push_back(vanka);
@@ -841,9 +878,6 @@ namespace CCND
           multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
         }
       }
-
-      GlobalSystemMatrix& matrix_sys = system.front()->matrix_sys;
-      GlobalSystemFilter& filter_sys = system.front()->filter_sys;
 
       // create our multigrid solver
       multigrid = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
@@ -875,7 +909,8 @@ namespace CCND
     virtual void init_solver_symbolic()
     {
       watch_nonlin_solver_init.start();
-      multigrid_hierarchy->init_symbolic();
+      if(multigrid_hierarchy)
+        multigrid_hierarchy->init_symbolic();
       solver->init_symbolic();
       watch_nonlin_solver_init.stop();
     }
@@ -883,7 +918,8 @@ namespace CCND
     virtual void init_solver_numeric()
     {
       watch_nonlin_solver_init.start();
-      multigrid_hierarchy->init_numeric();
+      if(multigrid_hierarchy)
+        multigrid_hierarchy->init_numeric();
       solver->init_numeric();
       watch_nonlin_solver_init.stop();
     }
@@ -891,7 +927,8 @@ namespace CCND
     virtual void done_solver_numeric()
     {
       solver->done_numeric();
-      multigrid_hierarchy->done_numeric();
+      if(multigrid_hierarchy)
+        multigrid_hierarchy->done_numeric();
 
       FEAT::Statistics::compress_solver_expressions();
     }
@@ -899,7 +936,8 @@ namespace CCND
     virtual void done_solver_symbolic()
     {
       solver->done_symbolic();
-      multigrid_hierarchy->done_symbolic();
+      if(multigrid_hierarchy)
+        multigrid_hierarchy->done_symbolic();
     }
 
     virtual bool solve_stokes()
@@ -924,7 +962,17 @@ namespace CCND
       else
       {
         watch_stokes_solve.start();
+        // solve
         stokes_status = Solver::solve(*solver, vec_sol, vec_rhs, system.front()->matrix_sys, system.front()->filter_sys);
+
+        // compute defect after solve manually
+        system.front()->matrix_sys.apply(vec_def, vec_sol, vec_rhs, -DataType(1));
+        system.front()->filter_sys.filter_def(vec_def);
+        //if(enable_fbm)
+          //system.front()->filter_interface_fbm.filter_def(vec_def.local().first());
+
+        comm.print("Defect after direct solve: " + stringify_fp_sci(vec_def.norm2()));
+
         watch_stokes_solve.stop();
       }
 
@@ -975,14 +1023,27 @@ namespace CCND
 
       initialize_nonlinear_defect();
 
+      // if FBM is enabled, then we temporarily assemble the Burgers defect into vec_def_unsynced
+      if(enable_fbm)
+        vec_def_unsynced.format();
+
       // set up Burgers assembly job for our defect vector
       Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
-        vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
+        enable_fbm ? vec_def_unsynced.local().template at<0>() : vec_def.local().template at<0>(),
+        vec_sol.local().template at<0>(),
         vec_sol.local().template at<0>(), domain.front()->space_velo, cubature_defect);
       setup_burgers_defect_job(burgers_def_job);
 
       // assemble burgers operator defect
       domain.front()->domain_asm.assemble(burgers_def_job);
+
+      // apply FBM filter if required
+      if(enable_fbm)
+      {
+        system.front()->apply_fbm_filter_to_def(vec_def_unsynced, vec_sol, -DataType(1));
+        vec_def.axpy(vec_def, vec_def_unsynced);
+      }
+
       // compute remainder of defect vector
       system.front()->matrix_sys.local().block_b().apply(
         vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -1.0);
@@ -992,8 +1053,8 @@ namespace CCND
       vec_def_unsynced.copy(vec_def);
       // synchronize and filter the defect
       vec_def.sync_0();
-      if(enable_fbm)
-        system.front()->filter_interface_fbm.filter_def(vec_def.local().first());
+      //if(enable_fbm)
+        //system.front()->filter_interface_fbm.filter_def(vec_def.local().first());
       system.front()->filter_sys.filter_def(vec_def);
       watch_nonlin_def_asm.stop();
     }
@@ -1125,7 +1186,7 @@ namespace CCND
       if(!single_line_plot)
         comm.print("\nSolving Navier-Stokes system...");
 
-      if(!plot_mg_iter)
+      if(!plot_mg_iter && (solver_iterative))
         solver_iterative->set_plot_mode(Solver::PlotMode::none);
 
       // vector of all non-linear defect norms
@@ -1254,13 +1315,17 @@ namespace CCND
       stats.times[Times::linsol_apply] = watch_nonlin_solver_apply.elapsed();
 
       // get multigrid timings
-      stats.times[Times::mg_defect] = multigrid_hierarchy->get_time_defect();
-      stats.times[Times::mg_smooth] = multigrid_hierarchy->get_time_smooth();
-      stats.times[Times::mg_coarse] = multigrid_hierarchy->get_time_coarse();
-      stats.times[Times::mg_transfer] = multigrid_hierarchy->get_time_transfer();
+      if(multigrid_hierarchy)
+      {
+        stats.times[Times::mg_defect] = multigrid_hierarchy->get_time_defect();
+        stats.times[Times::mg_smooth] = multigrid_hierarchy->get_time_smooth();
+        stats.times[Times::mg_coarse] = multigrid_hierarchy->get_time_coarse();
+        stats.times[Times::mg_transfer] = multigrid_hierarchy->get_time_transfer();
+      }
 
       // accumulate vanka sizes
-      stats.counts[Counts::vanka_data] = Index(ama_vankas.front()->data_size());
+      if(!ama_vankas.empty())
+        stats.counts[Counts::vanka_data] = Index(ama_vankas.front()->data_size());
       stats.bytes[Bytes::vanka] = 0ull;
 
       // accumulate vanka timings
@@ -1301,20 +1366,47 @@ namespace CCND
 
       // write velocity
       exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
+      exporter.add_vertex_vector("rhs_v", vec_rhs.local().template at<0>());
 
       // project pressure
-      LAFEM::DenseVector<DataType, Index> vtx_p;
+      LAFEM::DenseVector<DataType, Index> vtx_p, vtx_q;
       if(refined_mesh_vtk)
       {
         Assembly::DiscreteCellProjector::project_refined(vtx_p, vec_sol.local().template at<1>(), domain.front()->space_pres);
+        Assembly::DiscreteCellProjector::project_refined(vtx_q, vec_rhs.local().template at<1>(), domain.front()->space_pres);
       }
       else
       {
         Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), domain.front()->space_pres, "gauss-legendre:2");
+        Assembly::DiscreteCellProjector::project(vtx_q, vec_rhs.local().template at<1>(), domain.front()->space_pres, "gauss-legendre:2");
       }
 
       // write pressure
       exporter.add_cell_scalar("pressure", vtx_p.elements());
+      exporter.add_cell_scalar("rhs_p", vtx_q.elements());
+
+      // write FBM masks if
+      if(enable_fbm)
+      {
+        if(refined_mesh_vtk)
+        {
+          exporter.add_vertex_scalar("fbm_mask_v", system.front()->fbm_mask_velo.data());
+
+          const std::vector<int>& mask_p = domain.front()->fbm_assembler->get_fbm_mask_vector(dim);
+          const int nc = 1 << dim;
+          std::vector<int> mask_p_ref;
+          mask_p_ref.reserve(mask_p.size() * std::size_t(nc));
+          for(int i : mask_p)
+            for(int k(0); k < nc; ++k)
+              mask_p_ref.push_back(i);
+          exporter.add_cell_scalar("fbm_mask_p", mask_p_ref.data());
+        }
+        else
+        {
+          exporter.add_vertex_scalar("fbm_mask_v", domain.front()->fbm_assembler->get_fbm_mask_vector(0).data());
+          exporter.add_cell_scalar("fbm_mask_p", domain.front()->fbm_assembler->get_fbm_mask_vector(dim).data());
+        }
+      }
 
       // finally, write the VTK file
       exporter.write(vtk_name, comm);
@@ -1350,7 +1442,7 @@ namespace CCND
       comm.print(stats.format());
 
       // print multigrid timings
-      if(comm.rank() == 0)
+      if((comm.rank() == 0) && (multigrid_hierarchy))
       {
         comm.print("Multigrid Timings:");
         comm.print("              Defect /   Smoother /   Transfer /     Coarse");
