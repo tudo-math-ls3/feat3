@@ -1,0 +1,415 @@
+<FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This is a mesh for the unsymmetric 2D Y-pipe domain with one inflow on the left side and two
+    outflows of different length (3 and 5) on the right side.
+    The boundary is described by a Bezier spline named 'ypipe' and the mesh consists of 32 quadrilateral cells.
+  </Info>
+  <Chart name="bnd:1">
+    <Bezier dim="2" size="14" type="closed">
+      <Points>
+        0 0 -0.45
+        0 0.35 -0.45
+        2 1.25 -0.45 1.25 -0.9 2.15 -0.9
+        0 3 -0.9
+        0 3 -0.45
+        0 2.15 -0.45
+        2 1.7 -0.45 1.25 -0.18 1.25 0
+        2 1.25 0.18 1.7 0.45 2.15 0.45
+        0 5 0.45
+        0 5 0.9
+        0 2.15 0.9
+        2 1.25 0.9 1.25 0.45 0.35 0.45
+        0 0 0.45
+        0 0 -0.45
+      </Points>
+      <Params>
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+        8
+        9
+        10
+        11
+        12
+        13
+      </Params>
+    </Bezier>
+  </Chart>
+  <Mesh type="conformal:hypercube:2:2" size="52 83 32">
+    <Vertices>
+      0.35 0
+      0.884375 0
+      1.2536703125 -0.400667343750
+      1.6863875 -0.60825375
+      2.15 -0.675
+      2.575 -0.675
+      1.2536703125 0.400667343750
+      1.6863875 0.60825375
+      2.15 0.675
+      2.575 0.675
+      0 -0.45
+      0.35 -0.45
+      0.749459375 -0.4865203125
+      1.147990625 -0.6247546875
+      1.615625 -0.8296875
+      2.15 -0.9
+      2.575 -0.9
+      3 -0.9
+      3 -0.675
+      3 -0.45
+      2.575 -0.45
+      2.15 -0.45
+      1.75715 -0.38682
+      1.35935 -0.17658
+      1.25 0
+      1.35935 0.17658
+      1.75715 0.38682
+      2.15 0.45
+      2.575 0.45
+      3 0.45
+      3 0.9
+      2.575 0.9
+      2.15 0.9
+      1.615625 0.8296875
+      1.147990625 0.6247546875
+      0.749459375 0.4865203125
+      0.35 0.45
+      0 0.45
+      0 0
+      3 0.675
+      3.5 0.45
+      3.5 0.9
+      4 0.45
+      4 0.9
+      4.5 0.45
+      4.5 0.9
+      5 0.45
+      5 0.675
+      5 0.9
+      3.5 0.675
+      4 0.675
+      4.5 0.675
+    </Vertices>
+    <Topology dim="1">
+      10 11
+      11 12
+      12 13
+      13 14
+      14 15
+      15 16
+      16 17
+      17 18
+      18 19
+      19 20
+      20 21
+      21 22
+      22 23
+      23 24
+      24 25
+      25 26
+      26 27
+      27 28
+      28 29
+      29 39
+      39 30
+      30 31
+      31 32
+      32 33
+      33 34
+      34 35
+      35 36
+      36 37
+      37 38
+      38 10
+      38 0
+      0 1
+      24 1
+      1 2
+      2 3
+      3 4
+      4 5
+      18 5
+      1 6
+      6 7
+      7 8
+      8 9
+      39 9
+      11 0
+      36 0
+      12 1
+      35 1
+      13 2
+      23 2
+      14 3
+      22 3
+      15 4
+      21 4
+      16 5
+      20 5
+      25 6
+      34 6
+      26 7
+      33 7
+      27 8
+      32 8
+      28 9
+      31 9
+      29 40
+      40 42
+      42 44
+      44 46
+      30 41
+      41 43
+      43 45
+      45 48
+      46 47
+      47 48
+      40 49
+      41 49
+      42 50
+      43 50
+      44 51
+      45 51
+      39 49
+      49 50
+      50 51
+      47 51
+    </Topology>
+    <Topology dim="2">
+      10 11 38 0
+      36 37 0 38
+      11 12 0 1
+      35 36 1 0
+      12 13 1 2
+      23 24 2 1
+      13 14 2 3
+      22 23 3 2
+      14 15 3 4
+      21 22 4 3
+      15 16 4 5
+      20 21 5 4
+      16 17 5 18
+      18 19 5 20
+      24 25 1 6
+      34 35 6 1
+      25 26 6 7
+      33 34 7 6
+      26 27 7 8
+      32 33 8 7
+      27 28 8 9
+      31 32 9 8
+      28 29 9 39
+      39 30 9 31
+      29 40 39 49
+      39 49 30 41
+      40 42 49 50
+      41 49 43 50
+      42 44 50 51
+      43 50 45 51
+      44 46 51 47
+      45 51 48 47
+    </Topology>
+  </Mesh>
+  <MeshPart parent="root" name="bnd:in" topology="none" size="3 2 0">
+    <Mapping dim="0">
+      37
+      38
+      10
+    </Mapping>
+    <Mapping dim="1">
+      29
+      28
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:out:b" topology="none" size="3 2 0">
+    <Mapping dim="0">
+      18
+      19
+      17
+    </Mapping>
+    <Mapping dim="1">
+      8
+      7
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:out:t" topology="none" size="3 2 0">
+    <Mapping dim="0">
+      48
+      46
+      47
+    </Mapping>
+    <Mapping dim="1">
+      71
+      72
+    </Mapping>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:t" chart="bnd:1" topology="full" size="12 11">
+    <Mapping dim="0">
+      37
+      32
+      31
+      45
+      36
+      41
+      43
+      34
+      30
+      33
+      48
+      35
+    </Mapping>
+    <Mapping dim="1">
+      68
+      25
+      24
+      26
+      67
+      23
+      69
+      21
+      27
+      22
+      70
+    </Mapping>
+    <Topology dim="1">
+      5 6
+      7 11
+      9 7
+      11 4
+      8 5
+      1 9
+      6 3
+      8 2
+      4 0
+      2 1
+      3 10
+    </Topology>
+    <Attribute name="param" dim="1">
+      12
+      10
+      9.850877192982
+      9.175438596491
+      11
+      9.526315789474
+      9.350877192982
+      10.575
+      9.701754385965
+      10.25
+      9
+      10.825
+    </Attribute>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:b" chart="bnd:1" topology="full" size="8 7">
+    <Mapping dim="0">
+      14
+      13
+      16
+      17
+      12
+      15
+      11
+      10
+    </Mapping>
+    <Mapping dim="1">
+      0
+      1
+      3
+      5
+      2
+      4
+      6
+    </Mapping>
+    <Topology dim="1">
+      7 6
+      6 4
+      1 0
+      5 2
+      4 1
+      0 5
+      2 3
+    </Topology>
+    <Attribute name="param" dim="1">
+      1.75
+      1.425
+      2.5
+      3
+      1.175
+      2
+      1
+      0
+    </Attribute>
+  </MeshPart>
+  <MeshPart parent="root" name="bnd:c" chart="bnd:1" topology="full" size="15 14">
+    <Mapping dim="0">
+      20
+      44
+      46
+      25
+      42
+      23
+      40
+      24
+      26
+      22
+      27
+      28
+      29
+      19
+      21
+    </Mapping>
+    <Mapping dim="1">
+      11
+      64
+      10
+      15
+      18
+      9
+      17
+      12
+      14
+      66
+      63
+      13
+      65
+      16
+    </Mapping>
+    <Topology dim="1">
+      14 9
+      6 4
+      0 14
+      3 8
+      11 12
+      13 0
+      10 11
+      9 5
+      7 3
+      1 2
+      12 6
+      5 7
+      4 1
+      8 10
+    </Topology>
+    <Attribute name="param" dim="1">
+      4.5
+      7.824561403509
+      8
+      6.3
+      7.649122807018
+      5.7
+      7.473684210526
+      6
+      6.7
+      5.3
+      7
+      7.149122807018
+      7.298245614035
+      4
+      5
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
