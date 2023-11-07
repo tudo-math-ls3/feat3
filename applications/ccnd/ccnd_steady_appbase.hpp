@@ -496,7 +496,7 @@ namespace CCND
       comm.print(domain.get_chosen_parti_info());
 
       // always use FGMRES as coarse solver if coarse layer has more than 1 processes
-      coarse_gmres = (domain.back_layer().comm().size() > 1);
+      coarse_gmres |= (domain.back_layer().comm().size() > 1);
 
       // do we need a refined mesh for VTK output?
       if(want_vtk && refine_vtk)
@@ -870,7 +870,7 @@ namespace CCND
           ama_vankas.push_back(vanka);
           auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
           //auto coarse_solver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          auto coarse_solver = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, multigrid);
+          auto coarse_solver = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, schwarz);
           coarse_solver->set_max_iter(500);
           coarse_solver->set_tol_rel(1e-3);
           //coarse_solver->set_plot_mode(Solver::PlotMode::summary);
