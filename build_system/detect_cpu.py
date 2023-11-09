@@ -275,6 +275,8 @@ def detect_cpu():
     elif cpu_family == 25:
       if model == 1:
         cputype = "zen3"
+      if model == 33:
+        cputype = "zen3"
       if model == 80:
         cputype = "zen3"
 
