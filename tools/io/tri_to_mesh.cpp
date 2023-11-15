@@ -55,6 +55,7 @@ void add_mesh_part(RMESH * rmesh, String & file)
     mesh_part->deduct_target_sets_from_bottom<0>(rmesh->get_mesh()->get_index_set_holder());
     String part_name = file.lower();
     part_name.replace_all(".par", "");
+    part_name = "bnd:" + part_name;
     rmesh->add_mesh_part(part_name, std::move(mesh_part));
 
     par_file.close();
@@ -66,7 +67,7 @@ int main(int argc, char ** argv)
     if (argc < 3)
     {
         std::cout << "Usage 'tri2mesh file.prj mesh.xml [coord-scaling-factor]'" << std::endl;
-        std::cout << "Must be executed in the file.prj directory, as no folder vodoo takes place internally." << std::endl;
+        std::cout << "Must be executed in the file.prj directory, as no folder voodoo takes place internally." << std::endl;
         FEAT::Runtime::abort();
     }
 
