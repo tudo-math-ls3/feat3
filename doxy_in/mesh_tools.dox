@@ -1,0 +1,330 @@
+/** \page tools_meshtools Mesh Tools Overview
+
+\tableofcontents
+
+This page gives an overview over the mesh-file related tools and scripts that can be found in the tools/mesh_tools
+directory.
+
+- \ref meshtools_meshgen
+- \ref meshtools_mesh_extruder
+- \ref meshtools_mesh_indexer
+
+\section meshtools_meshgen Mesh Generator Scripts
+There exist a few Python scripts that can be used to generate FEAT 3 mesh-files for some simple 2D and 3D domains.
+ lease check the documentation of the scripts for details.
+
+\subsection meshtools_2d_quad_circle 2d_quad_circle.py
+Creates a 2D quadrilateral mesh that discretizes a circle domain with 4*N+1 quadrilateral elements, which looks roughly
+like this:
+\verbatim
+           .
+        ./'|'\.
+      ./'  |  '\.
+    ./'  ./'\   '\.
+  ./'  ./'   '\.  '\.
+ +----+         +----+
+  '\.  '\.   ./'  ./'
+    '\.  '\./'  ./'
+      '\   |  ./'
+        '\.|./'
+           '
+\endverbatim
+
+\subsection meshtools_2d_quad_onion 2d_quad_onion.py
+Creates a 2D quadrilateral mesh that discretizes a rectangular domain with 4*N+1 quadrilateral elements, which (for N=2)
+looks roughly like this:
+\verbatim
+ +-------------------+
+ |'\.             ./'|
+ |   +-----------+   |
+ |   |'\.     ./'|   |
+ |   |   +---+   |   |
+ |   |   |   |   |   |
+ |   |   +---+   |   |
+ |   |./'     '\.|   |
+ |   +-----------+   |
+ |./'             '\.|
+ +-------------------+
+\endverbatim
+
+\subsection meshtools_2d_quad_rect 2d_quad_rect.py
+Creates a 2D quadrilateral mesh that discretizes a rectangular domain with M*N quadrilateral elements. This script
+offers a wide variety of element sizing choices that also allow for the generation of anisotropic meshes, e.g.:
+\verbatim
+ +-----+--------------------+-----+
+ |     |                    |     |
+ +-----+--------------------+-----+
+ |     |                    |     |
+ |     |                    |     |
+ +-----+--------------------+-----+
+ |     |                    |     |
+ |     |                    |     |
+ |     |                    |     |
+ +-----+--------------------+-----+
+\endverbatim
+
+\subsection meshtools_2d_quad_ring 2d_quad_ring.py
+Creates a 2D quadrilateral mesh that discretizes a ring domain with M*N quadrilateral elements.
+
+\subsection meshtools_2d_tria_rect 2d_tria_rect.py
+Creates a 2D triangular mesh that discretizes a rectangular domain with 2*M*N quadrilateral elements. This script
+is the triangular version of the 2d_quad_rect.py script, which subdivides each quadrilateral into 2 triangles.
+
+\subsection meshtools_3d_hexa_cube 3d_hexa_cube.py
+Creates a 3D hexahedral mesh that discretizes a rectoid domain with M*N*L hexahedral elements.
+
+
+
+\section meshtools_mesh_extruder The mesh-extruder Tool
+This tool can be used to create a 3D hexahedral mesh from a 2D quadrilateral mesh by extruding it in Z direction thus
+forming a "2.5D" mesh, which also includes an extrusion of the 2D charts that were used to parameterize the 2D input
+mesh. The 3D mesh can optionally also be rotated and translated by specifing an origin, an offset and a set of
+yaw-pitch-roll rotation angles given in revolutions
+
+This tool accepts the following command line parameters:
+- <c>\--in <input-meshfiles...></c>\n
+Mandatory: Specifies the 2D quadrilateral input mesh file(s).
+- <c>\--out <output-meshfile></c>\n
+Mandatory: Specifies the 3D hexahedral output mesh file.
+- <c>\--z-list <z_0> <z_1> ... <z_n></c>\n
+Mandatory: Specifies the acending list of Z-coordinates at which the 3D mesh is to be sliced, where the first and the
+last entry in the list specify the total Z-extend of the 3D mesh. Mutually exclusive with \--z-range.
+- <c>\--z-range <z-min> <z-max> <n></c>\n
+Mandatory: Specifies the Z-coordinate range and the number of slices in Z-direction. Mutually exclusive with \--z-list.
+- <c>\--z-names <name-min> <name-max></c>\n
+Mandatory: Specifies the names for the Z-boundary mesh-parts.
+- <c>\--origin <x> <y></c>\n
+Optional: Specifies the 2D transformation origin. Default to 0, 0.
+- <c>\--offset <x> <y> <z></c>\n
+Optional: Specifies the 3D transformation offset. Default to 0, 0, 0.
+- <c>\--angles <yaw> <pitch> <roll></c>\n
+Optional: Specifies the 3D transformation angles in revolutions. Default to 0, 0, 0.
+
+The optional rigid body transformation consists of the origin vector \e v, the offset vector \e w as well as a 3D
+rotation matrix \e R, which is given by the yaw-pitch-roll angle triplet, which define the following transformation mapping:
+
+\f[ x \mapsto w + R \cdot(x - v)\f]
+
+\attention
+The yaw-pitch-roll angles are given in revolutions (aka rotations aka full turns) rather than radians or degrees to
+avoid angles with a large number of digits for commonly used rotations. Note: 1 revolution = 360 degrees = 2&pi; radians
+
+<b>Examples:</b>\n
+The following call creates a 3D unit cube mesh with 1 hexahedral element by extruding the 2D unit-square mesh:
+\verbatim
+mesh-extruder --in unit-square-quad.xml --out unit-cube-hexa.xml --z-range 0 1 1 --z-names bnd:f bnd:n
+\endverbatim
+
+The following call creates a 3D cylinder domain with 3 slices in Z-direction from the 12-quad unit-circle mesh, with its
+center translated to (0,0,0) and rotated by 45 degrees (=1/8 revolution) around the X-axis:
+\verbatim
+mesh-extruder --in unit_circle_quad_12.xml --out cylinder_tilted.xml --z-list 0.0 0.1 0.9 1.0 --offset 0 0 -0.5 --angles 0.125 0 0
+\endverbatim
+
+\section meshtools_mesh_indexer The mesh-indexer Tool
+This tool can be used to create a FEAT mesh file from a set of vertex coordinate and vertices@element indices text files.
+This is especially helpful if one needs to create a FEAT mesh file from some other mesh file format and if no other tool
+chain exists that could make that conversion possible in a more convenient way.
+
+This tool accepts the following command line parameters:
+- <c>\--out <output-meshfile></c>\n
+Mandatory: Specifies the filename of the FEAT 3 output mesh file.
+- <c>\--shape <shape></c>\n
+Mandatory: Specifies the shape of the mesh to be generated. Must be one of the following:
+  - h2  : Hypercube<2> mesh with 2D coordinates
+  - h3  : Hypercube<3> mesh with 3D coordinates
+  - h23 : Hypercube<2> mesh with 3D coordinates
+  - s2  : Simplex<2> mesh with 2D coordinates
+  - s3  : Simplex<3> mesh with 3D coordinates
+  - s23 : Simplex<2> mesh with 3D coordinates
+- <c>\--vtx <filenames...></c>\n
+Mandatory: Specifies the name(s) of the input text file(s) that contain the vertex coordinates.
+Each line of this file should contain the coordinate tuple (seperated by spaces) of a single vertex
+and the number of coordinates must match the mesh shape specified by <c>\--shape</c>.
+Empty lines and lines beginning with the hash character '#' are ignored.
+- <c>\--idx <filenames...></c>\n
+Mandatory: Specifies the name(s) of the input text file(s) that contain the 0-based vertices@element indices.
+Each line of this file should contain the vertex-index tuple (seperated by spaces) of a single element
+and the number of indices must match the mesh shape specified by <c>\--shape</c>. The indices are expected to be given
+in the correct order according to the FEAT 3 numbering, see \ref meshfile_shape_numbering for details.
+Empty lines and lines beginning with the hash character '#' are ignored.
+- <c>\--bnd</c>\n
+Specifies that a single mesh part named 'bnd' for the entire boundary is to be generated.
+- <c>\--parts <name1> <formula1> [<name2> <formula2> ...]</c>\n
+Specifies a set of name-formula argument pairs which are used to generate meshparts by using the
+FEAT::Geometry::ParsedHitTestFactory class. The first component of each pair specifies the name for the mesh part,
+whereas the second component specifies the formula in x,y,z coordinates, which is to be used for the hit test of the
+mesh part. A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates to a positive value in
+its coordinates or midpoint coordinates, respectively.
+
+\attention Please note that the <c>\--parts</c> option can only be used if FEAT is configured and linked against the
+'fparser' third-party library. Also, it is highly recommended to enclose each formula in a pair of double-quotation
+marks to ensure your command line interpreter doesn't get confused by more complex fomulae.
+
+
+The number of vertex coordinates files passed to the \--vtx argument must always be equal to the number of element
+indices files passed to the \--idx argument, since these always form a pair of vertices-elements relations.
+
+This tools offers the possibility to join several meshes into a single meshes by specifying a set of multiple
+vertices-indices file pairs. In this case, the indices of the i-th index file correspond to the vertices given in the
+i-th vertex coordinate file.
+
+Furthermore, this tool automatically removes duplicate vertices as well as orphan vertices, i.e. vertices which are not
+referenced by any element. Duplicate vertices usually appear when two or more meshes are joined together, whereas
+orphan vertices appear when one manually removes elements.
+
+<b>Examples:</b>\n
+The following call creates a 2D quadrilateral mesh from the vertices given in \c vertices.txt and the vertex@element
+indices given in <c>elements.txt</c> along with a single mesh-part named 'bnd' for the entire boundary:
+\verbatim
+mesh-indexer --out mesh.xml --shape h2 --vtx vertices.txt --idx elements.txt --bnd
+\endverbatim
+
+The following call creates a 3D tetrahedral mesh that is obtained by joining the two meshes which are given by the
+vertices-elements pairs \c verts_a.txt + \c elems_a.txt and \c verts_b.txt + \c elems_b.txt, i.e. \c elems_a.txt
+contains indices of the vertices in \c verts_a.txt and \c elems_b.txt contains indices of the vertices \c verts_b.txt:
+\verbatim
+mesh-indexer --out mesh.xml --shape s3 --vtx verts_a.txt verts_b.txt  --idx elems_a.txt elems_b.txt
+\endverbatim
+
+
+\section meshtools_mesh2vtk The mesh2vtk Tool
+This tool converts a mesh from the FEAT 3 mesh file format to a corresponding VTK format, which currently always
+correpsonds the XML-based VTU file format for unstructured meshes. This tool can optionally also apply a rigid body
+transformation given by an origin-angles-offset tuplet.
+
+This tool accepts the following command line parameters:
+- <c>\--mesh <filenames...></c>\n
+Mandatory: Specifies the filenames of the input mesh files in FEAT 3 mesh file format. Typically, one only specifies
+a single filename here, unless the information (e.g. charts and root mesh) is split up across several files.
+
+- <c>\--vtk <filename></c>\n
+Optional: Specifies the filename of the output VTK/VTU file. If not given, the name of the first input mesh file is
+used, but with the extension .vtu instead of .xml.
+
+- <c>\--level <lvl_max> [<lvl_min>]</c>\n
+Optional: Specifies the minimum and maximum refinement level of the mesh for which the VTK files are to be written.
+If not given, on the input level (0) is processed.
+
+- <c>\--origin <x> [<y> [<z>]]</c>\n
+Optional: Specifies the translation origin, which is subtracted before applying the rotation matrix.
+If not given, all origin coordinates are set to 0.
+
+- <c>\--angles <angle></c> (2D only)\n
+- <c>\--angles <yaw> <pitch> <roll></c> (3D only)\n
+Optional: Specifies the rotation angle (2D) or the yaw-pitch-roll angles (3D) for the rotation matrix.
+If not given, all angles are set to 0.
+<b>Note:</b> All angles are given in revolutions (aka rotations aka full turns) rather than radians or degrees;
+ 1 revolution = 360 degrees = 2&pi; radians.
+
+- <c>\--offset <x> [<y> [<z>]]</c>\n
+Optional: Specifies the translation offset, which is subtracted after applying the rotation matrix.
+If not given, all offset coordinates are set to 0.
+
+- <c>\--no-adapt</c>\n
+Optional: Disables the adaption of the mesh boundary based on the charts stored in the mesh file.
+
+- <c>\--no-dist</c>\n
+Optional: Disables the automatic computation of the distance to each chart stored in the mesh file.
+
+- <c>\--no-proj</c>\n
+Optional: Disables the automatic computation of the projection fields to each chart stored in the mesh file.
+
+- <c>\--no-volume</c>\n
+Optional: Disabled the automatic computation of the cell volumes.
+
+- <c>\--hit-test <name1> <formula1> [<name2> <formula2> ...]</c>\n
+Specifies a set of name-formula argument pairs which are used to generate meshparts by using the
+FEAT::Geometry::ParsedHitTestFactory class. The first component of each pair specifies the name for the mesh part,
+whereas the second component specifies the formula in x,y,z coordinates, which is to be used for the hit test of the
+mesh part. A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates to a positive value in
+its coordinates or midpoint coordinates, respectively.
+
+\attention Please note that the <c>\--hit-test</c> option can only be used if FEAT is configured and linked against the
+'fparser' third-party library. Also, it is highly recommended to enclose each formula in a pair of double-quotation
+marks to ensure your command line interpreter doesn't get confused by more complex fomulae.
+
+
+
+\section meshtools_mesh2eps The mesh2eps Tool
+This tool converts a 2D triangular or quadrilateral mesh from the FEAT 3 mesh file format to an ecapsulated post-script
+(EPS) file, so that it may be included as a vector graphic in e.g. a LaTeX document.
+
+This tool accepts the following command line parameters:
+- <c>\--mesh <filenames...></c>\n
+Mandatory: Specifies the filenames of the input mesh files in FEAT 3 mesh file format. Typically, one only specifies
+a single filename here, unless the information (e.g. charts and root mesh) is split up across several files.
+
+- <c>\--eps <filename></c>\n
+Optional: Specifies the filename of the output EPS file. If not given, the name of the first input mesh file is
+used, but with the extension .eps instead of .xml.
+
+- <c>\--level <lvl_max> [<lvl_min>]</c>\n
+Optional: Specifies the minimum and maximum refinement level of the mesh for which the EPS files are to be written.
+If not given, on the input level (0) is processed.
+
+- <c>\--box <width> <height></c>\n
+Specifies the bounding box of the figure in millimeters. If not given, a bounding box of 100 x 100 millimeters is used.
+
+- <c>\--stroke <width></c>\n
+Specifies the stroke width of the edges in millimeters. If not given, a stroke width of 0.1 millimeters is used.
+
+- <c>\--extra <offset></c>\n
+Specifies the extra offset of the figure in millimeters. If not given, an offset of 0.5 millimeters is used.
+
+- <c>\--no-adapt</c>\n
+Optional: Disables the adaption of the mesh boundary based on the charts stored in the mesh file.
+
+
+\section meshtools_mesh2tri The mesh2tri Tool
+This tool converts a mesh from the FEAT 3 mesh file format to the legacy FEATFLOW 1/2 TRI mesh file format.
+
+This tool accepts the following command line parameters:
+- <c>\--mesh <filenames...></c>\n
+Mandatory: Specifies the filenames of the input mesh files in FEAT 3 mesh file format. Typically, one only specifies
+a single filename here, unless the information (e.g. charts and root mesh) is split up across several files.
+
+- <c>\--tri <filename></c>\n
+Optional: Specifies the filename of the output TRI file. If not given, the name of the first input mesh file is
+used, but with the extension .tri instead of .xml.
+
+- <c>\--level <lvl_max> [<lvl_min>]</c>\n
+Optional: Specifies the minimum and maximum refinement level of the mesh for which the TRI files are to be written.
+If not given, on the input level (0) is processed.
+
+- <c>\--knpr [<mesh-part-names...>]</c>\n
+Specifies how the nodal property array KNPR is to be defined.\n
+If not given, then the entire nodal property array is formatted to 0.\n
+If given without any mesh-part names, then the nodal property is set to 0 for all interior vertices and to 1 for all
+boundary vertices.\n
+If at least one mesh-part name is given, then all vertices belonging to the first mesh-part get the nodal property 1,
+all vertices belonging to the second mesh-part get the nodal property 2, etc., and all remaining vertices get the nodal
+property 0.\n
+If multiple mesh-parts are to be combined so that all their vertices belong to the same nodal property group,
+then you can specify that group of mesh-parts by specifying their names in a double-quoted string, e.g.
+\verbatim
+  --knpr bnd:l "bnd:t bnd:b" bnd:r
+\endverbatim
+will yield 3 nodal property groups:
+bnd:l -> 1, bnd:t -> 2, bnd:b -> 2, bnd:r -> 3, the rest -> 0
+
+\section meshtools_tri2mesh The tri2mesh Tool
+This tool converts a 3D hexahedral mesh from the legacy FEATFLOW 1/2 TRI mesh file format to the FEAT 3 mesh file format.
+
+This tool has a fixed command line argument structure:
+\verbatim
+tri2mesh <prjfile> <meshfile> [<scale>]
+\endverbatim
+
+where
+- \c <prjfile> is the mandatory filename of the input PRJ file
+- \c <meshfile> is the mandatory filename of the output FEAT 3 mesh file
+- \c <scale> is the optional scaling factor for the coordinates
+
+\attention This tool must be executed in the file.prj directory, as no folder voodoo takes place internally.
+
+\todo Reimplement this tool in a less quick'n'dirty fashion...
+
+\author Peter Zajac
+
+*/

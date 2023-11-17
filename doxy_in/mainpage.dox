@@ -8,10 +8,14 @@
 - \ref feat_for_win_vs17
 - \ref feat_for_vscode
 
+\section main_sec_mesh Mesh related Topics
+- \ref mesh_file_format
+- \ref tools_meshtools
+- \ref meshopt_design
+
 \section main_sec_subsystems Kernel Subsystems
 The subsystems are in detail:
 - \ref lafem_design
-- \ref meshopt_design
 
 \section main_sec_details Details about specific topics:
 - [Related Pages](pages.html)

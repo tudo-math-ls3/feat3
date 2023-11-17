@@ -16,5 +16,8 @@ TARGET_LINK_LIBRARIES(mesh2eps feat)
 ADD_EXECUTABLE(mesh2vtk mesh_to_vtk.cpp)
 TARGET_LINK_LIBRARIES(mesh2vtk feat)
 
+ADD_EXECUTABLE(mesh2tri mesh_to_tri.cpp)
+TARGET_LINK_LIBRARIES (mesh2tri feat)
+
 ADD_EXECUTABLE(tri2mesh tri_to_mesh.cpp)
 TARGET_LINK_LIBRARIES (tri2mesh feat)

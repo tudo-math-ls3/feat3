@@ -3,6 +3,8 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+#include <kernel/runtime.hpp>
+#include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/geometry/common_factories.hpp>
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
@@ -11,8 +13,6 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/parsed_hit_test_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/util/simple_arg_parser.hpp>
-#include <kernel/runtime.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Geometry;
@@ -563,7 +563,7 @@ int main(int argc, char* argv[])
   const std::deque<String>& filenames = mpars->second;
 
   // our VTK output filename
-  String vtk_name = get_file_title(filenames.back());
+  String vtk_name = get_file_title(filenames.front());
   args.parse("vtk", vtk_name);
 
   // create an empty mesh file reader
