@@ -3,7 +3,10 @@
 # enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-# applications to build
+# add subdirectories with custom CMakeLists
+ADD_SUBDIRECTORY( mesh_tools )
+
+# add tools to build
 ADD_EXECUTABLE(cub-list cub_list/cub_list.cpp)
 TARGET_LINK_LIBRARIES(cub-list feat)
 
@@ -12,18 +15,6 @@ TARGET_LINK_LIBRARIES(matrix-cond feat)
 
 ADD_EXECUTABLE(matrix-info matrix_info/matrix_info.cpp)
 TARGET_LINK_LIBRARIES(matrix-info feat)
-
-ADD_EXECUTABLE(mesh-indexer mesh_indexer/mesh_indexer.cpp)
-TARGET_LINK_LIBRARIES(mesh-indexer feat)
-
-ADD_EXECUTABLE(mesh-extruder mesh_extruder/mesh_extruder.cpp)
-TARGET_LINK_LIBRARIES(mesh-extruder feat)
-
-ADD_EXECUTABLE(mesh2eps mesh_to_eps/mesh_to_eps.cpp)
-TARGET_LINK_LIBRARIES(mesh2eps feat)
-
-ADD_EXECUTABLE(mesh2vtk mesh_to_vtk/mesh_to_vtk.cpp)
-TARGET_LINK_LIBRARIES(mesh2vtk feat)
 
 ADD_EXECUTABLE(csr2mtx io/csr_to_mtx.cpp)
 TARGET_LINK_LIBRARIES (csr2mtx feat)
@@ -58,9 +49,6 @@ TARGET_LINK_LIBRARIES (mtx2tga feat)
 ADD_EXECUTABLE(resort-matrix io/resort_matrix.cpp)
 TARGET_LINK_LIBRARIES (resort-matrix feat)
 
-ADD_EXECUTABLE(tri2mesh io/tri_to_mesh.cpp)
-TARGET_LINK_LIBRARIES (tri2mesh feat)
-
 ADD_EXECUTABLE(mpi-info mpi_info/mpi_info.cpp)
 TARGET_LINK_LIBRARIES(mpi-info feat)
 
@@ -75,8 +63,3 @@ if (FEAT_HAVE_CUDA)
   SET_PROPERTY(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CUDA_INCLUDE_DIRS}")
   #TARGET_LINK_LIBRARIES (cuda-device-info)
 endif(FEAT_HAVE_CUDA)
-
-if (FEAT_HAVE_FPARSER)
-  ADD_EXECUTABLE(mesh-parsed-hit-test-vtk mesh_parsed_hit_test_vtk/mesh_parsed_hit_test_vtk.cpp)
-  TARGET_LINK_LIBRARIES(mesh-parsed-hit-test-vtk feat)
-endif(FEAT_HAVE_FPARSER)

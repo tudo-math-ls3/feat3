@@ -323,6 +323,19 @@ namespace FEAT
       }
 
       /**
+       * \brief Removes a mesh-part and its corresponding node
+       *
+       * \param[in] part_name
+       * The name of the child node to be removed
+       *
+       * \returns \c true, if a mesh-part with the corresponding name was removed, otherwise \c false.
+       */
+      bool remove_mesh_part(const String& part_name)
+      {
+        return _mesh_part_nodes.erase(part_name) > std::size_t(0);
+      }
+
+      /**
        * \brief Sets the chart for a particular mesh part.
        *
        * \param[in] part_name

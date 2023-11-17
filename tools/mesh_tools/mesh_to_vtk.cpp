@@ -9,6 +9,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
+#include <kernel/geometry/parsed_hit_test_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/runtime.hpp>
@@ -65,7 +66,16 @@ static void display_help()
   std::cout << " --no-volume" << std::endl;
   std::cout << "Do not compute cell volumes" << std::endl;
   std::cout << std::endl;
-
+  std::cout << " --hit-test <name1> <formula1> [<name2> <formula2> ...]" << std::endl;
+  std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts" << std::endl;
+  std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair" << std::endl;
+  std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula" << std::endl;
+  std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part." << std::endl;
+  std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates" << std::endl;
+  std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively." << std::endl;
+  std::cout << "Please note that this option can only be used if FEAT is configured and linked against" << std::endl;
+  std::cout << "the 'fparser' third-party library." << std::endl;
+  std::cout << std::endl;
   std::cout << " --help" << std::endl;
   std::cout << "Displays this message" << std::endl;
 }
@@ -201,6 +211,48 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 3, 3>& offset, Tiny::V
   return ((noff + nori + nang) > 0) ? 1 : 0;
 }
 
+#ifdef FEAT_HAVE_FPARSER
+template<typename MeshType_>
+bool build_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node, const std::map<String, String>& pts)
+{
+  for(auto it = pts.begin(); it != pts.end(); ++it)
+  {
+    // get part name and formula
+    String name = it->first;
+    String formula = it->second;
+
+    std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'..." << std::endl;
+
+    try
+    {
+      // try to parse the formula
+      Geometry::ParsedHitTestFactory<MeshType_> factory(*mesh_node.get_mesh());
+
+      // parse formula
+      factory.parse(formula);
+
+      // make sure to erase any meshpart with that name
+      mesh_node.remove_mesh_part(name);
+
+      // create mesh part
+      auto mesh_part = factory.make_unique();
+
+      // add to mesh node
+      mesh_node.add_mesh_part(name, std::move(mesh_part));
+    }
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: in boundary function formula '" << formula << "'" << std::endl;
+      std::cerr << exc.what() << std::endl;
+      return false;
+    }
+  }
+
+  // okay
+  return true;
+}
+#endif
+
 template<typename Mesh_>
 int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const String& filename)
 {
@@ -222,6 +274,28 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
   // compute cell volumes?
   bool calc_volume = (args.check("no-volume") < 0);
+
+#ifdef FEAT_HAVE_FPARSER
+  std::map<String, String> hit_formulae;
+  if(args.check("hit-test") > 0)
+  {
+    std::deque<String> parts = args.query("hit-test")->second;
+    if(parts.size() % 2u != 0u)
+    {
+      std::cerr << "ERROR: invalid number of parameters for option --hit-test, expected an even count" << std::endl;
+      return 1;
+    }
+
+    for(std::size_t i(0); i < parts.size(); i += 2u)
+      hit_formulae.emplace(parts[i], parts[i+1u]);
+  }
+#else // no FEAT_HAVE_FPARSER
+  if(args.check("hit-test") >= 0)
+  {
+    std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts" << std::endl;
+    return 1;
+  }
+#endif // FEAT_HAVE_FPARSER
 
   // create an empty atlas and a root mesh node
   auto atlas = Geometry::MeshAtlas<Mesh_>::make_unique();
@@ -272,9 +346,6 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     node->get_mesh()->transform(origin, angles, offset);
   }
 
-  // get all mesh part names
-  std::deque<String> part_names = node->get_mesh_part_names();
-
   // refine
   for(Index lvl(0); lvl <= lvl_max; ++lvl)
   {
@@ -286,6 +357,15 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
     if(lvl < lvl_min)
       continue;
+
+    // build hit-test mesh-parts
+#ifdef FEAT_HAVE_FPARSER
+    if(!build_meshparts(*node, hit_formulae))
+      return 1;
+#endif
+
+    // get all mesh part names
+    std::deque<String> part_names = node->get_mesh_part_names();
 
     // get our mesh
     Mesh_& mesh = *node->get_mesh();
@@ -455,6 +535,7 @@ int main(int argc, char* argv[])
   args.support("angles");
   args.support("offset");
   args.support("origin");
+  args.support("hit-test");
 
   // check for unsupported options
   auto unsupported = args.query_unsupported();
