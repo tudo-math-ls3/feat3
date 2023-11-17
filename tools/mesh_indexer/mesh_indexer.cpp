@@ -259,6 +259,60 @@ namespace MeshIndexerTool
   }
 #endif
 
+  template<std::size_t dim_>
+  void deorphan_vtx(std::vector<Real>& vtx, std::vector<Index>& idx)
+  {
+    std::cout << "Removing orphan vertices..." << std::endl;
+
+    // allocate vertex mask
+    const std::size_t num_verts = vtx.size() / dim_;
+    std::vector<std::size_t> mask(num_verts, 0u);
+
+    // loop over all indices and update vertex mask
+    for(auto i : idx)
+      ++mask[i];
+
+    // build new vertex indices
+    std::size_t n = 0u;
+    for(std::size_t i(0); i < num_verts; ++i)
+    {
+      if(mask[i] > 0u)
+      {
+        mask[i] = n;
+        ++n;
+      }
+    }
+
+    if(num_verts == n)
+    {
+      std::cout << "No orphan vertices found" << std::endl;
+      return;
+    }
+
+    // remove orphan vertices
+    for(std::size_t i(0); i < num_verts; ++i)
+    {
+      if((mask[i] == 0u) || (mask[i] == i))
+        continue;
+      for(std::size_t j(0); j < dim_; ++j)
+      {
+        vtx[dim_*mask[i] + j] = vtx[dim_*i + j];
+      }
+    }
+
+    // resize vertex vector to new length
+    vtx.resize(n * dim_);
+
+    // adjust indices
+    for(auto& i : idx)
+      i = mask[i];
+
+    // done
+    std::cout << "Removed " << (num_verts - n) << " orphan vertices" << std::endl;
+    std::cout << "Now have " << n << " from previously " << num_verts << " vertices" << std::endl;
+  }
+
+
   template<int dim_>
   void merge_vtx(std::vector<Real>& vtx, std::vector<std::size_t>& vtx_off,
     std::vector<std::size_t>& vtx_idx, const std::vector<std::vector<Real>>& vvtx)
@@ -319,8 +373,8 @@ namespace MeshIndexerTool
 
     if(num_vtx < vtx_idx.size())
     {
-      std::cout << "Originally had " << vtx_idx.size() << " vertices but reduced to " << num_vtx << std::endl;
-      std::cout << "In other words: removed " << (vtx_idx.size()-num_vtx) << " duplicate vertices" << std::endl;
+      std::cout << "Removed " << (vtx_idx.size()-num_vtx) << " duplicate vertices" << std::endl;
+      std::cout << "Now have " << num_vtx << " from previously " << vtx_idx.size() << " vertices" << std::endl;
       vtx.resize(num_vtx * std::size_t(dim_));
     }
   }
@@ -378,6 +432,9 @@ namespace MeshIndexerTool
 
     // merge index sets
     merge_idx<std::size_t(num_corners)>(idx, vtx_off, vtx_idx, iidx);
+
+    // remove orphan vertices
+    deorphan_vtx<world_dim>(vtx, idx);
 
     const Index num_verts = Index(vtx.size()) / Index(world_dim);
     const Index num_elems = Index(idx.size()) / Index(num_corners);
