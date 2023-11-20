@@ -2,6 +2,127 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
+//
+// ------------------------------------------------------------------------------------------------
+// Unsteady CCnD solver application base class header
+// ------------------------------------------------------------------------------------------------
+// This header file defines the CCND::UnsteadyAppBase class, which is itself derived from the
+// CCND::SteadyAppBase class and which can be used as a base class for CCnD type applications to
+// outsource commonly used functionality. This comment block describes the command line parameters
+// that can be used by all applications derived from this class that are not already offered by the
+// base class CCND::SteadyAppBase, unless the application overrides the parameters explicitly.
+//
+// The system is discretized using an isoparametric Q2/P1dc finite element discretization with
+// a BDF(2) time stepping scheme with constant time step length. The monolithic nonlinear Oseen
+// systems are solved using an adaptive Newton-Multigrid solver with an additive matrix-based
+// Vanka smoother ("AmaVanka") and using UMFPACK (if available) as a coarse grid solver. The
+// smoother iteration as well as the outer multigrid iteration is usually performed by a Richardson
+// iteration scheme, however, it is also possible to switch to a FGMRES(k) solver instead.
+// This application supports recursive partitioning.
+//
+//
+// ----------------------------------------------
+// Mandatory Time Discretization Setup Parameters
+// ----------------------------------------------
+// This application class defines default values for most of its parameters, however, the following
+// parameters are mandatory and always have to be specified explicitly:
+//
+// --time-max <T-max>
+// Specifies the maximum simulation time, i.e. the end T of the simulation time interval (0,T].
+// Not to be confused with runtime!
+//
+// --time-steps <N>
+// Specifies the total number of time-steps to perform over the entire time interval.
+//
+//
+// -----------------------------------------------
+// Additional Time Discretization Setup Parameters
+// -----------------------------------------------
+// The following parameters allow to further configure the time discretization.
+//
+// --time-expo <0|1|2>
+// Specifies the time step extrapolation order, which is used to define an initial guess u_k for
+// the non-linear solver in each time step k, where:
+//   --t-expo 0 use constant extrapolation from previous time step, i.e.
+//              u_k := u_{k-1}
+//   --t-expo 1 use linear extrapolation from two previous time steps, i.e.
+//              u_k := 2*u_{k-1} - u_{k-2}
+//   --t-expo 2 use quadratic extrapolation from three previous time steps, i.e.
+//              u_k := 3*u_{k-1} - 3*u_{k-2}) + u_{k-3}
+// Defaults to 2.
+//
+// --steady-tol <tol>
+// Specifies the velocity time-derivative tolerance for steady-state detection.
+// The time-stepping loop will be terminated before reaching T-max if the L2-norm
+// of the time-derivative of the velocity field drops below this tolerance, which
+// indicates that the flow has reached a steady state prematurely. Defaults to 1E-3.
+//
+//
+// ---------------------------------------------
+// Checkpoint & Restart Configuration Parameters
+// ---------------------------------------------
+// This application base implements a checkpoint-&-restart system based on the CheckpointControl
+// class, which allows to restart a simulation that has been aborted at a later time.
+// Note that a checkpoint file contains three consecutive solution vectors u_{k}, u_{k-1} and
+// u_{k-2} as well as the time-step index, the current simulation time and the time step size,
+// so these three quantities are restored from a checkpoint in a restart and do not need to be
+// specified explicitly.
+//
+// Important Note:
+// It is very important that the application, which is restarted from a previously saved
+// checkpoint, is launched with the same number of MPI processes, the same mesh and the same
+// maximum refinement level as the application run that was used to create the checkpoints.
+// However, many other parameters (e.g. viscosity, gradient/deformation tensor, linear solver
+// configuration) may be changed upon restart.
+//
+// --checkpoint <filename> [<stepping> [<modulus>]]
+// Specifies that the application should write out a checkpoint every <stepping> time steps
+// and that it should overwrite previously written checkpoint files every <modulus> checkpoints.
+// The <modulus> parameter is optional and it defaults to 2. Although it is possible to set the
+// modulus to 1, thus ensuring that only a single checkpoint file is created and is continuously
+// overwritten, it is strongly discouraged to do so, because this might lead to a corrupted
+// checkpoint file if the application crashes while trying to write the checkpoint file.
+// Keep in mind that I/O errors are one of the most common reasons for application crashes
+// on clusters, thus setting the modulus to 1 is a recipe for disaster.
+//
+// Example: --checkpoint savegame 5 3
+// The parameters in this example will cause the application to write a checkpoint file
+// whose filename begins with 'savegame' every 5-th time step and it only will keep the last
+// 3 checkpoints on disk by overwriting previous ones.
+// So it the application will write checkpoints in the following time-steps:
+// Time-Step  5: write to file  "savegame.0.cp"
+// Time-Step 10: write to file  "savegame.1.cp"
+// Time-Step 15: write to file  "savegame.2.cp"
+// Time-Step 20: overwrite file "savegame.0.cp"
+// Time-Step 25: overwrite file "savegame.1.cp"
+// Time-Step 30: overwrite file "savegame.2.cp"
+// Time-Step 35: overwrite file "savegame.0.cp"
+// ...
+//
+// --restart <filename> [<curtime>] [<timestep>]
+// Specifies that the application should restart from a previously saved checkpoint and
+// continue from that checkpoint rather than starting from scratch. The second and third
+// optional parameters <curtime> and <timestep> can be used to change the current simulation
+// time as well as the current time step. If these parameters are not given, the simulation
+// will continue from the simulation time and time step from when the checkpoint was written.
+//
+//
+// ------------------------
+// Miscellaneous Parameters
+// ------------------------
+// This section describes miscellaneous parameters that do not fit into any other section and
+// which do not deserve a custom section of their own.
+//
+// --vtk-step <step>
+// Specifies that the VTK files should only be written out every <step> time steps rather than in
+// every single time step.
+//
+// --main-step <step>
+// Specifies that the post-processing of the solution is only to be performed every <step> time
+// steps rather than in every single time step.
+//
+// \author Peter Zajac
+//
 #pragma once
 #ifndef APPLICATIONS_CCND_UNSTEADY_APPBASE_HPP
 #define APPLICATIONS_CCND_UNSTEADY_APPBASE_HPP 1

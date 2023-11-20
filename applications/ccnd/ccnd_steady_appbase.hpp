@@ -21,7 +21,7 @@
 // ------------------------------------
 // Basic Setup and Mandatory Parameters
 // ------------------------------------
-// This application defines default values for most of its parameters, however, the following
+// This application class defines default values for most of its parameters, however, the following
 // parameters are mandatory and always have to be specified explicitly:
 //
 // --mesh <meshfiles...>
@@ -417,7 +417,7 @@ namespace CCND
       want_vtk = (args.check("vtk") >= 0) || refine_vtk;
 
       // need base splitter for joined save/load
-      need_base_splitter = need_base_splitter || (args.check("save-joined-sol") >= 0) || (args.check("load-joined-sol") >= 0);
+      need_base_splitter = need_base_splitter || (args.check("save-final-sol-joined") >= 0) || (args.check("load-initial-sol-joined") >= 0);
 
       // need velocity truncation for Navier-Stokes
       need_velocity_truncation = need_velocity_truncation || navier;
@@ -685,7 +685,7 @@ namespace CCND
         watch_sol_init_read.start();
 
         String save_name;
-        args.parse("load-sol", save_name);
+        args.parse("load-initial-sol", save_name);
         comm.print("\nReading (partitioned) initial solution from '" + save_name + "'...");
 
         // read file into streams
@@ -709,7 +709,7 @@ namespace CCND
 
         String save_name;
         DataType load_scale = DataType(1);
-        args.parse("load-joined-sol", save_name, load_scale);
+        args.parse("load-initial-sol-joined", save_name, load_scale);
         comm.print("\nReading joined initial solution from '" + save_name + "'...");
 
         // parse vector from file
@@ -740,7 +740,7 @@ namespace CCND
         watch_sol_final_write.start();
 
         String save_name;
-        if(args.parse("save-sol", save_name) < 1)
+        if(args.parse("save-final-sol", save_name) < 1)
         {
           save_name = default_filename;
           save_name += "-lvl" + stringify(domain.front()->get_level_index());
@@ -771,7 +771,7 @@ namespace CCND
         watch_sol_final_write.start();
 
         String save_name;
-        if(args.parse("save-joined-sol", save_name) < 1)
+        if(args.parse("save-final-sol-joined", save_name) < 1)
         {
           save_name = default_filename;
           save_name += "-joined-lvl" + stringify(domain.front()->get_level_index()) + ".bin";
