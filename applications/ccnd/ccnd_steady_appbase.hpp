@@ -432,6 +432,9 @@ namespace CCND
       // set desired levels
       domain.set_desired_levels(args.query("level")->second);
 
+      // get mesh files to read in
+      mesh_file_names = args.query("mesh")->second;
+
       // keep base levels if we need to save/load joined solution vectors
       if(need_base_splitter)
         domain.keep_base_levels();
@@ -478,9 +481,6 @@ namespace CCND
 
       // Our mesh file reader
       Geometry::MeshFileReader mesh_reader;
-
-      // get mesh files to read in
-      mesh_file_names = args.query("mesh")->second;
 
       // start reading mesh files
       mesh_reader.add_mesh_files(comm, mesh_file_names);
