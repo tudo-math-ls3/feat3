@@ -187,18 +187,21 @@ namespace FEAT
        * An \transient array of floating point values. Its length is assumed to correspond to the number of
        * vertices of the mesh. Must not be \p nullptr.
        *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
        * \note
        * This function creates a (deep) copy of the data array, so the \p data array
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_vertex_scalar(const String& name, const T_* data)
+      void add_vertex_scalar(const String& name, const T_* data, double scaling_factor = double(1.))
       {
         XASSERTM(data != nullptr, "data array is nullptr");
         std::vector<double> d(_num_verts);
         for(Index i(0); i < _num_verts; ++i)
         {
-          d[i] = double(data[i]);
+          d[i] = scaling_factor * double(data[i]);
         }
         _vertex_scalars.push_back(std::make_pair(name, std::move(d)));
       }
@@ -215,12 +218,15 @@ namespace FEAT
        * The three \transient arrays of floating point values. Their lengths are assumed to correspond
        * to the number of vertices of the mesh. The first array \p x must not be \p nullptr.
        *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
        * \note
        * This function creates a (deep) copy of the three data arrays, so the data arrays
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_vertex_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
+      void add_vertex_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr, double scaling_factor = double(1.))
       {
         XASSERTM(x != nullptr, "x-data array is nullptr");
         std::vector<double> d(3*_num_verts);
@@ -229,17 +235,17 @@ namespace FEAT
         {
           for(Index i(0); i < _num_verts; ++i)
           {
-            d[3*i+0] = double(x[i]);
-            d[3*i+1] = double(y[i]);
-            d[3*i+2] = double(z[i]);
+            d[3*i+0] = scaling_factor * double(x[i]);
+            d[3*i+1] = scaling_factor * double(y[i]);
+            d[3*i+2] = scaling_factor * double(z[i]);
           }
         }
         else if(y != nullptr)
         {
           for(Index i(0); i < _num_verts; ++i)
           {
-            d[3*i+0] = double(x[i]);
-            d[3*i+1] = double(y[i]);
+            d[3*i+0] = scaling_factor * double(x[i]);
+            d[3*i+1] = scaling_factor * double(y[i]);
             d[3*i+2] = 0.0;
           }
         }
@@ -247,7 +253,7 @@ namespace FEAT
         {
           for(Index i(0); i < _num_verts; ++i)
           {
-            d[3*i+0] = double(x[i]);
+            d[3*i+0] = scaling_factor * double(x[i]);
             d[3*i+1] = 0.0;
             d[3*i+2] = 0.0;
           }
@@ -269,11 +275,14 @@ namespace FEAT
        * \param[in] v
        * A \transient reference to the vector containing the field values in the mesh vertices.
        *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
        * \note
        * This function creates a (deep) copy of the vector data.
        */
       template<typename VectorType_>
-      void add_vertex_vector(const String& name, const VectorType_& v)
+      void add_vertex_vector(const String& name, const VectorType_& v, double scaling_factor = double(1.))
       {
         std::vector<double> d(3*_num_verts);
 
@@ -283,7 +292,7 @@ namespace FEAT
             d[Index(3)*i+j] = double(0);
 
           for(int j(0); j < v.BlockSize; ++j)
-            d[Index(3)*i+Index(j)] = double(v(i)[j]);
+            d[Index(3)*i+Index(j)] = scaling_factor * double(v(i)[j]);
 
         }
         _vertex_vectors.push_back(std::make_pair(name, std::move(d)));
@@ -299,18 +308,21 @@ namespace FEAT
        * An \transient array of floating point values. Its length is assumed to correspond to the number of
        * cells of the mesh. Must not be \p nullptr.
        *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
        * \note
        * This function creates a (deep) copy of the data array, so the \p data array
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_cell_scalar(const String& name, const T_* data)
+      void add_cell_scalar(const String& name, const T_* data, double scaling_factor = double(1.))
       {
         XASSERTM(data != nullptr, "data array is nullptr");
         std::vector<double> d(_num_cells);
         for(Index i(0); i < _num_cells; ++i)
         {
-          d[i] = double(data[i]);
+          d[i] = scaling_factor * double(data[i]);
         }
         _cell_scalars.push_back(std::make_pair(name, std::move(d)));
       }
@@ -327,12 +339,15 @@ namespace FEAT
        * The three \transient arrays of floating point values. Their lengths are assumed to correspond
        * to the number of cells of the mesh. The first array \p x must not be \p nullptr.
        *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
        * \note
        * This function creates a (deep) copy of the three data arrays, so the data arrays
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_cell_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr)
+      void add_cell_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr, double scaling_factor = double(1.))
       {
         XASSERTM(x != nullptr, "x-data array is nullptr");
         std::vector<double> d(3*_num_cells);
@@ -341,17 +356,17 @@ namespace FEAT
         {
           for(Index i(0); i < _num_cells; ++i)
           {
-            d[3*i+0] = double(x[i]);
-            d[3*i+1] = double(y[i]);
-            d[3*i+2] = double(z[i]);
+            d[3*i+0] = scaling_factor * double(x[i]);
+            d[3*i+1] = scaling_factor * double(y[i]);
+            d[3*i+2] = scaling_factor * double(z[i]);
           }
         }
         else if(y != nullptr)
         {
           for(Index i(0); i < _num_cells; ++i)
           {
-            d[3*i+0] = double(x[i]);
-            d[3*i+1] = double(y[i]);
+            d[3*i+0] = scaling_factor * double(x[i]);
+            d[3*i+1] = scaling_factor * double(y[i]);
             d[3*i+2] = 0.0;
           }
         }
@@ -359,7 +374,7 @@ namespace FEAT
         {
           for(Index i(0); i < _num_cells; ++i)
           {
-            d[3*i+0] = double(x[i]);
+            d[3*i+0] = scaling_factor * double(x[i]);
             d[3*i+1] = 0.0;
             d[3*i+2] = 0.0;
           }
@@ -381,11 +396,14 @@ namespace FEAT
        * \param[in] v
        * A \transient reference to the vector containing the field values in the mesh cell.
        *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
        * \note
        * This function creates a (deep) copy of the vector data.
        */
       template<typename VectorType_>
-      void add_cell_vector(const String& name, const VectorType_& v)
+      void add_cell_vector(const String& name, const VectorType_& v, double scaling_factor = double(1.))
       {
         std::vector<double> d(3*_num_cells);
 
@@ -395,7 +413,7 @@ namespace FEAT
             d[Index(3)*i+j] = double(0);
 
           for(int j(0); j < v.BlockSize; ++j)
-            d[Index(3)*i+Index(j)] = double(v(i)[j]);
+            d[Index(3)*i+Index(j)] = scaling_factor * double(v(i)[j]);
 
         }
         _cell_vectors.push_back(std::make_pair(name, std::move(d)));
