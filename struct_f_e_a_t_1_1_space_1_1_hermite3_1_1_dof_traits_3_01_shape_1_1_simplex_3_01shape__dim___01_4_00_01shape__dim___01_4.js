@@ -1,0 +1,4 @@
+var struct_f_e_a_t_1_1_space_1_1_hermite3_1_1_dof_traits_3_01_shape_1_1_simplex_3_01shape__dim___01_4_00_01shape__dim___01_4 =
+[
+    [ "count", "struct_f_e_a_t_1_1_space_1_1_hermite3_1_1_dof_traits_3_01_shape_1_1_simplex_3_01shape__dim___01_4_00_01shape__dim___01_4.html#ae103c6d3287c2dff7ae49b610e4b1005", null ]
+];

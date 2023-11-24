@@ -1,0 +1,20 @@
+var class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06 =
+[
+    [ "BaseClass", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a28cfc6782adf797385af1c3b7fc4d75a", null ],
+    [ "SystemFilterType", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#aa4b1402a5e1f1932a3110433bec47b38", null ],
+    [ "SystemMatrixType", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a36f26920a94a7678c21690b7ec48f7b5", null ],
+    [ "SystemVectorType", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a9d69200d2d1ea8f9be8d632392bfc8c4", null ],
+    [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#ab0d6444c02a5529db06acddb7f178fbb", null ],
+    [ "apply", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#ae162070c491d897ae6f91d263200af40", null ],
+    [ "apply", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#ada919e3a7fdec1a1724963166c573804", null ],
+    [ "done", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#acacbcaccbf7ec307778128928a901d59", null ],
+    [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a07d95da07461208435735ff2f5516316", null ],
+    [ "done_symbolic", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#aae626762bc6dbc45cbbeede43bb05202", null ],
+    [ "init", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a7e61ce0b51e7f97317042a184aba8613", null ],
+    [ "init_numeric", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#aeae87053092ba231f4af3a38131c539b", null ],
+    [ "init_symbolic", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#ad5951c78bcbdfe2c8da7818627e80f8c", null ],
+    [ "name", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a8594096f377696992d8834f41cb8b7a7", null ],
+    [ "_filter_sys", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#aa085898e513647eb38d059d0debc73f2", null ],
+    [ "_local_solver", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#af6070abb8de12c8e91ab71e090f875b4", null ],
+    [ "_matrix_sys", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#addc3329acdf583556a181c303edb3214", null ]
+];

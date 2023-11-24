@@ -1,0 +1,4 @@
+var struct_f_e_a_t_1_1_space_1_1_lagrange3_1_1_dof_traits_3_01_shape_1_1_simplex_3_01shape__dim___01_4_00_011_01_4 =
+[
+    [ "count", "struct_f_e_a_t_1_1_space_1_1_lagrange3_1_1_dof_traits_3_01_shape_1_1_simplex_3_01shape__dim___01_4_00_011_01_4.html#a4c4c9faaf5da73aefe0a57b72a28322c", null ]
+];

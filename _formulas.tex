@@ -1,0 +1,1704 @@
+\documentclass{article}
+\usepackage{ifthen}
+\usepackage{epsfig}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+% Packages requested by user
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{newunicodechar}
+  \newunicodechar{⁻}{${}^{-}$}% Superscript minus
+  \newunicodechar{²}{${}^{2}$}% Superscript two
+  \newunicodechar{³}{${}^{3}$}% Superscript three
+
+\pagestyle{empty}
+\begin{document}
+$ \lambda = -d (k\pi)^2 $
+\pagebreak
+
+$ int_\Omega u = 0 $
+\pagebreak
+
+$ f(x) =\| x - x_0 \|_2 $
+\pagebreak
+
+$ x_0 $
+\pagebreak
+
+$ f(x) = a + b \| x - x_0 \|_2 $
+\pagebreak
+
+$ f(x) = b | (x - x_0)_i | $
+\pagebreak
+
+\[
+  u(x) = H(x) =
+  \begin{cases}
+    0, & x < 0 \\
+    1, & x \geq 0
+  \end{cases}
+\]
+\pagebreak
+
+$ 1D $
+\pagebreak
+
+\[
+  u(x,y) = H(x) H(y), u(x,y,z) = H(x) H(y) H(z)
+\]
+\pagebreak
+
+$ 2D, 3D $
+\pagebreak
+
+\[
+  u(x) = H(x) =
+  \begin{cases}
+    0, & x < 0 \\
+    1, & 2 (\cosh(x) - 1) \geq 0
+  \end{cases}
+\]
+\pagebreak
+
+\[
+  u(x,y)   = H(x)*H(y), u(x,y,z) = H(x)*H(y)*H(z)
+\]
+\pagebreak
+
+\[
+   u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
+   *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
+ \]
+\pagebreak
+
+$ x_0 = (0, -1)^T, u(x_0) = 3 $
+\pagebreak
+
+\[
+   u(x,y) = (x - 2)^4 + (x - 2 y)^2
+ \]
+\pagebreak
+
+$ x_0 = (2, 1)^T, u(x_0) = 0 $
+\pagebreak
+
+\[
+   u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
+ \]
+\pagebreak
+
+\begin{align*}
+   x_0 & \approx (-3.77931025337774689189076584129, -3.28318599128616941226600051437)^T \\
+   x_1 & \approx (-2.80511808695274485305357239809, 3.13131251825057296580430072341)^T \\
+   x_2 & = (3, 2)^T \\
+   x_3 & \approx (3.58442834033049174494433823938, -1.84812652696440355353830020904)^T.
+ \end{align*}
+\pagebreak
+
+$ \forall i = 0, \dots, 3: u(x_i) = 0 $
+\pagebreak
+
+$ x_4 \approx ( -0.270845, -0.93039)^T $
+\pagebreak
+
+\[
+  u(x,y) = 100(y-x^2)^2 + (1-x)^2.
+\]
+\pagebreak
+
+$ x_0 = (1, 1)^T$
+\pagebreak
+
+$ y = x^2 $
+\pagebreak
+
+$ t\in(0,1) $
+\pagebreak
+
+$4 v_{max} t (t-1)$
+\pagebreak
+
+\[
+   f: \mathbb{R}^d \to \mathbb{R}^d, (x, y, z)^T \mapsto \omega (-(y - y_0), x - x_0, 0)
+\]
+\pagebreak
+
+$ \omega $
+\pagebreak
+
+$ (x_0, y_0, z_0)^T $
+\pagebreak
+
+\[
+   f: \mathbb{R}^d \to \mathbb{R}^d, f_0(x_0, ..., x_d)^T =
+   \alpha \frac{4^{d-1}}{\prod_{i=1}^{d-1}(b_i - a_i)^2}\prod_{i=1}^{d-1}( (x_i - a_i)(b_i - x_i) ),
+   f_i \equiv 0, i=1,\dots,d
+\]
+\pagebreak
+
+$ \alpha $
+\pagebreak
+
+$ x $
+\pagebreak
+
+$ \{x\}\times [a_1, b_1] \times [a_2, b_2] $
+\pagebreak
+
+\[u(x,y,z) = \sin\bigg(\frac{\pi x}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
+ \sin\bigg(\frac{\pi y}{\sqrt{x^2+y^2+z^2}}\bigg)\cdot
+ \sin\bigg(\frac{\pi z}{\sqrt{x^2+y^2+z^2}}\bigg)\]
+\pagebreak
+
+$r := \sqrt{(x-0.5)^2 \cdot(y-0.5)^2}$
+\pagebreak
+
+\[u(x,y,z) = \begin{cases}\begin{bmatrix}5(y-0.5)\\ -5(x-0.5)\end{bmatrix},& r < 0.2\\
+\begin{bmatrix}(2/r - 5)(y-0.5) \\ (-2/r + 5)(x-0.5)\end{bmatrix},& 0.2 \leq r < 0.4\\0, & \text{else}\end{cases}\]
+\pagebreak
+
+\[v(t,x,y) := \begin{bmatrix}\sin(\pi x)\cos(\pi y)\exp(-2\pi^2 \nu t)\\
+-\cos(\pi x)\sin(\pi y)\exp(-2\pi^2 \nu t)\end{bmatrix}\]
+\pagebreak
+
+\[p(t,x,y) := \frac{1}{2}\Big(\cos(\pi x)^2 + \cos(\pi y)^2 -1\Big)\exp(-4\pi^2 \nu t)\]
+\pagebreak
+
+\[v(x,y) := \begin{bmatrix}-y\\x\end{bmatrix}\]
+\pagebreak
+
+\[p(x,y) := \frac{1}{2}\Big(x^2 + y^2\Big) - \frac{1}{4}\]
+\pagebreak
+
+\[v(x,y) := \frac{1}{d(x,y)} \begin{bmatrix}\hphantom{-}y\sin(2\pi d(x,y))\\ -x\sin(2\pi d(x,y))\end{bmatrix}\]
+\pagebreak
+
+$d(x,y) := \sqrt{x^2+y^2}$
+\pagebreak
+
+\[p(x,y) := \frac{\sin(2\pi d(x,y))}{2\pi}\]
+\pagebreak
+
+\[(x_0 y_0 , x_1 y_1)\]
+\pagebreak
+
+\[(x_0 y_0 , x_1 y_1 , v_{max})\]
+\pagebreak
+
+\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'(v,u,\psi)} + \delta \mathbf{S}(v,u,\psi)\]
+\pagebreak
+
+\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi \]
+\pagebreak
+
+\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi\]
+\pagebreak
+
+\[\mathbf{M}(u,\psi) := \int_\Omega u\psi\]
+\pagebreak
+
+\[\mathbf{K}(v,u,\psi) := \int_\Omega v\cdot \nabla u \psi\]
+\pagebreak
+
+\[\mathbf{K'}(v,u,\psi) := \int_\Omega \nabla v u \psi\]
+\pagebreak
+
+\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\]
+\pagebreak
+
+\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]
+\pagebreak
+
+$\delta_T$
+\pagebreak
+
+$\delta^*$
+\pagebreak
+
+$\|v\|_\Omega$
+\pagebreak
+
+\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'}(v,u,\psi) + \delta \mathbf{S}(v,u,\psi)\]
+\pagebreak
+
+\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi~dx \]
+\pagebreak
+
+\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi~dx\]
+\pagebreak
+
+\[\mathbf{M}(u,\psi) := \int_\Omega u\psi~dx\]
+\pagebreak
+
+\[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi~dx\]
+\pagebreak
+
+\[\mathbf{K'}(v,u,\psi) := \int_\Omega (\nabla v) u \psi~dx\]
+\pagebreak
+
+\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)~dx\]
+\pagebreak
+
+$\mathbf{K}(v,u,\psi)$
+\pagebreak
+
+$v\cdot\nabla u$
+\pagebreak
+
+$u\cdot\nabla u$
+\pagebreak
+
+$D\mathbf{K}$
+\pagebreak
+
+$v=u$
+\pagebreak
+
+\[D\mathbf{K}(v,u,\psi) = \bigg[\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}\bigg]\bigg|_{\hat{u}=u,\hat{v}=v}\]
+\pagebreak
+
+$\hat{u},\hat{v}\in V_h$
+\pagebreak
+
+$\|\hat{u}\| = \|\hat{v}\| = 1$
+\pagebreak
+
+\begin{align*}
+\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}
+&=\lim_{\varepsilon\rightarrow 0} \int_\Omega \frac{(v + \varepsilon \hat{v})\cdot\nabla(u+\varepsilon \hat{u}) - v\cdot\nabla u}{\varepsilon}\psi~dx\\
+&= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{v\cdot\nabla u +\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u} - v\cdot\nabla u}{\varepsilon}\psi~dx\\
+&= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u}}{\varepsilon}\psi~dx\\
+&= \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \frac{\varepsilon^2}{\varepsilon} \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
+&= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \varepsilon \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
+&= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx
+\end{align*}
+\pagebreak
+
+$\hat{u} := u$
+\pagebreak
+
+$\hat{v} = v$
+\pagebreak
+
+\[D\mathbf{K}(v,u,\psi) = \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=~\mathbf{K}(v,u,\psi)} + \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=:~\mathbf{K}'(v,u,\psi)}\]
+\pagebreak
+
+$D\mathbf{K}(v,u,\psi)$
+\pagebreak
+
+$\mathbf{K'}(v,u,\psi)$
+\pagebreak
+
+$\beta$
+\pagebreak
+
+$\beta'$
+\pagebreak
+
+$\beta = \beta' = 1$
+\pagebreak
+
+\[ \ell(\varphi) := \int_\Omega f\cdot\varphi \]
+\pagebreak
+
+\[ \ell(\varphi) := \int_\Omega -\Delta f\cdot\varphi \]
+\pagebreak
+
+\[ \nabla \varphi \cdot \nabla\psi \]
+\pagebreak
+
+\[a(\phi,\psi) := \sum_{T\in T_h} \int_{\widehat{T}}
+\sqrt{\textnormal{det}\big(\mathcal{G}_T\big)}
+\cdot\big(\widehat{\nabla}\widehat{\varphi}\big)^\top\cdot
+\mathcal{G}_T^{-1}
+\cdot\widehat{\nabla}\widehat{\psi},\]
+\pagebreak
+
+$\tau:\widehat{T}\rightarrow T$
+\pagebreak
+
+$\mathcal{G}_T := (\widehat{\nabla} \tau)^\top\cdot (\widehat{\nabla} \tau)$
+\pagebreak
+
+$\widehat{\nabla}\widehat{\varphi}$
+\pagebreak
+
+$\widehat{\nabla}\widehat{\psi}$
+\pagebreak
+
+\[ \varphi \cdot \psi \]
+\pagebreak
+
+$ d \times d $
+\pagebreak
+
+$ d $
+\pagebreak
+
+\[ \partial_i \varphi \cdot \psi \]
+\pagebreak
+
+\[ \varphi \cdot \partial_i \psi \]
+\pagebreak
+
+\[
+  \mathbf{D} \varphi : \mathbf{D} \psi
+\]
+\pagebreak
+
+\[
+  \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right).
+\]
+\pagebreak
+
+\[
+  \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right),
+\]
+\pagebreak
+
+$ (k,l) $
+\pagebreak
+
+$ \partial_k \varphi \partial_l \psi $
+\pagebreak
+
+$ a(\phi, \psi)_m = \int_\Omega(\nabla \phi, \psi e_m) dx, m=1,\dots,d $
+\pagebreak
+
+$ a(\phi, \psi)_m = \int_\Omega(\phi e_m, \nabla \psi) dx, m=1,\dots,d $
+\pagebreak
+
+$\nabla\cdot\sigma$
+\pagebreak
+
+$\mathbb{D}(u)$
+\pagebreak
+
+\[v \in\mathbb{R};\quad v := \int_\Omega u(x)~dx \]
+\pagebreak
+
+\[g \in\mathbb{R}^n;\quad g_i := \int_\Omega \partial_i u(x)~dx \]
+\pagebreak
+
+\[h \in\mathbb{R}^{n\times n};\quad h_{ij} := \int_\Omega \partial_i\partial_j u(x)~dx \]
+\pagebreak
+
+\[|u|_{H^0} := \int_\Omega (u(x))^2~dx \]
+\pagebreak
+
+\[|u|_{H^1} := \sum_{1\leq i\leq n}\int_\Omega (\partial_i u(x))^2~dx \]
+\pagebreak
+
+\[|u|_{H^2} := \sum_{1\leq i,j\leq n}\int_\Omega (\partial_i \partial_j u(x))^2~dx \]
+\pagebreak
+
+\[|u|_{L^1} := \int_\Omega |u(x)|~dx \]
+\pagebreak
+
+\[|u|_{L^\infty} := \max_{x\in\Omega} |u(x)| \]
+\pagebreak
+
+\[ \| \nabla \cdot u\|_{\mathcal{L}^2}^2 = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]
+\pagebreak
+
+\[ \| \nabla \times u\|_{\mathcal{L}^2}^2 \]
+\pagebreak
+
+$\nabla p$
+\pagebreak
+
+$\nabla\cdot v$
+\pagebreak
+
+\[ b(\psi,\varphi) := - \int_\Omega \psi \nabla \varphi\]
+\pagebreak
+
+\[ d(\varphi,\psi) := - \int_\Omega (\nabla \cdot \varphi) \psi\]
+\pagebreak
+
+$ g(\psi, \phi)_m = \alpha \int_\Omega(\nabla \psi, \phi e_m) dx, m=1,\dots,d $
+\pagebreak
+
+$ \phi $
+\pagebreak
+
+$ \psi $
+\pagebreak
+
+\[ \lambda\sigma + \gamma v\cdot\nabla\sigma - \zeta(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top)\]
+\pagebreak
+
+$\sigma$
+\pagebreak
+
+$(\sigma_{11}, \sigma_{12}, \sigma_{21}, \sigma_{22})$
+\pagebreak
+
+$(\sigma_{11}, \sigma_{22}, \sigma_{12})$
+\pagebreak
+
+$(\sigma_{11}, \sigma_{12}, \sigma_{13}, \sigma_{21}, \sigma_{22}, \sigma_{23}, \sigma_{31}, \sigma_{32}, \sigma_{33})$
+\pagebreak
+
+$(\sigma_{11}, \sigma_{22}, \sigma_{33}, \sigma_{12}, \sigma_{23}, \sigma_{31})$
+\pagebreak
+
+$\lambda$
+\pagebreak
+
+$\gamma$
+\pagebreak
+
+$v\cdot\nabla\sigma$
+\pagebreak
+
+$\zeta$
+\pagebreak
+
+$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$
+\pagebreak
+
+\[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\]
+\pagebreak
+
+\[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\]
+\pagebreak
+
+\[ \|u\|_{\mathcal{H}^0} = \Big(\int_\Omega \sum_{i=1}^d (u_i)^2\Big)^{\frac{1}{2}}\]
+\pagebreak
+
+\[ |u|_{\mathcal{H}^1} = \Big(\int_\Omega \sum_{i=1}^d (\nabla u_i)^2\Big)^{\frac{1}{2}}\]
+\pagebreak
+
+\[ \| \nabla \cdot u\|_{\mathcal{H}^0} = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]
+\pagebreak
+
+\[ \| \nabla \times u\|_{\mathcal{H}^0} \]
+\pagebreak
+
+\[ x \mapsto w + R\cdot (x - v) \]
+\pagebreak
+
+$ S $
+\pagebreak
+
+$ \mathbb{R}^d $
+\pagebreak
+
+$ x^j \in \mathbb{R}^d, j = 0, \dots, s $
+\pagebreak
+
+$ s = d $
+\pagebreak
+
+\[
+  \forall x \in \mathbb{R}^d: x = x^0 + \sum_{j=1}^s \lambda_j (x^j - x^0)
+\]
+\pagebreak
+
+$ \lambda_j, j=1,\dots,s $
+\pagebreak
+
+$ \lambda_0 := 1 - sum_{j=1}^s $
+\pagebreak
+
+\[
+  \forall x \in \mathbb{R}^d: x = \sum_{j=0}^s \lambda_j x^j.
+\]
+\pagebreak
+
+\[
+  x \in S \Leftrightarrow  \forall j = 0, \dots, d: \lambda_j \in [0, 1] .
+\]
+\pagebreak
+
+$ \exists j \in \{ 0, \dots, s \}: \lambda_j < 0 $
+\pagebreak
+
+$ x \notin S $
+\pagebreak
+
+$ j $
+\pagebreak
+
+$ s = d-1 $
+\pagebreak
+
+$ d = 2, 3 $
+\pagebreak
+
+\[
+    \forall j=0, \dots, s: \lambda_j \in [0, 1] \wedge\mathrm{ortho_dist} = 0.
+  \]
+\pagebreak
+
+$ \mathrm{ortho_dist} <
+  \mathrm{acceptable_distance} $
+\pagebreak
+
+$p = n\cdot2^k$
+\pagebreak
+
+$k\in\mathbb{N}$
+\pagebreak
+
+$ 0 \leq \mathrm{dim} \leq \mathrm{shape\_dim}.$
+\pagebreak
+
+\[S := D\cdot A\cdot B\]
+\pagebreak
+
+$ r \leftarrow this\cdot x $
+\pagebreak
+
+$ r \leftarrow y + \alpha~ this\cdot x $
+\pagebreak
+
+$ B, A = diag(a), D = B^T $
+\pagebreak
+
+\[ S = B^T A^{-1} B. \]
+\pagebreak
+
+$ B^T $
+\pagebreak
+
+$ D $
+\pagebreak
+
+$ B $
+\pagebreak
+
+$ r \leftarrow this~ x $
+\pagebreak
+
+$ r \leftarrow y + \alpha~ this~ x $
+\pagebreak
+
+$ this_i \leftarrow \alpha / x_i $
+\pagebreak
+
+$ this_i \leftarrow x_i \cdot y_i $
+\pagebreak
+
+$this \leftarrow x$
+\pagebreak
+
+$this \leftarrow \alpha x $
+\pagebreak
+
+$this \leftarrow \alpha~ x + y$
+\pagebreak
+
+$ r \leftarrow y + \alpha this\cdot x $
+\pagebreak
+
+$ this \leftarrow x \cdot y $
+\pagebreak
+
+$this \leftarrow \alpha~ x y + \beta~ z$
+\pagebreak
+
+$this \leftarrow \alpha~ x y + \beta~ this$
+\pagebreak
+
+$this^\top $
+\pagebreak
+
+$this \leftarrow x^\top $
+\pagebreak
+
+$x \leftarrow this$
+\pagebreak
+
+$this_i \leftarrow x_i \cdot y_i$
+\pagebreak
+
+$this \leftarrow \alpha~ x $
+\pagebreak
+
+$result \leftarrow x^T \mathrm{diag}(this) y $
+\pagebreak
+
+$result \leftarrow this \cdot x$
+\pagebreak
+
+$this \leftarrow this \cdot x$
+\pagebreak
+
+$this \leftarrow y + \alpha~ x$
+\pagebreak
+
+\[
+   row\_norms_i = \sum_{j=0}^{n-1} scal_j (this_{ij})^2
+\]
+\pagebreak
+
+\[
+  \mathrm{tr}(B^T \mathrm{diag}(A) B)
+\]
+\pagebreak
+
+\[ \lambda_{\min} = 2 \cdot d \cdot (1 - \cos\big(\pi/(m+1)\big) ) \]
+\pagebreak
+
+\[ \lambda_{\max} = 2 \cdot d \cdot (1 + \cos\big(\pi/(m+1)\big) ) \]
+\pagebreak
+
+\[ \lambda_{\min} = 2 \cdot \sum^d_{k=1} h_k^2 \big(1 - \cos(\pi h_k) \big) \]
+\pagebreak
+
+\[ \lambda_{\max} = 2 \cdot \sum^d_{k=1} h_k^2 \big(1 + \cos(\pi h_k) \big) \]
+\pagebreak
+
+\[r \leftarrow this\cdot x \]
+\pagebreak
+
+\[r \leftarrow y + \alpha\cdot this\cdot x \]
+\pagebreak
+
+$ this \leftarrow \alpha\cdot x + y $
+\pagebreak
+
+$ this \leftarrow \alpha\cdot x $
+\pagebreak
+
+\[ u \cdot \nu = g ~\mathrm{on}~ \Gamma \]
+\pagebreak
+
+$ f_s $
+\pagebreak
+
+\[ f_s(u,g) = u - (u \cdot \nu) \nu + g \nu. \]
+\pagebreak
+
+$ V_h $
+\pagebreak
+
+$ \mathcal{C}^0 $
+\pagebreak
+
+\[ \forall j \in \Gamma_h: \mathcal{N}_j(f_{s,h} \cdot \nu_h) = \mathcal{N}_j(g), \]
+\pagebreak
+
+$ \mathcal{N}_j $
+\pagebreak
+
+$ \Gamma_h, f_{s,h} $
+\pagebreak
+
+$ \nu_h $
+\pagebreak
+
+$ \nu $
+\pagebreak
+
+$ g = 0 $
+\pagebreak
+
+$v_j$
+\pagebreak
+
+\[ f_{s,h}(v_j) = v_j - \frac{\mathcal{N}_j(v_j \cdot \nu_h)}{\mathcal{N}_j (\nu_h \cdot \nu_h)} \nu_h. \]
+\pagebreak
+
+\[ f_{s,h}(v_h)(x_j) = v_h(x_j) - \frac{v_h \cdot \nu_h}{\nu_h \cdot \nu_h}(x_j) \nu(x_j) \]
+\pagebreak
+
+$ x_j \in \Gamma $
+\pagebreak
+
+\[ X \leftarrow X + \alpha D\cdot A\cdot B\]
+\pagebreak
+
+\[ v \leftarrow v + \alpha \mathrm{tr}( D \textnormal{diag}(A) \cdot B\]
+\pagebreak
+
+$ B = \mathrm{this} $
+\pagebreak
+
+$ this_{ij} \leftarrow x_{ij}\cdot s_i$
+\pagebreak
+
+$ this_{ij} \leftarrow x_{ij}\cdot s_j$
+\pagebreak
+
+\[ X \leftarrow X + \alpha D\cdot \textnormal{diag}(A)\cdot B\]
+\pagebreak
+
+\[ X \leftarrow X + \alpha D\cdot B\]
+\pagebreak
+
+\[
+  \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
+\]
+\pagebreak
+
+$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| $
+\pagebreak
+
+$ \mathcal{T} $
+\pagebreak
+
+$ K \in \mathcal{T} $
+\pagebreak
+
+$ \hat{K} $
+\pagebreak
+
+\[
+  \forall K \in \mathcal{T}: \exists R_K : \hat{K} \to K: \forall \hat{x} \in \hat{K}: \det \nabla
+  R_K(\hat{x}) \neq 0,
+\]
+\pagebreak
+
+$ \Phi: \mathcal{T} \to \Phi(\mathcal{T})$
+\pagebreak
+
+$ \Phi(\mathcal{T} $
+\pagebreak
+
+\[
+  \mathcal{F}(\Phi) = \int_\Omega \mathcal{L}(\Phi,x) dx = \sum_{K \in \mathcal{T}} \mu_K \int_K
+  \mathcal{L}_K(\Phi,x) dx.
+\]
+\pagebreak
+
+\[
+  \forall K \in \mathcal{T}: \exists L_K \in SO_d \times K: \mathcal{L}_K: \mathcal{L}(\Phi,\cdot) =
+  L_K(\nabla \Phi, \cdot) = L_K(\nabla R_K, \cdot)
+\]
+\pagebreak
+
+\[
+   F(\nabla R_K(\Phi))  := \int_K L(\nabla R_K (\Phi)(x)) dx = \mu_K L( \| \nabla R_T(\Phi) \|_F^2,
+   \| \mathrm{cof} \nabla R_T(\Phi) \|_F^2, \det \nabla R_T(\Phi) )
+\]
+\pagebreak
+
+$ F $
+\pagebreak
+
+\[
+   c(d) = (\alpha + |d|)^\beta, \alpha \geq 0.
+\]
+\pagebreak
+
+$ h $
+\pagebreak
+
+$ c $
+\pagebreak
+
+\[
+  \forall K_k \in \mathcal{T}_h: h_k = \left( \frac{c (K_k)}{\sum_{l=1}^N c(K_l) \sum_{l=1}^N
+  \mathrm{det} \nabla R_{T,l}(\phi)} \right)^{\frac{1}{d}}
+\]
+\pagebreak
+
+$ \{ x_i : i=1, \dots, n \} $
+\pagebreak
+
+\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]
+\pagebreak
+
+\[
+  s_d := \sum_{l=1}^N \mathrm{det} \nabla R_{T,l}(\Phi), s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
+\]
+\pagebreak
+
+$ x_j $
+\pagebreak
+
+\[
+  \frac{\partial h(K_k)}{\partial x_j} = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
+  {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
+  \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
+  (s_d s_c)^{-2}
+\]
+\pagebreak
+
+\[
+  \forall K \in \mathcal{T}_h: \underbrace{c(K)}_{ =: \mathtt{conc(cell)}} ~ \mathrm{and} ~ \underbrace{\sum_{K \in \mathcal{T}_h} c(K)}_{\mathtt{\_sum\_conc}}
+\]
+\pagebreak
+
+\[
+  \mathrm{grad\_conc}(k,i) = \frac{\partial}{\partial x_j} \sum_{l=1}^N c(K_l),
+\]
+\pagebreak
+
+$ i $
+\pagebreak
+
+$ c(d) = |d|$
+\pagebreak
+
+$ c(d) = (\alpha |d|)^\beta $
+\pagebreak
+
+$ c'(d) = \beta (\alpha |d|)^{(\beta-1)} * sign(d) $
+\pagebreak
+
+\[
+  L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2
+                         + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2
+                         + fac\_det (\det(\nabla R_K))^{p_d}
+  + \frac{fac\_rec\_det}{\det(\nabla R_K) + \sqrt{(\mathrm{fac\_reg}^2 + \det(\nabla R_K)^2)}}
+\]
+\pagebreak
+
+$ L $
+\pagebreak
+
+$ M: \mathbb{R} \to \mathbb{R}^{d \times d} $
+\pagebreak
+
+\begin{align*}
+   \frac{d}{dt} M(t)^{-1} &= - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
+   \frac{d}{dt} \| M(t) \|_F^2 &=  M(t) : \frac{d M}{d t}(t)\\
+   \frac{d}{dt} \mathrm{Cof}( M(t) ) &=  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{Cof}(M(t))
+   - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{Cof}(M(t)) \\
+   \frac{d}{dt} \mathrm{det}( M(t) ) &=  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)
+\end{align*}
+\pagebreak
+
+$ f: \mathbb{R}^{d \times d} \to V $
+\pagebreak
+
+$ V = \mathbb{R} $
+\pagebreak
+
+$ V = \mathbb{R}^{d \times d} $
+\pagebreak
+
+\[
+  M(t) = A + tB, \quad f'(A)B = \left. \frac{d f(M(t))}{dt}\right|_{t = 0}.
+\]
+\pagebreak
+
+$ M(0) = A $
+\pagebreak
+
+$ \frac{d M}{d t}(t) = B $
+\pagebreak
+
+$ A = \nabla R_K $
+\pagebreak
+
+$ B = \nabla \eta $
+\pagebreak
+
+\begin{align*}
+  \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)' \eta &= 4(\| \nabla R_K \|_F^2 - d)
+  \nabla R_K : \nabla \eta \\
+  \frac{d}{dt} \left( (\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta & =
+    4(\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{Cof}(\nabla R_K) :
+     \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{Cof}(\nabla R_K) \right) \\
+  \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta & = p~\mathrm{det}(\nabla R_K )^p
+  (\nabla R_K)^{-1} : \nabla \eta.
+\end{align*}
+\pagebreak
+
+$ \eta $
+\pagebreak
+
+$ \hat{\eta} $
+\pagebreak
+
+$ M $
+\pagebreak
+
+\[
+  \nabla \eta = M^T \nabla \hat{\eta},
+\]
+\pagebreak
+
+$ \eta := \hat{\eta} \circ M$
+\pagebreak
+
+$ p_d $
+\pagebreak
+
+$ f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac\_reg}^2 + d^2}} $
+\pagebreak
+
+$ f'(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac\_reg}^2 + d^2} +
+\mathrm{fac\_reg}^2 + d^2} $
+\pagebreak
+
+$ p = 1 $
+\pagebreak
+
+$ c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac\_reg}^2 + d^2} + \mathrm{fac\_reg}^2 + d^2)} $
+\pagebreak
+
+$ d = 1 $
+\pagebreak
+
+$ \times $
+\pagebreak
+
+$ K $
+\pagebreak
+
+$ \| \nabla R_K \|_F^2 $
+\pagebreak
+
+$ \| \mathrm{Cof}(\nabla R_K) \|_F^2 $
+\pagebreak
+
+$ \mathrm{det}(\nabla R_K)$
+\pagebreak
+
+\[
+  s_d := \sum_{l=1}^N \det(\nabla R_{T,l}(\Phi)), \quad s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
+\]
+\pagebreak
+
+\begin{align*}
+  \frac{\partial h(K_k)}{\partial x_j} & = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
+  {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
+  \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
+  (s_d s_c)^{-2}
+\end{align*}
+\pagebreak
+
+\begin{align*}
+  r_0 & := b - A x_0 \\
+  \hat{r}_0 & := r_0 \\
+  \tilde{r}_0 & := M^{-1} r_0 \\
+  \tilde{p}_0 & := \tilde{r}_0 \\
+  \rho_0 & :=
+  \begin{cases}
+    \left< \hat{r}_0, \tilde{r}_0 \right>, & \mathrm{~left~preconditioned} \\
+    \left< \hat{r}_0, r_0 \right>, & \mathrm{~right~preconditioned}
+  \end{cases}\\
+  \intertext{For $k = 0, \dots, \mathrm{max\_iter}$}
+  q_k & = A \tilde{p}_k & \mathrm{(~first~application~of~the~matrix)}\\
+  \tilde{q}_k & = M^{-1} q_k &\mathrm{(~first~application~of~the~preconditioner)}\\
+  \alpha_k & =
+  \begin{cases}
+    \frac{\rho_k}{\left< \hat{r}_0, q_k \right>}, & \mathrm{~left~preconditioned} \\
+    \frac{\rho_k}{\left< \hat{r}_0, \tilde{q}_k \right>}, & \mathrm{~right~preconditioned} \\
+  \end{cases}\\
+  x_{k+1/2} & = x_k + \alpha_k \tilde{p}_k\\
+  r_{k+1/2} & = r_k - \alpha_k q_k \\
+  \mathrm{If~} x_{k+1/2}, r_{k+1/2}& \mathrm{~are~good~enough:~break}\\
+  \tilde{r}_{k+1/2} & = \tilde{r}_k - \alpha_k \tilde{q}_k \\
+  t_k & = A \tilde{r}_{k+1/2} & \mathrm{(~second~application~of~the~matrix)}\\
+  \tilde{t}_k & = M^{-1} t_k & \mathrm{(~second~application~of~the~preconditioner)}\\
+  \omega_k& =
+  \begin{cases}
+    \frac{\left< \tilde{t}_k, \tilde{r}_{k+1/2} \right>}{\left< \tilde{t}_k, \tilde{t}_k \right>},
+    & \mathrm{~left~preconditioned} \\
+    \frac{\left< t_k, r_{k+1/2} \right>}{\left< t_k, t_k \right>}, & \mathrm{~right~preconditioned} \\
+  \end{cases}\\
+  x_{k+1} & = x_{k+1/2} + \omega_k \tilde{r}_{k+1/2} \\
+  r_{k+1} & = r_{k+1/2} - \omega_k t_{k} \\
+  \mathrm{If~} x_{k+1}, r_{k+1} & \mathrm{~are~good~enough:~break}\\
+  \tilde{r}_{k+1} & = \tilde{r}_{k+1/2} - \omega_k \tilde{t}_{k} \\
+  \rho_{k+1} & :=
+  \begin{cases}
+    \left< \hat{r}_0, \tilde{r}_k \right>, & \mathrm{~left~preconditioned} \\
+    \left< \hat{r}_0, r_k \right>, & \mathrm{~right~preconditioned}
+  \end{cases}\\
+  \beta_k & = \frac{\rho_k \omega_k}{\rho_{k+1} \alpha_k} \\
+  \tilde{p}_{k+1} & = \tilde{r}_{k+1} + \beta_k (\tilde{p}_k - \omega \tilde{q}_k)
+\end{align*}
+\pagebreak
+
+$(M^{-1}A)x = M^{-1}b$
+\pagebreak
+
+$(AM^{-1})y = b,~x=M^{-1}y$
+\pagebreak
+
+\[ \begin{bmatrix} A & B\\D & S \end{bmatrix} \cdot \begin{bmatrix}v\\p\end{bmatrix} = \begin{bmatrix}f\\g\end{bmatrix}\]
+\pagebreak
+
+\[ \begin{bmatrix} \tilde{A} & \tilde{B} & Q & 0\\\tilde{D} & \tilde{S} & 0 & P\\Q^\top & 0 & 0 & 0\\0 & P^\top & 0 & 0 \end{bmatrix}
+\cdot \begin{bmatrix}v\\p\\q\\\lambda\end{bmatrix} = \begin{bmatrix}f\\g\\0\\0\end{bmatrix}\]
+\pagebreak
+
+$\tilde{A}$
+\pagebreak
+
+$\tilde{B}$
+\pagebreak
+
+$\tilde{D}$
+\pagebreak
+
+$\tilde{S}$
+\pagebreak
+
+$q$
+\pagebreak
+
+\[
+  (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
+\]
+\pagebreak
+
+\[
+  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
+\]
+\pagebreak
+
+$ r_k $
+\pagebreak
+
+$ r_0 $
+\pagebreak
+
+\[
+  \alpha^* = \mathrm{argmin} \left< \nabla f(x + \alpha d), d \right>
+\]
+\pagebreak
+
+$ \| p \|_2 = 1 $
+\pagebreak
+
+$ \alpha_0 $
+\pagebreak
+
+$ \| p \|_2 $
+\pagebreak
+
+\[
+  x \mapsto x + \alpha d,
+\]
+\pagebreak
+
+\[
+  \hat{\alpha} = | \alpha | \frac{\| d \|_2}{ \| x \|_2}.
+\]
+\pagebreak
+
+\[
+  trim(f, \nabla f) =
+    \begin{cases}
+      (f, \nabla f), & f \leq f_t \\
+      (f_t, 0 ), & f > f_t
+    \end{cases},
+\]
+\pagebreak
+
+$ f_t : = 10*(|f_0|+1) $
+\pagebreak
+
+$ f $
+\pagebreak
+
+$ \delta = \left< dir, grad \right>$
+\pagebreak
+
+$ df = \left< \nabla f(x_0), d \right>$
+\pagebreak
+
+\[
+   f(x) < f(x_0) + \alpha c_1 \left< \nabla f(x_0), d \right> \wedge
+   |\left< \nabla f(x), d \right>| < - c_2 \left< \nabla f(x_0), d \right>,
+\]
+\pagebreak
+
+$c_1$
+\pagebreak
+
+$ c_2 $
+\pagebreak
+
+\[
+  \alpha^* = \mathrm{argmin} \nabla f(x + \alpha d) \cdot d
+\]
+\pagebreak
+
+$ [\alpha_{\mathrm{soft~min}}, \alpha_{\mathrm{soft~max}}] $
+\pagebreak
+
+$ [\alpha_{\mathrm{lo}}, \alpha_{\mathrm{hi}}] $
+\pagebreak
+
+$ \alpha_{\mathrm{soft~min}} = 0, \alpha_{\mathrm{soft~max}} = \alpha_0 + c(\alpha_0 -
+\alpha_{\mathrm{soft~min}}) $
+\pagebreak
+
+$ c = 4$
+\pagebreak
+
+$ [\alpha_0, \alpha_0]$
+\pagebreak
+
+$ \left< d, grad(\alpha_0) \right> < 0 $
+\pagebreak
+
+$ \alpha > \alpha_0 $
+\pagebreak
+
+$ \beta = 0,$
+\pagebreak
+
+\[
+  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_{k+1} := \left< r_{k+1}, z_{k+1} \right>,
+  \quad \eta_{k+\frac{1}{2}} := \left<r_{k+1}, p_k \right>, \quad \eta_k := \left<r_k, d_k\right>
+\]
+\pagebreak
+
+\[
+  \beta_{k+1} := \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}} - \eta_k}
+\]
+\pagebreak
+
+$ \beta_{DY}$
+\pagebreak
+
+\[
+  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+  \gamma_{k+\frac{1}{2}} := \left< r_k, z_{k+1} \right>, \quad
+  \eta_{k+\frac{1}{2}} := \left<r_{k+1}, p_k \right>, \quad \eta_k := \left<r_k, d_k\right>
+\]
+\pagebreak
+
+\[
+  \beta_{k+1} := \max \left\{0, \min \left\{ \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}+ \eta_k}, \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}}+ \eta_k} \right\} \right\}
+\]
+\pagebreak
+
+$ \beta_{DYHS}$
+\pagebreak
+
+\[
+  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+  \gamma_{k+\frac{1}{2}} = \left<r_{k+1}, p_k \right>
+\]
+\pagebreak
+
+\[
+  \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
+\]
+\pagebreak
+
+$ \beta_{FR}$
+\pagebreak
+
+\[
+  \bar{\beta}_{k+1} := \left< r_{k+1} -r_k - \frac{2 \|r_{k+1}\|^2}{\left< r_{k+1} - r_k, p_k \right>}
+  p_k, 1/(<r_{k+1} - r_k, p_k>) r_k \right>,
+\]
+\pagebreak
+
+\[
+  \beta_{k+1} := max\{ \beta, -1/ \left( \| p_k \| min\{ \mathrm{thresh}, \| r_{k+1} \| \} \right) \},
+\]
+\pagebreak
+
+$ \beta_{HZ}$
+\pagebreak
+
+\[
+  \beta_{k+1} := \max \left\{0, \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}
+  + \eta_k} \right\}
+\]
+\pagebreak
+
+$ \beta_{HS}$
+\pagebreak
+
+\begin{align*}
+  r_k & := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left< r_k, z_k \right>, \quad
+  \gamma_{k+\frac{1}{2}} := \left<r_{k+1}, z_k \right> \\
+  \beta_{k+1} & := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
+\end{align*}
+\pagebreak
+
+$ \beta_{PRP+}$
+\pagebreak
+
+$x $
+\pagebreak
+
+$ \mathrm{grad} \mathcal{F}(x) = 0.$
+\pagebreak
+
+$M_L = LL^\top$
+\pagebreak
+
+$M_R = R^\top R$
+\pagebreak
+
+$A$
+\pagebreak
+
+\[ \underbrace{(R^{-\top}A^\top L^{-\top} L^{-1}AR^{-1})}_{\widetilde{A}}
+~\cdot~\underbrace{(R x)}_{\widetilde{x}}~=~
+\underbrace{(R^{-\top}A^\top L^{-\top} L^{-1} b)}_{\widetilde{b}}\]
+\pagebreak
+
+$M = LU$
+\pagebreak
+
+\[ \underbrace{(U^{-\top}A^\top L^{-\top} L^{-1}AU^{-1})}_{\widetilde{A}}
+~\cdot~\underbrace{(U x)}_{\widetilde{x}}~=~
+\underbrace{(U^{-\top}A^\top L^{-\top} L^{-1} b)}_{\widetilde{b}}\]
+\pagebreak
+
+$M_R = U^\top U$
+\pagebreak
+
+$M^{-1} = \sum_{k=0}^m (I - \tilde M^{-1}A)^k \tilde M^{-1}$
+\pagebreak
+
+\[
+  x^* = \mathrm{argmin}_{x \in D} f(x) ~ \mathrm{subject~to~} \forall i \in E: c_i(x) = 0
+\]
+\pagebreak
+
+$ c_i $
+\pagebreak
+
+\[
+  Q(x,\mu) := f(x) + \frac{\mu}{2} \sum_{i \in E} c_i^2(x)
+\]
+\pagebreak
+
+$ (\mu_k)_k \in \mathbb{N}, \mu_k \stackrel{k \to \infty}{\longrightarrow} \infty $
+\pagebreak
+
+$ \mathrm{dim}( \mathrm{ker} (\nabla c_{i_1}, \dots, \nabla c_{i_M}) ) > 0 $
+\pagebreak
+
+$ Q $
+\pagebreak
+
+$\mu_k$
+\pagebreak
+
+$\mu_1 = 1$
+\pagebreak
+
+$ \leq 10 $
+\pagebreak
+
+\[\begin{bmatrix} A & B\\D & 0\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
+\pagebreak
+
+$ S \approx -DA^{-1}B$
+\pagebreak
+
+\[\begin{bmatrix} A & 0\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
+\pagebreak
+
+\[\begin{bmatrix} A & 0\\D & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
+\pagebreak
+
+\[\begin{bmatrix} A & B\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
+\pagebreak
+
+\[\begin{bmatrix} I & 0\\-DA^{-1} & I\end{bmatrix} \cdot \begin{bmatrix} A & B\\0 & S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
+\pagebreak
+
+$ A^{-1} $
+\pagebreak
+
+$ S^{-1} $
+\pagebreak
+
+$A^{-1}$
+\pagebreak
+
+$S^{-1}$
+\pagebreak
+
+\[\begin{bmatrix} A & B\\D & 0\end{bmatrix} \cdot \begin{bmatrix} v\\p\end{bmatrix} = \begin{bmatrix} f\\g\end{bmatrix}\]
+\pagebreak
+
+\[ L\cdot \| J_\tau^{-1} \cdot v \|_2^{-1} \]
+\pagebreak
+
+$J_\tau$
+\pagebreak
+
+$ x^j \in \mathbb{R}^d, j = 0, \dots, d $
+\pagebreak
+
+$ \lambda_0 $
+\pagebreak
+
+$ \lambda_1, \dots, \lambda_s $
+\pagebreak
+
+$ d=2, 3 $
+\pagebreak
+
+$ x^0, x^1 \in \mathbb{R}^d $
+\pagebreak
+
+$ x \in \mathbb{R}^d $
+\pagebreak
+
+$ p $
+\pagebreak
+
+$ x^0, x^1 $
+\pagebreak
+
+$ (x^1 - x^0, x - p) = 0 $
+\pagebreak
+
+$ p = x^0 + \omega (x^1 - x^0), \omega \in \mathbb{R} $
+\pagebreak
+
+\[
+  x \in S \Leftrightarrow \omega \in [0, 1]
+\]
+\pagebreak
+
+\[
+  \omega = \frac{(x^1 - x^0, x - x^0)}{\| x^1 - x^0 \|_2^2}.
+\]
+\pagebreak
+
+$ \mathrm{coeffs[0]} $
+\pagebreak
+
+$ \mathrm{coeffs[1]} = \| x - p \|_2 $
+\pagebreak
+
+$ x^j \in \mathbb{R}^d, j = 0, \dots, 2 $
+\pagebreak
+
+\[
+  v^3 := (x^1 - x^0) \times (x^2 - x^0) \Rightarrow v^3 \perp S.
+\]
+\pagebreak
+
+$ x^3 := \| v^3 \|_2^{-1} v^3 $
+\pagebreak
+
+$ x^0, \dots, x^3 $
+\pagebreak
+
+$ S' $
+\pagebreak
+
+$ \mathbb{R}^d$
+\pagebreak
+
+\[ f(n,m) := \prod_{k=m}^n k \]
+\pagebreak
+
+\[ {n \choose k} := \frac{n!}{k!(n-k)!} \]
+\pagebreak
+
+\[\sum_{k=0}^{n-1} a_k\cdot b_k\]
+\pagebreak
+
+\[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1} a_{ij} \cdot b_{ij}\]
+\pagebreak
+
+\[ y \leftarrow (1-\alpha)\cdot a + \alpha\cdot b \]
+\pagebreak
+
+\[ y \leftarrow A\cdot x \]
+\pagebreak
+
+\[ y^\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \]
+\pagebreak
+
+\[ y \leftarrow y + \alpha\cdot A\cdot x \]
+\pagebreak
+
+\[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \]
+\pagebreak
+
+\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} K_{ij}\cdot (A_{ij})^2 \]
+\pagebreak
+
+\[ \Big(\sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\Big)^{\frac{1}{2}} \]
+\pagebreak
+
+\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\]
+\pagebreak
+
+\[ \sum_{i=0}^{\min(m,n)} A_{ii}\]
+\pagebreak
+
+\[ \textnormal{vol}(A) := \sqrt{\textnormal{det}(A^\top\cdot A)} \]
+\pagebreak
+
+$ \mathrm{Cof}(A) $
+\pagebreak
+
+$ A $
+\pagebreak
+
+$A \in \mathbb{R}^{n \times n}$
+\pagebreak
+
+$A^{(i,j)} \in \mathbb{R}^{n-1 \times n-1}$
+\pagebreak
+
+\[
+  \mathrm{Cof}(A)_{i,j} = (-1)^{i+j} \det(A^{(i,j)})
+\]
+\pagebreak
+
+$ A \in \mathrm{GL}_n$
+\pagebreak
+
+$ \mathrm{Cof}(A) = \det(A) A^{-T} $
+\pagebreak
+
+\[ C\leftarrow A^\top\cdot A \]
+\pagebreak
+
+\[ x^\top\cdot A\cdot y = \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} x_i\cdot A_{ij}\cdot y_j\]
+\pagebreak
+
+\[ a_{ij} \leftarrow a_{ij} + \alpha x_i y_j \]
+\pagebreak
+
+\[ a_{ij} \leftarrow x_i y_j \]
+\pagebreak
+
+\[ C\leftarrow C + \alpha A\cdot B \]
+\pagebreak
+
+\[ C\leftarrow A\cdot B \]
+\pagebreak
+
+\[ C \leftarrow C + \alpha B^\top\cdot A\cdot D\]
+\pagebreak
+
+\[ C \leftarrow B^\top\cdot A\cdot D\]
+\pagebreak
+
+\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow A_{ij} + \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]
+\pagebreak
+
+\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]
+\pagebreak
+
+\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+    \alpha \sum_{p=0}^{k-1} A_{hp}\cdot T_{pij}\]
+\pagebreak
+
+\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\}, j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+    \alpha \sum_{p=0}^{m'-1}\sum_{q=0}^{n'-1} T_{hpq}\cdot B_{pi}\cdot D_{qj} \]
+\pagebreak
+
+\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+    \alpha x_h A_{ij}\]
+\pagebreak
+
+\begin{align*}
+  \frac{\partial u}{\partial t} + (u \cdot \nabla ) u
+  - \nabla \cdot \left(\frac{1}{Re} \nabla u - p I_d \right) & = f & \mathrm{in~} \Omega,
+  u_{\partial \Omega = u_D} \\
+  \nabla \cdot u & = 0 & \mathrm{in~} \Omega
+\end{align*}
+\pagebreak
+
+$\frac{\partial u}{\partial t}$
+\pagebreak
+
+$ \frac{D }{\delta_t}u $
+\pagebreak
+
+$ q $
+\pagebreak
+
+$ q=1,2$
+\pagebreak
+
+\begin{align*}
+  \frac{D }{\delta_t} u^k & = \frac{1}{\delta_t} (\beta_q u^{k} - \sum_{k=0}^{q-1} \beta_k u^{k-1-q} ) \\
+  & =
+  \begin{cases}
+    \frac{1}{\delta_t} (u^k - u^{k-1}), & q = 1 \\
+    \frac{1}{\delta_t} \left(\frac{3}{2} u^k - (2 u^{k-1} - \frac{1}{2}u^{k-2}) \right), & q = 2
+  \end{cases}
+\end{align*}
+\pagebreak
+
+$ \tilde{u} $
+\pagebreak
+
+$ \tilde{u}^* = u_D $
+\pagebreak
+
+$ \partial \Omega$
+\pagebreak
+
+$u$
+\pagebreak
+
+$ u \cdot \nu = u_D \cdot \nu $
+\pagebreak
+
+$ \partial \Omega $
+\pagebreak
+
+$ u $
+\pagebreak
+
+$ \nabla \cdot (u \cdot \nabla) u = 0 $
+\pagebreak
+
+$ \nabla \cdot \Delta u =0 $
+\pagebreak
+
+\begin{align*}
+  \nabla \cdot \frac{D }{\delta_t} u^k - \Delta p & = 0
+\end{align*}
+\pagebreak
+
+$ u^{*,k} = 2\tilde{u}^{k-1} - \tilde{u}^{k-2}$
+\pagebreak
+
+$ r $
+\pagebreak
+
+\[
+  p^{*,k} =
+  \begin{cases}
+    0, & r = 0 \\
+    p^{k-1}, & r = 1 \\
+    2 p^{k-1} - p^{k-2}, & r = 2
+  \end{cases}
+\]
+\pagebreak
+
+\begin{align*}
+  \frac{D }{\delta_t} \tilde{u}^k + ( u^* \nabla ) u^k - \nabla \cdot
+  \left( \nabla \tilde{u}^k - p^{*,k} I_d - \sum_{j=0}^{q-1} \frac{\beta_j}{\beta_q} \phi^{k-1-j} I_d \right) & = f^k,
+  \tilde{u}^k_{| \partial \Omega} = u^k_D \\
+  - \Delta \phi^k & = - \frac{\beta_q}{\delta_t} \nabla \cdot \tilde{u}^k,
+  \partial_\nu \phi^k_{| \partial \Omega} = 0, \int_{\Omega} \phi^k dx = 0 \\
+ p^k & = p^{k-1} + \phi^k - \frac{\chi}{Re} \nabla \cdot \tilde{u}^k
+  \end{align*}
+\pagebreak
+
+$ \chi = 1 $
+\pagebreak
+
+$ \chi = 0 $
+\pagebreak
+
+$ (q,r) = (1,0) $
+\pagebreak
+
+$ (q,r) = (1,1) $
+\pagebreak
+
+$ D(u) $
+\pagebreak
+
+$ \nabla u $
+\pagebreak
+
+$ w $
+\pagebreak
+
+\[
+  ((u^{*,k} - w) \cdot \nabla) \tilde{u}^k
+\]
+\pagebreak
+
+$ n_p $
+\pagebreak
+
+$x^2-y^2$
+\pagebreak
+
+$m_x, m_y$
+\pagebreak
+
+$r$
+\pagebreak
+
+$d_L, d_R$
+\pagebreak
+
+\[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\]
+\pagebreak
+
+\[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\]
+\pagebreak
+
+\[ n~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y~ v_x~ v_y\]
+\pagebreak
+
+$c^k_x$
+\pagebreak
+
+$c^k_y$
+\pagebreak
+
+$v_x$
+\pagebreak
+
+$v_y$
+\pagebreak
+
+\[ x \mapsto w + R \cdot(x - v)\]
+\pagebreak
+
+\[ - \Delta u = 0 ~ \mathrm{in} ~ \Omega, u = u_D ~\mathrm{on}~ \partial \Omega \]
+\pagebreak
+
+$ u_D $
+\pagebreak
+
+$\sqrt{\varepsilon}\approx \frac{3}{2} 10^{-8}$
+\pagebreak
+
+$A\in \mathbb{R}^{m\times n}$
+\pagebreak
+
+$\mathcal{S}(A) \subseteq \{1,\dots,m\}\times\{1,\dots,n\}$
+\pagebreak
+
+$a_{ij}$
+\pagebreak
+
+$|a_{ij}| < \mathrm{nztol}\cdot\|A\|_{\max}$
+\pagebreak
+
+\[\max_{1\leq i\leq m}\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)\big\}\Big)\]
+\pagebreak
+
+\[\max_{1\leq i\leq m}\Big\{ \underset{1\leq j\leq n}{\mathrm{argmax}}\big\{(i,j)\in\mathcal{S}(A)\big\}
+- \underset{1\leq j\leq n}{\mathrm{argmin}}\big\{(i,j)\in\mathcal{S}(A)\big\}\Big\}\]
+\pagebreak
+
+\[\mathrm{card}\Big(\mathcal{S}(A)\Big)\]
+\pagebreak
+
+\[\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)~:~|a_{ij}| \geq \mathrm{nztol}\cdot\|A\|_{\max}~\big\}\Big)\]
+\pagebreak
+
+\[(i,j)\in\mathcal{S}(A) \Longleftrightarrow (j,i)\in\mathcal{S}(A)\]
+\pagebreak
+
+\[|a_{ij} - a_{ji}| < \mathrm{nztol}\cdot\|A\|_{\max}\]
+\pagebreak
+
+\[ \max_{1\leq i\leq m} \Big\{\frac{1}{|a_{ij}|}\Big(\sum_{j=1}^n |a_{ij}|\Big)-1\Big\}\]
+\pagebreak
+
+\[\|A\|_F = \Big(\sum_{i=1}^m\sum_{j=1}^n |a_{ij}|^2\Big)^{\frac{1}{2}}\]
+\pagebreak
+
+\[\|A\|_1 = \max_{1\leq j\leq n} \sum_{i=1}^m |a_{ij}|\]
+\pagebreak
+
+\[\|A\|_\infty = \max_{1\leq i\leq m} \sum_{j=1}^n |a_{ij}|\]
+\pagebreak
+
+\[\|A\|_{\max} = \max_{\substack{1\leq i\leq m\\1\leq j\leq n}} |a_{ij}|\]
+\pagebreak
+
+\end{document}

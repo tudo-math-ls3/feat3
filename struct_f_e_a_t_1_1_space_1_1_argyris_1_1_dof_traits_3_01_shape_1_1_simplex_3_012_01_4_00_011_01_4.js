@@ -1,0 +1,4 @@
+var struct_f_e_a_t_1_1_space_1_1_argyris_1_1_dof_traits_3_01_shape_1_1_simplex_3_012_01_4_00_011_01_4 =
+[
+    [ "count", "struct_f_e_a_t_1_1_space_1_1_argyris_1_1_dof_traits_3_01_shape_1_1_simplex_3_012_01_4_00_011_01_4.html#a3f328b1405a958a5b55d4dec98ffc032", null ]
+];

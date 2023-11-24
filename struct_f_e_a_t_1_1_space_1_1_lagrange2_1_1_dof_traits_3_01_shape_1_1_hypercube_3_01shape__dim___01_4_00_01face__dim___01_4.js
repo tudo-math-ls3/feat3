@@ -1,0 +1,4 @@
+var struct_f_e_a_t_1_1_space_1_1_lagrange2_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_01face__dim___01_4 =
+[
+    [ "count", "struct_f_e_a_t_1_1_space_1_1_lagrange2_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_01face__dim___01_4.html#ae035b987d367cc650547b8d3baa05fad", null ]
+];

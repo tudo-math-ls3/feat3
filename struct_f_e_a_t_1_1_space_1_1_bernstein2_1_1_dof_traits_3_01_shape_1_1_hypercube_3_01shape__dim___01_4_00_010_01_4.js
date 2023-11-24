@@ -1,0 +1,4 @@
+var struct_f_e_a_t_1_1_space_1_1_bernstein2_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_010_01_4 =
+[
+    [ "count", "struct_f_e_a_t_1_1_space_1_1_bernstein2_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_010_01_4.html#afa3dfb6bb30759744df876c2a6d4fc13", null ]
+];

@@ -1,0 +1,11 @@
+var searchData=
+[
+  ['qpenalty_0',['QPenalty',['../class_f_e_a_t_1_1_solver_1_1_q_penalty.html#ab60b76865412e2284442667ff62a6ecd',1,'FEAT::Solver::QPenalty::QPenalty(FunctionalType &amp;functional, std::shared_ptr&lt; IterativeSolver&lt; VectorType &gt; &gt; inner_solver, DataType initial_penalty_param=DataType(1))'],['../class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a3ade90d8b0d132532c7b1a031bc44c46',1,'FEAT::Solver::QPenalty::QPenalty(const String &amp;section_name, PropertyMap *section, FunctionalType &amp;functional, std::shared_ptr&lt; IterativeSolver&lt; VectorType &gt; &gt; inner_solver)'],['../class_f_e_a_t_1_1_solver_1_1_q_penalty.html#af474e62d6cd749c65ebcd8028787187e',1,'FEAT::Solver::QPenalty::QPenalty(const QPenalty &amp;)=delete']]],
+  ['quadraticsystemlevel_1',['QuadraticSystemLevel',['../class_f_e_a_t_1_1_control_1_1_meshopt_1_1_quadratic_system_level.html#a5a04f25c2dbb321fe7177c8f6da6e107',1,'FEAT::Control::Meshopt::QuadraticSystemLevel']]],
+  ['query_2',['query',['../class_f_e_a_t_1_1_property_map.html#a97ede91d7bd7b75fd909671b8110a4e9',1,'FEAT::PropertyMap::query(String key_path) const'],['../class_f_e_a_t_1_1_property_map.html#ae476fb51cd6af7ee9eff6f847680073b',1,'FEAT::PropertyMap::query(String key_path, String default_value) const'],['../class_f_e_a_t_1_1_simple_arg_parser.html#a99f09de8dec9e2cd253508bf975459b8',1,'FEAT::SimpleArgParser::query()']]],
+  ['query_5fmemory_5fusage_3',['query_memory_usage',['../namespace_f_e_a_t_1_1_windows.html#a8600a9842ba75b7efedc674ed46f7d59',1,'FEAT::Windows']]],
+  ['query_5fperformance_5fcounter_4',['query_performance_counter',['../namespace_f_e_a_t_1_1_windows.html#ace71d32a51d5f170810bce006dca5be8',1,'FEAT::Windows']]],
+  ['query_5fperformance_5ffrequency_5',['query_performance_frequency',['../namespace_f_e_a_t_1_1_windows.html#a979dd3ce025f8f019b417774393d2905',1,'FEAT::Windows']]],
+  ['query_5fsection_6',['query_section',['../class_f_e_a_t_1_1_property_map.html#a791b5f9d68d8570c5b229647d20e200e',1,'FEAT::PropertyMap::query_section(String sec_path)'],['../class_f_e_a_t_1_1_property_map.html#a64449d5c11e29573604ef07418933236',1,'FEAT::PropertyMap::query_section(String sec_path) const']]],
+  ['query_5funsupported_7',['query_unsupported',['../class_f_e_a_t_1_1_simple_arg_parser.html#a9e58f26bc37dadf95d953db3cd453d37',1,'FEAT::SimpleArgParser']]]
+];

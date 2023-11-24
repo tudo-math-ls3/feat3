@@ -1,0 +1,28 @@
+var class_f_e_a_t_1_1_solver_1_1_polynomial_precond =
+[
+    [ "BaseClass", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a55564d34ca07df5afd32c7e3c1fded66", null ],
+    [ "DataType", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a4367c655ab5e911e853f810c9975f406", null ],
+    [ "FilterType", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a04f0885d0f4470bae50a5838308831bb", null ],
+    [ "MatrixType", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a8f6f1edff5af1ffa18a3cee49e2ab6b4", null ],
+    [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ac1fb944402f5fda01412384225e5c180", null ],
+    [ "PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a85d4787bf4b51cc165f524ace74a7a89", null ],
+    [ "PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a0ba920e5c5e19a9c0311841a425b4087", null ],
+    [ "~PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a2e21c4fc79bd90973adc65b590f040f7", null ],
+    [ "apply", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ae162070c491d897ae6f91d263200af40", null ],
+    [ "apply", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a25e7d4394f26f6198f7b1a1711583bc9", null ],
+    [ "done", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#acacbcaccbf7ec307778128928a901d59", null ],
+    [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#af2ea6e8c96de45c8408f3dcc59b8f186", null ],
+    [ "done_symbolic", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a326ab1f6d6f09f522b5c831cd58a185f", null ],
+    [ "init", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a7e61ce0b51e7f97317042a184aba8613", null ],
+    [ "init_numeric", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ab920d08eb3f675d7227e637ca371debd", null ],
+    [ "init_symbolic", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a7582e2aed9dbfad9d50cf6769dd0649a", null ],
+    [ "name", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a4f73bd7d6649475770d297270031ddde", null ],
+    [ "set_m", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a111e1611874c524c6f6d157f16e3b01c", null ],
+    [ "set_omega", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ac0b30a245b3a0808633dc4e769f04fac", null ],
+    [ "_aux1", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a6b77c8a9f907582c6951d0bfaa77c591", null ],
+    [ "_filter", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a3a73b9d0c31f0f048b325a0a562b8b15", null ],
+    [ "_inv_diag", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a9e5d0c401afaf45dce4308642894a1e0", null ],
+    [ "_m", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a1b635d98d96ea088044b336132594c72", null ],
+    [ "_matrix", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a053eb6848228f7f4b5b205f9528c2b3e", null ],
+    [ "_omega", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ab7d8ab20a62a844615b2841e5c042b07", null ]
+];

@@ -1,0 +1,7 @@
+var class_f_e_a_t_1_1_solver_1_1_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_b01c4c6795db9d1026723694e15647be =
+[
+    [ "SORPrecondWithBackend", "class_f_e_a_t_1_1_solver_1_1_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_b01c4c6795db9d1026723694e15647be.html#a5ddb68c099d5d168c02466f7070d8414", null ],
+    [ "SORPrecondWithBackend", "class_f_e_a_t_1_1_solver_1_1_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_b01c4c6795db9d1026723694e15647be.html#a9fa0ca025446e4ed77e430fcb63235c5", null ],
+    [ "name", "class_f_e_a_t_1_1_solver_1_1_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_b01c4c6795db9d1026723694e15647be.html#a98826e25e05947e4571add803a7f6ff7", null ],
+    [ "set_omega", "class_f_e_a_t_1_1_solver_1_1_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_b01c4c6795db9d1026723694e15647be.html#a34a28cf7e5b57a0a963e77c225245af7", null ]
+];

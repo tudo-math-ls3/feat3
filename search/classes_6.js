@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['gate_0',['Gate',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gate_3c_20localpresvector_2c_20presmirror_20_3e_1',['Gate&lt; LocalPresVector, PresMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gate_3c_20localscalarvector_2c_20scalarmirror_20_3e_2',['Gate&lt; LocalScalarVector, ScalarMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gate_3c_20localstressvector_2c_20stressmirror_20_3e_3',['Gate&lt; LocalStressVector, StressMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gate_3c_20localsystemvector_2c_20systemmirror_20_3e_4',['Gate&lt; LocalSystemVector, SystemMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gate_3c_20localsystemvectorr_2c_20systemmirror_20_3e_5',['Gate&lt; LocalSystemVectorR, SystemMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gate_3c_20localvelovector_2c_20velomirror_20_3e_6',['Gate&lt; LocalVeloVector, VeloMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_gate.html',1,'FEAT::Global']]],
+  ['gatheraxpy_7',['GatherAxpy',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_1_1_gather_axpy.html',1,'FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::GatherAxpy'],['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked_1_1_gather_axpy.html',1,'FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::GatherAxpy'],['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded_1_1_gather_axpy.html',1,'FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::GatherAxpy'],['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r_1_1_gather_axpy.html',1,'FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::GatherAxpy']]],
+  ['gausslegendredriver_8',['GaussLegendreDriver',['../class_f_e_a_t_1_1_cubature_1_1_scalar_1_1_gauss_legendre_driver.html',1,'FEAT::Cubature::Scalar']]],
+  ['gausslobattodriver_9',['GaussLobattoDriver',['../class_f_e_a_t_1_1_cubature_1_1_scalar_1_1_gauss_lobatto_driver.html',1,'FEAT::Cubature::Scalar']]],
+  ['genericumfpack_10',['GenericUmfpack',['../class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html',1,'FEAT::Solver']]],
+  ['gradient_11',['Gradient',['../class_f_e_a_t_1_1_analytic_1_1_gradient.html',1,'FEAT::Analytic']]],
+  ['gradienttestoperatorblocked_12',['GradientTestOperatorBlocked',['../class_f_e_a_t_1_1_assembly_1_1_common_1_1_gradient_test_operator_blocked.html',1,'FEAT::Assembly::Common']]],
+  ['gradienttrialoperatorblocked_13',['GradientTrialOperatorBlocked',['../class_f_e_a_t_1_1_assembly_1_1_common_1_1_gradient_trial_operator_blocked.html',1,'FEAT::Assembly::Common']]],
+  ['gradoperatorassembler_14',['GradOperatorAssembler',['../class_f_e_a_t_1_1_assembly_1_1_grad_operator_assembler.html',1,'FEAT::Assembly']]],
+  ['gradpresdivveloassembler_15',['GradPresDivVeloAssembler',['../class_f_e_a_t_1_1_assembly_1_1_grad_pres_div_velo_assembler.html',1,'FEAT::Assembly']]],
+  ['grammarerror_16',['GrammarError',['../class_f_e_a_t_1_1_xml_1_1_grammar_error.html',1,'FEAT::Xml']]],
+  ['graph_17',['Graph',['../class_f_e_a_t_1_1_adjacency_1_1_graph.html',1,'FEAT::Adjacency']]],
+  ['gridtransfer_18',['GridTransfer',['../class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html',1,'FEAT::Assembly']]],
+  ['gropppcg_19',['GroppPCG',['../class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html',1,'FEAT::Solver']]],
+  ['guermondstokessol_20',['GuermondStokesSol',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html',1,'FEAT::Analytic::Common']]],
+  ['guermondstokessolpressure_21',['GuermondStokesSolPressure',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure.html',1,'FEAT::Analytic::Common']]],
+  ['guermondstokessolrhs_22',['GuermondStokesSolRhs',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs.html',1,'FEAT::Analytic::Common']]]
+];

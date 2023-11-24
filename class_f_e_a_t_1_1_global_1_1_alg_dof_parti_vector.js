@@ -1,0 +1,25 @@
+var class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector =
+[
+    [ "AlgDofPartiType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a248a40f945913f92ffc319f97fdd0c96", null ],
+    [ "BufferVectorType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a326b4895e658f53d9bbc3b0579fe6653", null ],
+    [ "DataType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a6ed89e0e721d69443bf279991a513d0b", null ],
+    [ "GlobalVectorType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#ae889bac9ab7946098ad674c2cef58974", null ],
+    [ "IndexType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a0462b5109a66475a2f600ece2f05cecf", null ],
+    [ "LocalVectorType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a9e87a9ffb3693a40eef10949a1e4b442", null ],
+    [ "MirrorType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#aa2ad557268a7bcc92a539daa7866e2d7", null ],
+    [ "OwnedVectorType", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a9d10d6cf322a5e00a72350ccd5fc471e", null ],
+    [ "AlgDofPartiVector", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a8bb7a7bbb9a4fce788b8c9450034c0ab", null ],
+    [ "AlgDofPartiVector", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a249f1b7235212da01aabfcdc2f0849d3", null ],
+    [ "allgather", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#add7df0479016e78ba252e1d9994bd0b1", null ],
+    [ "clear", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a7d8b00c9e1050dadb227e443ad048063", null ],
+    [ "download", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a3e89504e29d5d5b0de931967a9d4e981", null ],
+    [ "download", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a3d2266383e5c2bc86ee98978d12062dc", null ],
+    [ "get_alg_dof_parti", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#aebd75f967080972399ae76caf184d073", null ],
+    [ "get_comm", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a1b3de9cdbcfeb5639a04c34e1bcac144", null ],
+    [ "owned", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a18650e971d3d31726062b5387f242035", null ],
+    [ "owned", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#ad8fbc62a0838d8f50b83e74c288c2971", null ],
+    [ "upload", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a347a616e9053b9ba7078288fa95d09a8", null ],
+    [ "upload", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a7e53d382f7334da825a7a5a5e3abfc6e", null ],
+    [ "_alg_dof_parti", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a165ba822f747e9acb09effdd7bef23e1", null ],
+    [ "_vector", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html#a9457696b333b9c183e237f4b8b333ac5", null ]
+];
