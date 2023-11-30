@@ -103,19 +103,12 @@ void Runtime::abort(bool dump_call_stack)
 #elif defined(_WIN32)
     Windows::dump_call_stack_to_stderr();
 #endif
+  }
+
 #ifdef FEAT_HAVE_MPI
   ::MPI_Abort(MPI_COMM_WORLD, 1);
 #endif
-
   std::abort();
-  }
-  else
-  {
-#ifdef FEAT_HAVE_MPI
-    ::MPI_Abort(MPI_COMM_WORLD, 1);
-#endif
-    std::abort();
-  }
 }
 
 int Runtime::finalize()
