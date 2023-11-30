@@ -154,12 +154,6 @@ This macro is defined by the build system if the FEAT kernel is linked against t
 This macro is defined by the build system if the FEAT kernel is linked against the triangle library,
 which offers a set of 2D triangular mesh generators.
 
-<hr>
-\subsection ppm_feat_have_trilinos FEAT_HAVE_TRILINOS
-This macro is defined by the build system if the FEAT kernel is linked against the trilinos library,
-a collection of reusable scientific software libraries, known in particular for linear solvers, non-linear solvers, transient solvers,
-optimization solvers, and uncertainty quantification (UQ) solvers.
-
 \note
 If you want to include the <c>triangle.h</c> header file, you first have to define the following preprocessor macros,
 \b before including the header itself:
@@ -168,6 +162,12 @@ If you want to include the <c>triangle.h</c> header file, you first have to defi
 #define REAL double
 #define VOID void
 \endcode
+
+<hr>
+\subsection ppm_feat_have_trilinos FEAT_HAVE_TRILINOS
+This macro is defined by the build system if the FEAT kernel is linked against the trilinos library,
+a collection of reusable scientific software libraries, known in particular for linear solvers, non-linear solvers, transient solvers,
+optimization solvers, and uncertainty quantification (UQ) solvers.
 
 <hr>
 \subsection ppm_feat_have_umfpack FEAT_HAVE_UMFPACK
