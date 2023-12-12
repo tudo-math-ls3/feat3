@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -338,22 +348,21 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename SolverDT_, typename SolverIT_, typename DT_, typename IT_, int dim_&gt;<br />
 class FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;</div><p >Core class for conversion of BCSR Stokes systems to CSR format for direct solvers. </p>
 <p >This class can be used to convert a Stokes saddle-point system of the form </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \begin{bmatrix} A &amp; B\\D &amp; S \end{bmatrix} \cdot \begin{bmatrix}v\\p\end{bmatrix} = \begin{bmatrix}f\\g\end{bmatrix}\]" src="form_276.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \begin{bmatrix} A &amp; B\\D &amp; S \end{bmatrix} \cdot \begin{bmatrix}v\\p\end{bmatrix} = \begin{bmatrix}f\\g\end{bmatrix}\]" src="form_276_dark.png"/>
+\[ \begin{bmatrix} A &amp; B\\D &amp; S \end{bmatrix} \cdot \begin{bmatrix}v\\p\end{bmatrix} = \begin{bmatrix}f\\g\end{bmatrix}\]
 </p>
 <p> consisting of BCSR-matrices A, B and D as well as a scalar matrix S, which is usually an empty matrix, into a scalar CSR system of the form  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \begin{bmatrix} \tilde{A} &amp; \tilde{B} &amp; Q &amp; 0\\\tilde{D} &amp; \tilde{S} &amp; 0 &amp; P\\Q^\top &amp; 0 &amp; 0 &amp; 0\\0 &amp; P^\top &amp; 0 &amp; 0 \end{bmatrix}
-\cdot \begin{bmatrix}v\\p\\q\\\lambda\end{bmatrix} = \begin{bmatrix}f\\g\\0\\0\end{bmatrix}\]" src="form_277.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \begin{bmatrix} \tilde{A} &amp; \tilde{B} &amp; Q &amp; 0\\\tilde{D} &amp; \tilde{S} &amp; 0 &amp; P\\Q^\top &amp; 0 &amp; 0 &amp; 0\\0 &amp; P^\top &amp; 0 &amp; 0 \end{bmatrix}
-\cdot \begin{bmatrix}v\\p\\q\\\lambda\end{bmatrix} = \begin{bmatrix}f\\g\\0\\0\end{bmatrix}\]" src="form_277_dark.png"/>
+\[ \begin{bmatrix} \tilde{A} &amp; \tilde{B} &amp; Q &amp; 0\\\tilde{D} &amp; \tilde{S} &amp; 0 &amp; P\\Q^\top &amp; 0 &amp; 0 &amp; 0\\0 &amp; P^\top &amp; 0 &amp; 0 \end{bmatrix}
+\cdot \begin{bmatrix}v\\p\\q\\\lambda\end{bmatrix} = \begin{bmatrix}f\\g\\0\\0\end{bmatrix}\]
 </p>
 <p> where</p><ul>
-<li><img class="formulaInl light-mode-visible" alt="$\tilde{A}$" src="form_278.png"/><img class="formulaInl dark-mode-visible" alt="$\tilde{A}$" src="form_278_dark.png"/> corresponds to the matrix block <em>A</em>, which has been filtered by all velocity unit filters, i.e. each row that corresponds to a velocity unit filter DOF has been replaced by a unit row.</li>
-<li><img class="formulaInl light-mode-visible" alt="$\tilde{B}$" src="form_279.png"/><img class="formulaInl dark-mode-visible" alt="$\tilde{B}$" src="form_279_dark.png"/> corresponds to the matrix block <em>B</em>, which has been off-diagonally filtered by all velocity unit filters, i.e. each row that corresponds to a velocity unit filter DOF has been replaced by an empty row.</li>
-<li><img class="formulaInl light-mode-visible" alt="$\tilde{D}$" src="form_280.png"/><img class="formulaInl dark-mode-visible" alt="$\tilde{D}$" src="form_280_dark.png"/> corresponds to the matrix block <em>D</em>, which has been off-diagonally filtered by all pressure unit filters, i.e. each row that corresponds to a pressure unit filter DOF has been replaced by an empty row.</li>
-<li><img class="formulaInl light-mode-visible" alt="$\tilde{S}$" src="form_281.png"/><img class="formulaInl dark-mode-visible" alt="$\tilde{S}$" src="form_281_dark.png"/> corresponds to the matrix block <em>S</em>, which has been filtered by all pressure unit filters, i.e. each row that corresponds to a pressure unit filter DOF has been replaced by a unit row.</li>
+<li>\(\tilde{A}\) corresponds to the matrix block <em>A</em>, which has been filtered by all velocity unit filters, i.e. each row that corresponds to a velocity unit filter DOF has been replaced by a unit row.</li>
+<li>\(\tilde{B}\) corresponds to the matrix block <em>B</em>, which has been off-diagonally filtered by all velocity unit filters, i.e. each row that corresponds to a velocity unit filter DOF has been replaced by an empty row.</li>
+<li>\(\tilde{D}\) corresponds to the matrix block <em>D</em>, which has been off-diagonally filtered by all pressure unit filters, i.e. each row that corresponds to a pressure unit filter DOF has been replaced by an empty row.</li>
+<li>\(\tilde{S}\) corresponds to the matrix block <em>S</em>, which has been filtered by all pressure unit filters, i.e. each row that corresponds to a pressure unit filter DOF has been replaced by a unit row.</li>
 <li><em>Q</em> corresponds to the <em>nv</em>-by-<em>nq</em> Lagrange multiplier matrices arising from the velocity slip filters, where <em>nv</em> denotes the total number of (scalar) velocity DOFs and <em>nq</em> denotes the total number of (blocked) velocity slip filter DOFs.</li>
 <li><em>P</em> corresponds to the <em>np</em>-by-1 Lagrange multiplier vector arising from the pressure mean filter, where <em>np</em> denoted the total number of pressure DOFs</li>
 <li><em>q</em> is the (vector-valued) Lagrange multiplier for the velocity slip boundary conditions. Note that the equation for this unknown only exists if there exists at least one non-empty velocity slip filter.</li>
-<li><img class="formulaInl light-mode-visible" alt="$\lambda$" src="form_124.png"/><img class="formulaInl dark-mode-visible" alt="$\lambda$" src="form_124_dark.png"/> is the scalar Lagrange multiplier for the pressure mean filter. Note that the equation for this unknown only exists if there exists a non-empty pressure mean filter.</li>
+<li>\(\lambda\) is the scalar Lagrange multiplier for the pressure mean filter. Note that the equation for this unknown only exists if there exists a non-empty pressure mean filter.</li>
 </ul>
 <p >This class is capable of handling and incorporating the following filters into the system:</p><ul>
 <li>velocity unit filters for the incorporation of inflow and no-flow (aka no-slip) boundary conditions</li>

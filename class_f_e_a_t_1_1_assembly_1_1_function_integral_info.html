@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -820,7 +830,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>squared L2-norm of the vector field divergence </p>
 <p >This entry stores the squared L2-norm of the divergence of the vector field: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \| \nabla \cdot u\|_{\mathcal{L}^2}^2 = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]" src="form_109.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \| \nabla \cdot u\|_{\mathcal{L}^2}^2 = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]" src="form_109_dark.png"/>
+\[ \| \nabla \cdot u\|_{\mathcal{L}^2}^2 = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This entry is only meaningful if u is a vector field from R^n to R^n with n=2 or n=3. </dd></dl>
 
@@ -846,7 +856,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>Integral of the function gradient. </p>
 <p >This entry stores the integral of the function gradient if max_der &gt;= 1, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[g \in\mathbb{R}^n;\quad g_i := \int_\Omega \partial_i u(x)~dx \]" src="form_102.png"/><img class="formulaDsp dark-mode-visible" alt="\[g \in\mathbb{R}^n;\quad g_i := \int_\Omega \partial_i u(x)~dx \]" src="form_102_dark.png"/>
+\[g \in\mathbb{R}^n;\quad g_i := \int_\Omega \partial_i u(x)~dx \]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="function__integral__jobs_8hpp_source.html#l00076">76</a> of file <a class="el" href="function__integral__jobs_8hpp_source.html">function_integral_jobs.hpp</a>.</p>
@@ -871,7 +881,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>Integral of the function hessian. </p>
 <p >This entry stores the integral of the function gradient if max_der &gt;= 2, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[h \in\mathbb{R}^{n\times n};\quad h_{ij} := \int_\Omega \partial_i\partial_j u(x)~dx \]" src="form_103.png"/><img class="formulaDsp dark-mode-visible" alt="\[h \in\mathbb{R}^{n\times n};\quad h_{ij} := \int_\Omega \partial_i\partial_j u(x)~dx \]" src="form_103_dark.png"/>
+\[h \in\mathbb{R}^{n\times n};\quad h_{ij} := \int_\Omega \partial_i\partial_j u(x)~dx \]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="function__integral__jobs_8hpp_source.html#l00084">84</a> of file <a class="el" href="function__integral__jobs_8hpp_source.html">function_integral_jobs.hpp</a>.</p>
@@ -918,7 +928,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>squared H0-norm (aka L2-norm) of the function </p>
 <p >This entry stores the squared H0-norm of the function if max_der &gt;= 0, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[|u|_{H^0} := \int_\Omega (u(x))^2~dx \]" src="form_104.png"/><img class="formulaDsp dark-mode-visible" alt="\[|u|_{H^0} := \int_\Omega (u(x))^2~dx \]" src="form_104_dark.png"/>
+\[|u|_{H^0} := \int_\Omega (u(x))^2~dx \]
 </p>
 <p >For vector fields, this is simply the sum of all component-wise H0-norms. </p>
 
@@ -966,7 +976,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>squared H1-semi-norm of the function </p>
 <p >This entry stores the squared H1-semi-norm of the function if max_der &gt;= 1, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[|u|_{H^1} := \sum_{1\leq i\leq n}\int_\Omega (\partial_i u(x))^2~dx \]" src="form_105.png"/><img class="formulaDsp dark-mode-visible" alt="\[|u|_{H^1} := \sum_{1\leq i\leq n}\int_\Omega (\partial_i u(x))^2~dx \]" src="form_105_dark.png"/>
+\[|u|_{H^1} := \sum_{1\leq i\leq n}\int_\Omega (\partial_i u(x))^2~dx \]
 </p>
 <p >For vector fields, this is simply the sum of all component-wise H1-semi-norms. </p>
 
@@ -1014,7 +1024,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>squared H2-semi-norm of the function </p>
 <p >This entry stores the squared H2-semi-norm of the function if max_der &gt;= 2, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[|u|_{H^2} := \sum_{1\leq i,j\leq n}\int_\Omega (\partial_i \partial_j u(x))^2~dx \]" src="form_106.png"/><img class="formulaDsp dark-mode-visible" alt="\[|u|_{H^2} := \sum_{1\leq i,j\leq n}\int_\Omega (\partial_i \partial_j u(x))^2~dx \]" src="form_106_dark.png"/>
+\[|u|_{H^2} := \sum_{1\leq i,j\leq n}\int_\Omega (\partial_i \partial_j u(x))^2~dx \]
 </p>
 <p >For vector fields, this is simply the sum of all component-wise H2-semi-norms. </p>
 
@@ -1062,7 +1072,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>L1-norm of the function. </p>
 <p >This entry stores the L1-norm of the function if max_der &gt;= 0, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[|u|_{L^1} := \int_\Omega |u(x)|~dx \]" src="form_107.png"/><img class="formulaDsp dark-mode-visible" alt="\[|u|_{L^1} := \int_\Omega |u(x)|~dx \]" src="form_107_dark.png"/>
+\[|u|_{L^1} := \int_\Omega |u(x)|~dx \]
 </p>
 <p >For vector fields, this is simply the sum of all component-wise L1-norms. </p>
 
@@ -1110,7 +1120,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>Lmax-norm of the function. </p>
 <p >This entry stores the Lmax-norm of the function if max_der &gt;= 0, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[|u|_{L^\infty} := \max_{x\in\Omega} |u(x)| \]" src="form_108.png"/><img class="formulaDsp dark-mode-visible" alt="\[|u|_{L^\infty} := \max_{x\in\Omega} |u(x)| \]" src="form_108_dark.png"/>
+\[|u|_{L^\infty} := \max_{x\in\Omega} |u(x)| \]
 </p>
 <p >For vector fields, this is simply the sum of all component-wise Lmax-norms. </p>
 
@@ -1158,7 +1168,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>Integral of the function value. </p>
 <p >This entry stores the integral of the function value if max_der &gt;= 0, i.e. it is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[v \in\mathbb{R};\quad v := \int_\Omega u(x)~dx \]" src="form_101.png"/><img class="formulaDsp dark-mode-visible" alt="\[v \in\mathbb{R};\quad v := \int_\Omega u(x)~dx \]" src="form_101_dark.png"/>
+\[v \in\mathbb{R};\quad v := \int_\Omega u(x)~dx \]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="function__integral__jobs_8hpp_source.html#l00068">68</a> of file <a class="el" href="function__integral__jobs_8hpp_source.html">function_integral_jobs.hpp</a>.</p>
@@ -1183,7 +1193,7 @@ template&lt;typename DataType_ , typename ValueType_ , typename GradientType_ , 
 
 <p>squared L2-norm of the vector field vorticity </p>
 <p >This entry stores the squared L2-norm of the curl of the vector field: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \| \nabla \times u\|_{\mathcal{L}^2}^2 \]" src="form_110.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \| \nabla \times u\|_{\mathcal{L}^2}^2 \]" src="form_110_dark.png"/>
+\[ \| \nabla \times u\|_{\mathcal{L}^2}^2 \]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This entry is only meaningful if u is a vector field from R^n to R^n with n=2 or n=3. </dd></dl>
 

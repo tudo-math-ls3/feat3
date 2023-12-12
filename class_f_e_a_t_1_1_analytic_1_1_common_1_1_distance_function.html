@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -157,12 +167,12 @@ Static Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;int dim_, typename DataType_&gt;<br />
 class FEAT::Analytic::Common::DistanceFunction&lt; dim_, DataType_ &gt;</div><p ><a class="el" href="namespace_f_e_a_t_1_1_analytic.html" title="Analytic namespace.">Analytic</a> distance function. </p>
-<p >This class implements the AnalyticFunction interface representing the distance function <img class="formulaInl light-mode-visible" alt="$ f(x) =\| x - x_0 \|_2 $" src="form_2.png"/><img class="formulaInl dark-mode-visible" alt="$ f(x) =\| x - x_0 \|_2 $" src="form_2_dark.png"/></p>
+<p >This class implements the AnalyticFunction interface representing the distance function \( f(x) =\| x - x_0 \|_2 \)</p>
 <p >This class supports function values, gradient and hessians for all dimensions.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if someone wants to compute the gradient or hessian there, as the functions return 0.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">ImgPointType_</td><td>The type of <img class="formulaInl light-mode-visible" alt="$ x_0 $" src="form_3.png"/><img class="formulaInl dark-mode-visible" alt="$ x_0 $" src="form_3_dark.png"/>.</td></tr>
+    <tr><td class="paramname">ImgPointType_</td><td>The type of \( x_0 \).</td></tr>
   </table>
   </dd>
 </dl>

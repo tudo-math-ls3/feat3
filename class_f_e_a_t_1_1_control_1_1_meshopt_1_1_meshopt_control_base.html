@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -610,13 +620,11 @@ template&lt;typename DomainControl_ &gt; </div>
   </dd>
 </dl>
 <p>In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is exactly lambda(cell). This is especially the goal for r-adaptivity. So in an optimal mesh,  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
-\]" src="form_215.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
-\]" src="form_215_dark.png"/>
+\]
 </p>
-<p> so we compute the 1-norm of the vector <img class="formulaInl light-mode-visible" alt="$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| $" src="form_216.png"/><img class="formulaInl dark-mode-visible" alt="$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| $" src="form_216_dark.png"/>.</p>
+<p> so we compute the 1-norm of the vector \((v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \).</p>
 <dl class="section return"><dt>Returns</dt><dd>The relative cell size quality indicator.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.</dd>
 <dd>

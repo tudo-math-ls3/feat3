@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -5238,7 +5248,7 @@ template&lt;typename Functional_ &gt; </div>
 <p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_q_penalty.html" title="Quadratic penalty iteration.">QPenalty</a> object using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Functional_</td><td>The type of the quadratic penalty function <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/>.</td></tr>
+    <tr><td class="paramname">Functional_</td><td>The type of the quadratic penalty function \( Q \).</td></tr>
   </table>
   </dd>
 </dl>
@@ -5246,7 +5256,7 @@ template&lt;typename Functional_ &gt; </div>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">section_name</td><td>The name of the config section, which it does not know by itself</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">section</td><td>A pointer to the <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a> section configuring this solver</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>The quadratic penalty function <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>The quadratic penalty function \( Q \).</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">inner_solver</td><td>The inner solver for solving the penalized unconstrained optimization problem.</td></tr>
   </table>
   </dd>
@@ -5302,13 +5312,13 @@ template&lt;typename Functional_ &gt; </div>
 <p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_q_penalty.html" title="Quadratic penalty iteration.">QPenalty</a> object. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Functional_</td><td>The type of the quadratic penalty function <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/>.</td></tr>
+    <tr><td class="paramname">Functional_</td><td>The type of the quadratic penalty function \( Q \).</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>The quadratic penalty function <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>The quadratic penalty function \( Q \).</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">inner_solver</td><td>The inner solver for solving the penalized unconstrained optimization problem.</td></tr>
   </table>
   </dd>

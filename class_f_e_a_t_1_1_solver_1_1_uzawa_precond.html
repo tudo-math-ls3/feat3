@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -205,27 +215,27 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_&gt;<br />
 class FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;</div><p >Uzawa preconditioner. </p>
 <p >This class implements the Uzawa preconditioner, which is a special preconditioner for saddle-point systems of the form </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\begin{bmatrix} A &amp; B\\D &amp; 0\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_345.png"/><img class="formulaDsp dark-mode-visible" alt="\[\begin{bmatrix} A &amp; B\\D &amp; 0\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_345_dark.png"/>
+\[\begin{bmatrix} A &amp; B\\D &amp; 0\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
 </p>
-<p >Let <img class="formulaInl light-mode-visible" alt="$ S \approx -DA^{-1}B$" src="form_346.png"/><img class="formulaInl dark-mode-visible" alt="$ S \approx -DA^{-1}B$" src="form_346_dark.png"/> be an approximation of the Schur-complement matrix, then this class supports a total of four different preconditioners for the saddle-point system above:</p><ul>
+<p >Let \( S \approx -DA^{-1}B\) be an approximation of the Schur-complement matrix, then this class supports a total of four different preconditioners for the saddle-point system above:</p><ul>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffaa0e17e2709a0404ae3d7de03b8ea9093" title="diagonal Uzawa preconditioner">UzawaType::diagonal</a>: Solves the system <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\begin{bmatrix} A &amp; 0\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_347.png"/><img class="formulaDsp dark-mode-visible" alt="\[\begin{bmatrix} A &amp; 0\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_347_dark.png"/>
+\[\begin{bmatrix} A &amp; 0\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
 </p>
 </li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffa81e073b428b50247daba38531dcf412a" title="lower-diagonal Uzawa preconditioner">UzawaType::lower</a>: Solves the system <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\begin{bmatrix} A &amp; 0\\D &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_348.png"/><img class="formulaDsp dark-mode-visible" alt="\[\begin{bmatrix} A &amp; 0\\D &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_348_dark.png"/>
+\[\begin{bmatrix} A &amp; 0\\D &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
 </p>
 </li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffa0122b4c2c01ee1c698ecc309d2b8eb5a" title="upper-diagonal Uzawa preconditioner">UzawaType::upper</a>: Solves the system <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\begin{bmatrix} A &amp; B\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_349.png"/><img class="formulaDsp dark-mode-visible" alt="\[\begin{bmatrix} A &amp; B\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_349_dark.png"/>
+\[\begin{bmatrix} A &amp; B\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
 </p>
 </li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffae9dc924f238fa6cc29465942875fe8f0" title="full Uzawa preconditioner">UzawaType::full</a>: Solves the system <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\begin{bmatrix} I &amp; 0\\-DA^{-1} &amp; I\end{bmatrix} \cdot \begin{bmatrix} A &amp; B\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_350.png"/><img class="formulaDsp dark-mode-visible" alt="\[\begin{bmatrix} I &amp; 0\\-DA^{-1} &amp; I\end{bmatrix} \cdot \begin{bmatrix} A &amp; B\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]" src="form_350_dark.png"/>
+\[\begin{bmatrix} I &amp; 0\\-DA^{-1} &amp; I\end{bmatrix} \cdot \begin{bmatrix} A &amp; B\\0 &amp; S\end{bmatrix} \cdot \begin{bmatrix} x_u\\x_p\end{bmatrix} = \begin{bmatrix} f_u\\f_p\end{bmatrix}\]
 </p>
 </li>
 </ul>
-<p >The required solution steps of <img class="formulaInl light-mode-visible" alt="$ A^{-1} $" src="form_351.png"/><img class="formulaInl dark-mode-visible" alt="$ A^{-1} $" src="form_351_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$ S^{-1} $" src="form_352.png"/><img class="formulaInl dark-mode-visible" alt="$ S^{-1} $" src="form_352_dark.png"/> are performed by two sub-solvers, which have to be created by the user and supplied to the constructor of this object.</p>
+<p >The required solution steps of \( A^{-1} \) and \( S^{-1} \) are performed by two sub-solvers, which have to be created by the user and supplied to the constructor of this object.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">MatrixA_,MatrixB_,MatrixD_</td><td>The types of the sub-matrices A, B and D.</td></tr>
@@ -462,8 +472,8 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">matrix_a,matrix_b,matrix_d</td><td>The three sub-matrices of the saddle-point matrix.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">filter_v,filter_p</td><td>The velocity and pressure filter, resp.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">solver_a</td><td>The solver representing <img class="formulaInl light-mode-visible" alt="$A^{-1}$" src="form_353.png"/><img class="formulaInl dark-mode-visible" alt="$A^{-1}$" src="form_353_dark.png"/>.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">solver_s</td><td>The solver representing <img class="formulaInl light-mode-visible" alt="$S^{-1}$" src="form_354.png"/><img class="formulaInl dark-mode-visible" alt="$S^{-1}$" src="form_354_dark.png"/>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">solver_a</td><td>The solver representing \(A^{-1}\).</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">solver_s</td><td>The solver representing \(S^{-1}\).</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>Specifies the type of the preconditioner. See this class' documentation for details.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">auto_init_s</td><td>Specifies whether this solver object should call the init/done functions of the <code>solver_s</code> object. If set to <code>false</code>, then the caller is responsible for the initialization and finalization of the S-block solver object. </td></tr>
   </table>

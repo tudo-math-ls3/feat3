@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -379,7 +389,7 @@ template&lt;typename DataType_ , int dim_&gt; </div>
 
 <p>Velocity field divergence H0-norm. </p>
 <p >This entry contains the H0-norm of the divergence of the velocity field: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \| \nabla \cdot u\|_{\mathcal{H}^0} = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]" src="form_133.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \| \nabla \cdot u\|_{\mathcal{H}^0} = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]" src="form_133_dark.png"/>
+\[ \| \nabla \cdot u\|_{\mathcal{H}^0} = \Big(\int_\Omega \big(\sum_{i=1}^d \partial_i u_i\big)^2\Big)^{\frac{1}{2}}\]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="velocity__analyser_8hpp_source.html#l00065">65</a> of file <a class="el" href="velocity__analyser_8hpp_source.html">velocity_analyser.hpp</a>.</p>
@@ -404,7 +414,7 @@ template&lt;typename DataType_ , int dim_&gt; </div>
 
 <p>Velocity field H0-norm. </p>
 <p >This entry contains the H0-norm of the velocity field: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \|u\|_{\mathcal{H}^0} = \Big(\int_\Omega \sum_{i=1}^d (u_i)^2\Big)^{\frac{1}{2}}\]" src="form_131.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \|u\|_{\mathcal{H}^0} = \Big(\int_\Omega \sum_{i=1}^d (u_i)^2\Big)^{\frac{1}{2}}\]" src="form_131_dark.png"/>
+\[ \|u\|_{\mathcal{H}^0} = \Big(\int_\Omega \sum_{i=1}^d (u_i)^2\Big)^{\frac{1}{2}}\]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="velocity__analyser_8hpp_source.html#l00049">49</a> of file <a class="el" href="velocity__analyser_8hpp_source.html">velocity_analyser.hpp</a>.</p>
@@ -452,7 +462,7 @@ template&lt;typename DataType_ , int dim_&gt; </div>
 
 <p>Velocity field H1-semi-norm. </p>
 <p >This entry contains the H1-semi-norm of the velocity field: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ |u|_{\mathcal{H}^1} = \Big(\int_\Omega \sum_{i=1}^d (\nabla u_i)^2\Big)^{\frac{1}{2}}\]" src="form_132.png"/><img class="formulaDsp dark-mode-visible" alt="\[ |u|_{\mathcal{H}^1} = \Big(\int_\Omega \sum_{i=1}^d (\nabla u_i)^2\Big)^{\frac{1}{2}}\]" src="form_132_dark.png"/>
+\[ |u|_{\mathcal{H}^1} = \Big(\int_\Omega \sum_{i=1}^d (\nabla u_i)^2\Big)^{\frac{1}{2}}\]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="velocity__analyser_8hpp_source.html#l00057">57</a> of file <a class="el" href="velocity__analyser_8hpp_source.html">velocity_analyser.hpp</a>.</p>
@@ -500,7 +510,7 @@ template&lt;typename DataType_ , int dim_&gt; </div>
 
 <p>Velocity field vorticity H0-norm. </p>
 <p >This entry contains the H0-norm of the curl of the velocity field: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \| \nabla \times u\|_{\mathcal{H}^0} \]" src="form_134.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \| \nabla \times u\|_{\mathcal{H}^0} \]" src="form_134_dark.png"/>
+\[ \| \nabla \times u\|_{\mathcal{H}^0} \]
 </p>
  
 <p class="definition">Definition at line <a class="el" href="velocity__analyser_8hpp_source.html#l00073">73</a> of file <a class="el" href="velocity__analyser_8hpp_source.html">velocity_analyser.hpp</a>.</p>

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -286,7 +296,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename MatrixA_, typename MatrixB_, typename MatrixD_, typename Filter_&gt;<br />
 class FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;</div><p ><a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> preconditioner/smoother class template implementation. </p>
 <p >This class template implements the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> preconditioner/smoother, which is a special Block-SOR/Gauss-Seidel variant suitable for working with saddle-point systems of the form </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\begin{bmatrix} A &amp; B\\D &amp; 0\end{bmatrix} \cdot \begin{bmatrix} v\\p\end{bmatrix} = \begin{bmatrix} f\\g\end{bmatrix}\]" src="form_355.png"/><img class="formulaDsp dark-mode-visible" alt="\[\begin{bmatrix} A &amp; B\\D &amp; 0\end{bmatrix} \cdot \begin{bmatrix} v\\p\end{bmatrix} = \begin{bmatrix} f\\g\end{bmatrix}\]" src="form_355_dark.png"/>
+\[\begin{bmatrix} A &amp; B\\D &amp; 0\end{bmatrix} \cdot \begin{bmatrix} v\\p\end{bmatrix} = \begin{bmatrix} f\\g\end{bmatrix}\]
 </p>
 <p >In total, this class template implements eight different variants of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a>, which can be chosen at run-time by specifying the corresponding VankaType in the constructor of this object. The eight variants are the cross-product of three binary variants:</p>
 <p ><b>1.a: Block Variants</b> (<code>VankaType::block_*_*</code>)<br  />

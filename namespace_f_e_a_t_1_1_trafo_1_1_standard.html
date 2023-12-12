@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -203,23 +213,19 @@ template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&g
   </table>
   </dd>
 </dl>
-<p>Assume we have a non-degenerate <code>Simplex&lt;1&gt;</code> called <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/> in <img class="formulaInl light-mode-visible" alt="$ \mathbb{R}^d $" src="form_137.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathbb{R}^d $" src="form_137_dark.png"/> where <img class="formulaInl light-mode-visible" alt="$ d=2, 3 $" src="form_361.png"/><img class="formulaInl dark-mode-visible" alt="$ d=2, 3 $" src="form_361_dark.png"/> Then <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/> is defined by vertices <img class="formulaInl light-mode-visible" alt="$ x^0, x^1 \in \mathbb{R}^d $" src="form_362.png"/><img class="formulaInl dark-mode-visible" alt="$ x^0, x^1 \in \mathbb{R}^d $" src="form_362_dark.png"/>.</p>
-<p >For a point <img class="formulaInl light-mode-visible" alt="$ x \in \mathbb{R}^d $" src="form_363.png"/><img class="formulaInl dark-mode-visible" alt="$ x \in \mathbb{R}^d $" src="form_363_dark.png"/> we are looking for its projection <img class="formulaInl light-mode-visible" alt="$ p $" src="form_364.png"/><img class="formulaInl dark-mode-visible" alt="$ p $" src="form_364_dark.png"/> onto the straight line defined by <img class="formulaInl light-mode-visible" alt="$ x^0, x^1 $" src="form_365.png"/><img class="formulaInl dark-mode-visible" alt="$ x^0, x^1 $" src="form_365_dark.png"/>, which means that <img class="formulaInl light-mode-visible" alt="$ (x^1 - x^0, x - p) = 0 $" src="form_366.png"/><img class="formulaInl dark-mode-visible" alt="$ (x^1 - x^0, x - p) = 0 $" src="form_366_dark.png"/>. If this holds, <img class="formulaInl light-mode-visible" alt="$ p $" src="form_364.png"/><img class="formulaInl dark-mode-visible" alt="$ p $" src="form_364_dark.png"/> has the form <img class="formulaInl light-mode-visible" alt="$ p = x^0 + \omega (x^1 - x^0), \omega \in \mathbb{R} $" src="form_367.png"/><img class="formulaInl dark-mode-visible" alt="$ p = x^0 + \omega (x^1 - x^0), \omega \in \mathbb{R} $" src="form_367_dark.png"/>.</p>
+<p>Assume we have a non-degenerate <code>Simplex&lt;1&gt;</code> called \( S \) in \( \mathbb{R}^d \) where \( d=2, 3 \) Then \( S \) is defined by vertices \( x^0, x^1 \in \mathbb{R}^d \).</p>
+<p >For a point \( x \in \mathbb{R}^d \) we are looking for its projection \( p \) onto the straight line defined by \( x^0, x^1 \), which means that \( (x^1 - x^0, x - p) = 0 \). If this holds, \( p \) has the form \( p = x^0 + \omega (x^1 - x^0), \omega \in \mathbb{R} \).</p>
 <p >It is easy to see that  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   x \in S \Leftrightarrow \omega \in [0, 1]
-\]" src="form_368.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  x \in S \Leftrightarrow \omega \in [0, 1]
-\]" src="form_368_dark.png"/>
+\]
 </p>
 <p> and that  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \omega = \frac{(x^1 - x^0, x - x^0)}{\| x^1 - x^0 \|_2^2}.
-\]" src="form_369.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \omega = \frac{(x^1 - x^0, x - x^0)}{\| x^1 - x^0 \|_2^2}.
-\]" src="form_369_dark.png"/>
+\]
 </p>
-<p >This routine computes the coefficient <img class="formulaInl light-mode-visible" alt="$ \omega $" src="form_26.png"/><img class="formulaInl dark-mode-visible" alt="$ \omega $" src="form_26_dark.png"/> and saves it to <img class="formulaInl light-mode-visible" alt="$ \mathrm{coeffs[0]} $" src="form_370.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{coeffs[0]} $" src="form_370_dark.png"/> and the distance <img class="formulaInl light-mode-visible" alt="$ \mathrm{coeffs[1]} = \| x - p \|_2 $" src="form_371.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{coeffs[1]} = \| x - p \|_2 $" src="form_371_dark.png"/>.</p>
+<p >This routine computes the coefficient \( \omega \) and saves it to \( \mathrm{coeffs[0]} \) and the distance \( \mathrm{coeffs[1]} = \| x - p \|_2 \).</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00143">143</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>
@@ -281,15 +287,13 @@ template&lt;typename DT_ , int sc_, int sp_, int smx_, int snx_&gt; </div>
   </table>
   </dd>
 </dl>
-<p>Assume we have a non-degenerate <code>Simplex&lt;2&gt;</code> called <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/> in <img class="formulaInl light-mode-visible" alt="$ \mathbb{R}^d $" src="form_137.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathbb{R}^d $" src="form_137_dark.png"/> defined by vertices <img class="formulaInl light-mode-visible" alt="$ x^j \in \mathbb{R}^d, j = 0, \dots, 2 $" src="form_372.png"/><img class="formulaInl dark-mode-visible" alt="$ x^j \in \mathbb{R}^d, j = 0, \dots, 2 $" src="form_372_dark.png"/>. Then  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p>Assume we have a non-degenerate <code>Simplex&lt;2&gt;</code> called \( S \) in \( \mathbb{R}^d \) defined by vertices \( x^j \in \mathbb{R}^d, j = 0, \dots, 2 \). Then  </p><p class="formulaDsp">
+\[
   v^3 := (x^1 - x^0) \times (x^2 - x^0) \Rightarrow v^3 \perp S.
-\]" src="form_373.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  v^3 := (x^1 - x^0) \times (x^2 - x^0) \Rightarrow v^3 \perp S.
-\]" src="form_373_dark.png"/>
+\]
 </p>
-<p >Using <img class="formulaInl light-mode-visible" alt="$ x^3 := \| v^3 \|_2^{-1} v^3 $" src="form_374.png"/><img class="formulaInl dark-mode-visible" alt="$ x^3 := \| v^3 \|_2^{-1} v^3 $" src="form_374_dark.png"/>, the vertices <img class="formulaInl light-mode-visible" alt="$ x^0, \dots, x^3 $" src="form_375.png"/><img class="formulaInl dark-mode-visible" alt="$ x^0, \dots, x^3 $" src="form_375_dark.png"/> define a fictitious <code>Simplex&lt;3&gt;</code> <img class="formulaInl light-mode-visible" alt="$ S' $" src="form_376.png"/><img class="formulaInl dark-mode-visible" alt="$ S' $" src="form_376_dark.png"/>. Then we can proceed with computing the coefficients as in the <code>Simplex&lt;d&gt;</code> in <img class="formulaInl light-mode-visible" alt="$ \mathbb{R}^d$" src="form_377.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathbb{R}^d$" src="form_377_dark.png"/> variant of this function, and the last coefficient is just the distance of the point <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> to the plane in which <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/> lies.</p>
-<p >If <img class="formulaInl light-mode-visible" alt="$ \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 $" src="form_145.png"/><img class="formulaInl dark-mode-visible" alt="$ \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 $" src="form_145_dark.png"/>, then <img class="formulaInl light-mode-visible" alt="$ x \notin S $" src="form_146.png"/><img class="formulaInl dark-mode-visible" alt="$ x \notin S $" src="form_146_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> lies on the far side of the plane defined by the facet opposite vertex <img class="formulaInl light-mode-visible" alt="$ j $" src="form_147.png"/><img class="formulaInl dark-mode-visible" alt="$ j $" src="form_147_dark.png"/>. This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</p>
+<p >Using \( x^3 := \| v^3 \|_2^{-1} v^3 \), the vertices \( x^0, \dots, x^3 \) define a fictitious <code>Simplex&lt;3&gt;</code> \( S&#39; \). Then we can proceed with computing the coefficients as in the <code>Simplex&lt;d&gt;</code> in \( \mathbb{R}^d\) variant of this function, and the last coefficient is just the distance of the point \( x \) to the plane in which \( S \) lies.</p>
+<p >If \( \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 \), then \( x \notin S \) and \( x \) lies on the far side of the plane defined by the facet opposite vertex \( j \). This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00207">207</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>
@@ -351,29 +355,23 @@ template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&g
   </table>
   </dd>
 </dl>
-<p>Assume we have a non-degenerate <code>Simplex&lt;d&gt;</code> called <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/> in <img class="formulaInl light-mode-visible" alt="$ \mathbb{R}^d $" src="form_137.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathbb{R}^d $" src="form_137_dark.png"/> defined by vertices <img class="formulaInl light-mode-visible" alt="$ x^j \in \mathbb{R}^d, j = 0, \dots, d $" src="form_358.png"/><img class="formulaInl dark-mode-visible" alt="$ x^j \in \mathbb{R}^d, j = 0, \dots, d $" src="form_358_dark.png"/>.</p>
+<p>Assume we have a non-degenerate <code>Simplex&lt;d&gt;</code> called \( S \) in \( \mathbb{R}^d \) defined by vertices \( x^j \in \mathbb{R}^d, j = 0, \dots, d \).</p>
 <p >Then  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \forall x \in \mathbb{R}^d: x = x^0 + \sum_{j=1}^s \lambda_j (x^j - x^0)
-\]" src="form_140.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall x \in \mathbb{R}^d: x = x^0 + \sum_{j=1}^s \lambda_j (x^j - x^0)
-\]" src="form_140_dark.png"/>
+\]
 </p>
-<p> and <img class="formulaInl light-mode-visible" alt="$ \lambda_j, j=1,\dots,s $" src="form_141.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda_j, j=1,\dots,s $" src="form_141_dark.png"/> with <img class="formulaInl light-mode-visible" alt="$ \lambda_0 := 1 - sum_{j=1}^s $" src="form_142.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda_0 := 1 - sum_{j=1}^s $" src="form_142_dark.png"/> are called the <b> barycentric coordinates of <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> wrt. S </b>. Since <img class="formulaInl light-mode-visible" alt="$ \lambda_0 $" src="form_359.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda_0 $" src="form_359_dark.png"/> is redundant, we just compute the <code>coefficients</code> <img class="formulaInl light-mode-visible" alt="$ \lambda_1, \dots, \lambda_s $" src="form_360.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda_1, \dots, \lambda_s $" src="form_360_dark.png"/>. Note that the above equation can be rewritten as  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p> and \( \lambda_j, j=1,\dots,s \) with \( \lambda_0 := 1 - sum_{j=1}^s \) are called the <b> barycentric coordinates of \( x \) wrt. S </b>. Since \( \lambda_0 \) is redundant, we just compute the <code>coefficients</code> \( \lambda_1, \dots, \lambda_s \). Note that the above equation can be rewritten as  </p><p class="formulaDsp">
+\[
   \forall x \in \mathbb{R}^d: x = \sum_{j=0}^s \lambda_j x^j.
-\]" src="form_143.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall x \in \mathbb{R}^d: x = \sum_{j=0}^s \lambda_j x^j.
-\]" src="form_143_dark.png"/>
+\]
 </p>
 <p >It is easy to see that  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   x \in S \Leftrightarrow  \forall j = 0, \dots, d: \lambda_j \in [0, 1] .
-\]" src="form_144.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  x \in S \Leftrightarrow  \forall j = 0, \dots, d: \lambda_j \in [0, 1] .
-\]" src="form_144_dark.png"/>
+\]
 </p>
-<p> If <img class="formulaInl light-mode-visible" alt="$ \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 $" src="form_145.png"/><img class="formulaInl dark-mode-visible" alt="$ \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 $" src="form_145_dark.png"/>, then <img class="formulaInl light-mode-visible" alt="$ x \notin S $" src="form_146.png"/><img class="formulaInl dark-mode-visible" alt="$ x \notin S $" src="form_146_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> lies on the far side of the plane defined by the facet opposite vertex <img class="formulaInl light-mode-visible" alt="$ j $" src="form_147.png"/><img class="formulaInl dark-mode-visible" alt="$ j $" src="form_147_dark.png"/>. This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</p>
+<p> If \( \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 \), then \( x \notin S \) and \( x \) lies on the far side of the plane defined by the facet opposite vertex \( j \). This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00070">70</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>

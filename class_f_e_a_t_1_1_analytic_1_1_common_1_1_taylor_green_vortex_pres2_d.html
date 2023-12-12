@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -168,7 +178,7 @@ Static Public Attributes</h2></td></tr>
 class FEAT::Analytic::Common::TaylorGreenVortexPres2D&lt; DT_ &gt;</div><p >Taylor-Green Vortex pressure function. </p>
 <p >This class implements the Taylor-Green vortex pressure function, which is the pressure function of an analytical solution to the incompressible 2D Navier-Stokes equations on the unit-square. The compatible pressure function is <a class="el" href="class_f_e_a_t_1_1_analytic_1_1_common_1_1_taylor_green_vortex_velo2_d.html" title="Taylor-Green Vortex velocity field.">TaylorGreenVortexVelo2D</a>.</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[p(t,x,y) := \frac{1}{2}\Big(\cos(\pi x)^2 + \cos(\pi y)^2 -1\Big)\exp(-4\pi^2 \nu t)\]" src="form_36.png"/><img class="formulaDsp dark-mode-visible" alt="\[p(t,x,y) := \frac{1}{2}\Big(\cos(\pi x)^2 + \cos(\pi y)^2 -1\Big)\exp(-4\pi^2 \nu t)\]" src="form_36_dark.png"/>
+\[p(t,x,y) := \frac{1}{2}\Big(\cos(\pi x)^2 + \cos(\pi y)^2 -1\Big)\exp(-4\pi^2 \nu t)\]
 </p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -137,7 +147,7 @@ Static Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;int dimension_&gt;<br />
 class FEAT::Assembly::Common::IdentityOperatorBlocked&lt; dimension_ &gt;</div><p >Vector-valued identity operator implementation. </p>
-<p >This functor can be used with the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> assembly class template to assemble one scalar matrix corresponding to one block of the <img class="formulaInl light-mode-visible" alt="$ d \times d $" src="form_88.png"/><img class="formulaInl dark-mode-visible" alt="$ d \times d $" src="form_88_dark.png"/> block matrix, where <img class="formulaInl light-mode-visible" alt="$ d $" src="form_89.png"/><img class="formulaInl dark-mode-visible" alt="$ d $" src="form_89_dark.png"/> is the number of space dimensions.</p>
+<p >This functor can be used with the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> assembly class template to assemble one scalar matrix corresponding to one block of the \( d \times d \) block matrix, where \( d \) is the number of space dimensions.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00374">374</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -220,15 +230,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a58a4414426334eeaee3f6bd10b58f630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a58a4414426334eeaee3f6bd10b58f630">More...</a><br /></td></tr>
 <tr class="separator:a58a4414426334eeaee3f6bd10b58f630"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d6d08314ed49abfa6c0fa2ea116da19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a1d6d08314ed49abfa6c0fa2ea116da19">copy</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x, bool full=false)</td></tr>
-<tr class="memdesc:a1d6d08314ed49abfa6c0fa2ea116da19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a1d6d08314ed49abfa6c0fa2ea116da19">More...</a><br /></td></tr>
+<tr class="memdesc:a1d6d08314ed49abfa6c0fa2ea116da19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \(this \leftarrow x\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a1d6d08314ed49abfa6c0fa2ea116da19">More...</a><br /></td></tr>
 <tr class="separator:a1d6d08314ed49abfa6c0fa2ea116da19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad486486693c22a3b456aad94630b2ada"><td class="memTemplParams" colspan="2">template&lt;typename VT_ &gt; </td></tr>
 <tr class="memitem:ad486486693c22a3b456aad94630b2ada"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ad486486693c22a3b456aad94630b2ada">copy</a> (const VT_ &amp;a)</td></tr>
-<tr class="memdesc:ad486486693c22a3b456aad94630b2ada"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ad486486693c22a3b456aad94630b2ada">More...</a><br /></td></tr>
+<tr class="memdesc:ad486486693c22a3b456aad94630b2ada"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \(this \leftarrow x\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ad486486693c22a3b456aad94630b2ada">More...</a><br /></td></tr>
 <tr class="separator:ad486486693c22a3b456aad94630b2ada"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2c36f6aadece3f8451a3a3cae8a15fd"><td class="memTemplParams" colspan="2">template&lt;typename VT_ &gt; </td></tr>
 <tr class="memitem:aa2c36f6aadece3f8451a3a3cae8a15fd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aa2c36f6aadece3f8451a3a3cae8a15fd">copy_inv</a> (VT_ &amp;a) const</td></tr>
-<tr class="memdesc:aa2c36f6aadece3f8451a3a3cae8a15fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl light-mode-visible" alt="$x \leftarrow this$" src="form_176.png"/><img class="formulaInl dark-mode-visible" alt="$x \leftarrow this$" src="form_176_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aa2c36f6aadece3f8451a3a3cae8a15fd">More...</a><br /></td></tr>
+<tr class="memdesc:aa2c36f6aadece3f8451a3a3cae8a15fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \(x \leftarrow this\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aa2c36f6aadece3f8451a3a3cae8a15fd">More...</a><br /></td></tr>
 <tr class="separator:aa2c36f6aadece3f8451a3a3cae8a15fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25bd5a57dcc0b466fc7e483fc8320e9d"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </td></tr>
 <tr class="memitem:a25bd5a57dcc0b466fc7e483fc8320e9d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a25bd5a57dcc0b466fc7e483fc8320e9d">deserialize</a> (std::vector&lt; char &gt; input)</td></tr>
@@ -321,22 +331,22 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae407e06827a6ee6634e4c513836a17a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Linear algebra operations</div></td></tr>
 <tr class="memitem:ae8a8f9b7c245d83aa3e288737ce8df91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ae8a8f9b7c245d83aa3e288737ce8df91">axpy</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;y, const DT_ alpha=DT_(1))</td></tr>
-<tr class="memdesc:ae8a8f9b7c245d83aa3e288737ce8df91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow \alpha~ x + y$" src="form_169.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow \alpha~ x + y$" src="form_169_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ae8a8f9b7c245d83aa3e288737ce8df91">More...</a><br /></td></tr>
+<tr class="memdesc:ae8a8f9b7c245d83aa3e288737ce8df91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(this \leftarrow \alpha~ x + y\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ae8a8f9b7c245d83aa3e288737ce8df91">More...</a><br /></td></tr>
 <tr class="separator:ae8a8f9b7c245d83aa3e288737ce8df91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bfb1a46a75ac2c11fd6a6b16d157abb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a1bfb1a46a75ac2c11fd6a6b16d157abb">component_product</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;y)</td></tr>
-<tr class="memdesc:a1bfb1a46a75ac2c11fd6a6b16d157abb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$this_i \leftarrow x_i \cdot y_i$" src="form_177.png"/><img class="formulaInl dark-mode-visible" alt="$this_i \leftarrow x_i \cdot y_i$" src="form_177_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a1bfb1a46a75ac2c11fd6a6b16d157abb">More...</a><br /></td></tr>
+<tr class="memdesc:a1bfb1a46a75ac2c11fd6a6b16d157abb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(this_i \leftarrow x_i \cdot y_i\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a1bfb1a46a75ac2c11fd6a6b16d157abb">More...</a><br /></td></tr>
 <tr class="separator:a1bfb1a46a75ac2c11fd6a6b16d157abb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa960f3412469e8fad2dc681700bce955"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aa960f3412469e8fad2dc681700bce955">component_invert</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x, const DT_ alpha=DT_(1))</td></tr>
-<tr class="memdesc:aa960f3412469e8fad2dc681700bce955"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl light-mode-visible" alt="$ this_i \leftarrow \alpha / x_i $" src="form_165.png"/><img class="formulaInl dark-mode-visible" alt="$ this_i \leftarrow \alpha / x_i $" src="form_165_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aa960f3412469e8fad2dc681700bce955">More...</a><br /></td></tr>
+<tr class="memdesc:aa960f3412469e8fad2dc681700bce955"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \( this_i \leftarrow \alpha / x_i \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aa960f3412469e8fad2dc681700bce955">More...</a><br /></td></tr>
 <tr class="separator:aa960f3412469e8fad2dc681700bce955"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01b45cc58ed417b8c04572d8ec72f1c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a01b45cc58ed417b8c04572d8ec72f1c0">scale</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x, const DT_ alpha)</td></tr>
-<tr class="memdesc:a01b45cc58ed417b8c04572d8ec72f1c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a01b45cc58ed417b8c04572d8ec72f1c0">More...</a><br /></td></tr>
+<tr class="memdesc:a01b45cc58ed417b8c04572d8ec72f1c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(this \leftarrow \alpha~ x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a01b45cc58ed417b8c04572d8ec72f1c0">More...</a><br /></td></tr>
 <tr class="separator:a01b45cc58ed417b8c04572d8ec72f1c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a505c8a0144294e543e3d14b4246fdb8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a54999b841fb4f87e5a5061dc1a32685d">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a505c8a0144294e543e3d14b4246fdb8a">triple_dot</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;y) const</td></tr>
-<tr class="memdesc:a505c8a0144294e543e3d14b4246fdb8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179.png"/><img class="formulaInl dark-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a505c8a0144294e543e3d14b4246fdb8a">More...</a><br /></td></tr>
+<tr class="memdesc:a505c8a0144294e543e3d14b4246fdb8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(result \leftarrow x^T \mathrm{diag}(this) y \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a505c8a0144294e543e3d14b4246fdb8a">More...</a><br /></td></tr>
 <tr class="separator:a505c8a0144294e543e3d14b4246fdb8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c3f6d3769fcbfcbf9edc5225e8df003"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a54999b841fb4f87e5a5061dc1a32685d">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a3c3f6d3769fcbfcbf9edc5225e8df003">dot</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a> &amp;x) const</td></tr>
-<tr class="memdesc:a3c3f6d3769fcbfcbf9edc5225e8df003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$result \leftarrow this \cdot x$" src="form_180.png"/><img class="formulaInl dark-mode-visible" alt="$result \leftarrow this \cdot x$" src="form_180_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a3c3f6d3769fcbfcbf9edc5225e8df003">More...</a><br /></td></tr>
+<tr class="memdesc:a3c3f6d3769fcbfcbf9edc5225e8df003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(result \leftarrow this \cdot x\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a3c3f6d3769fcbfcbf9edc5225e8df003">More...</a><br /></td></tr>
 <tr class="separator:a3c3f6d3769fcbfcbf9edc5225e8df003"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae81e3bc7ab22332cf9e01ce1fdba8283"><td class="memItemLeft" align="right" valign="top">DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ae81e3bc7ab22332cf9e01ce1fdba8283">norm2</a> () const</td></tr>
 <tr class="memdesc:ae81e3bc7ab22332cf9e01ce1fdba8283"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates and returns the euclid norm of this vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ae81e3bc7ab22332cf9e01ce1fdba8283">More...</a><br /></td></tr>
@@ -1545,7 +1555,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow \alpha~ x + y$" src="form_169.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow \alpha~ x + y$" src="form_169_dark.png"/>. </p>
+<p>Calculate \(this \leftarrow \alpha~ x + y\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The first summand vector to be scaled. </td></tr>
@@ -1876,7 +1886,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl light-mode-visible" alt="$ this_i \leftarrow \alpha / x_i $" src="form_165.png"/><img class="formulaInl dark-mode-visible" alt="$ this_i \leftarrow \alpha / x_i $" src="form_165_dark.png"/>. </p>
+<p>Performs \( this_i \leftarrow \alpha / x_i \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The vector whose components serve as denominators.</td></tr>
@@ -1929,7 +1939,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$this_i \leftarrow x_i \cdot y_i$" src="form_177.png"/><img class="formulaInl dark-mode-visible" alt="$this_i \leftarrow x_i \cdot y_i$" src="form_177_dark.png"/>. </p>
+<p>Calculate \(this_i \leftarrow x_i \cdot y_i\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The first factor. </td></tr>
@@ -2111,7 +2121,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>. </p>
+<p>Performs \(this \leftarrow x\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The vector to be copied. </td></tr>
@@ -2152,7 +2162,7 @@ template&lt;typename VT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>. </p>
+<p>Performs \(this \leftarrow x\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The vector to be copied (could be of any format; must have same size). </td></tr>
@@ -2196,7 +2206,7 @@ template&lt;typename VT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl light-mode-visible" alt="$x \leftarrow this$" src="form_176.png"/><img class="formulaInl dark-mode-visible" alt="$x \leftarrow this$" src="form_176_dark.png"/>. </p>
+<p>Performs \(x \leftarrow this\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The target-vector to be copied to (could be of any format; must have same size). </td></tr>
@@ -2279,7 +2289,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$result \leftarrow this \cdot x$" src="form_180.png"/><img class="formulaInl dark-mode-visible" alt="$result \leftarrow this \cdot x$" src="form_180_dark.png"/>. </p>
+<p>Calculate \(result \leftarrow this \cdot x\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The other vector.</td></tr>
@@ -3406,7 +3416,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178_dark.png"/>. </p>
+<p>Calculate \(this \leftarrow \alpha~ x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The vector to be scaled. </td></tr>
@@ -3589,7 +3599,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179.png"/><img class="formulaInl dark-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179_dark.png"/>. </p>
+<p>Calculate \(result \leftarrow x^T \mathrm{diag}(this) y \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The first vector.</td></tr>

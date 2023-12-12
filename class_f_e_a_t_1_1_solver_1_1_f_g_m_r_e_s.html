@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -617,13 +627,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </table>
   </dd>
 </dl>
-<p>The GMRES-algorithm can check for convergence at two positions during the iteration: One is to check the factor <img class="formulaInl light-mode-visible" alt="$q$" src="form_282.png"/><img class="formulaInl dark-mode-visible" alt="$q$" src="form_282_dark.png"/> from the algorithm when building up a the Krylow-spaces (in the inner loop), the other one is to check the real residuum after the space is built up. This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor <img class="formulaInl light-mode-visible" alt="$q$" src="form_282.png"/><img class="formulaInl dark-mode-visible" alt="$q$" src="form_282_dark.png"/> will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means: If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.<br  />
+<p>The GMRES-algorithm can check for convergence at two positions during the iteration: One is to check the factor \(q\) from the algorithm when building up a the Krylow-spaces (in the inner loop), the other one is to check the real residuum after the space is built up. This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor \(q\) will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means: If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.<br  />
 The solution to this problem is this factor: The preconditioned residuum needs to fulfill the usual convergence criterion, but they are scaled with this factor: Instead of the usual convergence criterion, it has to fulfill the scaled convergence criterion  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-\]" src="form_283.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-\]" src="form_283_dark.png"/>
+\]
 </p>
 <p> This means: If you do not know any estimate for the correlation between your preconditioned residuum and the real residuum, you can just set this factor to zero. This will deactivate this intermediate check and thus result in a few more iterations, but it is the save variant that will lead to convergence. You should only set it to something else than zero if you really know what you are doing! </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -2460,13 +2468,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
@@ -2511,13 +2517,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -3486,13 +3490,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>inner pseudo-residual scaling factor </p>
-<p >The GMRES-algorithm can check for convergence at two positions during the iteration: One is to check the factor <img class="formulaInl light-mode-visible" alt="$q$" src="form_282.png"/><img class="formulaInl dark-mode-visible" alt="$q$" src="form_282_dark.png"/> from the algorithm when building up a the Krylow-spaces (in the inner loop), the other one is to check the real residuum after the space is built up. This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor <img class="formulaInl light-mode-visible" alt="$q$" src="form_282.png"/><img class="formulaInl dark-mode-visible" alt="$q$" src="form_282_dark.png"/> will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means: If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.<br  />
+<p >The GMRES-algorithm can check for convergence at two positions during the iteration: One is to check the factor \(q\) from the algorithm when building up a the Krylow-spaces (in the inner loop), the other one is to check the real residuum after the space is built up. This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor \(q\) will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means: If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.<br  />
 The solution to this problem is this factor: The preconditioned residuum needs to fulfill the usual convergence criterion, but they are scaled with this factor: Instead of the usual convergence criterion, it has to fulfill the scaled convergence criterion  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-\]" src="form_283.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-\]" src="form_283_dark.png"/>
+\]
 </p>
 <p> This means: If you do not know any estimate for the correlation between your preconditioned residuum and the real residuum, you can just set this factor to zero. This will deactivate this intermediate check and thus result in a few more iterations, but it is the save variant that will lead to convergence. You should only set it to something else than zero if you really know what you are doing! </p>
 
@@ -4054,13 +4056,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -4098,13 +4098,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -4142,13 +4140,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -1086,10 +1096,10 @@ template&lt;typename Trafo_ , typename EvalPolicy_ &gt; </div>
 
 <p>Computes and returns the directed mesh width. </p>
 <p >The usual internal implementation of this function returns the following expression: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ L\cdot \| J_\tau^{-1} \cdot v \|_2^{-1} \]" src="form_356.png"/><img class="formulaDsp dark-mode-visible" alt="\[ L\cdot \| J_\tau^{-1} \cdot v \|_2^{-1} \]" src="form_356_dark.png"/>
+\[ L\cdot \| J_\tau^{-1} \cdot v \|_2^{-1} \]
 </p>
 <p> where</p><ul>
-<li><img class="formulaInl light-mode-visible" alt="$J_\tau$" src="form_357.png"/><img class="formulaInl dark-mode-visible" alt="$J_\tau$" src="form_357_dark.png"/> is the Jacobian matrix of the transformation from the reference hypercube or a regular (equilateral) simplex, evaluated in the barycentre of that element.</li>
+<li>\(J_\tau\) is the Jacobian matrix of the transformation from the reference hypercube or a regular (equilateral) simplex, evaluated in the barycentre of that element.</li>
 <li><em>v</em> is the given (normalized) ray direction vector.</li>
 <li><em>L</em> is an appropriate scaling factor, which is chosen to ensure that this function returns a value of 1 for the unit element with all edge lengths equal to 1</li>
 </ul>

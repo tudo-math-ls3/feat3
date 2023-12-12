@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -223,7 +233,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa1350fe1e2a7ddd4fe24f4ae2548e2e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#aa1350fe1e2a7ddd4fe24f4ae2548e2e1">More...</a><br /></td></tr>
 <tr class="separator:aa1350fe1e2a7ddd4fe24f4ae2548e2e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78f2a4621e9f7ebbf6d7b99c77de455d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a78f2a4621e9f7ebbf6d7b99c77de455d">copy</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html">SparseMatrixCSCR</a> &amp;x, bool full=false)</td></tr>
-<tr class="memdesc:a78f2a4621e9f7ebbf6d7b99c77de455d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a78f2a4621e9f7ebbf6d7b99c77de455d">More...</a><br /></td></tr>
+<tr class="memdesc:a78f2a4621e9f7ebbf6d7b99c77de455d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \(this \leftarrow x\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a78f2a4621e9f7ebbf6d7b99c77de455d">More...</a><br /></td></tr>
 <tr class="separator:a78f2a4621e9f7ebbf6d7b99c77de455d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a893df37b8b5d4265eee1e1b14c4f375b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a736ade08913719c7ddbee634abe2b348">VectorTypeL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a893df37b8b5d4265eee1e1b14c4f375b">create_vector_l</a> () const</td></tr>
 <tr class="memdesc:a893df37b8b5d4265eee1e1b14c4f375b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a new compatible L-Vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a893df37b8b5d4265eee1e1b14c4f375b">More...</a><br /></td></tr>
@@ -337,19 +347,19 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3ac4910258355bc7819e103fad7d766f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Linear algebra operations</div></td></tr>
 <tr class="memitem:a6d51813632c4682b0e1bfe9e015b0b8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a6d51813632c4682b0e1bfe9e015b0b8d">axpy</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html">SparseMatrixCSCR</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html">SparseMatrixCSCR</a> &amp;y, const DT_ alpha=DT_(1))</td></tr>
-<tr class="memdesc:a6d51813632c4682b0e1bfe9e015b0b8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow y + \alpha~ x$" src="form_182.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow y + \alpha~ x$" src="form_182_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a6d51813632c4682b0e1bfe9e015b0b8d">More...</a><br /></td></tr>
+<tr class="memdesc:a6d51813632c4682b0e1bfe9e015b0b8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(this \leftarrow y + \alpha~ x\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a6d51813632c4682b0e1bfe9e015b0b8d">More...</a><br /></td></tr>
 <tr class="separator:a6d51813632c4682b0e1bfe9e015b0b8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0f3d02d76a102d75edd1b3edf78a73a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#ab0f3d02d76a102d75edd1b3edf78a73a">scale</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html">SparseMatrixCSCR</a> &amp;x, const DT_ alpha)</td></tr>
-<tr class="memdesc:ab0f3d02d76a102d75edd1b3edf78a73a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#ab0f3d02d76a102d75edd1b3edf78a73a">More...</a><br /></td></tr>
+<tr class="memdesc:ab0f3d02d76a102d75edd1b3edf78a73a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(this \leftarrow \alpha~ x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#ab0f3d02d76a102d75edd1b3edf78a73a">More...</a><br /></td></tr>
 <tr class="separator:ab0f3d02d76a102d75edd1b3edf78a73a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2b7706db576884bef21f0e98174a0f2"><td class="memItemLeft" align="right" valign="top">DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#aa2b7706db576884bef21f0e98174a0f2">norm_frobenius</a> () const</td></tr>
 <tr class="memdesc:aa2b7706db576884bef21f0e98174a0f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the Frobenius norm of this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#aa2b7706db576884bef21f0e98174a0f2">More...</a><br /></td></tr>
 <tr class="separator:aa2b7706db576884bef21f0e98174a0f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd2d39fa97f0ca7ab864763e85ae9d3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#acd2d39fa97f0ca7ab864763e85ae9d3e">apply</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a>&lt; DT_, IT_ &gt; &amp;r, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a>&lt; DT_, IT_ &gt; &amp;x, bool transposed=false) const</td></tr>
-<tr class="memdesc:acd2d39fa97f0ca7ab864763e85ae9d3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#acd2d39fa97f0ca7ab864763e85ae9d3e">More...</a><br /></td></tr>
+<tr class="memdesc:acd2d39fa97f0ca7ab864763e85ae9d3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow this\cdot x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#acd2d39fa97f0ca7ab864763e85ae9d3e">More...</a><br /></td></tr>
 <tr class="separator:acd2d39fa97f0ca7ab864763e85ae9d3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e5abefd83978ac068df57714c03daec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a3e5abefd83978ac068df57714c03daec">apply</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a>&lt; DT_, IT_ &gt; &amp;r, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a>&lt; DT_, IT_ &gt; &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a>&lt; DT_, IT_ &gt; &amp;y, const DT_ alpha=DT_(1), const bool transposed=false) const</td></tr>
-<tr class="memdesc:a3e5abefd83978ac068df57714c03daec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a3e5abefd83978ac068df57714c03daec">More...</a><br /></td></tr>
+<tr class="memdesc:a3e5abefd83978ac068df57714c03daec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow y + \alpha~ this\cdot x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_c_r.html#a3e5abefd83978ac068df57714c03daec">More...</a><br /></td></tr>
 <tr class="separator:a3e5abefd83978ac068df57714c03daec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
@@ -1744,7 +1754,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow this\cdot x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result. </td></tr>
@@ -1814,7 +1824,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow y + \alpha~ this\cdot x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result. </td></tr>
@@ -1919,7 +1929,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow y + \alpha~ x$" src="form_182.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow y + \alpha~ x$" src="form_182_dark.png"/>. </p>
+<p>Calculate \(this \leftarrow y + \alpha~ x\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The first summand matrix to be scaled. </td></tr>
@@ -2440,7 +2450,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>. </p>
+<p>Performs \(this \leftarrow x\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The Matrix to be copied. </td></tr>
@@ -3600,7 +3610,7 @@ template&lt;typename DT_ , typename IT_  = Index&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow \alpha~ x $" src="form_178_dark.png"/>. </p>
+<p>Calculate \(this \leftarrow \alpha~ x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The matrix to be scaled. </td></tr>

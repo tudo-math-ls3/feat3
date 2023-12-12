@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -126,10 +136,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5c38d84f4d864b7650d610697663f12c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afab26275e49e6f3676c7855086659058"><td class="memTemplParams" colspan="2">template&lt;typename LocalVector_ , typename Mirror_ &gt; </td></tr>
 <tr class="memitem:afab26275e49e6f3676c7855086659058"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#afab26275e49e6f3676c7855086659058">set_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">Global::Vector</a>&lt; LocalVector_, Mirror_ &gt; &amp;convect)</td></tr>
-<tr class="memdesc:afab26275e49e6f3676c7855086659058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#afab26275e49e6f3676c7855086659058">More...</a><br /></td></tr>
+<tr class="memdesc:afab26275e49e6f3676c7855086659058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm \(\|v\|_\Omega\) for the streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#afab26275e49e6f3676c7855086659058">More...</a><br /></td></tr>
 <tr class="separator:afab26275e49e6f3676c7855086659058"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0e2cdc758d58fa7666622cdb0167d77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#ae0e2cdc758d58fa7666622cdb0167d77">set_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;convect)</td></tr>
-<tr class="memdesc:ae0e2cdc758d58fa7666622cdb0167d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#ae0e2cdc758d58fa7666622cdb0167d77">More...</a><br /></td></tr>
+<tr class="memdesc:ae0e2cdc758d58fa7666622cdb0167d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#ae0e2cdc758d58fa7666622cdb0167d77">More...</a><br /></td></tr>
 <tr class="separator:ae0e2cdc758d58fa7666622cdb0167d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -178,45 +188,45 @@ Public Attributes</h2></td></tr>
 class FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;</div><p >Burgers operator assembly class. </p>
 <p >This class is responsible for assembling the scalar and vector-valued Burgers operators:</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'(v,u,\psi)} + \delta \mathbf{S}(v,u,\psi)\]" src="form_44.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'(v,u,\psi)} + \delta \mathbf{S}(v,u,\psi)\]" src="form_44_dark.png"/>
+\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta&#39; \mathbf{K&#39;(v,u,\psi)} + \delta \mathbf{S}(v,u,\psi)\]
 </p>
 <p >where</p><ul>
 <li><b>L</b> is the diffusive operator, which is either<ul>
 <li>the <em>gradient tensor</em>: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi \]" src="form_45.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi \]" src="form_45_dark.png"/>
+\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi \]
 </p>
 </li>
 <li>or the <em>deformation tensor</em>: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi\]" src="form_46.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi\]" src="form_46_dark.png"/>
+\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi\]
 </p>
 </li>
 </ul>
 </li>
 <li><b>M</b> is the reactive operator: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{M}(u,\psi) := \int_\Omega u\psi\]" src="form_47.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{M}(u,\psi) := \int_\Omega u\psi\]" src="form_47_dark.png"/>
+\[\mathbf{M}(u,\psi) := \int_\Omega u\psi\]
 </p>
 </li>
 <li><b>K</b> is the convective operator: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{K}(v,u,\psi) := \int_\Omega v\cdot \nabla u \psi\]" src="form_48.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{K}(v,u,\psi) := \int_\Omega v\cdot \nabla u \psi\]" src="form_48_dark.png"/>
+\[\mathbf{K}(v,u,\psi) := \int_\Omega v\cdot \nabla u \psi\]
 </p>
 </li>
 <li><b>K'</b> is the Frechet derivative of the convective operator: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{K'}(v,u,\psi) := \int_\Omega \nabla v u \psi\]" src="form_49.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{K'}(v,u,\psi) := \int_\Omega \nabla v u \psi\]" src="form_49_dark.png"/>
+\[\mathbf{K&#39;}(v,u,\psi) := \int_\Omega \nabla v u \psi\]
 </p>
 </li>
 <li><b>S</b> is the Samarskij-style streamline-diffusion stabilization operator: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\]" src="form_50.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\]" src="form_50_dark.png"/>
+\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)\]
 </p>
  where <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]" src="form_51.png"/><img class="formulaDsp dark-mode-visible" alt="\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]" src="form_51_dark.png"/>
+\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]
 </p>
 </li>
 </ul>
 <p ><b>Notes on Streamline Diffusion Stabilization:</b><br  />
-The implementation of the streamline diffusion stabilization is based on Turek's CFD book (see <b>[TurekCFD]</b>, pages 119 &ndash; 123), however, in the formula above, the local stabilization parameter <img class="formulaInl light-mode-visible" alt="$\delta_T$" src="form_52.png"/><img class="formulaInl dark-mode-visible" alt="$\delta_T$" src="form_52_dark.png"/> is not pre- multiplied by the global parameter <img class="formulaInl light-mode-visible" alt="$\delta^*$" src="form_53.png"/><img class="formulaInl dark-mode-visible" alt="$\delta^*$" src="form_53_dark.png"/>, compare eq. (3.75) in the book, as we use delta as a scaling parameter for the whole operator <b>S</b> in the definition of the full operator <b>N</b>, see above. To enable streamline diffusion stabilization, you have to perform several tasks:</p><ol type="1">
+The implementation of the streamline diffusion stabilization is based on Turek's CFD book (see <b>[TurekCFD]</b>, pages 119 &ndash; 123), however, in the formula above, the local stabilization parameter \(\delta_T\) is not pre- multiplied by the global parameter \(\delta^*\), compare eq. (3.75) in the book, as we use delta as a scaling parameter for the whole operator <b>S</b> in the definition of the full operator <b>N</b>, see above. To enable streamline diffusion stabilization, you have to perform several tasks:</p><ol type="1">
 <li>Set the global stabilization parameter <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#a2dfa25520ecd8bf0d0aea3a1f836b0b7" title="scaling parameter for streamline diffusion stabilization operator S">sd_delta</a>, which corresponds to the delta* parameter in the CFD book. According to the book (and previous <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> versions), the value should be in range [0.1, 2], but according to my personal experience, even smaller values may be a good choice (e.g. 0.02).</li>
 <li>Set the viscosity parameter <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#a35a6d30d2f9e0e6acae55bff65467654" title="viscosity parameter nu_S for streamline diffusion (usually equal to nu)">sd_nu</a>, which is usually set equal to nu. The only reason for this extra parameter is so that you can use this assembler class to assemble the stabilization without necessarily also assembling the diffusion operator, which is what would happen if you set nu to a non-zero value.</li>
-<li>Set the (maximum) velocity norm <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#a4f4883c5f65430315f82cddd6cb913bc" title="velocity norm for streamline diffusion">sd_v_norm</a> of the convection field, which corresponds to <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> and is required for the computation of the local delta_T parameters. You can do this by either specifying the value directly or, more conveniently, use one of this class's <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#ae0e2cdc758d58fa7666622cdb0167d77" title="Sets the convection field norm  for the local streamline diffusion parameter delta_T.">set_sd_v_norm()</a> functions to compute this norm from a (local or global) convection field vector.</li>
+<li>Set the (maximum) velocity norm <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#a4f4883c5f65430315f82cddd6cb913bc" title="velocity norm for streamline diffusion">sd_v_norm</a> of the convection field, which corresponds to \(\|v\|_\Omega\) and is required for the computation of the local delta_T parameters. You can do this by either specifying the value directly or, more conveniently, use one of this class's <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html#ae0e2cdc758d58fa7666622cdb0167d77" title="Sets the convection field norm  for the local streamline diffusion parameter delta_T.">set_sd_v_norm()</a> functions to compute this norm from a (local or global) convection field vector.</li>
 </ol>
 <dl class="section author"><dt>Author</dt><dd>Jonas Dünnebacke (based on Peter Zajacs <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembler.html" title="Burgers operator assembly class.">BurgersAssembler</a>) </dd></dl>
 
@@ -458,7 +468,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the streamline diffusion parameter delta_T. </p>
+<p>Sets the convection field norm \(\|v\|_\Omega\) for the streamline diffusion parameter delta_T. </p>
 <dl class="section note"><dt>Note</dt><dd>This function automatically syncs the norm over all processes by using the vector's gate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -499,7 +509,7 @@ template&lt;typename DataType_ , typename IndexType_ , int dim_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T. </p>
+<p>Sets the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">convect</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> (local) convection field vector. </td></tr>

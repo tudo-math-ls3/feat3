@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -116,7 +126,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Assembles the gradient operator. </p>
-<p >This is the gradient bilinear form using blocked types without partial integration: <img class="formulaInl light-mode-visible" alt="$ g(\psi, \phi)_m = \alpha \int_\Omega(\nabla \psi, \phi e_m) dx, m=1,\dots,d $" src="form_115.png"/><img class="formulaInl dark-mode-visible" alt="$ g(\psi, \phi)_m = \alpha \int_\Omega(\nabla \psi, \phi e_m) dx, m=1,\dots,d $" src="form_115_dark.png"/></p>
+<p >This is the gradient bilinear form using blocked types without partial integration: \( g(\psi, \phi)_m = \alpha \int_\Omega(\nabla \psi, \phi e_m) dx, m=1,\dots,d \)</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="grad__operator__assembler_8hpp_source.html#l00028">28</a> of file <a class="el" href="grad__operator__assembler_8hpp_source.html">grad_operator_assembler.hpp</a>.</p>
@@ -187,8 +197,8 @@ template&lt;typename DT_ , typename IT_ , int dim_, typename SpaceTest_ , typena
     <tr><td class="paramname">DT_</td><td>The floating point type</td></tr>
     <tr><td class="paramname">IT_</td><td>The index type for our containers</td></tr>
     <tr><td class="paramname">dim_</td><td>The world dimension, which is also the block size</td></tr>
-    <tr><td class="paramname">SpaceTest_</td><td>The space for <img class="formulaInl light-mode-visible" alt="$ \phi $" src="form_116.png"/><img class="formulaInl dark-mode-visible" alt="$ \phi $" src="form_116_dark.png"/></td></tr>
-    <tr><td class="paramname">SpaceTrial_</td><td>The space for <img class="formulaInl light-mode-visible" alt="$ \psi $" src="form_117.png"/><img class="formulaInl dark-mode-visible" alt="$ \psi $" src="form_117_dark.png"/></td></tr>
+    <tr><td class="paramname">SpaceTest_</td><td>The space for \( \phi \)</td></tr>
+    <tr><td class="paramname">SpaceTrial_</td><td>The space for \( \psi \)</td></tr>
     <tr><td class="paramname">CubatureFactory_</td><td>For creating the cubature rule</td></tr>
   </table>
   </dd>
@@ -197,10 +207,10 @@ template&lt;typename DT_ , typename IT_ , int dim_, typename SpaceTest_ , typena
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">vec_asm</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> vector we assemble onto</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">vec_in</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> vector we apply the bilinear form to</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">test_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for <img class="formulaInl light-mode-visible" alt="$ \phi $" src="form_116.png"/><img class="formulaInl dark-mode-visible" alt="$ \phi $" src="form_116_dark.png"/></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">trial_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for <img class="formulaInl light-mode-visible" alt="$ \psi $" src="form_117.png"/><img class="formulaInl dark-mode-visible" alt="$ \psi $" src="form_117_dark.png"/></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">test_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for \( \phi \)</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">trial_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for \( \psi \)</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>Creates the cubature rule we want to use</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">scale</td><td>Scaling parameter <img class="formulaInl light-mode-visible" alt="$ \alpha $" src="form_29.png"/><img class="formulaInl dark-mode-visible" alt="$ \alpha $" src="form_29_dark.png"/> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scale</td><td>Scaling parameter \( \alpha \) </td></tr>
   </table>
   </dd>
 </dl>
@@ -271,8 +281,8 @@ template&lt;typename DT_ , typename IT_ , int dim_, typename SpaceTest_ , typena
     <tr><td class="paramname">DT_</td><td>The floating point type</td></tr>
     <tr><td class="paramname">IT_</td><td>The index type for our containers</td></tr>
     <tr><td class="paramname">dim_</td><td>The world dimension, which is also the block size</td></tr>
-    <tr><td class="paramname">SpaceTest_</td><td>The space for <img class="formulaInl light-mode-visible" alt="$ \phi $" src="form_116.png"/><img class="formulaInl dark-mode-visible" alt="$ \phi $" src="form_116_dark.png"/></td></tr>
-    <tr><td class="paramname">SpaceTrial_</td><td>The space for <img class="formulaInl light-mode-visible" alt="$ \psi $" src="form_117.png"/><img class="formulaInl dark-mode-visible" alt="$ \psi $" src="form_117_dark.png"/></td></tr>
+    <tr><td class="paramname">SpaceTest_</td><td>The space for \( \phi \)</td></tr>
+    <tr><td class="paramname">SpaceTrial_</td><td>The space for \( \psi \)</td></tr>
     <tr><td class="paramname">CubatureFactory_</td><td>For creating the cubature rule</td></tr>
   </table>
   </dd>
@@ -280,10 +290,10 @@ template&lt;typename DT_ , typename IT_ , int dim_, typename SpaceTest_ , typena
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">matrix_g</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> matrix we assemble into, gets overwritten</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">test_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for <img class="formulaInl light-mode-visible" alt="$ \phi $" src="form_116.png"/><img class="formulaInl dark-mode-visible" alt="$ \phi $" src="form_116_dark.png"/></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">trial_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for <img class="formulaInl light-mode-visible" alt="$ \psi $" src="form_117.png"/><img class="formulaInl dark-mode-visible" alt="$ \psi $" src="form_117_dark.png"/></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">test_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for \( \phi \)</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">trial_space</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> space for \( \psi \)</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>Creates the cubature rule we want to use</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">scale</td><td>Scaling parameter <img class="formulaInl light-mode-visible" alt="$ \alpha $" src="form_29.png"/><img class="formulaInl dark-mode-visible" alt="$ \alpha $" src="form_29_dark.png"/> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scale</td><td>Scaling parameter \( \alpha \) </td></tr>
   </table>
   </dd>
 </dl>

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -299,7 +309,7 @@ template&lt;typename DataType_ , typename IndexType_ &gt; </div>
 <p>Computes the largest eigenvalue of the FD-style matrix. </p>
 <p >The largest eigenvalue of the FD-style matrix is given as</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \lambda_{\max} = 2 \cdot d \cdot (1 + \cos\big(\pi/(m+1)\big) ) \]" src="form_186.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \lambda_{\max} = 2 \cdot d \cdot (1 + \cos\big(\pi/(m+1)\big) ) \]" src="form_186_dark.png"/>
+\[ \lambda_{\max} = 2 \cdot d \cdot (1 + \cos\big(\pi/(m+1)\big) ) \]
 </p>
 <dl class="section return"><dt>Returns</dt><dd>The largest eigenvalue of the matrix. </dd></dl>
 
@@ -339,7 +349,7 @@ template&lt;typename DataType_ , typename IndexType_ &gt; </div>
 <p>Computes the smallest eigenvalue of the FD-style matrix. </p>
 <p >The smallest eigenvalue of the FD-style matrix wrt the sine-bubble eigenvector is given as</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \lambda_{\min} = 2 \cdot d \cdot (1 - \cos\big(\pi/(m+1)\big) ) \]" src="form_185.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \lambda_{\min} = 2 \cdot d \cdot (1 - \cos\big(\pi/(m+1)\big) ) \]" src="form_185_dark.png"/>
+\[ \lambda_{\min} = 2 \cdot d \cdot (1 - \cos\big(\pi/(m+1)\big) ) \]
 </p>
 <dl class="section return"><dt>Returns</dt><dd>The smallest eigenvalue of the matrix. </dd></dl>
 

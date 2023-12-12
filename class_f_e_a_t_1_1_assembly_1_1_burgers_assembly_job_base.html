@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -135,18 +145,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab739a9d2f76c5c23e567196995ae71bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b10e6340b78da910ce99c28d24ebcd9"><td class="memTemplParams" colspan="2">template&lt;typename VectorType_ &gt; </td></tr>
 <tr class="memitem:a3b10e6340b78da910ce99c28d24ebcd9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9">set_sd_v_norm</a> (const VectorType_ &amp;convect)</td></tr>
-<tr class="memdesc:a3b10e6340b78da910ce99c28d24ebcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9">More...</a><br /></td></tr>
+<tr class="memdesc:a3b10e6340b78da910ce99c28d24ebcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9">More...</a><br /></td></tr>
 <tr class="separator:a3b10e6340b78da910ce99c28d24ebcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a34f836bb6de7a3f2304de70d46516716"><td class="memTemplParams" colspan="2">template&lt;typename LocalVector_ , typename Mirror_ &gt; </td></tr>
 <tr class="memitem:a34f836bb6de7a3f2304de70d46516716"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#ad74b37015de3ba9088143fdb0c175a1a">DataType</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a34f836bb6de7a3f2304de70d46516716">calc_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">Global::Vector</a>&lt; LocalVector_, Mirror_ &gt; &amp;convect)</td></tr>
-<tr class="memdesc:a34f836bb6de7a3f2304de70d46516716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a34f836bb6de7a3f2304de70d46516716">More...</a><br /></td></tr>
+<tr class="memdesc:a34f836bb6de7a3f2304de70d46516716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm \(\|v\|_\Omega\) for the streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a34f836bb6de7a3f2304de70d46516716">More...</a><br /></td></tr>
 <tr class="separator:a34f836bb6de7a3f2304de70d46516716"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfba980460d5a619a9da83ab1e78eb7f"><td class="memTemplParams" colspan="2">template&lt;typename IndexType_ , int conv_dim_&gt; </td></tr>
 <tr class="memitem:abfba980460d5a619a9da83ab1e78eb7f"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#ad74b37015de3ba9088143fdb0c175a1a">DataType</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#abfba980460d5a619a9da83ab1e78eb7f">calc_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, conv_dim_ &gt; &amp;convect)</td></tr>
-<tr class="memdesc:abfba980460d5a619a9da83ab1e78eb7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#abfba980460d5a619a9da83ab1e78eb7f">More...</a><br /></td></tr>
+<tr class="memdesc:abfba980460d5a619a9da83ab1e78eb7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#abfba980460d5a619a9da83ab1e78eb7f">More...</a><br /></td></tr>
 <tr class="separator:abfba980460d5a619a9da83ab1e78eb7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -191,46 +201,46 @@ class FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ 
 <p >This base class is used by various Burgers assemblers to outsource common coefficient member variables as well as code related to precomputing quantities required for the streamline diffusion stabilization.</p>
 <p >The operators assembled by the derived classes are the scalar and vector-valued Burgers operators:</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'}(v,u,\psi) + \delta \mathbf{S}(v,u,\psi)\]" src="form_55.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta' \mathbf{K'}(v,u,\psi) + \delta \mathbf{S}(v,u,\psi)\]" src="form_55_dark.png"/>
+\[\mathbf{N}(v,u,\psi) := \nu \mathbf{L}(u,\psi) + \theta \mathbf{M}(u,\psi) + \beta \mathbf{K}(v,u,\psi) + \beta&#39; \mathbf{K&#39;}(v,u,\psi) + \delta \mathbf{S}(v,u,\psi)\]
 </p>
 <p >where</p><ul>
 <li><b>L</b> is the diffusive operator, which is either<ul>
 <li>the <em>gradient tensor</em>: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi~dx \]" src="form_56.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi~dx \]" src="form_56_dark.png"/>
+\[\mathbf{L}(u,\psi) := \int_\Omega \nabla u \cdot \nabla \psi~dx \]
 </p>
 </li>
 <li>or the <em>deformation tensor</em> (vector-valued operators only): <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi~dx\]" src="form_57.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi~dx\]" src="form_57_dark.png"/>
+\[\mathbf{L}(u,\psi) := \frac{1}{4} \int_\Omega (\nabla+\nabla^\top) u : (\nabla+\nabla^\top) \psi~dx\]
 </p>
 </li>
 </ul>
 </li>
 <li><b>M</b> is the reactive operator: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{M}(u,\psi) := \int_\Omega u\psi~dx\]" src="form_58.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{M}(u,\psi) := \int_\Omega u\psi~dx\]" src="form_58_dark.png"/>
+\[\mathbf{M}(u,\psi) := \int_\Omega u\psi~dx\]
 </p>
 </li>
 <li><b>K</b> is the convective operator: <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi~dx\]" src="form_59.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi~dx\]" src="form_59_dark.png"/>
+\[\mathbf{K}(v,u,\psi) := \int_\Omega (v\cdot \nabla) u \psi~dx\]
 </p>
 </li>
 <li><b>K'</b> is the additional term for the Fr&eacute;chet derivative of the convective operator <b>K</b> (vector-valued operators only; see note below for details): <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{K'}(v,u,\psi) := \int_\Omega (\nabla v) u \psi~dx\]" src="form_60.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{K'}(v,u,\psi) := \int_\Omega (\nabla v) u \psi~dx\]" src="form_60_dark.png"/>
+\[\mathbf{K&#39;}(v,u,\psi) := \int_\Omega (\nabla v) u \psi~dx\]
 </p>
 </li>
 <li><b>S</b> is the Samarskij-style streamline-diffusion stabilization operator (see note below for details): <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)~dx\]" src="form_61.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)~dx\]" src="form_61_dark.png"/>
+\[\mathbf{S}(v,u,\psi) := \sum_{T\in\mathcal{T}_h}\delta_{T}\int_T (v\cdot\nabla u)\cdot(v\cdot\nabla\psi)~dx\]
 </p>
  where <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]" src="form_51.png"/><img class="formulaDsp dark-mode-visible" alt="\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]" src="form_51_dark.png"/>
+\[\delta_T := \frac{h_T}{\|v\|_\Omega}\cdot\frac{2Re_T}{1+Re_T}\qquad\textnormal{and}\qquad Re_T := \frac{\|v\|_T\cdot h_T}{\nu_\mathbf{S}}\]
 </p>
 </li>
 </ul>
 <p ><b>Notes on the Fr&eacute;chet derivative of the convective term:</b><br  />
-The trilinearform <img class="formulaInl light-mode-visible" alt="$\mathbf{K}(v,u,\psi)$" src="form_62.png"/><img class="formulaInl dark-mode-visible" alt="$\mathbf{K}(v,u,\psi)$" src="form_62_dark.png"/> represents the weak formulation of the convective term <img class="formulaInl light-mode-visible" alt="$v\cdot\nabla u$" src="form_63.png"/><img class="formulaInl dark-mode-visible" alt="$v\cdot\nabla u$" src="form_63_dark.png"/>, which is the generalization of the non-linear term <img class="formulaInl light-mode-visible" alt="$u\cdot\nabla u$" src="form_64.png"/><img class="formulaInl dark-mode-visible" alt="$u\cdot\nabla u$" src="form_64_dark.png"/>. To obtain the Fr&eacute;chet derivative <img class="formulaInl light-mode-visible" alt="$D\mathbf{K}$" src="form_65.png"/><img class="formulaInl dark-mode-visible" alt="$D\mathbf{K}$" src="form_65_dark.png"/> of this non-linear operator in the case of <img class="formulaInl light-mode-visible" alt="$v=u$" src="form_66.png"/><img class="formulaInl dark-mode-visible" alt="$v=u$" src="form_66_dark.png"/>, which is required for the Newton method on the Burgers equation, by definition of the Fr&eacute;chet derivative we have to compute </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[D\mathbf{K}(v,u,\psi) = \bigg[\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}\bigg]\bigg|_{\hat{u}=u,\hat{v}=v}\]" src="form_67.png"/><img class="formulaDsp dark-mode-visible" alt="\[D\mathbf{K}(v,u,\psi) = \bigg[\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}\bigg]\bigg|_{\hat{u}=u,\hat{v}=v}\]" src="form_67_dark.png"/>
+The trilinearform \(\mathbf{K}(v,u,\psi)\) represents the weak formulation of the convective term \(v\cdot\nabla u\), which is the generalization of the non-linear term \(u\cdot\nabla u\). To obtain the Fr&eacute;chet derivative \(D\mathbf{K}\) of this non-linear operator in the case of \(v=u\), which is required for the Newton method on the Burgers equation, by definition of the Fr&eacute;chet derivative we have to compute </p><p class="formulaDsp">
+\[D\mathbf{K}(v,u,\psi) = \bigg[\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}\bigg]\bigg|_{\hat{u}=u,\hat{v}=v}\]
 </p>
-<p> with <img class="formulaInl light-mode-visible" alt="$\hat{u},\hat{v}\in V_h$" src="form_68.png"/><img class="formulaInl dark-mode-visible" alt="$\hat{u},\hat{v}\in V_h$" src="form_68_dark.png"/> with <img class="formulaInl light-mode-visible" alt="$\|\hat{u}\| = \|\hat{v}\| = 1$" src="form_69.png"/><img class="formulaInl dark-mode-visible" alt="$\|\hat{u}\| = \|\hat{v}\| = 1$" src="form_69_dark.png"/>. So, here goes:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+<p> with \(\hat{u},\hat{v}\in V_h\) with \(\|\hat{u}\| = \|\hat{v}\| = 1\). So, here goes:  </p><p class="formulaDsp">
+\begin{align*}
 \lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}
 &amp;=\lim_{\varepsilon\rightarrow 0} \int_\Omega \frac{(v + \varepsilon \hat{v})\cdot\nabla(u+\varepsilon \hat{u}) - v\cdot\nabla u}{\varepsilon}\psi~dx\\
 &amp;= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{v\cdot\nabla u +\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u} - v\cdot\nabla u}{\varepsilon}\psi~dx\\
@@ -238,25 +248,17 @@ The trilinearform <img class="formulaInl light-mode-visible" alt="$\mathbf{K}(v,
 &amp;= \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \frac{\varepsilon^2}{\varepsilon} \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
 &amp;= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \varepsilon \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
 &amp;= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx
-\end{align*}" src="form_70.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-\lim_{\varepsilon\rightarrow 0} \frac{\mathbf{K}(v + \varepsilon \hat{v}, u+\varepsilon \hat{u}, \psi)}{\varepsilon}
-&amp;=\lim_{\varepsilon\rightarrow 0} \int_\Omega \frac{(v + \varepsilon \hat{v})\cdot\nabla(u+\varepsilon \hat{u}) - v\cdot\nabla u}{\varepsilon}\psi~dx\\
-&amp;= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{v\cdot\nabla u +\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u} - v\cdot\nabla u}{\varepsilon}\psi~dx\\
-&amp;= \lim_{\varepsilon\rightarrow 0} \int_\Omega\frac{\varepsilon v\cdot\nabla \hat{u} + \varepsilon \hat{v}\cdot\nabla u+\varepsilon^2 \hat{v}\cdot\nabla \hat{u}}{\varepsilon}\psi~dx\\
-&amp;= \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \lim_{\varepsilon\rightarrow 0}\frac{\varepsilon}{\varepsilon}\int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \frac{\varepsilon^2}{\varepsilon} \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
-&amp;= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx + \lim_{\varepsilon\rightarrow 0} \varepsilon \int_\Omega (\hat{v}\cdot\nabla \hat{u})\psi~dx\\
-&amp;= \int_\Omega (v\cdot\nabla \hat{u})\psi~dx + \int_\Omega (\hat{v}\cdot\nabla u)\psi~dx
-\end{align*}" src="form_70_dark.png"/>
+\end{align*}
 </p>
-<p> Finally, we obtain our Fr&eacute;chet derivative by setting <img class="formulaInl light-mode-visible" alt="$\hat{u} := u$" src="form_71.png"/><img class="formulaInl dark-mode-visible" alt="$\hat{u} := u$" src="form_71_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$\hat{v} = v$" src="form_72.png"/><img class="formulaInl dark-mode-visible" alt="$\hat{v} = v$" src="form_72_dark.png"/>: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[D\mathbf{K}(v,u,\psi) = \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=~\mathbf{K}(v,u,\psi)} + \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=:~\mathbf{K}'(v,u,\psi)}\]" src="form_73.png"/><img class="formulaDsp dark-mode-visible" alt="\[D\mathbf{K}(v,u,\psi) = \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=~\mathbf{K}(v,u,\psi)} + \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=:~\mathbf{K}'(v,u,\psi)}\]" src="form_73_dark.png"/>
+<p> Finally, we obtain our Fr&eacute;chet derivative by setting \(\hat{u} := u\) and \(\hat{v} = v\): </p><p class="formulaDsp">
+\[D\mathbf{K}(v,u,\psi) = \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=~\mathbf{K}(v,u,\psi)} + \underbrace{\int_\Omega (v\cdot\nabla u)\psi~dx}_{=:~\mathbf{K}&#39;(v,u,\psi)}\]
 </p>
-<p> Note that in the case of this assembly class, the Fr&eacute;chet derivative <img class="formulaInl light-mode-visible" alt="$D\mathbf{K}(v,u,\psi)$" src="form_74.png"/><img class="formulaInl dark-mode-visible" alt="$D\mathbf{K}(v,u,\psi)$" src="form_74_dark.png"/> is split into its two additive parts <img class="formulaInl light-mode-visible" alt="$\mathbf{K}(v,u,\psi)$" src="form_62.png"/><img class="formulaInl dark-mode-visible" alt="$\mathbf{K}(v,u,\psi)$" src="form_62_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$\mathbf{K'}(v,u,\psi)$" src="form_75.png"/><img class="formulaInl dark-mode-visible" alt="$\mathbf{K'}(v,u,\psi)$" src="form_75_dark.png"/>, which are individually scaled by <img class="formulaInl light-mode-visible" alt="$\beta$" src="form_76.png"/><img class="formulaInl dark-mode-visible" alt="$\beta$" src="form_76_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$\beta'$" src="form_77.png"/><img class="formulaInl dark-mode-visible" alt="$\beta'$" src="form_77_dark.png"/>, respectively, so one has to set both <img class="formulaInl light-mode-visible" alt="$\beta = \beta' = 1$" src="form_78.png"/><img class="formulaInl dark-mode-visible" alt="$\beta = \beta' = 1$" src="form_78_dark.png"/> to use the full Fr&eacute;chet derivative operator <img class="formulaInl light-mode-visible" alt="$D\mathbf{K}$" src="form_65.png"/><img class="formulaInl dark-mode-visible" alt="$D\mathbf{K}$" src="form_65_dark.png"/>.</p>
+<p> Note that in the case of this assembly class, the Fr&eacute;chet derivative \(D\mathbf{K}(v,u,\psi)\) is split into its two additive parts \(\mathbf{K}(v,u,\psi)\) and \(\mathbf{K&#39;}(v,u,\psi)\), which are individually scaled by \(\beta\) and \(\beta&#39;\), respectively, so one has to set both \(\beta = \beta&#39; = 1\) to use the full Fr&eacute;chet derivative operator \(D\mathbf{K}\).</p>
 <p ><b>Notes on Streamline Diffusion Stabilization:</b><br  />
-The implementation of the streamline diffusion stabilization is based on Turek's CFD book (see <b>[TurekCFD]</b>, pages 119 &ndash; 123), however, in the formula above, the local stabilization parameter <img class="formulaInl light-mode-visible" alt="$\delta_T$" src="form_52.png"/><img class="formulaInl dark-mode-visible" alt="$\delta_T$" src="form_52_dark.png"/> is not pre- multiplied by the global parameter <img class="formulaInl light-mode-visible" alt="$\delta^*$" src="form_53.png"/><img class="formulaInl dark-mode-visible" alt="$\delta^*$" src="form_53_dark.png"/>, compare eq. (3.75) in the book, as we use delta as a scaling parameter for the whole operator <b>S</b> in the definition of the full operator <b>N</b>, see above. To enable streamline diffusion stabilization, you have to perform several tasks:</p><ol type="1">
+The implementation of the streamline diffusion stabilization is based on Turek's CFD book (see <b>[TurekCFD]</b>, pages 119 &ndash; 123), however, in the formula above, the local stabilization parameter \(\delta_T\) is not pre- multiplied by the global parameter \(\delta^*\), compare eq. (3.75) in the book, as we use delta as a scaling parameter for the whole operator <b>S</b> in the definition of the full operator <b>N</b>, see above. To enable streamline diffusion stabilization, you have to perform several tasks:</p><ol type="1">
 <li>Set the global stabilization parameter <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3352b79041bcacc5b6c5ac8a04042799" title="scaling parameter for streamline diffusion stabilization operator S">sd_delta</a>, which corresponds to the delta* parameter in the CFD book. According to the book (and previous <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> versions), the value should be in range [0.1, 2], but according to my personal experience, even smaller values may be a good choice (e.g. 0.02).</li>
 <li>Set the viscosity parameter <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#af19d13d192d42ceec47f03db6e14bc65" title="viscosity parameter nu_S for streamline diffusion (usually equal to nu)">sd_nu</a>, which is usually set equal to nu. The only reason for this extra parameter to exist is so that you can use this assembler class to assemble the stabilization without necessarily also assembling the diffusion operator, which is what would happen if you set nu to a non-zero value.</li>
-<li>Set the (maximum) velocity norm <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#adae2e75ea23d8fce5804558721dd7465" title="velocity norm for streamline diffusion">sd_v_norm</a> of the convection field, which corresponds to <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> and is required for the computation of the local delta_T parameters. You can do this by either specifying the value directly or, more conveniently, use one of this class's <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9" title="Sets the convection field norm  for the local streamline diffusion parameter delta_T.">set_sd_v_norm()</a> functions to compute this norm from a (local or global) convection field vector.</li>
+<li>Set the (maximum) velocity norm <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#adae2e75ea23d8fce5804558721dd7465" title="velocity norm for streamline diffusion">sd_v_norm</a> of the convection field, which corresponds to \(\|v\|_\Omega\) and is required for the computation of the local delta_T parameters. You can do this by either specifying the value directly or, more conveniently, use one of this class's <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9" title="Sets the convection field norm  for the local streamline diffusion parameter delta_T.">set_sd_v_norm()</a> functions to compute this norm from a (local or global) convection field vector.</li>
 </ol>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -416,7 +418,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the streamline diffusion parameter delta_T. </p>
+<p>Calculates the convection field norm \(\|v\|_\Omega\) for the streamline diffusion parameter delta_T. </p>
 <dl class="section note"><dt>Note</dt><dd>This function automatically syncs the norm over all processes by using the vector's gate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -460,7 +462,7 @@ template&lt;typename IndexType_ , int conv_dim_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T. </p>
+<p>Calculates the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">convect</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> (local) convection field vector.</td></tr>
@@ -505,7 +507,7 @@ template&lt;typename VectorType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T. </p>
+<p>Sets the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">convect</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> (local) convection field vector. </td></tr>

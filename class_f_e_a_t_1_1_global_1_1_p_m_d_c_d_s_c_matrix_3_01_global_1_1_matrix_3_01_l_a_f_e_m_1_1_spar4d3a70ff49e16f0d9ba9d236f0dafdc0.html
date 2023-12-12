@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -170,10 +180,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0b33b85f4ca5b247096b8aaae0be7b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor  <a href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a0b33b85f4ca5b247096b8aaae0be7b72">More...</a><br /></td></tr>
 <tr class="separator:a0b33b85f4ca5b247096b8aaae0be7b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f27fd86124cee0eafc4aadfbb813e7d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a8f27fd86124cee0eafc4aadfbb813e7d">apply</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">VectorTypeL</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">VectorTypeR</a> &amp;x) const</td></tr>
-<tr class="memdesc:a8f27fd86124cee0eafc4aadfbb813e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156_dark.png"/>.  <a href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a8f27fd86124cee0eafc4aadfbb813e7d">More...</a><br /></td></tr>
+<tr class="memdesc:a8f27fd86124cee0eafc4aadfbb813e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow this\cdot x \).  <a href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a8f27fd86124cee0eafc4aadfbb813e7d">More...</a><br /></td></tr>
 <tr class="separator:a8f27fd86124cee0eafc4aadfbb813e7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e132b1c2a1906e60933d7afcc3fcd00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a4e132b1c2a1906e60933d7afcc3fcd00">apply</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">VectorTypeL</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">VectorTypeR</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">VectorTypeL</a> &amp;y, const DataType alpha=DataType(1)) const</td></tr>
-<tr class="memdesc:a4e132b1c2a1906e60933d7afcc3fcd00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157_dark.png"/>.  <a href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a4e132b1c2a1906e60933d7afcc3fcd00">More...</a><br /></td></tr>
+<tr class="memdesc:a4e132b1c2a1906e60933d7afcc3fcd00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow y + \alpha~ this\cdot x \).  <a href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a4e132b1c2a1906e60933d7afcc3fcd00">More...</a><br /></td></tr>
 <tr class="separator:a4e132b1c2a1906e60933d7afcc3fcd00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78b1be2944631774548d3031a638c5f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a78b1be2944631774548d3031a638c5f6">asm_adp_numeric</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LocalMatrixTypeS</a> &amp;matrix) const</td></tr>
 <tr class="memdesc:a78b1be2944631774548d3031a638c5f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies the numeric values of the matrix into an ADP matrix.  <a href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html#a78b1be2944631774548d3031a638c5f6">More...</a><br /></td></tr>
@@ -349,7 +359,7 @@ Protected Attributes</h2></td></tr>
 class FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;</div><p >Pre-Multiplied Discontinuous Diagonal Schur-Complement <a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html" title="Global Matrix wrapper class template.">Matrix</a>. </p>
 <p >This class implements an efficient pre-multiplied distributed Schur-Complement matrix</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[S := D\cdot A\cdot B\]" src="form_155.png"/><img class="formulaDsp dark-mode-visible" alt="\[S := D\cdot A\cdot B\]" src="form_155_dark.png"/>
+\[S := D\cdot A\cdot B\]
 </p>
 <p >where</p><ul>
 <li><em>A</em> is a diagonal matrix (usually an inverted lumped velocity mass matrix)</li>
@@ -1710,7 +1720,7 @@ template&lt;typename DT_ , typename IT_ , int dim_, typename MirrorV_ , typename
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow this\cdot x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result. </td></tr>
@@ -1773,7 +1783,7 @@ template&lt;typename DT_ , typename IT_ , int dim_, typename MirrorV_ , typename
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow y + \alpha~ this\cdot x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result. </td></tr>

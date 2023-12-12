@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -638,7 +648,7 @@ template&lt;int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, in
 
 <p>Adds the algebraic matrix double-product of three other matrices onto this matrix. </p>
 <p >Let <em>C</em> denote <code>this</code> m-by-n matrix, <em>B</em> the left k-by-m input matrix, <em>D</em> the right l-by-n input matrix and <em>A</em> the inner k-by-l input matrix, then this operation computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ C \leftarrow C + \alpha B^\top\cdot A\cdot D\]" src="form_405.png"/><img class="formulaDsp dark-mode-visible" alt="\[ C \leftarrow C + \alpha B^\top\cdot A\cdot D\]" src="form_405_dark.png"/>
+\[ C \leftarrow C + \alpha B^\top\cdot A\cdot D\]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -705,7 +715,7 @@ template&lt;int la_, int lb_, int sma_, int sna_, int smb_, int snb_&gt; </div>
 
 <p>Adds the algebraic matrix-product of two other matrices onto this matrix. </p>
 <p >Let <em>C</em> denote <code>this</code> matrix, and let <em>A</em> denote the left m-by-l matrix and <em>B</em> the right l-by-n matrix, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ C\leftarrow C + \alpha A\cdot B \]" src="form_403.png"/><img class="formulaDsp dark-mode-visible" alt="\[ C\leftarrow C + \alpha A\cdot B \]" src="form_403_dark.png"/>
+\[ C\leftarrow C + \alpha A\cdot B \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -771,7 +781,7 @@ template&lt;int snx_, int sny_&gt; </div>
 
 <p>Adds the outer product of two vectors onto the matrix. </p>
 <p >This function performs: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ a_{ij} \leftarrow a_{ij} + \alpha x_i y_j \]" src="form_401.png"/><img class="formulaDsp dark-mode-visible" alt="\[ a_{ij} \leftarrow a_{ij} + \alpha x_i y_j \]" src="form_401_dark.png"/>
+\[ a_{ij} \leftarrow a_{ij} + \alpha x_i y_j \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -879,7 +889,7 @@ template&lt;int l_, int snv_, int slt_, int smt_, int snt_&gt; </div>
 
 <p>Adds the result of a vector-tensor left-product onto this matrix. </p>
 <p >Let <em>A</em> denote <code>this</code> m-by-n matrix, <em>v</em> the l-size input vector and <em>T</em> the l-by-m-by-b input tensor, then this operation computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow A_{ij} + \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]" src="form_407.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow A_{ij} + \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]" src="form_407_dark.png"/>
+\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow A_{ij} + \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This function is used for the computation of second-order derivatives by the chain rule.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1058,7 +1068,7 @@ template&lt;typename T_ , int m_, int n_, int sm_ = m_, int sn_ = n_&gt; </div>
 
 <p>Returns the Frobenius norm of the matrix. </p>
 <p >This function computes and returns </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \Big(\sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\Big)^{\frac{1}{2}} \]" src="form_388.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \Big(\sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\Big)^{\frac{1}{2}} \]" src="form_388_dark.png"/>
+\[ \Big(\sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\Big)^{\frac{1}{2}} \]
 </p>
 <dl class="section return"><dt>Returns</dt><dd>The Frobenius norm of the matrix. </dd></dl>
 
@@ -1097,7 +1107,7 @@ template&lt;typename T_ , int m_, int n_, int sm_ = m_, int sn_ = n_&gt; </div>
 
 <p>Returns the Frobenius norm squared of the matrix. </p>
 <p >This function computes and returns </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\]" src="form_389.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\]" src="form_389_dark.png"/>
+\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} (A_{ij})^2\]
 </p>
 <dl class="section return"><dt>Returns</dt><dd>The Frobenius norm of the matrix. </dd></dl>
 
@@ -1136,7 +1146,7 @@ template&lt;typename T_ , int m_, int n_, int sm_ = m_, int sn_ = n_&gt; </div>
 
 <p>Returns the Hessian norm square. </p>
 <p >This function computes and returns </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} K_{ij}\cdot (A_{ij})^2 \]" src="form_387.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} K_{ij}\cdot (A_{ij})^2 \]" src="form_387_dark.png"/>
+\[ \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} K_{ij}\cdot (A_{ij})^2 \]
 </p>
 <p> where K_ij is 1 for i=j and 1/2 otherwise.</p>
 <dl class="section note"><dt>Note</dt><dd>This function is used for the computation of the H^2 semi-norm of a function.</dd></dl>
@@ -1708,7 +1718,7 @@ template&lt;int snx_, int sny_&gt; </div>
 
 <p>Computes the scalar product of two vectors with this matrix. </p>
 <p >This function returns </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ x^\top\cdot A\cdot y = \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} x_i\cdot A_{ij}\cdot y_j\]" src="form_400.png"/><img class="formulaDsp dark-mode-visible" alt="\[ x^\top\cdot A\cdot y = \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} x_i\cdot A_{ij}\cdot y_j\]" src="form_400_dark.png"/>
+\[ x^\top\cdot A\cdot y = \sum_{i=0}^{m-1}\sum_{j=0}^{n-1} x_i\cdot A_{ij}\cdot y_j\]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1756,14 +1766,12 @@ template&lt;int sma_, int sna_&gt; </div>
 </div><div class="memdoc">
 
 <p>Sets this matrix to the cofactor matrix of another matrix. </p>
-<p ><img class="formulaInl light-mode-visible" alt="$ \mathrm{Cof}(A) $" src="form_392.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{Cof}(A) $" src="form_392_dark.png"/> is the <em>cofactor matrix</em> of <img class="formulaInl light-mode-visible" alt="$ A $" src="form_393.png"/><img class="formulaInl dark-mode-visible" alt="$ A $" src="form_393_dark.png"/>. If <img class="formulaInl light-mode-visible" alt="$A \in \mathbb{R}^{n \times n}$" src="form_394.png"/><img class="formulaInl dark-mode-visible" alt="$A \in \mathbb{R}^{n \times n}$" src="form_394_dark.png"/>, define <img class="formulaInl light-mode-visible" alt="$A^{(i,j)} \in \mathbb{R}^{n-1 \times n-1}$" src="form_395.png"/><img class="formulaInl dark-mode-visible" alt="$A^{(i,j)} \in \mathbb{R}^{n-1 \times n-1}$" src="form_395_dark.png"/> as the matrix obtained by deleting the <img class="formulaInl light-mode-visible" alt="$ i $" src="form_238.png"/><img class="formulaInl dark-mode-visible" alt="$ i $" src="form_238_dark.png"/>th column and <img class="formulaInl light-mode-visible" alt="$ j $" src="form_147.png"/><img class="formulaInl dark-mode-visible" alt="$ j $" src="form_147_dark.png"/>th row of <img class="formulaInl light-mode-visible" alt="$ A $" src="form_393.png"/><img class="formulaInl dark-mode-visible" alt="$ A $" src="form_393_dark.png"/>. Then  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p >\( \mathrm{Cof}(A) \) is the <em>cofactor matrix</em> of \( A \). If \(A \in \mathbb{R}^{n \times n}\), define \(A^{(i,j)} \in \mathbb{R}^{n-1 \times n-1}\) as the matrix obtained by deleting the \( i \)th column and \( j \)th row of \( A \). Then  </p><p class="formulaDsp">
+\[
   \mathrm{Cof}(A)_{i,j} = (-1)^{i+j} \det(A^{(i,j)})
-\]" src="form_396.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \mathrm{Cof}(A)_{i,j} = (-1)^{i+j} \det(A^{(i,j)})
-\]" src="form_396_dark.png"/>
+\]
 </p>
-<p> and if <img class="formulaInl light-mode-visible" alt="$ A \in \mathrm{GL}_n$" src="form_397.png"/><img class="formulaInl dark-mode-visible" alt="$ A \in \mathrm{GL}_n$" src="form_397_dark.png"/>, <img class="formulaInl light-mode-visible" alt="$ \mathrm{Cof}(A) = \det(A) A^{-T} $" src="form_398.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{Cof}(A) = \det(A) A^{-T} $" src="form_398_dark.png"/>.</p>
+<p> and if \( A \in \mathrm{GL}_n\), \( \mathrm{Cof}(A) = \det(A) A^{-T} \).</p>
 <dl class="section warning"><dt>Warning</dt><dd>This function only works for <code>m_</code> = <code>n_</code> and will intentionally fail to compile in any other case.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1831,7 +1839,7 @@ template&lt;int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, in
 
 <p>Sets this matrix to the algebraic matrix double-product of three other matrices. </p>
 <p >Let <em>C</em> denote <code>this</code> m-by-n matrix, <em>B</em> the left k-by-m input matrix, <em>D</em> the right l-by-n input matrix and <em>A</em> the inner k-by-l input matrix, then this operation computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ C \leftarrow B^\top\cdot A\cdot D\]" src="form_406.png"/><img class="formulaDsp dark-mode-visible" alt="\[ C \leftarrow B^\top\cdot A\cdot D\]" src="form_406_dark.png"/>
+\[ C \leftarrow B^\top\cdot A\cdot D\]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1880,7 +1888,7 @@ template&lt;int l_, int sla_, int sna_&gt; </div>
 
 <p>Sets this matrix to the Gram matrix of another matrix. </p>
 <p >Let <em>C</em> denote <code>this</code> n-by-n matrix, and let <em>A</em> denote the l-by-n input matrix, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ C\leftarrow A^\top\cdot A \]" src="form_399.png"/><img class="formulaDsp dark-mode-visible" alt="\[ C\leftarrow A^\top\cdot A \]" src="form_399_dark.png"/>
+\[ C\leftarrow A^\top\cdot A \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -2016,7 +2024,7 @@ template&lt;int la_, int lb_, int sma_, int sna_, int smb_, int snb_&gt; </div>
 
 <p>Sets this matrix to the algebraic matrix-product of two other matrices. </p>
 <p >Let <em>C</em> denote <code>this</code> matrix, and let <em>A</em> denote the left m-by-l matrix and <em>B</em> the right l-by-n matrix, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ C\leftarrow A\cdot B \]" src="form_404.png"/><img class="formulaDsp dark-mode-visible" alt="\[ C\leftarrow A\cdot B \]" src="form_404_dark.png"/>
+\[ C\leftarrow A\cdot B \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -2075,7 +2083,7 @@ template&lt;int snx_, int sny_&gt; </div>
 
 <p>Sets this matrix to the outer product of two vectors. </p>
 <p >This function performs: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ a_{ij} \leftarrow x_i y_j \]" src="form_402.png"/><img class="formulaDsp dark-mode-visible" alt="\[ a_{ij} \leftarrow x_i y_j \]" src="form_402_dark.png"/>
+\[ a_{ij} \leftarrow x_i y_j \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -2289,7 +2297,7 @@ template&lt;int l_, int snv_, int slt_, int smt_, int snt_&gt; </div>
 
 <p>Sets this matrix to the result of a vector-tensor left-product. </p>
 <p >Let <em>A</em> denote <code>this</code> m-by-n matrix, <em>v</em> the l-size input vector and <em>T</em> the l-by-m-by-b input tensor, then this operation computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]" src="form_408.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]" src="form_408_dark.png"/>
+\[ \forall i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ A_{ij} \leftarrow \alpha \sum_{k=0}^{l-1} v_k\cdot T_{kij}\]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This function is used for the computation of second-order derivatives by the chain rule.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -2417,7 +2425,7 @@ template&lt;typename T_ , int m_, int n_, int sm_ = m_, int sn_ = n_&gt; </div>
 
 <p>Returns the trace of the matrix. </p>
 <p >This function computes and returns </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \sum_{i=0}^{\min(m,n)} A_{ii}\]" src="form_390.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \sum_{i=0}^{\min(m,n)} A_{ii}\]" src="form_390_dark.png"/>
+\[ \sum_{i=0}^{\min(m,n)} A_{ii}\]
 </p>
 <p> i.e. the sum of all main diagonal elements.</p>
 <dl class="section return"><dt>Returns</dt><dd>The trace of the matrix. </dd></dl>
@@ -2457,7 +2465,7 @@ template&lt;typename T_ , int m_, int n_, int sm_ = m_, int sn_ = n_&gt; </div>
 
 <p>Returns the volume of the matrix. </p>
 <p >The volume of a matrix <em>A</em> is defined as: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \textnormal{vol}(A) := \sqrt{\textnormal{det}(A^\top\cdot A)} \]" src="form_391.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \textnormal{vol}(A) := \sqrt{\textnormal{det}(A^\top\cdot A)} \]" src="form_391_dark.png"/>
+\[ \textnormal{vol}(A) := \sqrt{\textnormal{det}(A^\top\cdot A)} \]
 </p>
 <dl class="section note"><dt>Note</dt><dd>For <code>m_</code> = <code>n_</code>, the volume of the matrix equals the absolute of its determinant. </dd>
 <dd>

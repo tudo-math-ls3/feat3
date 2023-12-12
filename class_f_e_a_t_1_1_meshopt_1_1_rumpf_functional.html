@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -187,69 +197,46 @@ class FEAT::Meshopt::RumpfFunctional&lt; DataType_, TrafoType_ &gt;</div><p >Fun
 <p>The actual implementation has to be supplied by the specializations in TrafoType_.</p>
 <p >A <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html" title="Functionals for measuring and optimising mesh quality.">RumpfFunctional</a> computes the cell local contribution to the local functional value and its gradient. The basic archetype is of the form</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2
                          + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2
                          + fac\_det (\det(\nabla R_K))^{p_d}
   + \frac{fac\_rec\_det}{\det(\nabla R_K) + \sqrt{(\mathrm{fac\_reg}^2 + \det(\nabla R_K)^2)}}
-\]" src="form_242.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  L( \nabla R_K ) = \int_K fac\_norm (\| \nabla R_K \|^2_F - d)^2
-                         + fac\_cof (\| \mathrm{Cof}(\nabla R_K) \|^2_F - d)^2
-                         + fac\_det (\det(\nabla R_K))^{p_d}
-  + \frac{fac\_rec\_det}{\det(\nabla R_K) + \sqrt{(\mathrm{fac\_reg}^2 + \det(\nabla R_K)^2)}}
-\]" src="form_242_dark.png"/>
+\]
 </p>
-<p >For the computation of the gradient of <img class="formulaInl light-mode-visible" alt="$ L $" src="form_243.png"/><img class="formulaInl dark-mode-visible" alt="$ L $" src="form_243_dark.png"/>, we need to calculate some directional derivatives wrt. matrices.</p>
-<p >Let <img class="formulaInl light-mode-visible" alt="$ M: \mathbb{R} \to \mathbb{R}^{d \times d} $" src="form_244.png"/><img class="formulaInl dark-mode-visible" alt="$ M: \mathbb{R} \to \mathbb{R}^{d \times d} $" src="form_244_dark.png"/> be a matrix valued mapping. Then we have the following identities:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+<p >For the computation of the gradient of \( L \), we need to calculate some directional derivatives wrt. matrices.</p>
+<p >Let \( M: \mathbb{R} \to \mathbb{R}^{d \times d} \) be a matrix valued mapping. Then we have the following identities:  </p><p class="formulaDsp">
+\begin{align*}
    \frac{d}{dt} M(t)^{-1} &amp;= - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
    \frac{d}{dt} \| M(t) \|_F^2 &amp;=  M(t) : \frac{d M}{d t}(t)\\
    \frac{d}{dt} \mathrm{Cof}( M(t) ) &amp;=  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{Cof}(M(t))
    - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{Cof}(M(t)) \\
    \frac{d}{dt} \mathrm{det}( M(t) ) &amp;=  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)
-\end{align*}" src="form_245.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-   \frac{d}{dt} M(t)^{-1} &amp;= - M^{-1}(t) \frac{d M}{d t}(t) M^{-1}(t) \\
-   \frac{d}{dt} \| M(t) \|_F^2 &amp;=  M(t) : \frac{d M}{d t}(t)\\
-   \frac{d}{dt} \mathrm{Cof}( M(t) ) &amp;=  M(t)^{-T} : \frac{d M}{d t}(t) \mathrm{Cof}(M(t))
-   - M^{-T} \left(\frac{d M}{d t}(t) \right)^T \mathrm{Cof}(M(t)) \\
-   \frac{d}{dt} \mathrm{det}( M(t) ) &amp;=  \mathrm{det}(M(t)) \left( M^{-1}(t) : \frac{d M}{d t}(t) \right)
-\end{align*}" src="form_245_dark.png"/>
+\end{align*}
 </p>
-<p> With this, we can compute directional derivatives of a function <img class="formulaInl light-mode-visible" alt="$ f: \mathbb{R}^{d \times d} \to V $" src="form_246.png"/><img class="formulaInl dark-mode-visible" alt="$ f: \mathbb{R}^{d \times d} \to V $" src="form_246_dark.png"/> with e.g. <img class="formulaInl light-mode-visible" alt="$ V = \mathbb{R} $" src="form_247.png"/><img class="formulaInl dark-mode-visible" alt="$ V = \mathbb{R} $" src="form_247_dark.png"/> or <img class="formulaInl light-mode-visible" alt="$ V = \mathbb{R}^{d \times d} $" src="form_248.png"/><img class="formulaInl dark-mode-visible" alt="$ V = \mathbb{R}^{d \times d} $" src="form_248_dark.png"/> with regard to matrices according to  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
-  M(t) = A + tB, \quad f'(A)B = \left. \frac{d f(M(t))}{dt}\right|_{t = 0}.
-\]" src="form_249.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  M(t) = A + tB, \quad f'(A)B = \left. \frac{d f(M(t))}{dt}\right|_{t = 0}.
-\]" src="form_249_dark.png"/>
+<p> With this, we can compute directional derivatives of a function \( f: \mathbb{R}^{d \times d} \to V \) with e.g. \( V = \mathbb{R} \) or \( V = \mathbb{R}^{d \times d} \) with regard to matrices according to  </p><p class="formulaDsp">
+\[
+  M(t) = A + tB, \quad f&#39;(A)B = \left. \frac{d f(M(t))}{dt}\right|_{t = 0}.
+\]
 </p>
-<p> Here, <img class="formulaInl light-mode-visible" alt="$ M(0) = A $" src="form_250.png"/><img class="formulaInl dark-mode-visible" alt="$ M(0) = A $" src="form_250_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$ \frac{d M}{d t}(t) = B $" src="form_251.png"/><img class="formulaInl dark-mode-visible" alt="$ \frac{d M}{d t}(t) = B $" src="form_251_dark.png"/>. For computing the directional derivatives of this <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html" title="Functionals for measuring and optimising mesh quality.">RumpfFunctional</a>, set <img class="formulaInl light-mode-visible" alt="$ A = \nabla R_K $" src="form_252.png"/><img class="formulaInl dark-mode-visible" alt="$ A = \nabla R_K $" src="form_252_dark.png"/> (the current FE function) and <img class="formulaInl light-mode-visible" alt="$ B = \nabla \eta $" src="form_253.png"/><img class="formulaInl dark-mode-visible" alt="$ B = \nabla \eta $" src="form_253_dark.png"/> (test function). Because the form is nonlinear, it cannot be represented as a matrix where the columns are associated with the trial functions.</p>
+<p> Here, \( M(0) = A \) and \( \frac{d M}{d t}(t) = B \). For computing the directional derivatives of this <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html" title="Functionals for measuring and optimising mesh quality.">RumpfFunctional</a>, set \( A = \nabla R_K \) (the current FE function) and \( B = \nabla \eta \) (test function). Because the form is nonlinear, it cannot be represented as a matrix where the columns are associated with the trial functions.</p>
 <p >So we get  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
-  \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)' \eta &amp;= 4(\| \nabla R_K \|_F^2 - d)
+\begin{align*}
+  \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)&#39; \eta &amp;= 4(\| \nabla R_K \|_F^2 - d)
   \nabla R_K : \nabla \eta \\
-  \frac{d}{dt} \left( (\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta &amp; =
+  \frac{d}{dt} \left( (\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d)^2\right)&#39; \eta &amp; =
     4(\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{Cof}(\nabla R_K) :
      \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{Cof}(\nabla R_K) \right) \\
-  \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta &amp; = p~\mathrm{det}(\nabla R_K )^p
+  \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)&#39; \eta &amp; = p~\mathrm{det}(\nabla R_K )^p
   (\nabla R_K)^{-1} : \nabla \eta.
-\end{align*}" src="form_254.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  \frac{d}{dt} \left( (\| \nabla R_K \|_F^2 - d)^2\right)' \eta &amp;= 4(\| \nabla R_K \|_F^2 - d)
-  \nabla R_K : \nabla \eta \\
-  \frac{d}{dt} \left( (\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d)^2\right)' \eta &amp; =
-    4(\| \mathrm{Cof}(\nabla R_K) \|_F^2 - d) ~ \mathrm{Cof}(\nabla R_K) :
-     \left( \left( \left( (\nabla R_K)^{-1} :\nabla \eta ~ I_d - (\nabla R_K)^{-1} \nabla \eta \right) \right) \mathrm{Cof}(\nabla R_K) \right) \\
-  \frac{d}{dt} \left( \mathrm{det}(\nabla R_K)^p \right)' \eta &amp; = p~\mathrm{det}(\nabla R_K )^p
-  (\nabla R_K)^{-1} : \nabla \eta.
-\end{align*}" src="form_254_dark.png"/>
+\end{align*}
 </p>
-<p >Note that the test function <img class="formulaInl light-mode-visible" alt="$ \eta $" src="form_255.png"/><img class="formulaInl dark-mode-visible" alt="$ \eta $" src="form_255_dark.png"/> might not be the standard FE basis functions as defined by the FE space used (call those <img class="formulaInl light-mode-visible" alt="$ \hat{\eta} $" src="form_256.png"/><img class="formulaInl dark-mode-visible" alt="$ \hat{\eta} $" src="form_256_dark.png"/>). They might be with regard to a different reference cell, so a transformation is involved, which is realized by passing the [c] material tensor [/c] <img class="formulaInl light-mode-visible" alt="$ M $" src="form_257.png"/><img class="formulaInl dark-mode-visible" alt="$ M $" src="form_257_dark.png"/> (which can be identified with a matrix in this case) to corresponding functions and using the relation  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p >Note that the test function \( \eta \) might not be the standard FE basis functions as defined by the FE space used (call those \( \hat{\eta} \)). They might be with regard to a different reference cell, so a transformation is involved, which is realized by passing the [c] material tensor [/c] \( M \) (which can be identified with a matrix in this case) to corresponding functions and using the relation  </p><p class="formulaDsp">
+\[
   \nabla \eta = M^T \nabla \hat{\eta},
-\]" src="form_258.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \nabla \eta = M^T \nabla \hat{\eta},
-\]" src="form_258_dark.png"/>
+\]
 </p>
-<p> which is nothing but the chain rule applied to <img class="formulaInl light-mode-visible" alt="$ \eta := \hat{\eta} \circ M$" src="form_259.png"/><img class="formulaInl dark-mode-visible" alt="$ \eta := \hat{\eta} \circ M$" src="form_259_dark.png"/>. </p>
+<p> which is nothing but the chain rule applied to \( \eta := \hat{\eta} \circ M\). </p>
 
 <p class="definition">Definition at line <a class="el" href="rumpf__functional_8hpp_source.html#l00188">188</a> of file <a class="el" href="rumpf__functional_8hpp_source.html">rumpf_functional.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
@@ -547,14 +534,13 @@ template&lt;typename DataType_ , typename TrafoType_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">fac_det_</td><td>Factor for the Rumpf functional</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fac_cof_</td><td>Factor for the Rumpf functional</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fac_reg_</td><td>Regularization factor for the Rumpf functional</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">exponent_det_</td><td>The exponent for the det term, called <img class="formulaInl light-mode-visible" alt="$ p_d $" src="form_260.png"/><img class="formulaInl dark-mode-visible" alt="$ p_d $" src="form_260_dark.png"/> above.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exponent_det_</td><td>The exponent for the det term, called \( p_d \) above.</td></tr>
   </table>
   </dd>
 </dl>
 <p>Because we want the functional to have a minimum if the mesh consists of correctly scaled versions of the optimal element (that is, every local transformation is the identity modulo translation), fac_det and fac_rec_det are now coupled.</p>
-<p ><img class="formulaInl light-mode-visible" alt="$ f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac\_reg}^2 + d^2}} $" src="form_261.png"/><img class="formulaInl dark-mode-visible" alt="$ f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac\_reg}^2 + d^2}} $" src="form_261_dark.png"/> We want to have <img class="formulaInl light-mode-visible" alt="$ f'(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac\_reg}^2 + d^2} +
-\mathrm{fac\_reg}^2 + d^2} $" src="form_262.png"/><img class="formulaInl dark-mode-visible" alt="$ f'(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac\_reg}^2 + d^2} +
-\mathrm{fac\_reg}^2 + d^2} $" src="form_262_dark.png"/> for <img class="formulaInl light-mode-visible" alt="$ p = 1 $" src="form_263.png"/><img class="formulaInl dark-mode-visible" alt="$ p = 1 $" src="form_263_dark.png"/> or <img class="formulaInl light-mode-visible" alt="$ c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac\_reg}^2 + d^2} + \mathrm{fac\_reg}^2 + d^2)} $" src="form_264.png"/><img class="formulaInl dark-mode-visible" alt="$ c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac\_reg}^2 + d^2} + \mathrm{fac\_reg}^2 + d^2)} $" src="form_264_dark.png"/> for <img class="formulaInl light-mode-visible" alt="$ d = 1 $" src="form_265.png"/><img class="formulaInl dark-mode-visible" alt="$ d = 1 $" src="form_265_dark.png"/> for p = 2. </p>
+<p >\( f(d) = c_s d^p + \frac{1}{d + \sqrt{ \mathrm{fac\_reg}^2 + d^2}} \) We want to have \( f&#39;(1) = 0 \Leftrightarrow c_s = \frac{1}{d \sqrt{ \mathrm{fac\_reg}^2 + d^2} +
+\mathrm{fac\_reg}^2 + d^2} \) for \( p = 1 \) or \( c_s = \frac{1}{2d (d \sqrt{ \mathrm{fac\_reg}^2 + d^2} + \mathrm{fac\_reg}^2 + d^2)} \) for \( d = 1 \) for p = 2. </p>
 
 </div>
 </div>
@@ -619,37 +605,27 @@ template&lt;typename DataType_ , typename TrafoType_ &gt; </div>
 
 <p>Adds the gradient h part to the local gradient. </p>
 <p >Due to the chain rule, the derivatives of h wrt. the vertex coordinates x have been computed and contribute to the local gradient.</p>
-<p >The optimal scales <img class="formulaInl light-mode-visible" alt="$ h $" src="form_228.png"/><img class="formulaInl dark-mode-visible" alt="$ h $" src="form_228_dark.png"/> depend on the concentration <img class="formulaInl light-mode-visible" alt="$ c $" src="form_229.png"/><img class="formulaInl dark-mode-visible" alt="$ c $" src="form_229_dark.png"/> by the relation  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p >The optimal scales \( h \) depend on the concentration \( c \) by the relation  </p><p class="formulaDsp">
+\[
   \forall K_k \in \mathcal{T}_h: h_k = \left( \frac{c (K_k)}{\sum_{l=1}^N c(K_l) \sum_{l=1}^N
   \mathrm{det} \nabla R_{T,l}(\phi)} \right)^{\frac{1}{d}}
-\]" src="form_230.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall K_k \in \mathcal{T}_h: h_k = \left( \frac{c (K_k)}{\sum_{l=1}^N c(K_l) \sum_{l=1}^N
-  \mathrm{det} \nabla R_{T,l}(\phi)} \right)^{\frac{1}{d}}
-\]" src="form_230_dark.png"/>
+\]
 </p>
-<p >The concentration function in turn indirectly depends on the vertex locations <img class="formulaInl light-mode-visible" alt="$ \{ x_i : i=1, \dots, n \} $" src="form_231.png"/><img class="formulaInl dark-mode-visible" alt="$ \{ x_i : i=1, \dots, n \} $" src="form_231_dark.png"/> via </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]" src="form_232.png"/><img class="formulaDsp dark-mode-visible" alt="\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]" src="form_232_dark.png"/>
+<p >The concentration function in turn indirectly depends on the vertex locations \( \{ x_i : i=1, \dots, n \} \) via </p><p class="formulaDsp">
+\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]
 </p>
 <p> so that we have to take this dependency into account for the full gradient. Define  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   s_d := \sum_{l=1}^N \det(\nabla R_{T,l}(\Phi)), \quad s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
-\]" src="form_271.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  s_d := \sum_{l=1}^N \det(\nabla R_{T,l}(\Phi)), \quad s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
-\]" src="form_271_dark.png"/>
+\]
 </p>
-<p> So for each <img class="formulaInl light-mode-visible" alt="$ x_j $" src="form_234.png"/><img class="formulaInl dark-mode-visible" alt="$ x_j $" src="form_234_dark.png"/> we arrive at  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+<p> So for each \( x_j \) we arrive at  </p><p class="formulaDsp">
+\begin{align*}
   \frac{\partial h(K_k)}{\partial x_j} &amp; = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
   {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
   \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
   (s_d s_c)^{-2}
-\end{align*}" src="form_272.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  \frac{\partial h(K_k)}{\partial x_j} &amp; = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
-  {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
-  \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
-  (s_d s_c)^{-2}
-\end{align*}" src="form_272_dark.png"/>
+\end{align*}
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -657,7 +633,7 @@ template&lt;typename DataType_ , typename TrafoType_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">mat_tensor</td><td>The material function.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">trafo_eval</td><td>Evaluator for the transformation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">space_eval</td><td>Evaluator for the FE spaces.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>(number of vertices per cell) <img class="formulaInl light-mode-visible" alt="$ \times $" src="form_266.png"/><img class="formulaInl dark-mode-visible" alt="$ \times $" src="form_266_dark.png"/> (world_dim) - matrix that holds the local coordinates that define the cell <img class="formulaInl light-mode-visible" alt="$ K $" src="form_267.png"/><img class="formulaInl dark-mode-visible" alt="$ K $" src="form_267_dark.png"/>. These are the coefficients for the FE function representing the transformation.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>(number of vertices per cell) \( \times \) (world_dim) - matrix that holds the local coordinates that define the cell \( K \). These are the coefficients for the FE function representing the transformation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The local optimal scale</td></tr>
     <tr><td class="paramdir"></td><td class="paramname">grad_h</td><td>The gradient of h wrt. the local vertex coordinates </td></tr>
   </table>
@@ -743,11 +719,11 @@ template&lt;typename DataType_ , typename TrafoType_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">mat_tensor</td><td>The material function.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">trafo_eval</td><td>Evaluator for the transformation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">space_eval</td><td>Evaluator for the FE spaces.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>(number of vertices per cell) <img class="formulaInl light-mode-visible" alt="$ \times $" src="form_266.png"/><img class="formulaInl dark-mode-visible" alt="$ \times $" src="form_266_dark.png"/> (world_dim) - matrix that holds the local coordinates that define the cell <img class="formulaInl light-mode-visible" alt="$ K $" src="form_267.png"/><img class="formulaInl dark-mode-visible" alt="$ K $" src="form_267_dark.png"/>. These are the coefficients for the FE function representing the transformation.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>(number of vertices per cell) \( \times \) (world_dim) - matrix that holds the local coordinates that define the cell \( K \). These are the coefficients for the FE function representing the transformation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The local optimal scale.</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">fval_frobenius</td><td>Contribution of <img class="formulaInl light-mode-visible" alt="$ \| \nabla R_K \|_F^2 $" src="form_268.png"/><img class="formulaInl dark-mode-visible" alt="$ \| \nabla R_K \|_F^2 $" src="form_268_dark.png"/>.</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">fval_cof</td><td>Contribution of <img class="formulaInl light-mode-visible" alt="$ \| \mathrm{Cof}(\nabla R_K) \|_F^2 $" src="form_269.png"/><img class="formulaInl dark-mode-visible" alt="$ \| \mathrm{Cof}(\nabla R_K) \|_F^2 $" src="form_269_dark.png"/>.</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">fval_det</td><td>Contribution of <img class="formulaInl light-mode-visible" alt="$ \mathrm{det}(\nabla R_K)$" src="form_270.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{det}(\nabla R_K)$" src="form_270_dark.png"/>.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">fval_frobenius</td><td>Contribution of \( \| \nabla R_K \|_F^2 \).</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">fval_cof</td><td>Contribution of \( \| \mathrm{Cof}(\nabla R_K) \|_F^2 \).</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">fval_det</td><td>Contribution of \( \mathrm{det}(\nabla R_K)\).</td></tr>
   </table>
   </dd>
 </dl>
@@ -821,7 +797,7 @@ template&lt;typename DataType_ , typename TrafoType_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">mat_tensor</td><td>The material function.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">trafo_eval</td><td>Evaluator for the transformation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">space_eval</td><td>Evaluator for the FE spaces.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>(number of vertices per cell) <img class="formulaInl light-mode-visible" alt="$ \times $" src="form_266.png"/><img class="formulaInl dark-mode-visible" alt="$ \times $" src="form_266_dark.png"/> (world_dim) - matrix that holds the local coordinates that define the cell <img class="formulaInl light-mode-visible" alt="$ K $" src="form_267.png"/><img class="formulaInl dark-mode-visible" alt="$ K $" src="form_267_dark.png"/>. These are the coefficients for the FE function representing the transformation.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>(number of vertices per cell) \( \times \) (world_dim) - matrix that holds the local coordinates that define the cell \( K \). These are the coefficients for the FE function representing the transformation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>(world_dim) - vector that holds the dimensions of the target reference cell</td></tr>
   </table>
   </dd>

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -735,7 +745,7 @@ template&lt;typename Matrix_ , typename Space_ , typename CubatureFactory_ &gt; 
 
 <p>Assembles the jump operator onto a matrix. </p>
 <p >This function assembles the jump operator: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\]" src="form_130.png"/><img class="formulaDsp dark-mode-visible" alt="\[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\]" src="form_130_dark.png"/>
+\[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\]
 </p>
 <dl class="section attention"><dt>Attention</dt><dd>The matrix must have an extended stencil, which must have been assembled by calling <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#a8cd652d4a25615b6e59c64fd4a9741f1" title="Assembles an extended-facet matrix structure from a single space.">Assembly::SymbolicAssembler::assemble_matrix_ext_facet1()</a> !</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -818,7 +828,7 @@ template&lt;typename Matrix_ , typename Space_ , typename CubatureFactory_ &gt; 
 
 <p>Assembles the jump-stabilization operator onto a matrix. </p>
 <p >This function assembles the jump stabilization operator: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\]" src="form_129.png"/><img class="formulaDsp dark-mode-visible" alt="\[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\]" src="form_129_dark.png"/>
+\[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\]
 </p>
 <dl class="section attention"><dt>Attention</dt><dd>The matrix must have an extended stencil, which must have been assembled by calling <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#a8cd652d4a25615b6e59c64fd4a9741f1" title="Assembles an extended-facet matrix structure from a single space.">Assembly::SymbolicAssembler::assemble_matrix_ext_facet1()</a> !</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>

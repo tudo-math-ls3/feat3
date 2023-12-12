@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -504,7 +514,7 @@ template&lt;int m_, int sma_, int sna_, int sx_&gt; </div>
 
 <p>Adds the result of a matrix-vector product onto this vector. </p>
 <p >Let <em>y</em> denote <code>this</code> vector, and let <em>A</em> denote the input matrix and <em>x</em> in the input vector, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ y \leftarrow y + \alpha\cdot A\cdot x \]" src="form_385.png"/><img class="formulaDsp dark-mode-visible" alt="\[ y \leftarrow y + \alpha\cdot A\cdot x \]" src="form_385_dark.png"/>
+\[ y \leftarrow y + \alpha\cdot A\cdot x \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -568,7 +578,7 @@ template&lt;int m_, int sma_, int sna_, int sx_&gt; </div>
 
 <p>Adds the result of a vector-matrix product onto this vector. </p>
 <p >Let <em>y</em> denote <code>this</code> vector, and let <em>x</em> in the input vector and <em>A</em> denote the input matrix, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \]" src="form_386.png"/><img class="formulaDsp dark-mode-visible" alt="\[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \]" src="form_386_dark.png"/>
+\[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1395,7 +1405,7 @@ template&lt;int sna_, int snb_&gt; </div>
 
 <p>Sets this vector to the convex combination of two other vectors. </p>
 <p >Let <em>y</em> denote <code>this</code> vector, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ y \leftarrow (1-\alpha)\cdot a + \alpha\cdot b \]" src="form_382.png"/><img class="formulaDsp dark-mode-visible" alt="\[ y \leftarrow (1-\alpha)\cdot a + \alpha\cdot b \]" src="form_382_dark.png"/>
+\[ y \leftarrow (1-\alpha)\cdot a + \alpha\cdot b \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1455,7 +1465,7 @@ template&lt;int m_, int sma_, int sna_, int sx_&gt; </div>
 
 <p>Sets this vector to the result of a matrix-vector product. </p>
 <p >Let <em>y</em> denote <code>this</code> vector, and let <em>A</em> denote the input matrix and <em>x</em> in the input vector, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ y \leftarrow A\cdot x \]" src="form_383.png"/><img class="formulaDsp dark-mode-visible" alt="\[ y \leftarrow A\cdot x \]" src="form_383_dark.png"/>
+\[ y \leftarrow A\cdot x \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1514,7 +1524,7 @@ template&lt;int m_, int sma_, int sna_, int sx_&gt; </div>
 
 <p>Sets this vector to the result of a vector-matrix product. </p>
 <p >Let <em>y</em> denote <code>this</code> vector, and let <em>x</em> in the input vector and <em>A</em> denote the input matrix, then this function computes: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ y^\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \]" src="form_384.png"/><img class="formulaDsp dark-mode-visible" alt="\[ y^\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \]" src="form_384_dark.png"/>
+\[ y^\top \leftarrow x^\top \cdot A \Longleftrightarrow y \leftarrow A^\top\cdot x \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

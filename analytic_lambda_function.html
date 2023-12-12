@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -213,7 +223,7 @@ Richardson Extrapolation of Derivatives</h2>
 <p >As said before, if you do not specify the formulae for the first and/or second order derivatives explicitly, then the Lambda function classes will automatically enable a Richardson extrapolation scheme based on second-order central difference quotients. The Richardson extrapolation scheme can be configured up to a certain extend by specifying an initial h for the extrapolation scheme as well as the maximum number of Richardson iterations by setting the <code>initial_h_grad</code> / <code>initial_h_hess</code> and <code>max_steps_grad</code> / <code>max_steps_hess</code> attributes of the Lambda function classes. The default initial for both gradient and hessian extrapolation is set to 0.01 and the default maximum number of extrapolation steps is set to 10. There are currently no getter/setter functions for these two attributes, but they are public, so you can access them directly, although there is little reason to change them unless in very specific scenarios.</p>
 <h2><a class="anchor" id="ana_lambda_examples_scalar"></a>
 Scalar Examples</h2>
-<p >A simple example to create an analytic Lambda function object for the scalar 2D function <img class="formulaInl light-mode-visible" alt="$x^2-y^2$" src="form_441.png"/><img class="formulaInl dark-mode-visible" alt="$x^2-y^2$" src="form_441_dark.png"/> (without specifying any partial derivatives explicitly) by using generic lambdas is given here: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> saddle_func = create_lambda_function_scalar_2d( [](<span class="keyword">auto</span> x, <span class="keyword">auto</span> y){<span class="keywordflow">return</span> x*x - y*y;} );</div>
+<p >A simple example to create an analytic Lambda function object for the scalar 2D function \(x^2-y^2\) (without specifying any partial derivatives explicitly) by using generic lambdas is given here: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> saddle_func = create_lambda_function_scalar_2d( [](<span class="keyword">auto</span> x, <span class="keyword">auto</span> y){<span class="keywordflow">return</span> x*x - y*y;} );</div>
 </div><!-- fragment --><p >One may also provide the first and second partial derivatives: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> saddle_func = create_lambda_function_scalar_2d(</div>
 <div class="line">  [](<span class="keyword">auto</span> x, <span class="keyword">auto</span> y) {<span class="keywordflow">return</span>  x*x - y*y;}, <span class="comment">// function value</span></div>
 <div class="line">  [](<span class="keyword">auto</span> x, <span class="keyword">auto</span> y) {<span class="keywordflow">return</span>  2.0*x;},     <span class="comment">// X-derivative</span></div>

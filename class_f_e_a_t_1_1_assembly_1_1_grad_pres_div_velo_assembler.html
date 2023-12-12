@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -116,12 +126,12 @@ Static Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Grad(P)/Div(V) assembler class. </p>
-<p >This class assembles the two bilinearforms <img class="formulaInl light-mode-visible" alt="$\nabla p$" src="form_111.png"/><img class="formulaInl dark-mode-visible" alt="$\nabla p$" src="form_111_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$\nabla\cdot v$" src="form_112.png"/><img class="formulaInl dark-mode-visible" alt="$\nabla\cdot v$" src="form_112_dark.png"/> of the Stokes equations, from which the weak formulations are obtained by integration by parts, i.e.</p>
+<p >This class assembles the two bilinearforms \(\nabla p\) and \(\nabla\cdot v\) of the Stokes equations, from which the weak formulations are obtained by integration by parts, i.e.</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ b(\psi,\varphi) := - \int_\Omega \psi \nabla \varphi\]" src="form_113.png"/><img class="formulaDsp dark-mode-visible" alt="\[ b(\psi,\varphi) := - \int_\Omega \psi \nabla \varphi\]" src="form_113_dark.png"/>
+\[ b(\psi,\varphi) := - \int_\Omega \psi \nabla \varphi\]
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ d(\varphi,\psi) := - \int_\Omega (\nabla \cdot \varphi) \psi\]" src="form_114.png"/><img class="formulaDsp dark-mode-visible" alt="\[ d(\varphi,\psi) := - \int_\Omega (\nabla \cdot \varphi) \psi\]" src="form_114_dark.png"/>
+\[ d(\varphi,\psi) := - \int_\Omega (\nabla \cdot \varphi) \psi\]
 </p>
 <dl class="section note"><dt>Note</dt><dd>Both bilinearforms are by default multiplied by -1 to obtain symmetry of the resulting Stokes matrix.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>

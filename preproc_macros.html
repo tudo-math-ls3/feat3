@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -297,14 +307,14 @@ FEAT_HAVE_SUPERLU_DIST</h2>
  <h2><a class="anchor" id="ppm_feat_have_triangle"></a>
 FEAT_HAVE_TRIANGLE</h2>
 <p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the triangle library, which offers a set of 2D triangular mesh generators.</p>
-<hr  />
- <h2><a class="anchor" id="ppm_feat_have_trilinos"></a>
-FEAT_HAVE_TRILINOS</h2>
-<p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the trilinos library, a collection of reusable scientific software libraries, known in particular for linear solvers, non-linear solvers, transient solvers, optimization solvers, and uncertainty quantification (UQ) solvers.</p>
 <dl class="section note"><dt>Note</dt><dd>If you want to include the <code>triangle.h</code> header file, you first have to define the following preprocessor macros, <b>before</b> including the header itself: <div class="fragment"><div class="line"><span class="preprocessor">#define ANSI_DECLARATORS</span></div>
 <div class="line"><span class="preprocessor">#define REAL double</span></div>
 <div class="line"><span class="preprocessor">#define VOID void</span></div>
 </div><!-- fragment --></dd></dl>
+<hr  />
+ <h2><a class="anchor" id="ppm_feat_have_trilinos"></a>
+FEAT_HAVE_TRILINOS</h2>
+<p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the trilinos library, a collection of reusable scientific software libraries, known in particular for linear solvers, non-linear solvers, transient solvers, optimization solvers, and uncertainty quantification (UQ) solvers.</p>
 <hr  />
  <h2><a class="anchor" id="ppm_feat_have_umfpack"></a>
 FEAT_HAVE_UMFPACK</h2>

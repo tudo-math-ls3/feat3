@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -174,13 +184,11 @@ class FEAT::Analytic::Common::XYPlaneRotation&lt; DT_, dim_ &gt;</div><p >Veloci
   </dd>
 </dl>
 <p>This is the mapping  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
    f: \mathbb{R}^d \to \mathbb{R}^d, (x, y, z)^T \mapsto \omega (-(y - y_0), x - x_0, 0)
-\]" src="form_25.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-   f: \mathbb{R}^d \to \mathbb{R}^d, (x, y, z)^T \mapsto \omega (-(y - y_0), x - x_0, 0)
-\]" src="form_25_dark.png"/>
+\]
 </p>
-<p> for a given angular velocity <img class="formulaInl light-mode-visible" alt="$ \omega $" src="form_26.png"/><img class="formulaInl dark-mode-visible" alt="$ \omega $" src="form_26_dark.png"/> and and origin <img class="formulaInl light-mode-visible" alt="$ (x_0, y_0, z_0)^T $" src="form_27.png"/><img class="formulaInl dark-mode-visible" alt="$ (x_0, y_0, z_0)^T $" src="form_27_dark.png"/>.</p>
+<p> for a given angular velocity \( \omega \) and and origin \( (x_0, y_0, z_0)^T \).</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l02372">2372</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>

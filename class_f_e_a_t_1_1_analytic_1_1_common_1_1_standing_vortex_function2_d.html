@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -138,11 +148,10 @@ Static Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Standing-Vortex function in 2D. </p>
 <p >This function represents the 2D standing vortex velocity field, which is a common benchmark velocity field for testing the stability of Navier-Stokes discretizations and stabilizations.</p>
-<p >The field is given with <img class="formulaInl light-mode-visible" alt="$r := \sqrt{(x-0.5)^2 \cdot(y-0.5)^2}$" src="form_33.png"/><img class="formulaInl dark-mode-visible" alt="$r := \sqrt{(x-0.5)^2 \cdot(y-0.5)^2}$" src="form_33_dark.png"/> as</p>
+<p >The field is given with \(r := \sqrt{(x-0.5)^2 \cdot(y-0.5)^2}\) as</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[u(x,y,z) = \begin{cases}\begin{bmatrix}5(y-0.5)\\ -5(x-0.5)\end{bmatrix},&amp; r &lt; 0.2\\
-\begin{bmatrix}(2/r - 5)(y-0.5) \\ (-2/r + 5)(x-0.5)\end{bmatrix},&amp; 0.2 \leq r &lt; 0.4\\0, &amp; \text{else}\end{cases}\]" src="form_34.png"/><img class="formulaDsp dark-mode-visible" alt="\[u(x,y,z) = \begin{cases}\begin{bmatrix}5(y-0.5)\\ -5(x-0.5)\end{bmatrix},&amp; r &lt; 0.2\\
-\begin{bmatrix}(2/r - 5)(y-0.5) \\ (-2/r + 5)(x-0.5)\end{bmatrix},&amp; 0.2 \leq r &lt; 0.4\\0, &amp; \text{else}\end{cases}\]" src="form_34_dark.png"/>
+\[u(x,y,z) = \begin{cases}\begin{bmatrix}5(y-0.5)\\ -5(x-0.5)\end{bmatrix},&amp; r &lt; 0.2\\
+\begin{bmatrix}(2/r - 5)(y-0.5) \\ (-2/r + 5)(x-0.5)\end{bmatrix},&amp; 0.2 \leq r &lt; 0.4\\0, &amp; \text{else}\end{cases}\]
 </p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 

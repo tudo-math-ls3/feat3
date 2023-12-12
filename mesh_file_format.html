@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -380,12 +390,12 @@ Chart Description</h1>
 </ul>
 <h2><a class="anchor" id="meshfile_chart_circle_param"></a>
 Circle Parameterization</h2>
-<p >Let <img class="formulaInl light-mode-visible" alt="$m_x, m_y$" src="form_442.png"/><img class="formulaInl dark-mode-visible" alt="$m_x, m_y$" src="form_442_dark.png"/> denote the coordinates of the circle midpoint, <img class="formulaInl light-mode-visible" alt="$r$" src="form_443.png"/><img class="formulaInl dark-mode-visible" alt="$r$" src="form_443_dark.png"/> the circle radius and <img class="formulaInl light-mode-visible" alt="$d_L, d_R$" src="form_444.png"/><img class="formulaInl dark-mode-visible" alt="$d_L, d_R$" src="form_444_dark.png"/> the left and right domain interval borders, then the parameterization of the circle is defined as follows:</p>
+<p >Let \(m_x, m_y\) denote the coordinates of the circle midpoint, \(r\) the circle radius and \(d_L, d_R\) the left and right domain interval borders, then the parameterization of the circle is defined as follows:</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\]" src="form_445.png"/><img class="formulaDsp dark-mode-visible" alt="\[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\]" src="form_445_dark.png"/>
+\[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\]
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\]" src="form_446.png"/><img class="formulaDsp dark-mode-visible" alt="\[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\]" src="form_446_dark.png"/>
+\[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\]
 </p>
 <h3><a class="anchor" id="meshfile_chart_circle_examples"></a>
 2D Circle Chart Examples</h3>
@@ -429,12 +439,12 @@ Terminology</h2>
 <h3><a class="anchor" id="meshfile_chart_bezier_points"></a>
 Bezier Points</h3>
 <p >The <code>Points</code> node itself has no attributes, and its contents specify both the vertex points and the control points of the Spline. Each line corresponds to a single Bezier segment, which consists of all control points following the previous vertex point as well as the end vertex point of the segment, encoded in the following way: </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ n~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y~ v_x~ v_y\]" src="form_447.png"/><img class="formulaDsp dark-mode-visible" alt="\[ n~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y~ v_x~ v_y\]" src="form_447_dark.png"/>
+\[ n~ c^1_x~ c^1_y~ c^2_x~ c^2_y~ ...~ c^n_x~ c^n_y~ v_x~ v_y\]
 </p>
 <p >where</p><ul>
 <li><em>n</em> specifies the number of control points for the segment</li>
-<li><img class="formulaInl light-mode-visible" alt="$c^k_x$" src="form_448.png"/><img class="formulaInl dark-mode-visible" alt="$c^k_x$" src="form_448_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$c^k_y$" src="form_449.png"/><img class="formulaInl dark-mode-visible" alt="$c^k_y$" src="form_449_dark.png"/> specify the x- and y-coordinates of the <em>k</em>-th inner control point following the previous vertex point, resp.</li>
-<li><img class="formulaInl light-mode-visible" alt="$v_x$" src="form_450.png"/><img class="formulaInl dark-mode-visible" alt="$v_x$" src="form_450_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$v_y$" src="form_451.png"/><img class="formulaInl dark-mode-visible" alt="$v_y$" src="form_451_dark.png"/> specify the x- and y-coordinates of the next vertex point, resp.</li>
+<li>\(c^k_x\) and \(c^k_y\) specify the x- and y-coordinates of the <em>k</em>-th inner control point following the previous vertex point, resp.</li>
+<li>\(v_x\) and \(v_y\) specify the x- and y-coordinates of the next vertex point, resp.</li>
 </ul>
 <dl class="section remark"><dt>Remarks</dt><dd>A Bezier curve without any inner control points is a simple line segment.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The first vertex point of a Bezier spline must <b>not</b> be preceeded by any control points.</dd></dl>
@@ -541,7 +551,7 @@ Transformation</h3>
 <p >The <code>Extrude</code> chart supports the three attributes <code>origin</code>, <code>offset</code> and <code>angles</code> to define a "proper rigid
 transformation" (a transformation that consists only of translations and rotations) for the extruded chart. The transformation consists of two translation vectors <em>v</em> and <em>w</em> as well as a 3D rotation matrix <em>R</em>, which define the following transformation mapping:</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ x \mapsto w + R \cdot(x - v)\]" src="form_452.png"/><img class="formulaDsp dark-mode-visible" alt="\[ x \mapsto w + R \cdot(x - v)\]" src="form_452_dark.png"/>
+\[ x \mapsto w + R \cdot(x - v)\]
 </p>
 <p >Each of the three components is optional and can be specified by the following attributes:</p><ul>
 <li><code>origin:</code> specifies the X- and Y-coordinates of the origin vector <em>v</em>, separated by whitespaces</li>

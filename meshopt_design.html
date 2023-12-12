@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -102,10 +112,10 @@ Basic overview</h1>
 <li><p class="startli">The mesh is moving, where only the boundary movement is known (i.e. decoupled fluid-structure interactions, Navier Stokes with free capillary boundary etc.).</p>
 <p class="startli">Then this movement has to be continued to the interiour of the computational domain. In finite element and math terminology: If the boundary movement is a function with "enough regularity", then it is the trace of a function on the whole domain and we can find one possible preimage by constructing an inverse trace operator.</p>
 <p class="startli">The most simple example for this to solve </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ - \Delta u = 0 ~ \mathrm{in} ~ \Omega, u = u_D ~\mathrm{on}~ \partial \Omega \]" src="form_453.png"/><img class="formulaDsp dark-mode-visible" alt="\[ - \Delta u = 0 ~ \mathrm{in} ~ \Omega, u = u_D ~\mathrm{on}~ \partial \Omega \]" src="form_453_dark.png"/>
+\[ - \Delta u = 0 ~ \mathrm{in} ~ \Omega, u = u_D ~\mathrm{on}~ \partial \Omega \]
 </p>
-<p> with finite element tools on the FE space the transformation is from, where <img class="formulaInl light-mode-visible" alt="$ u_D $" src="form_454.png"/><img class="formulaInl dark-mode-visible" alt="$ u_D $" src="form_454_dark.png"/> are the new boundary coordinates. The solution then contains the new vertex coordinates in the interiour.</p>
-<p class="startli">This is also called <em>Laplacian smoothing</em> and is nothing more than minimising the harmonic energy of the transformation which satisfies the appropriate boundary conditions. This is implemented in FEAT::Meshopt::LaplaceFunctional. The boundary coordinates <img class="formulaInl light-mode-visible" alt="$ u_D $" src="form_454.png"/><img class="formulaInl dark-mode-visible" alt="$ u_D $" src="form_454_dark.png"/> are then the trace of the FE function <img class="formulaInl light-mode-visible" alt="$ u $" src="form_424.png"/><img class="formulaInl dark-mode-visible" alt="$ u $" src="form_424_dark.png"/> on <img class="formulaInl light-mode-visible" alt="$ \partial \Omega $" src="form_423.png"/><img class="formulaInl dark-mode-visible" alt="$ \partial \Omega $" src="form_423_dark.png"/> and the solving of the above problem was the application of one possible inverse trace operator. The solution is also the minimizer of the harmonic energy on the space with the appropriate boundary values.</p>
+<p> with finite element tools on the FE space the transformation is from, where \( u_D \) are the new boundary coordinates. The solution then contains the new vertex coordinates in the interiour.</p>
+<p class="startli">This is also called <em>Laplacian smoothing</em> and is nothing more than minimising the harmonic energy of the transformation which satisfies the appropriate boundary conditions. This is implemented in FEAT::Meshopt::LaplaceFunctional. The boundary coordinates \( u_D \) are then the trace of the FE function \( u \) on \( \partial \Omega \) and the solving of the above problem was the application of one possible inverse trace operator. The solution is also the minimizer of the harmonic energy on the space with the appropriate boundary values.</p>
 </li>
 <li><p class="startli">A given mesh is to be improved according to some quality measure.</p>
 <p class="startli">This quality measure needs to be a functional defined in terms geometric quantities. There are some regularity assumptions that need to hold, i.e. we need to be able to compute the first order derivatives with regard to the mesh vertices.</p>

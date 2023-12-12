@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -115,43 +125,42 @@ $(document).ready(function(){initNavTree('tools_matrix_info.html',''); initResiz
 </ul>
 <p >Furthermore, the following options are available:</p><ul>
 <li><b><code>--nztol tol </code></b><br  />
-Specifies the relative tolerance for non-zero entries, where <code>tol</code> is a small non-negative floating point number. If not specified, <img class="formulaInl light-mode-visible" alt="$\sqrt{\varepsilon}\approx \frac{3}{2} 10^{-8}$" src="form_455.png"/><img class="formulaInl dark-mode-visible" alt="$\sqrt{\varepsilon}\approx \frac{3}{2} 10^{-8}$" src="form_455_dark.png"/> is used.</li>
+Specifies the relative tolerance for non-zero entries, where <code>tol</code> is a small non-negative floating point number. If not specified, \(\sqrt{\varepsilon}\approx \frac{3}{2} 10^{-8}\) is used.</li>
 </ul>
-<p >In the following, for the given input matrix <img class="formulaInl light-mode-visible" alt="$A\in \mathbb{R}^{m\times n}$" src="form_456.png"/><img class="formulaInl dark-mode-visible" alt="$A\in \mathbb{R}^{m\times n}$" src="form_456_dark.png"/>, let <img class="formulaInl light-mode-visible" alt="$\mathcal{S}(A) \subseteq \{1,\dots,m\}\times\{1,\dots,n\}$" src="form_457.png"/><img class="formulaInl dark-mode-visible" alt="$\mathcal{S}(A) \subseteq \{1,\dots,m\}\times\{1,\dots,n\}$" src="form_457_dark.png"/> denote the sparsity pattern of <em>A</em>, i.e. the set of all (i,j) pairs which exist in the sparse matrix <em>A</em>.</p>
+<p >In the following, for the given input matrix \(A\in \mathbb{R}^{m\times n}\), let \(\mathcal{S}(A) \subseteq \{1,\dots,m\}\times\{1,\dots,n\}\) denote the sparsity pattern of <em>A</em>, i.e. the set of all (i,j) pairs which exist in the sparse matrix <em>A</em>.</p>
 <p >The tool provides the following information:</p><ul>
 <li><b>Matrix Filename</b>: self-explanatory</li>
-<li><b>Non-Zero Tolerance</b>: the tolerance used by this tool for detecting non-zeros. A matrix entry <img class="formulaInl light-mode-visible" alt="$a_{ij}$" src="form_458.png"/><img class="formulaInl dark-mode-visible" alt="$a_{ij}$" src="form_458_dark.png"/> is interpreted as zero, if <img class="formulaInl light-mode-visible" alt="$|a_{ij}| &lt; \mathrm{nztol}\cdot\|A\|_{\max}$" src="form_459.png"/><img class="formulaInl dark-mode-visible" alt="$|a_{ij}| &lt; \mathrm{nztol}\cdot\|A\|_{\max}$" src="form_459_dark.png"/>.</li>
+<li><b>Non-Zero Tolerance</b>: the tolerance used by this tool for detecting non-zeros. A matrix entry \(a_{ij}\) is interpreted as zero, if \(|a_{ij}| &lt; \mathrm{nztol}\cdot\|A\|_{\max}\).</li>
 <li><b>Number of Rows</b>: self-explanatory</li>
 <li><b>Number of Columns</b>: self-explanatory</li>
 <li><b>Max Row Degree</b>: specifies the maximum number of symbolical non-zero entries per row, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\max_{1\leq i\leq m}\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)\big\}\Big)\]" src="form_460.png"/><img class="formulaDsp dark-mode-visible" alt="\[\max_{1\leq i\leq m}\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)\big\}\Big)\]" src="form_460_dark.png"/>
+\[\max_{1\leq i\leq m}\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)\big\}\Big)\]
 </p>
 </li>
 <li><b>Max Column Degree</b>: specifies the maximum number of symbolical non-zero entries per column</li>
 <li><b>Row Degree Distribution</b>: 10 | 0 | 0 | 5 | 0 | 0 | 7 | 8 | 0 | 70 stands for a distribution of degrees per row, where 10% of the rows contain 0-9% of the maximum matrix row degree. 5 % of the rows contain 30-39% of the maximum matrix row degree. 70% of the rows contain 90-100% of the maximum matrix row degree. Thus we have 10% intervals ascending from left to right, which contain the percentage of rows, which have in common this percentage of row entries, relative to the maximum row degree.</li>
 <li><b>Average Row Degree</b>: the sum of all row degrees divided by the number of rows.</li>
 <li><b>Max Row Bandwidth</b>: specifies the maximum row bandwith, i.e.  <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\max_{1\leq i\leq m}\Big\{ \underset{1\leq j\leq n}{\mathrm{argmax}}\big\{(i,j)\in\mathcal{S}(A)\big\}
-- \underset{1\leq j\leq n}{\mathrm{argmin}}\big\{(i,j)\in\mathcal{S}(A)\big\}\Big\}\]" src="form_461.png"/><img class="formulaDsp dark-mode-visible" alt="\[\max_{1\leq i\leq m}\Big\{ \underset{1\leq j\leq n}{\mathrm{argmax}}\big\{(i,j)\in\mathcal{S}(A)\big\}
-- \underset{1\leq j\leq n}{\mathrm{argmin}}\big\{(i,j)\in\mathcal{S}(A)\big\}\Big\}\]" src="form_461_dark.png"/>
+\[\max_{1\leq i\leq m}\Big\{ \underset{1\leq j\leq n}{\mathrm{argmax}}\big\{(i,j)\in\mathcal{S}(A)\big\}
+- \underset{1\leq j\leq n}{\mathrm{argmin}}\big\{(i,j)\in\mathcal{S}(A)\big\}\Big\}\]
 </p>
 </li>
 <li><b>Max Column Bandwidth</b>: specifies the maximum column bandwith.</li>
 <li><b>Symbolical Non-Zeros</b>: specifies the total number of entries in the sparsity pattern of <em>A</em>, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathrm{card}\Big(\mathcal{S}(A)\Big)\]" src="form_462.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathrm{card}\Big(\mathcal{S}(A)\Big)\]" src="form_462_dark.png"/>
+\[\mathrm{card}\Big(\mathcal{S}(A)\Big)\]
 </p>
 </li>
 <li><b>Numerical Non-Zeros</b>: specifies the total number of entries of <em>A</em>, which are non-zero, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)~:~|a_{ij}| \geq \mathrm{nztol}\cdot\|A\|_{\max}~\big\}\Big)\]" src="form_463.png"/><img class="formulaDsp dark-mode-visible" alt="\[\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)~:~|a_{ij}| \geq \mathrm{nztol}\cdot\|A\|_{\max}~\big\}\Big)\]" src="form_463_dark.png"/>
+\[\mathrm{card}\Big(\big\{(i,j)\in\mathcal{S}(A)~:~|a_{ij}| \geq \mathrm{nztol}\cdot\|A\|_{\max}~\big\}\Big)\]
 </p>
 </li>
 <li><b>Has Main Diag Structure</b>: specifies whether the main diagonal is included in the matrix sparsity pattern.</li>
 <li><b>Has Symmetric Structure</b>: specifies whether the matrix sparsity pattern is symmetric, i.e. specifies whether it holds that <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[(i,j)\in\mathcal{S}(A) \Longleftrightarrow (j,i)\in\mathcal{S}(A)\]" src="form_464.png"/><img class="formulaDsp dark-mode-visible" alt="\[(i,j)\in\mathcal{S}(A) \Longleftrightarrow (j,i)\in\mathcal{S}(A)\]" src="form_464_dark.png"/>
+\[(i,j)\in\mathcal{S}(A) \Longleftrightarrow (j,i)\in\mathcal{S}(A)\]
 </p>
 </li>
 <li><b>Has Symmetric Content</b>: specifies whether the matrix is symmetric, i.e. specifies whether it holds that <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[|a_{ij} - a_{ji}| &lt; \mathrm{nztol}\cdot\|A\|_{\max}\]" src="form_465.png"/><img class="formulaDsp dark-mode-visible" alt="\[|a_{ij} - a_{ji}| &lt; \mathrm{nztol}\cdot\|A\|_{\max}\]" src="form_465_dark.png"/>
+\[|a_{ij} - a_{ji}| &lt; \mathrm{nztol}\cdot\|A\|_{\max}\]
 </p>
  Note that this will always be false if the matrix sparsity pattern is not symmetric, even if the matrix is numerically symmetric.</li>
 <li><b>Matrix Content</b>: classifies the entries in the sparsity pattern of the matrix. This can be one of the following eight:<ul>
@@ -169,7 +178,7 @@ Specifies the relative tolerance for non-zero entries, where <code>tol</code> is
 <li><b>Lower Content</b>: classifies the entries which are below the main diagonal of the matrix. See <b>Matrix Content</b> for possible values.</li>
 <li><b>Upper Content</b>: classifies the entries which are above the main diagonal of the matrix. See <b>Matrix Content</b> for possible values.</li>
 <li><b>Row-Diag Dominance Factor</b>: specifies the row-diagonal dominance factor, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \max_{1\leq i\leq m} \Big\{\frac{1}{|a_{ij}|}\Big(\sum_{j=1}^n |a_{ij}|\Big)-1\Big\}\]" src="form_466.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \max_{1\leq i\leq m} \Big\{\frac{1}{|a_{ij}|}\Big(\sum_{j=1}^n |a_{ij}|\Big)-1\Big\}\]" src="form_466_dark.png"/>
+\[ \max_{1\leq i\leq m} \Big\{\frac{1}{|a_{ij}|}\Big(\sum_{j=1}^n |a_{ij}|\Big)-1\Big\}\]
 </p>
  where<ul>
 <li>a value &lt; 1 indicates that the matrix is strictly diagonal dominant</li>
@@ -179,19 +188,19 @@ Specifies the relative tolerance for non-zero entries, where <code>tol</code> is
 </li>
 <li><b>Col-Diag Dominance Factor</b>: specifies the column-diagonal dominance factor. See <b>Row-Diag Dominance Factor</b>.</li>
 <li><b>Frobenius Norm</b>: specifies the Frobenius norm of the matrix, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\|A\|_F = \Big(\sum_{i=1}^m\sum_{j=1}^n |a_{ij}|^2\Big)^{\frac{1}{2}}\]" src="form_467.png"/><img class="formulaDsp dark-mode-visible" alt="\[\|A\|_F = \Big(\sum_{i=1}^m\sum_{j=1}^n |a_{ij}|^2\Big)^{\frac{1}{2}}\]" src="form_467_dark.png"/>
+\[\|A\|_F = \Big(\sum_{i=1}^m\sum_{j=1}^n |a_{ij}|^2\Big)^{\frac{1}{2}}\]
 </p>
 </li>
 <li><b>Col-Sum Norm</b>: specifies the column-sum norm of the matrix, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\|A\|_1 = \max_{1\leq j\leq n} \sum_{i=1}^m |a_{ij}|\]" src="form_468.png"/><img class="formulaDsp dark-mode-visible" alt="\[\|A\|_1 = \max_{1\leq j\leq n} \sum_{i=1}^m |a_{ij}|\]" src="form_468_dark.png"/>
+\[\|A\|_1 = \max_{1\leq j\leq n} \sum_{i=1}^m |a_{ij}|\]
 </p>
 </li>
 <li><b>Row-Sum Norm</b>: specifies the row-sum norm of the matrix, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\|A\|_\infty = \max_{1\leq i\leq m} \sum_{j=1}^n |a_{ij}|\]" src="form_469.png"/><img class="formulaDsp dark-mode-visible" alt="\[\|A\|_\infty = \max_{1\leq i\leq m} \sum_{j=1}^n |a_{ij}|\]" src="form_469_dark.png"/>
+\[\|A\|_\infty = \max_{1\leq i\leq m} \sum_{j=1}^n |a_{ij}|\]
 </p>
 </li>
 <li><b>Maximum Norm</b>: specifies the maximum norm of the matrix, i.e. <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[\|A\|_{\max} = \max_{\substack{1\leq i\leq m\\1\leq j\leq n}} |a_{ij}|\]" src="form_470.png"/><img class="formulaDsp dark-mode-visible" alt="\[\|A\|_{\max} = \max_{\substack{1\leq i\leq m\\1\leq j\leq n}} |a_{ij}|\]" src="form_470_dark.png"/>
+\[\|A\|_{\max} = \max_{\substack{1\leq i\leq m\\1\leq j\leq n}} |a_{ij}|\]
 </p>
  </li>
 </ul>

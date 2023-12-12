@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -182,7 +192,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a57fdfb40250022d5b847bca837a6db5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a57fdfb40250022d5b847bca837a6db5a">More...</a><br /></td></tr>
 <tr class="separator:a57fdfb40250022d5b847bca837a6db5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a477a7871587276efb290ea2cbcdd8da3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a477a7871587276efb290ea2cbcdd8da3">copy</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a> &amp;x, bool full=false)</td></tr>
-<tr class="memdesc:a477a7871587276efb290ea2cbcdd8da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a477a7871587276efb290ea2cbcdd8da3">More...</a><br /></td></tr>
+<tr class="memdesc:a477a7871587276efb290ea2cbcdd8da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \(this \leftarrow x\).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a477a7871587276efb290ea2cbcdd8da3">More...</a><br /></td></tr>
 <tr class="separator:a477a7871587276efb290ea2cbcdd8da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1be95582b1a06b52c0692b09fc52c146"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a1be95582b1a06b52c0692b09fc52c146">dot</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a> &amp;x) const</td></tr>
 <tr class="separator:a1be95582b1a06b52c0692b09fc52c146"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -236,7 +246,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab8af1027ef1441a4b0e8b47d8258bd59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total size of this tuple-vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#ab8af1027ef1441a4b0e8b47d8258bd59">More...</a><br /></td></tr>
 <tr class="separator:ab8af1027ef1441a4b0e8b47d8258bd59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7be8e923bec9e80ab26545adb9d56ece"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a7be8e923bec9e80ab26545adb9d56ece">triple_dot</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a> &amp;y) const</td></tr>
-<tr class="memdesc:a7be8e923bec9e80ab26545adb9d56ece"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179.png"/><img class="formulaInl dark-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179_dark.png"/>.   <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a7be8e923bec9e80ab26545adb9d56ece">More...</a><br /></td></tr>
+<tr class="memdesc:a7be8e923bec9e80ab26545adb9d56ece"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \(result \leftarrow x^T \mathrm{diag}(this) y \).   <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a7be8e923bec9e80ab26545adb9d56ece">More...</a><br /></td></tr>
 <tr class="separator:a7be8e923bec9e80ab26545adb9d56ece"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bb485939fd63b5977583bd1fba15e2f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a4bb485939fd63b5977583bd1fba15e2f">write_out</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, std::ostream &amp;file) const</td></tr>
 <tr class="memdesc:a4bb485939fd63b5977583bd1fba15e2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write out vector to file.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a4bb485939fd63b5977583bd1fba15e2f">More...</a><br /></td></tr>
@@ -1148,7 +1158,7 @@ template&lt;typename First_ , typename... Rest_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl light-mode-visible" alt="$this \leftarrow x$" src="form_167.png"/><img class="formulaInl dark-mode-visible" alt="$this \leftarrow x$" src="form_167_dark.png"/>. </p>
+<p>Performs \(this \leftarrow x\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The vector to be copied. </td></tr>
@@ -1939,7 +1949,7 @@ template&lt;typename First_ , typename... Rest_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179.png"/><img class="formulaInl dark-mode-visible" alt="$result \leftarrow x^T \mathrm{diag}(this) y $" src="form_179_dark.png"/>.  </p>
+<p>Calculate \(result \leftarrow x^T \mathrm{diag}(this) y \).  </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The first vector.</td></tr>

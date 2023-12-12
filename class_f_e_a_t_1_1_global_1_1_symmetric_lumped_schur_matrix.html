@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -152,10 +162,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a12c3313a7174c71985ab979732a925ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor.  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a12c3313a7174c71985ab979732a925ab">More...</a><br /></td></tr>
 <tr class="separator:a12c3313a7174c71985ab979732a925ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a210b0bea4a3c5ff9545fc3e89732d716"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a210b0bea4a3c5ff9545fc3e89732d716">apply</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#aa36af6b21a5424b419478cb00c0e9e32">VectorTypeL</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a3ff3ff943649d50d0d049b9deca2049d">VectorTypeR</a> &amp;x) const</td></tr>
-<tr class="memdesc:a210b0bea4a3c5ff9545fc3e89732d716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163_dark.png"/>.  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a210b0bea4a3c5ff9545fc3e89732d716">More...</a><br /></td></tr>
+<tr class="memdesc:a210b0bea4a3c5ff9545fc3e89732d716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow this~ x \).  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a210b0bea4a3c5ff9545fc3e89732d716">More...</a><br /></td></tr>
 <tr class="separator:a210b0bea4a3c5ff9545fc3e89732d716"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14648d96bbe3b331cbffe776b0d0c792"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a14648d96bbe3b331cbffe776b0d0c792">apply</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#aa36af6b21a5424b419478cb00c0e9e32">VectorTypeL</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a3ff3ff943649d50d0d049b9deca2049d">VectorTypeR</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#aa36af6b21a5424b419478cb00c0e9e32">VectorTypeL</a> &amp;y, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#acfe49eedf47731f6aaf6f41d23a77332">DataType</a> alpha=<a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#acfe49eedf47731f6aaf6f41d23a77332">DataType</a>(1)) const</td></tr>
-<tr class="memdesc:a14648d96bbe3b331cbffe776b0d0c792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this~ x $" src="form_164.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this~ x $" src="form_164_dark.png"/>.  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a14648d96bbe3b331cbffe776b0d0c792">More...</a><br /></td></tr>
+<tr class="memdesc:a14648d96bbe3b331cbffe776b0d0c792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow y + \alpha~ this~ x \).  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a14648d96bbe3b331cbffe776b0d0c792">More...</a><br /></td></tr>
 <tr class="separator:a14648d96bbe3b331cbffe776b0d0c792"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a082c691f5fe3a4b3ec35bcb9b821d0d3"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a082c691f5fe3a4b3ec35bcb9b821d0d3">bytes</a> () const</td></tr>
 <tr class="memdesc:a082c691f5fe3a4b3ec35bcb9b821d0d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total amount of bytes allocated.  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a082c691f5fe3a4b3ec35bcb9b821d0d3">More...</a><br /></td></tr>
@@ -178,7 +188,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3f269da8110186ec34437f8f88bc413a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a3f269da8110186ec34437f8f88bc413a">get_comm</a> () const</td></tr>
 <tr class="separator:a3f269da8110186ec34437f8f88bc413a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a957cb4da11f1551d938bd5c3eb4e5d99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a957cb4da11f1551d938bd5c3eb4e5d99">preproc_rhs</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#ad5bcbbda7a039ae9447c99b258368a08">VectorTypeML</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#ae486222eae8f49d15438cbc34f4e4879">VectorTypeMR</a> &amp;x) const</td></tr>
-<tr class="memdesc:a957cb4da11f1551d938bd5c3eb4e5d99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163_dark.png"/>.  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a957cb4da11f1551d938bd5c3eb4e5d99">More...</a><br /></td></tr>
+<tr class="memdesc:a957cb4da11f1551d938bd5c3eb4e5d99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow this~ x \).  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#a957cb4da11f1551d938bd5c3eb4e5d99">More...</a><br /></td></tr>
 <tr class="separator:a957cb4da11f1551d938bd5c3eb4e5d99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6fb4615db5120ea6a84d5c7ec1a9f2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#ad6fb4615db5120ea6a84d5c7ec1a9f2d">rows</a> () const</td></tr>
 <tr class="memdesc:ad6fb4615db5120ea6a84d5c7ec1a9f2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the total number of rows in this matrix.  <a href="class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html#ad6fb4615db5120ea6a84d5c7ec1a9f2d">More...</a><br /></td></tr>
@@ -232,11 +242,11 @@ class FEAT::Global::SymmetricLumpedSchurMatrix&lt; LumpedMatrixA_, MatrixB_, Mat
   </table>
   </dd>
 </dl>
-<p>For given matrices <img class="formulaInl light-mode-visible" alt="$ B, A = diag(a), D = B^T $" src="form_158.png"/><img class="formulaInl dark-mode-visible" alt="$ B, A = diag(a), D = B^T $" src="form_158_dark.png"/>, this emulates the matrix </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ S = B^T A^{-1} B. \]" src="form_159.png"/><img class="formulaDsp dark-mode-visible" alt="\[ S = B^T A^{-1} B. \]" src="form_159_dark.png"/>
+<p>For given matrices \( B, A = diag(a), D = B^T \), this emulates the matrix </p><p class="formulaDsp">
+\[ S = B^T A^{-1} B. \]
 </p>
 <p> This is called Lumped because the diagonal structure of A usually comes from lumping.</p>
-<dl class="section warning"><dt>Warning</dt><dd>For efficiency reasons, <img class="formulaInl light-mode-visible" alt="$ B^T $" src="form_160.png"/><img class="formulaInl dark-mode-visible" alt="$ B^T $" src="form_160_dark.png"/> needs to be explicitly computed and passed as <img class="formulaInl light-mode-visible" alt="$ D $" src="form_161.png"/><img class="formulaInl dark-mode-visible" alt="$ D $" src="form_161_dark.png"/>, but this property is only checked very superficially (and only in debug mode).</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>For efficiency reasons, \( B^T \) needs to be explicitly computed and passed as \( D \), but this property is only checked very superficially (and only in debug mode).</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>In the current implementation, all container template parameters must be <a class="el" href="namespace_f_e_a_t_1_1_global.html" title="Global linear algebra namespace.">Global</a>:: as the synchronization is done manually by using local() objects and calling sync_0()</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
@@ -596,7 +606,7 @@ template&lt;typename LumpedMatrixA_ , typename MatrixB_ , typename MatrixD_ , ty
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow this~ x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result.</td></tr>
@@ -659,7 +669,7 @@ template&lt;typename LumpedMatrixA_ , typename MatrixB_ , typename MatrixD_ , ty
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this~ x $" src="form_164.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this~ x $" src="form_164_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow y + \alpha~ this~ x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result.</td></tr>
@@ -893,13 +903,13 @@ template&lt;typename LumpedMatrixA_ , typename MatrixB_ , typename MatrixD_ , ty
 <p>Extracts the diagonal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">diag</td><td>The diagonal of <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/></td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">diag</td><td>The diagonal of \( S \)</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">sync</td><td>Return diag as type 0 or type 1 (if true)</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This operation is only possible because A = diag(a)</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>If the matrix <img class="formulaInl light-mode-visible" alt="$ B $" src="form_162.png"/><img class="formulaInl dark-mode-visible" alt="$ B $" src="form_162_dark.png"/> is a distributed matrix, this requires synchronization which is expensive. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>If the matrix \( B \) is a distributed matrix, this requires synchronization which is expensive. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="symmetric__lumped__schur__matrix_8hpp_source.html#l00257">257</a> of file <a class="el" href="symmetric__lumped__schur__matrix_8hpp_source.html">symmetric_lumped_schur_matrix.hpp</a>.</p>
 
@@ -972,7 +982,7 @@ template&lt;typename LumpedMatrixA_ , typename MatrixB_ , typename MatrixD_ , ty
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this~ x $" src="form_163_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow this~ x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result.</td></tr>

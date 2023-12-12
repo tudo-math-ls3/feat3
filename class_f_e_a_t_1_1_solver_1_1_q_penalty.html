@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -428,22 +438,18 @@ class FEAT::Solver::QPenalty&lt; Functional_ &gt;</div><p >Quadratic penalty ite
   </dd>
 </dl>
 <p>This class implements an outer solver for a quadratic penalty iteration. Assume we have an optimization problem of the form  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   x^* = \mathrm{argmin}_{x \in D} f(x) ~ \mathrm{subject~to~} \forall i \in E: c_i(x) = 0
-\]" src="form_336.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  x^* = \mathrm{argmin}_{x \in D} f(x) ~ \mathrm{subject~to~} \forall i \in E: c_i(x) = 0
-\]" src="form_336_dark.png"/>
+\]
 </p>
-<p> <img class="formulaInl light-mode-visible" alt="$ c_i $" src="form_337.png"/><img class="formulaInl dark-mode-visible" alt="$ c_i $" src="form_337_dark.png"/> are <em>equality constraints</em> turning the minimization of <img class="formulaInl light-mode-visible" alt="$ f $" src="form_295.png"/><img class="formulaInl dark-mode-visible" alt="$ f $" src="form_295_dark.png"/> into a <em>constrained optimization problem</em>. To solve this constrained problem, one can solve a series of unconstrained problems with the quadratic penalty iteration by defining the quadratic penalty function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p> \( c_i \) are <em>equality constraints</em> turning the minimization of \( f \) into a <em>constrained optimization problem</em>. To solve this constrained problem, one can solve a series of unconstrained problems with the quadratic penalty iteration by defining the quadratic penalty function  </p><p class="formulaDsp">
+\[
   Q(x,\mu) := f(x) + \frac{\mu}{2} \sum_{i \in E} c_i^2(x)
-\]" src="form_338.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  Q(x,\mu) := f(x) + \frac{\mu}{2} \sum_{i \in E} c_i^2(x)
-\]" src="form_338_dark.png"/>
+\]
 </p>
-<p> and solving it for a series <img class="formulaInl light-mode-visible" alt="$ (\mu_k)_k \in \mathbb{N}, \mu_k \stackrel{k \to \infty}{\longrightarrow} \infty $" src="form_339.png"/><img class="formulaInl dark-mode-visible" alt="$ (\mu_k)_k \in \mathbb{N}, \mu_k \stackrel{k \to \infty}{\longrightarrow} \infty $" src="form_339_dark.png"/>. Because the penalty terms are smooth, tools from unconstrained optimization can be applied (see <b>[NW06]</b> Chapter 17.1). The greatest advantage of this is that this needs no constraint qualifications and is still applicable if <img class="formulaInl light-mode-visible" alt="$ \mathrm{dim}( \mathrm{ker} (\nabla c_{i_1}, \dots, \nabla c_{i_M}) ) &gt; 0 $" src="form_340.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{dim}( \mathrm{ker} (\nabla c_{i_1}, \dots, \nabla c_{i_M}) ) &gt; 0 $" src="form_340_dark.png"/>, which is required by all more sophisticated methods like augmented Lagragian etc.</p>
-<p >All of this means that the Functional_ <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/> must be assembled anew in every iteration and the inner solver needs to take care of this.</p>
-<p >One critical part is the choice of <img class="formulaInl light-mode-visible" alt="$\mu_k$" src="form_342.png"/><img class="formulaInl dark-mode-visible" alt="$\mu_k$" src="form_342_dark.png"/>. It needs to start small (i.e. <img class="formulaInl light-mode-visible" alt="$\mu_1 = 1$" src="form_343.png"/><img class="formulaInl dark-mode-visible" alt="$\mu_1 = 1$" src="form_343_dark.png"/>) because the initial state might violate the constraints quite strongly. The rate of increase has to be fast enough that the number of penalty iterations remains small (i.e. <img class="formulaInl light-mode-visible" alt="$ \leq 10 $" src="form_344.png"/><img class="formulaInl dark-mode-visible" alt="$ \leq 10 $" src="form_344_dark.png"/>), but the systematic ill-conditioning of the penalty function means that we cannot be too quick about this. If the increase is too quick, the previous iterate will be too far away of a minimizer of the new problem and the inner solver will fail to converge. So take care.</p>
+<p> and solving it for a series \( (\mu_k)_k \in \mathbb{N}, \mu_k \stackrel{k \to \infty}{\longrightarrow} \infty \). Because the penalty terms are smooth, tools from unconstrained optimization can be applied (see <b>[NW06]</b> Chapter 17.1). The greatest advantage of this is that this needs no constraint qualifications and is still applicable if \( \mathrm{dim}( \mathrm{ker} (\nabla c_{i_1}, \dots, \nabla c_{i_M}) ) &gt; 0 \), which is required by all more sophisticated methods like augmented Lagragian etc.</p>
+<p >All of this means that the Functional_ \( Q \) must be assembled anew in every iteration and the inner solver needs to take care of this.</p>
+<p >One critical part is the choice of \(\mu_k\). It needs to start small (i.e. \(\mu_1 = 1\)) because the initial state might violate the constraints quite strongly. The rate of increase has to be fast enough that the number of penalty iterations remains small (i.e. \( \leq 10 \)), but the systematic ill-conditioning of the penalty function means that we cannot be too quick about this. If the increase is too quick, the previous iterate will be too far away of a minimizer of the new problem and the inner solver will fail to converge. So take care.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="qpenalty_8hpp_source.html#l00049">49</a> of file <a class="el" href="qpenalty_8hpp_source.html">qpenalty.hpp</a>.</p>
@@ -638,7 +644,7 @@ template&lt;typename Functional_ &gt; </div>
 <p>Constructor using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Functional_</td><td>The type of the quadratic penalty function <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/>.</td></tr>
+    <tr><td class="paramname">Functional_</td><td>The type of the quadratic penalty function \( Q \).</td></tr>
   </table>
   </dd>
 </dl>
@@ -646,7 +652,7 @@ template&lt;typename Functional_ &gt; </div>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">section_name</td><td>The name of the config section, which it does not know by itself.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">section</td><td>A pointer to the <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a> section configuring this solver.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>The quadratic penalty function <img class="formulaInl light-mode-visible" alt="$ Q $" src="form_341.png"/><img class="formulaInl dark-mode-visible" alt="$ Q $" src="form_341_dark.png"/>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>The quadratic penalty function \( Q \).</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">inner_solver</td><td>The inner solver for solving the penalized unconstrained optimization problem. </td></tr>
   </table>
   </dd>
@@ -2232,13 +2238,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
@@ -2277,13 +2281,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -3489,13 +3491,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -3529,13 +3529,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -3599,13 +3597,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 

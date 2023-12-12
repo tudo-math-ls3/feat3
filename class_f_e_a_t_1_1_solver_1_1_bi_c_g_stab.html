@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -450,7 +460,7 @@ Even if no preconditioning is used, the variant has to be set to left or right.<
   </dd>
 </dl>
 <p>This is the algorithm:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+\begin{align*}
   r_0 &amp; := b - A x_0 \\
   \hat{r}_0 &amp; := r_0 \\
   \tilde{r}_0 &amp; := M^{-1} r_0 \\
@@ -491,50 +501,9 @@ Even if no preconditioning is used, the variant has to be set to left or right.<
   \end{cases}\\
   \beta_k &amp; = \frac{\rho_k \omega_k}{\rho_{k+1} \alpha_k} \\
   \tilde{p}_{k+1} &amp; = \tilde{r}_{k+1} + \beta_k (\tilde{p}_k - \omega \tilde{q}_k)
-\end{align*}" src="form_273.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  r_0 &amp; := b - A x_0 \\
-  \hat{r}_0 &amp; := r_0 \\
-  \tilde{r}_0 &amp; := M^{-1} r_0 \\
-  \tilde{p}_0 &amp; := \tilde{r}_0 \\
-  \rho_0 &amp; :=
-  \begin{cases}
-    \left&lt; \hat{r}_0, \tilde{r}_0 \right&gt;, &amp; \mathrm{~left~preconditioned} \\
-    \left&lt; \hat{r}_0, r_0 \right&gt;, &amp; \mathrm{~right~preconditioned}
-  \end{cases}\\
-  \intertext{For $k = 0, \dots, \mathrm{max\_iter}$}
-  q_k &amp; = A \tilde{p}_k &amp; \mathrm{(~first~application~of~the~matrix)}\\
-  \tilde{q}_k &amp; = M^{-1} q_k &amp;\mathrm{(~first~application~of~the~preconditioner)}\\
-  \alpha_k &amp; =
-  \begin{cases}
-    \frac{\rho_k}{\left&lt; \hat{r}_0, q_k \right&gt;}, &amp; \mathrm{~left~preconditioned} \\
-    \frac{\rho_k}{\left&lt; \hat{r}_0, \tilde{q}_k \right&gt;}, &amp; \mathrm{~right~preconditioned} \\
-  \end{cases}\\
-  x_{k+1/2} &amp; = x_k + \alpha_k \tilde{p}_k\\
-  r_{k+1/2} &amp; = r_k - \alpha_k q_k \\
-  \mathrm{If~} x_{k+1/2}, r_{k+1/2}&amp; \mathrm{~are~good~enough:~break}\\
-  \tilde{r}_{k+1/2} &amp; = \tilde{r}_k - \alpha_k \tilde{q}_k \\
-  t_k &amp; = A \tilde{r}_{k+1/2} &amp; \mathrm{(~second~application~of~the~matrix)}\\
-  \tilde{t}_k &amp; = M^{-1} t_k &amp; \mathrm{(~second~application~of~the~preconditioner)}\\
-  \omega_k&amp; =
-  \begin{cases}
-    \frac{\left&lt; \tilde{t}_k, \tilde{r}_{k+1/2} \right&gt;}{\left&lt; \tilde{t}_k, \tilde{t}_k \right&gt;},
-    &amp; \mathrm{~left~preconditioned} \\
-    \frac{\left&lt; t_k, r_{k+1/2} \right&gt;}{\left&lt; t_k, t_k \right&gt;}, &amp; \mathrm{~right~preconditioned} \\
-  \end{cases}\\
-  x_{k+1} &amp; = x_{k+1/2} + \omega_k \tilde{r}_{k+1/2} \\
-  r_{k+1} &amp; = r_{k+1/2} - \omega_k t_{k} \\
-  \mathrm{If~} x_{k+1}, r_{k+1} &amp; \mathrm{~are~good~enough:~break}\\
-  \tilde{r}_{k+1} &amp; = \tilde{r}_{k+1/2} - \omega_k \tilde{t}_{k} \\
-  \rho_{k+1} &amp; :=
-  \begin{cases}
-    \left&lt; \hat{r}_0, \tilde{r}_k \right&gt;, &amp; \mathrm{~left~preconditioned} \\
-    \left&lt; \hat{r}_0, r_k \right&gt;, &amp; \mathrm{~right~preconditioned}
-  \end{cases}\\
-  \beta_k &amp; = \frac{\rho_k \omega_k}{\rho_{k+1} \alpha_k} \\
-  \tilde{p}_{k+1} &amp; = \tilde{r}_{k+1} + \beta_k (\tilde{p}_k - \omega \tilde{q}_k)
-\end{align*}" src="form_273_dark.png"/>
+\end{align*}
 </p>
-<dl class="section note"><dt>Note</dt><dd>The combined algorithm shown above was derived by applying the unpreconditioned <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> algorithm (see e.g. <b>[Meister2015]</b>, page 208) onto the left-only-preconditioned system <img class="formulaInl light-mode-visible" alt="$(M^{-1}A)x = M^{-1}b$" src="form_274.png"/><img class="formulaInl dark-mode-visible" alt="$(M^{-1}A)x = M^{-1}b$" src="form_274_dark.png"/> and the right-only-preconditioned system <img class="formulaInl light-mode-visible" alt="$(AM^{-1})y = b,~x=M^{-1}y$" src="form_275.png"/><img class="formulaInl dark-mode-visible" alt="$(AM^{-1})y = b,~x=M^{-1}y$" src="form_275_dark.png"/>, respectively. After further optimising the two resulting algorithms by some clever vector substitutions and some reordering, we have obtained two versions of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> algorithm, which only differed by the choice of the scalar products, so that these two versions could be easily <em>merged</em> into the single algorithm as shown above.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The combined algorithm shown above was derived by applying the unpreconditioned <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> algorithm (see e.g. <b>[Meister2015]</b>, page 208) onto the left-only-preconditioned system \((M^{-1}A)x = M^{-1}b\) and the right-only-preconditioned system \((AM^{-1})y = b,~x=M^{-1}y\), respectively. After further optimising the two resulting algorithms by some clever vector substitutions and some reordering, we have obtained two versions of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> algorithm, which only differed by the choice of the scalar products, so that these two versions could be easily <em>merged</em> into the single algorithm as shown above.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul and Peter Zajac </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="bicgstab_8hpp_source.html#l00137">137</a> of file <a class="el" href="bicgstab_8hpp_source.html">bicgstab.hpp</a>.</p>
@@ -2554,13 +2523,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
@@ -2605,13 +2572,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -3957,13 +3922,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -4001,13 +3964,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -4045,13 +4006,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 

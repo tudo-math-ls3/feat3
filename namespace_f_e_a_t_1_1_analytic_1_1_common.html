@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -263,13 +273,11 @@ Typedefs</h2></td></tr>
 
 <p>Bazaraa/Shetty function. </p>
 <p >This class implements the AnalyticFunction interface representing the function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
    u(x,y) = (x - 2)^4 + (x - 2 y)^2
- \]" src="form_14.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-   u(x,y) = (x - 2)^4 + (x - 2 y)^2
- \]" src="form_14_dark.png"/>
+ \]
 </p>
-<p> This function has a global miminum in <img class="formulaInl light-mode-visible" alt="$ x_0 = (2, 1)^T, u(x_0) = 0 $" src="form_15.png"/><img class="formulaInl dark-mode-visible" alt="$ x_0 = (2, 1)^T, u(x_0) = 0 $" src="form_15_dark.png"/> and is frequently used for testing optimization algorithms because the hessian at the minimal point is singular.</p>
+<p> This function has a global miminum in \( x_0 = (2, 1)^T, u(x_0) = 0 \) and is frequently used for testing optimization algorithms because the hessian at the minimal point is singular.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l01861">1861</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
@@ -378,15 +386,12 @@ template&lt;int dim_&gt; </div>
   </dd>
 </dl>
 <p>This class implements the <a class="el" href="class_f_e_a_t_1_1_analytic_1_1_static_function.html" title="Analytic static function interface class template.">StaticFunction</a> interface representing the function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
    u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
    *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
- \]" src="form_12.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-   u(x,y) =(1+(1+x+y)^2 * (19 - 14*x+3*x^2-14*y+6*x*y+3*y^2))
-   *(30 + (2*x-3*y)^2 * (18 - 32*x +12*x^2 + 48*y - 36*x*y + 27*y^2))
- \]" src="form_12_dark.png"/>
+ \]
 </p>
-<p> This function has a global miminum in <img class="formulaInl light-mode-visible" alt="$ x_0 = (0, -1)^T, u(x_0) = 3 $" src="form_13.png"/><img class="formulaInl dark-mode-visible" alt="$ x_0 = (0, -1)^T, u(x_0) = 3 $" src="form_13_dark.png"/>.</p>
+<p> This function has a global miminum in \( x_0 = (0, -1)^T, u(x_0) = 3 \).</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l01847">1847</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
@@ -409,28 +414,20 @@ template&lt;int dim_&gt; </div>
 
 <p>Heaviside function. </p>
 <p >This class implements the AnalyticFunction interface representing the function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   u(x) = H(x) =
   \begin{cases}
     0, &amp; x &lt; 0 \\
     1, &amp; x \geq 0
   \end{cases}
-\]" src="form_6.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  u(x) = H(x) =
-  \begin{cases}
-    0, &amp; x &lt; 0 \\
-    1, &amp; x \geq 0
-  \end{cases}
-\]" src="form_6_dark.png"/>
+\]
 </p>
-<p> in <img class="formulaInl light-mode-visible" alt="$ 1D $" src="form_7.png"/><img class="formulaInl dark-mode-visible" alt="$ 1D $" src="form_7_dark.png"/> and  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p> in \( 1D \) and  </p><p class="formulaDsp">
+\[
   u(x,y) = H(x) H(y), u(x,y,z) = H(x) H(y) H(z)
-\]" src="form_8.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  u(x,y) = H(x) H(y), u(x,y,z) = H(x) H(y) H(z)
-\]" src="form_8_dark.png"/>
+\]
 </p>
-<p> in <img class="formulaInl light-mode-visible" alt="$ 2D, 3D $" src="form_9.png"/><img class="formulaInl dark-mode-visible" alt="$ 2D, 3D $" src="form_9_dark.png"/> respectively.</p>
+<p> in \( 2D, 3D \) respectively.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l01368">1368</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
@@ -453,28 +450,20 @@ template&lt;int dim_&gt; </div>
 
 <p>Regularized Heaviside static function. </p>
 <p >This class implements the AnalyticFunction interface representing the function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   u(x) = H(x) =
   \begin{cases}
     0, &amp; x &lt; 0 \\
     1, &amp; 2 (\cosh(x) - 1) \geq 0
   \end{cases}
-\]" src="form_10.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  u(x) = H(x) =
-  \begin{cases}
-    0, &amp; x &lt; 0 \\
-    1, &amp; 2 (\cosh(x) - 1) \geq 0
-  \end{cases}
-\]" src="form_10_dark.png"/>
+\]
 </p>
-<p >in <img class="formulaInl light-mode-visible" alt="$ 1D $" src="form_7.png"/><img class="formulaInl dark-mode-visible" alt="$ 1D $" src="form_7_dark.png"/> and  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p >in \( 1D \) and  </p><p class="formulaDsp">
+\[
   u(x,y)   = H(x)*H(y), u(x,y,z) = H(x)*H(y)*H(z)
-\]" src="form_11.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  u(x,y)   = H(x)*H(y), u(x,y,z) = H(x)*H(y)*H(z)
-\]" src="form_11_dark.png"/>
+\]
 </p>
-<p> in <img class="formulaInl light-mode-visible" alt="$ 2D, 3D $" src="form_9.png"/><img class="formulaInl dark-mode-visible" alt="$ 2D, 3D $" src="form_9_dark.png"/> respectively.</p>
+<p> in \( 2D, 3D \) respectively.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l01558">1558</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
@@ -495,27 +484,20 @@ template&lt;int dim_&gt; </div>
 
 <p>Himmelblau function. </p>
 <p >This class implements the AnalyticFunction interface representing the function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
    u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
- \]" src="form_16.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-   u(x,y) = (x^2 + y^2 - 11)^2 + (x + y^2 - 7)^2
- \]" src="form_16_dark.png"/>
+ \]
 </p>
 <p> The function is nonconvex and has 4 local minima at  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+\begin{align*}
    x_0 &amp; \approx (-3.77931025337774689189076584129, -3.28318599128616941226600051437)^T \\
    x_1 &amp; \approx (-2.80511808695274485305357239809, 3.13131251825057296580430072341)^T \\
    x_2 &amp; = (3, 2)^T \\
    x_3 &amp; \approx (3.58442834033049174494433823938, -1.84812652696440355353830020904)^T.
- \end{align*}" src="form_17.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-   x_0 &amp; \approx (-3.77931025337774689189076584129, -3.28318599128616941226600051437)^T \\
-   x_1 &amp; \approx (-2.80511808695274485305357239809, 3.13131251825057296580430072341)^T \\
-   x_2 &amp; = (3, 2)^T \\
-   x_3 &amp; \approx (3.58442834033049174494433823938, -1.84812652696440355353830020904)^T.
- \end{align*}" src="form_17_dark.png"/>
+ \end{align*}
 </p>
-<p> with <img class="formulaInl light-mode-visible" alt="$ \forall i = 0, \dots, 3: u(x_i) = 0 $" src="form_18.png"/><img class="formulaInl dark-mode-visible" alt="$ \forall i = 0, \dots, 3: u(x_i) = 0 $" src="form_18_dark.png"/>.</p>
-<p >It is often used for testing optimization algorithms because of the nonconvexity and existence of a local maximum in <img class="formulaInl light-mode-visible" alt="$ x_4 \approx ( -0.270845, -0.93039)^T $" src="form_19.png"/><img class="formulaInl dark-mode-visible" alt="$ x_4 \approx ( -0.270845, -0.93039)^T $" src="form_19_dark.png"/> and several saddle points.</p>
+<p> with \( \forall i = 0, \dots, 3: u(x_i) = 0 \).</p>
+<p >It is often used for testing optimization algorithms because of the nonconvexity and existence of a local maximum in \( x_4 \approx ( -0.270845, -0.93039)^T \) and several saddle points.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l01959">1959</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
@@ -564,13 +546,11 @@ template&lt;int dim_&gt; </div>
 
 <p>Rosenbrock function. </p>
 <p >This class implements the AnalyticFunction interface representing the function  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   u(x,y) = 100(y-x^2)^2 + (1-x)^2.
-\]" src="form_20.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  u(x,y) = 100(y-x^2)^2 + (1-x)^2.
-\]" src="form_20_dark.png"/>
+\]
 </p>
-<p >The function has a global minimum in <img class="formulaInl light-mode-visible" alt="$ x_0 = (1, 1)^T$" src="form_21.png"/><img class="formulaInl dark-mode-visible" alt="$ x_0 = (1, 1)^T$" src="form_21_dark.png"/> and a "steep valley" along the parabola <img class="formulaInl light-mode-visible" alt="$ y = x^2 $" src="form_22.png"/><img class="formulaInl dark-mode-visible" alt="$ y = x^2 $" src="form_22_dark.png"/>. This is a great challenge to descend-based optimization algorithms like steepest descent or nonlinear CG and the reason it is frequently used as a target function to test such algorithms.</p>
+<p >The function has a global minimum in \( x_0 = (1, 1)^T\) and a "steep valley" along the parabola \( y = x^2 \). This is a great challenge to descend-based optimization algorithms like steepest descent or nonlinear CG and the reason it is frequently used as a target function to test such algorithms.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l02025">2025</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>

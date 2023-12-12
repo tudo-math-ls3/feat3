@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -554,9 +564,8 @@ template&lt;int lt_, int mt_, int nt_, int slt_, int smt_, int snt_, int smb_, i
 
 <p>Adds the result of a matrix-tensor-matrix double-product onto this tensor. </p>
 <p >Let <em>K</em> denote this l-by-m-by-n tensor, <em>T</em> the l-by-m'-by-n' input tensor, <em>B</em> the m'-by-m and <em>D</em> the n'-by-n input matrices, then this operation computes:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\}, j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
-    \alpha \sum_{p=0}^{m'-1}\sum_{q=0}^{n'-1} T_{hpq}\cdot B_{pi}\cdot D_{qj} \]" src="form_410.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\}, j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
-    \alpha \sum_{p=0}^{m'-1}\sum_{q=0}^{n'-1} T_{hpq}\cdot B_{pi}\cdot D_{qj} \]" src="form_410_dark.png"/>
+\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\}, j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+    \alpha \sum_{p=0}^{m&#39;-1}\sum_{q=0}^{n&#39;-1} T_{hpq}\cdot B_{pi}\cdot D_{qj} \]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This function is used for the computation of second-order derivatives by the chain rule.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -622,9 +631,8 @@ template&lt;int k_, int sma_, int sna_, int slt_, int smt_, int snt_&gt; </div>
 
 <p>Adds the result of a matrix-tensor product onto this tensor. </p>
 <p >Let <em>K</em> denote this tensor, <em>A</em> the input matrix and <em>T</em> the input tensor, then this operation computes:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
-    \alpha \sum_{p=0}^{k-1} A_{hp}\cdot T_{pij}\]" src="form_409.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
-    \alpha \sum_{p=0}^{k-1} A_{hp}\cdot T_{pij}\]" src="form_409_dark.png"/>
+\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+    \alpha \sum_{p=0}^{k-1} A_{hp}\cdot T_{pij}\]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This function is used for the computation of second-order derivatives by the chain rule.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -689,9 +697,8 @@ template&lt;int slx_, int sma_, int sna_&gt; </div>
 
 <p>Adds the result of a vector-matrix outer product onto this tensor. </p>
 <p >Let <em>K</em> denote this tensor, <em>x</em> the input vector and <em>A</em> the input matrix, then this operation computes:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
-    \alpha x_h A_{ij}\]" src="form_411.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
-    \alpha x_h A_{ij}\]" src="form_411_dark.png"/>
+\[ \forall h\in\{0,...,l-1\}, i\in\{0,...,m-1\},j\in\{0,...,n-1\}:~ K_{hij} \leftarrow K_{hij} +
+    \alpha x_h A_{ij}\]
 </p>
 <dl class="section note"><dt>Note</dt><dd>This function is used for the computation of vector-valued hessian tensors.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>

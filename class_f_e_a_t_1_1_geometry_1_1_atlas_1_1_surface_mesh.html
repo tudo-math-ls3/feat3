@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -939,31 +949,25 @@ template&lt;typename DT_ , int n_, int sn_, int sb_&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The absolute value of the last coefficient, which is the absolute distance.</dd></dl>
-<p>Assume we have a non-degenerate <code>Simplex<s></code> called <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/> in <img class="formulaInl light-mode-visible" alt="$ \mathbb{R}^d $" src="form_137.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathbb{R}^d $" src="form_137_dark.png"/> defined by vertices <img class="formulaInl light-mode-visible" alt="$ x^j \in \mathbb{R}^d, j = 0, \dots, s $" src="form_138.png"/><img class="formulaInl dark-mode-visible" alt="$ x^j \in \mathbb{R}^d, j = 0, \dots, s $" src="form_138_dark.png"/>. Assume for now that <img class="formulaInl light-mode-visible" alt="$ s = d $" src="form_139.png"/><img class="formulaInl dark-mode-visible" alt="$ s = d $" src="form_139_dark.png"/>.</s></p>
+<p>Assume we have a non-degenerate <code>Simplex<s></code> called \( S \) in \( \mathbb{R}^d \) defined by vertices \( x^j \in \mathbb{R}^d, j = 0, \dots, s \). Assume for now that \( s = d \).</s></p>
 <p ><s>Then  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \forall x \in \mathbb{R}^d: x = x^0 + \sum_{j=1}^s \lambda_j (x^j - x^0)
-\]" src="form_140.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall x \in \mathbb{R}^d: x = x^0 + \sum_{j=1}^s \lambda_j (x^j - x^0)
-\]" src="form_140_dark.png"/>
+\]
 </p>
-<p> and <img class="formulaInl light-mode-visible" alt="$ \lambda_j, j=1,\dots,s $" src="form_141.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda_j, j=1,\dots,s $" src="form_141_dark.png"/> with <img class="formulaInl light-mode-visible" alt="$ \lambda_0 := 1 - sum_{j=1}^s $" src="form_142.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda_0 := 1 - sum_{j=1}^s $" src="form_142_dark.png"/> are called the <b> barycentric coordinates of <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> wrt. S </b>. Note that the above equation can be rewritten as  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p> and \( \lambda_j, j=1,\dots,s \) with \( \lambda_0 := 1 - sum_{j=1}^s \) are called the <b> barycentric coordinates of \( x \) wrt. S </b>. Note that the above equation can be rewritten as  </p><p class="formulaDsp">
+\[
   \forall x \in \mathbb{R}^d: x = \sum_{j=0}^s \lambda_j x^j.
-\]" src="form_143.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall x \in \mathbb{R}^d: x = \sum_{j=0}^s \lambda_j x^j.
-\]" src="form_143_dark.png"/>
+\]
 </p>
 <p></s></p>
 <p ><s>It is easy to see that  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   x \in S \Leftrightarrow  \forall j = 0, \dots, d: \lambda_j \in [0, 1] .
-\]" src="form_144.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  x \in S \Leftrightarrow  \forall j = 0, \dots, d: \lambda_j \in [0, 1] .
-\]" src="form_144_dark.png"/>
+\]
 </p>
-<p> If <img class="formulaInl light-mode-visible" alt="$ \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 $" src="form_145.png"/><img class="formulaInl dark-mode-visible" alt="$ \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 $" src="form_145_dark.png"/>, then <img class="formulaInl light-mode-visible" alt="$ x \notin S $" src="form_146.png"/><img class="formulaInl dark-mode-visible" alt="$ x \notin S $" src="form_146_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> lies on the far side of the plane defined by the facet opposite vertex <img class="formulaInl light-mode-visible" alt="$ j $" src="form_147.png"/><img class="formulaInl dark-mode-visible" alt="$ j $" src="form_147_dark.png"/>. This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</s></p>
-<p ><s>This routine assumes that <img class="formulaInl light-mode-visible" alt="$ s = d-1 $" src="form_148.png"/><img class="formulaInl dark-mode-visible" alt="$ s = d-1 $" src="form_148_dark.png"/>, where <img class="formulaInl light-mode-visible" alt="$ d = 2, 3 $" src="form_149.png"/><img class="formulaInl dark-mode-visible" alt="$ d = 2, 3 $" src="form_149_dark.png"/> and that the last coefficient is actually the signed distance of the point <img class="formulaInl light-mode-visible" alt="$ x $" src="form_30.png"/><img class="formulaInl dark-mode-visible" alt="$ x $" src="form_30_dark.png"/> to which the coefficients belong to the hyperplane defined by <img class="formulaInl light-mode-visible" alt="$ S $" src="form_136.png"/><img class="formulaInl dark-mode-visible" alt="$ S $" src="form_136_dark.png"/>. </s></p>
+<p> If \( \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 \), then \( x \notin S \) and \( x \) lies on the far side of the plane defined by the facet opposite vertex \( j \). This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</s></p>
+<p ><s>This routine assumes that \( s = d-1 \), where \( d = 2, 3 \) and that the last coefficient is actually the signed distance of the point \( x \) to which the coefficients belong to the hyperplane defined by \( S \). </s></p>
 
 <p class="definition">Definition at line <a class="el" href="surface__mesh_8hpp_source.html#l00733">733</a> of file <a class="el" href="surface__mesh_8hpp_source.html">surface_mesh.hpp</a>.</p>
 
@@ -1239,15 +1243,12 @@ template&lt;typename DT_ , int n_, int sn_, typename IdxType_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if bary and traversed indicate that the point can be projected to the current cell.</dd></dl>
 <p>After the barycentric coordinates of a point wrt. a cell have been computed, we have to determine if the point lies in that cell. This is definitely the case if  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
     \forall j=0, \dots, s: \lambda_j \in [0, 1] \wedge\mathrm{ortho_dist} = 0.
-  \]" src="form_150.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-    \forall j=0, \dots, s: \lambda_j \in [0, 1] \wedge\mathrm{ortho_dist} = 0.
-  \]" src="form_150_dark.png"/>
+  \]
 </p>
-<p >If the first condition holds, the second is violated but <img class="formulaInl light-mode-visible" alt="$ \mathrm{ortho_dist} &lt;
-  \mathrm{acceptable_distance} $" src="form_151.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathrm{ortho_dist} &lt;
-  \mathrm{acceptable_distance} $" src="form_151_dark.png"/>, the search was successful as well.</p>
+<p >If the first condition holds, the second is violated but \( \mathrm{ortho_dist} &lt;
+  \mathrm{acceptable_distance} \), the search was successful as well.</p>
 <p >Because we are dealing with floats, we add some tolerance either way. The remaining problem is a concave surface like this:</p>
 <pre class="fragment"> x
  (exteriour)
@@ -1906,7 +1907,7 @@ template&lt;typename Mesh_ &gt; </div>
 <p>Applies a "proper rigid" transformation onto the chart. </p>
 <p >Let <em>v</em> denote the <code>origin</code> world point, <em>w</em> the <code>offset</code> world point and <em>R</em> the rotation matrix corresponding to the <code>angles</code>, then this function applies the following transformation for any point <em>x</em> of the chart:</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ x \mapsto w + R\cdot (x - v) \]" src="form_135.png"/><img class="formulaDsp dark-mode-visible" alt="\[ x \mapsto w + R\cdot (x - v) \]" src="form_135_dark.png"/>
+\[ x \mapsto w + R\cdot (x - v) \]
 </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

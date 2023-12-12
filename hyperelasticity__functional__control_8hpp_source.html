@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -431,14 +441,14 @@ $(document).ready(function(){initNavTree('hyperelasticity__functional__control_8
 <div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span> </div>
 <div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>                sys_lvl-&gt;global_functional.eval_fval_grad(fval, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">grad</a>);</div>
 <div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>                sys_lvl-&gt;filter_sys.filter_def(<a class="code hl_enumvalue" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">grad</a>);</div>
-<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>                exporter.<a class="code hl_function" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a6469f654ab53e1c3bd01e9e6094be250">add_vertex_vector</a>(<span class="stringliteral">&quot;grad&quot;</span>, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">grad</a>.local());</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>                exporter.<a class="code hl_function" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a7d44b8cceba6dcd4c3f59a68cfdbcbca">add_vertex_vector</a>(<span class="stringliteral">&quot;grad&quot;</span>, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">grad</a>.local());</div>
 <div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span> </div>
 <div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>                <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; it:sys_lvl-&gt;filter_sys.local().template at&lt;0&gt;())</div>
 <div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>                {</div>
 <div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>                  <span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a> field_name(<span class="stringliteral">&quot;nu_&quot;</span>+it.first);</div>
 <div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>                  <span class="comment">// WARNING: This explicitly assumes that the filter vector belong to a P1/Q1 space and thus &quot;lives&quot;</span></div>
 <div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>                  <span class="comment">// in the mesh&#39;s vertices</span></div>
-<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>                  exporter.<a class="code hl_function" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a6469f654ab53e1c3bd01e9e6094be250">add_vertex_vector</a>(field_name, it.second.get_filter_vector());</div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>                  exporter.<a class="code hl_function" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a7d44b8cceba6dcd4c3f59a68cfdbcbca">add_vertex_vector</a>(field_name, it.second.get_filter_vector());</div>
 <div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>                }</div>
 <div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>              }</div>
 <div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>            }</div>
@@ -733,7 +743,7 @@ $(document).ready(function(){initNavTree('hyperelasticity__functional__control_8
 <div class="ttc" id="aclass_f_e_a_t_1_1_control_1_1_meshopt_1_1_nonlinear_system_level_html_aac37a3750998ba905e30b68465d24481"><div class="ttname"><a href="class_f_e_a_t_1_1_control_1_1_meshopt_1_1_nonlinear_system_level.html#aac37a3750998ba905e30b68465d24481">FEAT::Control::Meshopt::NonlinearSystemLevel::GlobalSystemVectorR</a></div><div class="ttdeci">Global::Vector&lt; LocalSystemVectorR, SystemMirror &gt; GlobalSystemVectorR</div><div class="ttdoc">Global right-vectors.</div><div class="ttdef"><b>Definition:</b> <a href="meshopt__control_8hpp_source.html#l00950">meshopt_control.hpp:950</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_control_1_1_meshopt_1_1_nonlinear_system_level_html_af98b029432f0dd8063897aed87b08e7f"><div class="ttname"><a href="class_f_e_a_t_1_1_control_1_1_meshopt_1_1_nonlinear_system_level.html#af98b029432f0dd8063897aed87b08e7f">FEAT::Control::Meshopt::NonlinearSystemLevel::global_functional</a></div><div class="ttdeci">GlobalFunctional global_functional</div><div class="ttdoc">The global nonlinear functional.</div><div class="ttdef"><b>Definition:</b> <a href="meshopt__control_8hpp_source.html#l00960">meshopt_control.hpp:960</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_geometry_1_1_export_v_t_k_html"><div class="ttname"><a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html">FEAT::Geometry::ExportVTK</a></div><div class="ttdoc">VTK exporter class template.</div><div class="ttdef"><b>Definition:</b> <a href="export__vtk_8hpp_source.html#l00113">export_vtk.hpp:114</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_geometry_1_1_export_v_t_k_html_a6469f654ab53e1c3bd01e9e6094be250"><div class="ttname"><a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a6469f654ab53e1c3bd01e9e6094be250">FEAT::Geometry::ExportVTK::add_vertex_vector</a></div><div class="ttdeci">void add_vertex_vector(const String &amp;name, const T_ *x, const T_ *y=nullptr, const T_ *z=nullptr)</div><div class="ttdoc">Adds a vector-field vertex variable to the exporter.</div><div class="ttdef"><b>Definition:</b> <a href="export__vtk_8hpp_source.html#l00223">export_vtk.hpp:223</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_geometry_1_1_export_v_t_k_html_a7d44b8cceba6dcd4c3f59a68cfdbcbca"><div class="ttname"><a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a7d44b8cceba6dcd4c3f59a68cfdbcbca">FEAT::Geometry::ExportVTK::add_vertex_vector</a></div><div class="ttdeci">void add_vertex_vector(const String &amp;name, const T_ *x, const T_ *y=nullptr, const T_ *z=nullptr, double scaling_factor=double(1.))</div><div class="ttdoc">Adds a vector-field vertex variable to the exporter.</div><div class="ttdef"><b>Definition:</b> <a href="export__vtk_8hpp_source.html#l00229">export_vtk.hpp:229</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_geometry_1_1_standard_refinery_html"><div class="ttname"><a href="class_f_e_a_t_1_1_geometry_1_1_standard_refinery.html">FEAT::Geometry::StandardRefinery</a></div><div class="ttdoc">Standard Refinery class template.</div><div class="ttdef"><b>Definition:</b> <a href="factory_8hpp_source.html#l00058">factory.hpp:60</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_global_1_1_filter_html"><div class="ttname"><a href="class_f_e_a_t_1_1_global_1_1_filter.html">FEAT::Global::Filter&lt; LocalSystemFilter, SystemMirror &gt;</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_global_1_1_nonlinear_functional_html_a2b612d04b6c39786ce38453cca3278d8"><div class="ttname"><a href="class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a2b612d04b6c39786ce38453cca3278d8">FEAT::Global::NonlinearFunctional::reset_num_evals</a></div><div class="ttdeci">void reset_num_evals()</div><div class="ttdoc">Resets the evaluation counters.</div><div class="ttdef"><b>Definition:</b> <a href="nonlinear__functional_8hpp_source.html#l00163">nonlinear_functional.hpp:163</a></div></div>

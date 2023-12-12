@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -151,10 +161,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af197bc33a6c95b2f46bb76f40aef27de"><td class="mdescLeft">&#160;</td><td class="mdescRight">move ctor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#af197bc33a6c95b2f46bb76f40aef27de">More...</a><br /></td></tr>
 <tr class="separator:af197bc33a6c95b2f46bb76f40aef27de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68f8bbd6837fa4d027c597981b0b5723"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a68f8bbd6837fa4d027c597981b0b5723">apply</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#adc393b902e034111af42521a0e95e109">VectorTypeL</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#aff28f85206a28dc12f59906100fb9a4d">VectorTypeR</a> &amp;x) const</td></tr>
-<tr class="memdesc:a68f8bbd6837fa4d027c597981b0b5723"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a68f8bbd6837fa4d027c597981b0b5723">More...</a><br /></td></tr>
+<tr class="memdesc:a68f8bbd6837fa4d027c597981b0b5723"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow this\cdot x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a68f8bbd6837fa4d027c597981b0b5723">More...</a><br /></td></tr>
 <tr class="separator:a68f8bbd6837fa4d027c597981b0b5723"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4d16c2cb6a4b9d46be600a62db15d95"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#af4d16c2cb6a4b9d46be600a62db15d95">apply</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#adc393b902e034111af42521a0e95e109">VectorTypeL</a> &amp;r, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#aff28f85206a28dc12f59906100fb9a4d">VectorTypeR</a> &amp;x, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#adc393b902e034111af42521a0e95e109">VectorTypeL</a> &amp;y, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a7e9abc17ab56dab2518fad03d019a35d">DataType</a> alpha=<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a7e9abc17ab56dab2518fad03d019a35d">DataType</a>(1)) const</td></tr>
-<tr class="memdesc:af4d16c2cb6a4b9d46be600a62db15d95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157_dark.png"/>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#af4d16c2cb6a4b9d46be600a62db15d95">More...</a><br /></td></tr>
+<tr class="memdesc:af4d16c2cb6a4b9d46be600a62db15d95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate \( r \leftarrow y + \alpha~ this\cdot x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#af4d16c2cb6a4b9d46be600a62db15d95">More...</a><br /></td></tr>
 <tr class="separator:af4d16c2cb6a4b9d46be600a62db15d95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e5a1800d55a6929bbeb82f36d504b8f"><td class="memTemplParams" colspan="2">template&lt;int i_, int j_&gt; </td></tr>
 <tr class="memitem:a1e5a1800d55a6929bbeb82f36d504b8f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix_element.html">TupleMatrixElement</a>&lt; i_, j_, FirstRow_, RestRows_... &gt;::Type &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a1e5a1800d55a6929bbeb82f36d504b8f">at</a> ()</td></tr>
@@ -615,7 +625,7 @@ template&lt;typename FirstRow_ , typename... RestRows_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow this\cdot x $" src="form_156_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow this\cdot x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result. </td></tr>
@@ -676,7 +686,7 @@ template&lt;typename FirstRow_ , typename... RestRows_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate <img class="formulaInl light-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157.png"/><img class="formulaInl dark-mode-visible" alt="$ r \leftarrow y + \alpha~ this\cdot x $" src="form_157_dark.png"/>. </p>
+<p>Calculate \( r \leftarrow y + \alpha~ this\cdot x \). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">r</td><td>The vector that receives the result. </td></tr>

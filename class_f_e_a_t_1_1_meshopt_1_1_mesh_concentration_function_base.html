@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -729,37 +739,27 @@ template&lt;typename Trafo_ , typename RefCellTrafo_  = RumpfTrafo&lt;Trafo_, ty
   </table>
   </dd>
 </dl>
-<p>The optimal scales <img class="formulaInl light-mode-visible" alt="$ h $" src="form_228.png"/><img class="formulaInl dark-mode-visible" alt="$ h $" src="form_228_dark.png"/> depend on the concentration <img class="formulaInl light-mode-visible" alt="$ c $" src="form_229.png"/><img class="formulaInl dark-mode-visible" alt="$ c $" src="form_229_dark.png"/> by the relation  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p>The optimal scales \( h \) depend on the concentration \( c \) by the relation  </p><p class="formulaDsp">
+\[
   \forall K_k \in \mathcal{T}_h: h_k = \left( \frac{c (K_k)}{\sum_{l=1}^N c(K_l) \sum_{l=1}^N
   \mathrm{det} \nabla R_{T,l}(\phi)} \right)^{\frac{1}{d}}
-\]" src="form_230.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall K_k \in \mathcal{T}_h: h_k = \left( \frac{c (K_k)}{\sum_{l=1}^N c(K_l) \sum_{l=1}^N
-  \mathrm{det} \nabla R_{T,l}(\phi)} \right)^{\frac{1}{d}}
-\]" src="form_230_dark.png"/>
+\]
 </p>
-<p >The concentration function in turn indirectly depends on the vertex locations <img class="formulaInl light-mode-visible" alt="$ \{ x_i : i=1, \dots, n \} $" src="form_231.png"/><img class="formulaInl dark-mode-visible" alt="$ \{ x_i : i=1, \dots, n \} $" src="form_231_dark.png"/> via </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]" src="form_232.png"/><img class="formulaDsp dark-mode-visible" alt="\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]" src="form_232_dark.png"/>
+<p >The concentration function in turn indirectly depends on the vertex locations \( \{ x_i : i=1, \dots, n \} \) via </p><p class="formulaDsp">
+\[ c(K_k) = (\alpha + \sum_{x_j \in K_k} \varphi(x_j))^\beta, \]
 </p>
 <p> so that we have to take this dependency into account for the full gradient. Define  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   s_d := \sum_{l=1}^N \mathrm{det} \nabla R_{T,l}(\Phi), s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
-\]" src="form_233.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  s_d := \sum_{l=1}^N \mathrm{det} \nabla R_{T,l}(\Phi), s_c :=  \frac{c (K_k)}{\sum_{l=1}^N c(K_l)}.
-\]" src="form_233_dark.png"/>
+\]
 </p>
-<p> So for each <img class="formulaInl light-mode-visible" alt="$ x_j $" src="form_234.png"/><img class="formulaInl dark-mode-visible" alt="$ x_j $" src="form_234_dark.png"/> we arrive at  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p> So for each \( x_j \) we arrive at  </p><p class="formulaDsp">
+\[
   \frac{\partial h(K_k)}{\partial x_j} = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
   {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
   \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
   (s_d s_c)^{-2}
-\]" src="form_235.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \frac{\partial h(K_k)}{\partial x_j} = \frac{1}{d} \left( \frac{c(K_k)}{s_d s_c} \right)^
-  {\frac{1}{d}-1} \left[ c(K_k) ( \frac{\partial s_d}{\partial x_j} s_c + s_d
-  \frac{\partial s_c}{\partial x_j} ) + \frac{\partial c(K_k)}{\partial x_j} s_d s_c \right]
-  (s_d s_c)^{-2}
-\]" src="form_235_dark.png"/>
+\]
 </p>
  
 <p>Implemented in <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_mesh_concentration_function.html#a2f1a1899968aaac3d5c63909ab3f8aa2">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_mesh_concentration_function.html#a2f1a1899968aaac3d5c63909ab3f8aa2">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RumpfTrafo&lt; Trafo_, typename Trafo_::CoordType &gt; &gt;</a>.</p>

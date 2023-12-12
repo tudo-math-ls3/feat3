@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -138,7 +148,7 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock"><div class="compoundTemplParams">template&lt;int dimension_&gt;<br />
 class FEAT::Assembly::Common::LaplaceOperatorBlocked&lt; dimension_ &gt;</div><p >-Laplace operator implementation </p>
 <p >This functor implements the weak formulation of the bilinear blocked Laplace operator, i.e. </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \nabla \varphi \cdot \nabla\psi \]" src="form_81.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \nabla \varphi \cdot \nabla\psi \]" src="form_81_dark.png"/>
+\[ \nabla \varphi \cdot \nabla\psi \]
 </p>
 <p >This functor can be used with the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> assembly class template to assemble a blocked Laplace/Stiffness matrix.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>

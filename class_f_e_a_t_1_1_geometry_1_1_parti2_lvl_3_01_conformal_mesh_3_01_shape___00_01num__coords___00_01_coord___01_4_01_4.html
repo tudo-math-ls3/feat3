@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -149,7 +159,7 @@ Protected Attributes</h2></td></tr>
 class FEAT::Geometry::Parti2Lvl&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;</div><p >2-Level-Partitioner class template specialization for <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html" title="Conformal mesh class template.">ConformalMesh</a> </p>
 <p >This class implements a <em>2-Level-Partitioner</em>, i.e. a simple partitioner that exploits the 2-level refinement algorithm and numbering.</p>
 <p >The 2-Level-Partitioner can provide a valid partitioning of a (refined) mesh, if the number of required patches matches the number of elements in a refined mesh.</p>
-<p >For Hypercube meshes, this algorithm can do even better: Let <em>n</em> be the number of elements in the mesh and <em>p</em> the desired number of patches, then this algorithm can provide a valid partitioning if <img class="formulaInl light-mode-visible" alt="$p = n\cdot2^k$" src="form_152.png"/><img class="formulaInl dark-mode-visible" alt="$p = n\cdot2^k$" src="form_152_dark.png"/> for some <img class="formulaInl light-mode-visible" alt="$k\in\mathbb{N}$" src="form_153.png"/><img class="formulaInl dark-mode-visible" alt="$k\in\mathbb{N}$" src="form_153_dark.png"/>.</p>
+<p >For Hypercube meshes, this algorithm can do even better: Let <em>n</em> be the number of elements in the mesh and <em>p</em> the desired number of patches, then this algorithm can provide a valid partitioning if \(p = n\cdot2^k\) for some \(k\in\mathbb{N}\).</p>
 <p >The basic usage of this class is as follows:</p><ol type="1">
 <li>Create an object of this class and pass the to-be-partitioned mesh as well as the desired number of ranks/patches to the constructor.</li>
 <li>If the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti2_lvl_3_01_conformal_mesh_3_01_shape___00_01num__coords___00_01_coord___01_4_01_4.html#a82c8da8f01a03e75227c137b46af05d0" title="Specifies whether a 2-level partitioning exists.">success()</a> function returns <code>true</code>, then a valid 2-level partitioning has been found. If the function returns <code>false</code>, then no 2-level partitioning exists and one has to try some other partitioning strategy.</li>

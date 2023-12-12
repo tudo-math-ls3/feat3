@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -151,7 +161,7 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:aaf1db83e56238387d7f87a60e3f7ac52"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to handle the ALE term.  <a href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#aaf1db83e56238387d7f87a60e3f7ac52">More...</a><br /></td></tr>
 <tr class="separator:aaf1db83e56238387d7f87a60e3f7ac52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c3d8c904e55bb347722ed861f7217a9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#a0b813080e9f0f7e6a0bf829d50e0f7da">DataType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#a5c3d8c904e55bb347722ed861f7217a9">coeff_extrapolation_p</a></td></tr>
-<tr class="memdesc:a5c3d8c904e55bb347722ed861f7217a9"><td class="mdescLeft">&#160;</td><td class="mdescRight"><img class="formulaInl light-mode-visible" alt="$ n_p $" src="form_440.png"/><img class="formulaInl dark-mode-visible" alt="$ n_p $" src="form_440_dark.png"/> coefficients for extrapolating the pressure from previous time steps  <a href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#a5c3d8c904e55bb347722ed861f7217a9">More...</a><br /></td></tr>
+<tr class="memdesc:a5c3d8c904e55bb347722ed861f7217a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">\( n_p \) coefficients for extrapolating the pressure from previous time steps  <a href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#a5c3d8c904e55bb347722ed861f7217a9">More...</a><br /></td></tr>
 <tr class="separator:a5c3d8c904e55bb347722ed861f7217a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac93c51a32a43db36868911aff4977c64"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#a0b813080e9f0f7e6a0bf829d50e0f7da">DataType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html#ac93c51a32a43db36868911aff4977c64">coeff_lhs_v</a></td></tr>
 <tr class="separator:ac93c51a32a43db36868911aff4977c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -223,90 +233,60 @@ class FEAT::Control::Time::NvsBdfQ&lt; DT_ &gt;</div><p >Set of coefficients for
 </dl>
 <p>This sounds more sophisticated than it is, as BDF(1) is the Implicit Euler scheme and BDF(2) is the only other scheme supported until this class is extended to support higher order.</p>
 <p >For the incompressible Navier-Stokes equations  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+\begin{align*}
   \frac{\partial u}{\partial t} + (u \cdot \nabla ) u
   - \nabla \cdot \left(\frac{1}{Re} \nabla u - p I_d \right) &amp; = f &amp; \mathrm{in~} \Omega,
   u_{\partial \Omega = u_D} \\
   \nabla \cdot u &amp; = 0 &amp; \mathrm{in~} \Omega
-\end{align*}" src="form_412.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  \frac{\partial u}{\partial t} + (u \cdot \nabla ) u
-  - \nabla \cdot \left(\frac{1}{Re} \nabla u - p I_d \right) &amp; = f &amp; \mathrm{in~} \Omega,
-  u_{\partial \Omega = u_D} \\
-  \nabla \cdot u &amp; = 0 &amp; \mathrm{in~} \Omega
-\end{align*}" src="form_412_dark.png"/>
+\end{align*}
 </p>
 <p> with appropriate boundary conditions, a family of operator splitting techniques called <em> projection methods </em> exists, where the equations are split into several, easier to handle parts which are then solved successively. This usually introduces a <em> splitting </em> error.</p>
-<p >As a first step, replace the time derivative <img class="formulaInl light-mode-visible" alt="$\frac{\partial u}{\partial t}$" src="form_413.png"/><img class="formulaInl dark-mode-visible" alt="$\frac{\partial u}{\partial t}$" src="form_413_dark.png"/> by a discrete approximation <img class="formulaInl light-mode-visible" alt="$ \frac{D }{\delta_t}u $" src="form_414.png"/><img class="formulaInl dark-mode-visible" alt="$ \frac{D }{\delta_t}u $" src="form_414_dark.png"/>. For this class, the <em> backward differentiation formula </em> of order <img class="formulaInl light-mode-visible" alt="$ q $" src="form_415.png"/><img class="formulaInl dark-mode-visible" alt="$ q $" src="form_415_dark.png"/> (BDF(q)) is used, where only <img class="formulaInl light-mode-visible" alt="$ q=1,2$" src="form_416.png"/><img class="formulaInl dark-mode-visible" alt="$ q=1,2$" src="form_416_dark.png"/> are implemented here.</p>
+<p >As a first step, replace the time derivative \(\frac{\partial u}{\partial t}\) by a discrete approximation \( \frac{D }{\delta_t}u \). For this class, the <em> backward differentiation formula </em> of order \( q \) (BDF(q)) is used, where only \( q=1,2\) are implemented here.</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+\begin{align*}
   \frac{D }{\delta_t} u^k &amp; = \frac{1}{\delta_t} (\beta_q u^{k} - \sum_{k=0}^{q-1} \beta_k u^{k-1-q} ) \\
   &amp; =
   \begin{cases}
     \frac{1}{\delta_t} (u^k - u^{k-1}), &amp; q = 1 \\
     \frac{1}{\delta_t} \left(\frac{3}{2} u^k - (2 u^{k-1} - \frac{1}{2}u^{k-2}) \right), &amp; q = 2
   \end{cases}
-\end{align*}" src="form_417.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  \frac{D }{\delta_t} u^k &amp; = \frac{1}{\delta_t} (\beta_q u^{k} - \sum_{k=0}^{q-1} \beta_k u^{k-1-q} ) \\
-  &amp; =
-  \begin{cases}
-    \frac{1}{\delta_t} (u^k - u^{k-1}), &amp; q = 1 \\
-    \frac{1}{\delta_t} \left(\frac{3}{2} u^k - (2 u^{k-1} - \frac{1}{2}u^{k-2}) \right), &amp; q = 2
-  \end{cases}
-\end{align*}" src="form_417_dark.png"/>
+\end{align*}
 </p>
-<p >The scheme splits the solution process into computing a <em> tentative velocity </em> <img class="formulaInl light-mode-visible" alt="$ \tilde{u} $" src="form_418.png"/><img class="formulaInl dark-mode-visible" alt="$ \tilde{u} $" src="form_418_dark.png"/> which is not divergence-free but satisfies the boundary condition <img class="formulaInl light-mode-visible" alt="$ \tilde{u}^* = u_D $" src="form_419.png"/><img class="formulaInl dark-mode-visible" alt="$ \tilde{u}^* = u_D $" src="form_419_dark.png"/> on <img class="formulaInl light-mode-visible" alt="$ \partial \Omega$" src="form_420.png"/><img class="formulaInl dark-mode-visible" alt="$ \partial \Omega$" src="form_420_dark.png"/>. It is then projected to the space of (weakly) divergence free functions to obtain the solution <img class="formulaInl light-mode-visible" alt="$u$" src="form_421.png"/><img class="formulaInl dark-mode-visible" alt="$u$" src="form_421_dark.png"/>, which then only satisfies the boundary condition <img class="formulaInl light-mode-visible" alt="$ u \cdot \nu = u_D \cdot \nu $" src="form_422.png"/><img class="formulaInl dark-mode-visible" alt="$ u \cdot \nu = u_D \cdot \nu $" src="form_422_dark.png"/> on <img class="formulaInl light-mode-visible" alt="$ \partial \Omega $" src="form_423.png"/><img class="formulaInl dark-mode-visible" alt="$ \partial \Omega $" src="form_423_dark.png"/>.</p>
-<p >It is possible to skip computing <img class="formulaInl light-mode-visible" alt="$ u $" src="form_424.png"/><img class="formulaInl dark-mode-visible" alt="$ u $" src="form_424_dark.png"/> explicitly. For the convection term, extrapolation in time can be used for linearization and using <img class="formulaInl light-mode-visible" alt="$ u $" src="form_424.png"/><img class="formulaInl dark-mode-visible" alt="$ u $" src="form_424_dark.png"/> over <img class="formulaInl light-mode-visible" alt="$ \tilde{u} $" src="form_418.png"/><img class="formulaInl dark-mode-visible" alt="$ \tilde{u} $" src="form_418_dark.png"/> does not have any advantages. The only other term using <img class="formulaInl light-mode-visible" alt="$ u $" src="form_424.png"/><img class="formulaInl dark-mode-visible" alt="$ u $" src="form_424_dark.png"/> is then the time discretization, where the projection update can be carried out implicitly by using the auxillary variable <img class="formulaInl light-mode-visible" alt="$ \phi $" src="form_116.png"/><img class="formulaInl dark-mode-visible" alt="$ \phi $" src="form_116_dark.png"/>. Assuming that <img class="formulaInl light-mode-visible" alt="$ \nabla \cdot (u \cdot \nabla) u = 0 $" src="form_425.png"/><img class="formulaInl dark-mode-visible" alt="$ \nabla \cdot (u \cdot \nabla) u = 0 $" src="form_425_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$ \nabla \cdot \Delta u =0 $" src="form_426.png"/><img class="formulaInl dark-mode-visible" alt="$ \nabla \cdot \Delta u =0 $" src="form_426_dark.png"/>, applying the divergence operator to the momentum equation yields  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+<p >The scheme splits the solution process into computing a <em> tentative velocity </em> \( \tilde{u} \) which is not divergence-free but satisfies the boundary condition \( \tilde{u}^* = u_D \) on \( \partial \Omega\). It is then projected to the space of (weakly) divergence free functions to obtain the solution \(u\), which then only satisfies the boundary condition \( u \cdot \nu = u_D \cdot \nu \) on \( \partial \Omega \).</p>
+<p >It is possible to skip computing \( u \) explicitly. For the convection term, extrapolation in time can be used for linearization and using \( u \) over \( \tilde{u} \) does not have any advantages. The only other term using \( u \) is then the time discretization, where the projection update can be carried out implicitly by using the auxillary variable \( \phi \). Assuming that \( \nabla \cdot (u \cdot \nabla) u = 0 \) and \( \nabla \cdot \Delta u =0 \), applying the divergence operator to the momentum equation yields  </p><p class="formulaDsp">
+\begin{align*}
   \nabla \cdot \frac{D }{\delta_t} u^k - \Delta p &amp; = 0
-\end{align*}" src="form_427.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  \nabla \cdot \frac{D }{\delta_t} u^k - \Delta p &amp; = 0
-\end{align*}" src="form_427_dark.png"/>
+\end{align*}
 </p>
-<p >To linearize the convection term, the extrapolated velocity <img class="formulaInl light-mode-visible" alt="$ u^{*,k} = 2\tilde{u}^{k-1} - \tilde{u}^{k-2}$" src="form_428.png"/><img class="formulaInl dark-mode-visible" alt="$ u^{*,k} = 2\tilde{u}^{k-1} - \tilde{u}^{k-2}$" src="form_428_dark.png"/> is used.</p>
-<p >The pressure in the momentum equation is also extrapolated with <img class="formulaInl light-mode-visible" alt="$ r $" src="form_429.png"/><img class="formulaInl dark-mode-visible" alt="$ r $" src="form_429_dark.png"/> from the previous time steps:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p >To linearize the convection term, the extrapolated velocity \( u^{*,k} = 2\tilde{u}^{k-1} - \tilde{u}^{k-2}\) is used.</p>
+<p >The pressure in the momentum equation is also extrapolated with \( r \) from the previous time steps:  </p><p class="formulaDsp">
+\[
   p^{*,k} =
   \begin{cases}
     0, &amp; r = 0 \\
     p^{k-1}, &amp; r = 1 \\
     2 p^{k-1} - p^{k-2}, &amp; r = 2
   \end{cases}
-\]" src="form_430.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  p^{*,k} =
-  \begin{cases}
-    0, &amp; r = 0 \\
-    p^{k-1}, &amp; r = 1 \\
-    2 p^{k-1} - p^{k-2}, &amp; r = 2
-  \end{cases}
-\]" src="form_430_dark.png"/>
+\]
 </p>
 <p >The scheme is then as follow:  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+\begin{align*}
   \frac{D }{\delta_t} \tilde{u}^k + ( u^* \nabla ) u^k - \nabla \cdot
   \left( \nabla \tilde{u}^k - p^{*,k} I_d - \sum_{j=0}^{q-1} \frac{\beta_j}{\beta_q} \phi^{k-1-j} I_d \right) &amp; = f^k,
   \tilde{u}^k_{| \partial \Omega} = u^k_D \\
   - \Delta \phi^k &amp; = - \frac{\beta_q}{\delta_t} \nabla \cdot \tilde{u}^k,
   \partial_\nu \phi^k_{| \partial \Omega} = 0, \int_{\Omega} \phi^k dx = 0 \\
  p^k &amp; = p^{k-1} + \phi^k - \frac{\chi}{Re} \nabla \cdot \tilde{u}^k
-  \end{align*}" src="form_431.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  \frac{D }{\delta_t} \tilde{u}^k + ( u^* \nabla ) u^k - \nabla \cdot
-  \left( \nabla \tilde{u}^k - p^{*,k} I_d - \sum_{j=0}^{q-1} \frac{\beta_j}{\beta_q} \phi^{k-1-j} I_d \right) &amp; = f^k,
-  \tilde{u}^k_{| \partial \Omega} = u^k_D \\
-  - \Delta \phi^k &amp; = - \frac{\beta_q}{\delta_t} \nabla \cdot \tilde{u}^k,
-  \partial_\nu \phi^k_{| \partial \Omega} = 0, \int_{\Omega} \phi^k dx = 0 \\
- p^k &amp; = p^{k-1} + \phi^k - \frac{\chi}{Re} \nabla \cdot \tilde{u}^k
-  \end{align*}" src="form_431_dark.png"/>
+  \end{align*}
 </p>
-<p> The parameter <img class="formulaInl light-mode-visible" alt="$ \chi = 1 $" src="form_432.png"/><img class="formulaInl dark-mode-visible" alt="$ \chi = 1 $" src="form_432_dark.png"/> means the (better) rotational version of the scheme is used, otherwise <img class="formulaInl light-mode-visible" alt="$ \chi = 0 $" src="form_433.png"/><img class="formulaInl dark-mode-visible" alt="$ \chi = 0 $" src="form_433_dark.png"/>.</p>
-<p >Some special cases are the Chorin-Temam (or non-incremental first order pressure correction) scheme ( <img class="formulaInl light-mode-visible" alt="$ (q,r) = (1,0) $" src="form_434.png"/><img class="formulaInl dark-mode-visible" alt="$ (q,r) = (1,0) $" src="form_434_dark.png"/> ), the Van Kan (or incremental first order pressure correction) scheme ( <img class="formulaInl light-mode-visible" alt="$ (q,r) = (1,1) $" src="form_435.png"/><img class="formulaInl dark-mode-visible" alt="$ (q,r) = (1,1) $" src="form_435_dark.png"/> ).</p>
-<p >If the deformation tensor based bilinear form is used for the viscous term (meaning <img class="formulaInl light-mode-visible" alt="$ D(u) $" src="form_436.png"/><img class="formulaInl dark-mode-visible" alt="$ D(u) $" src="form_436_dark.png"/> instead of <img class="formulaInl light-mode-visible" alt="$ \nabla u $" src="form_437.png"/><img class="formulaInl dark-mode-visible" alt="$ \nabla u $" src="form_437_dark.png"/>), the rotational coefficient gains an additional factor 2.</p>
-<p >If do-nothing boundaries for the momentum equation exist, the auxillary variable <img class="formulaInl light-mode-visible" alt="$ \phi $" src="form_116.png"/><img class="formulaInl dark-mode-visible" alt="$ \phi $" src="form_116_dark.png"/> needs Robin boundary conditions.</p>
-<p >If the domain moves with the ALE velocity <img class="formulaInl light-mode-visible" alt="$ w $" src="form_438.png"/><img class="formulaInl dark-mode-visible" alt="$ w $" src="form_438_dark.png"/>, the convection term should read  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p> The parameter \( \chi = 1 \) means the (better) rotational version of the scheme is used, otherwise \( \chi = 0 \).</p>
+<p >Some special cases are the Chorin-Temam (or non-incremental first order pressure correction) scheme ( \( (q,r) = (1,0) \) ), the Van Kan (or incremental first order pressure correction) scheme ( \( (q,r) = (1,1) \) ).</p>
+<p >If the deformation tensor based bilinear form is used for the viscous term (meaning \( D(u) \) instead of \( \nabla u \)), the rotational coefficient gains an additional factor 2.</p>
+<p >If do-nothing boundaries for the momentum equation exist, the auxillary variable \( \phi \) needs Robin boundary conditions.</p>
+<p >If the domain moves with the ALE velocity \( w \), the convection term should read  </p><p class="formulaDsp">
+\[
   ((u^{*,k} - w) \cdot \nabla) \tilde{u}^k
-\]" src="form_439.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  ((u^{*,k} - w) \cdot \nabla) \tilde{u}^k
-\]" src="form_439_dark.png"/>
+\]
 </p>
 <p >For details (for the Stokes problem) see <b>[GMS06]</b>.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
@@ -712,8 +692,8 @@ template&lt;typename DT_ &gt; </div>
 <p>Sets the coefficients. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">num_steps</td><td>The <img class="formulaInl light-mode-visible" alt="$ q $" src="form_415.png"/><img class="formulaInl dark-mode-visible" alt="$ q $" src="form_415_dark.png"/></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">p_extrapolation_steps</td><td>The <img class="formulaInl light-mode-visible" alt="$ r $" src="form_429.png"/><img class="formulaInl dark-mode-visible" alt="$ r $" src="form_429_dark.png"/> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_steps</td><td>The \( q \)</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_extrapolation_steps</td><td>The \( r \) </td></tr>
   </table>
   </dd>
 </dl>
@@ -1033,7 +1013,7 @@ template&lt;typename DT_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p><img class="formulaInl light-mode-visible" alt="$ n_p $" src="form_440.png"/><img class="formulaInl dark-mode-visible" alt="$ n_p $" src="form_440_dark.png"/> coefficients for extrapolating the pressure from previous time steps </p>
+<p>\( n_p \) coefficients for extrapolating the pressure from previous time steps </p>
 
 <p class="definition">Definition at line <a class="el" href="nvs__bdf__q_8hpp_source.html#l00152">152</a> of file <a class="el" href="nvs__bdf__q_8hpp_source.html">nvs_bdf_q.hpp</a>.</p>
 

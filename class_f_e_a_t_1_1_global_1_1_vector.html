@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -705,7 +715,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Computes the component-wise inverse of a vector. </p>
-<p >This function performs <img class="formulaInl light-mode-visible" alt="$ this_i \leftarrow \alpha / x_i $" src="form_165.png"/><img class="formulaInl dark-mode-visible" alt="$ this_i \leftarrow \alpha / x_i $" src="form_165_dark.png"/></p>
+<p >This function performs \( this_i \leftarrow \alpha / x_i \)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector whose components are to be inverted</td></tr>
@@ -757,7 +767,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Computes the component-wise product of two vector. </p>
-<p >This function performs <img class="formulaInl light-mode-visible" alt="$ this_i \leftarrow x_i \cdot y_i $" src="form_166.png"/><img class="formulaInl dark-mode-visible" alt="$ this_i \leftarrow x_i \cdot y_i $" src="form_166_dark.png"/></p>
+<p >This function performs \( this_i \leftarrow x_i \cdot y_i \)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x,y</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> references to the two vectors whose components are to be multiplied </td></tr>

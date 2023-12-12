@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -100,8 +110,8 @@ $(document).ready(function(){initNavTree('functions_a.html',''); initResizable()
 <li>adapt_by_name()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#aaff881ae4d87294112f4a396bb0e940d">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;</a></li>
 <li>add()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fb2547903a7c1221e7b4cb33f43c9e4">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_factory.html#ad6b6d6949f0d464fb9df6e0d3a5be0da">FEAT::LAFEM::SparseMatrixFactory&lt; DT_, IT_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#ac5183a95145bfeb66b070692995a9400">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#aa6937d5273042fe670b56e27efc47f12">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;</a></li>
 <li>add_attribute()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html#ae8e0665a25647cd81392dc3c571a7325">FEAT::Geometry::MeshPart&lt; MeshType_ &gt;</a></li>
-<li>add_cell_scalar()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a7cd8acb28ad8d7da10c3fd687bb33366">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
-<li>add_cell_vector()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a626f4105831bdb88904e650bd74ac6a7">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
+<li>add_cell_scalar()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ae444b579cee882b28a3742df8d3ceb36">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
+<li>add_cell_vector()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a464aac7a1552bd3f2aae3e1016615265">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
 <li>add_constant()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_analytic_1_1_parsed_scalar_function.html#aafd96acc7f38574d1c7d3b158c62919a">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function.html#aa17f28e8cbbe153fab1d9d3f2e6a0699">FEAT::Analytic::ParsedVectorFunction&lt; dom_dim_, img_dim_ &gt;</a></li>
 <li>add_constraint_grad()&#160;:&#160;<a class="el" href="struct_f_e_a_t_1_1_meshopt_1_1_alignment_penalty.html#a88586fe21a10cbc4b5c324f57b4cc783">FEAT::Meshopt::AlignmentPenalty&lt; DT_, ShapeType_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_mesh_concentration_function.html#a41c4e59100a9e4cd10908e632a7aed3b">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_mesh_concentration_function_base.html#a589e912280c748fc12a693990e1d7dac">FEAT::Meshopt::MeshConcentrationFunctionBase&lt; Trafo_, RefCellTrafo_ &gt;</a></li>
 <li>add_double_mat_mult()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html#aaafd85c394bb979637f67892a9a0dc0b">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a789dd0c602a0ad69eb35e838418b20f7">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;</a></li>
@@ -139,8 +149,8 @@ $(document).ready(function(){initNavTree('functions_a.html',''); initResizable()
 <li>add_vec_mat_mult()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html#aabe9cd8d8c6d90b5ff977140030860bc">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;</a></li>
 <li>add_vec_mat_outer_product()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a8febb0f5a1be10f0ce1dad0a8eefed09">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;</a></li>
 <li>add_vec_tensor_mult()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html#ac246dd00cb839989a329bb24569153ef">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;</a></li>
-<li>add_vertex_scalar()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a8cd7ad3c1a1b21e1c0020e0c3e3d5df0">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
-<li>add_vertex_vector()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a6469f654ab53e1c3bd01e9e6094be250">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
+<li>add_vertex_scalar()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ad0d951de22acdf9a59f548ff6e97e27c">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
+<li>add_vertex_vector()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a7d44b8cceba6dcd4c3f59a68cfdbcbca">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;</a></li>
 <li>Adjactor1&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html#aced05fbe289bc145ba17cbdeb23c5b77">FEAT::Adjacency::CompositeAdjactor&lt; Adj1_, Adj2_ &gt;</a></li>
 <li>Adjactor2&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html#a43ec9da3cc8d87a59d035bc3460e6c1c">FEAT::Adjacency::CompositeAdjactor&lt; Adj1_, Adj2_ &gt;</a></li>
 <li>ADPSolverBase()&#160;:&#160;<a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a42e034a5b2fa7611184addf4f7f3bc1b">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;</a></li>

@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -432,44 +442,32 @@ class FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctio
 </dl>
 <p>Mesh optimization algorithms derived from Martin Rumpf's paper <b>[Rum96]</b>.</p>
 <dl class="section note"><dt>Note</dt><dd>The evaluation of the nonlinear functional requires operations that are essentially similar to an assembly of an operator into a matrix.</dd></dl>
-<p>Assume we have a regular, conforming mesh <img class="formulaInl light-mode-visible" alt="$ \mathcal{T} $" src="form_217.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathcal{T} $" src="form_217_dark.png"/> and each cell <img class="formulaInl light-mode-visible" alt="$ K \in \mathcal{T} $" src="form_218.png"/><img class="formulaInl dark-mode-visible" alt="$ K \in \mathcal{T} $" src="form_218_dark.png"/> can be expressed as the image of an (optimal) reference cell <img class="formulaInl light-mode-visible" alt="$ \hat{K} $" src="form_219.png"/><img class="formulaInl dark-mode-visible" alt="$ \hat{K} $" src="form_219_dark.png"/> such that  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+<p>Assume we have a regular, conforming mesh \( \mathcal{T} \) and each cell \( K \in \mathcal{T} \) can be expressed as the image of an (optimal) reference cell \( \hat{K} \) such that  </p><p class="formulaDsp">
+\[
   \forall K \in \mathcal{T}: \exists R_K : \hat{K} \to K: \forall \hat{x} \in \hat{K}: \det \nabla
   R_K(\hat{x}) \neq 0,
-\]" src="form_220.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall K \in \mathcal{T}: \exists R_K : \hat{K} \to K: \forall \hat{x} \in \hat{K}: \det \nabla
-  R_K(\hat{x}) \neq 0,
-\]" src="form_220_dark.png"/>
+\]
 </p>
-<p> which ensures that the mapping is nonsingular and that the orientation of the reference cell is preserved. We are now looking for a deformation <img class="formulaInl light-mode-visible" alt="$ \Phi: \mathcal{T} \to \Phi(\mathcal{T})$" src="form_221.png"/><img class="formulaInl dark-mode-visible" alt="$ \Phi: \mathcal{T} \to \Phi(\mathcal{T})$" src="form_221_dark.png"/> such that <img class="formulaInl light-mode-visible" alt="$ \Phi(\mathcal{T} $" src="form_222.png"/><img class="formulaInl dark-mode-visible" alt="$ \Phi(\mathcal{T} $" src="form_222_dark.png"/> is optimal in the sense that it minimizes a functional of the form</p>
+<p> which ensures that the mapping is nonsingular and that the orientation of the reference cell is preserved. We are now looking for a deformation \( \Phi: \mathcal{T} \to \Phi(\mathcal{T})\) such that \( \Phi(\mathcal{T} \) is optimal in the sense that it minimizes a functional of the form</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \mathcal{F}(\Phi) = \int_\Omega \mathcal{L}(\Phi,x) dx = \sum_{K \in \mathcal{T}} \mu_K \int_K
   \mathcal{L}_K(\Phi,x) dx.
-\]" src="form_223.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \mathcal{F}(\Phi) = \int_\Omega \mathcal{L}(\Phi,x) dx = \sum_{K \in \mathcal{T}} \mu_K \int_K
-  \mathcal{L}_K(\Phi,x) dx.
-\]" src="form_223_dark.png"/>
+\]
 </p>
 <p >Under the assumptions of frame indifference and translation invariance it can be shown that  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \forall K \in \mathcal{T}: \exists L_K \in SO_d \times K: \mathcal{L}_K: \mathcal{L}(\Phi,\cdot) =
   L_K(\nabla \Phi, \cdot) = L_K(\nabla R_K, \cdot)
-\]" src="form_224.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall K \in \mathcal{T}: \exists L_K \in SO_d \times K: \mathcal{L}_K: \mathcal{L}(\Phi,\cdot) =
-  L_K(\nabla \Phi, \cdot) = L_K(\nabla R_K, \cdot)
-\]" src="form_224_dark.png"/>
+\]
 </p>
 <p> and that the local cell functional is of the form  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
    F(\nabla R_K(\Phi))  := \int_K L(\nabla R_K (\Phi)(x)) dx = \mu_K L( \| \nabla R_T(\Phi) \|_F^2,
    \| \mathrm{cof} \nabla R_T(\Phi) \|_F^2, \det \nabla R_T(\Phi) )
-\]" src="form_225.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-   F(\nabla R_K(\Phi))  := \int_K L(\nabla R_K (\Phi)(x)) dx = \mu_K L( \| \nabla R_T(\Phi) \|_F^2,
-   \| \mathrm{cof} \nabla R_T(\Phi) \|_F^2, \det \nabla R_T(\Phi) )
-\]" src="form_225_dark.png"/>
+\]
 </p>
-<p >In the code, <img class="formulaInl light-mode-visible" alt="$ F $" src="form_226.png"/><img class="formulaInl dark-mode-visible" alt="$ F $" src="form_226_dark.png"/> is called the <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html" title="Functionals for measuring and optimising mesh quality.">RumpfFunctional</a>.</p>
+<p >In the code, \( F \) is called the <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html" title="Functionals for measuring and optimising mesh quality.">RumpfFunctional</a>.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00175">175</a> of file <a class="el" href="hyperelasticity__functional_8hpp_source.html">hyperelasticity_functional.hpp</a>.</p>
@@ -1344,7 +1342,7 @@ template&lt;typename DT_ , typename IT_ , typename Trafo_ , typename CellFunctio
 
 <p class="definition">Definition at line <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00606">606</a> of file <a class="el" href="hyperelasticity__functional_8hpp_source.html">hyperelasticity_functional.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00255">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::_mesh_conc</a>, <a class="el" href="export__vtk_8hpp_source.html#l00307">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_cell_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00335">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_cell_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00195">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_vertex_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00223">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_vertex_vector()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00731">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l01128">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::eval_fval_cellwise()</a>, and <a class="el" href="mesh__quality__functional_8hpp_source.html#l00128">FEAT::Meshopt::MeshQualityFunctional&lt; Trafo_::MeshType &gt;::get_mesh()</a>.</p>
+<p class="reference">References <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00255">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::_mesh_conc</a>, <a class="el" href="export__vtk_8hpp_source.html#l00319">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_cell_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00350">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_cell_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00198">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_vertex_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00229">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::add_vertex_vector()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00731">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l01128">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::eval_fval_cellwise()</a>, and <a class="el" href="mesh__quality__functional_8hpp_source.html#l00128">FEAT::Meshopt::MeshQualityFunctional&lt; Trafo_::MeshType &gt;::get_mesh()</a>.</p>
 
 </div>
 </div>
@@ -1477,13 +1475,11 @@ template&lt;typename DT_ , typename IT_ , typename Trafo_ , typename CellFunctio
   </dd>
 </dl>
 <p>In a truly optimal mesh (consisting ONLY of reference cells of the right size), every cell's volume is exactly lambda(cell). This is especially the goal for r-adaptivity. So in an optimal mesh,  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
-\]" src="form_215.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \forall K \in \mathcal{T}_h: |K|/|\Omega| = \lambda(K)
-\]" src="form_215_dark.png"/>
+\]
 </p>
-<p> so we compute the 1-norm of the vector <img class="formulaInl light-mode-visible" alt="$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| $" src="form_216.png"/><img class="formulaInl dark-mode-visible" alt="$(v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| $" src="form_216_dark.png"/>.</p>
+<p> so we compute the 1-norm of the vector \((v)_i = \left| \frac{|K_i|}{\sum_j |K_j|} - \lambda(K_i) \right| \).</p>
 <dl class="section return"><dt>Returns</dt><dd>The relative cell size quality indicator.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>lambda_min, lambda_max, vol_min, and vol_max are all volume fractions.</dd>
 <dd>

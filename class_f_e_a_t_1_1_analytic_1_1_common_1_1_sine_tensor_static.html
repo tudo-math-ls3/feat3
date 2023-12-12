@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -186,7 +196,7 @@ class FEAT::Analytic::Common::SineTensorStatic&lt; DataType_, k_ &gt;</div><p >S
 <li>2D: u(x,y) = sin(k*pi*x) * sin(k*pi*y)</li>
 <li>3D: u(x,y,z) = sin(k*pi*x) * sin(k*pi*y) * sin(k*pi*z)</li>
 </ul>
-<p >For any positive integral <em>k</em>, these functions are eigenfunctions of the Laplace operator. The corresponding eigenvalue is <img class="formulaInl light-mode-visible" alt="$ \lambda = -d (k\pi)^2 $" src="form_0.png"/><img class="formulaInl dark-mode-visible" alt="$ \lambda = -d (k\pi)^2 $" src="form_0_dark.png"/>, where <em>d</em> is the dimension of the domain.</p>
+<p >For any positive integral <em>k</em>, these functions are eigenfunctions of the Laplace operator. The corresponding eigenvalue is \( \lambda = -d (k\pi)^2 \), where <em>d</em> is the dimension of the domain.</p>
 <p >Moreover, on any rectangular/rectoid domain [x0,x1]x[y0,y1]x[z0,z1] with integral domain boundaries xi,yi,zi, this function fulfills homogeneous Dirichlet boundary conditions.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 

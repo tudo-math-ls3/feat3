@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -1947,7 +1957,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </table>
   </dd>
 </dl>
-<p>If the returned <img class="formulaInl light-mode-visible" alt="$ \beta = 0,$" src="form_309.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta = 0,$" src="form_309_dark.png"/> the next search direction is the steepest descent direction.</p>
+<p>If the returned \( \beta = 0,\) the next search direction is the steepest descent direction.</p>
 <dl class="section return"><dt>Returns</dt><dd>The new parameter beta. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00636">636</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
@@ -2102,23 +2112,18 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 <p>The Dai-Yuan update sets  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_{k+1} := \left&lt; r_{k+1}, z_{k+1} \right&gt;,
   \quad \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_310.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_{k+1} := \left&lt; r_{k+1}, z_{k+1} \right&gt;,
-  \quad \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_310_dark.png"/>
+\]
 </p>
   <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \beta_{k+1} := \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}} - \eta_k}
-\]" src="form_311.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \beta_{k+1} := \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}} - \eta_k}
-\]" src="form_311_dark.png"/>
+\]
 </p>
 <p >Note the sign changes due to this being formulated in terms of the defect rather than the function's gradient.</p>
-<dl class="section return"><dt>Returns</dt><dd>The new <img class="formulaInl light-mode-visible" alt="$ \beta_{DY}$" src="form_312.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta_{DY}$" src="form_312_dark.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The new \( \beta_{DY}\) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00713">713</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
 
@@ -2263,25 +2268,19 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 <p>The hybrid Dai-Yuan/Hestenes-Stiefel update sets  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
   \gamma_{k+\frac{1}{2}} := \left&lt; r_k, z_{k+1} \right&gt;, \quad
   \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_313.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
-  \gamma_{k+\frac{1}{2}} := \left&lt; r_k, z_{k+1} \right&gt;, \quad
-  \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_313_dark.png"/>
+\]
 </p>
   <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \beta_{k+1} := \max \left\{0, \min \left\{ \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}+ \eta_k}, \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}}+ \eta_k} \right\} \right\}
-\]" src="form_314.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \beta_{k+1} := \max \left\{0, \min \left\{ \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}+ \eta_k}, \frac{\gamma_{k+1}}{ - \eta_{k+\frac{1}{2}}+ \eta_k} \right\} \right\}
-\]" src="form_314_dark.png"/>
+\]
 </p>
 <p >Note the sign changes due to this being formulated in terms of the defect rather than the function's gradient.</p>
-<dl class="section return"><dt>Returns</dt><dd>The new <img class="formulaInl light-mode-visible" alt="$ \beta_{DYHS}$" src="form_315.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta_{DYHS}$" src="form_315_dark.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The new \( \beta_{DYHS}\) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00742">742</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
 
@@ -2336,22 +2335,17 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 <p>The Fletcher-Reeves update sets  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
   \gamma_{k+\frac{1}{2}} = \left&lt;r_{k+1}, p_k \right&gt;
-\]" src="form_316.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
-  \gamma_{k+\frac{1}{2}} = \left&lt;r_{k+1}, p_k \right&gt;
-\]" src="form_316_dark.png"/>
+\]
 </p>
   <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
-\]" src="form_317.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \beta_{k+1} := \frac{\gamma_{k+1}}{\gamma_k}
-\]" src="form_317_dark.png"/>
+\]
 </p>
-<dl class="section return"><dt>Returns</dt><dd>The new <img class="formulaInl light-mode-visible" alt="$ \beta_{FR}$" src="form_318.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta_{FR}$" src="form_318_dark.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The new \( \beta_{FR}\) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00777">777</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
 
@@ -2970,36 +2964,27 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 <p>The Hager-Zhang update sets  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
   \gamma_{k+\frac{1}{2}} := \left&lt; r_k, z_{k+1} \right&gt;, \quad
   \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_313.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
-  \gamma_{k+\frac{1}{2}} := \left&lt; r_k, z_{k+1} \right&gt;, \quad
-  \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_313_dark.png"/>
+\]
 </p>
   <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \bar{\beta}_{k+1} := \left&lt; r_{k+1} -r_k - \frac{2 \|r_{k+1}\|^2}{\left&lt; r_{k+1} - r_k, p_k \right&gt;}
   p_k, 1/(&lt;r_{k+1} - r_k, p_k&gt;) r_k \right&gt;,
-\]" src="form_319.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \bar{\beta}_{k+1} := \left&lt; r_{k+1} -r_k - \frac{2 \|r_{k+1}\|^2}{\left&lt; r_{k+1} - r_k, p_k \right&gt;}
-  p_k, 1/(&lt;r_{k+1} - r_k, p_k&gt;) r_k \right&gt;,
-\]" src="form_319_dark.png"/>
+\]
 </p>
   <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \beta_{k+1} := max\{ \beta, -1/ \left( \| p_k \| min\{ \mathrm{thresh}, \| r_{k+1} \| \} \right) \},
-\]" src="form_320.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \beta_{k+1} := max\{ \beta, -1/ \left( \| p_k \| min\{ \mathrm{thresh}, \| r_{k+1} \| \} \right) \},
-\]" src="form_320_dark.png"/>
+\]
 </p>
 <p >where thresh is a predefined threshold parameter (i.e. 0.01).</p>
 <p >Note the sign changes due to this being formulated in terms of the defect rather than the function's gradient.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This update strategy needs more precision in the linesearch than all others and is not very efficient in the current implementation. This serves more as a starting point for further improvement.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The new <img class="formulaInl light-mode-visible" alt="$ \beta_{HZ}$" src="form_321.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta_{HZ}$" src="form_321_dark.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The new \( \beta_{HZ}\) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00812">812</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
 
@@ -3036,27 +3021,20 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Hestenes-Stiefel update. </p>
 <p >The Hestenes-Stiefel update sets  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
   \gamma_{k+\frac{1}{2}} := \left&lt; r_k, z_{k+1} \right&gt;, \quad
   \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_313.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  r_k := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
-  \gamma_{k+\frac{1}{2}} := \left&lt; r_k, z_{k+1} \right&gt;, \quad
-  \eta_{k+\frac{1}{2}} := \left&lt;r_{k+1}, p_k \right&gt;, \quad \eta_k := \left&lt;r_k, d_k\right&gt;
-\]" src="form_313_dark.png"/>
+\]
 </p>
   <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   \beta_{k+1} := \max \left\{0, \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}
   + \eta_k} \right\}
-\]" src="form_322.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  \beta_{k+1} := \max \left\{0, \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{ - \eta_{k+\frac{1}{2}}
-  + \eta_k} \right\}
-\]" src="form_322_dark.png"/>
+\]
 </p>
 <p >Note the sign changes due to this being formulated in terms of the defect rather than the function's gradient.</p>
-<dl class="section return"><dt>Returns</dt><dd>The new <img class="formulaInl light-mode-visible" alt="$ \beta_{HS}$" src="form_323.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta_{HS}$" src="form_323_dark.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The new \( \beta_{HS}\) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00851">851</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
 
@@ -3199,13 +3177,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
@@ -3250,13 +3226,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -3447,17 +3421,13 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 <p>The Polak-Ribière-Polyak update sets  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\begin{align*}
+\begin{align*}
   r_k &amp; := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
   \gamma_{k+\frac{1}{2}} := \left&lt;r_{k+1}, z_k \right&gt; \\
   \beta_{k+1} &amp; := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
-\end{align*}" src="form_324.png"/><img class="formulaDsp dark-mode-visible" alt="\begin{align*}
-  r_k &amp; := -\nabla f(x_k), \quad z_k := M^{-1} r_k, \quad  \gamma_k := \left&lt; r_k, z_k \right&gt;, \quad
-  \gamma_{k+\frac{1}{2}} := \left&lt;r_{k+1}, z_k \right&gt; \\
-  \beta_{k+1} &amp; := \max\left\{ 0,  \frac{\gamma_{k+1} - \gamma_{k+\frac{1}{2}}}{\gamma_k} \right\}
-\end{align*}" src="form_324_dark.png"/>
+\end{align*}
 </p>
-<dl class="section return"><dt>Returns</dt><dd>The new <img class="formulaInl light-mode-visible" alt="$ \beta_{PRP+}$" src="form_325.png"/><img class="formulaInl dark-mode-visible" alt="$ \beta_{PRP+}$" src="form_325_dark.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The new \( \beta_{PRP+}\) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="nlcg_8hpp_source.html#l00876">876</a> of file <a class="el" href="nlcg_8hpp_source.html">nlcg.hpp</a>.</p>
 
@@ -5191,13 +5161,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -5235,13 +5203,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy"  </p>
 
@@ -5309,13 +5275,11 @@ the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
 or<br  />
 the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
 As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[
+\[
   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284.png"/><img class="formulaDsp dark-mode-visible" alt="\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]" src="form_284_dark.png"/>
+\]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ r_k $" src="form_285.png"/><img class="formulaInl dark-mode-visible" alt="$ r_k $" src="form_285_dark.png"/> is the defect vector in the current iteration and <img class="formulaInl light-mode-visible" alt="$ r_0 $" src="form_286.png"/><img class="formulaInl dark-mode-visible" alt="$ r_0 $" src="form_286_dark.png"/> the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
+<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
 and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
 did not gain 8 digits so far then I'm also happy" </p>
 

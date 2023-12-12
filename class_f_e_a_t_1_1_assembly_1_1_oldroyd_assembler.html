@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -126,15 +136,15 @@ Static Protected Member Functions</h2></td></tr>
 <div class="textblock"><p >Oldroyd-B operator assembly class. </p>
 <p >This class is responsible for assembling the <em>upper convected time derivative</em> operator</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \lambda\sigma + \gamma v\cdot\nabla\sigma - \zeta(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top)\]" src="form_118.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \lambda\sigma + \gamma v\cdot\nabla\sigma - \zeta(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top)\]" src="form_118_dark.png"/>
+\[ \lambda\sigma + \gamma v\cdot\nabla\sigma - \zeta(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top)\]
 </p>
-<p >which is used in the Oldroyd-B model for the stress tensor <img class="formulaInl light-mode-visible" alt="$\sigma$" src="form_119.png"/><img class="formulaInl dark-mode-visible" alt="$\sigma$" src="form_119_dark.png"/> in a 3-field Stokes formulation.</p>
-<p >This class can assemble the above mentioned operator for both symmetric and unsymmetric representations of <img class="formulaInl light-mode-visible" alt="$\sigma$" src="form_119.png"/><img class="formulaInl dark-mode-visible" alt="$\sigma$" src="form_119_dark.png"/>, where stress tensor is encoded as a block vector in the following fashion:</p>
+<p >which is used in the Oldroyd-B model for the stress tensor \(\sigma\) in a 3-field Stokes formulation.</p>
+<p >This class can assemble the above mentioned operator for both symmetric and unsymmetric representations of \(\sigma\), where stress tensor is encoded as a block vector in the following fashion:</p>
 <ul>
-<li>2D unsymmetric (4 components): <img class="formulaInl light-mode-visible" alt="$(\sigma_{11}, \sigma_{12}, \sigma_{21}, \sigma_{22})$" src="form_120.png"/><img class="formulaInl dark-mode-visible" alt="$(\sigma_{11}, \sigma_{12}, \sigma_{21}, \sigma_{22})$" src="form_120_dark.png"/></li>
-<li>2D symmetric (3 components): <img class="formulaInl light-mode-visible" alt="$(\sigma_{11}, \sigma_{22}, \sigma_{12})$" src="form_121.png"/><img class="formulaInl dark-mode-visible" alt="$(\sigma_{11}, \sigma_{22}, \sigma_{12})$" src="form_121_dark.png"/></li>
-<li>3D unsymmetric (9 components): <img class="formulaInl light-mode-visible" alt="$(\sigma_{11}, \sigma_{12}, \sigma_{13}, \sigma_{21}, \sigma_{22}, \sigma_{23}, \sigma_{31}, \sigma_{32}, \sigma_{33})$" src="form_122.png"/><img class="formulaInl dark-mode-visible" alt="$(\sigma_{11}, \sigma_{12}, \sigma_{13}, \sigma_{21}, \sigma_{22}, \sigma_{23}, \sigma_{31}, \sigma_{32}, \sigma_{33})$" src="form_122_dark.png"/></li>
-<li>3D symmetric (6 components): <img class="formulaInl light-mode-visible" alt="$(\sigma_{11}, \sigma_{22}, \sigma_{33}, \sigma_{12}, \sigma_{23}, \sigma_{31})$" src="form_123.png"/><img class="formulaInl dark-mode-visible" alt="$(\sigma_{11}, \sigma_{22}, \sigma_{33}, \sigma_{12}, \sigma_{23}, \sigma_{31})$" src="form_123_dark.png"/></li>
+<li>2D unsymmetric (4 components): \((\sigma_{11}, \sigma_{12}, \sigma_{21}, \sigma_{22})\)</li>
+<li>2D symmetric (3 components): \((\sigma_{11}, \sigma_{22}, \sigma_{12})\)</li>
+<li>3D unsymmetric (9 components): \((\sigma_{11}, \sigma_{12}, \sigma_{13}, \sigma_{21}, \sigma_{22}, \sigma_{23}, \sigma_{31}, \sigma_{32}, \sigma_{33})\)</li>
+<li>3D symmetric (6 components): \((\sigma_{11}, \sigma_{22}, \sigma_{33}, \sigma_{12}, \sigma_{23}, \sigma_{31})\)</li>
 </ul>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
@@ -220,9 +230,9 @@ template&lt;typename DT_ , typename IT_ , typename SpaceV_ , typename SpaceS_ , 
     <tr><td class="paramdir">[in]</td><td class="paramname">space_v</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> velocity space.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">space_s</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> stress space.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>The cubature factory to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lambda</td><td>The scaling factor <img class="formulaInl light-mode-visible" alt="$\lambda$" src="form_124.png"/><img class="formulaInl dark-mode-visible" alt="$\lambda$" src="form_124_dark.png"/> for the reactive term <img class="formulaInl light-mode-visible" alt="$\sigma$" src="form_119.png"/><img class="formulaInl dark-mode-visible" alt="$\sigma$" src="form_119_dark.png"/>.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">gamma</td><td>The scaling factor <img class="formulaInl light-mode-visible" alt="$\gamma$" src="form_125.png"/><img class="formulaInl dark-mode-visible" alt="$\gamma$" src="form_125_dark.png"/> for the convective term <img class="formulaInl light-mode-visible" alt="$v\cdot\nabla\sigma$" src="form_126.png"/><img class="formulaInl dark-mode-visible" alt="$v\cdot\nabla\sigma$" src="form_126_dark.png"/></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">zeta</td><td>The scaling factor <img class="formulaInl light-mode-visible" alt="$\zeta$" src="form_127.png"/><img class="formulaInl dark-mode-visible" alt="$\zeta$" src="form_127_dark.png"/> for the complicated term <img class="formulaInl light-mode-visible" alt="$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$" src="form_128.png"/><img class="formulaInl dark-mode-visible" alt="$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$" src="form_128_dark.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lambda</td><td>The scaling factor \(\lambda\) for the reactive term \(\sigma\).</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">gamma</td><td>The scaling factor \(\gamma\) for the convective term \(v\cdot\nabla\sigma\)</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">zeta</td><td>The scaling factor \(\zeta\) for the complicated term \(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top\). </td></tr>
   </table>
   </dd>
 </dl>
@@ -276,7 +286,7 @@ template&lt;typename DT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Auxiliary evaluation function: symmetric 2D version. </p>
-<p >This function evaluates the 2D version of the term <img class="formulaInl light-mode-visible" alt="$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$" src="form_128.png"/><img class="formulaInl dark-mode-visible" alt="$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$" src="form_128_dark.png"/> while exploiting the symmetry of the stress tensor, thus resulting in a (reduced) 3x3 matrix.</p>
+<p >This function evaluates the 2D version of the term \(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top\) while exploiting the symmetry of the stress tensor, thus resulting in a (reduced) 3x3 matrix.</p>
 <p >The components of the stress tensor are assumed to be ordered as (sigma_11, sigma_22, sigma_12). </p>
 
 <p class="definition">Definition at line <a class="el" href="oldroyd__assembler_8hpp_source.html#l00307">307</a> of file <a class="el" href="oldroyd__assembler_8hpp_source.html">oldroyd_assembler.hpp</a>.</p>
@@ -326,7 +336,7 @@ template&lt;typename DT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Auxiliary evaluation function: unsymmetric 2D version. </p>
-<p >This function evaluates the 2D version of the term <img class="formulaInl light-mode-visible" alt="$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$" src="form_128.png"/><img class="formulaInl dark-mode-visible" alt="$\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top$" src="form_128_dark.png"/> without exploiting the symmetry of the stress tensor, thus resulting in a 4x4 matrix.</p>
+<p >This function evaluates the 2D version of the term \(\nabla v\cdot\sigma + \sigma\cdot\nabla v^\top\) without exploiting the symmetry of the stress tensor, thus resulting in a 4x4 matrix.</p>
 <p >The components of the stress tensor are assumed to be ordered as (sigma_11, sigma_12, sigma_21, sigma_22). </p>
 
 <p class="definition">Definition at line <a class="el" href="oldroyd__assembler_8hpp_source.html#l00243">243</a> of file <a class="el" href="oldroyd__assembler_8hpp_source.html">oldroyd_assembler.hpp</a>.</p>

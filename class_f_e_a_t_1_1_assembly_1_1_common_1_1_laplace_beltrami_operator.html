@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -135,20 +145,16 @@ Static Public Attributes</h2></td></tr>
 <p >This class implements the Laplace-Beltrami operator, which represents a generalization the standard Laplace operator that can also be defined on manifolds.</p>
 <p >The discrete Laplace-Beltrami operator is defines as follows:</p>
 <p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[a(\phi,\psi) := \sum_{T\in T_h} \int_{\widehat{T}}
+\[a(\phi,\psi) := \sum_{T\in T_h} \int_{\widehat{T}}
 \sqrt{\textnormal{det}\big(\mathcal{G}_T\big)}
 \cdot\big(\widehat{\nabla}\widehat{\varphi}\big)^\top\cdot
 \mathcal{G}_T^{-1}
-\cdot\widehat{\nabla}\widehat{\psi},\]" src="form_82.png"/><img class="formulaDsp dark-mode-visible" alt="\[a(\phi,\psi) := \sum_{T\in T_h} \int_{\widehat{T}}
-\sqrt{\textnormal{det}\big(\mathcal{G}_T\big)}
-\cdot\big(\widehat{\nabla}\widehat{\varphi}\big)^\top\cdot
-\mathcal{G}_T^{-1}
-\cdot\widehat{\nabla}\widehat{\psi},\]" src="form_82_dark.png"/>
+\cdot\widehat{\nabla}\widehat{\psi},\]
 </p>
 <p> where</p><ul>
-<li><img class="formulaInl light-mode-visible" alt="$\tau:\widehat{T}\rightarrow T$" src="form_83.png"/><img class="formulaInl dark-mode-visible" alt="$\tau:\widehat{T}\rightarrow T$" src="form_83_dark.png"/> is the transformation from the reference element onto the real element</li>
-<li><img class="formulaInl light-mode-visible" alt="$\mathcal{G}_T := (\widehat{\nabla} \tau)^\top\cdot (\widehat{\nabla} \tau)$" src="form_84.png"/><img class="formulaInl dark-mode-visible" alt="$\mathcal{G}_T := (\widehat{\nabla} \tau)^\top\cdot (\widehat{\nabla} \tau)$" src="form_84_dark.png"/> is the Gram matrix of the transformation's Jacobian matrix</li>
-<li><img class="formulaInl light-mode-visible" alt="$\widehat{\nabla}\widehat{\varphi}$" src="form_85.png"/><img class="formulaInl dark-mode-visible" alt="$\widehat{\nabla}\widehat{\varphi}$" src="form_85_dark.png"/> and <img class="formulaInl light-mode-visible" alt="$\widehat{\nabla}\widehat{\psi}$" src="form_86.png"/><img class="formulaInl dark-mode-visible" alt="$\widehat{\nabla}\widehat{\psi}$" src="form_86_dark.png"/> are the reference basis function gradients on the reference element</li>
+<li>\(\tau:\widehat{T}\rightarrow T\) is the transformation from the reference element onto the real element</li>
+<li>\(\mathcal{G}_T := (\widehat{\nabla} \tau)^\top\cdot (\widehat{\nabla} \tau)\) is the Gram matrix of the transformation's Jacobian matrix</li>
+<li>\(\widehat{\nabla}\widehat{\varphi}\) and \(\widehat{\nabla}\widehat{\psi}\) are the reference basis function gradients on the reference element</li>
 </ul>
 <dl class="section attention"><dt>Attention</dt><dd>This operator can only be used in conjunction with parametric finite element spaces, because it explicitly requires reference basis gradients.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>

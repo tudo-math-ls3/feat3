@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -217,23 +227,23 @@ class FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;</div><p >Slip Filter
   </dd>
 </dl>
 <p>An application of this filter sets a given vector component, i.e. it sets the normal component of a given velocity vector to zero. This is for enforcing boundary conditions like </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ u \cdot \nu = g ~\mathrm{on}~ \Gamma \]" src="form_193.png"/><img class="formulaDsp dark-mode-visible" alt="\[ u \cdot \nu = g ~\mathrm{on}~ \Gamma \]" src="form_193_dark.png"/>
+\[ u \cdot \nu = g ~\mathrm{on}~ \Gamma \]
 </p>
-<p> in the strong sense. An application of the slip filter <img class="formulaInl light-mode-visible" alt="$ f_s $" src="form_194.png"/><img class="formulaInl dark-mode-visible" alt="$ f_s $" src="form_194_dark.png"/> is can be written as </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ f_s(u,g) = u - (u \cdot \nu) \nu + g \nu. \]" src="form_195.png"/><img class="formulaDsp dark-mode-visible" alt="\[ f_s(u,g) = u - (u \cdot \nu) \nu + g \nu. \]" src="form_195_dark.png"/>
+<p> in the strong sense. An application of the slip filter \( f_s \) is can be written as </p><p class="formulaDsp">
+\[ f_s(u,g) = u - (u \cdot \nu) \nu + g \nu. \]
 </p>
-<p >In the Finite Element case, this boundary condition can only be enforced in the strong sense if the FE space <img class="formulaInl light-mode-visible" alt="$ V_h $" src="form_196.png"/><img class="formulaInl dark-mode-visible" alt="$ V_h $" src="form_196_dark.png"/> is at least <img class="formulaInl light-mode-visible" alt="$ \mathcal{C}^0 $" src="form_197.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathcal{C}^0 $" src="form_197_dark.png"/>. One possible approximation is the condition that </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ \forall j \in \Gamma_h: \mathcal{N}_j(f_{s,h} \cdot \nu_h) = \mathcal{N}_j(g), \]" src="form_198.png"/><img class="formulaDsp dark-mode-visible" alt="\[ \forall j \in \Gamma_h: \mathcal{N}_j(f_{s,h} \cdot \nu_h) = \mathcal{N}_j(g), \]" src="form_198_dark.png"/>
+<p >In the Finite Element case, this boundary condition can only be enforced in the strong sense if the FE space \( V_h \) is at least \( \mathcal{C}^0 \). One possible approximation is the condition that </p><p class="formulaDsp">
+\[ \forall j \in \Gamma_h: \mathcal{N}_j(f_{s,h} \cdot \nu_h) = \mathcal{N}_j(g), \]
 </p>
-<p> where <img class="formulaInl light-mode-visible" alt="$ \mathcal{N}_j $" src="form_199.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathcal{N}_j $" src="form_199_dark.png"/> is the node functional to the Dof <code>j</code> associated with <img class="formulaInl light-mode-visible" alt="$ \Gamma_h, f_{s,h} $" src="form_200.png"/><img class="formulaInl dark-mode-visible" alt="$ \Gamma_h, f_{s,h} $" src="form_200_dark.png"/> is a discrete slip filter mapping and <img class="formulaInl light-mode-visible" alt="$ \nu_h $" src="form_201.png"/><img class="formulaInl dark-mode-visible" alt="$ \nu_h $" src="form_201_dark.png"/> is some discrete approximation of <img class="formulaInl light-mode-visible" alt="$ \nu $" src="form_202.png"/><img class="formulaInl dark-mode-visible" alt="$ \nu $" src="form_202_dark.png"/>. Assuming <img class="formulaInl light-mode-visible" alt="$ g = 0 $" src="form_203.png"/><img class="formulaInl dark-mode-visible" alt="$ g = 0 $" src="form_203_dark.png"/> for simplicity, if <img class="formulaInl light-mode-visible" alt="$v_j$" src="form_204.png"/><img class="formulaInl dark-mode-visible" alt="$v_j$" src="form_204_dark.png"/> is a basis function of <img class="formulaInl light-mode-visible" alt="$ V_h $" src="form_196.png"/><img class="formulaInl dark-mode-visible" alt="$ V_h $" src="form_196_dark.png"/>, possible choice is </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ f_{s,h}(v_j) = v_j - \frac{\mathcal{N}_j(v_j \cdot \nu_h)}{\mathcal{N}_j (\nu_h \cdot \nu_h)} \nu_h. \]" src="form_205.png"/><img class="formulaDsp dark-mode-visible" alt="\[ f_{s,h}(v_j) = v_j - \frac{\mathcal{N}_j(v_j \cdot \nu_h)}{\mathcal{N}_j (\nu_h \cdot \nu_h)} \nu_h. \]" src="form_205_dark.png"/>
+<p> where \( \mathcal{N}_j \) is the node functional to the Dof <code>j</code> associated with \( \Gamma_h, f_{s,h} \) is a discrete slip filter mapping and \( \nu_h \) is some discrete approximation of \( \nu \). Assuming \( g = 0 \) for simplicity, if \(v_j\) is a basis function of \( V_h \), possible choice is </p><p class="formulaDsp">
+\[ f_{s,h}(v_j) = v_j - \frac{\mathcal{N}_j(v_j \cdot \nu_h)}{\mathcal{N}_j (\nu_h \cdot \nu_h)} \nu_h. \]
 </p>
 <p> In the case of conforming Lagrange elements, this reduces to </p><p class="formulaDsp">
-<img class="formulaDsp light-mode-visible" alt="\[ f_{s,h}(v_h)(x_j) = v_h(x_j) - \frac{v_h \cdot \nu_h}{\nu_h \cdot \nu_h}(x_j) \nu(x_j) \]" src="form_206.png"/><img class="formulaDsp dark-mode-visible" alt="\[ f_{s,h}(v_h)(x_j) = v_h(x_j) - \frac{v_h \cdot \nu_h}{\nu_h \cdot \nu_h}(x_j) \nu(x_j) \]" src="form_206_dark.png"/>
+\[ f_{s,h}(v_h)(x_j) = v_h(x_j) - \frac{v_h \cdot \nu_h}{\nu_h \cdot \nu_h}(x_j) \nu(x_j) \]
 </p>
-<p> for all Lagrange nodes <img class="formulaInl light-mode-visible" alt="$ x_j \in \Gamma $" src="form_207.png"/><img class="formulaInl dark-mode-visible" alt="$ x_j \in \Gamma $" src="form_207_dark.png"/>.</p>
+<p> for all Lagrange nodes \( x_j \in \Gamma \).</p>
 <p >At the moment, the SlipFilterAssembler is only implemented for Lagrange 1 functions and P1/Q1 transformations. For conforming Lagrange <code>p</code> spaces, interpolation of the outer unit normal field to the Lagrange <code>p</code> space needs to be implemented. For other function spaces (especially nonconforming ones) it not clear if the above approximation is sensible in any way.</p>
-<p >Even for spaces with enough regularity (at least <img class="formulaInl light-mode-visible" alt="$ \mathcal{C}^0 $" src="form_197.png"/><img class="formulaInl dark-mode-visible" alt="$ \mathcal{C}^0 $" src="form_197_dark.png"/>), the application of Node functionals to FE functions of a different space is missing.</p>
+<p >Even for spaces with enough regularity (at least \( \mathcal{C}^0 \)), the application of Node functionals to FE functions of a different space is missing.</p>
 <p >Also missing: Filtering of matrices.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_slip_filter_assembler.html" title="Contains routines to assemble slip filters.">Assembly::SlipFilterAssembler</a></dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>

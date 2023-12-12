@@ -16,6 +16,16 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript">
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -148,18 +158,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9ea018cb483e8763e70ebfd3c5576a55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b10e6340b78da910ce99c28d24ebcd9"><td class="memTemplParams" colspan="2">template&lt;typename VectorType_ &gt; </td></tr>
 <tr class="memitem:a3b10e6340b78da910ce99c28d24ebcd9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9">set_sd_v_norm</a> (const VectorType_ &amp;convect)</td></tr>
-<tr class="memdesc:a3b10e6340b78da910ce99c28d24ebcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9">More...</a><br /></td></tr>
+<tr class="memdesc:a3b10e6340b78da910ce99c28d24ebcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a3b10e6340b78da910ce99c28d24ebcd9">More...</a><br /></td></tr>
 <tr class="separator:a3b10e6340b78da910ce99c28d24ebcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a34f836bb6de7a3f2304de70d46516716"><td class="memTemplParams" colspan="2">template&lt;typename LocalVector_ , typename Mirror_ &gt; </td></tr>
 <tr class="memitem:a34f836bb6de7a3f2304de70d46516716"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html#a1643ac527ae9ee5a40dbcf79c6deba6f">DataType</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a34f836bb6de7a3f2304de70d46516716">calc_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">Global::Vector</a>&lt; LocalVector_, Mirror_ &gt; &amp;convect)</td></tr>
-<tr class="memdesc:a34f836bb6de7a3f2304de70d46516716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a34f836bb6de7a3f2304de70d46516716">More...</a><br /></td></tr>
+<tr class="memdesc:a34f836bb6de7a3f2304de70d46516716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm \(\|v\|_\Omega\) for the streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#a34f836bb6de7a3f2304de70d46516716">More...</a><br /></td></tr>
 <tr class="separator:a34f836bb6de7a3f2304de70d46516716"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfba980460d5a619a9da83ab1e78eb7f"><td class="memTemplParams" colspan="2">template&lt;typename IndexType_ , int conv_dim_&gt; </td></tr>
 <tr class="memitem:abfba980460d5a619a9da83ab1e78eb7f"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html#a1643ac527ae9ee5a40dbcf79c6deba6f">DataType</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#abfba980460d5a619a9da83ab1e78eb7f">calc_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, conv_dim_ &gt; &amp;convect)</td></tr>
-<tr class="memdesc:abfba980460d5a619a9da83ab1e78eb7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#abfba980460d5a619a9da83ab1e78eb7f">More...</a><br /></td></tr>
+<tr class="memdesc:abfba980460d5a619a9da83ab1e78eb7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T.  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html#abfba980460d5a619a9da83ab1e78eb7f">More...</a><br /></td></tr>
 <tr class="separator:abfba980460d5a619a9da83ab1e78eb7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -433,7 +443,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the streamline diffusion parameter delta_T. </p>
+<p>Calculates the convection field norm \(\|v\|_\Omega\) for the streamline diffusion parameter delta_T. </p>
 <dl class="section note"><dt>Note</dt><dd>This function automatically syncs the norm over all processes by using the vector's gate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -477,7 +487,7 @@ template&lt;typename IndexType_ , int conv_dim_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Calculates the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T. </p>
+<p>Calculates the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">convect</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> (local) convection field vector.</td></tr>
@@ -522,7 +532,7 @@ template&lt;typename VectorType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the convection field norm <img class="formulaInl light-mode-visible" alt="$\|v\|_\Omega$" src="form_54.png"/><img class="formulaInl dark-mode-visible" alt="$\|v\|_\Omega$" src="form_54_dark.png"/> for the local streamline diffusion parameter delta_T. </p>
+<p>Sets the convection field norm \(\|v\|_\Omega\) for the local streamline diffusion parameter delta_T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">convect</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> (local) convection field vector. </td></tr>
