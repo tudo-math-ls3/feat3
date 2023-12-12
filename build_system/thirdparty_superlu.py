@@ -10,7 +10,7 @@ import platform
 
 class SuperLU(ThirdpartyPackage):
   def __init__(self,trunk_dirname):
-    self.version = "7.1.0" #I guess we could update this?!
+    self.version = "8.1.1"
     self.names = ["superlu"]
     self.name = "SuperLU"
     self.dirname = "superlu_dist-" + self.version
