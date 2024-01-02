@@ -121,17 +121,17 @@ To do this, press
  to configure and build FEAT in <c>VScode</c>.
  The simplest way to do this is to use
  \verbatim
- python3 configure<c>VScode</c>.py gcc
+ python3 configureVScode.py gcc
  \endverbatim
  or
  \verbatim
- python3 configure<c>VScode</c> clang
+ python3 configureVScode.py clang
  \endverbatim
  which provides the simplest setup of four variants for your chosen compiler, differing in the selected optimization type.
 
  \note See
   \verbatim
- python3 configure<c>VScode</c>.py --help
+ python3 configureVScode.py --help
  \endverbatim
  for various options and flags for setting up FEAT variants.
  Importantly, we differentiate between four variant types. First of all the optimization type, i.e. <c>opt, debug, fast</c> or <c>noop</c>, then the
@@ -143,9 +143,9 @@ To do this, press
  \attention
  Due to <c>CMake Tools</c>, changes to the variants file are not automatically registered by <c>VScode</c>. After running the configure script, you will need to restart <c>VScode</c>.
  This can be easily done by using
- \ verbatim
+ \verbatim
  CTRL + Shift + P -> Reload window
- \end verbatim
+ \endverbatim
 
  \attention
  If a third-party library is not found in your third-party folder, it will be downloaded automatically.
@@ -242,6 +242,71 @@ To do this, press
  \note
  You should also add <c> ms-vscode.cmake-tools </c> to the default <c>configuration provider</c> setting of IntelliSense.
 
+\section clangd Using clangd as Language Server
+Instead of using the C/C++ extension of Microsoft, using clangd as language server can improve performance espacially on the side of file disovery.
+While there are a few disadvanteges, mainly the missing parsing of doxygen comments (which is a feature request momentarily under <a href="https://github.com/clangd/clangd/issues/529"> review</a> ),
+it should be considered if you are running into problems with the IntelliSense setup.
+
+\subsection clangd_setup Setup of clangd
+First of all, you should have a clangd installed in your system.
+Since clangd is part of the LLVM project, it should be part of your clang installation.
+To test this, and get the path to yopu clangd installation, simply type into a terminal
+\verbatim
+which clangd
+\endverbatim
+
+After you have confirmed the location of your clangd installation, search in <c>VScode</c> extentions the clangd plug-in,
+which handles the configuration of the language server.
+You will also see a prompt asking which language server should be your default provider, choose clangd.
+Then, add to your settings file:
+\verbatim
+"C_Cpp.intelliSenseEngine": "disabled", //disable intellisense lsp
+"clangd.path": "/path/to/your/clangd",
+"clangd.arguments": ["-log=verbose",
+                      "-pretty",
+                      "--background-index",
+                      "--compile-commands-dir=${workspaceFolder}/build"]
+\endverbatim
+
+which disables IntelliSense and add a few options to the clangd language server.
+One important thing is <c>"--compile-commands-dir=${workspaceFolder}/build"</c>, which provides the path to the
+<c>compile_commands.json</c> file.
+This file provides the building information, clangd needs to correctly parse you project and can fortunally be automatically build by <c>CMake</c>.
+To do this, simply add
+\verbatim
+--export_compile_commands
+\endverbatim
+to the config call of the <c>FEAT3</c> configuration, e.g. either <c>configure</c> or <c>configureVScode</c>.
+
+To reduce the load IntelliSense has on the system, you can also add to your settings file
+\verbatim
+"C_Cpp.intelliSenseCacheSize": 0,
+"C_Cpp.intelliSenseMemoryLimit": 256,
+"C_Cpp.autocomplete": "disabled",
+"C_Cpp.hover": "disabled"
+\endverbatim
+
+\note
+If you do not require debugging capabilities, for which we still need IntelliSense, you can deactivate the C/C++ extension complettly, since everything
+else should be handled by clangd.
+
+\subsection clangd_config Configuring clangd
+
+It can be very helpful to provide clangd with extra information in you sourcefiles (for example extra include or typedefs), which are unecessary or even wrong
+in the actual build process.
+This can very well happen, if for example a header file depends on a prior include of another header, which is done on application level (as for example done in the new
+ccnd applications).
+To differentiate between clangd compilation and any other, we add an additional compile flag to our clangd setup.
+For this create a file under the local config directory <c>~/.config/clangd</c>(if it does not exist, create it) named <c>config.yaml</c>.
+Here simply add
+\verbatim
+CompileFlags:
+  Add: [-D_CLANGD=1]
+\endverbatim
+
+Which adds a compiler definition <c>_CLANGD</c> which can be checked with a <c>#ifdef</c> pre-compiler call.
+
+/TODO: Add additional configuration options and information regarding cland-tidy .
 
 \author Maximilian Esser
 **/
