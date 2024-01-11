@@ -1,4 +1,7 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:3:3">
+  <Chart name="surface">
+    <CGAL filename="FEAT_SOURCE_DIR/data/models/scalexa_gendie_simple.off" />
+  </Chart>
   <Mesh type="conformal:hypercube:3:3" size="975 2606 2304 672">
     <Vertices>
       0 0 0
@@ -6951,7 +6954,7 @@
       1295
     </Mapping>
   </MeshPart>
-  <MeshPart name="bnd:pin" parent="root" topology="none" size="217 424 208 0">
+  <MeshPart name="bnd:pin" parent="root" topology="none" size="217 424 208 0" chart="surface">
     <Mapping dim="0">
       51
       52
@@ -7808,7 +7811,7 @@
       1223
     </Mapping>
   </MeshPart>
-  <MeshPart name="bnd:wall" parent="root" topology="none" size="304 592 288 0">
+  <MeshPart name="bnd:wall" parent="root" topology="none" size="304 592 288 0" chart="surface">
     <Mapping dim="0">
       9
       10

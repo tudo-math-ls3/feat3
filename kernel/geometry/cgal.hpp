@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
+#include <cstddef>
 #ifndef KERNEL_GEOMETRY_CGAL_HPP
 #define KERNEL_GEOMETRY_CGAL_HPP 1
 
@@ -35,6 +36,9 @@ namespace FEAT
      */
     class CGALWrapper
     {
+    public:
+      typedef Tiny::Vector<double, 3> PointType;
+      typedef Tiny::Matrix<double, 3, 3> TransformMatrix;
     private:
       void * _cgal_data;
 
@@ -58,10 +62,28 @@ namespace FEAT
       double squared_distance(double x, double y, double z) const;
 
       /// Returns the nearest point regarding on all input primitives defined at objects' construction.
-      Tiny::Vector<double, 3> closest_point(const Tiny::Vector<double, 3>& point) const;
+      PointType closest_point(const PointType& point) const;
 
       /// Returns the nearest point regarding on all input primitives defined at objects' construction.
-      Tiny::Vector<double, 3> closest_point(double x, double y, double z) const;
+      PointType closest_point(double x, double y, double z) const;
+
+      PointType closest_point(const PointType& point, PointType& primitive_grad) const;
+
+      /// Applies an affine transformation to the underlying polyhedron and reinitializes the AABB tree
+      /// see https://doc.cgal.org/5.5.3/Kernel_23/classCGAL_1_1Aff__transformation__3.html for definition
+      /// of transformation matrix and translation
+      void transform(const TransformMatrix& trafo_mat, const PointType& translation, double scale = double(1));
+
+      /// Returns the size in bytes, //TODO: Implement me
+      std::size_t bytes() const;
+
+
+    private:
+      /// Delete tree, which also requires to delete the inside tester
+      void _delete_tree();
+      /// initializes tree and inside tester with already initialized polyhedron
+      void _init_wrapper();
+
     }; // class CGALWrapper
   } // namespace Geometry
 } // namespace FEAT
