@@ -9,6 +9,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 
 #if defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
 
@@ -55,6 +56,12 @@ namespace FEAT
 
       /// Returns the minimun squared distance between the query point and all input primitives defined at objects' construction.
       double squared_distance(double x, double y, double z) const;
+
+      /// Returns the nearest point regarding on all input primitives defined at objects' construction.
+      Tiny::Vector<double, 3> closest_point(const Tiny::Vector<double, 3>& point) const;
+
+      /// Returns the nearest point regarding on all input primitives defined at objects' construction.
+      Tiny::Vector<double, 3> closest_point(double x, double y, double z) const;
     }; // class CGALWrapper
   } // namespace Geometry
 } // namespace FEAT

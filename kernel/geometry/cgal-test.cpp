@@ -46,6 +46,10 @@ public:
     CGALWrapper cw(mts, CGALFileMode::fm_off);
     TEST_CHECK_EQUAL(cw.point_inside(50, 50, 50), false);
     TEST_CHECK_EQUAL(cw.point_inside(0.1, 0.1, 0.1), true);
+    auto point = cw.closest_point(FEAT::Tiny::Vector<double, 3>{{0.1, 0.1, 0.2}});
+    TEST_CHECK_EQUAL_WITHIN_EPS(point[0], 0.484741, true);
+    TEST_CHECK_EQUAL_WITHIN_EPS(point[1], 0.32213, true);
+    TEST_CHECK_EQUAL_WITHIN_EPS(point[2], 0.35707, true);
   }
 
 } cgal_test;

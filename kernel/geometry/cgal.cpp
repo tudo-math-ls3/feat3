@@ -111,6 +111,19 @@ double FEAT::Geometry::CGALWrapper::squared_distance(double x, double y, double 
   return (double)cd->_tree->squared_distance(query);
 }
 
+FEAT::Tiny::Vector<double, 3> FEAT::Geometry::CGALWrapper::closest_point(const FEAT::Tiny::Vector<double, 3>& point) const
+{
+  return closest_point(point[0], point[1], point[2]);
+}
+
+FEAT::Tiny::Vector<double, 3> FEAT::Geometry::CGALWrapper::closest_point(double x, double y, double z) const
+{
+  Point_ query(x, y, z);
+  CGALWrapperData * cd = (CGALWrapperData*)_cgal_data;
+  Point_ n_point = cd->_tree->closest_point(query);
+  return FEAT::Tiny::Vector<double, 3>{{(double)n_point[0], (double)n_point[1], (double)n_point[2]}};
+}
+
 void FEAT::Geometry::CGALWrapper::_parse_mesh(std::istream & file, CGALFileMode file_mode)
 {
   delete (CGALWrapperData*)_cgal_data;
