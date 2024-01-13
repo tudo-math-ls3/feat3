@@ -5,6 +5,7 @@
 
 #pragma once
 #include "feat_config.hpp"
+#include "kernel/geometry/mesh_part.hpp"
 #include "kernel/util/assertion.hpp"
 #ifndef KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP
 #define KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP 1
@@ -13,9 +14,11 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/geometry/cgal.hpp>
+#include <kernel/runtime.hpp>
 
 
-namespace FEAT{
+namespace FEAT
+{
   namespace Geometry
   {
     namespace Atlas
@@ -45,6 +48,7 @@ namespace FEAT{
        */
       template<typename Mesh_>
       class CGALSurfaceMesh :
+#ifdef FEAT_HAVE_CGAL
         public ChartCRTP<CGALSurfaceMesh<Mesh_>, Mesh_, CGALSurfaceMeshTraits>
       {
       public:
@@ -84,22 +88,22 @@ namespace FEAT{
         {}
 
 
-        virtual ~CGALSurfaceMesh() = default;
+        ~CGALSurfaceMesh() = default;
 
         /// \copydoc ChartBase::bytes
-        virtual std::size_t bytes() const override
+        std::size_t bytes() const override
         {
           return cgal.bytes();
         }
 
         /** \copydoc ChartBase::get_type() */
-        virtual String get_type() const override
+        String get_type() const override
         {
           return "CGALSurfaceMesh";
         }
 
         /// \copydoc ChartBase:transform()
-        virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
+        void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
         {
           // create rotation matrix as double
           Tiny::Matrix<double, 3, 3> rot;
@@ -109,7 +113,7 @@ namespace FEAT{
         }
 
         /** \copydoc ChartBase::write */
-        virtual void write(std::ostream& /*os*/, const String& /*sindent*/) const override
+        void write(std::ostream& /*os*/, const String& /*sindent*/) const override
         {
           XABORTM("Not implemented yet");
         }
@@ -226,9 +230,102 @@ namespace FEAT{
         {
           return cgal.point_inside(double(point[0]), double(point[1]), double(point[2])) ? -compute_dist(point, grad_distance) : compute_dist(point, grad_distance);
         }
+#else
+      public ChartBase<Mesh_>  //dummy implementation... you should not create a CGALSurfaceMesh chart, if you do not have cgal loaded...
+      {
+      public:
+        /// Dimension of the CGAL mesh
+        static constexpr int shape_dim = 2;
+        /// The CRTP base class
+        typedef ChartBase<Mesh_> BaseClass;
+        /// Floating point type for coordinates
+        typedef typename BaseClass::CoordType CoordType;
+        /// Vector type for world points
+        typedef typename BaseClass::WorldPoint WorldPoint;
+        /// Meshtype of Baseclass
+        typedef typename BaseClass::MeshType MeshType;
+        /// Parttype of Baseclass
+        typedef typename BaseClass::PartType PartType;
 
+        CGALSurfaceMesh()
+        {
+          XABORTM("ERROR: Can not create a CGALSurfaceMesh without CGAL enabled");
+        }
 
+        bool can_explicit() const override
+        {
+          return false;
+        }
+
+        bool can_implicit() const override
+        {
+          return false;
+        }
+
+        void adapt(MeshType&, const PartType&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+        }
+
+        void adapt(PartType&, const PartType&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+        }
+
+        void transform(const WorldPoint&, const WorldPoint&, const WorldPoint&) override
+        {
+          XABORTM("Thou shalt not arrive here!");
+        }
+
+        WorldPoint map(const WorldPoint&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+          return WorldPoint{};
+        }
+
+        WorldPoint project(const WorldPoint&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+          return WorldPoint{};
+        }
+
+        CoordType dist(const WorldPoint&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+          return CoordType{};
+        }
+
+        CoordType dist(const WorldPoint&, WorldPoint&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+          return CoordType{};
+        }
+
+        CoordType signed_dist(const WorldPoint&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+          return CoordType{};
+        }
+
+        CoordType signed_dist(const WorldPoint&, WorldPoint&) const override
+        {
+          XABORTM("Thou shalt not arrive here!");
+          return CoordType{};
+        }
+
+        String get_type() const override
+        {
+          return "CGALSurfaceMeshDummy";
+        }
+
+        void write(std::ostream&, const String&) const override
+        {
+          return;
+        }
+
+#endif
       }; //class CGALSurfaceMesh
+
 
       template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>, bool enable_ = (Mesh_::shape_dim > 2)>
       class CGALSurfaceMeshChartParser :
@@ -256,19 +353,20 @@ namespace FEAT{
         {
         }
 
-        virtual bool attribs(std::map<String,bool>& attrs) const override
+        bool attribs(std::map<String,bool>& attrs) const override
         {
           attrs.emplace("filename", true);
           return true;
         }
 
-        virtual void create(
+        void create(
           int iline,
           const String& sline,
           const String&,
           const std::map<String, String>& attrs,
           bool) override
         {
+#ifdef FEAT_HAVE_CGAL
           String filename;
 
           // try to parse the filename
@@ -302,18 +400,26 @@ namespace FEAT{
 
           // everything seems fine, let's create the chart then
           _chart.reset(new ChartType(filename, mode));
+#else
+          std::cout << "ERROR: Trying to parse a CGALMeshpart chart without CGAL enabled" << std::endl;
+          FEAT::Runtime::abort();
+          //no unused warnings by casting to void:
+          (void)iline;
+          (void)sline;
+          (void)attrs;
+#endif
         }
 
-        virtual void close(int, const String&) override
+        void close(int, const String&) override
         {
         }
 
-        virtual bool content(int, const String&) override
+        bool content(int, const String&) override
         {
           return false;
         }
 
-        virtual std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String&) override
+        std::shared_ptr<Xml::MarkupParser> markup(int, const String&, const String&) override
         {
           return nullptr;
         }
