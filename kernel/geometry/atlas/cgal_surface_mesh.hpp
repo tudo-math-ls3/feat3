@@ -4,12 +4,11 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#include "feat_config.hpp"
-#include "kernel/geometry/mesh_part.hpp"
-#include "kernel/util/assertion.hpp"
+
 #ifndef KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP
 #define KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP 1
 
+#include "kernel/util/assertion.hpp"
 #include <kernel/geometry/atlas/chart.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/string.hpp>
