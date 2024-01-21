@@ -5,6 +5,7 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/meta_matrix_test_base.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -57,7 +58,8 @@ public:
     // generate a test system: A,x,b
     typename BaseClass::SystemDiagMatrix mat_sys;
     typename BaseClass::SystemVector vec_sol, vec_rhs;
-    this->gen_system(7, mat_sys, vec_sol, vec_rhs);
+    //For cuda >= 12 this has to be a multiple of 2
+    this->gen_system(8, mat_sys, vec_sol, vec_rhs);
 
     // test t <- b - A*x
     typename BaseClass::SystemVector vec_tmp(mat_sys.create_vector_l());
@@ -79,6 +81,7 @@ public:
     mat_sys.apply(vec_tmp_dense, vec_sol_dense, vec_rhs_dense, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
 
+
     // test t <- A*x; t <- t - b with densevectors
     mat_sys.apply(vec_tmp_dense, vec_sol_dense);
     vec_tmp_dense.axpy(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
@@ -92,7 +95,7 @@ public:
     // generate a test system: A,x,b
     typename BaseClass::SystemFullMatrix mat_sys;
     typename BaseClass::SystemVector vec_sol, vec_rhs;
-    this->gen_system(7, mat_sys, vec_sol, vec_rhs);
+    this->gen_system(8, mat_sys, vec_sol, vec_rhs);
 
     // test t <- b - A*x
     typename BaseClass::SystemVector vec_tmp(mat_sys.create_vector_l());

@@ -265,7 +265,7 @@ public:
     }
 
     // test PCGNRILU
-    if (this->get_preferred_backend() != PreferredBackend::cuda)
+    // if (this->get_preferred_backend() != PreferredBackend::cuda)
     {
       auto solver = Solver::new_pcgnrilu(matrix, filter, 0);
       test_solver("PCGNRILU", *solver, vec_sol, vec_ref, vec_rhs, 31);

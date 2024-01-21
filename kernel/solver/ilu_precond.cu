@@ -26,14 +26,34 @@ namespace FEAT
       struct CudaIluSolveInfo
       {
         cusparseMatDescr_t descr_M;
+#if CUSPARSE_VER_MAJOR < 12
         cusparseMatDescr_t descr_L;
         cusparseMatDescr_t descr_U;
+#else
+        cusparseSpMatDescr_t descr_L;
+        cusparseSpMatDescr_t descr_U;
+        //in this case, we also need handler for input and output vectors
+        //cusparseDnVecDescr_t descr_X;  //should not be needed, since buffersize and anaylsis accept NULL as vectors...
+        //cusparseDnVecDescr_t descr_Y;
+
+#endif
         csrilu02Info_t info_M;
+#if CUSPARSE_VER_MAJOR < 12
         csrsv2Info_t  info_L;
         csrsv2Info_t  info_U;
+#else
+        cusparseSpSVDescr_t  info_L;
+        cusparseSpSVDescr_t  info_U;
+#endif
+
         int pBufferSize_M;
+#if CUSPARSE_VER_MAJOR < 12
         int pBufferSize_L;
         int pBufferSize_U;
+#else
+        size_t pBufferSize_L;
+        size_t pBufferSize_U;
+#endif
         int pBufferSize;
         void *pBuffer;
         int structural_zero;
@@ -42,7 +62,7 @@ namespace FEAT
         const cusparseOperation_t trans_U  = CUSPARSE_OPERATION_NON_TRANSPOSE;
         const cusparseSolvePolicy_t policy_M = CUSPARSE_SOLVE_POLICY_NO_LEVEL;
         const cusparseSolvePolicy_t policy_L = CUSPARSE_SOLVE_POLICY_NO_LEVEL;
-        const cusparseSolvePolicy_t policy_U = CUSPARSE_SOLVE_POLICY_USE_LEVEL;
+        const cusparseSolvePolicy_t policy_U = CUSPARSE_SOLVE_POLICY_USE_LEVEL; //why?
         double * z;
         int m;
         int nnz;
@@ -63,38 +83,90 @@ namespace FEAT
         cusparseSetMatIndexBase(info->descr_M, CUSPARSE_INDEX_BASE_ZERO);
         cusparseSetMatType(info->descr_M, CUSPARSE_MATRIX_TYPE_GENERAL);
 
+#if CUSPARSE_VER_MAJOR < 12
         cusparseCreateMatDescr(&(info->descr_L));
         cusparseSetMatIndexBase(info->descr_L, CUSPARSE_INDEX_BASE_ZERO);
         cusparseSetMatType(info->descr_L, CUSPARSE_MATRIX_TYPE_GENERAL);
         cusparseSetMatFillMode(info->descr_L, CUSPARSE_FILL_MODE_LOWER);
         cusparseSetMatDiagType(info->descr_L, CUSPARSE_DIAG_TYPE_UNIT);
+#else
+        //assertion if int is 32 bits
+        static_assert(sizeof(int) == 4u, "ERROR: Size of int is not 32 bits");
+        cusparseCreateCsr(&(info->descr_L), info->m, info->m, info->nnz,
+                                      csrRowPtr, csrColInd, csrVal,
+                                      CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,   //use typedef somewhere? Since this goes wrong, if int is something other than 32 bits...
+                                      CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);     //Also variable size in theroy...
+        //set attributes
+        {
+          cusparseFillMode_t fillmode = CUSPARSE_FILL_MODE_LOWER;
+          cusparseDiagType_t diagtype = CUSPARSE_DIAG_TYPE_UNIT;
+          cusparseSpMatSetAttribute(info->descr_L, CUSPARSE_SPMAT_FILL_MODE, &fillmode, sizeof(cusparseFillMode_t)); //set relevant data, rest should be set by default due to new CSR implementation...
+          cusparseSpMatSetAttribute(info->descr_L, CUSPARSE_SPMAT_DIAG_TYPE, &diagtype, sizeof(cusparseSpMatAttribute_t));
+        }
+#endif
 
+#if CUSPARSE_VER_MAJOR < 12
         cusparseCreateMatDescr(&(info->descr_U));
         cusparseSetMatIndexBase(info->descr_U, CUSPARSE_INDEX_BASE_ZERO);
         cusparseSetMatType(info->descr_U, CUSPARSE_MATRIX_TYPE_GENERAL);
         cusparseSetMatFillMode(info->descr_U, CUSPARSE_FILL_MODE_UPPER);
         cusparseSetMatDiagType(info->descr_U, CUSPARSE_DIAG_TYPE_NON_UNIT);
+#else
+        cusparseCreateCsr(&(info->descr_U), info->m, info->m, info->nnz,
+                                      csrRowPtr, csrColInd, csrVal,
+                                      CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+                                      CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
+        {
+          cusparseFillMode_t fillmode = CUSPARSE_FILL_MODE_UPPER;
+          cusparseDiagType_t diagtype = CUSPARSE_DIAG_TYPE_NON_UNIT;
+          cusparseSpMatSetAttribute(info->descr_U, CUSPARSE_SPMAT_FILL_MODE, &fillmode, sizeof(cusparseFillMode_t)); //set relevant data, rest should be set by default due to new CSR implementation...
+          cusparseSpMatSetAttribute(info->descr_U, CUSPARSE_SPMAT_DIAG_TYPE, &diagtype, sizeof(cusparseSpMatAttribute_t));
+        }
+#endif
 
         cusparseCreateCsrilu02Info(&(info->info_M));
+#if CUSPARSE_VER_MAJOR < 12
         cusparseCreateCsrsv2Info(&(info->info_L));
         cusparseCreateCsrsv2Info(&(info->info_U));
+#else
+        // create information handler for cuSparseSolver
+        cusparseSpSV_createDescr(&(info->info_L));
+        cusparseSpSV_createDescr(&(info->info_U));
+#endif
+
+// #if CUSPARSE_VER_MAJOR >= 12
+//         //for now, we need to create pseudo vector arrays... we will set these later to the real vector by transfering the data pointer
+//         cusparseCreateDnVec(&(info->descr_X), info->m, nullptr, CUDA_R_64F);
+//         cusparseCreateDnVec(&(info->descr_Y), info->m, nullptr, CUDA_R_64F);
+// #endif
 
         status = cusparseDcsrilu02_bufferSize(Util::Intern::cusparse_handle, m, nnz,
                 info->descr_M, csrVal, csrRowPtr, csrColInd, info->info_M, &(info->pBufferSize_M));
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrilu02_bufferSize failed with status code: " + stringify(status));
-
+#if CUSPARSE_VER_MAJOR < 12
         status = cusparseDcsrsv2_bufferSize(Util::Intern::cusparse_handle, info->trans_L, m, nnz,
             info->descr_L, csrVal, csrRowPtr, csrColInd, info->info_L, &(info->pBufferSize_L));
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseDcsrsv2_bufferSize failed with status code: " + stringify(status));
 
         status = cusparseDcsrsv2_bufferSize(Util::Intern::cusparse_handle, info->trans_U, m, nnz,
-            info->descr_U, csrVal, csrRowPtr, csrColInd, info->info_L, &(info->pBufferSize_U));
+            info->descr_U, csrVal, csrRowPtr, csrColInd, info->info_L, &(info->pBufferSize_U)); //TODO: Error using info_L here?
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseDcsrsv2_bufferSize failed with status code: " + stringify(status));
+#else
+        const double alpha = 1.;
+        status = cusparseSpSV_bufferSize(Util::Intern::cusparse_handle, info->trans_L, &alpha,
+            info->descr_L, NULL /*info->descr_X*/, NULL /*info->descr_Y*/, CUDA_R_64F, CUSPARSE_SPSV_ALG_DEFAULT, info->info_L, &(info->pBufferSize_L));
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_bufferSize failed with status code: " + stringify(status));
 
-        info->pBufferSize = max(info->pBufferSize_M, max(info->pBufferSize_L, info->pBufferSize_U));
+        status = cusparseSpSV_bufferSize(Util::Intern::cusparse_handle, info->trans_U, &alpha,
+            info->descr_U, NULL /*info->descr_X*/, NULL /*info->descr_Y*/, CUDA_R_64F, CUSPARSE_SPSV_ALG_DEFAULT, info->info_U, &(info->pBufferSize_U));
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_bufferSize failed with status code: " + stringify(status));
+#endif
+        info->pBufferSize = max(info->pBufferSize_M, int(max(info->pBufferSize_L, info->pBufferSize_U)));
         cudaMalloc((void**)&(info->pBuffer), info->pBufferSize_M);
 
         status = cusparseDcsrilu02_analysis(Util::Intern::cusparse_handle, m, nnz, info->descr_M,
@@ -107,7 +179,7 @@ namespace FEAT
         {
           throw InternalError(__func__, __FILE__, __LINE__, "CUSPARSE ZERO PIVOT ERROR!");
         }
-
+#if CUSPARSE_VER_MAJOR< 12
         status = cusparseDcsrsv2_analysis(Util::Intern::cusparse_handle, info->trans_L, m, nnz, info->descr_L,
                 csrVal, csrRowPtr, csrColInd, info->info_L, info->policy_L, info->pBuffer);
         if (status != CUSPARSE_STATUS_SUCCESS)
@@ -117,6 +189,19 @@ namespace FEAT
                 csrVal, csrRowPtr, csrColInd, info->info_U, info->policy_U, info->pBuffer);
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparse_csrv_analysis failed with status code: " + stringify(status));
+#else
+        status = cusparseSpSV_analysis(Util::Intern::cusparse_handle, info->trans_L, &alpha,
+                              info->descr_L, NULL /*info->descr_X*/, NULL /*info->descr_Y*/, CUDA_R_64F,
+                              CUSPARSE_SPSV_ALG_DEFAULT, info->info_L, info->pBuffer);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_analysis failed with status code: " + stringify(status));
+
+        status = cusparseSpSV_analysis(Util::Intern::cusparse_handle, info->trans_U, &alpha,
+                              info->descr_U, NULL /*info->descr_X*/, NULL /*info->descr_Y*/, CUDA_R_64F,
+                              CUSPARSE_SPSV_ALG_DEFAULT, info->info_U, info->pBuffer);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_analysis failed with status code: " + stringify(status));
+#endif
 
         cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -147,18 +232,51 @@ namespace FEAT
       {
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
         const double alpha = 1.;
-
+#if CUSPARSE_VER_MAJOR < 12
         cusparseStatus_t status = cusparseDcsrsv2_solve(Util::Intern::cusparse_handle, info->trans_L, info->m, info->nnz, &alpha, info->descr_L,
                csrVal, csrRowPtr, csrColInd, info->info_L,
                   x, info->z, info->policy_L, info->pBuffer);
         if (status != CUSPARSE_STATUS_SUCCESS)
-          throw InternalError(__func__, __FILE__, __LINE__, "sucparseDcsrsv2_solve failed with status code: " + stringify(status));
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparseDcsrsv2_solve failed with status code: " + stringify(status));
 
         status = cusparseDcsrsv2_solve(Util::Intern::cusparse_handle, info->trans_U, info->m, info->nnz, &alpha, info->descr_U,
                csrVal, csrRowPtr, csrColInd, info->info_U,
                   info->z, y, info->policy_U, info->pBuffer);
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsr2_solve failed with status code: " + stringify(status));
+#else
+        //we have to create vector handlers to use the vector data in the new api (or shift them into our vector handlers... lets see whats necessary)
+        cusparseConstDnVecDescr_t descr_X;
+        cusparseDnVecDescr_t descr_Y, descr_Z;
+        cusparseCreateConstDnVec(&descr_X, info->m, x, CUDA_R_64F);
+        cusparseCreateDnVec(&descr_Z, info->m, info->z, CUDA_R_64F); //first write into z...
+        cusparseCreateDnVec(&descr_Y, info->m, y, CUDA_R_64F);
+        //now solve first triang system
+        cusparseStatus_t status = cusparseSpSV_solve(Util::Intern::cusparse_handle, info->trans_L, &alpha,
+                           info->descr_L, descr_X, descr_Z, CUDA_R_64F, CUSPARSE_SPSV_ALG_DEFAULT, info->info_L);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+        {
+          //delete vecs descr if someone catches the error
+          cusparseDestroyDnVec(descr_Y);
+          cusparseDestroyDnVec(descr_Z);
+          cusparseDestroyDnVec(descr_X);
+          throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_solve failed with status code: " + stringify(status));
+        }
+
+        status = cusparseSpSV_solve(Util::Intern::cusparse_handle, info->trans_U, &alpha,
+                           info->descr_U, descr_Z, descr_Y, CUDA_R_64F, CUSPARSE_SPSV_ALG_DEFAULT, info->info_U);
+        if (status != CUSPARSE_STATUS_SUCCESS)
+        {
+          cusparseDestroyDnVec(descr_Y);
+          cusparseDestroyDnVec(descr_Z);
+          cusparseDestroyDnVec(descr_X);
+          throw InternalError(__func__, __FILE__, __LINE__, "SECONDcusparseSpSV_solve failed with status code: " + stringify(status));
+        }
+        //destroy descr
+        cusparseDestroyDnVec(descr_Y);
+        cusparseDestroyDnVec(descr_Z);
+        cusparseDestroyDnVec(descr_X);
+#endif
 
         cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -177,11 +295,21 @@ namespace FEAT
         cudaFree(info->z);
         cudaFree(info->pBuffer);
         cusparseDestroyMatDescr(info->descr_M);
+#if CUSPARSE_VER_MAJOR < 12
         cusparseDestroyMatDescr(info->descr_L);
         cusparseDestroyMatDescr(info->descr_U);
+#else
+        cusparseDestroySpMat(info->descr_L);
+        cusparseDestroySpMat(info->descr_U);
+#endif
         cusparseDestroyCsrilu02Info(info->info_M);
+#if CUSPARSE_VER_MAJOR < 12
         cusparseDestroyCsrsv2Info(info->info_L);
         cusparseDestroyCsrsv2Info(info->info_U);
+#else
+        cusparseSpSV_destroyDescr(info->info_L);
+        cusparseSpSV_destroyDescr(info->info_L);
+#endif
 
         delete info;
       }
