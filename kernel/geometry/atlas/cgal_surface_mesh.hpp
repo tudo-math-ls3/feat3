@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <memory>
 #ifndef KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP
 #define KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP 1
 
@@ -85,6 +86,19 @@ namespace FEAT
         CGALSurfaceMesh(std::istream & file, CGALFileMode file_mode) :
         cgal{file, file_mode}
         {}
+
+        static std::unique_ptr<CGALSurfaceMesh<Mesh_>> create_cgal_surface_mesh(const String& filename)
+        {
+          Geometry::CGALFileMode file_mode;
+          //check for file extension
+          if(filename.ends_with(".off"))
+            file_mode = Geometry::CGALFileMode::fm_off;
+          else if(filename.ends_with(".obj"))
+            file_mode = Geometry::CGALFileMode::fm_obj;
+          else
+           XABORTM("No valid file extension " + filename.split_by_charset(".").back());
+          return std::make_unique<CGALSurfaceMesh<Mesh_>>(filename, file_mode);
+        }
 
 
         ~CGALSurfaceMesh() = default;
@@ -326,6 +340,7 @@ namespace FEAT
       }; //class CGALSurfaceMesh
 
 
+/*  For now, CGALSurfaceMeshParser should not be used... in any case, lets keep the implementation if it is required someday...
       template<typename Mesh_, typename ChartReturn_ = ChartBase<Mesh_>, bool enable_ = (Mesh_::shape_dim > 2)>
       class CGALSurfaceMeshChartParser :
         public Xml::DummyParser
@@ -388,13 +403,6 @@ namespace FEAT
             XABORTM("ERROR: File extension ." + split.back() + " is not valid/implemented yet.");
           }
 
-          //check if filename begins with env variable accesser
-          if(filename.starts_with("FEAT_SOURCE_DIR"))
-            filename.replace_all("FEAT_SOURCE_DIR", FEAT_SOURCE_DIR);
-
-          if(filename.starts_with("FEAT_BINARY_DIR"))
-            filename.replace_all("FEAT_BINARY_DIR", FEAT_BINARY_DIR);
-
           ///TODO: Add options for affine transformation
 
           // everything seems fine, let's create the chart then
@@ -423,6 +431,7 @@ namespace FEAT
           return nullptr;
         }
       }; // class CGALSurfaceMeshChartParser<...>
+*/
     } //namespace Atlas
   } //namespace Geometry
 } //namespace FEAT

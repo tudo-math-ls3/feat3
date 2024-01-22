@@ -13,7 +13,6 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/circle.hpp>
-#include <kernel/geometry/atlas/cgal_surface_mesh.hpp>
 #include <kernel/geometry/atlas/extrude.hpp>
 #include <kernel/geometry/atlas/surface_mesh.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
@@ -1837,8 +1836,6 @@ namespace FEAT
           return std::make_shared<Atlas::SurfaceMeshChartParser<RootMesh_>>(chart);
         if(name == "Extrude")
           return std::make_shared<Atlas::ExtrudeChartParser<RootMesh_>>(chart);
-        if(name == "CGAL")
-          return std::make_shared<Atlas::CGALSurfaceMeshChartParser<RootMesh_>>(chart);
 
         return nullptr;
       }

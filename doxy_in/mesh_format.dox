@@ -488,23 +488,21 @@ Extruding a 2D \c Circle chart effectively yields a 3D cylinder:
 The \c CGALSurfaceMesh chart represents a surface triangulation of a 3D object very simliar
 to the SurfaceMesh chart, but is handled by the CGAL thirdparty package.
 
-A \c CGALSurfaceMesh has the following attributes:
-- \b filename (mandatory): specifies the absolute path to the file that contains the geometric surface data. Has to be either an <a href="https://segeval.cs.princeton.edu/public/off_format.html"> off</a> or an
+\attention Due to several consistency problems with file pathes in mesh files, it was decided to disable defining a CGAL meshchart in
+the xml file itself.
+If you want to use this, you are required to create CGAL meshpart by hand.
+For this, suppose you already have an Atlas object created.
+Then simply call
+\code{.cpp}
+auto cgal_ptr = CGALSurfaceMesh<MeshType>::create_cgal_surface_mesh(filename);
+atlas.add_mesh_chart(<name>, cgal_ptr);
+\endcode
+
+
+\b filename (mandatory): specifies the absolute path to the file that contains the geometric surface data. Has to be either an <a href="https://segeval.cs.princeton.edu/public/off_format.html"> off</a> or an
  <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml"> obj</a> file.
 
-\attention
-If the filename starts with \c "FEAT_SOURCE_DIR" or \c "FEAT_BINARY_DIR", the sub-string will be substituted at runtime with the corresponding environment variable set by the build system
-and found in the \c feat3_config.hpp file.
 
-The definition of a \c CGALSurfaceMesh is trivial since it contains no child nodes.
-
-\subsubsection meshfile_chart_CGAL_surfacemesh_examples 3D CGAL based SurfaceMesh Examples
-We take an example from the \c scalexa_gendie_simple.xml mesh found in \c /data/meshes :
-\code{.xml}
-<Chart name="surface">
-  <CGAL filename="FEAT_SOURCE_DIR/data/models/scalexa_gendie_simple.off" />
-</Chart>
-\endcode
 
 
 \section meshfile_mesh Root Mesh Description

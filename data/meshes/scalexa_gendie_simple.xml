@@ -1,7 +1,4 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:3:3">
-  <Chart name="surface">
-    <CGAL filename="FEAT_SOURCE_DIR/data/models/scalexa_gendie_simple.off" />
-  </Chart>
   <Mesh type="conformal:hypercube:3:3" size="975 2606 2304 672">
     <Vertices>
       0 0 0
