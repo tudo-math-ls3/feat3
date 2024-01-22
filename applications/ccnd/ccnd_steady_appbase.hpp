@@ -31,6 +31,19 @@
 // Specifies the mesh refinement levels in the syntax according to Control::PartiDomainControl.
 //
 //
+// ------------------------
+// Optional Mesh Parameters
+// ------------------------
+// This parameters further define specific parts of the used mesh
+//
+// --cgal-mesh-chart <chart-name> <filename> [..]
+// Specify pairs of chart_name and corresponding filename for cgal based charts that should be explicitly
+// added to the mesh atlas before the mesh is parsed.
+// This is necessary, if a meshpart references a cgal chart that is not (and can not) be defined in the
+// meshfile itself.
+//
+//
+//
 // ----------------------------
 // System Definition Parameters
 // ----------------------------
@@ -169,6 +182,8 @@
 // \author Peter Zajac
 //
 #pragma once
+#include "applications/ccnd/ccnd_common.hpp"
+#include <iterator>
 #ifndef APPLICATIONS_CCND_STEADY_APPBASE_HPP
 #define APPLICATIONS_CCND_STEADY_APPBASE_HPP 1
 
@@ -287,6 +302,10 @@ namespace CCND
     std::deque<String> mesh_file_names;
     String mesh_file_type;
 
+    //create a new cgal_chart
+    bool create_cgal_chart = false;
+    std::deque<String> cgal_chart_pairs;
+
     /// a handful of stopwatches
     StopWatch watch_create_domain, watch_create_system, watch_create_solver;
     StopWatch watch_stokes_solve, watch_nonlin_loop, watch_nonlin_def_asm, watch_nonlin_mat_asm, watch_nonlin_solver_init, watch_nonlin_solver_apply;
@@ -326,6 +345,7 @@ namespace CCND
       args.support("vtk");
       args.support("refine-vtk");
       args.support("mesh");
+      args.support("cgal-mesh-chart");
       args.support("nu");
       args.support("upsam");
       args.support("min-nl-iter");
@@ -435,6 +455,16 @@ namespace CCND
       // get mesh files to read in
       mesh_file_names = args.query("mesh")->second;
 
+      create_cgal_chart = (args.check("cgal-mesh-chart") >= 0);
+      if(create_cgal_chart)
+      {
+        cgal_chart_pairs = args.query("cgal-mesh-part")->second;
+        if(cgal_chart_pairs.size() == 0 || cgal_chart_pairs.size()%2 != 0)
+        {
+          XABORTM("Either chart pair names are empty or a part of a pair is missing");
+        }
+      }
+
       // keep base levels if we need to save/load joined solution vectors
       if(need_base_splitter)
         domain.keep_base_levels();
@@ -446,6 +476,8 @@ namespace CCND
       comm.print(String("Dimension").pad_back(pad_len, pad_char) + ": " + stringify(dim));
       comm.print(String("Mesh Files").pad_back(pad_len, pad_char) + ": '" + stringify_join(mesh_file_names, "' , '") + "'");
       comm.print(String("Mesh Type").pad_back(pad_len, pad_char) + ": " + mesh_file_type);
+      if(create_cgal_chart)
+        comm.print(String("CgalMesh Files/Charts").pad_back(pad_len, pad_char) + ": '" + stringify_join(cgal_chart_pairs, "' , '") + "'");
       comm.print(String("Desired Levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels());
       comm.print(String("Chosen Levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels());
 #ifdef FEAT_CCND_APP_ISOPARAM
@@ -488,6 +520,30 @@ namespace CCND
       // read the mesh file root markups and write mesh type
       mesh_reader.read_root_markup();
       mesh_file_type = mesh_reader.get_meshtype_string();
+
+      //before we create the mesh in our domain, we need to add our charts if required
+      if(create_cgal_chart)
+      {
+        //requires create_cgal_chart to be divisble by 2
+        if(cgal_chart_pairs.size()%2 != 0)
+        {
+          XABORTM("CGAL chart pair names are not pairs.");
+        }
+#if defined(FEAT_HAVE_CGAL) && (FEAT_CCND_APP_DIM == 3)
+        for(auto it = cgal_chart_pairs.begin(); it != cgal_chart_pairs.end(); std::advance(it, 2))
+        {
+          //first the chart name, then the filename
+          if(!domain.get_atlas().add_mesh_chart(*it, Geometry::Atlas::CGALSurfaceMesh<MeshType>::create_cgal_surface_mesh(*(std::next(it)))))
+          {
+            XABORTM("Could not add cgal surface mesh " + *it + " " + *(std::next(it)));
+          }
+        }
+#elif defined(FEAT_HAVE_CGAL)
+        XABORTM("Trying to create CGALSurfaceMesh with dimension < 3");
+#else
+        XABORTM("Trying to create CGALSurfaceMesh without CGAL");
+#endif
+      }
 
       // try to create the domain
       domain.create(mesh_reader);
