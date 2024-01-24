@@ -10,6 +10,7 @@
 // includes, FEAT
 #include <kernel/analytic/static_wrapper.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/geometry/cgal.hpp>
 
 // includes, system
 #include <initializer_list>
@@ -4268,6 +4269,94 @@ namespace FEAT
           }
         }; // class SineRingVortexRHS2D::Evaluator<...>
       }; // class SineRingVortexRHS2D<...>
+
+#ifdef FEAT_HAVE_CGAL
+      /**
+       * \brief CGAL based analytic signed distance function
+       *
+       * This function can be used as an interface to an anayltic function of a cgal 3D mesh distance evaluation,
+       * for example to evaluate an interpolation.
+       * Thereby the definition is as follows:
+       * dist(point) >= 0 if point is inside or on the boundary of the mesh.
+       * dist(point) < 0 if point is outside of the geometry.
+       *
+       * \tparam DT_ The underlying datatype of the evaluation.
+       * \note The actual cgal call always works with double precision.
+       *
+       * \author Maximilian Esser
+       */
+      template<typename DT_>
+      class CGALDistFunc : public Analytic::Function
+      {
+      public:
+        /// The floating point type
+        typedef DT_ DataType;
+        /// What type this mapping maps to
+        typedef Analytic::Image::Scalar ImageType;
+        /// The dimension to map from
+        static constexpr int domain_dim = 3;
+        /// We can compute the value
+        static constexpr bool can_value = true;
+        /// We can compute the gradient
+        static constexpr bool can_grad = false;
+        /// We can't compute the Hessian
+        static constexpr bool can_hess = false;
+        /// Type to map from
+        typedef Tiny::Vector<DT_, domain_dim> PointType;
+
+      private:
+        /// Wrapper to CGAL library
+        Geometry::CGALWrapper _cgal_wrapper;
+      public:
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] filestream_
+         *            A stringstream containing the file data.
+         *
+         * \param[in] filemode_
+         *            The file mode of the data.
+         */
+        explicit CGALDistFunc(std::istream& filestream_, Geometry::CGALFileMode filemode_) :
+          _cgal_wrapper(filestream_, filemode_)
+        {
+        }
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          const Geometry::CGALWrapper* _cgal_wrapper;
+
+        public:
+          explicit Evaluator(const CGALDistFunc& function) :
+            _cgal_wrapper(&function._cgal_wrapper)
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            return ((_cgal_wrapper->point_inside(double(point[0]), double(point[1]), double(point[2])) ? ValueType(1) : ValueType(-1)) *
+                    ValueType(Math::sqrt(_cgal_wrapper->squared_distance(double(point[0]), double(point[1]), double(point[2])))));
+          }
+        }; // class CGALDistFunc::Evaluator<...>
+      }; // class CGALDistFunc<...>
+#endif
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

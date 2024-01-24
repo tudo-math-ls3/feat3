@@ -20,6 +20,8 @@ public:
   {
   }
 
+  virtual ~CommonFunctionTest() = default;
+
   void test_par_profile_scalar() const
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
@@ -1811,6 +1813,48 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-23.693995515706431689), tol);
   }
 
+#ifdef FEAT_HAVE_CGAL
+  void test_cgal_signed_dist_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    std::stringstream mts;
+    mts<<"OFF"<<std::endl;
+    mts<<"8 12 18"<<std::endl;
+    mts<<"0.0 0.0 0.0"<<std::endl;
+    mts<<"1.0 0.0 0.0"<<std::endl;
+    mts<<"0.0 1.0 0.0"<<std::endl;
+    mts<<"1.0 1.0 0.0"<<std::endl;
+    mts<<"0.0 0.0 1.0"<<std::endl;
+    mts<<"1.0 0.0 1.0"<<std::endl;
+    mts<<"0.0 1.0 1.0"<<std::endl;
+    mts<<"1.0 1.0 1.0"<<std::endl;
+    mts<<"3 0 1 2"<<std::endl;
+    mts<<"3 1 3 2"<<std::endl;
+    mts<<"3 0 5 1"<<std::endl;
+    mts<<"3 0 4 5"<<std::endl;
+    mts<<"3 2 4 0"<<std::endl;
+    mts<<"3 4 2 6"<<std::endl;
+    mts<<"3 3 1 5"<<std::endl;
+    mts<<"3 3 5 7"<<std::endl;
+    mts<<"3 2 3 7"<<std::endl;
+    mts<<"3 2 7 6"<<std::endl;
+    mts<<"3 5 4 7"<<std::endl;
+    mts<<"3 7 4 6"<<std::endl;
+
+    Common::CGALDistFunc<DT_> func(mts, Geometry::CGALFileMode::fm_off);
+
+    DT_ val_1 = Analytic::eval_value_x(func, 0.0, 0.0, 0.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0), tol);
+    DT_ val_2 = Analytic::eval_value_x(func, 0.5, 0.5, 0.5);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(0.5), tol);
+    DT_ val_3 = Analytic::eval_value_x(func, 0.1, 0.2, 0.2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0.1), tol);
+    DT_ val_4 = Analytic::eval_value_x(func, 0.3, 0.2, -0.132);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_4, DT_(-0.11), tol);
+
+  }
+#endif
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1867,6 +1911,9 @@ public:
     test_sine_ring_vortex_velo_2d();
     test_sine_ring_vortex_pres_2d();
     test_sine_ring_vortex_rhs_2d();
+#ifdef FEAT_HAVE_CGAL
+    test_cgal_signed_dist_3d();
+#endif
   }
 };
 
