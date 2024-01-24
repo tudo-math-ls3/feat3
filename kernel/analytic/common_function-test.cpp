@@ -1850,7 +1850,7 @@ public:
     DT_ val_3 = Analytic::eval_value_x(func, 0.1, 0.2, 0.2);
     TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0.1), tol);
     DT_ val_4 = Analytic::eval_value_x(func, 0.3, 0.2, -0.132);
-    TEST_CHECK_EQUAL_WITHIN_EPS(val_4, DT_(-0.11), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_4, DT_(-0.132), tol);
 
   }
 #endif

@@ -110,25 +110,16 @@ SET (test_list
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feat test_system)
-  ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target ${test}
-    --build-nocmake
-    --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/${test} none)
-  SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 
-  ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(${test}_generic ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/${test} main)
-  SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/${test} generic)
+  SET_PROPERTY(TEST ${test}_generic PROPERTY LABELS "generic")
 ENDFOREACH(test)
 
 # add all tests to kernel_tests

@@ -247,7 +247,7 @@ namespace FEAT
         * \param[in] id_in
         * the testcase's id string
         */
-      explicit UnitTest(const String& id_in, const String datatype_name = "none", const String index_name = "none", PreferredBackend preferred_backend = PreferredBackend::generic)
+      explicit UnitTest(const String& id_in, const String& datatype_name = "none", const String& index_name = "none", PreferredBackend preferred_backend = PreferredBackend::generic)
         : _id(id_in),
         _datatype_name(datatype_name),
         _index_name(index_name),

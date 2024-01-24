@@ -16,32 +16,19 @@ endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 ADD_EXECUTABLE(tensor_operations-test EXCLUDE_FROM_ALL tensor_operations-test.cpp)
 TARGET_LINK_LIBRARIES(tensor_operations-test feat test_system)
-ADD_TEST(tensor_operations-test_none ${CMAKE_CTEST_COMMAND}
-  --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-  --build-generator ${CMAKE_GENERATOR}
-  --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-  --build-target tensor_operations-test
-  --build-nocmake
-  --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test none)
-SET_PROPERTY(TEST tensor_operations-test_none PROPERTY LABELS "none")
-if (FEAT_VALGRIND)
-  SET_PROPERTY(TEST tensor_operations-test_none PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-  SET_PROPERTY(TEST tensor_operations-test_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (FEAT_VALGRIND)
 
-ADD_TEST(tensor_operations-test_main ${CMAKE_CTEST_COMMAND}
+ADD_TEST(tensor_operations-test_generic ${CMAKE_CTEST_COMMAND}
   --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
   --build-generator ${CMAKE_GENERATOR}
   --build-makeprogram ${CMAKE_MAKE_PROGRAM}
   --build-target tensor_operations-test
   --build-nocmake
   --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test main)
-SET_PROPERTY(TEST tensor_operations-test_main PROPERTY LABELS "main")
+  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test generic)
+SET_PROPERTY(TEST tensor_operations-test_generic PROPERTY LABELS "generic")
 if (FEAT_VALGRIND)
-  SET_PROPERTY(TEST tensor_operations-test_main PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-  SET_PROPERTY(TEST tensor_operations-test_main PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  SET_PROPERTY(TEST tensor_operations-test_generic PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+  SET_PROPERTY(TEST tensor_operations-test_generic PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_VALGRIND)
 
 if (FEAT_HAVE_MPI)
