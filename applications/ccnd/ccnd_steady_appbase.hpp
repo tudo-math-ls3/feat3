@@ -289,6 +289,7 @@ namespace CCND
     String cubature_matrix_m = "gauss-legendre:3";
     String cubature_defect   = "gauss-legendre:3";
 
+
     /// name of VTK output file(s)
     String vtk_filename;
     /// write VTK files?
@@ -532,10 +533,25 @@ namespace CCND
 #if defined(FEAT_HAVE_CGAL) && (FEAT_CCND_APP_DIM == 3)
         for(auto it = cgal_chart_pairs.begin(); it != cgal_chart_pairs.end(); std::advance(it, 2))
         {
+          // create a new stream
+          auto stream_cgal = std::make_shared<std::stringstream>();
+
+          Geometry::CGALFileMode cgal_filemode;
+          const String& filename = *(std::next(it));
+          if(filename.ends_with(".off"))
+            cgal_filemode = Geometry::CGALFileMode::fm_off;
+          else if(filename.ends_with(".obj"))
+            cgal_filemode = Geometry::CGALFileMode::fm_obj;
+          else
+           XABORTM("No valid file extension " + filename.split_by_charset(".").back());
+
+          // read the stream
+          DistFileIO::read_common(*stream_cgal, filename, this->comm);
+
           //first the chart name, then the filename
-          if(!domain.get_atlas().add_mesh_chart(*it, Geometry::Atlas::CGALSurfaceMesh<MeshType>::create_cgal_surface_mesh(*(std::next(it)))))
+          if(!domain.get_atlas().add_mesh_chart(*it, Geometry::Atlas::CGALSurfaceMesh<MeshType>::create_cgal_surface_mesh(*stream_cgal, cgal_filemode)))
           {
-            XABORTM("Could not add cgal surface mesh " + *it + " " + *(std::next(it)));
+            XABORTM("Could not add cgal surface mesh " + *it + " " + filename);
           }
         }
 #elif defined(FEAT_HAVE_CGAL)

@@ -87,17 +87,9 @@ namespace FEAT
         cgal{file, file_mode}
         {}
 
-        static std::unique_ptr<CGALSurfaceMesh<Mesh_>> create_cgal_surface_mesh(const String& filename)
+        static std::unique_ptr<CGALSurfaceMesh<Mesh_>> create_cgal_surface_mesh(std::istream& file, Geometry::CGALFileMode file_mode)
         {
-          Geometry::CGALFileMode file_mode;
-          //check for file extension
-          if(filename.ends_with(".off"))
-            file_mode = Geometry::CGALFileMode::fm_off;
-          else if(filename.ends_with(".obj"))
-            file_mode = Geometry::CGALFileMode::fm_obj;
-          else
-           XABORTM("No valid file extension " + filename.split_by_charset(".").back());
-          return std::make_unique<CGALSurfaceMesh<Mesh_>>(filename, file_mode);
+          return std::make_unique<CGALSurfaceMesh<Mesh_>>(file, file_mode);
         }
 
 
