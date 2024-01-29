@@ -17,18 +17,28 @@ endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 ADD_EXECUTABLE(tensor_operations-test EXCLUDE_FROM_ALL tensor_operations-test.cpp)
 TARGET_LINK_LIBRARIES(tensor_operations-test feat test_system)
 
-ADD_TEST(tensor_operations-test_generic ${CMAKE_CTEST_COMMAND}
+ADD_TEST(tensor_operations-test_all ${CMAKE_CTEST_COMMAND}
   --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
   --build-generator ${CMAKE_GENERATOR}
   --build-makeprogram ${CMAKE_MAKE_PROGRAM}
   --build-target tensor_operations-test
   --build-nocmake
   --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test generic)
-SET_PROPERTY(TEST tensor_operations-test_generic PROPERTY LABELS "generic")
+  --test-command ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test)
+SET_PROPERTY(TEST tensor_operations-test_all PROPERTY LABELS "all")
+
 if (FEAT_VALGRIND)
-  SET_PROPERTY(TEST tensor_operations-test_generic PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-  SET_PROPERTY(TEST tensor_operations-test_generic PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  ADD_TEST(tensor_operations-test_valgrind ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target tensor_operations-test
+    --build-nocmake
+    --build-noclean
+    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test generic)
+  SET_PROPERTY(TEST tensor_operations-test_valgrind PROPERTY LABELS "valgrind")
+  SET_PROPERTY(TEST tensor_operations-test_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+  SET_PROPERTY(TEST tensor_operations-test_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_VALGRIND)
 
 if (FEAT_HAVE_MPI)
