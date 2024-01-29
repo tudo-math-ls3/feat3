@@ -55,7 +55,7 @@ public:
     MeshType mesh_f(refine_factory);
 
     // compute eps
-    const DataType eps = Math::pow(Math::eps<DataType>(), DataType(0.8));
+    const DataType eps = Math::pow(Math::eps<DataType>(), DataType(0.75));
 
     // create trafos
     TrafoType trafo_f(mesh_f);

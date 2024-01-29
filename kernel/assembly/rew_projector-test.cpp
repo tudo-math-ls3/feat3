@@ -10,6 +10,7 @@
 #include <kernel/geometry/common_factories.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
@@ -43,6 +44,7 @@ class RewProjectorTest :
 
   typedef Space::Discontinuous::Element<QuadTrafo> QuadSpaceQ0;
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
+  typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
   typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceRT;
 
 public:
@@ -74,21 +76,23 @@ public:
 
     // project Q0
     DataType_ q0_err = project<QuadSpaceQ0>(trafo, "gauss-legendre:2");
-    q0_err = q0_err / DataType_(7.9731492672E-2) - DataType_(1);
+    q0_err = q0_err / DataType_(7.973149267259641e-02) - DataType_(1);
     TEST_CHECK_EQUAL_WITHIN_EPS(q0_err, DataType_(0), eps);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(q0_err, DataType_(7.97315E-2), eps);
 
     // project Q1
     DataType_ q1_err = project<QuadSpaceQ1>(trafo, "gauss-legendre:3");
-    q1_err = q1_err / DataType_(4.1430308042E-3) - DataType_(1);
+    q1_err = q1_err / DataType_(4.143030804263830e-03) - DataType_(1);
     TEST_CHECK_EQUAL_WITHIN_EPS(q1_err, DataType_(0), eps);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(q1_err, DataType_(4.14303E-3), eps);
+
+    // project Q2
+    DataType_ q2_err = project<QuadSpaceQ2>(trafo, "gauss-legendre:4");
+    q2_err = q2_err / DataType_(2.157823711367303e-04) - DataType_(1);
+    TEST_CHECK_EQUAL_WITHIN_EPS(q2_err, DataType_(0), eps);
 
     // project RT
     DataType_ rt_err = project<QuadSpaceRT>(trafo, "gauss-legendre:3");
-    rt_err = rt_err / DataType_(7.5903151744E-3) - DataType_(1);
+    rt_err = rt_err / DataType_(7.5903151744156896e-03) - DataType_(1);
     TEST_CHECK_EQUAL_WITHIN_EPS(rt_err, DataType_(0), eps);
-    //TEST_CHECK_EQUAL_WITHIN_EPS(rt_err, DataType_(7.59032E-3), eps);
   }
 
   template<typename Space_>

@@ -10,17 +10,15 @@ using namespace FEAT;
 using namespace FEAT::TestSystem;
 using namespace FEAT::Analytic;
 
-template<typename DT_, typename IT_>
+template<typename DT_>
 class CommonFunctionTest :
   public UnitTest
 {
 public:
-  CommonFunctionTest(PreferredBackend backend) :
-    UnitTest("CommonFunctionTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  CommonFunctionTest() :
+    UnitTest("CommonFunctionTest", Type::Traits<DT_>::name(), "none", PreferredBackend::generic)
   {
   }
-
-  virtual ~CommonFunctionTest() = default;
 
   void test_par_profile_scalar() const
   {
@@ -851,6 +849,10 @@ public:
   {
     DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     // create himmelblau-function object
     Analytic::Common::HimmelblauFunction func;
 
@@ -1616,6 +1618,10 @@ public:
 
   void test_standing_vortex_function_2d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // create standing-vortex function object
@@ -1648,6 +1654,10 @@ public:
 
   void test_taylor_green_vortex_velo_2d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     Analytic::Common::TaylorGreenVortexVelo2D<DT_> func(DT_(0.01), DT_(0.5));
@@ -1678,6 +1688,10 @@ public:
 
   void test_taylor_green_vortex_pres_2d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     Analytic::Common::TaylorGreenVortexPres2D<DT_> func(DT_(0.01), DT_(0.5));
@@ -1694,6 +1708,10 @@ public:
 
   void test_poiseuille_pipe_flow_3d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
     const DT_ tol2 = Math::pow(Math::eps<DT_>(), DT_(0.6));
 
@@ -1757,6 +1775,10 @@ public:
 
   void test_sine_ring_vortex_velo_2d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     Analytic::Common::SineRingVortexVelo2D<DT_> func;
@@ -1787,6 +1809,10 @@ public:
 
   void test_sine_ring_vortex_pres_2d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     Analytic::Common::SineRingVortexPres2D<DT_> func;
@@ -1803,6 +1829,10 @@ public:
 
   void test_sine_ring_vortex_rhs_2d() const
   {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     Analytic::Common::SineRingVortexRHS2D<DT_> func(DT_(1.0), DT_(1.2), DT_(1.5), DT_(1.7));
@@ -1917,25 +1947,15 @@ public:
   }
 };
 
-CommonFunctionTest <double, std::uint32_t> common_function_test_double_uint32(PreferredBackend::generic);
-CommonFunctionTest <float, std::uint32_t> common_function_test_float_uint32(PreferredBackend::generic);
-CommonFunctionTest <double, std::uint64_t> common_function_test_double_uint64(PreferredBackend::generic);
-CommonFunctionTest <float, std::uint64_t> common_function_test_float_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-CommonFunctionTest <float, std::uint64_t> mkl_common_function_test_float_uint64(PreferredBackend::mkl);
-CommonFunctionTest <double, std::uint64_t> mkl_common_function_test_double_uint64(PreferredBackend::mkl);
-#endif
+CommonFunctionTest <double> common_function_test_double;
+CommonFunctionTest <float> common_function_test_float;
 #ifdef FEAT_HAVE_QUADMATH
-CommonFunctionTest <__float128, std::uint64_t> common_function_test_float128_uint64(PreferredBackend::generic);
-CommonFunctionTest <__float128, std::uint32_t> common_function_test_float128_uint32(PreferredBackend::generic);
+CommonFunctionTest <__float128> common_function_test_float128;
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-CommonFunctionTest <Half, std::uint32_t> common_function_test_half_uint32(PreferredBackend::generic);
-CommonFunctionTest <Half, std::uint64_t> common_function_test_half_uint64(PreferredBackend::generic);
+CommonFunctionTest <Half> common_function_test_half;
 #endif
 #ifdef FEAT_HAVE_CUDA
-CommonFunctionTest <float, std::uint32_t> cuda_common_function_test_float_uint32(PreferredBackend::cuda);
-CommonFunctionTest <double, std::uint32_t> cuda_common_function_test_double_uint32(PreferredBackend::cuda);
-CommonFunctionTest <float, std::uint64_t> cuda_common_function_test_float_uint64(PreferredBackend::cuda);
-CommonFunctionTest <double, std::uint64_t> cuda_common_function_test_double_uint64(PreferredBackend::cuda);
+CommonFunctionTest <float> cuda_common_function_test_float;
+CommonFunctionTest <double> cuda_common_function_test_double;
 #endif

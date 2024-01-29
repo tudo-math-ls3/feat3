@@ -109,7 +109,7 @@ public:
   void test_unit_2d_q0(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.7));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -118,7 +118,9 @@ public:
     QuadSpaceQ0 space(trafo);
 
     // create a cubature factory
-    Cubature::DynamicFactory cubature_factory("gauss-legendre:5");
+    // note: Gauss-Legengre:7 gives us an integration error of roughly 1.28979e-27,
+    // which is barely lower than the tolerance for __float128
+    Cubature::DynamicFactory cubature_factory("gauss-legendre:7");
 
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));

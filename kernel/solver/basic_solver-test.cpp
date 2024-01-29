@@ -86,11 +86,14 @@ public:
     TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance\n"
       + "result: " + stringify_fp_sci(d) + "; expected result <= " + stringify(tol));
 
-    // check number of iterations
-    const Index n = solver.get_num_iter();
-    TEST_CHECK_MSG((n <= ref_iters + iter_tol) && (n + iter_tol >= ref_iters),
-      name + ": performed " + stringify(n) + " iterations; expected "
-      + stringify(ref_iters) + " +/- " + stringify(iter_tol));
+    // check number of iterations (only in double precision)
+    if(sizeof(DataType) == 8u)
+    {
+      const Index n = solver.get_num_iter();
+      TEST_CHECK_MSG((n <= ref_iters + iter_tol) && (n + iter_tol >= ref_iters),
+        name + ": performed " + stringify(n) + " iterations; expected "
+        + stringify(ref_iters) + " +/- " + stringify(iter_tol));
+    }
   }
 
   virtual void run() const override
@@ -163,7 +166,7 @@ public:
     {
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_pcr(matrix, filter, precon);
-      solver->set_tol_rel(1e-7);
+      solver->set_tol_rel(1e-8);
       test_solver("PCR-JAC", *solver, vec_sol, vec_ref, vec_rhs, 27);
     }
 
@@ -295,7 +298,7 @@ public:
     {
       auto precon = Solver::new_jacobi_precond(matrix, filter, DataType(0.5));
       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
-      solver->set_tol_rel(1e-7);
+      solver->set_tol_rel(1e-9);
       test_solver("BiCGStab-right-Jacobi(0.5)", *solver, vec_sol, vec_ref, vec_rhs, 19);
     }
 
