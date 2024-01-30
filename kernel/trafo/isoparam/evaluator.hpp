@@ -984,7 +984,6 @@ namespace FEAT
          */
         DataType volume() const
         {
-          //XASSERTM(false, "volume computation not available for isoparametric trafo");
           // 2-point Gauss-Legendre coordinate
           static const DataType G = DataType(FEAT_F128C(0.57735026918962576450914878050195745564760175127));
 
@@ -1011,16 +1010,31 @@ namespace FEAT
          *
          * This function approximates the cell width along a given normalized ray direction vector.
          *
+         * \attention This function only returns an approximation for the directed width, as computing
+         * the exact directed with would be too expensive.
+         *
          * \param[in] ray
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        DataType width_directed(const ImagePointType&) const
+        DataType width_directed(const ImagePointType& ray) const
         {
-          XASSERTM(false, "cell width computation not available for isoparametric trafo");
-          return DataType(0);
+          JacobianMatrixType jac_mat;
+          JacobianInverseType jac_inv;
+          DomainPointType ref_ray, cub_pt;
+          cub_pt = DataType(0);
+
+          // compute jacobian matrix at barycentre
+          calc_jac_mat(jac_mat, cub_pt);
+
+          // invert jacobian matrix and multiply by ray vector
+          jac_inv.set_inverse(jac_mat);
+          ref_ray.set_mat_vec_mult(jac_inv, ray);
+
+          // return scaled inverse ray norm
+          return DataType(2) / ref_ray.norm_euclid();
         }
       }; // class Evaluator<Hypercube<2>,...>
 
@@ -1487,8 +1501,26 @@ namespace FEAT
          */
         DataType volume() const
         {
-          XASSERTM(false, "volume computation not available for isoparametric trafo");
-          return DataType(0);
+          // 2-point Gauss-Legendre coordinate
+          const DataType cx = DataType(FEAT_F128C(0.57735026918962576450914878050195745564760175127));
+
+          JacobianMatrixType jac_mat;
+          DomainPointType cub_pt;
+          DataType vol = DataType(0);
+
+          // loop over all 8 cubature points
+          for(int i(0); i < 8; ++i)
+          {
+            // set cubature point coords by magic bitshifts
+            for(int j(0); j < 3; ++j)
+              cub_pt[j] = DataType((((i >> j) & 1) << 1) - 1) * cx;
+
+            // compute jacobian matrix and add its volume
+            calc_jac_mat(jac_mat, cub_pt);
+            vol += jac_mat.vol();
+          }
+
+          return vol;
         }
 
         /**
@@ -1496,16 +1528,31 @@ namespace FEAT
          *
          * This function approximates the cell width along a given normalized ray direction vector.
          *
+         * \attention This function only returns an approximation for the directed width, as computing
+         * the exact directed with would be too expensive.
+         *
          * \param[in] ray
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        DataType width_directed(const ImagePointType&) const
+        DataType width_directed(const ImagePointType& ray) const
         {
-          XASSERTM(false, "cell width computation not available for isoparametric trafo");
-          return DataType(0);
+          JacobianMatrixType jac_mat;
+          JacobianInverseType jac_inv;
+          DomainPointType ref_ray, cub_pt;
+          cub_pt = DataType(0);
+
+          // compute jacobian matrix at barycentre
+          calc_jac_mat(jac_mat, cub_pt);
+
+          // invert jacobian matrix and multiply by ray vector
+          jac_inv.set_inverse(jac_mat);
+          ref_ray.set_mat_vec_mult(jac_inv, ray);
+
+          // return scaled inverse ray norm
+          return DataType(2) / ref_ray.norm_euclid();
         }
       }; // class Evaluator<Hypercube<3>,...>
     } // namespace Isoparam

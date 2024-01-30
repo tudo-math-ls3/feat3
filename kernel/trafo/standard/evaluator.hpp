@@ -1385,7 +1385,7 @@ namespace FEAT
           // which is hard-coded in the code below.
 
           // compute 1D Gauss-Legendre root
-          const DataType cx = DataType(1) / Math::sqrt(DataType(3));
+          const DataType cx = DataType(FEAT_F128C(0.57735026918962576450914878050195745564760175127));
 
           JacobianMatrixType jac_mat;
           DomainPointType cub_pt;
