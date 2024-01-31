@@ -256,6 +256,9 @@ namespace CCND
       // compute pressure difference
       bench_analysis.compute_pressure_difference(comm, vec_sol.local().at<1>(), domain.front()->space_pres);
 
+      // compute pressure drop
+      bench_analysis.compute_pressure_drop(comm, vec_sol.local().at<1>(), domain.front()->space_pres, bench);
+
       // compute fluxes
       bench_analysis.compute_fluxes(comm, vec_sol.local().first(), domain.front()->space_velo);
 

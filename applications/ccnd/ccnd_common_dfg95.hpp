@@ -337,8 +337,12 @@ namespace CCND
       const MeshPartType* mesh_part_bnd_c = nullptr;
       /// meshpart for sphere boundary
       const MeshPartType* mesh_part_bnd_s = nullptr;
+      /// meshpart for left edge
+      const MeshPartType* mesh_part_bnd_l = nullptr;
       /// meshpart for right edge
       const MeshPartType* mesh_part_bnd_r = nullptr;
+      /// meshpart for inflow
+      const MeshPartType* mesh_part_bnd_in = nullptr;
       /// meshpart for outflow
       const MeshPartType* mesh_part_bnd_out = nullptr;
       /// meshpart for upper inner edge
@@ -347,7 +351,7 @@ namespace CCND
       const MeshPartType* mesh_part_inner_l = nullptr;
 
       /// trace assemblers for obstacle body force and fluxes
-      std::unique_ptr<Assembly::TraceAssembler<TrafoType>> body_force_asm, flux_asm_u, flux_asm_l, flux_asm_out;
+      std::unique_ptr<Assembly::TraceAssembler<TrafoType>> body_force_asm, flux_asm_u, flux_asm_l, flux_asm_in, flux_asm_out;
 
       /// inverse mapping data for pressure evaluation
       Trafo::InverseMappingData<DataType, dim> point_iv_a, point_iv_e;
@@ -369,7 +373,8 @@ namespace CCND
       // reference values for benchmark values
       DataType ref_drag = DataType(dim == 2 ? 5.57953523384 : 6.18533);
       DataType ref_lift = DataType(dim == 2 ? 0.010618948146 : 0.009401);
-      DataType ref_d_p = DataType(dim == 2 ? 0.11752016697 : 0.170826996);
+      DataType ref_p_diff = DataType(dim == 2 ? 0.11752016697 : 0.170826996);
+      //DataType ref_p_drop = DataType(dim == 2 ? 1.0 : 1.0);
 
       // drag/lift forces by line integration
       DataType drag_coeff_line, lift_coeff_line, drag_err_line, lift_err_line;
@@ -378,7 +383,10 @@ namespace CCND
       DataType drag_coeff_vol, lift_coeff_vol, side_coeff_vol, drag_err_vol, lift_err_vol, side_err_vol;
 
       // pressure values
-      DataType pres_diff, pres_err;
+      DataType pres_diff, pres_diff_err;
+
+      // pressure drop from inflow to outflow
+      DataType pres_drop, pres_drop_err;
 
       // flow through upper/lower region and outflow flux
       DataType flux_upper, flux_lower, flux_out;
@@ -391,7 +399,8 @@ namespace CCND
       BenchmarkAnalysis() :
         drag_coeff_line(0.0), lift_coeff_line(0.0), drag_err_line(0.0), lift_err_line(0.0),
         drag_coeff_vol(0.0), lift_coeff_vol(0.0), side_coeff_vol(0.0), drag_err_vol(0.0), lift_err_vol(0.0), side_err_vol(0.0),
-        pres_diff(0.0), pres_err(0.0),
+        pres_diff(0.0), pres_diff_err(0.0),
+        pres_drop(0.0), pres_drop_err(0.0),
         flux_upper(0.0), flux_lower(0.0), flux_out(0.0)
       {
       }
@@ -406,28 +415,31 @@ namespace CCND
         const char pc = '.';
         // append coefficients and velocity info
         s += "Solution Analysis:\n";
-        s += String("\nDrag Coefficient (Line)").pad_back(padlen, pc) + ": " + stringify_fp_fix(drag_coeff_line, prec);
+        s += String("\nDrag Coefficient (Line)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_line, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(drag_err_line, prec) + " ]";
-        s += String("\nLift Coefficient (Line)").pad_back(padlen, pc) + ": " + stringify_fp_fix(lift_coeff_line, prec);
+        s += String("\nLift Coefficient (Line)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(lift_coeff_line, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(lift_err_line, prec) + " ]";
-        s += String("\nDrag Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(drag_coeff_vol, prec);
+        s += String("\nDrag Coefficient (Vol)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_vol, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(drag_err_vol, prec) + " ]";
-        s += String("\nLift Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(lift_coeff_vol, prec);
+        s += String("\nLift Coefficient (Vol)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(lift_coeff_vol, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(lift_err_vol, prec) + " ]";
-        s += String("\nSide Coefficient (Vol)").pad_back(padlen, pc) + ": " + stringify_fp_fix(side_coeff_vol, prec);
+        s += String("\nSide Coefficient (Vol)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(side_coeff_vol, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(side_err_vol, prec) + " ]";
-        s += String("\nPressure Difference").pad_back(padlen, pc) + ": " + stringify_fp_fix(pres_diff, prec);
+        s += String("\nPressure Difference").pad_back(padlen, pc) + ".: " + stringify_fp_fix(pres_diff, prec);
         if(print_errors)
-          s += "   [ Error: " + stringify_fp_sci(pres_err, prec) + " ]";
-        s += String("\nUpper Flux").pad_back(padlen, pc) + ": " + stringify_fp_fix(flux_upper, prec);
-        s += String("\nLower Flux").pad_back(padlen, pc) + ": " + stringify_fp_fix(flux_lower, prec);
-        s += String("\nOut Flux").pad_back(padlen, pc) + ": " + stringify_fp_fix(flux_out, prec);
-        s += String("\n") +velo_info.format_string(prec, padlen, pc);
+          s += "   [ Error: " + stringify_fp_sci(pres_diff_err, prec) + " ]";
+        s += String("\nPressure Drop").pad_back(padlen, pc) + ".: " + stringify_fp_fix(pres_drop, prec);
+        if(print_errors)
+          s += "   [ Error: " + stringify_fp_sci(pres_drop_err, prec) + " ]";
+        s += String("\nUpper Flux").pad_back(padlen, pc) + ".: " + stringify_fp_fix(flux_upper, prec);
+        s += String("\nLower Flux").pad_back(padlen, pc) + ".: " + stringify_fp_fix(flux_lower, prec);
+        s += String("\nOut Flux").pad_back(padlen, pc) + ".: " + stringify_fp_fix(flux_out, prec);
+        s += String("\n") + velo_info.format_string(prec, padlen, pc);
 
         return s;
       }
@@ -442,6 +454,8 @@ namespace CCND
         s += stringify_fp_fix(drag_coeff_vol, prec) + " " + stringify_fp_fix(lift_coeff_vol, prec) + " " + stringify_fp_fix(side_coeff_vol, prec) + "\n";
         s += prefix + "Pressure Difference...: ";
         s += stringify_fp_fix(pres_diff, prec) + "\n";
+        s += prefix + "Pressure Drop.........: ";
+        s += stringify_fp_fix(pres_drop, prec) + "\n";
         s += prefix + "Fluxes Upper/Lower/Out: ";
         s += stringify_fp_fix(flux_upper, prec) + " " + stringify_fp_fix(flux_lower, prec) + " " + stringify_fp_fix(flux_out, prec) + "\n";
         s += prefix + "Velocity H0/H1/Vor/Div: ";
@@ -461,7 +475,9 @@ namespace CCND
         mesh_part_fbm     = mesh_node.find_mesh_part("fbm");
         mesh_part_bnd_c   = mesh_node.find_mesh_part("bnd:c");
         mesh_part_bnd_s   = mesh_node.find_mesh_part("bnd:sphere");
+        mesh_part_bnd_l   = mesh_node.find_mesh_part("bnd:l");
         mesh_part_bnd_r   = mesh_node.find_mesh_part("bnd:r");
+        mesh_part_bnd_in  = mesh_node.find_mesh_part("bnd:in");
         mesh_part_bnd_out = mesh_node.find_mesh_part("bnd:out");
         mesh_part_inner_u = mesh_node.find_mesh_part("inner:u");
         mesh_part_inner_l = mesh_node.find_mesh_part("inner:l");
@@ -487,6 +503,14 @@ namespace CCND
         if(mesh_part_inner_l != nullptr)
           flux_asm_l->add_mesh_part(*mesh_part_inner_l);
         flux_asm_l->compile();
+
+        // create trace assembler for in flux
+        flux_asm_in.reset(new Assembly::TraceAssembler<TrafoType>(space_v.get_trafo()));
+        if(mesh_part_bnd_l != nullptr)
+          flux_asm_in->add_mesh_part(*mesh_part_bnd_l);
+        if(mesh_part_bnd_in != nullptr)
+          flux_asm_in->add_mesh_part(*mesh_part_bnd_in);
+        flux_asm_in->compile();
 
         // create trace assembler for out flux
         flux_asm_out.reset(new Assembly::TraceAssembler<TrafoType>(space_v.get_trafo()));
@@ -615,7 +639,29 @@ namespace CCND
 
         // compute error to reference values
         pres_diff = d_p;
-        pres_err = Math::abs((d_p - ref_d_p) / ref_d_p);
+        pres_diff_err = Math::abs((d_p - ref_p_diff) / ref_p_diff);
+      }
+
+      virtual void compute_pressure_drop(const Dist::Comm& comm, const LocalPresVector& vec_sol_p, const SpacePresType& space_pres, int bench)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_flux);
+
+        DataType pv[2] =
+        {
+          flux_asm_in->assemble_discrete_integral(vec_sol_p, space_pres, cubature_factory),
+          flux_asm_out->assemble_discrete_integral(vec_sol_p, space_pres, cubature_factory)
+        };
+
+        comm.allreduce(pv, pv, 2u, Dist::op_sum);
+
+        // compute error to reference values
+        if(bench == 7)
+          pres_drop = (pv[0] - pv[1]) / (DataType(0.205*0.205) * Math::pi<DataType>());
+        else if(dim == 2)
+          pres_drop = (pv[0] - pv[1]) / DataType(0.41);
+        else if(dim == 3)
+          pres_drop = (pv[0] - pv[1]) / DataType(0.41*0.41);
+        pres_drop_err = 0.0;//Math::abs((pres_drop - ref_pres_drop) / ref_pres_drop);
       }
 
       virtual void compute_fluxes(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const SpaceVeloType& space_velo)

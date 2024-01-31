@@ -14,11 +14,11 @@
 #include <kernel/util/statistics.hpp>
 #include <kernel/geometry/hit_test_factory.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/geometry/atlas/cgal_surface_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/trafo/isoparam/mapping.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
+#include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/analytic/wrappers.hpp>
@@ -118,8 +118,13 @@ namespace CCND
 #endif
 
   // define FE space types
+#ifdef FEAT_CCND_APP_Q1T_P0
+  typedef Space::CroRavRanTur::Element<TrafoType> SpaceVeloType;
+  typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<0>> SpacePresType;
+#else
   typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
   typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
+#endif
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,6 +251,7 @@ namespace CCND
 
       // assemble interface filter for velocity
       fbm_asm.assemble_interface_filter(filter_interface_fbm, space_velo, matrix_a, velo_mass_matrix);
+      //filter_interface_fbm = LocalVeloUnitFilter(space_velo.get_num_dofs());
 
       // assemble mask vectors on finest level
       if(asm_mask)
