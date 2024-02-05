@@ -21,28 +21,28 @@
 #include <likwid-marker.h>
 #else
 // cpu markers
-#define LIKWID_MARKER_INIT
-#define LIKWID_MARKER_THREADINIT
-#define LIKWID_MARKER_SWITCH
-#define LIKWID_MARKER_REGISTER(regionTag)
-#define LIKWID_MARKER_START(regionTag)
-#define LIKWID_MARKER_STOP(regionTag)
-#define LIKWID_MARKER_CLOSE
-#define LIKWID_MARKER_GET(regionTag, nevents, events, time, count)
+#define LIKWID_MARKER_INIT ((void)0)
+#define LIKWID_MARKER_THREADINIT ((void)0)
+#define LIKWID_MARKER_SWITCH ((void)0)
+#define LIKWID_MARKER_REGISTER(regionTag) ((void)0)
+#define LIKWID_MARKER_START(regionTag) ((void)0)
+#define LIKWID_MARKER_STOP(regionTag) ((void)0)
+#define LIKWID_MARKER_CLOSE ((void)0)
+#define LIKWID_MARKER_GET(regionTag, nevents, events, time, count) ((void)0)
 #endif
 
 // special case if we did not activate cuda support, this logic requires
 // that LIKWID_NVMON is only defined if LIKWID_PERFMON is also defined
 #ifndef LIKWID_NVMARKER_INIT
 //gpu markers
-#define LIKWID_NVMARKER_INIT
-#define LIKWID_NVMARKER_SWITCH
-#define LIKWID_NVMARKER_REGISTER(regionTag)
-#define LIKWID_NVMARKER_START(regionTag)
-#define LIKWID_NVMARKER_STOP(regionTag)
-#define LIKWID_NVMARKER_RESET(regionTag)
-#define LIKWID_NVMARKER_CLOSE
-#define LIKWID_NVMARKER_GET(name, ngpu, nevents, eventlist, time, count)
+#define LIKWID_NVMARKER_INIT ((void)0)
+#define LIKWID_NVMARKER_SWITCH ((void)0)
+#define LIKWID_NVMARKER_REGISTER(regionTag) ((void)0)
+#define LIKWID_NVMARKER_START(regionTag) ((void)0)
+#define LIKWID_NVMARKER_STOP(regionTag) ((void)0)
+#define LIKWID_NVMARKER_RESET(regionTag) ((void)0)
+#define LIKWID_NVMARKER_CLOSE ((void)0)
+#define LIKWID_NVMARKER_GET(name, ngpu, nevents, eventlist, time, count) ((void)0)
 #endif
 
 //these are simple aliases which should only be called once per programm, i.e. in FEAT runtime guard
