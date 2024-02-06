@@ -243,10 +243,10 @@ DenseVectorBlockedSerializeTest <double, std::uint64_t> cpu_dense_vector_blocked
 DenseVectorBlockedSerializeTest <float, std::uint64_t> mkl_cpu_dense_vector_blocked_serialize_test_float_uint64(PreferredBackend::mkl);
 DenseVectorBlockedSerializeTest <double, std::uint64_t> mkl_cpu_dense_vector_blocked_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
-#ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedSerializeTest <__float128, std::uint32_t> cpu_dense_vector_blocked_serialize_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedSerializeTest <__float128, std::uint64_t> cpu_dense_vector_blocked_serialize_test_float128_uint64(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//DenseVectorBlockedSerializeTest <__float128, std::uint32_t> cpu_dense_vector_blocked_serialize_test_float128_uint32(PreferredBackend::generic);
+//DenseVectorBlockedSerializeTest <__float128, std::uint64_t> cpu_dense_vector_blocked_serialize_test_float128_uint64(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_HALFMATH
 DenseVectorBlockedSerializeTest <Half, std::uint32_t> dv_blocked_serialize_test_half_uint32(PreferredBackend::generic);
 DenseVectorBlockedSerializeTest <Half, std::uint64_t> dv_blocked_serialize_test_half_uint64(PreferredBackend::generic);

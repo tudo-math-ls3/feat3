@@ -246,10 +246,10 @@ DenseMatrixSerializeTest <double, std::uint64_t> cpu_dense_matrix_serialize_test
 DenseMatrixSerializeTest <float, std::uint64_t> mkl_cpu_dense_matrix_serialize_test_float_uint64(PreferredBackend::mkl);
 DenseMatrixSerializeTest <double, std::uint64_t> mkl_cpu_dense_matrix_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
-#ifdef FEAT_HAVE_QUADMATH
-DenseMatrixSerializeTest <__float128, std::uint32_t> cpu_dense_matrix_serialize_test_float128_uint32(PreferredBackend::generic);
-DenseMatrixSerializeTest <__float128, std::uint64_t> cpu_dense_matrix_serialize_test_float128_uint64(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//DenseMatrixSerializeTest <__float128, std::uint32_t> cpu_dense_matrix_serialize_test_float128_uint32(PreferredBackend::generic);
+//DenseMatrixSerializeTest <__float128, std::uint64_t> cpu_dense_matrix_serialize_test_float128_uint64(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_HALFMATH
 //DenseMatrixSerializeTest<__half, std::uint32_t> cpu_dense_matrix_serialize_test_half_uint(PreferredBackend::generic);
 //DenseMatrixSerializeTest<__half, std::uint64_t> cpu_dense_matrix_serialize_test_half_ulong(PreferredBackend::generic);

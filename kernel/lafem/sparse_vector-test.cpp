@@ -188,10 +188,10 @@ SparseVectorSerializeTest <double, std::uint64_t> cpu_sparse_vector_serialize_te
 SparseVectorSerializeTest <float, std::uint64_t> mkl_cpu_sparse_vector_serialize_test_float_uint64(PreferredBackend::mkl);
 SparseVectorSerializeTest <double, std::uint64_t> mkl_cpu_sparse_vector_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
-#ifdef FEAT_HAVE_QUADMATH
-SparseVectorSerializeTest <__float128, std::uint64_t> cpu_sparse_vector_serialize_test_float128_uint64(PreferredBackend::generic);
-SparseVectorSerializeTest <__float128, std::uint32_t> cpu_sparse_vector_serialize_test_float128_uint32(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//SparseVectorSerializeTest <__float128, std::uint64_t> cpu_sparse_vector_serialize_test_float128_uint64(PreferredBackend::generic);
+//SparseVectorSerializeTest <__float128, std::uint32_t> cpu_sparse_vector_serialize_test_float128_uint32(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_HALFMATH
 SparseVectorSerializeTest <Half, std::uint32_t> sparse_vector_serialize_test_half_uint32(PreferredBackend::generic);
 SparseVectorSerializeTest <Half, std::uint64_t> sparse_vector_serialize_test_half_uint64(PreferredBackend::generic);

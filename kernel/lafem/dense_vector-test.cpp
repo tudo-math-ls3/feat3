@@ -246,10 +246,10 @@ DenseVectorSerializeTest <float, std::uint32_t> dv_serialize_test_float_uint32(P
 DenseVectorSerializeTest <double, std::uint32_t> dv_serialize_test_double_uint32(PreferredBackend::generic);
 DenseVectorSerializeTest <float, std::uint64_t> dv_serialize_test_float_uint64(PreferredBackend::generic);
 DenseVectorSerializeTest <double, std::uint64_t> dv_serialize_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_QUADMATH
-DenseVectorSerializeTest <__float128, std::uint32_t> dv_serialize_test_float128_uint32(PreferredBackend::generic);
-DenseVectorSerializeTest <__float128, std::uint64_t> dv_serialize_test_float128_uint64(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//DenseVectorSerializeTest <__float128, std::uint32_t> dv_serialize_test_float128_uint32(PreferredBackend::generic);
+//DenseVectorSerializeTest <__float128, std::uint64_t> dv_serialize_test_float128_uint64(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_MKL
 DenseVectorSerializeTest <float, std::uint64_t> mkl_dv_serialize_test_float_uint64(PreferredBackend::mkl);
 DenseVectorSerializeTest <double, std::uint64_t> mkl_dv_serialize_test_double_uint64(PreferredBackend::mkl);

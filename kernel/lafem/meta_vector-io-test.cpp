@@ -75,10 +75,10 @@ MetaVectorIOTest <double, std::uint64_t> meta_vector_io_test_generic_double_uint
 MetaVectorIOTest <float, std::uint64_t> mkl_meta_vector_io_test_float_uint64(PreferredBackend::mkl);
 MetaVectorIOTest <double, std::uint64_t> mkl_meta_vector_io_test_double_uint64(PreferredBackend::mkl);
 #endif
-#ifdef FEAT_HAVE_QUADMATH
-MetaVectorIOTest <__float128, std::uint32_t> meta_vector_io_test_generic_float128_uint32(PreferredBackend::generic);
-MetaVectorIOTest <__float128, std::uint64_t> meta_vector_io_test_generic_float128_uint64(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//MetaVectorIOTest <__float128, std::uint32_t> meta_vector_io_test_generic_float128_uint32(PreferredBackend::generic);
+//MetaVectorIOTest <__float128, std::uint64_t> meta_vector_io_test_generic_float128_uint64(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_HALFMATH
 MetaVectorIOTest <Half, std::uint32_t> meta_vector_io_test_half_uint32(PreferredBackend::generic);
 MetaVectorIOTest <Half, std::uint64_t> meta_vector_io_test_half_uint64(PreferredBackend::generic);

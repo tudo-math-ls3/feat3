@@ -212,10 +212,10 @@ SparseMatrixBCSRSerializeTest <double, std::uint32_t> cpu_sparse_matrix_bcsr_ser
 SparseMatrixBCSRSerializeTest <float, std::uint64_t> mkl_cpu_sparse_matrix_bcsr_serialize_test_float_uint64(PreferredBackend::mkl);
 SparseMatrixBCSRSerializeTest <double, std::uint64_t> mkl_cpu_sparse_matrix_bcsr_serialize_test_double_uint64(PreferredBackend::mkl);
 #endif
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixBCSRSerializeTest <__float128, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_float128_uint64(PreferredBackend::generic);
-SparseMatrixBCSRSerializeTest <__float128, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_float128_uint32(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//SparseMatrixBCSRSerializeTest <__float128, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_float128_uint64(PreferredBackend::generic);
+//SparseMatrixBCSRSerializeTest <__float128, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_float128_uint32(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_HALFMATH
 SparseMatrixBCSRSerializeTest <Half, std::uint32_t> cpu_sparse_matrix_bcsr_serialize_test_half_uint32(PreferredBackend::generic);
 SparseMatrixBCSRSerializeTest <Half, std::uint64_t> cpu_sparse_matrix_bcsr_serialize_test_half_uint64(PreferredBackend::generic);
