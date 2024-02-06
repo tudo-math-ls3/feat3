@@ -19,6 +19,7 @@
 #include <kernel/lafem/none_filter.hpp>
 #include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/unit_filter.hpp>
+#include <kernel/lafem/unit_filter_blocked.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
 #include <kernel/lafem/filter_chain.hpp>
 #include <kernel/lafem/filter_sequence.hpp>
