@@ -133,7 +133,7 @@ namespace FEAT
        */
       const Dist::Comm* get_comm() const
       {
-        return _comm;
+        return this->_comm;
       }
 
       /**
@@ -144,7 +144,37 @@ namespace FEAT
        */
       void set_comm(const Dist::Comm* comm_)
       {
-        _comm = comm_;
+        this->_comm = comm_;
+      }
+
+      /**
+       * \brief Returns a const reference to the neighbor ranks vector
+       *
+       * \returns A const reference to the neighbor ranks vector
+       */
+      const std::vector<int> get_ranks() const
+      {
+        return this->_ranks;
+      }
+
+      /**
+       * \brief Returns a const reference to the neighbor mirrors vector
+       *
+       * \returns A const reference to the neighbor mirrors vector
+       */
+      const std::vector<Mirror_>& get_mirrors() const
+      {
+        return this->_mirrors;
+      }
+
+      /**
+       * \brief Returns a const reference to the frequencies vector
+       *
+       * \returns A const reference to the frequencies vector
+       */
+      const LocalVector_& get_freqs() const
+      {
+        return this->_freqs;
       }
 
       /**
