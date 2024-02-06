@@ -137,16 +137,18 @@
 // Initial Solution Read-In and Final Solution Write-Out
 // -----------------------------------------------------
 //
-// --load-initial-sol <filename>
+// --load-initial-sol <filename> [<level-index>]
 // Specifies that the application should read in the initial (partitioned) solution guess
 // from a single binary output file, which was written by a --save-final-sol from a previous run.
+// If the <level-index> is given, then the initial solution is read in at that specified level
+// and is then prolongated to the finest level by using the multigrid transfer operators.
 // If specified, the solving of the Stokes system to obtain an initial guess is skipped.
 //
-// --load-initial-sol-joined <filename> [<scale>]
+// --load-initial-sol-joined <filename> [<level-index>]
 // Specifies that the application should read in the initial joined solution guess from a
 // single binary output file, which was written by a --save-final-sol-joined from a previous run.
-// The second option argument <scale> is given, then the loaded solution is scaled by that factor,
-// which can be used if the loaded solution was computed with a different inflow velocity.
+// If the <level-index> is given, then the initial solution is read in at that specified level
+// and is then prolongated to the finest level by using the multigrid transfer operators.
 // If specified, the solving of the Stokes system to obtain an initial guess is skipped.
 //
 // --save-final-sol <filename>
@@ -669,7 +671,11 @@ namespace CCND
 
       // assemble base splitter on finest level if required
       if(need_base_splitter)
-        system.front()->assemble_base_splitters(domain.front());
+        //  system.front()->assemble_base_splitters(domain.front());
+      {
+        for (Index i(0); i < num_levels; ++i)
+          system.at(i)->assemble_base_splitters(domain.at(i));
+      }
       watch_create_system.stop();
     }
 
@@ -757,15 +763,62 @@ namespace CCND
         watch_sol_init_read.start();
 
         String save_name;
-        args.parse("load-initial-sol", save_name);
-        comm.print("\nReading (partitioned) initial solution from '" + save_name + "'...");
+        int level_idx = -1;
+        std::size_t slidx(0);
+
+        args.parse("load-initial-sol", save_name, level_idx);
+
+        if(level_idx < 0)
+          comm.print("\nReading (partitioned) initial solution from '" + save_name + "'...");
+        else
+        {
+          int fine_level_idx = domain.front()->get_level_index();
+          if(level_idx > fine_level_idx)
+          {
+            comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is finer that fine level");
+            Runtime::abort();
+          }
+          slidx = fine_level_idx - level_idx;
+          if(slidx >= system.size())
+          {
+            comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is coarser than coarse level");
+            Runtime::abort();
+          }
+          comm.print("\nReading (partitioned) initial solution from '" + save_name + "' on level " + stringify(level_idx) +  "...");
+        }
 
         // read file into streams
         BinaryStream bs_com, bs_sol;
         DistFileIO::read_combined(bs_com, bs_sol, save_name, comm);
 
         // parse vector from stream
-        vec_sol.local().read_from(LAFEM::FileMode::fm_binary, bs_sol);
+        if(level_idx < 0)
+        {
+          vec_sol.local().read_from(LAFEM::FileMode::fm_binary, bs_sol);
+        }
+        else
+        {
+          // read vector on given level
+          GlobalSystemVector vec_tmp = system.at(slidx)->matrix_sys.create_vector_l();
+          vec_tmp.local().read_from(LAFEM::FileMode::fm_binary, bs_sol);
+
+          // prolongate up to finest level
+          while(slidx > std::size_t(0))
+          {
+            // apply our solution filter in case the BCs have changed
+            system.at(slidx)->filter_sys.filter_sol(vec_tmp);
+
+            --slidx;
+
+            // prolongate
+            GlobalSystemVector vec_tmp2 = system.at(slidx)->matrix_sys.create_vector_l();
+            system.at(slidx)->transfer_sys.prol(vec_tmp2, vec_tmp);
+            vec_tmp = std::move(vec_tmp2);
+          }
+
+          vec_sol.copy(vec_tmp);
+        }
+
 
         // apply our solution filter in case the BCs have changed
         system.front()->filter_sys.filter_sol(vec_sol);
@@ -780,18 +833,49 @@ namespace CCND
         watch_sol_init_read.start();
 
         String save_name;
-        DataType load_scale = DataType(1);
-        args.parse("load-initial-sol-joined", save_name, load_scale);
-        comm.print("\nReading joined initial solution from '" + save_name + "'...");
+        int level_idx = -1;
+        args.parse("load-initial-sol-joined", save_name, level_idx);
 
-        // parse vector from file
-        system.front()->base_splitter_sys.split_read_from(vec_sol, save_name);
-
-        // scale vector if desired
-        if(Math::abs(load_scale - DataType(1)) > DataType(1E-8))
+        if(level_idx < 0)
         {
-          comm.print("\nScaling joined initial solution by " + stringify(load_scale));
-          vec_sol.scale(vec_sol, load_scale);
+          comm.print("\nReading joined initial solution from '" + save_name + "' on finest level...");
+          system.front()->base_splitter_sys.split_read_from(vec_sol, save_name);
+        }
+        else
+        {
+          int fine_level_idx = domain.front()->get_level_index();
+          if(level_idx > fine_level_idx)
+          {
+            comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is finer that fine level");
+            Runtime::abort();
+          }
+          std::size_t slidx = fine_level_idx - level_idx;
+          if(slidx >= system.size())
+          {
+            comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is coarser than coarse level");
+            Runtime::abort();
+          }
+          comm.print("\nReading joined initial solution from '" + save_name + "' on level " + stringify(level_idx) +  "...");
+
+          // read vector on given level
+          GlobalSystemVector vec_tmp = system.at(slidx)->matrix_sys.create_vector_l();
+          system.at(slidx)->base_splitter_sys.split_read_from(vec_tmp, save_name);
+
+          // prolongate up to finest level
+          while(slidx > std::size_t(0))
+          {
+            // apply our solution filter in case the BCs have changed
+            system.at(slidx)->filter_sys.filter_sol(vec_tmp);
+
+            --slidx;
+
+            // prolongate
+            GlobalSystemVector vec_tmp2 = system.at(slidx)->matrix_sys.create_vector_l();
+            system.at(slidx)->transfer_sys.prol(vec_tmp2, vec_tmp);
+            vec_tmp = std::move(vec_tmp2);
+          }
+
+          vec_sol.copy(vec_tmp);
         }
 
         // apply our solution filter in case the BCs have changed
