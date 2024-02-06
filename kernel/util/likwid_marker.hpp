@@ -66,10 +66,10 @@
   #define FEAT_KERNEL_MARKER_STOP(regionTag) LIKWID_MARKER_STOP(regionTag)
   #define FEAT_KERNEL_MARKER_GET(regionTag, nevents, events, time, count) LIKWID_MARKER_GET(regionTag, nevents, events, time, count)
 #else
-  #define FEAT_KERNEL_MARKER_REGISTER(regionTag)
-  #define FEAT_KERNEL_MARKER_START(regionTag)
-  #define FEAT_KERNEL_MARKER_STOP(regionTag)
-  #define FEAT_KERNEL_MARKER_GET(regionTag, nevents, events, time, count)
+  #define FEAT_KERNEL_MARKER_REGISTER(regionTag) ((void)0)
+  #define FEAT_KERNEL_MARKER_START(regionTag) ((void)0)
+  #define FEAT_KERNEL_MARKER_STOP(regionTag) ((void)0)
+  #define FEAT_KERNEL_MARKER_GET(regionTag, nevents, events, time, count) ((void)0)
 
 #endif //FEAT_KERNEL_MARKER_ACTIVATED
 
@@ -79,10 +79,10 @@
   #define FEAT_APPLICATION_MARKER_STOP(regionTag) LIKWID_MARKER_STOP(regionTag)
   #define FEAT_APPLICATION_MARKER_GET(regionTag, nevents, events, time, count) LIKWID_MARKER_GET(regionTag, nevents, events, time, count)
 #else
-  #define FEAT_APPLICATION_MARKER_REGISTER(regionTag)
-  #define FEAT_APPLICATION_MARKER_START(regionTag)
-  #define FEAT_APPLICATION_MARKER_STOP(regionTag)
-  #define FEAT_APPLICATION_MARKER_GET(regionTag, nevents, events, time, count)
+  #define FEAT_APPLICATION_MARKER_REGISTER(regionTag) ((void)0)
+  #define FEAT_APPLICATION_MARKER_START(regionTag) ((void)0)
+  #define FEAT_APPLICATION_MARKER_STOP(regionTag) ((void)0)
+  #define FEAT_APPLICATION_MARKER_GET(regionTag, nevents, events, time, count) ((void)0)
 #endif //FEAT_APPLICATION_MARKER_ACTIVATED
 
 #ifdef FEAT_SPECIAL_MARKER_ACTIVATED
@@ -91,10 +91,10 @@
   #define FEAT_SPECIAL_MARKER_STOP(regionTag) LIKWID_MARKER_STOP(regionTag)
   #define FEAT_SPECIAL_MARKER_GET(regionTag, nevents, events, time, count) LIKWID_MARKER_GET(regionTag, nevents, events, time, count)
 #else
-  #define FEAT_SPECIAL_MARKER_REGISTER(regionTag)
-  #define FEAT_SPECIAL_MARKER_START(regionTag)
-  #define FEAT_SPECIAL_MARKER_STOP(regionTag)
-  #define FEAT_SPECIAL_MARKER_GET(regionTag, nevents, events, time, count)
+  #define FEAT_SPECIAL_MARKER_REGISTER(regionTag) ((void)0)
+  #define FEAT_SPECIAL_MARKER_START(regionTag) ((void)0)
+  #define FEAT_SPECIAL_MARKER_STOP(regionTag) ((void)0)
+  #define FEAT_SPECIAL_MARKER_GET(regionTag, nevents, events, time, count) ((void)0)
 #endif //FEAT_KERNEL_MARKER_ACTIVATED
 
 // FEAT CUDA marker
