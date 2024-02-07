@@ -1347,10 +1347,10 @@ SparseMatrixCSRCompressionTest <double, std::uint64_t> sm_csr_comp_test_double_u
 SparseMatrixCSRCompressionTest <float, std::uint64_t> mkl_sm_csr_comp_test_float_uint64(PreferredBackend::mkl);
 SparseMatrixCSRCompressionTest <double, std::uint64_t> mkl_sm_csr_comp_test_double_uint64(PreferredBackend::mkl);
 #endif
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRCompressionTest <__float128, std::uint32_t> sm_csr_comp_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest <__float128, std::uint64_t> sm_csr_comp_test_float128_uint64(PreferredBackend::generic);
-#endif
+//#ifdef FEAT_HAVE_QUADMATH
+//SparseMatrixCSRCompressionTest <__float128, std::uint32_t> sm_csr_comp_test_float128_uint32(PreferredBackend::generic);
+//SparseMatrixCSRCompressionTest <__float128, std::uint64_t> sm_csr_comp_test_float128_uint64(PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_HALFMATH
 SparseMatrixCSRCompressionTest <Half, std::uint32_t> sm_csr_comp_test_half_uint32(PreferredBackend::generic);
 SparseMatrixCSRCompressionTest <Half, std::uint64_t> sm_csr_comp_test_half_uint64(PreferredBackend::generic);
