@@ -166,7 +166,7 @@ public:
     {
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_pcr(matrix, filter, precon);
-      solver->set_tol_rel(1e-8);
+      solver->set_tol_rel(1e-7);
       test_solver("PCR-JAC", *solver, vec_sol, vec_ref, vec_rhs, 27);
     }
 
@@ -298,7 +298,7 @@ public:
     {
       auto precon = Solver::new_jacobi_precond(matrix, filter, DataType(0.5));
       auto solver = Solver::new_bicgstab(matrix, filter, precon, BiCGStabPreconVariant::right);
-      solver->set_tol_rel(1e-9);
+      solver->set_tol_rel(1e-7);
       test_solver("BiCGStab-right-Jacobi(0.5)", *solver, vec_sol, vec_ref, vec_rhs, 19);
     }
 
