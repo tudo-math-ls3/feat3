@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['compiler_20hacks_0',['Compiler Hacks',['../compilerhacks.html',1,'']]]
+  ['bibliography_0',['Bibliography',['../citelist.html',1,'']]]
 ];

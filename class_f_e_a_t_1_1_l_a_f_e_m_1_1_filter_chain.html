@@ -154,6 +154,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a88cdf7e4786d96ee169ef92695e63984"><td class="memTemplParams" colspan="2">template&lt;int i_&gt; </td></tr>
 <tr class="memitem:a88cdf7e4786d96ee169ef92695e63984"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_element.html">TupleElement</a>&lt; i_, First_, Rest_... &gt;::Type const &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html#a88cdf7e4786d96ee169ef92695e63984">at</a> () const</td></tr>
 <tr class="separator:a88cdf7e4786d96ee169ef92695e63984"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9508f552873eecaf1ef19d820f155e0"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html#ad9508f552873eecaf1ef19d820f155e0">bytes</a> () const</td></tr>
+<tr class="memdesc:ad9508f552873eecaf1ef19d820f155e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total amount of bytes allocated.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html#ad9508f552873eecaf1ef19d820f155e0">More...</a><br /></td></tr>
+<tr class="separator:ad9508f552873eecaf1ef19d820f155e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a591fac466b59c692fe1ed6b3d866d958"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">FilterChain</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html#a591fac466b59c692fe1ed6b3d866d958">clone</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>) const</td></tr>
 <tr class="memdesc:a591fac466b59c692fe1ed6b3d866d958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a clone of itself.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html#a591fac466b59c692fe1ed6b3d866d958">More...</a><br /></td></tr>
 <tr class="separator:a591fac466b59c692fe1ed6b3d866d958"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -531,7 +534,7 @@ template&lt;int i_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00152">152</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00158">158</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 </div>
 </div>
@@ -564,9 +567,44 @@ template&lt;int i_&gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00160">160</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00166">166</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="filter__chain_8hpp_source.html#l00040">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::num_blocks</a>.</p>
+
+</div>
+</div>
+<a id="ad9508f552873eecaf1ef19d820f155e0" name="ad9508f552873eecaf1ef19d820f155e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9508f552873eecaf1ef19d820f155e0">&#9670;&#160;</a></span>bytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename First_ , typename... Rest_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">FEAT::LAFEM::FilterChain</a>&lt; First_, Rest_ &gt;::bytes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the total amount of bytes allocated. </p>
+
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00130">130</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="filter__chain_8hpp_source.html#l00067">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::_first</a>, <a class="el" href="filter__chain_8hpp_source.html#l00069">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::_rest</a>, and <a class="el" href="filter__chain_8hpp_source.html#l00130">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::bytes()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00130">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -718,7 +756,7 @@ template&lt;typename Vector_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00192">192</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00198">198</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 </div>
 </div>
@@ -758,7 +796,7 @@ template&lt;typename Vector_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00184">184</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00190">190</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 </div>
 </div>
@@ -798,7 +836,7 @@ template&lt;typename Matrix_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00200">200</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00206">206</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 </div>
 </div>
@@ -838,7 +876,7 @@ template&lt;typename Vector_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00168">168</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00174">174</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 </div>
 </div>
@@ -878,7 +916,7 @@ template&lt;typename Vector_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00176">176</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00182">182</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
 </div>
 </div>
@@ -972,7 +1010,7 @@ template&lt;typename First_ , typename... Rest_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00067">67</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00110">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::clone()</a>, and <a class="el" href="filter__chain_8hpp_source.html#l00099">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00130">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::bytes()</a>, <a class="el" href="filter__chain_8hpp_source.html#l00110">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::clone()</a>, and <a class="el" href="filter__chain_8hpp_source.html#l00099">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -1002,7 +1040,7 @@ template&lt;typename First_ , typename... Rest_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00069">69</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00110">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::clone()</a>, and <a class="el" href="filter__chain_8hpp_source.html#l00099">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00130">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::bytes()</a>, <a class="el" href="filter__chain_8hpp_source.html#l00110">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::clone()</a>, and <a class="el" href="filter__chain_8hpp_source.html#l00099">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -1032,7 +1070,7 @@ template&lt;typename First_ , typename... Rest_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="filter__chain_8hpp_source.html#l00040">40</a> of file <a class="el" href="filter__chain_8hpp_source.html">filter_chain.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00160">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::at()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="filter__chain_8hpp_source.html#l00166">FEAT::LAFEM::FilterChain&lt; First_, Rest_ &gt;::at()</a>.</p>
 
 </div>
 </div>

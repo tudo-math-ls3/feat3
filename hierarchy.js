@@ -520,6 +520,7 @@ var hierarchy =
     [ "FEAT::Dist::Status", "class_f_e_a_t_1_1_dist_1_1_status.html", null ],
     [ "FEAT::DistFileIO", "class_f_e_a_t_1_1_dist_file_i_o.html", null ],
     [ "FEAT::Geometry::Atlas::BezierTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_traits.html", null ],
+    [ "FEAT::Geometry::Atlas::CGALSurfaceMeshTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_c_g_a_l_surface_mesh_traits.html", null ],
     [ "FEAT::Geometry::Atlas::ChartBase< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html", [
       [ "FEAT::Geometry::Atlas::ChartCRTP< Bezier< Mesh_ >, Mesh_, BezierTraits >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_c_r_t_p.html", [
         [ "FEAT::Geometry::Atlas::Bezier< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier.html", null ]
@@ -536,6 +537,7 @@ var hierarchy =
       [ "FEAT::Geometry::Atlas::ChartCRTP< SurfaceMesh< Mesh_ >, Mesh_, SurfaceMeshTraits >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_c_r_t_p.html", [
         [ "FEAT::Geometry::Atlas::SurfaceMesh< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_surface_mesh.html", null ]
       ] ],
+      [ "FEAT::Geometry::Atlas::CGALSurfaceMesh< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_c_g_a_l_surface_mesh.html", null ],
       [ "FEAT::Geometry::Atlas::ChartCRTP< Derived_, Mesh_, Traits_ >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_c_r_t_p.html", null ]
     ] ],
     [ "FEAT::Geometry::Atlas::CircleTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_circle_traits.html", null ],

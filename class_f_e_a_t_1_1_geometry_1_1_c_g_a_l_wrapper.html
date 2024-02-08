@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_c_g_a_l
 
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
@@ -115,6 +116,13 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_c_g_a_l
 
 <p><code>#include &lt;<a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a310f3fb54a4f39081d7496c827674418"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; double, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a310f3fb54a4f39081d7496c827674418">PointType</a></td></tr>
+<tr class="separator:a310f3fb54a4f39081d7496c827674418"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6264af21cb09f5573fbab7625549ed6f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; double, 3, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a6264af21cb09f5573fbab7625549ed6f">TransformMatrix</a></td></tr>
+<tr class="separator:a6264af21cb09f5573fbab7625549ed6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7808f6f7edde79817f36d9e35e9604ae"><td class="memItemLeft" align="right" valign="top"><a id="a7808f6f7edde79817f36d9e35e9604ae" name="a7808f6f7edde79817f36d9e35e9604ae"></a>
@@ -129,6 +137,21 @@ Public Member Functions</h2></td></tr>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~CGALWrapper</b> ()</td></tr>
 <tr class="memdesc:a374f946fa6642ca2d93fe57e44ea3faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
 <tr class="separator:a374f946fa6642ca2d93fe57e44ea3faa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0410eb2b74d03db5406f01fb6cde9f8"><td class="memItemLeft" align="right" valign="top"><a id="af0410eb2b74d03db5406f01fb6cde9f8" name="af0410eb2b74d03db5406f01fb6cde9f8"></a>
+std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>bytes</b> () const</td></tr>
+<tr class="memdesc:af0410eb2b74d03db5406f01fb6cde9f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size in bytes, //TODO: Implement me. <br /></td></tr>
+<tr class="separator:af0410eb2b74d03db5406f01fb6cde9f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af17d58bb894319c4c06c72b6f1028543"><td class="memItemLeft" align="right" valign="top"><a id="af17d58bb894319c4c06c72b6f1028543" name="af17d58bb894319c4c06c72b6f1028543"></a>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;point) const</td></tr>
+<tr class="memdesc:af17d58bb894319c4c06c72b6f1028543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
+<tr class="separator:af17d58bb894319c4c06c72b6f1028543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad56b265806697c51ccbff1a596239625"><td class="memItemLeft" align="right" valign="top"><a id="ad56b265806697c51ccbff1a596239625" name="ad56b265806697c51ccbff1a596239625"></a>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;point, <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;primitive_grad) const</td></tr>
+<tr class="separator:ad56b265806697c51ccbff1a596239625"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46548a2537c11e28f10a05b15906ed5d"><td class="memItemLeft" align="right" valign="top"><a id="a46548a2537c11e28f10a05b15906ed5d" name="a46548a2537c11e28f10a05b15906ed5d"></a>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (double x, double y, double z) const</td></tr>
+<tr class="memdesc:a46548a2537c11e28f10a05b15906ed5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
+<tr class="separator:a46548a2537c11e28f10a05b15906ed5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1de4936e34fc19e518e496b5c2149dd"><td class="memItemLeft" align="right" valign="top"><a id="ad1de4936e34fc19e518e496b5c2149dd" name="ad1de4936e34fc19e518e496b5c2149dd"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>point_inside</b> (double x, double y, double z) const</td></tr>
 <tr class="memdesc:ad1de4936e34fc19e518e496b5c2149dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a point is inside the Polyhedron defined at objects' construction. <br /></td></tr>
@@ -137,9 +160,19 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>point_inside</b> (dou
 double&#160;</td><td class="memItemRight" valign="bottom"><b>squared_distance</b> (double x, double y, double z) const</td></tr>
 <tr class="memdesc:a90010c7a51a4d43ca97b4dd685396b49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minimun squared distance between the query point and all input primitives defined at objects' construction. <br /></td></tr>
 <tr class="separator:a90010c7a51a4d43ca97b4dd685396b49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f917a5d74b89fc62e044a7eae7baee9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a5f917a5d74b89fc62e044a7eae7baee9">transform</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">TransformMatrix</a> &amp;trafo_mat, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;translation, double scale=double(1))</td></tr>
+<tr class="separator:a5f917a5d74b89fc62e044a7eae7baee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
+<tr class="memitem:ad8242ea3674b3b6a7308c64e6c388838"><td class="memItemLeft" align="right" valign="top"><a id="ad8242ea3674b3b6a7308c64e6c388838" name="ad8242ea3674b3b6a7308c64e6c388838"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_delete_tree</b> ()</td></tr>
+<tr class="memdesc:ad8242ea3674b3b6a7308c64e6c388838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete tree, which also requires to delete the inside tester. <br /></td></tr>
+<tr class="separator:ad8242ea3674b3b6a7308c64e6c388838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a763f7c403640f8012c6ac73c4d5c7ded"><td class="memItemLeft" align="right" valign="top"><a id="a763f7c403640f8012c6ac73c4d5c7ded" name="a763f7c403640f8012c6ac73c4d5c7ded"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_init_wrapper</b> ()</td></tr>
+<tr class="memdesc:a763f7c403640f8012c6ac73c4d5c7ded"><td class="mdescLeft">&#160;</td><td class="mdescRight">initializes tree and inside tester with already initialized polyhedron <br /></td></tr>
+<tr class="separator:a763f7c403640f8012c6ac73c4d5c7ded"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a188ec68d857d69b85d89dfa0aa762bd9"><td class="memItemLeft" align="right" valign="top"><a id="a188ec68d857d69b85d89dfa0aa762bd9" name="a188ec68d857d69b85d89dfa0aa762bd9"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>_parse_mesh</b> (std::istream &amp;file, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#abcc16a3ca21fc13d41a4a9af795fb25f">CGALFileMode</a> file_mode)</td></tr>
 <tr class="memdesc:a188ec68d857d69b85d89dfa0aa762bd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">read in stream in prescibed file format and preprocess search tree for in/out test <br /></td></tr>
@@ -155,8 +188,77 @@ Private Attributes</h2></td></tr>
 <p >This class acts as a wrapper for a small portion of the CGAL Library. As of now, only the interaction with 3d tetrahedral OFF files is implemented.</p>
 <dl class="section note"><dt>Note</dt><dd><a href="https://www.cgal.org/">https://www.cgal.org/</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00035">35</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
-</div><h2 class="groupheader">Member Data Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00037">37</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a310f3fb54a4f39081d7496c827674418" name="a310f3fb54a4f39081d7496c827674418"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a310f3fb54a4f39081d7496c827674418">&#9670;&#160;</a></span>PointType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt;double, 3&gt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">FEAT::Geometry::CGALWrapper::PointType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00040">40</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a6264af21cb09f5573fbab7625549ed6f" name="a6264af21cb09f5573fbab7625549ed6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6264af21cb09f5573fbab7625549ed6f">&#9670;&#160;</a></span>TransformMatrix</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt;double, 3, 3&gt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">FEAT::Geometry::CGALWrapper::TransformMatrix</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00041">41</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a5f917a5d74b89fc62e044a7eae7baee9" name="a5f917a5d74b89fc62e044a7eae7baee9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f917a5d74b89fc62e044a7eae7baee9">&#9670;&#160;</a></span>transform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::Geometry::CGALWrapper::transform </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">TransformMatrix</a> &amp;&#160;</td>
+          <td class="paramname"><em>trafo_mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>translation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>scale</em> = <code>double(1)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Applies an affine transformation to the underlying polyhedron and reinitializes the AABB tree see <a href="https://doc.cgal.org/5.5.3/Kernel_23/classCGAL_1_1Aff__transformation__3.html">https://doc.cgal.org/5.5.3/Kernel_23/classCGAL_1_1Aff__transformation__3.html</a> for definition of transformation matrix and translation </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
 <a id="aad79f9c74f652313769351e4e8f1b798" name="aad79f9c74f652313769351e4e8f1b798"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aad79f9c74f652313769351e4e8f1b798">&#9670;&#160;</a></span>_cgal_data</h2>
 
@@ -177,7 +279,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00038">38</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00043">43</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>

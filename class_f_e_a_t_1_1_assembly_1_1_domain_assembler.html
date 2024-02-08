@@ -298,7 +298,7 @@ class FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;</div><p >Domain Integral A
 <dl class="section attention"><dt>Attention</dt><dd>Please be aware that the setup of a <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html" title="Domain Integral Assembler class template.">DomainAssembler</a> object is a rather expensive operation, because the assembler has to perform a lot of internal initialization including an analysis of the element adjacency pattern as well as applying graph coloring/layering algorithms, which (in general) may have super-linear runtime. Therefore you should always hang on to a <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html" title="Domain Integral Assembler class template.">DomainAssembler</a> object once it has been created and avoid re-creation of several <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html" title="Domain Integral Assembler class template.">DomainAssembler</a> objects that could have been avoided by saving a previously created <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html" title="Domain Integral Assembler class template.">DomainAssembler</a> object.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00392">392</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00393">393</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ac6751d9ac3d3ed696cf232ba936ea7c6" name="ac6751d9ac3d3ed696cf232ba936ea7c6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac6751d9ac3d3ed696cf232ba936ea7c6">&#9670;&#160;</a></span>MeshType</h2>
@@ -316,7 +316,7 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>the underlying mesh type </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00398">398</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00399">399</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -336,7 +336,7 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>the underlying trafo type </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00396">396</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00397">397</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -375,7 +375,7 @@ template&lt;typename Trafo_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00987">987</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00990">990</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +406,7 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01013">1013</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01016">1016</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -439,11 +439,11 @@ template&lt;typename Trafo_ &gt; </div>
 <p>Builds the color element vectors for the colored threading strategy. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000010">Todo:</a></b></dt><dd>utilize mesh permutation coloring if available </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01779">1779</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01788">1788</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>, <a class="el" href="graph_8hpp_source.html#l00316">FEAT::Adjacency::Graph::degree()</a>, <a class="el" href="graph_8hpp_source.html#l00342">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00357">FEAT::Adjacency::Graph::get_image_idx()</a>, <a class="el" href="math_8hpp_source.html#l00120">FEAT::Math::min()</a>, and <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
 
 </div>
 </div>
@@ -474,11 +474,11 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Builds the element adjacencies graphs. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01495">1495</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01504">1504</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="graph_8hpp_source.html#l00342">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00357">FEAT::Adjacency::Graph::get_image_idx()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="graph_8cpp_source.html#l00193">FEAT::Adjacency::Graph::sort_indices()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
 
 </div>
 </div>
@@ -528,11 +528,11 @@ template&lt;typename Trafo_ &gt; </div>
 </dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd>utilize mesh permutation layering if available </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01543">1543</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01552">1552</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="graph_8hpp_source.html#l00316">FEAT::Adjacency::Graph::degree()</a>, <a class="el" href="graph_8hpp_source.html#l00342">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00357">FEAT::Adjacency::Graph::get_image_idx()</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
 
 </div>
 </div>
@@ -563,11 +563,11 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Build the actual thread layers for the layered strategy. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01686">1686</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01695">1695</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00976">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_num_worker_threads</a>, <a class="el" href="math_8hpp_source.html#l00120">FEAT::Math::min()</a>, and <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00979">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_num_worker_threads</a>, <a class="el" href="math_8hpp_source.html#l00120">FEAT::Math::min()</a>, and <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>.</p>
 
 </div>
 </div>
@@ -599,11 +599,11 @@ template&lt;typename Trafo_ &gt; </div>
 <p>Compiles the domain assembler. </p>
 <p >This function performs all the required initializations based on the chosen threading strategy and desired worker thread count. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01423">1423</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01429">1429</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01779">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_colors()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01495">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_graphs()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01543">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_layers()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01686">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_thread_layers()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00966">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_stats</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00968">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a2bd9c0ed00116be1258e0cc66617d7c8">FEAT::Assembly::automatic</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a028f0749e1b6a005abdfb9a3975d8c32">FEAT::Assembly::colored</a>, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a028f0749e1b6a005abdfb9a3975d8c32">FEAT::Geometry::colored</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a9442e6482c63def4c35bc13b704c52e2">FEAT::Assembly::layered</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a3c5097fb5c0edb92db17a1740f6ae4bf">FEAT::Assembly::layered_sorted</a>, and <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0add5c07036f2975ff4bce568b6511d3bc">FEAT::Assembly::single</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01788">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_colors()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01504">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_graphs()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01552">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_layers()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01695">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_thread_layers()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00969">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_stats</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00971">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a2bd9c0ed00116be1258e0cc66617d7c8">FEAT::Assembly::automatic</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a028f0749e1b6a005abdfb9a3975d8c32">FEAT::Assembly::colored</a>, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a028f0749e1b6a005abdfb9a3975d8c32">FEAT::Geometry::colored</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a9442e6482c63def4c35bc13b704c52e2">FEAT::Assembly::layered</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a3c5097fb5c0edb92db17a1740f6ae4bf">FEAT::Assembly::layered_sorted</a>, and <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0add5c07036f2975ff4bce568b6511d3bc">FEAT::Assembly::single</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01157">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01182">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile_all_elements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01160">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01185">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile_all_elements()</a>.</p>
 
 </div>
 </div>
@@ -642,9 +642,9 @@ template&lt;typename Trafo_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If the element <code>ielem</code> has already been added to the assembler by calling this function or the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html#a9525b6da98a3132c559fae05dbd540ac" title="Adds all elements of a mesh-part to the assembler.">add_mesh_part</a> function, then it will not be added a second time, so every element is processed at most once, no matter how often it has been added to the assembler. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01049">1049</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01052">1052</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -683,9 +683,9 @@ template&lt;typename Trafo_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If an element in the mesh-part has already been added to the assembler by calling this function or the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html#a9abfbff531993581e08b9ec03c7ecc90" title="Adds a single element to the assembler.">add_element</a> function, then it will not be added a second time, so every element is processed at most once, no matter how often it has been added to the assembler. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01066">1066</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01069">1069</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -725,9 +725,9 @@ template&lt;typename Job_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01204">1204</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01207">1207</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00976">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_num_worker_threads</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00968">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01316">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble_master()</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a028f0749e1b6a005abdfb9a3975d8c32">FEAT::Assembly::colored</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a9442e6482c63def4c35bc13b704c52e2">FEAT::Assembly::layered</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a3c5097fb5c0edb92db17a1740f6ae4bf">FEAT::Assembly::layered_sorted</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0add5c07036f2975ff4bce568b6511d3bc">FEAT::Assembly::single</a>, <a class="el" href="assertion_8hpp_source.html#l00113">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00979">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_num_worker_threads</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00971">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01322">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble_master()</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a028f0749e1b6a005abdfb9a3975d8c32">FEAT::Assembly::colored</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a9442e6482c63def4c35bc13b704c52e2">FEAT::Assembly::layered</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a3c5097fb5c0edb92db17a1740f6ae4bf">FEAT::Assembly::layered_sorted</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0add5c07036f2975ff4bce568b6511d3bc">FEAT::Assembly::single</a>, <a class="el" href="assertion_8hpp_source.html#l00113">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00041">FEAT::Assembly::assemble_bilinear_operator_matrix_1()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00079">FEAT::Assembly::assemble_bilinear_operator_matrix_2()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00150">FEAT::Assembly::assemble_force_function_vector()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00116">FEAT::Assembly::assemble_linear_functional_vector()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00182">FEAT::Assembly::integrate_analytic_function()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00210">FEAT::Assembly::integrate_discrete_function()</a>, and <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00243">FEAT::Assembly::integrate_error_function()</a>.</p>
 
@@ -770,11 +770,11 @@ template&lt;typename Job_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01316">1316</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01322">1322</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00968">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00971">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01204">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01207">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>.</p>
 
 </div>
 </div>
@@ -805,9 +805,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Clears the assembler. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01021">1021</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01024">1024</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00958">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_color_elements</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00952">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_elem_neighbors</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00956">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00954">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_mask</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00950">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_elems_at_vert</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00960">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_layer_elements</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00964">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_fences</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00962">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_layers</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00966">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_stats</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00968">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00948">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_verts_at_elem</a>, <a class="el" href="graph_8cpp_source.html#l00176">FEAT::Adjacency::Graph::clear()</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00961">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_color_elements</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00955">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_elem_neighbors</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00959">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00957">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_mask</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00953">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_elems_at_vert</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00963">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_layer_elements</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00967">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_fences</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00965">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_layers</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00969">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_thread_stats</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00971">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_threads</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00951">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_verts_at_elem</a>, <a class="el" href="graph_8cpp_source.html#l00176">FEAT::Adjacency::Graph::clear()</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -840,9 +840,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p >This function compiles the assembler for all cells/elements that have been added manually by previous calls of the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html#a9abfbff531993581e08b9ec03c7ecc90" title="Adds a single element to the assembler.">add_element</a> or <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html#a9525b6da98a3132c559fae05dbd540ac" title="Adds all elements of a mesh-part to the assembler.">add_mesh_part</a> functions according to the chosen threading strategy and desired maximum worker thread count.</p>
 <dl class="section note"><dt>Note</dt><dd>If you want to compile the assembler for all cells/elements of the trafo's underlying mesh, consider using the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html#a57321922a430a9a10c0876e162496edb" title="Compiles the assembler for all elements of the underlying mesh.">compile_all_elements()</a> function instead. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01157">1157</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01160">1160</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00956">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00959">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -874,9 +874,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p>Compiles the assembler for all elements of the underlying mesh. </p>
 <p >This function compiles the assembler for all elements of the trafo's underlying mesh according to the chosen threading strategy and desired maximum worker thread count. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01182">1182</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01185">1185</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00956">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l00959">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -908,9 +908,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p>Returns a string dump of various debugging information. </p>
 <dl class="section return"><dt>Returns</dt><dd>A string dump of various debugging information </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01347">1347</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01353">1353</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00972">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_strategy</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a9442e6482c63def4c35bc13b704c52e2">FEAT::Assembly::layered</a>, <a class="el" href="math_8hpp_source.html#l00134">FEAT::Math::max()</a>, <a class="el" href="string_8hpp_source.html#l00393">FEAT::String::pad_front()</a>, <a class="el" href="string_8hpp_source.html#l00991">FEAT::stringify()</a>, and <a class="el" href="string_8hpp_source.html#l01117">FEAT::stringify_fp_fix()</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00975">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_strategy</a>, <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0a9442e6482c63def4c35bc13b704c52e2">FEAT::Assembly::layered</a>, <a class="el" href="math_8hpp_source.html#l00134">FEAT::Math::max()</a>, <a class="el" href="string_8hpp_source.html#l00393">FEAT::String::pad_front()</a>, <a class="el" href="string_8hpp_source.html#l00991">FEAT::stringify()</a>, and <a class="el" href="string_8hpp_source.html#l01117">FEAT::stringify_fp_fix()</a>.</p>
 
 </div>
 </div>
@@ -941,9 +941,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Returns the element indices vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01085">1085</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01088">1088</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00956">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00959">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_element_indices</a>.</p>
 
 </div>
 </div>
@@ -974,9 +974,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Returns the maximum number of worker threads. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01105">1105</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01108">1108</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00974">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_max_worker_threads</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00977">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_max_worker_threads</a>.</p>
 
 </div>
 </div>
@@ -1009,9 +1009,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p >This returned count corresponds to the actual number of worker threads used for assembling, which may be lower than the maximum number of worker requested by the user.</p>
 <dl class="section note"><dt>Note</dt><dd>The assembler has to be compiled before calling this function, because the actual number of worker threads to use is determined in the compilation process. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01119">1119</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01122">1122</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00976">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_num_worker_threads</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00979">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_num_worker_threads</a>.</p>
 
 </div>
 </div>
@@ -1042,9 +1042,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Returns the threading strategy. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01141">1141</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01144">1144</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00972">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_strategy</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00975">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_strategy</a>.</p>
 
 </div>
 </div>
@@ -1075,9 +1075,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Returns a reference to the domain assembler's trafo. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01077">1077</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01080">1080</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00946">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_trafo</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00949">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_trafo</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00041">FEAT::Assembly::assemble_bilinear_operator_matrix_1()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00079">FEAT::Assembly::assemble_bilinear_operator_matrix_2()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00150">FEAT::Assembly::assemble_force_function_vector()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00116">FEAT::Assembly::assemble_linear_functional_vector()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00182">FEAT::Assembly::integrate_analytic_function()</a>, <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00210">FEAT::Assembly::integrate_discrete_function()</a>, and <a class="el" href="domain__assembler__helpers_8hpp_source.html#l00243">FEAT::Assembly::integrate_error_function()</a>.</p>
 
@@ -1111,7 +1111,7 @@ template&lt;typename Trafo_ &gt; </div>
 <p>Reduces the thread statistics to a single object. </p>
 <dl class="section return"><dt>Returns</dt><dd>A combined thread statistics object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01408">1408</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01414">1414</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -1142,7 +1142,7 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Resets the thread statistics. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01397">1397</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01403">1403</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -1175,9 +1175,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p>Sets the maximum number of worker threads. </p>
 <dl class="section attention"><dt>Attention</dt><dd>The number of worker threads has to be set before the assembler is compiled. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01096">1096</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01099">1099</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1211,9 +1211,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p >See <a class="el" href="namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0" title="Threading Strategy for multi-threaded assembler.">Assembly::ThreadingStrategy</a> for details.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The threading strategy has to be set before the assembler is compiled. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01132">1132</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l01135">1135</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00978">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l00981">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compiled</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1242,9 +1242,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of element color offsets </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00958">958</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00961">961</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1272,9 +1272,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>specifies whether the assembler has already been compiled </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00978">978</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00981">981</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01049">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::add_element()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01066">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::add_mesh_part()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01204">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01316">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble_master()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01096">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::set_max_worker_threads()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01132">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::set_threading_strategy()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01052">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::add_element()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01069">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::add_mesh_part()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01207">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01322">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble_master()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01099">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::set_max_worker_threads()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01135">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::set_threading_strategy()</a>.</p>
 
 </div>
 </div>
@@ -1302,9 +1302,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>adjacency graph for element neighbors </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00952">952</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00955">955</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1332,9 +1332,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of all elements to assemble on </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00956">956</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00959">959</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01157">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01182">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile_all_elements()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01085">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_element_indices()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01160">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01185">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::compile_all_elements()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_element_indices()</a>.</p>
 
 </div>
 </div>
@@ -1362,9 +1362,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>an element mask vector </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00954">954</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00957">957</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1392,9 +1392,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>adjacency graph for elements-at-vertex </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00950">950</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00953">953</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1422,9 +1422,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of element layer offsets </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00960">960</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00963">963</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1452,9 +1452,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>specifies the maximum number of worker threads to use </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00974">974</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00977">977</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01105">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_max_worker_threads()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01108">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_max_worker_threads()</a>.</p>
 
 </div>
 </div>
@@ -1482,9 +1482,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>specifies the actual number of worker threads to use </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00976">976</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00979">979</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01686">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_thread_layers()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01204">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01119">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_num_worker_threads()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01695">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_build_thread_layers()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01207">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01122">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_num_worker_threads()</a>.</p>
 
 </div>
 </div>
@@ -1512,9 +1512,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>specifies the chosen threading strategy </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00972">972</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00975">975</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01347">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::dump()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01141">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_threading_strategy()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01353">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::dump()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01144">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_threading_strategy()</a>.</p>
 
 </div>
 </div>
@@ -1542,9 +1542,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of thread fences </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00964">964</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00967">967</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1572,9 +1572,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of thread layer blocks </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00962">962</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00965">965</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1602,7 +1602,7 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a mutex for free use by the worker threads </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00970">970</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00973">973</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -1630,9 +1630,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of thread statistics </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00966">966</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00969">969</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1660,9 +1660,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a vector of worker threads </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00968">968</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00971">971</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01423">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01204">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01316">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble_master()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01429">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::_compile()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01207">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01322">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble_master()</a>, and <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1690,9 +1690,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a reference to the underlying trafo </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00946">946</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00949">949</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01077">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01080">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>.</p>
 
 </div>
 </div>
@@ -1720,9 +1720,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>adjacency graph for vertices-at-element </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00948">948</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00951">951</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01021">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler_8hpp_source.html#l01024">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
@@ -1750,7 +1750,7 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>the shape dimension </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00400">400</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00401">401</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>

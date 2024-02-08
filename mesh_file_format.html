@@ -141,6 +141,7 @@ $(document).ready(function(){initNavTree('mesh_file_format.html',''); initResiza
 <li class="level3"><a href="#meshfile_chart_extrude_examples">3D Extrude Chart Examples</a></li>
 </ul>
 </li>
+<li class="level2"><a href="#meshfile_chart_CGAL_surfacemesh">3D CGAL based SurfaceMesh Chart Description</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#meshfile_mesh">Root Mesh Description</a><ul><li class="level2"><a href="#meshfile_mesh_vertices">Vertices Description</a></li>
@@ -568,7 +569,14 @@ Note: 1 revolution = 360 degrees = 2&pi; radians</dd></dl>
 <div class="line">    &lt;<span class="keywordtype">Circle</span> <span class="keyword">radius</span>=<span class="stringliteral">&quot;0.2&quot;</span> <span class="keyword">midpoint</span>=<span class="stringliteral">&quot;0.5 1.0&quot;</span>/&gt;</div>
 <div class="line">  &lt;/<span class="keywordtype">Extrude</span>&gt;</div>
 <div class="line">&lt;/<span class="keywordtype">Chart</span>&gt;</div>
-</div><!-- fragment --><h1><a class="anchor" id="meshfile_mesh"></a>
+</div><!-- fragment --><h2><a class="anchor" id="meshfile_chart_CGAL_surfacemesh"></a>
+3D CGAL based SurfaceMesh Chart Description</h2>
+<p >The <code>CGALSurfaceMesh</code> chart represents a surface triangulation of a 3D object very simliar to the SurfaceMesh chart, but is handled by the CGAL thirdparty package.</p>
+<dl class="section attention"><dt>Attention</dt><dd>Due to several consistency problems with file pathes in mesh files, it was decided to disable defining a CGAL meshchart in the xml file itself. If you want to use this, you are required to create CGAL meshpart by hand. For this, suppose you already have an Atlas object created. Then simply call <div class="fragment"><div class="line"><span class="keyword">auto</span> cgal_ptr = CGALSurfaceMesh&lt;MeshType&gt;::create_cgal_surface_mesh(filename);</div>
+<div class="line">atlas.add_mesh_chart(&lt;name&gt;, cgal_ptr);</div>
+</div><!-- fragment --></dd></dl>
+<p><b>filename</b> (mandatory): specifies the absolute path to the file that contains the geometric surface data. Has to be either an <a href="https://segeval.cs.princeton.edu/public/off_format.html">off</a> or an <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml">obj</a> file.</p>
+<h1><a class="anchor" id="meshfile_mesh"></a>
 Root Mesh Description</h1>
 <p >The <code>RootMesh</code> node defines the actual root mesh, i.e. the mesh that is used for the domain discretization. Note that each mesh file can contain at most one root mesh.</p>
 <p >The <code>RootMesh</code> node has the following attributes:</p><ul>

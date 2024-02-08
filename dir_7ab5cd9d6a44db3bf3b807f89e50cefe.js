@@ -19,6 +19,7 @@ var dir_7ab5cd9d6a44db3bf3b807f89e50cefe =
     [ "half.hpp", "half_8hpp_source.html", null ],
     [ "kahan_summation.cpp", "kahan__summation_8cpp_source.html", null ],
     [ "kahan_summation.hpp", "kahan__summation_8hpp_source.html", null ],
+    [ "likwid_marker.hpp", "likwid__marker_8hpp.html", "likwid__marker_8hpp" ],
     [ "math.hpp", "math_8hpp_source.html", null ],
     [ "memory_pool.cpp", "memory__pool_8cpp_source.html", null ],
     [ "memory_pool.hpp", "memory__pool_8hpp_source.html", null ],

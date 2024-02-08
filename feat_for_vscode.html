@@ -125,6 +125,10 @@ $(document).ready(function(){initNavTree('feat_for_vscode.html',''); initResizab
 <li class="level1"><a href="#vscode_editor">Working with VScode</a><ul><li class="level2"><a href="#intellisense_filediscovery">Problems with file discovery</a></li>
 </ul>
 </li>
+<li class="level1"><a href="#clangd">Using clangd as Language Server</a><ul><li class="level2"><a href="#clangd_setup">Setup of clangd</a></li>
+<li class="level2"><a href="#clangd_config">Configuring clangd</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="textblock"><p >This page describes the setup and use of <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> with the Visual Studio Code editor.</p>
@@ -167,9 +171,9 @@ VScode setup</h1>
 <dl class="section note"><dt>Note</dt><dd>For now, ignore any recommandation prompts <code>VScode</code> gives.</dd></dl>
 <h1><a class="anchor" id="vscode_configuration_setup"></a>
 Configuration Setup</h1>
-<p >Before we can configure the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> <code>CMake</code> project, we need to run the Python script <code>configureVScode.py</code> from our workfolder. To do this, open an internal terminal by typing </p><pre class="fragment"> CTRL + Shift + `</pre><p >This configure script works similarly to the "standard" configure script used to configure <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> under GNU without IDE support, but instead of triggering the <code>CMake</code> call itself, it simply edits the <code>cmake-variants.json</code> file , which is then used to to configure and build <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> in <code>VScode</code>. The simplest way to do this is to use </p><pre class="fragment"> python3 configure&lt;c&gt;VScode&lt;/c&gt;.py gcc</pre><p> or </p><pre class="fragment"> python3 configure&lt;c&gt;VScode&lt;/c&gt; clang</pre><p> which provides the simplest setup of four variants for your chosen compiler, differing in the selected optimization type.</p>
-<dl class="section note"><dt>Note</dt><dd>See <pre class="fragment"> python3 configure&lt;c&gt;VScode&lt;/c&gt;.py --help</pre> for various options and flags for setting up <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> variants. Importantly, we differentiate between four variant types. First of all the optimization type, i.e. <code>opt, debug, fast</code> or <code>noop</code>, then the "standard" thirdparties, with <code>thirdparty</code> enabling <b>ALL</b> selected non-mpi thirdparties and <code>thirdparty-off</code> disabling all thirdparties. Furthermore the <code>mpi</code> variant, with <code>mpi-off</code> disabling mpi, <code>mpi</code> enabling only mpi and <code>mpi-thirdparty</code> enabling mpi and all selected thirdparties requiring mpi. At last there is also the <code>cuda</code> variant, enabling or disabling cuda.</dd></dl>
-<dl class="section attention"><dt>Attention</dt><dd>Due to <code>CMake Tools</code>, changes to the variants file are not automatically registered by <code>VScode</code>. After running the configure script, you will need to restart <code>VScode</code>. This can be easily done by using \ verbatim CTRL + Shift + P -&gt; Reload window \end verbatim</dd>
+<p >Before we can configure the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> <code>CMake</code> project, we need to run the Python script <code>configureVScode.py</code> from our workfolder. To do this, open an internal terminal by typing </p><pre class="fragment"> CTRL + Shift + `</pre><p >This configure script works similarly to the "standard" configure script used to configure <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> under GNU without IDE support, but instead of triggering the <code>CMake</code> call itself, it simply edits the <code>cmake-variants.json</code> file , which is then used to to configure and build <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> in <code>VScode</code>. The simplest way to do this is to use </p><pre class="fragment"> python3 configureVScode.py gcc</pre><p> or </p><pre class="fragment"> python3 configureVScode.py clang</pre><p> which provides the simplest setup of four variants for your chosen compiler, differing in the selected optimization type.</p>
+<dl class="section note"><dt>Note</dt><dd>See <pre class="fragment"> python3 configureVScode.py --help</pre> for various options and flags for setting up <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> variants. Importantly, we differentiate between four variant types. First of all the optimization type, i.e. <code>opt, debug, fast</code> or <code>noop</code>, then the "standard" thirdparties, with <code>thirdparty</code> enabling <b>ALL</b> selected non-mpi thirdparties and <code>thirdparty-off</code> disabling all thirdparties. Furthermore the <code>mpi</code> variant, with <code>mpi-off</code> disabling mpi, <code>mpi</code> enabling only mpi and <code>mpi-thirdparty</code> enabling mpi and all selected thirdparties requiring mpi. At last there is also the <code>cuda</code> variant, enabling or disabling cuda.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>Due to <code>CMake Tools</code>, changes to the variants file are not automatically registered by <code>VScode</code>. After running the configure script, you will need to restart <code>VScode</code>. This can be easily done by using <pre class="fragment"> CTRL + Shift + P -&gt; Reload window</pre></dd>
 <dd>
 If a third-party library is not found in your third-party folder, it will be downloaded automatically. For this reason (and others) you should place your <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> source directory somewhere where you do not need root or admin rights to write/modify files.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>If you want to change your <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> build, you will need to re-run the configuration script and repeat the steps above.</dd></dl>
@@ -205,6 +209,31 @@ Problems with file discovery</h2>
     }</pre> If you want to see, which folders are included in your <code>PATH</code>, check <pre class="fragment"> C/Cpp: Log Diagnostics</pre></dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>If you create a new <code>header file</code> which is not included anywhere in the project, you will see an include error generated by IntelliSense for any <code>header file</code>. To fix this, simply add the new <code>header file</code>, i.e. the file where you see the error, not the include target, to any source list of an executable. While this does not change the build process, it fixes the bug.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>You should also add <code> ms-vscode.cmake-tools </code> to the default <code>configuration provider</code> setting of IntelliSense.</dd></dl>
+<h1><a class="anchor" id="clangd"></a>
+Using clangd as Language Server</h1>
+<p >Instead of using the C/C++ extension of Microsoft, using clangd as language server can improve performance espacially on the side of file disovery. While there are a few disadvanteges, mainly the missing parsing of doxygen comments (which is a feature request momentarily under <a href="https://github.com/clangd/clangd/issues/529">review</a> ), it should be considered if you are running into problems with the IntelliSense setup.</p>
+<h2><a class="anchor" id="clangd_setup"></a>
+Setup of clangd</h2>
+<p >First of all, you should have a clangd installed in your system. Since clangd is part of the LLVM project, it should be part of your clang installation. To test this, and get the path to yopu clangd installation, simply type into a terminal </p><pre class="fragment">which clangd
+</pre><p >After you have confirmed the location of your clangd installation, search in <code>VScode</code> extentions the clangd plug-in, which handles the configuration of the language server. You will also see a prompt asking which language server should be your default provider, choose clangd. Then, add to your settings file: </p><pre class="fragment">"C_Cpp.intelliSenseEngine": "disabled", //disable intellisense lsp
+"clangd.path": "/path/to/your/clangd",
+"clangd.arguments": ["-log=verbose",
+                      "-pretty",
+                      "--background-index",
+                      "--compile-commands-dir=${workspaceFolder}/build"]
+</pre><p >which disables IntelliSense and add a few options to the clangd language server. One important thing is <code>"--compile-commands-dir=${workspaceFolder}/build"</code>, which provides the path to the <code>compile_commands.json</code> file. This file provides the building information, clangd needs to correctly parse you project and can fortunally be automatically build by <code>CMake</code>. To do this, simply add </p><pre class="fragment">--export_compile_commands
+</pre><p> to the config call of the <code>FEAT3</code> configuration, e.g. either <code>configure</code> or <code>configureVScode</code>.</p>
+<p >To reduce the load IntelliSense has on the system, you can also add to your settings file </p><pre class="fragment">"C_Cpp.intelliSenseCacheSize": 0,
+"C_Cpp.intelliSenseMemoryLimit": 256,
+"C_Cpp.autocomplete": "disabled",
+"C_Cpp.hover": "disabled"
+</pre><dl class="section note"><dt>Note</dt><dd>If you do not require debugging capabilities, for which we still need IntelliSense, you can deactivate the C/C++ extension complettly, since everything else should be handled by clangd.</dd></dl>
+<h2><a class="anchor" id="clangd_config"></a>
+Configuring clangd</h2>
+<p >It can be very helpful to provide clangd with extra information in you sourcefiles (for example extra include or typedefs), which are unecessary or even wrong in the actual build process. This can very well happen, if for example a header file depends on a prior include of another header, which is done on application level (as for example done in the new ccnd applications). To differentiate between clangd compilation and any other, we add an additional compile flag to our clangd setup. For this create a file under the local config directory <code>~/.config/clangd</code>(if it does not exist, create it) named <code>config.yaml</code>. Here simply add </p><pre class="fragment">CompileFlags:
+  Add: [-D_CLANGD=1]
+</pre><p >Which adds a compiler definition <code>_CLANGD</code> which can be checked with a <code>#ifdef</code> pre-compiler call.</p>
+<p >/TODO: Add additional configuration options and information regarding cland-tidy .</p>
 <dl class="section author"><dt>Author</dt><dd>Maximilian Esser </dd></dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

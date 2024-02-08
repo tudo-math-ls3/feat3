@@ -5,6 +5,8 @@ var namespace_f_e_a_t_1_1_geometry_1_1_atlas =
     [ "BezierParamsParser", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_params_parser.html", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_params_parser" ],
     [ "BezierPointsParser", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_points_parser.html", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_points_parser" ],
     [ "BezierTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_traits.html", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_bezier_traits" ],
+    [ "CGALSurfaceMesh", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_c_g_a_l_surface_mesh.html", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_c_g_a_l_surface_mesh" ],
+    [ "CGALSurfaceMeshTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_c_g_a_l_surface_mesh_traits.html", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_c_g_a_l_surface_mesh_traits" ],
     [ "ChartBase", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base" ],
     [ "ChartCRTP", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_c_r_t_p.html", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_c_r_t_p" ],
     [ "Circle", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_circle.html", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_circle" ],
