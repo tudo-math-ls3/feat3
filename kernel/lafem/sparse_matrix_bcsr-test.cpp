@@ -678,6 +678,130 @@ SparseMatrixBCSRScaleTest <float, std::uint32_t> cuda_sm_bcsr_scale_test_float_u
 SparseMatrixBCSRScaleTest <double, std::uint32_t> cuda_sm_bcsr_scale_test_double_uint32(PreferredBackend::cuda);
 #endif
 
+
+template<
+  typename DT_,
+  typename IT_>
+  class SparseMatrixBCSRScaleRowColTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRScaleRowColTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRScaleRowColTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRScaleRowColTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+
+    const DT_ pi(Math::pi<DT_>());
+    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+
+    DenseVector<DT_, IT_> dv1(30);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i+1));
+    }
+    DenseVector<IT_, IT_> dv2(5);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    dv2(2, IT_(0));
+    dv2(3, IT_(2));
+    dv2(4, IT_(3));
+
+    DenseVector<IT_, IT_> dv3(4);
+    dv3(0, IT_(0));
+    dv3(1, IT_(2));
+    dv3(2, IT_(5));
+    dv3(3, IT_(5));
+
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(3, 4, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> b;
+    b.clone(a);
+
+    // Scale rows
+
+    DenseVectorBlocked<DT_, IT_, 2> s(a.rows());
+    for (Index i(0); i < s.size(); ++i)
+    {
+      s(i, Tiny::Vector<DT_, 2>{pi * (i % 3 + 1) - DT_(5.21) + DT_(i),  DT_(i) * DT_(12.31) });
+    }
+    DenseVectorBlocked<DT_, IT_, 3> t(a.columns());
+    for (Index i(0); i < t.size(); ++i)
+    {
+      t(i, Tiny::Vector<DT_, 3>{pi * (i % 3 + 1) - DT_(5.21) + DT_(i),  DT_(i) * DT_(12.31), DT_(i) *DT_(-324.21) - DT_(13.37) });
+    }
+
+    b.scale_rows(b, s);
+    for (Index row(0); row < a.rows(); ++row)
+    {
+      for (Index col(0); col < a.columns(); ++col)
+      {
+        auto ab = a(row, col);
+        auto bb = b(row, col);
+        auto sb = s(row);
+        for (int irow(0); irow < 2; ++irow)
+        {
+          for (int icol(0); icol < 3; ++icol)
+          {
+            auto bv = bb(irow, icol);
+            auto av = ab(irow, icol);
+            TEST_CHECK_EQUAL_WITHIN_EPS(bv, av * sb(irow), eps);
+          }
+        }
+      }
+    }
+
+    a.clone(b);
+    b.scale_cols(b, t);
+    for (Index row(0); row < a.rows(); ++row)
+    {
+      for (Index col(0); col < a.columns(); ++col)
+      {
+        auto ab = a(row, col);
+        auto bb = b(row, col);
+        auto tb = t(col);
+        for (int irow(0); irow < 2; ++irow)
+        {
+          for (int icol(0); icol < 3; ++icol)
+          {
+            auto bv = bb(irow, icol);
+            auto av = ab(irow, icol);
+            TEST_CHECK_EQUAL_WITHIN_EPS(bv, av * tb(icol), eps);
+          }
+        }
+      }
+    }
+  }
+};
+
+SparseMatrixBCSRScaleRowColTest <float, std::uint64_t>  cpu_sm_bcsr_row_col_scale_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRScaleRowColTest <double, std::uint64_t> cpu_sm_bcsr_row_col_scale_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRScaleRowColTest <float, std::uint32_t>  cpu_sm_bcsr_row_col_scale_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRScaleRowColTest <double, std::uint32_t> cpu_sm_bcsr_row_col_scale_test_double_uint32(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRScaleRowColTest <float, std::uint64_t>  mkl_cpu_sm_bcsr_row_col_scale_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRScaleRowColTest <double, std::uint64_t> mkl_cpu_sm_bcsr_row_col_scale_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRScaleRowColTest <__float128, std::uint64_t> cpu_sparse_matrix_bcsr_row_col_scale_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRScaleRowColTest <__float128, std::uint32_t> cpu_sparse_matrix_bcsr_row_col_scale_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRScaleRowColTest <Half, std::uint32_t> cpu_sm_bcsr_row_col_scale_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRScaleRowColTest <Half, std::uint64_t> cpu_sm_bcsr_row_col_scale_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRScaleRowColTest <float, std::uint64_t>  cuda_sm_bcsr_row_col_scale_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRScaleRowColTest <double, std::uint64_t> cuda_sm_bcsr_row_col_scale_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRScaleRowColTest <float, std::uint32_t>  cuda_sm_bcsr_row_col_scale_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRScaleRowColTest <double, std::uint32_t> cuda_sm_bcsr_row_col_scale_test_double_uint32(PreferredBackend::cuda);
+#endif
+
 /**
  * \brief Test class for the sparse matrix csr blocked norm method.
  *

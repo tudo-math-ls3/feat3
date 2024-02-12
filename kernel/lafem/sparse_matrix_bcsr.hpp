@@ -19,6 +19,7 @@
 #include <kernel/lafem/arch/apply.hpp>
 #include <kernel/lafem/arch/lumping.hpp>
 #include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/row_norm.hpp>
 #include <kernel/lafem/arch/diagonal.hpp>
 #include <kernel/adjacency/graph.hpp>
@@ -1256,6 +1257,46 @@ namespace FEAT
         SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> tx_t(txcolumns, txrows, tcol_ind, tval, trow_ptr);
 
         this->assign(tx_t);
+      }
+
+      /**
+       * \brief Calculate \f$ this_{ij} \leftarrow x_{ij}\cdot s_i\f$
+       *
+       * \param[in] x The matrix whose rows are to be scaled.
+       * \param[in] s The vector to the scale the rows by.
+       */
+      void scale_rows(const SparseMatrixBCSR & x, const DenseVectorBlocked<DT_,IT_, BlockHeight_> & s)
+      {
+        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
+        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(s.size() == this->rows(), "Vector size does not match!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements<Perspective::pod>());
+        Arch::ScaleRows::template bcsr<BlockHeight_, BlockWidth_>(this->val<Perspective::pod>(), x.template val<Perspective::pod>(),
+          this->col_ind(), this->row_ptr(), s.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
+
+      void scale_cols(const SparseMatrixBCSR & x, const DenseVectorBlocked<DT_,IT_, BlockWidth_> & s)
+      {
+        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
+        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(s.size() == this->columns(), "Vector size does not match!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->used_elements<Perspective::pod>());
+        Arch::ScaleCols::template bcsr<BlockHeight_, BlockWidth_>(this->val<Perspective::pod>(), x.template val<Perspective::pod>(),
+          this->col_ind(), this->row_ptr(), s.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**

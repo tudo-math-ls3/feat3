@@ -50,6 +50,33 @@ namespace FEAT
 
         template <typename DT_, typename IT_>
         static void csr_cuda(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template <int bh_, int bw_, typename DT_, typename IT_>
+        static void bcsr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          if constexpr ( (std::is_same<DT_, double>::value || std::is_same<DT_, float>::value)
+                         && (std::is_same<IT_, std::uint32_t>::value || std::is_same<IT_, std::uint64_t>::value))
+          {
+            BACKEND_SKELETON_VOID_T2(bh_, bw_, bcsr_cuda, bcsr_generic, bcsr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
+          }
+          else
+          {
+            bcsr_generic<bh_, bw_>(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
+          }
+        }
+
+        template <int bh_, int bw_, typename DT_, typename IT_>
+        static void bcsr_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template<typename DT_, typename IT_>
+        static void bcsr_cuda_intern(DT_*, const DT_* const, const IT_* const, const IT_* const, const DT_* const, const Index, const Index, const Index, const int, const int);
+
+        template <int bh_, int bw_, typename DT_, typename IT_>
+        static void bcsr_cuda(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index cols, const Index used_el)
+        {
+          bcsr_cuda_intern(r, a, col_ind, row_ptr, x, rows, cols, used_el, bh_, bw_);
+        }
+
       };
 
 #ifdef FEAT_EICKT
@@ -95,6 +122,33 @@ namespace FEAT
 
         template <typename DT_, typename IT_>
         static void csr_cuda(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+
+        template <int bh_, int bw_, typename DT_, typename IT_>
+        static void bcsr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        {
+          if constexpr ( (std::is_same<DT_, double>::value || std::is_same<DT_, float>::value)
+                         && (std::is_same<IT_, std::uint32_t>::value || std::is_same<IT_, std::uint64_t>::value))
+          {
+            BACKEND_SKELETON_VOID_T2(bh_, bw_, bcsr_cuda, bcsr_generic, bcsr_generic, r, a, col_ind, row_ptr, x, rows, columns, used_elements)
+          }
+          else
+          {
+            bcsr_generic<bh_, bw_>(r, a, col_ind, row_ptr, x, rows, columns, used_elements);
+          }
+        }
+
+        template <int bh_, int bw_, typename DT_, typename IT_>
+        static void bcsr_generic(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
+
+        template<typename DT_, typename IT_>
+        static void bcsr_cuda_intern(DT_*, const DT_* const, const IT_* const, const IT_* const, const DT_* const, const Index, const Index, const Index, const int, const int);
+
+        template <int bh_, int bw_, typename DT_, typename IT_>
+        static void bcsr_cuda(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index cols, const Index used_el)
+        {
+          bcsr_cuda_intern(r, a, col_ind, row_ptr, x, rows, cols, used_el, bh_, bw_);
+        }
       };
 
 #ifdef FEAT_EICKT
