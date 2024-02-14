@@ -284,8 +284,7 @@ namespace FEAT
       void clone(const Vector& other, LAFEM::CloneMode mode = LAFEM::CloneMode::Weak)
       {
         XASSERTM(&(other.local()) != &(this->local()), "Trying to self-clone a Global::Vector!");
-
-        this->local() = other.local().clone(mode);
+        *this = other.clone(mode);
       }
 
       /**
