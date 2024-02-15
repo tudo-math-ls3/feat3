@@ -63,7 +63,12 @@ public:
   template<typename Solver_>
   void test_solver(String name, Solver_& solver, VectorType& vec_sol, const VectorType& vec_ref, const VectorType& vec_rhs, const Index ref_iters, const Index iter_tol = 2u) const
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
+    #ifdef FEAT_HAVE_QUADMATH
+      // a bit more tolerance for quad precision
+      const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.4));
+    #else
+      const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
+    #endif
 
     // set solver name and plot summary
     std::cout << std::endl;
