@@ -192,6 +192,8 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
           cxxflags += " -march=cascadelake -m64"
         else:
           cxxflags += " -march=skylake -m64"
+    elif cpu == "sapphirerapids":
+      cxxflags += " -march=sapphirerapids -m64"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
@@ -252,6 +254,8 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
         cxxflags += " -m64 -march=znver2"
       else:
         cxxflags += " -m64 -march=znver1"
+    elif cpu == "zen4":
+      cxxflags += " -m64 -march=znver4"
 
     #ARM
     elif cpu == "cortexa15":

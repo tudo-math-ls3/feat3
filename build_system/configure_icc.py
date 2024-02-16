@@ -97,6 +97,8 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -xCORE-AVX2"
     elif cpu == "icelake":
       cxxflags += " -xCORE-AVX2"
+    elif cpu == "sapphirerapids":
+      cxxflags += " -xCORE-AVX512"
     elif cpu == "itanium":
       # no setting necessary, the itanium version of the intel compiler
       # sets everything automatically
@@ -140,6 +142,10 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     elif cpu == "zen":
       cxxflags += " -march=core-avx2" # not really supported by intel
     elif cpu == "zen2":
+      cxxflags += " -march=core-avx2" # not really supported by intel
+    elif cpu == "zen3":
+      cxxflags += " -march=core-avx2" # not really supported by intel
+    elif cpu == "zen4":
       cxxflags += " -march=core-avx2" # not really supported by intel
     else:
       print ("Warning: Detected cpu type not supported by configure_icc.py, using generic vectorisation support instead")

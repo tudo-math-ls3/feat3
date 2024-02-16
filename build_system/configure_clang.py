@@ -157,6 +157,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
       cxxflags += " -march=core-avx2"
     elif cpu == "ice-lake":
       cxxflags += " -march=core-avx2"
+    elif cpu == "sapphirerapdis":
+      cxxflags += " -march=core-avx2"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
@@ -209,6 +211,8 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
         cxxflags += " -m64 -march=znver2"
       else:
         cxxflags += " -m64 -march=znver1"
+    elif cpu == "zen4":
+      cxxflags += " -m64 -march=znver4"
     #ARM
     elif cpu == "cortexa53":
       cxxflags += " -march=a53"
