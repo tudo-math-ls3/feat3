@@ -1998,6 +1998,10 @@ namespace FEAT
       /**
        * \brief Blocking gather
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2028,6 +2032,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2053,6 +2061,10 @@ namespace FEAT
 
       /**
        * \brief Nonblocking gather
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
@@ -2088,6 +2100,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
        * stored internally and must remain valid until the returned request is fulfilled.
@@ -2117,6 +2133,10 @@ namespace FEAT
 
       /**
        * \brief Blocking scatter
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p recvbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
@@ -2148,6 +2168,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p recvbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2173,6 +2197,10 @@ namespace FEAT
 
       /**
        * \brief Nonblocking scatter
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p recvbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
@@ -2208,6 +2236,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p recvbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
        * stored internally and must remain valid until the returned request is fulfilled.
@@ -2238,6 +2270,10 @@ namespace FEAT
       /**
        * \brief Blocking gather-to-all
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2265,6 +2301,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2287,6 +2327,10 @@ namespace FEAT
 
       /**
        * \brief Nonblocking gather-to-all
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
@@ -2319,6 +2363,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
        * stored internally and must remain valid until the returned request is fulfilled.
@@ -2345,6 +2393,10 @@ namespace FEAT
 
       /**
        * \brief Blocking gather-to-all
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \attention
        * In contrast to most other functions, this function uses \c int rather than <c>std::size_t</c>
@@ -2380,6 +2432,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \attention
        * In contrast to most other functions, this function uses \c int rather than <c>std::size_t</c>
        * as the type for the receive counts and displacements for technical reasons!
@@ -2410,6 +2466,10 @@ namespace FEAT
       /**
        * \brief Blocking All-to-All Scatter/Gather
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2437,6 +2497,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \transient pointer to the send buffer for the operation.
        *
@@ -2459,6 +2523,10 @@ namespace FEAT
 
       /**
        * \brief Nonblocking All-to-All Scatter/Gather
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
@@ -2491,6 +2559,10 @@ namespace FEAT
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
        *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
+       *
        * \param[in] sendbuf
        * A \resident pointer to the send buffer for the operation. The pointer to the buffer is
        * stored internally and must remain valid until the returned request is fulfilled.
@@ -2517,6 +2589,10 @@ namespace FEAT
 
       /**
        * \brief Blocking All-to-All Scatter/Gather
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \attention
        * In contrast to most other functions, this function uses \c int rather than <c>std::size_t</c>
@@ -2554,6 +2630,10 @@ namespace FEAT
        * \brief Blocking All-to-All Scatter/Gather
        *
        * This function automatically deducts the datatype of the send/receive buffer(s) (if possible).
+       *
+       * \note
+       * \p sendbuf and \p recvbuf are allowed to be identical; in this case, the
+       * \p sendbuf argument of the MPI function call is set to \c MPI_IN_PLACE.
        *
        * \attention
        * In contrast to most other functions, this function uses \c int rather than <c>std::size_t</c>

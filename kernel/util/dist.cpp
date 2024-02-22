@@ -552,64 +552,90 @@ namespace FEAT
 
     void Comm::gather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
-      MPI_Gather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
+      if(sendbuf == recvbuf)
+        MPI_Gather(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
+      else
+        MPI_Gather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
     }
 
     Request Comm::igather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Igather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
+      if(sendbuf == recvbuf)
+        MPI_Igather(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
+      else
+        MPI_Igather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       return Request(req);
     }
 
     void Comm::scatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
-      MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
+      if(sendbuf == recvbuf)
+        MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, MPI_IN_PLACE, 0, sendtype.dt, root, comm);
+      else
+        MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
     }
 
     Request Comm::iscatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
+      if(sendbuf == recvbuf)
+        MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, MPI_IN_PLACE, 0, sendtype.dt, root, comm, &req);
+      else
+        MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       return Request(req);
     }
 
     void Comm::allgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
-      MPI_Allgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
+      if(sendbuf == recvbuf)
+        MPI_Allgather(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
+      else
+        MPI_Allgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
     }
 
     Request Comm::iallgather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      MPI_Iallgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
+      if(sendbuf == recvbuf)
+        MPI_Iallgather(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
+      else
+        MPI_Iallgather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
       return Request(req);
     }
 
     void Comm::allgatherv(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, const int* recvcounts, const int* displs, const Datatype& recvtype) const
     {
-      MPI_Allgatherv(sendbuf, int(sendcount), sendtype.dt, recvbuf, recvcounts, displs, recvtype.dt, comm);
+      if(sendbuf == recvbuf)
+        MPI_Allgatherv(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, recvcounts, displs, recvtype.dt, comm);
+      else
+        MPI_Allgatherv(sendbuf, int(sendcount), sendtype.dt, recvbuf, recvcounts, displs, recvtype.dt, comm);
     }
 
     void Comm::alltoall(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
-      MPI_Alltoall(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
+      if(sendbuf == recvbuf)
+        MPI_Alltoall(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
+      else
+        MPI_Alltoall(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
     }
 
     Request Comm::ialltoall(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-#ifdef MSMPI_VER
-      MPI_Alltoall(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm);
-#else
-      MPI_Ialltoall(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
-#endif
+      if(sendbuf == recvbuf)
+        MPI_Ialltoall(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
+      else
+        MPI_Ialltoall(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, comm, &req);
       return Request(req);
     }
 
     void Comm::alltoallv(const void* sendbuf, const int* sendcounts, const int* sdispls, const Datatype& sendtype, void* recvbuf, const int* recvcounts, const int* rdispls, const Datatype& recvtype) const
     {
-      MPI_Alltoallv(sendbuf, sendcounts, sdispls, sendtype.dt, recvbuf, recvcounts, rdispls, recvtype.dt, comm);
+      if(sendbuf == recvbuf)
+        MPI_Alltoallv(MPI_IN_PLACE, 0, 0, recvtype.dt, recvbuf, recvcounts, rdispls, recvtype.dt, comm);
+      else
+        MPI_Alltoallv(sendbuf, sendcounts, sdispls, sendtype.dt, recvbuf, recvcounts, rdispls, recvtype.dt, comm);
     }
 
     void Comm::reduce(const void* sendbuf, void* recvbuf, std::size_t count, const Datatype& datatype, const Operation& op, int root) const
