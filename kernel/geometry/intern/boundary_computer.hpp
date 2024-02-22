@@ -110,7 +110,7 @@ namespace FEAT
 
       public:
         template<typename ParentIndexSetHolder_>
-        explicit BoundaryFaceComputer(const ParentIndexSetHolder_& index_set_holder)
+        void compute_all(const ParentIndexSetHolder_& index_set_holder)
         {
           // Phase 1:
           // Compute all facets, i.e. (n-1)-dimensional faces, which reside on the boundary.
@@ -136,6 +136,55 @@ namespace FEAT
           {
             // for each conformal mesh, a facet must be adjacent to either 1 (boundary facet) or 2 (inner facet) cells.
             ASSERTM((caf[i] > 0) && (caf[i] < 3), "invalid number of cells at facet");
+            if(caf[i] == Index(1))
+              ++count;
+          }
+
+          // allocate boundary facet sets
+          _faces.reserve(count);
+          for(Index i(0); i < Index(caf.size()); ++i)
+          {
+            if(caf[i] == Index(1))
+              _faces.push_back(i);
+          }
+
+          // Phase 2:
+          // Compute all lower-dimensional faces adjacent to any of our boundary facets.
+          BaseClass::compute(index_set_holder, _faces);
+        }
+
+        template<typename ParentIndexSetHolder_>
+        void compute_masked(const ParentIndexSetHolder_& index_set_holder, const std::vector<int>& mask)
+        {
+          // Phase 1:
+          // Compute all facets, i.e. (n-1)-dimensional faces, which reside on the boundary.
+          // We do this by computing how many cells are adjacent to a particular facet.
+          // If the number of cells is exactly 1, the facet is a boundary facet.
+
+          const auto& face_index_set = index_set_holder.template get_index_set<shape_dim_, shape_dim_-1>();
+
+          // allocate a temporary vector; this stores the number of cells adjacent to each facet
+          std::vector<Index> caf(face_index_set.get_index_bound(), Index(0));
+
+          // loop over all cells of the mesh
+          for(Index i(0); i < face_index_set.get_num_entities(); ++i)
+          {
+            // loop over all facets adjacent to the current cell and increments its counter by one
+            for(int j(0); j < face_index_set.get_num_indices(); ++j)
+              ++caf[face_index_set(i,j)];
+          }
+
+          // reset all masked facets to 0, so that they won't be part of the created boundary mesh part
+          XASSERTM(mask.size() == caf.size(), "invalid mask vector size");
+          for(std::size_t i(0); i < caf.size(); ++i)
+            caf[i] = (mask[i] > 0 ? Index(0) : caf[i]);
+
+          // count the number of boundary facets
+          Index count(0);
+          for(Index i(0); i < Index(caf.size()); ++i)
+          {
+            // for each conformal mesh, a facet must be adjacent to either 1 (boundary facet) or 2 (inner facet) cells.
+            ASSERTM((mask[i] > 0) || ((caf[i] > 0) && (caf[i] < 3)), "invalid number of cells at facet");
             if(caf[i] == Index(1))
               ++count;
           }
