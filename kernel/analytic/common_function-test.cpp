@@ -1843,6 +1843,33 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-23.693995515706431689), tol);
   }
 
+  void test_ball_cap_function_2d() const
+  {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+
+    Analytic::Common::BallCapFunction2D func;
+
+    // evaluate function
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.6), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0.02138656368050375964), tol);
+
+    // evaluate gradient
+    Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.6), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(-0.16903085094570331550), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.19720265943665386808), tol);
+
+    // evaluate hessian
+    Tiny::Matrix<DT_, 2, 2> hess_1 = Analytic::eval_hessian_x(func, DT_(0.6), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0], DT_(-0.31391443747059187164), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1], DT_(-0.037562411321267403442), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0], DT_(-0.037562411321267403442), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1], DT_(-0.32554089811765082985), tol);
+  }
+
 #ifdef FEAT_HAVE_CGAL
   void test_cgal_signed_dist_3d() const
   {
@@ -1941,6 +1968,7 @@ public:
     test_sine_ring_vortex_velo_2d();
     test_sine_ring_vortex_pres_2d();
     test_sine_ring_vortex_rhs_2d();
+    test_ball_cap_function_2d();
 #ifdef FEAT_HAVE_CGAL
     test_cgal_signed_dist_3d();
 #endif

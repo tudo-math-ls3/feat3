@@ -4357,6 +4357,67 @@ namespace FEAT
         }; // class CGALDistFunc::Evaluator<...>
       }; // class CGALDistFunc<...>
 #endif
+
+      /**
+       * \brief Ball-Cap Function on the 2D unit circle
+       *
+       * This function represents the upper quarter manifold of a ball of radius 4 on the unit circle domain of radius
+       * 1 around the origin. This function in homogeneous on the boundary of the unit circle domain.
+       *
+       * This function is given by the formula \f$ (\sqrt{4 - x^2 - y^2} - \sqrt{3}) / 2 \f$.
+       *
+       * \author Peter Zajac
+       */
+      class BallCapFunction2D :
+        public Analytic::Function
+      {
+      public:
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        public:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+          typedef typename Traits_::GradientType GradientType;
+          typedef typename Traits_::HessianType HessianType;
+
+          explicit Evaluator(const BallCapFunction2D& )
+          {
+          }
+
+          ValueType value(const PointType& point) const
+          {
+            return DataType(0.5) * (Math::sqrt(DataType(4) - point.norm_euclid_sqr()) - Math::sqrt(DataType(3)));
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            const DataType s = DataType(0.5) / Math::sqrt(DataType(4) - point.norm_euclid_sqr());
+            GradientType grad;
+            grad[0] = -s * point[0];
+            grad[1] = -s * point[1];
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            const DataType s = DataType(0.5) / Math::cub(Math::sqrt(DataType(4) - point.norm_euclid_sqr()));
+            HessianType hess;
+            hess[0][0] = s * (Math::sqr(point[1]) - DataType(4));
+            hess[1][1] = s * (Math::sqr(point[0]) - DataType(4));
+            hess[0][1] = hess[1][0] = -s * point[0] * point[1];
+            return hess;
+          }
+        }; // class BallCapFunction2D::Evaluator<...>
+      }; // class BallCapFunction2D
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT
