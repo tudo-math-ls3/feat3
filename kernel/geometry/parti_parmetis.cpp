@@ -122,6 +122,7 @@ namespace FEAT
       std::vector<idx_t> options(4, 0);
       std::vector<real_t> tpwgts(_num_parts, real_t(1) / real_t(_num_parts));
       std::vector<real_t> ubvec(1, real_t(1.05));
+      std::vector<idx_t> vwgt;
       std::vector<idx_t> part(_num_local_elems, 0);
 
       // convert midpoints to xyz
@@ -158,12 +159,36 @@ namespace FEAT
       }
       xadj.push_back(idx_t(adjncy.size()));
 
+      // set up weights if desired
+      if(!this->_weights.empty())
+      {
+        std::size_t n = this->_weights.size();
+        wgtflag = 2; // vertex weights only
+        vwgt.resize(n);
+
+        // ParMETIS expects integer weights, but we have float weights, so we first have to compute
+        // the total sum of all weights and then choose a scaling factor so that the sum of the
+        // scaled weights is a large integer not greater than 10^9; then we can simply multiply
+        // the weights by that scaling factor and convert to integers.
+
+        // compute the total sum of all weights
+        Real wsum(0.0);
+        for(std::size_t i(0); i < n; ++i)
+          wsum += this->_weights[i];
+        XASSERTM(wsum > 1e-3, "weight sum appears to be zero");
+
+        // compute integer weights for METIS
+        Real scale = 1E+9 / wsum;
+        for(std::size_t i(0); i < n; ++i)
+          vwgt[i] = idx_t(scale * this->_weights[i]);
+      }
+
       // call ParMETIS
       int rtn = ParMETIS_V3_PartGeomKway(
         vtxdist.data(),   // in: first dof for each processor, on all processes, length P+1
         xadj.data(),      // in: dom_ptr of adjacency Graph (w/o self-adjacency)
         adjncy.data(),    // in: img_idx of adjacency Graph (w/o self-adjacency)
-        nullptr,          // in: vertex weights (may be set to nullptr)
+        vwgt.data(),      // in: vertex weights (may be set to nullptr)
         nullptr,          // in: edge weights (may be set to nullptr)
         &wgtflag,         // in: 0 for no weights
         &numflag,         // in: 0 for C numbering

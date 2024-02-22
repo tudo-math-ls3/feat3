@@ -53,10 +53,13 @@ namespace FEAT
         Index first_elem;
         /// the sub-graph for this process
         Adjacency::Graph sub_graph;
+        /// the weights for the elements of this sub-graph
+        std::vector<float> weights;
 
         Hypergraph() :
           first_elem(0u),
-          sub_graph()
+          sub_graph(),
+          weights()
         {
         }
       }; // class Hypergraph
@@ -106,14 +109,17 @@ namespace FEAT
        * The desired number of partitions to create. Must be > 0, but it does not necessarily need
        * to be equal to the number of processes in the communicator.
        *
+       * \param[in] weights
+       * A vector containing the distribution weights for each element. May be empty if all elements are to be weighted equally.
+       *
        * \returns
        * \c true, if the partitioning was successful, or \c false, if some error occurred.
        */
       template<int n_>
-      bool execute(const IndexSet<n_>& faces_at_elem, const Index num_parts)
+      bool execute(const IndexSet<n_>& faces_at_elem, const Index num_parts, const std::vector<Real>& weights)
       {
         Adjacency::Graph graph(Adjacency::RenderType::as_is, faces_at_elem);
-        return execute(graph, num_parts);
+        return execute(graph, num_parts, weights);
       }
 
       /**
@@ -128,10 +134,13 @@ namespace FEAT
       * The desired number of partitions to create. Must be > 0, but it does not necessarily need
       * to be equal to the number of processes in the communicator.
       *
+      * \param[in] weights
+      * A vector containing the distribution weights for each element. May be empty if all elements are to be weighted equally.
+      *
       * \returns
       * \c true, if the partitioning was successful, or \c false, if some error occurred.
       */
-      bool execute(const Adjacency::Graph& faces_at_elem, const Index num_parts);
+      bool execute(const Adjacency::Graph& faces_at_elem, const Index num_parts, const std::vector<Real>& weights);
 
       /**
        * \brief Builds and returns the elements-at-rank graph representing the partitioning.
@@ -143,7 +152,7 @@ namespace FEAT
 
     protected:
       /// auxiliary function: builds a hypergraph from the adjacency graph
-      void _create_hypergraph(const Adjacency::Graph& faces_at_elem);
+      void _create_hypergraph(const Adjacency::Graph& faces_at_elem, const std::vector<Real>& weights);
       /// auxiliary function: applies Zoltan onto the hypergraph
       bool _apply_zoltan();
       /// auxiliary function: gathers the partitioned coloring onto the root process

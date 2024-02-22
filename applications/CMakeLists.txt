@@ -20,11 +20,13 @@ SET (app_list
   poisson_dirichlet
   poisson_mixed
   poisson_neumann
+  poisson_voxel_mg
   poisson_scarc
   stokes_3field_bench
   stokes_dricav_2d
   stokes_poiseuille_2d
   stokes_vortex_2d
+  stokes_voxel_ypipe
   )
 
 FOREACH (app ${app_list} )

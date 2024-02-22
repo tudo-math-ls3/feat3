@@ -122,7 +122,7 @@ namespace CCNDSimple
   }
 
 
-  void DomainControl::create(SimpleArgParser& args)
+  void DomainControl::create_domain(SimpleArgParser& args)
   {
     if(args.check("mesh") < 1)
     {

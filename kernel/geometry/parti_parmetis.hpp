@@ -48,6 +48,8 @@ namespace FEAT
       Adjacency::Graph _subgraph;
       /// element midpoints
       std::vector<Real> _midpoints;
+      /// elements weights; empty if not weighted
+      std::vector<Real> _weights;
       /// element partitioning
       std::vector<Index> _parts;
       /// the element coloring
@@ -90,16 +92,20 @@ namespace FEAT
        * The desired number of partitions to create. Must be > 0, but it does not necessarily need
        * to be equal to the number of processes in the communicator.
        *
+       * \param[in] weights
+       * A vector containing the distribution weights for each element. May be empty if all elements are to be weighted equally.
+       *
        * \returns
        * \c true, if the partitioning was successful, or \c false, if some error occurred.
        */
       template<int nf_, int nv_, typename VertexSet_>
       bool execute(const IndexSet<nf_>& faces_at_elem, const IndexSet<nv_>& verts_at_elem,
-        const VertexSet_& vertices, const Index num_parts)
+        const VertexSet_& vertices, const Index num_parts, const std::vector<Real>& weights)
       {
         Adjacency::Graph graph(Adjacency::RenderType::as_is, faces_at_elem);
         _create_subgraph(graph, num_parts);
         _compute_midpoints(verts_at_elem, vertices);
+        _weights = weights;
         return _execute();
       }
 

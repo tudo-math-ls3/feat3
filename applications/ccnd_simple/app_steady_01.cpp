@@ -127,7 +127,7 @@ namespace CCNDSimple
     DomainControl domain(comm);
 
     // create the domain
-    domain.create(args);
+    domain.create_domain(args);
 
     // print domain info
     domain.print_info();

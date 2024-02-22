@@ -42,16 +42,21 @@ extern "C" static int feat_zoltan_num_elems(void* data, int* ierr)
  * \param[out] ierr
  * A pointer to the object that receives the error code
  */
-extern "C" static void feat_zoltan_elem_ids(void* data, int size_gid, int size_lid,
-  ZOLTAN_ID_PTR global_id, ZOLTAN_ID_PTR DOXY(local_id), int wgt_dim, float* DOXY(obj_wgts), int* ierr)
+extern "C" static void feat_zoltan_elem_list(void* data, int size_gid, int size_lid,
+  ZOLTAN_ID_PTR global_id, ZOLTAN_ID_PTR DOXY(local_id), int wgt_dim, float* obj_wgts, int* ierr)
 {
   XASSERT(size_gid == 1);
   XASSERT(size_lid == 0);
-  XASSERT(wgt_dim == 0);
+  //XASSERT(wgt_dim == 0);
   const PartiZoltan::Hypergraph& hyg = *reinterpret_cast<const PartiZoltan::Hypergraph*>(data);
   const Index n = hyg.sub_graph.get_num_nodes_domain();
   for(Index i(0); i < n; ++i)
     global_id[i] = ZOLTAN_ID_TYPE(hyg.first_elem + i);
+  if(wgt_dim > 0)
+  {
+    for(Index i(0); i < n; ++i)
+      obj_wgts[i] = hyg.weights[i];
+  }
   *ierr = ZOLTAN_OK;
 }
 
@@ -134,7 +139,7 @@ namespace FEAT
       }
     }
 
-    bool PartiZoltan::execute(const Adjacency::Graph& faces_at_elem, const Index num_parts)
+    bool PartiZoltan::execute(const Adjacency::Graph& faces_at_elem, const Index num_parts, const std::vector<Real>& weights)
     {
       // set number of desired partitions and total number of elements
       this->_num_parts = num_parts;
@@ -164,7 +169,7 @@ namespace FEAT
       if(z_size > 0)
       {
         // create our sub-hypergraph
-        this->_create_hypergraph(faces_at_elem);
+        this->_create_hypergraph(faces_at_elem, weights);
 
         // apply Zoltan partitioner
         is_ok = this->_apply_zoltan();
@@ -174,7 +179,7 @@ namespace FEAT
       return this->_broadcast_coloring(is_ok);
     }
 
-    void PartiZoltan::_create_hypergraph(const Adjacency::Graph& faces_at_elem)
+    void PartiZoltan::_create_hypergraph(const Adjacency::Graph& faces_at_elem, const std::vector<Real>& weights)
     {
       // get number of elements and faces
       const Index num_elems = faces_at_elem.get_num_nodes_domain();
@@ -213,6 +218,15 @@ namespace FEAT
       // combine graph into our sub-hypergraph
       this->_hypergraph.first_elem = first_elem;
       this->_hypergraph.sub_graph = Adjacency::Graph(Adjacency::RenderType::injectify_sorted, faces_at_my_elem, elems_at_faces);
+
+      // extract weights if desired
+      if(!weights.empty())
+      {
+        XASSERT(end_elem <= weights.size());
+        this->_hypergraph.weights.resize(my_num_elems);
+        for(Index i(0); i < my_num_elems; ++i)
+          this->_hypergraph.weights[i] = float(weights[first_elem + i]);
+      }
     }
 
     bool PartiZoltan::_apply_zoltan()
@@ -230,14 +244,14 @@ namespace FEAT
       Zoltan_Set_Param(zz, "NUM_LID_ENTRIES", "0");
       Zoltan_Set_Param(zz, "RETURN_LISTS", "PARTS");
       Zoltan_Set_Param(zz, "NUM_GLOBAL_PARTS", stringify(this->_num_parts).c_str());
-      Zoltan_Set_Param(zz, "OBJ_WEIGHT_DIM", "0");
+      Zoltan_Set_Param(zz, "OBJ_WEIGHT_DIM", this->_hypergraph.weights.empty() ? "0" : "1");
       Zoltan_Set_Param(zz, "EDGE_WEIGHT_DIM", "0");
       //Zoltan_Set_Param(zz, "CHECK_GRAPH", "2");
       Zoltan_Set_Param(zz, "PHG_EDGE_SIZE_THRESHOLD", "0.5");
 
       // set hypergraph interface callbacks
       Zoltan_Set_Num_Obj_Fn(zz, feat_zoltan_num_elems, &this->_hypergraph);
-      Zoltan_Set_Obj_List_Fn(zz, feat_zoltan_elem_ids, &this->_hypergraph);
+      Zoltan_Set_Obj_List_Fn(zz, feat_zoltan_elem_list, &this->_hypergraph);
       Zoltan_Set_HG_Size_CS_Fn(zz, feat_zoltan_hypergraph_size, &this->_hypergraph);
       Zoltan_Set_HG_CS_Fn(zz, feat_zoltan_hypergraph_data, &this->_hypergraph);
 

@@ -14,6 +14,12 @@ TARGET_LINK_LIBRARIES(dbg-dist-mesh-distortion feat)
 ADD_EXECUTABLE(dbg-mesh-distortion dbg_mesh_distortion.cpp)
 TARGET_LINK_LIBRARIES(dbg-mesh-distortion feat)
 
+ADD_EXECUTABLE(dbg-voxel-domain dbg_voxel_domain.cpp)
+TARGET_LINK_LIBRARIES(dbg-voxel-domain feat)
+
+ADD_EXECUTABLE(dbg-voxel-domain-gendie dbg_voxel_domain_gendie.cpp)
+TARGET_LINK_LIBRARIES(dbg-voxel-domain-gendie feat)
+
 ADD_EXECUTABLE(basis-dump basis_dump.cpp)
 TARGET_LINK_LIBRARIES(basis-dump feat)
 

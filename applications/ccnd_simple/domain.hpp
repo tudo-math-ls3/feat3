@@ -108,10 +108,10 @@ namespace CCNDSimple
     static void add_supported_args(SimpleArgParser& args);
 
     /// parses the arguments
-    virtual bool parse_args(SimpleArgParser& args);
+    virtual bool parse_args(SimpleArgParser& args) override;
 
     /// creates the domain controller based on the arguments
-    virtual void create(SimpleArgParser& args);
+    virtual void create_domain(SimpleArgParser& args);
 
     /// prints info on chosen partitioning and levels after creation
     virtual void print_info();
