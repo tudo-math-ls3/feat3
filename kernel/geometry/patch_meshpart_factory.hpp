@@ -67,6 +67,11 @@ namespace FEAT
           _cells_patch.push_back(*it);
       }
 
+      explicit PatchMeshPartFactory(std::vector<Index>&& cells_patch) :
+        _cells_patch(std::forward<std::vector<Index>>(cells_patch))
+      {
+      }
+
       /// virtual destructor
       virtual ~PatchMeshPartFactory()
       {

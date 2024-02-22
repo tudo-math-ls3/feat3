@@ -965,7 +965,7 @@ namespace FEAT
         return this->_patches;
       }
 
-      /// Deletes all halo meshparts from this mesh node.
+      /// Deletes all patch meshparts from this mesh node.
       void clear_patches()
       {
         _patches.clear();
@@ -994,15 +994,25 @@ namespace FEAT
         // refine our halos
         for(const auto& v : _halos)
         {
-          StandardRefinery<MeshPartType> halo_refinery(*v.second, *this->_mesh);
-          fine_node->add_halo(v.first, halo_refinery.make_unique());
+          if(v.second)
+          {
+            StandardRefinery<MeshPartType> halo_refinery(*v.second, *this->_mesh);
+            fine_node->add_halo(v.first, halo_refinery.make_unique());
+          }
+          else
+            fine_node->add_halo(v.first, nullptr);
         }
 
         // refine our patch mesh-parts
         for(const auto& v : _patches)
         {
-          StandardRefinery<MeshPartType> patch_refinery(*v.second, *this->_mesh);
-          fine_node->add_patch(v.first, patch_refinery.make_unique());
+          if(v.second)
+          {
+            StandardRefinery<MeshPartType> patch_refinery(*v.second, *this->_mesh);
+            fine_node->add_patch(v.first, patch_refinery.make_unique());
+          }
+          else
+            fine_node->add_patch(v.first, nullptr);
         }
 
         // adapt by chart?
@@ -1024,6 +1034,154 @@ namespace FEAT
       /**
        * \brief Extracts a patch from the root mesh as a new mesh node
        *
+       * \param[in] elements
+       * A vector containing the indices of the patch elements.
+       *
+       * \param[in] split_meshparts
+       * Specifies whether the mesh-parts of the mesh node are to be extracted. If \c false, then
+       * the returned mesh node will not contain any mesh parts.
+       *
+       * \param[in] split_halos
+       * Specifies whether the halos of the mesh node are to be extracted.
+       * If \c false, then the returned mesh node will not contain any halos.
+       *
+       * \param[in] split_patches
+       * Specifies whether the patch mesh-parts of the mesh node are to be extracted.
+       * If \c false, then the returned mesh node will not contain any patch mesh parts.
+       *
+       * \returns
+       * A unique pointer to the new mesh node representing the extracted patch.
+       */
+      std::unique_ptr<RootMeshNode> extract_patch(std::vector<Index>&& elements,
+        bool split_meshparts, bool split_halos, bool split_patches)
+      {
+        XASSERTM(!elements.empty(), "cannot create empty patch!");
+
+        // get our mesh
+        const MeshType* base_root_mesh = this->get_mesh();
+        XASSERTM(base_root_mesh != nullptr, "mesh node has no mesh");
+
+        // Step 1: create mesh part of the patch
+        MeshPartType* patch_mesh_part = nullptr;
+        {
+          // create a factory for our partition
+          PatchMeshPartFactory<MeshType> part_factory(std::forward<std::vector<Index>>(elements));
+
+          // create patch mesh part and add it to our map
+          patch_mesh_part = this->add_patch(-1, part_factory.make_unique());
+
+          // deduct the target sets
+          patch_mesh_part->template deduct_target_sets_from_top<MeshType::shape_dim>(
+            base_root_mesh->get_index_set_holder());
+        }
+
+        // Step 2: Create root mesh node of partition by using PatchMeshFactory
+        std::unique_ptr<RootMeshNode> patch_node;
+        {
+          // create patch root mesh
+          PatchMeshFactory<MeshType> patch_factory(*base_root_mesh, *patch_mesh_part);
+          patch_node = RootMeshNode::make_unique(patch_factory.make_unique(), this->_atlas);
+        }
+
+        // Step 3: intersect boundary and other base mesh parts
+        if(split_meshparts)
+        {
+          // create mesh part splitter
+          PatchMeshPartSplitter<MeshType> part_splitter(*base_root_mesh, *patch_mesh_part);
+
+          // get all mesh part names
+          std::deque<String> part_names = this->get_mesh_part_names();
+
+          // loop over all base-mesh mesh parts
+          for(auto it = part_names.begin(); it != part_names.end(); ++it)
+          {
+            // get base mesh part node
+            auto* base_part_node = this->find_mesh_part_node(*it);
+            XASSERTM(base_part_node != nullptr, String("base-mesh part '") + (*it) + "' not found!");
+
+            // our split mesh part
+            std::unique_ptr<MeshPartType> split_part;
+
+            // get base-mesh part
+            MeshPartType* base_part = base_part_node->get_mesh();
+
+            // build
+            if((base_part != nullptr) && part_splitter.build(*base_part))
+            {
+              // create our mesh part
+              split_part = part_splitter.make_unique();
+            }
+
+            // Insert patch mesh part
+            patch_node->add_mesh_part(*it, std::move(split_part), this->find_mesh_part_chart_name(*it), this->find_mesh_part_chart(*it));
+          }
+        }
+
+        // Step 4: intersect halos
+        if(split_halos)
+        {
+          // create mesh part splitter
+          PatchMeshPartSplitter<MeshType> part_splitter(*base_root_mesh, *patch_mesh_part);
+
+          // loop over all halo mesh parts
+          for(auto it = this->_halos.begin(); it != this->_halos.end(); ++it)
+          {
+            // our split halo
+            std::unique_ptr<MeshPartType> split_halo;
+
+            // get base-mesh halo
+            MeshPartType* base_halo = it->second.get();
+
+            // build
+            if((base_halo != nullptr) && part_splitter.build(*base_halo))
+            {
+              // create our mesh halo
+              split_halo = part_splitter.make_unique();
+            }
+
+            // Insert patch mesh halo
+            patch_node->add_halo(it->first, std::move(split_halo));
+          }
+        }
+
+        // Step 5: intersect patches
+        if(split_patches)
+        {
+          // create mesh part splitter
+          PatchMeshPartSplitter<MeshType> part_splitter(*base_root_mesh, *patch_mesh_part);
+
+          // loop over all halo mesh parts
+          for(auto it = this->_patches.begin(); it != this->_patches.end(); ++it)
+          {
+            // skip the -1 patch, which is the one that we're currently creating
+            if(it->first < 0)
+              continue;
+
+            // our split patch
+            std::unique_ptr<MeshPartType> split_patch;
+
+            // get base-mesh patch
+            MeshPartType* base_patch = it->second.get();
+
+            // build
+            if((base_patch != nullptr) && part_splitter.build(*base_patch))
+            {
+              // create our mesh patch
+              split_patch = part_splitter.make_unique();
+            }
+
+            // Insert patch mesh halo
+            patch_node->add_patch(it->first, std::move(split_patch));
+          }
+        }
+
+        // return patch node
+        return patch_node;
+      }
+
+      /**
+       * \brief Extracts a patch from the root mesh as a new mesh node
+       *
        * This function also computes the communication neighbor ranks.
        *
        * \param[out] comm_ranks
@@ -1037,7 +1195,7 @@ namespace FEAT
        * The rank of the patch to be created.
        *
        * \returns
-       * A new mesh node representing the extracted patch.
+       * A unique pointer to the new mesh node representing the extracted patch.
        */
       std::unique_ptr<RootMeshNode> extract_patch(
         std::vector<int>& comm_ranks,
