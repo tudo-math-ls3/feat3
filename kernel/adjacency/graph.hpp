@@ -33,7 +33,7 @@ namespace FEAT
      */
     class Graph
     {
-     public:
+    public:
       using IndexVector = std::vector < Index>;
 
       /**

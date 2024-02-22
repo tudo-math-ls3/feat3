@@ -197,6 +197,36 @@ namespace FEAT
       {
         return _num_colors - 1;
       }
+
+      /**
+       * \brief Returns the number of colors.
+       *
+       * \returns The number of colors.
+       */
+      Index get_num_colors() const
+      {
+        return _num_colors;
+      }
+
+      /// Checks whether the coloring is empty
+      bool empty() const
+      {
+        return _coloring.empty();
+      }
+
+      /// Returns the color for a node i.
+      Index& operator[](Index i)
+      {
+        ASSERT(i < _coloring.size());
+        return _coloring[i];
+      }
+
+      /// Returns the color for a node i.
+      const Index& operator[](Index i) const
+      {
+        ASSERT(i < _coloring.size());
+        return _coloring[i];
+      }
     }; // class Coloring
   } // namespace Adjacency
 } // namespace FEAT
