@@ -663,6 +663,64 @@ namespace FEAT
       }
     }; // StructUnitCubeFactory<ConformalMesh<Hypercube>>
 
+    /// specialization for ConformalMesh<Simplex>
+    template<int shape_dim_, typename Coord_>
+    class StructUnitCubeFactory<ConformalMesh<Shape::Simplex<shape_dim_>, shape_dim_, Coord_>> :
+      public Factory<ConformalMesh<Shape::Simplex<shape_dim_>, shape_dim_, Coord_>>
+    {
+    public:
+      typedef ConformalMesh<Shape::Simplex<shape_dim_>, shape_dim_, Coord_> MeshType;
+      typedef ConformalMesh<Shape::Hypercube<shape_dim_>, shape_dim_, Coord_> QuadMeshType;
+      typedef Factory<MeshType> BaseClass;
+
+      typedef typename BaseClass::VertexSetType VertexSetType;
+      typedef typename BaseClass::IndexSetHolderType IndexSetHolderType;
+
+      static_assert(shape_dim_ <= 3, "this class can only be used for dimension <= 3");
+
+    private:
+      std::unique_ptr<QuadMeshType> _quad_mesh;
+      std::unique_ptr<ShapeConvertFactory<MeshType>> _shape_convert_factory;
+
+    public:
+      explicit StructUnitCubeFactory(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        // create a structured quad mesh
+        StructUnitCubeFactory<QuadMeshType> quad_factory(nx, ny, nz);
+        this->_quad_mesh.reset(new QuadMeshType(quad_factory));
+
+        // create shape convert factory
+        this->_shape_convert_factory.reset(new ShapeConvertFactory<MeshType>(*this->_quad_mesh));
+      }
+
+      virtual Index get_num_entities(int dim) override
+      {
+        return this->_shape_convert_factory->get_num_entities(dim);
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set) override
+      {
+        this->_shape_convert_factory->fill_vertex_set(vertex_set);
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) override
+      {
+        this->_shape_convert_factory->fill_index_sets(index_set_holder);
+      }
+
+      static MeshType make_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        StructUnitCubeFactory factory(nx, ny, nz);
+        return MeshType(factory);
+      }
+
+      static std::unique_ptr<MeshType> make_unique_from(Index nx = 1u, Index ny = 1u, Index nz = 1u)
+      {
+        StructUnitCubeFactory factory(nx, ny, nz);
+        return std::unique_ptr<MeshType>(new MeshType(factory));
+      }
+    }; // StructUnitCubeFactory<ConformalMesh<Simplex>>
+
     /// specialization for StructuredMesh
     template<int shape_dim_, typename Coord_>
     class StructUnitCubeFactory<StructuredMesh<shape_dim_, shape_dim_, Coord_>> :
