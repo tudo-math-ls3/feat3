@@ -281,10 +281,15 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       void assign(const Container<DT2_, IT2_> & other)
       {
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::release_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::release_memory(this->_indices.at(i));
+        if (!this->_foreign_memory)
+        {
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool::release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool::release_memory(this->_indices.at(i));
+        }
+
+        this->_foreign_memory = false;
 
         this->_elements.clear();
         this->_indices.clear();
@@ -878,7 +883,7 @@ namespace FEAT
           for (Index i(0) ; i < _elements.size() ; ++i)
             MemoryPool::release_memory(this->_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryPool::release_memory(this->_indices.at(i));
+            MemoryPool::release_memory(this->_indices.at(i));
         }
 
         this->_elements.clear();
@@ -990,10 +995,13 @@ namespace FEAT
         if (this == &other)
           return;
 
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::release_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::release_memory(this->_indices.at(i));
+        if (!this->_foreign_memory)
+        {
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool::release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool::release_memory(this->_indices.at(i));
+        }
 
         this->_elements = std::move(other._elements);
         this->_indices = std::move(other._indices);
@@ -1001,6 +1009,11 @@ namespace FEAT
         this->_indices_size = std::move(other._indices_size);
         this->_scalar_index = std::move(other._scalar_index);
         this->_scalar_dt = std::move(other._scalar_dt);
+
+        other._elements.clear();
+        other._indices.clear();
+        other._elements_size.clear();
+        other._indices_size.clear();
 
         this->_foreign_memory = other._foreign_memory;
       }
