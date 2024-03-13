@@ -298,7 +298,85 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles the standard Dof-Adjacency graph.
+      * \brief Assembles the Dof-Adjacency graph where test and trial spaces are defined on different meshes.
+      *
+      * \param[in] test_space
+      * The \transient test-space defined on the test space mesh.
+      *
+      * \param[in] trial_space
+      * The \transient trial-space defined on the trial space mesh.
+      *
+      * \param[in] trial2test_adjactor
+      * A \transient object implementing the adjactor interface, which maps from the set of trial space mesh cells
+      * to the test space mesh cells, which iterates over the set of all test space mesh cells intersecting with
+      * a given trial space mesh cell.
+      *
+      * \returns
+      * The inter-mesh Dof-Adjacency graph for the test- and trial-space combination defined on different meshes.
+      */
+      template<typename TestSpace_, typename TrialSpace_, typename TrialToTestAdjator_>
+      static Adjacency::Graph assemble_graph_intermesh(
+        const TestSpace_& test_space,
+        const TrialSpace_& trial_space,
+        const TrialToTestAdjator_& trial2test_adjactor)
+      {
+        // create test- and trial-dof-mappers
+        Adjacency::Graph test_dof_mapping(Space::DofMappingRenderer::render(test_space));
+        Adjacency::Graph trial_dof_mapping(Space::DofMappingRenderer::render(trial_space));
+
+        // get trial and test mesh permutations
+        const Adjacency::Permutation& trial_perm = trial_space.get_trafo().get_mesh().get_mesh_permutation().get_perm();
+        const Adjacency::Permutation& test_inv_perm = test_space.get_trafo().get_mesh().get_mesh_permutation().get_inv_perm();
+        if(!trial_perm.empty() || !test_inv_perm.empty())
+        {
+          // render trial2test adjactor
+          Adjacency::Graph trial2test_graph(Adjacency::RenderType::as_is, trial2test_adjactor);
+
+          // permute graph indices
+          Adjacency::Graph permuted_graph;
+          if(trial_perm.empty())
+          {
+            // no trial permutation, only test mesh permuted
+            permuted_graph = std::move(trial2test_graph);
+            permuted_graph.permute_indices(test_inv_perm);
+          }
+          else if(test_inv_perm.empty())
+          {
+            // no test permutation, only trial mesh permuted
+            // create a dummy identity permutation for the test mesh
+            Adjacency::Permutation id_perm(trial2test_graph.get_num_nodes_image(), Adjacency::Permutation::type_identity);
+            permuted_graph = Adjacency::Graph(trial2test_graph, trial_perm, id_perm);
+          }
+          else
+          {
+            // both trial and test permutations exist
+            permuted_graph = Adjacency::Graph(trial2test_graph, trial_perm, test_inv_perm);
+          }
+
+          // render transposed test-dof-mapping
+          Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, permuted_graph, test_dof_mapping);
+
+          // render composite test-dof-mapping/trial-dof-support graph
+          Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
+
+          // return the graph
+          return dof_adjactor;
+        }
+        else // no permutation
+        {
+          // render transposed test-dof-mapping
+          Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, trial2test_adjactor, test_dof_mapping);
+
+          // render composite test-dof-mapping/trial-dof-support graph
+          Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
+
+          // return the graph
+          return dof_adjactor;
+        }
+      }
+
+      /**
+       * \brief Assembles the 2-level refinement Dof-Adjacency graph.
        *
        * \param[in] fine_space
        * The \transient test-space defined on the refined mesh.
@@ -319,65 +397,12 @@ namespace FEAT
         const FineTestSpace_& fine_space,
         const CoarseTrialSpace_& coarse_space)
       {
-        // create test- and trial-dof-mappers
-        Adjacency::Graph test_dof_mapping(Space::DofMappingRenderer::render(fine_space));
-        Adjacency::Graph trial_dof_mapping(Space::DofMappingRenderer::render(coarse_space));
-
         // create an refinement adjactor
         Geometry::Intern::CoarseFineCellMapping<typename FineTestSpace_::MeshType, typename CoarseTrialSpace_::MeshType>
             refine_adjactor(fine_space.get_trafo().get_mesh(), coarse_space.get_trafo().get_mesh());
 
-        // get coarse and fine mesh permutations
-        const Adjacency::Permutation& coarse_perm =
-          coarse_space.get_trafo().get_mesh().get_mesh_permutation().get_perm();
-        const Adjacency::Permutation& fine_inv_perm =
-          fine_space.get_trafo().get_mesh().get_mesh_permutation().get_inv_perm();
-        if(!coarse_perm.empty() || !fine_inv_perm.empty())
-        {
-          // render refinement adjactor
-          Adjacency::Graph refine_graph(Adjacency::RenderType::as_is, refine_adjactor);
-
-          // permute refinement graph indices
-          Adjacency::Graph permuted_graph;
-          if(coarse_perm.empty())
-          {
-            // no coarse permutation, only fine mesh permuted
-            permuted_graph = std::move(refine_graph);
-            permuted_graph.permute_indices(fine_inv_perm);
-          }
-          else if(fine_inv_perm.empty())
-          {
-            // no fine permutation, only coarse mesh permuted
-            // create a dummy identity permutation for the fine mesh
-            Adjacency::Permutation id_perm(refine_graph.get_num_nodes_image(), Adjacency::Permutation::type_identity);
-            permuted_graph = Adjacency::Graph(refine_graph, coarse_perm, id_perm);
-          }
-          else
-          {
-            // both coarse and fine permutations exist
-            permuted_graph = Adjacency::Graph(refine_graph, coarse_perm, fine_inv_perm);
-          }
-
-          // render transposed test-dof-mapping
-          Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, permuted_graph, test_dof_mapping);
-
-          // render composite test-dof-mapping/trial-dof-support graph
-          Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
-
-          // return the graph
-          return dof_adjactor;
-        }
-        else // no permutation
-        {
-          // render transposed test-dof-mapping
-          Adjacency::Graph test_dof_support(Adjacency::RenderType::injectify_transpose, refine_adjactor, test_dof_mapping);
-
-          // render composite test-dof-mapping/trial-dof-support graph
-          Adjacency::Graph dof_adjactor(Adjacency::RenderType::injectify_sorted, test_dof_support, trial_dof_mapping);
-
-          // return the graph
-          return dof_adjactor;
-        }
+        // call inter-mesh assembler
+        return assemble_graph_intermesh(fine_space, coarse_space, refine_adjactor);
       }
 
       /**
@@ -505,6 +530,28 @@ namespace FEAT
       static void assemble_matrix_diag(MatrixType_ & matrix, const Space_& space)
       {
         matrix = MatrixType_(assemble_graph_diag(space));
+      }
+
+      /**
+       * \brief Assembles a matrix structure from a test-trial-mesh pair defined on different meshes.
+       *
+       * \param[out] matrix
+       * A \transient reference to the matrix to be assembled.
+       *
+       * \param[in] test_space, trials_space
+       * The \transient fine and coarse spaces to be used for the assembly.
+       *
+       * \param[in] trial2test_adjactor
+       * A \transient object implementing the adjactor interface, which maps from the set of trial space mesh cells
+       * to the test space mesh cells, which iterates over the set of all test space mesh cells intersecting with
+       * a given trial space mesh cell.
+       */
+      template<typename MatrixType_, typename TestSpace_, typename TrialSpace_, typename Trial2TestAdjactor_>
+      static void assemble_matrix_intermesh(MatrixType_ & matrix,
+        const TestSpace_& test_space, const TrialSpace_& trial_space,
+        const Trial2TestAdjactor_& trial2test_adjactor)
+      {
+        matrix = MatrixType_(assemble_graph_intermesh(test_space, trial_space, trial2test_adjactor));
       }
 
       /**
