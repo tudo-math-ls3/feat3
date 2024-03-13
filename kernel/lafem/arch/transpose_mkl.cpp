@@ -8,7 +8,9 @@
 #include <kernel/lafem/arch/transpose.hpp>
 
 #include <cstring>
+FEAT_DISABLE_WARNINGS
 #include <mkl.h>
+FEAT_RESTORE_WARNINGS
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;

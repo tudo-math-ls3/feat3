@@ -10,8 +10,10 @@
 
 #include <cstring>
 
+FEAT_DISABLE_WARNINGS
 #include <mkl.h>
 #include <mkl_spblas.h>
+FEAT_RESTORE_WARNINGS
 
 /// \todo remove this pragma once MKL is switched to sparse executor interface
 // disable 'deprecated' warnings for MKL functions, because this file won't compile otherwise

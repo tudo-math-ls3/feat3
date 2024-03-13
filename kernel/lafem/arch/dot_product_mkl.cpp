@@ -7,7 +7,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
 
+FEAT_DISABLE_WARNINGS
 #include <mkl.h>
+FEAT_RESTORE_WARNINGS
 
 
 using namespace FEAT;

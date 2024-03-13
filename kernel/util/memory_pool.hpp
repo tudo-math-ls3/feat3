@@ -21,7 +21,9 @@
 #include <cstddef>
 
 #ifdef FEAT_HAVE_MKL
+FEAT_DISABLE_WARNINGS
 #include <mkl.h>
+FEAT_RESTORE_WARNINGS
 #endif
 
 
