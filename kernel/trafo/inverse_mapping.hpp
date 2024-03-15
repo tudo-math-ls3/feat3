@@ -368,7 +368,7 @@ namespace FEAT
        * This function performs several steps:
        * - First, for each of the candidate cells, this function tries to unmap
        *   the given point onto the cell to obtain the domain point coordinates
-       *   by using a Newton iteration provided bythe #unmap_point_by_newton() function.
+       *   by using a Newton iteration provided by the #unmap_point_by_newton() function.
        * - Finally, this function checks whether the unmapped point is on the
        *   reference cell by using the #test_domain_point() function.
        *
@@ -381,13 +381,14 @@ namespace FEAT
        * not on the candidate cell, but outside of it.
        *
        * \Note You should be sure that at least on cell in the given Cell array does indeed contain
-       *       the inquiered point. Else you the more costly overload function above
+       *       the inquired point. Else you the more costly overload function above
        *
        * \param[in] img_point
        * The image point that is to be unmapped.
        *
-       * \param[in] cell_array
-       * An array of indices containing the possible canditates which contain the imgage point.
+       * \param[in] cell
+       * A \transient reference to a vector of indices containing the possible candidates
+       * which may contain the image point.
        *
        * \param[in] ignore_failures
        * Specifies whether to ignore cells on which the Newton iteration broke down.
@@ -398,7 +399,7 @@ namespace FEAT
        * An InverseMappingData object that contains the set of cells and
        * domain points, which are mapped onto the given \p img_point.
        */
-      InvMapDataType unmap_point(const ImagePointType& img_point, const std::vector<Index> cells, bool ignore_failures = false) const
+      InvMapDataType unmap_point(const ImagePointType& img_point, const std::vector<Index>& cells, bool ignore_failures = false) const
       {
         // store image point
         InvMapDataType inv_data;

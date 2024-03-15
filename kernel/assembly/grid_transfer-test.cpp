@@ -283,3 +283,109 @@ GridTransferTest <double, std::uint32_t> cuda_grid_transfer_test_csr_double_uint
 GridTransferTest <float, std::uint64_t> cuda_grid_transfer_test_csr_float_uint64(PreferredBackend::cuda);
 GridTransferTest <double, std::uint64_t> cuda_grid_transfer_test_csr_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<typename DT_, typename IT_>
+class InterMeshGridTransferTest :
+  public UnitTest
+{
+  typedef LAFEM::SparseMatrixCSR<DT_, IT_> MatrixType;
+  typedef LAFEM::DenseVector<DT_, IT_> VectorType;
+
+  typedef Geometry::ConformalMesh<Shape::Quadrilateral> MeshType;
+
+  typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+public:
+  InterMeshGridTransferTest(PreferredBackend backend) :
+    UnitTest("InterMeshGridTransferTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    // test Q1
+    run_space<Space::Lagrange1::Element<TrafoType>>();
+
+    // test Q1~
+    run_space<Space::CroRavRanTur::Element<TrafoType>>();
+  }
+
+  template<typename SpaceType_>
+  void run_space() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create coarse mesh
+    Geometry::RefinedUnitCubeFactory<MeshType> coarse_factory(2);
+    MeshType mesh_c(coarse_factory);
+
+    // refine the mesh
+    Geometry::StandardRefinery<MeshType> refine_factory(mesh_c);
+    MeshType mesh_f(refine_factory);
+
+    // get a coarse-to-fine cell mapping
+    Geometry::Intern::CoarseFineCellMapping<MeshType> c2f_map(mesh_f, mesh_c);
+
+    // render transposed fine-to-coarse cell mapping
+    Adjacency::Graph f2c_map(Adjacency::RenderType::transpose_sorted, c2f_map);
+
+    // create trafos and spaces
+    TrafoType trafo_c(mesh_c);
+    TrafoType trafo_f(mesh_f);
+    SpaceType_ space_c(trafo_c);
+    SpaceType_ space_f(trafo_f);
+
+    String cubature_name("gauss-legendre:" + stringify(SpaceType_::local_degree+1));
+
+    // assemble prolongation matrix structure
+    MatrixType matrix_p;
+    Assembly::SymbolicAssembler::assemble_matrix_2lvl(matrix_p, space_f, space_c);
+
+    // assemble transfer matrix structure
+    MatrixType matrix_t;
+    Assembly::SymbolicAssembler::assemble_matrix_intermesh(matrix_t, space_f, space_c, c2f_map);
+
+    // ensure that the matrix structures are identical
+    TEST_CHECK_EQUAL(matrix_p.rows(), matrix_t.rows());
+    TEST_CHECK_EQUAL(matrix_p.columns(), matrix_t.columns());
+    TEST_CHECK_EQUAL(matrix_p.used_elements(), matrix_t.used_elements());
+
+    const Index nrows = matrix_p.rows();
+    const Index nnzes = matrix_p.used_elements();
+
+    // get the arrays
+    IT_* row_ptr_p = matrix_p.row_ptr();
+    IT_* col_idx_p = matrix_p.col_ind();
+    IT_* row_ptr_t = matrix_t.row_ptr();
+    IT_* col_idx_t = matrix_t.col_ind();
+
+    // compare arrays
+    for(Index i(0); i <= nrows; ++i)
+    {
+      TEST_CHECK_EQUAL(row_ptr_p[i], row_ptr_t[i]);
+    }
+    for(Index i(0); i < nnzes; ++i)
+    {
+      TEST_CHECK_EQUAL(col_idx_p[i], col_idx_t[i]);
+    }
+
+    // assemble prolongation matrix entries
+    matrix_p.format();
+    Assembly::GridTransfer::assemble_prolongation_direct(matrix_p, space_f, space_c, cubature_name);
+
+    // assemble transfer matrix entries
+    matrix_t.format();
+    int nfailed = Assembly::GridTransfer::assemble_intermesh_transfer_direct(matrix_t, space_f, space_c, f2c_map, cubature_name);
+    TEST_CHECK_EQUAL(nfailed, 0);
+
+    DT_* val_p = matrix_p.val();
+    DT_* val_t = matrix_t.val();
+
+    for(Index i(0); i < nnzes; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(val_p[i], val_t[i], tol);
+    }
+  }
+};
+
+InterMeshGridTransferTest<double, std::uint64_t> intermesh_grid_transfer_test_double_uint64(PreferredBackend::generic);
