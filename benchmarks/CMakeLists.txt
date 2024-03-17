@@ -1,7 +1,7 @@
 # CmakeLists for directory "benchmarks"
 
 # enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(benchmarks
   axpy-bench
@@ -20,9 +20,9 @@ set(benchmarks
   stokes_multigrid-bench
 )
 
-ADD_CUSTOM_TARGET(benchmarks DEPENDS ${benchmarks})
+add_custom_target(benchmarks DEPENDS ${benchmarks})
 
-FOREACH (bench ${benchmarks})
-  ADD_EXECUTABLE(${bench} ${bench}.cpp)
-  TARGET_LINK_LIBRARIES(${bench} feat)
-ENDFOREACH(bench)
+foreach (bench ${benchmarks})
+  add_executable(${bench} ${bench}.cpp)
+  target_link_libraries(${bench} feat)
+endforeach (bench)

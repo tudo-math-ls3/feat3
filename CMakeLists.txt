@@ -1,19 +1,19 @@
 # Top-Level FEAT CMakeLists.txt
 
-cmake_minimum_required (VERSION 3.15.5)
+cmake_minimum_required(VERSION 3.15.5)
 if (((CMAKE_MAJOR_VERSION GREATER 3)) OR ((CMAKE_MAJOR_VERSION EQUAL 3) AND (CMAKE_MINOR_VERSION GREATER 0)))
-cmake_policy(SET CMP0054 NEW)
+  cmake_policy(SET CMP0054 NEW)
 endif (((CMAKE_MAJOR_VERSION GREATER 3)) OR ((CMAKE_MAJOR_VERSION EQUAL 3) AND (CMAKE_MINOR_VERSION GREATER 0)))
 
 if (((CMAKE_MAJOR_VERSION GREATER 3)) OR ((CMAKE_MAJOR_VERSION EQUAL 3) AND (CMAKE_MINOR_VERSION GREATER 15)))
-cmake_policy(SET CMP0091 NEW) ##sets global MSVC runtime settings...
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+  cmake_policy(SET CMP0091 NEW) ##sets global MSVC runtime settings...
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif (((CMAKE_MAJOR_VERSION GREATER 3)) OR ((CMAKE_MAJOR_VERSION EQUAL 3) AND (CMAKE_MINOR_VERSION GREATER 15)))
 
 #enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
-PROJECT( FEAT )
+project( FEAT )
 
 #wrapper for sequential ctest execution
 set(FEAT_CTEST_RUNNER "")
@@ -30,28 +30,28 @@ endif(FEAT_DELETE_BUILD_FLAGS)
 site_name( FEAT_HOSTNAME )
 
 include (CTest)
-ENABLE_TESTING()
+enable_testing()
 
 find_package(Git)
-if(GIT_FOUND)
+if (GIT_FOUND)
   execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --verify HEAD
     WORKING_DIRECTORY ${FEAT_SOURCE_DIR}
     OUTPUT_VARIABLE FEAT_GIT_SHA1
     ERROR_VARIABLE FEAT_GIT_SHA1)
   if (FEAT_GIT_SHA1 MATCHES "fatal")
-    SET(FEAT_GIT_SHA1 "")
+    set(FEAT_GIT_SHA1 "")
   endif (FEAT_GIT_SHA1 MATCHES "fatal")
-  STRING(STRIP "${FEAT_GIT_SHA1}" FEAT_GIT_SHA1)
-endif(GIT_FOUND)
+  string(STRIP "${FEAT_GIT_SHA1}" FEAT_GIT_SHA1)
+endif (GIT_FOUND)
 
 if (FEAT_COTIRE)
   include(${FEAT_SOURCE_DIR}/build_system/cotire.cmake)
 endif (FEAT_COTIRE)
 
 if (FEAT_HAVE_MKL)
-  set (BLA_VENDOR Intel10_64ilp_seq)
+  set(BLA_VENDOR Intel10_64ilp_seq)
   find_package(BLAS REQUIRED)
-  ADD_LINK_OPTIONS(${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES})
+  add_link_options(${BLAS_LINKER_FLAGS} ${BLAS_LIBRARIES})
 endif (FEAT_HAVE_MKL)
 
 if (FEAT_HAVE_CUDA)
@@ -61,7 +61,7 @@ if (FEAT_HAVE_CUDA)
   set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "" CACHE STRING "RelDeb CUDA flag" FORCE)
   set(CMAKE_CUDA_FLAGS_MINSIZEREL "" CACHE STRING "MinSize CUDA flag" FORCE)
 
-  SET(INTERNAL_CUDA_FLAGS "-g -std=c++17 -O3 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations")
+  set(INTERNAL_CUDA_FLAGS "-g -std=c++17 -O3 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations")
   if(BUILD_ID MATCHES ".*fast.*")
     set(INTERNAL_CUDA_FLAGS " --use_fast_math ${INTERNAL_CUDA_FLAGS}")
   endif(BUILD_ID MATCHES ".*fast.*")
@@ -90,7 +90,7 @@ if (FEAT_HAVE_CUDA)
 
   if (FEAT_HAVE_HALFMATH)
     if (CUDA_HAS_FP16)
-      INCLUDE_DIRECTORIES("${CUDA_TOOLKIT_ROOT_DIR}/include")
+      include_directories("${CUDA_TOOLKIT_ROOT_DIR}/include")
     else (CUDA_HAS_FP16)
       message(FATAL_ERROR "half support enabled in buildid but your cuda version lacks half support")
     endif(CUDA_HAS_FP16)
@@ -100,8 +100,8 @@ endif(FEAT_HAVE_CUDA)
 
 if (FEAT_HAVE_MPI)
   if (FEAT_MPI_CXX)
-    set (MPI_CXX_COMPILER ${FEAT_MPI_CXX})
-    set (MPI_C_COMPILER ${FEAT_MPI_C})
+    set(MPI_CXX_COMPILER ${FEAT_MPI_CXX})
+    set(MPI_C_COMPILER ${FEAT_MPI_C})
   endif (FEAT_MPI_CXX)
   find_package(MPI REQUIRED)
   execute_process(COMMAND "${MPIEXEC}" --version
@@ -114,29 +114,29 @@ if (FEAT_HAVE_MPI)
   endif (CMAKE_MPI_VERSION)
 
   if (MPI_C_COMPILER_INCLUDE_DIRS)
-    INCLUDE_DIRECTORIES(BEFORE "${MPI_C_COMPILER_INCLUDE_DIRS}")
+    include_directories(BEFORE "${MPI_C_COMPILER_INCLUDE_DIRS}")
   endif()
   if (MPI_CXX_COMPILER_INCLUDE_DIRS)
-    INCLUDE_DIRECTORIES(BEFORE "${MPI_CXX_COMPILER_INCLUDE_DIRS}")
-  endif()
+    include_directories(BEFORE "${MPI_CXX_COMPILER_INCLUDE_DIRS}")
+  endif ()
 
-  ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
+  add_definitions( -DOMPI_SKIP_MPICXX )
 
   #set ctest runner to single process mpiexec execution
   set(FEAT_CTEST_RUNNER ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 1 ${MPIEXEC_PREFLAGS})
 endif (FEAT_HAVE_MPI)
 
-if("${FEAT_COMPILER_ID}" STREQUAL "clang")
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-FIND_PACKAGE (Threads REQUIRED)
-ADD_LINK_OPTIONS(${CMAKE_THREAD_LIBS_INIT})
-endif()
+if ("${FEAT_COMPILER_ID}" STREQUAL "clang")
+  set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+  set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+  find_package(Threads REQUIRED)
+  add_link_options(${CMAKE_THREAD_LIBS_INIT})
+endif ()
 find_package(OpenMP)
 if (OpenMP_FOUND)
-  OPTION(FEAT_HAVE_OMP "FEAT OpenMP support available" ON)
-  ADD_COMPILE_OPTIONS(${OpenMP_CXX_FLAGS})
-  ADD_LINK_OPTIONS(${OpenMP_CXX_FLAGS})
+  option(FEAT_HAVE_OMP "FEAT OpenMP support available" ON)
+  add_compile_options(${OpenMP_CXX_FLAGS})
+  add_link_options(${OpenMP_CXX_FLAGS})
 endif (OpenMP_FOUND)
 
 if (FEAT_VALGRIND)
@@ -167,61 +167,61 @@ if (FEAT_TRILINOS_PATH)
       Xpetra
       Zoltan
       Zoltan2)
-    INCLUDE_DIRECTORIES(AFTER ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
+    include_directories(AFTER ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
 endif (FEAT_TRILINOS_PATH)
 
 
 if (FEAT_HAVE_ALGLIB)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ALGLIB}/cpp/src")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ALGLIB}/cpp/src")
 endif(FEAT_HAVE_ALGLIB)
 
 if (FEAT_HAVE_BOOST)
-  INCLUDE_DIRECTORIES(BEFORE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_BOOST}")
+  include_directories(BEFORE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_BOOST}")
 endif (FEAT_HAVE_BOOST)
 
 if (FEAT_HAVE_CGAL)
   if (NOT FEAT_HAVE_BOOST)
     find_package(Boost REQUIRED COMPONENTS thread)
-    INCLUDE_DIRECTORIES(BEFORE "${Boost_INCLUDE_DIRS}")
+    include_directories(BEFORE "${Boost_INCLUDE_DIRS}")
     if (NOT Boost_FOUND)
       message("boost not found on your system! you may add the keyword boost to the build-id-string in your configure statement to install it.")
     endif (NOT Boost_FOUND)
   endif (NOT FEAT_HAVE_BOOST)
 
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_CGAL}/include")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_CGAL}/include")
 endif(FEAT_HAVE_CGAL)
 
 if (FEAT_HAVE_DEATH_HANDLER)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_DEATHHANDLER}/DeathHandler-master")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_DEATHHANDLER}/DeathHandler-master")
 endif(FEAT_HAVE_DEATH_HANDLER)
 
 if (FEAT_HAVE_FLOATX)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FLOATX}/FloatX-develop/src")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FLOATX}/FloatX-develop/src")
 endif(FEAT_HAVE_FLOATX)
 
 if (FEAT_HAVE_FPARSER)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FPARSER}/")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FPARSER}/")
 endif(FEAT_HAVE_FPARSER)
 
 if (FEAT_HAVE_PARMETIS)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/include")
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/metis/include")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/include")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_PARMETIS}/metis/include")
 endif (FEAT_HAVE_PARMETIS)
 
 if (FEAT_HAVE_TRIANGLE)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_TRIANGLE}")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_TRIANGLE}")
 endif(FEAT_HAVE_TRIANGLE)
 
 if (FEAT_HAVE_ZFP)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZFP}/include/")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZFP}/include/")
 endif(FEAT_HAVE_ZFP)
 
 if (FEAT_HAVE_ZLIB)
-  INCLUDE_DIRECTORIES("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZLIB}/")
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZLIB}/")
 endif(FEAT_HAVE_ZLIB)
 
 # our custom target to build (but not execute) all tests in all directories
-ADD_CUSTOM_TARGET (tests)
+add_custom_target(tests)
 
 # add a target to generate API documentation with Doxygen
 if (${CMAKE_VERSION} VERSION_GREATER "3.8.99")
@@ -263,19 +263,19 @@ if (CMAKE_CXX_COMPILER_ARG1)
 endif (CMAKE_CXX_COMPILER_ARG1)
 
 # top lvl include dir
-INCLUDE_DIRECTORIES("${FEAT_BINARY_DIR}" "${FEAT_SOURCE_DIR}")
+include_directories("${FEAT_BINARY_DIR}" "${FEAT_SOURCE_DIR}")
 
 # directories to scan recursively
-ADD_SUBDIRECTORY( thirdparty )
-ADD_SUBDIRECTORY( kernel )
-ADD_SUBDIRECTORY( test_system )
-ADD_SUBDIRECTORY( tools )
-ADD_SUBDIRECTORY( applications )
-ADD_SUBDIRECTORY( area51 )
-ADD_SUBDIRECTORY( benchmarks )
-ADD_SUBDIRECTORY( tutorials )
-ADD_SUBDIRECTORY( control )
+add_subdirectory( thirdparty )
+add_subdirectory( kernel )
+add_subdirectory( test_system )
+add_subdirectory( tools )
+add_subdirectory( applications )
+add_subdirectory( area51 )
+add_subdirectory( benchmarks )
+add_subdirectory( tutorials )
+add_subdirectory( control )
 
 # store all variables describing the build in a custom header file
 # to use later on in the real code
-configure_file (${FEAT_SOURCE_DIR}/feat_config.hpp.in ${FEAT_BINARY_DIR}/feat_config.hpp)
+configure_file(${FEAT_SOURCE_DIR}/feat_config.hpp.in ${FEAT_BINARY_DIR}/feat_config.hpp)

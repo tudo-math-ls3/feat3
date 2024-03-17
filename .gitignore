@@ -69,7 +69,7 @@ thirdparty/hypre-*/
 thirdparty/parmetis-*/
 thirdparty/SuiteSparse-*/
 thirdparty/superlu_dist-*/
-thirdparty/triangle-*/
+thirdparty/triangle*/
 thirdparty/zfp-*/
 thirdparty/zlib-*/
 thirdparty/Zoltan-*/

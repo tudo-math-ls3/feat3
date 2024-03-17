@@ -1,7 +1,7 @@
 # CMakeLists for directory "applications/ccnd"
 
 # enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # add all executables
 add_executable(ccnd-steady-dfg95-2d ccnd_steady_dfg95.cpp)
@@ -48,33 +48,33 @@ set(app_list_q1t
 set(app_list ${app_list_2d} ${app_list_3d})
 
 # set dimension
-foreach(app ${app_list_2d})
+foreach (app ${app_list_2d})
   target_compile_definitions(${app} PUBLIC FEAT_CCND_APP_DIM=2)
-endforeach(app)
-foreach(app ${app_list_3d})
+endforeach (app)
+foreach (app ${app_list_3d})
   target_compile_definitions(${app} PUBLIC FEAT_CCND_APP_DIM=3)
-endforeach(app)
+endforeach (app)
 
 # set isoparametric trafo for Q2/P1dc apps
-foreach(app ${app_list_iso})
+foreach (app ${app_list_iso})
   target_compile_definitions(${app} PUBLIC FEAT_CCND_APP_ISOPARAM)
-endforeach(app)
+endforeach (app)
 
 # set Q1T/P0 spaces
-foreach(app ${app_list_q1t})
+foreach (app ${app_list_q1t})
   target_compile_definitions(${app} PUBLIC FEAT_CCND_APP_Q1T_P0)
-endforeach(app)
+endforeach (app)
 
 # set the other compile options for all applications
-foreach(app ${app_list})
+foreach (app ${app_list})
   target_link_libraries(${app} feat)
-  if(MPI_C_COMPILE_FLAGS)
+  if (MPI_C_COMPILE_FLAGS)
     set_target_properties(${app} PROPERTIES COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-  endif()
-  if(MPI_C_LINK_FLAGS)
+  endif ()
+  if (MPI_C_LINK_FLAGS)
     set_target_properties(${app} PROPERTIES LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-  endif()
-endforeach(app)
+  endif ()
+endforeach (app)
 
 #######################################################################################################################
 
@@ -90,10 +90,10 @@ if (FEAT_HAVE_QUADMATH)
   target_compile_definitions(ccnd-steady-dfg95-2d-qp PUBLIC FEAT_CCND_APP_DIM=2 FEAT_CCND_APP_QUADMATH FEAT_CCND_APP_ISOPARAM)
   target_compile_definitions(ccnd-steady-dfg95-3d-qp PUBLIC FEAT_CCND_APP_DIM=3 FEAT_CCND_APP_QUADMATH FEAT_CCND_APP_ISOPARAM)
 
-  if(MPI_C_COMPILE_FLAGS)
+  if (MPI_C_COMPILE_FLAGS)
     set_target_properties(ccnd-steady-dfg95-2d-qp PROPERTIES COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-  endif()
-  if(MPI_C_LINK_FLAGS)
+  endif ()
+  if (MPI_C_LINK_FLAGS)
     set_target_properties(ccnd-steady-dfg95-2d-qp PROPERTIES LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-  endif()
+  endif ()
 endif (FEAT_HAVE_QUADMATH)

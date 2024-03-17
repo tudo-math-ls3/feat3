@@ -1,11 +1,11 @@
 # enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # include test_aux subdirectory
-ADD_SUBDIRECTORY( test_aux )
+add_subdirectory( test_aux )
 
 # list of geometry source files and depenencies
-SET(kernel-geometry-list
+set(kernel-geometry-list
   cgal.cpp
   parti_parmetis.cpp
   parti_zoltan.cpp
@@ -16,21 +16,21 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 if (FEAT_EICKT)
-  SET (kernel-geometry-list
+  set(kernel-geometry-list
     ${kernel-geometry-list}
     conformal_mesh-eickt.cpp
     mesh_part-eickt.cpp
     mesh_node-eickt.cpp
     mesh_file_reader-eickt.cpp
   )
-endif(FEAT_EICKT)
+endif (FEAT_EICKT)
 
-ADD_LIBRARY(kernel-geometry STATIC ${kernel-geometry-list})
+add_library(kernel-geometry STATIC ${kernel-geometry-list})
 
-TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
+target_link_libraries(kernel-geometry PRIVATE kernel-util)
 
 # list of geometry tests
-SET (test_list
+set(test_list
   boundary_factory-test
   cgal-test
   hit_test_factory-test
@@ -49,12 +49,12 @@ SET (test_list
 )
 
 # create all tests
-FOREACH (test ${test_list} )
-  ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  ADD_DEPENDENCIES(${test} kernel-geometry-test-aux)
-  TARGET_LINK_LIBRARIES(${test} feat test_system kernel-geometry-test-aux)
+foreach (test ${test_list} )
+  add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  add_dependencies(${test} kernel-geometry-test-aux)
+  target_link_libraries(${test} feat test_system kernel-geometry-test-aux)
 
-  ADD_TEST(${test}_all ${CMAKE_CTEST_COMMAND}
+  add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -62,10 +62,10 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/kernel/geometry/${test})
-  SET_PROPERTY(TEST ${test}_all PROPERTY LABELS "all")
+  set_property(TEST ${test}_all PROPERTY LABELS "all")
 
   if (FEAT_VALGRIND)
-    ADD_TEST(${test}_valgrind ${CMAKE_CTEST_COMMAND}
+    add_test(${test}_valgrind ${CMAKE_CTEST_COMMAND}
       --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
       --build-generator ${CMAKE_GENERATOR}
       --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -73,33 +73,33 @@ FOREACH (test ${test_list} )
       --build-nocmake
       --build-noclean
       --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/geometry/${test} generic)
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+    set_property(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
+    set_property(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+    set_property(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAT_VALGRIND)
 
-ENDFOREACH(test)
+endforeach (test)
 
 
 #disabling warnings with pragmas does not always work with gcc
 #https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  SET_SOURCE_FILES_PROPERTIES(cgal.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
-  SET_SOURCE_FILES_PROPERTIES(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
+  set_source_files_properties(cgal.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
+  set_source_files_properties(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-undef")
 
   #silence weird glibcxx warning
   #cgal/CGAL-4.14/include/CGAL/AABB_tree.h:1138:20:
   #warning: argument 1 value ‘18446744073709551615’ exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
   if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
-    SET_SOURCE_FILES_PROPERTIES(cgal.cpp APPEND_STRING PROPERTY COMPILE_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
-    SET_SOURCE_FILES_PROPERTIES(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
-    SET_SOURCE_FILES_PROPERTIES(cgal.cpp APPEND_STRING PROPERTY LINK_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
-    SET_SOURCE_FILES_PROPERTIES(cgal-test.cpp APPEND_STRING PROPERTY LINK_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
+    set_source_files_properties(cgal.cpp APPEND_STRING PROPERTY COMPILE_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
+    set_source_files_properties(cgal-test.cpp APPEND_STRING PROPERTY COMPILE_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
+    set_source_files_properties(cgal.cpp APPEND_STRING PROPERTY LINK_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
+    set_source_files_properties(cgal-test.cpp APPEND_STRING PROPERTY LINK_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
   endif (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
 endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 # add all tests to geometry_tests
-ADD_CUSTOM_TARGET(geometry_tests DEPENDS ${test_list})
+add_custom_target(geometry_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests geometry_tests)
+add_dependencies(tests geometry_tests)

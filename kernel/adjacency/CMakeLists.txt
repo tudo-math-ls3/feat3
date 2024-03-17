@@ -1,8 +1,8 @@
 # enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of adjacency source files
-ADD_LIBRARY(kernel-adjacency STATIC
+add_library(kernel-adjacency STATIC
   coloring.cpp
   cuthill_mckee.cpp
   graph.cpp
@@ -13,21 +13,21 @@ if (FEAT_COTIRE)
 endif (FEAT_COTIRE)
 
 # list of adjacency tests
-SET (test_list
+set(test_list
   coloring-test
   cuthill_mckee-test
   graph-test
   permutation-test
 )
 
-TARGET_LINK_LIBRARIES (kernel-adjacency kernel-util)
+target_link_libraries(kernel-adjacency PRIVATE kernel-util)
 
 # create all tests
-FOREACH (test ${test_list} )
-  ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feat test_system)
+foreach (test ${test_list} )
+  add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  target_link_libraries(${test} feat test_system)
 
-  ADD_TEST(${test}_all ${CMAKE_CTEST_COMMAND}
+  add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -35,9 +35,9 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/kernel/adjacency/${test})
-  SET_PROPERTY(TEST ${test}_all PROPERTY LABELS "all")
+  set_property(TEST ${test}_all PROPERTY LABELS "all")
   if (FEAT_VALGRIND)
-    ADD_TEST(${test}_valgrind ${CMAKE_CTEST_COMMAND}
+    add_test(${test}_valgrind ${CMAKE_CTEST_COMMAND}
       --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
       --build-generator ${CMAKE_GENERATOR}
       --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -45,15 +45,15 @@ FOREACH (test ${test_list} )
       --build-nocmake
       --build-noclean
       --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/adjacency/${test} generic)
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+    set_property(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
+    set_property(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+    set_property(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAT_VALGRIND)
 
-ENDFOREACH(test)
+endforeach (test)
 
 # add all tests to adjacency_tests
-ADD_CUSTOM_TARGET(adjacency_tests DEPENDS ${test_list})
+add_custom_target(adjacency_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests adjacency_tests)
+add_dependencies(tests adjacency_tests)

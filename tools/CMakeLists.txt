@@ -4,62 +4,62 @@
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # add subdirectories with custom CMakeLists
-ADD_SUBDIRECTORY( mesh_tools )
+add_subdirectory( mesh_tools )
 
 # add tools to build
-ADD_EXECUTABLE(cub-list cub_list/cub_list.cpp)
-TARGET_LINK_LIBRARIES(cub-list feat)
+add_executable(cub-list cub_list/cub_list.cpp)
+target_link_libraries(cub-list feat)
 
-ADD_EXECUTABLE(matrix-cond matrix_cond/matrix_cond.cpp)
-TARGET_LINK_LIBRARIES(matrix-cond feat)
+add_executable(matrix-cond matrix_cond/matrix_cond.cpp)
+target_link_libraries(matrix-cond feat)
 
-ADD_EXECUTABLE(matrix-info matrix_info/matrix_info.cpp)
-TARGET_LINK_LIBRARIES(matrix-info feat)
+add_executable(matrix-info matrix_info/matrix_info.cpp)
+target_link_libraries(matrix-info feat)
 
-ADD_EXECUTABLE(csr2mtx io/csr_to_mtx.cpp)
-TARGET_LINK_LIBRARIES (csr2mtx feat)
+add_executable(csr2mtx io/csr_to_mtx.cpp)
+target_link_libraries(csr2mtx feat)
 
-ADD_EXECUTABLE(mtx2csr io/mtx_to_csr.cpp)
-TARGET_LINK_LIBRARIES (mtx2csr feat)
+add_executable(mtx2csr io/mtx_to_csr.cpp)
+target_link_libraries(mtx2csr feat)
 
-ADD_EXECUTABLE(dm2mtx io/dm_to_mtx.cpp)
-TARGET_LINK_LIBRARIES (dm2mtx feat)
+add_executable(dm2mtx io/dm_to_mtx.cpp)
+target_link_libraries(dm2mtx feat)
 
-ADD_EXECUTABLE(mtx2dm io/mtx_to_dm.cpp)
-TARGET_LINK_LIBRARIES (mtx2dm feat)
+add_executable(mtx2dm io/mtx_to_dm.cpp)
+target_link_libraries(mtx2dm feat)
 
-ADD_EXECUTABLE(dv2exp io/dv_to_exp.cpp)
-TARGET_LINK_LIBRARIES (dv2exp feat)
+add_executable(dv2exp io/dv_to_exp.cpp)
+target_link_libraries(dv2exp feat)
 
-ADD_EXECUTABLE(exp2dv io/exp_to_dv.cpp)
-TARGET_LINK_LIBRARIES (exp2dv feat)
+add_executable(exp2dv io/exp_to_dv.cpp)
+target_link_libraries(exp2dv feat)
 
-ADD_EXECUTABLE(dv2mtx io/dv_to_mtx.cpp)
-TARGET_LINK_LIBRARIES (dv2mtx feat)
+add_executable(dv2mtx io/dv_to_mtx.cpp)
+target_link_libraries(dv2mtx feat)
 
-ADD_EXECUTABLE(mtx2dv io/mtx_to_dv.cpp)
-TARGET_LINK_LIBRARIES (mtx2dv feat)
+add_executable(mtx2dv io/mtx_to_dv.cpp)
+target_link_libraries(mtx2dv feat)
 
-ADD_EXECUTABLE(csr2tga io/csr_to_tga.cpp)
-TARGET_LINK_LIBRARIES (csr2tga feat)
+add_executable(csr2tga io/csr_to_tga.cpp)
+target_link_libraries(csr2tga feat)
 
-ADD_EXECUTABLE(mtx2tga io/mtx_to_tga.cpp)
-TARGET_LINK_LIBRARIES (mtx2tga feat)
+add_executable(mtx2tga io/mtx_to_tga.cpp)
+target_link_libraries(mtx2tga feat)
 
-ADD_EXECUTABLE(resort-matrix io/resort_matrix.cpp)
-TARGET_LINK_LIBRARIES (resort-matrix feat)
+add_executable(resort-matrix io/resort_matrix.cpp)
+target_link_libraries(resort-matrix feat)
 
-ADD_EXECUTABLE(mpi-info mpi_info/mpi_info.cpp)
-TARGET_LINK_LIBRARIES(mpi-info feat)
+add_executable(mpi-info mpi_info/mpi_info.cpp)
+target_link_libraries(mpi-info feat)
 
-ADD_EXECUTABLE(checkpoint-info checkpoint_info/checkpoint_info.cpp)
-TARGET_LINK_LIBRARIES(checkpoint-info feat)
+add_executable(checkpoint-info checkpoint_info/checkpoint_info.cpp)
+target_link_libraries(checkpoint-info feat)
 
-ADD_EXECUTABLE(stokes2vtk stokes2vtk/stokes2vtk.cpp)
-TARGET_LINK_LIBRARIES(stokes2vtk feat)
+add_executable(stokes2vtk stokes2vtk/stokes2vtk.cpp)
+target_link_libraries(stokes2vtk feat)
 
 if (FEAT_HAVE_CUDA)
-  ADD_EXECUTABLE(cuda-device-info cuda_device_info/cuda_device_info.cpp)
-  SET_PROPERTY(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
-  TARGET_LINK_LIBRARIES(cuda-device-info ${CUDA_cudart_LIBRARY})
-endif(FEAT_HAVE_CUDA)
+  add_executable(cuda-device-info cuda_device_info/cuda_device_info.cpp)
+  set_property(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
+  target_link_libraries(cuda-device-info ${CUDA_cudart_LIBRARY})
+endif (FEAT_HAVE_CUDA)

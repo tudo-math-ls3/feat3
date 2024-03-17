@@ -1,13 +1,13 @@
 # enable compiler output
-set (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of arch source files
-SET (kernel-lafem-arch-list
+set(kernel-lafem-arch-list
   empty_lafem_arch.cpp
   )
 
 if (FEAT_EICKT)
-  SET (kernel-lafem-arch-list
+  set(kernel-lafem-arch-list
     ${kernel-lafem-arch-list}
     axpy_generic-eickt.cpp
     apply_generic-eickt.cpp
@@ -34,7 +34,7 @@ if (FEAT_EICKT)
 endif (FEAT_EICKT)
 
 if (FEAT_HAVE_MKL)
-  SET (kernel-lafem-arch-list ${kernel-lafem-arch-list}
+  set(kernel-lafem-arch-list ${kernel-lafem-arch-list}
     axpy_mkl.cpp
     apply_mkl.cpp
     component_product_mkl.cpp
@@ -47,16 +47,16 @@ if (FEAT_HAVE_MKL)
     transpose_mkl.cpp
     unit_filter_mkl.cpp
   )
-endif(FEAT_HAVE_MKL)
+endif (FEAT_HAVE_MKL)
 
 
-ADD_LIBRARY(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
+add_library(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
 if (FEAT_COTIRE)
   cotire(kernel-lafem-arch)
 endif (FEAT_COTIRE)
 
 if (FEAT_HAVE_CUDA)
-  ADD_LIBRARY(kernel-lafem-arch-cuda STATIC
+  add_library(kernel-lafem-arch-cuda STATIC
     axpy.cu
     apply.cu
     component_invert.cu
@@ -78,7 +78,7 @@ if (FEAT_HAVE_CUDA)
     unit_filter_blocked.cu
   )
 
-  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
+  target_link_libraries(kernel-lafem-arch-cuda PRIVATE kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
 #TODO: Use Static variants?  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_static_LIBRARY} ${CUDA_cublas_static_LIBRARY})
-  TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)
-endif(FEAT_HAVE_CUDA)
+  target_link_libraries(kernel-lafem-arch PRIVATE kernel-lafem-arch-cuda)
+endif (FEAT_HAVE_CUDA)

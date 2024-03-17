@@ -1,7 +1,7 @@
 # enable compiler output
-SET (CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
-SET(KERNEL_LIBRARY_FILES
+set(KERNEL_LIBRARY_FILES
   assertion.cpp
   dist.cpp
   dist_file_io.cpp
@@ -12,19 +12,19 @@ SET(KERNEL_LIBRARY_FILES
   xml_scanner.cpp
 )
 
-if(WIN32)
+if (WIN32)
   set(KERNEL_LIBRARY_FILES ${KERNEL_LIBRARY_FILES} os_windows.cpp)
-endif(WIN32)
+endif (WIN32)
 
 # list of util source files
-ADD_LIBRARY(kernel-util STATIC ${KERNEL_LIBRARY_FILES})
+add_library(kernel-util STATIC ${KERNEL_LIBRARY_FILES})
 
-if(WIN32)
-  TARGET_LINK_LIBRARIES(kernel-util -limagehlp)
-  if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    TARGET_LINK_LIBRARIES(kernel-util -lmsvcr120)
-  endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-endif(WIN32)
+if (WIN32)
+  target_link_libraries(kernel-util PRIVATE -limagehlp)
+  if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    target_link_libraries(kernel-util PRIVATE -lmsvcr120)
+  endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+endif (WIN32)
 
 # if(DEFINED ENV{OS})
 #   #check if we are on Windows
@@ -48,43 +48,43 @@ if (FEAT_COTIRE)
 endif (FEAT_COTIRE)
 
 #link against mpi if available
-TARGET_LINK_LIBRARIES(kernel-util ${MPI_C_LIBRARIES})
+target_link_libraries(kernel-util PRIVATE ${MPI_C_LIBRARIES})
 
-if(FEAT_USE_LIKWID)
+if (FEAT_USE_LIKWID)
   find_package(likwid)
-  if(likwid_FOUND)
+  if (likwid_FOUND)
     # set(LIKWID_LIBRARIES -L/sfw/likwid/git230818/lib -llikwid)
-    target_link_libraries(kernel-util ${LIKWID_LIBRARIES})
-    target_include_directories(kernel-util PUBLIC ${LIKWID_INCLUDES})
+    target_link_libraries(kernel-util PRIVATE ${LIKWID_LIBRARIES})
+    target_include_directories(kernel-util PRIVATE ${LIKWID_INCLUDES})
 
-  else(likwid_FOUND)
+  else (likwid_FOUND)
     message(STATUS "Could not find likwid cmake path, consider specifing it with likwid_DIR")
-  endif(likwid_FOUND)
-endif(FEAT_USE_LIKWID)
+  endif (likwid_FOUND)
+endif (FEAT_USE_LIKWID)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-  TARGET_LINK_LIBRARIES(kernel-util -lexecinfo)
-endif()
+if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+  target_link_libraries(kernel-util PRIVATE -lexecinfo)
+endif ()
 
-if(MPI_C_COMPILE_FLAGS)
+if (MPI_C_COMPILE_FLAGS)
   set_target_properties(kernel-util PROPERTIES
     COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-endif()
-if(MPI_C_LINK_FLAGS)
+endif ()
+if (MPI_C_LINK_FLAGS)
   set_target_properties(kernel-util PROPERTIES
     LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-endif()
+endif ()
 
 if (FEAT_HAVE_CUDA)
-  ADD_LIBRARY(kernel-util-cuda STATIC
+  add_library(kernel-util-cuda STATIC
     cuda_util.cu
   )
-  target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY})
-  TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
-endif(FEAT_HAVE_CUDA)
+  target_link_libraries(kernel-util-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY})
+  target_link_libraries(kernel-util PRIVATE kernel-util-cuda)
+endif (FEAT_HAVE_CUDA)
 
 # list of util tests
-SET (test_list
+set(test_list
   binary_stream-test
   math-test
   memory_usage-test
@@ -100,11 +100,11 @@ SET (test_list
 )
 
 # create all tests
-FOREACH (test ${test_list} )
-  ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feat test_system)
+foreach (test ${test_list} )
+  add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  target_link_libraries(${test} feat test_system)
 
-  ADD_TEST(${test}_all ${CMAKE_CTEST_COMMAND}
+  add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -112,10 +112,10 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/kernel/util/${test})
-  SET_PROPERTY(TEST ${test}_all PROPERTY LABELS "all")
+  set_property(TEST ${test}_all PROPERTY LABELS "all")
 
   if (FEAT_VALGRIND)
-    ADD_TEST(${test}_valgrind ${CMAKE_CTEST_COMMAND}
+    add_test(${test}_valgrind ${CMAKE_CTEST_COMMAND}
       --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
       --build-generator ${CMAKE_GENERATOR}
       --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -123,15 +123,14 @@ FOREACH (test ${test_list} )
       --build-nocmake
       --build-noclean
       --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/util/${test} generic)
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-    SET_PROPERTY(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+    set_property(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
+    set_property(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+    set_property(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   endif (FEAT_VALGRIND)
-
-ENDFOREACH(test)
+endforeach (test)
 
 # add all tests to util_tests
-ADD_CUSTOM_TARGET(util_tests DEPENDS ${test_list})
+add_custom_target(util_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests util_tests)
+add_dependencies(tests util_tests)
