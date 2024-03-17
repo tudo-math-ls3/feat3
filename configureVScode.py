@@ -101,7 +101,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Be aware that icc needs the path to a gcc binary and clang needs the path to folder containing the whole toolchain.")
   print ("--cuda_host_compiler=/usr/bin/gcc")
   print ("  Selects the system compiler (and header files) used by nvcc.")
-  print ("--cuda_arch=sm_30")
+  print ("--cuda_arch=sm_60")
   print ("  Selects the cuda architecture target (defaults to sm_30 if not set).")
   print ("--export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json.")
@@ -233,6 +233,7 @@ cuda_host_compiler = ""
 compiler_cxx = ""
 compiler_cc = ""
 cuda_arch = ""
+cuda_arch_int = ""
 cuda_verbose = False
 restrict_errors = False
 
@@ -288,6 +289,7 @@ for option in extra_options:
       print ("Error: multiple cuda_arch parameters in\n" + "\n".join(extra_options))
       exit(1)
     cuda_arch = option.replace("--cuda_arch=", "", 1)
+    cuda_arch_int = cuda_arch.split("_")[-1]
 
   if option.startswith("--cuda_verbose"):
     unused_extra_options.remove(option)
@@ -444,11 +446,13 @@ if "cuda" in buildid:
 
   cuda_dict["FEAT_HAVE_CUDA"] = "ON"
   if not cuda_arch:
-    cuda_arch = "sm_30"
+    cuda_arch = "sm_60"
+    cuda_arch_int=60
   cuda_dict["FEAT_CUDA_ARCH"] = cuda_arch
+  cuda_dict["CMAKE_CUDA_ARCHITECTURES"] = cuda_arch_int
 
   if cuda_verbose:
-    cuda_arch["FEAT_CUDA_VERBOSE"] = "ON"
+    cuda_dict["FEAT_CUDA_VERBOSE"] = "ON"
 
   if "cudamemcheck" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
@@ -620,7 +624,7 @@ dic_json["cmakeFlags"] = {'default':'generic',
 
 dic_json['buildType'] = dict()
 dic_json['buildType']['default'] = 'opt'
-dic_json['buildType'][ 'description'] = 'Build Option'
+dic_json['buildType']['description'] = 'Build Option'
 dic_json['buildType']['choices'] = dict()
 dic_json['buildType']['choices']['debug'] = {'short':'Debug',
                                              'long':'Build with debugging info',

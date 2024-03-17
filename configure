@@ -568,7 +568,9 @@ if "cuda" in buildid:
   cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
   if not cuda_arch:
     cuda_arch = "native"
+    cuda_arch_int = 60
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
+  cmake_flags += " -DCMAKE_CUDA_ARCHITECTURES=" + str(cuda_arch_int)
 
   if cuda_verbose:
     cmake_flags += " -DFEAT_CUDA_VERBOSE:BOOL=ON"

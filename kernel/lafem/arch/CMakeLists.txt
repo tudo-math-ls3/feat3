@@ -56,7 +56,7 @@ if (FEAT_COTIRE)
 endif (FEAT_COTIRE)
 
 if (FEAT_HAVE_CUDA)
-  CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda
+  ADD_LIBRARY(kernel-lafem-arch-cuda STATIC
     axpy.cu
     apply.cu
     component_invert.cu
@@ -76,9 +76,9 @@ if (FEAT_HAVE_CUDA)
     transpose.cu
     unit_filter.cu
     unit_filter_blocked.cu
-    STATIC
   )
-  #CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
-  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_CUBLAS_LIBRARRIES} ${CUDA_TOOLKIT_ROOT_DIR}/lib64/libcublasLt.so)
+
+  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
+#TODO: Use Static variants?  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_static_LIBRARY} ${CUDA_cublas_static_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)
 endif(FEAT_HAVE_CUDA)

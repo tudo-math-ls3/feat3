@@ -76,12 +76,10 @@ if(MPI_C_LINK_FLAGS)
 endif()
 
 if (FEAT_HAVE_CUDA)
-  CUDA_ADD_LIBRARY(kernel-util-cuda
+  ADD_LIBRARY(kernel-util-cuda STATIC
     cuda_util.cu
-    STATIC
   )
-  CUDA_ADD_CUBLAS_TO_TARGET(kernel-util-cuda)
-  target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY})
+  target_link_libraries(kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-util kernel-util-cuda)
 endif(FEAT_HAVE_CUDA)
 

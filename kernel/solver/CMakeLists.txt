@@ -40,15 +40,13 @@ endif (FEAT_HAVE_SUPERLU_DIST)
 
 
 if (FEAT_HAVE_CUDA)
-  CUDA_ADD_LIBRARY(kernel-solver-cuda
+  ADD_LIBRARY(kernel-solver-cuda STATIC
     cusolver.cu
     ilu_precond.cu
     sor_precond.cu
     ssor_precond.cu
-    STATIC
   )
-  target_link_libraries(kernel-solver-cuda ${CUDA_cusolver_LIBRARY})
-  target_link_libraries(kernel-solver-cuda ${CUDA_cusparse_LIBRARY})
+  target_link_libraries(kernel-solver-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-solver kernel-solver-cuda)
 endif(FEAT_HAVE_CUDA)
 
