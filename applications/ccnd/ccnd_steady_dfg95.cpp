@@ -25,7 +25,7 @@
 //
 // --v-max <vmax>
 // Specifies the maximum velocity of the inflow boundary condition.
-// Defaults to 1.5 in 2D and 2.25 in 3D.
+// Defaults to 0.3 in 2D and 0.45 in 3D.
 //
 // --fbm
 // Enables the fictitious boundary method (FBM) to enforce the boundary conditions for the circular

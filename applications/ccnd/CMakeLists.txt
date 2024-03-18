@@ -28,7 +28,7 @@ SET(app_list_3d
 )
 
 # define isoparametric Q2/P1dc app list
-SET(app_list_q2_iso
+SET(app_list_iso
   ccnd-steady-dfg95-2d
   ccnd-unsteady-dfg95-2d
   ccnd-steady-taygre-2d
