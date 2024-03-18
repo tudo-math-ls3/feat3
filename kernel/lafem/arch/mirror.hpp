@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/backend.hpp>
 
 namespace FEAT
 {
@@ -24,10 +25,50 @@ namespace FEAT
           gather_dv_generic(boff, nidx, idx, buf, vec);
         }
 
+        static void gather_dv(const Index boff, const Index nidx, const std::uint32_t * idx, float * buf, const float * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dv_cuda, gather_dv_generic, gather_dv_generic, boff, nidx, idx, buf, vec)
+        }
+
+        static void gather_dv(const Index boff, const Index nidx, const std::uint64_t * idx, float * buf, const float * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dv_cuda, gather_dv_generic, gather_dv_generic, boff, nidx, idx, buf, vec)
+        }
+
+        static void gather_dv(const Index boff, const Index nidx, const std::uint32_t * idx, double * buf, const double * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dv_cuda, gather_dv_generic, gather_dv_generic, boff, nidx, idx, buf, vec)
+        }
+
+        static void gather_dv(const Index boff, const Index nidx, const std::uint64_t * idx, double * buf, const double * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dv_cuda, gather_dv_generic, gather_dv_generic, boff, nidx, idx, buf, vec)
+        }
+
         template<typename DT_, typename IT_>
         static void scatter_dv(const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
         {
           scatter_dv_generic(boff, nidx, idx, buf, vec, alpha);
+        }
+
+        static void scatter_dv(const Index boff, const Index nidx, const std::uint32_t * idx, const float * buf, float * vec, const float alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dv_cuda, scatter_dv_generic, scatter_dv_generic, boff, nidx, idx, buf, vec, alpha)
+        }
+
+        static void scatter_dv(const Index boff, const Index nidx, const std::uint64_t * idx, const float * buf, float * vec, const float alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dv_cuda, scatter_dv_generic, scatter_dv_generic, boff, nidx, idx, buf, vec, alpha)
+        }
+
+        static void scatter_dv(const Index boff, const Index nidx, const std::uint32_t * idx, const double * buf, double * vec, const double alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dv_cuda, scatter_dv_generic, scatter_dv_generic, boff, nidx, idx, buf, vec, alpha)
+        }
+
+        static void scatter_dv(const Index boff, const Index nidx, const std::uint64_t * idx, const double * buf, double * vec, const double alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dv_cuda, scatter_dv_generic, scatter_dv_generic, boff, nidx, idx, buf, vec, alpha)
         }
 
         template<typename DT_, typename IT_>
@@ -36,10 +77,50 @@ namespace FEAT
           gather_dvb_generic(bs, boff, nidx, idx, buf, vec);
         }
 
+        static void gather_dvb(const Index bs, const Index boff, const Index nidx, const std::uint32_t * idx, float * buf, const float * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dvb_cuda, gather_dvb_generic, gather_dvb_generic, bs, boff, nidx, idx, buf, vec)
+        }
+
+        static void gather_dvb(const Index bs, const Index boff, const Index nidx, const std::uint64_t * idx, float * buf, const float * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dvb_cuda, gather_dvb_generic, gather_dvb_generic, bs, boff, nidx, idx, buf, vec)
+        }
+
+        static void gather_dvb(const Index bs, const Index boff, const Index nidx, const std::uint32_t * idx, double * buf, const double * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dvb_cuda, gather_dvb_generic, gather_dvb_generic, bs, boff, nidx, idx, buf, vec)
+        }
+
+        static void gather_dvb(const Index bs, const Index boff, const Index nidx, const std::uint64_t * idx, double * buf, const double * vec)
+        {
+          BACKEND_SKELETON_VOID(gather_dvb_cuda, gather_dvb_generic, gather_dvb_generic, bs, boff, nidx, idx, buf, vec)
+        }
+
         template<typename DT_, typename IT_>
         static void scatter_dvb(const Index bs, const Index boff, const Index nidx, const IT_* idx, const DT_* buf, DT_* vec, const DT_ alpha)
         {
           scatter_dvb_generic(bs, boff, nidx, idx, buf, vec, alpha);
+        }
+
+        static void scatter_dvb(const Index bs, const Index boff, const Index nidx, const std::uint32_t * idx, const float * buf, float * vec, const float alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dvb_cuda, scatter_dvb_generic, scatter_dvb_generic, bs, boff, nidx, idx, buf, vec, alpha)
+        }
+
+        static void scatter_dvb(const Index bs, const Index boff, const Index nidx, const std::uint64_t * idx, const float * buf, float * vec, const float alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dvb_cuda, scatter_dvb_generic, scatter_dvb_generic, bs, boff, nidx, idx, buf, vec, alpha)
+        }
+
+        static void scatter_dvb(const Index bs, const Index boff, const Index nidx, const std::uint32_t * idx, const double * buf, double * vec, const double alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dvb_cuda, scatter_dvb_generic, scatter_dvb_generic, bs, boff, nidx, idx, buf, vec, alpha)
+        }
+
+        static void scatter_dvb(const Index bs, const Index boff, const Index nidx, const std::uint64_t * idx, const double * buf, double * vec, const double alpha)
+        {
+          BACKEND_SKELETON_VOID(scatter_dvb_cuda, scatter_dvb_generic, scatter_dvb_generic, bs, boff, nidx, idx, buf, vec, alpha)
         }
 
         template<typename DT_, typename IT_>
