@@ -30,6 +30,7 @@ var hierarchy =
     [ "FEAT::Assembly::BurgersAssemblyTaskBase< BurgersBlockedVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", null ],
     [ "FEAT::Assembly::BurgersAssemblyTaskBase< BurgersScalarMatrixAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", null ],
     [ "FEAT::Assembly::BurgersAssemblyTaskBase< BurgersScalarVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", null ],
+    [ "FEAT::Geometry::Atlas::ChartBase< MeshType >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html", null ],
     [ "FEAT::LAFEM::Container< CoordType, Index >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
     [ "FEAT::LAFEM::Container< CoordType, IndexType >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
     [ "FEAT::LAFEM::Container< DataType, IndexType >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
@@ -43,8 +44,14 @@ var hierarchy =
     [ "FEAT::Control::Domain::DomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html", [
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control.html", null ],
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl2< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2.html", null ],
-      [ "FEAT::Control::Domain::PartiDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html", null ],
+      [ "FEAT::Control::Domain::PartiDomainControlBase< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html", [
+        [ "FEAT::Control::Domain::PartiDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html", null ],
+        [ "FEAT::Control::Domain::VoxelDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html", null ]
+      ] ],
       [ "FEAT::Control::Domain::UnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control.html", null ]
+    ] ],
+    [ "DomainLevel_", null, [
+      [ "FEAT::Control::Domain::VoxelDomainLevelWrapper< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper.html", null ]
     ] ],
     [ "FEAT::Cubature::DriverBase< Shape::Simplex< 2 > >", "class_f_e_a_t_1_1_cubature_1_1_driver_base.html", [
       [ "FEAT::Cubature::SymmetricSimplexDriver< Shape::Simplex< 2 > >", "class_f_e_a_t_1_1_cubature_1_1_symmetric_simplex_driver_3_01_shape_1_1_simplex_3_012_01_4_01_4.html", [
@@ -188,6 +195,7 @@ var hierarchy =
     ] ],
     [ "FEAT::Geometry::Factory< MeshPart< ParentMesh_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory.html", [
       [ "FEAT::Geometry::BoundaryFactory< ParentMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html", null ],
+      [ "FEAT::Geometry::MaskedBoundaryFactory< ParentMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html", null ],
       [ "FEAT::Geometry::StandardRefinery< MeshPart< ParentMesh_ > >", "class_f_e_a_t_1_1_geometry_1_1_standard_refinery_3_01_mesh_part_3_01_parent_mesh___01_4_01_4.html", null ]
     ] ],
     [ "FEAT::Cubature::FactoryExplicitWrapper< Shape::Hypercube< dim_ > >", "class_f_e_a_t_1_1_cubature_1_1_factory_explicit_wrapper.html", [
@@ -218,6 +226,7 @@ var hierarchy =
     [ "FEAT::Analytic::EvalTraitsBase< DataType_, domain_dim_, Image::Scalar >", "struct_f_e_a_t_1_1_analytic_1_1_eval_traits_base_3_01_data_type___00_01domain__dim___00_01_image_1_1_scalar_01_4.html", null ],
     [ "FEAT::Analytic::EvalTraitsBase< DataType_, domain_dim_, Image::Vector< image_dim_ > >", "struct_f_e_a_t_1_1_analytic_1_1_eval_traits_base_3_01_data_type___00_01domain__dim___00_01_image55653a181e5217b83cea43e69e5552e5.html", null ],
     [ "FEAT::Analytic::Function", "class_f_e_a_t_1_1_analytic_1_1_function.html", [
+      [ "FEAT::Analytic::Common::BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", null ],
       [ "FEAT::Analytic::Common::ConstantFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", null ],
       [ "FEAT::Analytic::Common::ConstantVectorFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", null ],
       [ "FEAT::Analytic::Common::DistanceFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_distance_function.html", null ],
@@ -261,6 +270,7 @@ var hierarchy =
     ] ],
     [ "FEAT::Analytic::Function::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_function_1_1_evaluator.html", [
       [ "FEAT::Analytic::AutoDerive< Function_, DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_auto_derive_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::Common::BallCapFunction2D::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ParProfileScalar< DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_scalar_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ParProfileVector< DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_vector_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::StandingVortexFunction2D::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d_1_1_evaluator.html", null ],
@@ -416,8 +426,11 @@ var hierarchy =
       [ "FEAT::Control::Domain::Stokes3FieldDomainLevel< Mesh_, Trafo_, SpaceVelo_, SpacePres_, SpaceStress_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_stokes3_field_domain_level.html", null ],
       [ "FEAT::Control::Domain::StokesDomainLevel< Mesh_, Trafo_, SpaceVelo_, SpacePres_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_stokes_domain_level.html", null ]
     ] ],
-    [ "FEAT::Control::Domain::PartiDomainControl< DomainLevel_ >::Ancestor", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_1_1_ancestor.html", null ],
+    [ "FEAT::Control::Domain::PartiDomainControlBase< DomainLevel_ >::Ancestor", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html", null ],
     [ "FEAT::Control::Domain::VirtualLevel< DomLvl_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html", null ],
+    [ "FEAT::Control::Domain::VoxelSlagMasker< CoordType_, dim_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_masker.html", [
+      [ "FEAT::Control::Domain::VoxelSlagLambdaMasker< Lambda_, CoordType_, dim_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_lambda_masker.html", null ]
+    ] ],
     [ "FEAT::Control::Meshopt::ControlFactory< DT_, IT_ >", "struct_f_e_a_t_1_1_control_1_1_meshopt_1_1_control_factory.html", null ],
     [ "FEAT::Control::Meshopt::DuDvFunctionalAssemblerLevel< typename >", "class_f_e_a_t_1_1_control_1_1_meshopt_1_1_du_dv_functional_assembler_level.html", null ],
     [ "FEAT::Control::Meshopt::MeshoptControlBase< DomainControl_ >", "class_f_e_a_t_1_1_control_1_1_meshopt_1_1_meshopt_control_base.html", [
@@ -448,6 +461,7 @@ var hierarchy =
       [ "FEAT::Control::StokesPowerUnitVeloNonePresSystemLevel< dim_, DataType_, IndexType_, ScalarMatrix_ >", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level.html", null ]
     ] ],
     [ "FEAT::Control::Time::NvsBdfQ< DT_ >", "class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html", null ],
+    [ "FEAT::Control::VoxelTransferAssembler", "class_f_e_a_t_1_1_control_1_1_voxel_transfer_assembler.html", null ],
     [ "FEAT::Cubature::AutoAlias< Shape_ >", "class_f_e_a_t_1_1_cubature_1_1_auto_alias.html", null ],
     [ "FEAT::Cubature::BarycentreDriver< Shape_ >", "class_f_e_a_t_1_1_cubature_1_1_barycentre_driver.html", null ],
     [ "FEAT::Cubature::DriverBase< Shape_ >", "class_f_e_a_t_1_1_cubature_1_1_driver_base.html", null ],
@@ -1400,6 +1414,7 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< CoordType, 2 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< CoordType, 3 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< CoordType, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Tiny::Vector< CoordType, shape_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, conv_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, domain_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
@@ -1420,5 +1435,8 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< T_, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< T_, n_, sn_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Geometry::VertexSet< Shape_::dimension, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
-    [ "FEAT::Geometry::VertexSet< shape_dim_, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ]
+    [ "FEAT::Geometry::VertexSet< shape_dim_, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
+    [ "FEAT::Control::Domain::VoxelSlagMasker< MeshType::CoordType, MeshType::shape_dim >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_masker.html", [
+      [ "FEAT::Control::Domain::VoxelSlagChartMasker< MeshType >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_chart_masker.html", null ]
+    ] ]
 ];

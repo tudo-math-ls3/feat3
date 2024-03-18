@@ -22,7 +22,7 @@ var searchData=
   ['analyticfunctionintegraljob_19',['AnalyticFunctionIntegralJob',['../class_f_e_a_t_1_1_assembly_1_1_analytic_function_integral_job.html',1,'FEAT::Assembly']]],
   ['analyticfunctionoperator_20',['AnalyticFunctionOperator',['../class_f_e_a_t_1_1_solver_1_1_analytic_function_operator.html',1,'FEAT::Solver']]],
   ['analyticvertexprojector_21',['AnalyticVertexProjector',['../class_f_e_a_t_1_1_assembly_1_1_analytic_vertex_projector.html',1,'FEAT::Assembly']]],
-  ['ancestor_22',['Ancestor',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_1_1_ancestor.html',1,'FEAT::Control::Domain::PartiDomainControl']]],
+  ['ancestor_22',['Ancestor',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html',1,'FEAT::Control::Domain::PartiDomainControlBase']]],
   ['anotherclass_23',['AnotherClass',['../class_f_e_a_t_1_1_type_1_1_another_class.html',1,'FEAT::Type']]],
   ['apply_24',['Apply',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_apply.html',1,'FEAT::LAFEM::Arch']]],
   ['approximatehessianprecond_25',['ApproximateHessianPrecond',['../class_f_e_a_t_1_1_solver_1_1_approximate_hessian_precond.html',1,'FEAT::Solver']]],

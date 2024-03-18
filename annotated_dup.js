@@ -13,6 +13,7 @@ var annotated_dup =
       ] ],
       [ "Analytic", "namespace_f_e_a_t_1_1_analytic.html", [
         [ "Common", "namespace_f_e_a_t_1_1_analytic_1_1_common.html", [
+          [ "BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d" ],
           [ "ConstantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function" ],
           [ "ConstantVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function" ],
           [ "CosineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static" ],
@@ -169,11 +170,17 @@ var annotated_dup =
           [ "HierarchUnitCubeDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control" ],
           [ "HierarchUnitCubeDomainControl2", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2" ],
           [ "PartiDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control" ],
+          [ "PartiDomainControlBase", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base" ],
           [ "SimpleDomainLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_simple_domain_level.html", null ],
           [ "Stokes3FieldDomainLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_stokes3_field_domain_level.html", null ],
           [ "StokesDomainLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_stokes_domain_level.html", null ],
           [ "UnitCubeDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control" ],
-          [ "VirtualLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html", null ]
+          [ "VirtualLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html", null ],
+          [ "VoxelDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control" ],
+          [ "VoxelDomainLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper" ],
+          [ "VoxelSlagChartMasker", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_chart_masker.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_chart_masker" ],
+          [ "VoxelSlagLambdaMasker", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_lambda_masker.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_lambda_masker" ],
+          [ "VoxelSlagMasker", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_masker.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_masker" ]
         ] ],
         [ "Meshopt", "namespace_f_e_a_t_1_1_control_1_1_meshopt.html", [
           [ "ControlFactory", "struct_f_e_a_t_1_1_control_1_1_meshopt_1_1_control_factory.html", "struct_f_e_a_t_1_1_control_1_1_meshopt_1_1_control_factory" ],
@@ -208,7 +215,8 @@ var annotated_dup =
         [ "StokesBlockedUnitVeloNonePresSystemLevel", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_unit_velo_none_pres_system_level.html", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_unit_velo_none_pres_system_level" ],
         [ "StokesPowerSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level" ],
         [ "StokesPowerUnitVeloMeanPresSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_mean_pres_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_mean_pres_system_level" ],
-        [ "StokesPowerUnitVeloNonePresSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level" ]
+        [ "StokesPowerUnitVeloNonePresSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level" ],
+        [ "VoxelTransferAssembler", "class_f_e_a_t_1_1_control_1_1_voxel_transfer_assembler.html", "class_f_e_a_t_1_1_control_1_1_voxel_transfer_assembler" ]
       ] ],
       [ "Cubature", "namespace_f_e_a_t_1_1_cubature.html", [
         [ "Scalar", "namespace_f_e_a_t_1_1_cubature_1_1_scalar.html", [
@@ -345,6 +353,7 @@ var annotated_dup =
         [ "IndexTree", "class_f_e_a_t_1_1_geometry_1_1_index_tree.html", "class_f_e_a_t_1_1_geometry_1_1_index_tree" ],
         [ "IndexTuple", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple.html", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple" ],
         [ "MacroFactory", "class_f_e_a_t_1_1_geometry_1_1_macro_factory.html", null ],
+        [ "MaskedBoundaryFactory", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory" ],
         [ "MeshAtlas", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas" ],
         [ "MeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion" ],
         [ "MeshExtruder", "class_f_e_a_t_1_1_geometry_1_1_mesh_extruder.html", null ],

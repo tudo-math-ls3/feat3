@@ -90,6 +90,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r =
     [ "row_ptr", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#adbeec6b6c5a5ec645b7587a0e33b0552", null ],
     [ "rows", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#a41adc745296415b7765e6d3b45dd02a9", null ],
     [ "scale", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#ad68db1e86c572bb857ec2caa8971f180", null ],
+    [ "scale_rows", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#acaf660f495380bc60f6f0e494c9761f9", null ],
     [ "serialize", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#add3376e18aebd395d6f2a2a3063613a1", null ],
     [ "set_checkpoint_data", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#a9dae85fd4d7b9a2768e6cedcdb6859da", null ],
     [ "size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html#a855d50aabec2f0f1ef98d1bbbd46767c", null ],

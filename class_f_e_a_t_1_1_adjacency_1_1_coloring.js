@@ -10,11 +10,15 @@ var class_f_e_a_t_1_1_adjacency_1_1_coloring =
     [ "~Coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a640507c84350edbe8007f39dac4d7c12", null ],
     [ "clone", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#aff56e2465c2ead2da912b690b4bc3905", null ],
     [ "create_partition_graph", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a24fb5326b73a7958cc9765cb24800ff7", null ],
+    [ "empty", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a772cfdfcd15eacfadfd70bdca6fa64c8", null ],
     [ "get_coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#ab1c2cadfc39d724f2793bcf5d5197e43", null ],
     [ "get_coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#ab8af4b64c792256d658d1339f9e70dcb", null ],
     [ "get_max_color", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#aaf4e1e02dc7dd9ea46f082bd120d99be", null ],
+    [ "get_num_colors", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#af0872e301fd47fbf5eeb5c0de31cec0b", null ],
     [ "get_num_nodes", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a2a5c3ed4551f8319aa0a788c830cbf29", null ],
     [ "operator=", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a04483933f1f500fd8e26bc9bd2082e2d", null ],
+    [ "operator[]", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a070f7f261e97cd98e0cbd6ff42eee788", null ],
+    [ "operator[]", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a023e645b77082e8196107a8be67dccd0", null ],
     [ "_coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a0e4feb73b9cbfe87254329a0de31994d", null ],
     [ "_num_colors", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a25ea2362191019a206f7093bfb8e3780", null ]
 ];

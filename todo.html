@@ -106,10 +106,10 @@ $(document).ready(function(){initNavTree('todo.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><dl class="reflist">
 <dt>Page <a class="el" href="amg.html">Algebraic Multigrid</a>  </dt>
-<dd><a class="anchor" id="_todo000059"></a>verbose description </dd>
+<dd><a class="anchor" id="_todo000060"></a>verbose description </dd>
 <dt>Page <a class="el" href="mesh_file_format.html">FEAT Mesh File Format</a>  </dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000061"></a>talk about auto-partitioner</p>
-<p class="enddd"><a class="anchor" id="_todo000060"></a>basic parser info </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000061"></a>basic parser info</p>
+<p class="enddd"><a class="anchor" id="_todo000062"></a>talk about auto-partitioner </p>
 </dd>
 <dt>Class <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_adjactor.html">FEAT::Adjacency::Adjactor</a>  </dt>
 <dd><a class="anchor" id="_todo000001"></a>details and terminology </dd>
@@ -137,12 +137,14 @@ $(document).ready(function(){initNavTree('todo.html',''); initResizable(); });
 <dd><a class="anchor" id="_todo000054"></a>does this really work?  </dd>
 <dt>Class <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;</a>  </dt>
 <dd><a class="anchor" id="_todo000055"></a>document this </dd>
+<dt>Class <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;</a>  </dt>
+<dd><a class="anchor" id="_todo000056"></a>document this </dd>
 <dt>Member <a class="el" href="class_f_e_a_t_1_1_control_1_1_statistics.html#a552d75cb9e035e29e27443a01bf7c561">FEAT::Control::Statistics::report</a>  (double solver_toe, int statistics_check, int shape_dimension, std::deque&lt; std::shared_ptr&lt; SystemLevelType_ &gt; &gt; &amp;system_levels, DomainType_ &amp;domain)</dt>
-<dd><a class="anchor" id="_todo000056"></a>reimplement method based on expressions  </dd>
+<dd><a class="anchor" id="_todo000057"></a>reimplement method based on expressions  </dd>
 <dt>Member <a class="el" href="struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html#a7e910cf335c2288b1318aebdd59fdb41">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates</a>  (const Domain::VirtualLevel&lt; DomainLevel_ &gt; &amp;virt_dom_lvl)</dt>
-<dd><a class="anchor" id="_todo000057"></a>find out what to do for disc/cont pressure spaces here...  </dd>
+<dd><a class="anchor" id="_todo000058"></a>find out what to do for disc/cont pressure spaces here...  </dd>
 <dt>Member <a class="el" href="struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html#a8242fc0261f863ea041cd47c08be0d4b">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_grad_div_matrices</a>  (Assembly::DomainAssembler&lt; Trafo_ &gt; &amp;dom_asm, const SpaceVelo_ &amp;space_velo, const SpacePres_ &amp;space_pres, const Cubature_ &amp;cubature)</dt>
-<dd><a class="anchor" id="_todo000058"></a>share matrix structures of D_i  </dd>
+<dd><a class="anchor" id="_todo000059"></a>share matrix structures of D_i  </dd>
 <dt>Class <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_silvester_open_driver.html">FEAT::Cubature::SilvesterOpenDriver&lt; Shape_ &gt;</a>  </dt>
 <dd><a class="anchor" id="_todo000012"></a>implement Simplex&lt;3&gt; rules </dd>
 <dt>Class <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_symmetric_simplex_driver.html">FEAT::Cubature::SymmetricSimplexDriver&lt; Shape_ &gt;</a>  </dt>
@@ -229,7 +231,7 @@ $(document).ready(function(){initNavTree('todo.html',''); initResizable(); });
 <dt>Class <a class="el" href="struct_f_e_a_t_1_1_space_1_1_lagrange3_1_1_dof_traits.html">FEAT::Space::Lagrange3::DofTraits&lt; Shape_, dim_ &gt;</a>  </dt>
 <dd><a class="anchor" id="_todo000049"></a>implement Simplex dof-traits </dd>
 <dt>Member <a class="el" href="class_f_e_a_t_1_1_test_system_1_1_test_list.html#a06fd049017218e93ee69d1e8886b43a7">FEAT::TestSystem::TestList::instance</a>  ()</dt>
-<dd><a class="anchor" id="_todo000064"></a>Make thread safe  </dd>
+<dd><a class="anchor" id="_todo000065"></a>Make thread safe  </dd>
 <dt>Class <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;</a>  </dt>
 <dd><p class="startdd"><a class="anchor" id="_todo000050"></a>implement Simplex evaluators (all) </p>
 <p class="interdd"></p>
@@ -240,9 +242,9 @@ $(document).ready(function(){initNavTree('todo.html',''); initResizable(); });
 <dt>Class <a class="el" href="class_f_e_a_t_1_1_xml_1_1_scanner.html">FEAT::Xml::Scanner</a>  </dt>
 <dd><a class="anchor" id="_todo000052"></a>document </dd>
 <dt>Page <a class="el" href="tools_meshtools.html">Mesh Tools Overview</a>  </dt>
-<dd><a class="anchor" id="_todo000062"></a>Reimplement this tool in a less quick'n'dirty fashion... </dd>
+<dd><a class="anchor" id="_todo000063"></a>Reimplement this tool in a less quick'n'dirty fashion... </dd>
 <dt>Page <a class="el" href="tools.html">Tool overview</a>  </dt>
-<dd><a class="anchor" id="_todo000063"></a>add documentation</dd>
+<dd><a class="anchor" id="_todo000064"></a>add documentation</dd>
 </dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

@@ -1,5 +1,6 @@
 var namespace_f_e_a_t_1_1_analytic_1_1_common =
 [
+    [ "BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d" ],
     [ "ConstantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function" ],
     [ "ConstantVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function" ],
     [ "CosineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static" ],

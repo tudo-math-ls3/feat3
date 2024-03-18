@@ -420,7 +420,7 @@ Protected Attributes</h2></td></tr>
 <li>The blocking receive function has the following MPI prototype: <div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Recv(<span class="keywordtype">void</span>* buf, <span class="keywordtype">int</span> count, MPI_Datatype datatype, <span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag, MPI_Comm <a class="code hl_variable" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">comm</a>, MPI_Status *status)</div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_a79d67a074d3d01313be043e44ccf560f"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">FEAT::Dist::Comm::comm</a></div><div class="ttdeci">MPI_Comm comm</div><div class="ttdoc">our MPI communicator handle</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l01355">dist.hpp:1355</a></div></div>
 </div><!-- fragment --> The corresponding wrapper function for is the <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469" title="Blocking Receive.">Dist::Comm::recv()</a> member function: <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469">recv</a>(<span class="keywordtype">void</span>* buf, std::size_t count, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">Datatype</a>&amp; datatype, <span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag, <a class="code hl_class" href="class_f_e_a_t_1_1_dist_1_1_status.html">Status</a>&amp; status) <span class="keyword">const</span></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_a6f3fa27caec70f54672c4171809a2469"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469">FEAT::Dist::Comm::recv</a></div><div class="ttdeci">void recv(void *buffer, std::size_t count, const Datatype &amp;datatype, int source, int tag, Status &amp;status) const</div><div class="ttdoc">Blocking Receive.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8cpp_source.html#l00685">dist.cpp:685</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_a6f3fa27caec70f54672c4171809a2469"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469">FEAT::Dist::Comm::recv</a></div><div class="ttdeci">void recv(void *buffer, std::size_t count, const Datatype &amp;datatype, int source, int tag, Status &amp;status) const</div><div class="ttdoc">Blocking Receive.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8cpp_source.html#l00711">dist.cpp:711</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_status_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_status.html">FEAT::Dist::Status</a></div><div class="ttdoc">Communication Status class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00296">dist.hpp:297</a></div></div>
 <div class="ttc" id="astruct_f_e_a_t_1_1_dist_1_1_datatype_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">FEAT::Dist::Datatype</a></div><div class="ttdoc">Communication Datatype class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00076">dist.hpp:77</a></div></div>
 </div><!-- fragment --> The overloaded wrapper function template with automatic type deduction is: <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
@@ -428,7 +428,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- fragment --></li>
 <li>The nonblocking reduce function has the following MPI prototype: <div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Ireduce(<span class="keyword">const</span> <span class="keywordtype">void</span>* sendbuf, <span class="keywordtype">void</span>* recvbuf, <span class="keywordtype">int</span> count, MPI_Datatype datatype, MPI_Op op, <span class="keywordtype">int</span> root, MPI_Comm <a class="code hl_variable" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">comm</a>, MPI_Request *request)</div>
 </div><!-- fragment --> The corresponding wrapper function for is the <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129" title="Nonblocking Reduce.">Dist::Comm::ireduce()</a> member function: <div class="fragment"><div class="line"><a class="code hl_class" href="class_f_e_a_t_1_1_dist_1_1_request.html">Request</a> <a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129">ireduce</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* sendbuf, <span class="keywordtype">void</span>* recvbuf, std::size_t count, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">Datatype</a>&amp; datatype, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_operation.html">Operation</a>&amp; op, <span class="keywordtype">int</span> root) <span class="keyword">const</span></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_ac856663d919ddfcf0c3defe925633129"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129">FEAT::Dist::Comm::ireduce</a></div><div class="ttdeci">Request ireduce(const void *sendbuf, void *recvbuf, std::size_t count, const Datatype &amp;datatype, const Operation &amp;op, int root) const</div><div class="ttdoc">Nonblocking Reduce.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8cpp_source.html#l00621">dist.cpp:621</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_ac856663d919ddfcf0c3defe925633129"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129">FEAT::Dist::Comm::ireduce</a></div><div class="ttdeci">Request ireduce(const void *sendbuf, void *recvbuf, std::size_t count, const Datatype &amp;datatype, const Operation &amp;op, int root) const</div><div class="ttdoc">Nonblocking Reduce.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8cpp_source.html#l00647">dist.cpp:647</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_request_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_request.html">FEAT::Dist::Request</a></div><div class="ttdoc">Communication Request class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00424">dist.hpp:425</a></div></div>
 <div class="ttc" id="astruct_f_e_a_t_1_1_dist_1_1_operation_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_dist_1_1_operation.html">FEAT::Dist::Operation</a></div><div class="ttdoc">Communication Operation class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00238">dist.hpp:239</a></div></div>
 </div><!-- fragment --> The overloaded wrapper function template with automatic type deduction is: <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
@@ -616,6 +616,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Blocking gather-to-all. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -627,9 +628,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.7, page 165 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02283">2283</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02323">2323</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00577">allgather()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00589">allgather()</a>.</p>
 
 </div>
 </div>
@@ -684,6 +685,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Blocking gather-to-all. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -697,11 +699,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.7, page 165 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00577">577</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00589">589</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02283">allgather()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00340">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, and <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="dist_8hpp_source.html#l02323">allgather()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00340">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, and <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>.</p>
 
 </div>
 </div>
@@ -761,6 +763,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Blocking gather-to-all. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>In contrast to most other functions, this function uses <code>int</code> rather than <code>std::size_t</code> as the type for the receive counts and displacements for technical reasons!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -774,9 +777,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.7, page 166 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02405">2405</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02461">2461</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00589">allgatherv()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00607">allgatherv()</a>.</p>
 
 </div>
 </div>
@@ -837,6 +840,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Blocking gather-to-all. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>In contrast to most other functions, this function uses <code>int</code> rather than <code>std::size_t</code> as the type for the receive counts and displacements for technical reasons!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -852,11 +856,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.7, page 166 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00589">589</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00607">607</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02405">allgatherv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02461">allgatherv()</a>.</p>
 
 </div>
 </div>
@@ -903,9 +907,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03060">3060</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03140">3140</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00763">allprint()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>.</p>
 
 </div>
 </div>
@@ -951,11 +955,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00763">763</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00789">789</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="math_8hpp_source.html#l00228">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00393">FEAT::String::pad_front()</a>, <a class="el" href="dist_8cpp_source.html#l00685">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00673">send()</a>, <a class="el" href="string_8hpp_source.html#l00468">FEAT::String::split_by_charset()</a>, <a class="el" href="string_8hpp_source.html#l00991">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="math_8hpp_source.html#l00228">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00393">FEAT::String::pad_front()</a>, <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00699">send()</a>, <a class="el" href="string_8hpp_source.html#l00468">FEAT::String::split_by_charset()</a>, <a class="el" href="string_8hpp_source.html#l00991">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l03060">allprint()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l03140">allprint()</a>.</p>
 
 </div>
 </div>
@@ -1021,9 +1025,9 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.9.6, page 187 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02776">2776</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02856">2856</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00629">allreduce()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00655">allreduce()</a>.</p>
 
 </div>
 </div>
@@ -1085,11 +1089,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.9.6, page 187 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00629">629</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00655">655</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="global_2mean__filter_8hpp_source.html#l00074">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01288">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="dist_8hpp_source.html#l02776">allreduce()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00125">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="matrix_8hpp_source.html#l00267">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00276">FEAT::Control::Meshopt::MeshoptControlBase&lt; DomainControl_ &gt;::compute_mesh_quality()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00218">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00242">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00086">FEAT::Assembly::ScalarDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00177">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00275">FEAT::Assembly::MatrixDiscreteEvalData&lt; DT_, dim_i_, dim_j_ &gt;::mean_value_dist()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00859">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="error__computer_8hpp_source.html#l00285">FEAT::Assembly::ScalarErrorInfo&lt; DataType_ &gt;::synchronize()</a>, <a class="el" href="error__computer_8hpp_source.html#l00861">FEAT::Assembly::VectorErrorInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00508">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="velocity__analyser_8hpp_source.html#l00109">FEAT::Assembly::VelocityInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, and <a class="el" href="matrix_8hpp_source.html#l00257">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="global_2mean__filter_8hpp_source.html#l00074">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l02011">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="dist_8hpp_source.html#l02856">allreduce()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00125">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="matrix_8hpp_source.html#l00267">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00276">FEAT::Control::Meshopt::MeshoptControlBase&lt; DomainControl_ &gt;::compute_mesh_quality()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00218">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00242">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00086">FEAT::Assembly::ScalarDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00177">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00275">FEAT::Assembly::MatrixDiscreteEvalData&lt; DT_, dim_i_, dim_j_ &gt;::mean_value_dist()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="error__computer_8hpp_source.html#l00285">FEAT::Assembly::ScalarErrorInfo&lt; DataType_ &gt;::synchronize()</a>, <a class="el" href="error__computer_8hpp_source.html#l00861">FEAT::Assembly::VectorErrorInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00508">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="velocity__analyser_8hpp_source.html#l00109">FEAT::Assembly::VelocityInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, and <a class="el" href="matrix_8hpp_source.html#l00257">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>.</p>
 
 </div>
 </div>
@@ -1143,6 +1147,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Blocking All-to-All Scatter/Gather. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -1154,9 +1159,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.8, page 168 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02455">2455</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02519">2519</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00594">alltoall()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00615">alltoall()</a>.</p>
 
 </div>
 </div>
@@ -1211,6 +1216,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Blocking All-to-All Scatter/Gather. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -1224,11 +1230,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.8, page 168 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00594">594</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00615">615</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02455">alltoall()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02519">alltoall()</a>.</p>
 
 </div>
 </div>
@@ -1294,6 +1300,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Blocking All-to-All Scatter/Gather. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>In contrast to most other functions, this function uses <code>int</code> rather than <code>std::size_t</code> as the type for the send/receive counts and displacements for technical reasons!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1308,9 +1315,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.8, page 170 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02583">2583</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02663">2663</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00610">alltoallv()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00633">alltoallv()</a>.</p>
 
 </div>
 </div>
@@ -1377,6 +1384,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Blocking All-to-All Scatter/Gather. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>In contrast to most other functions, this function uses <code>int</code> rather than <code>std::size_t</code> as the type for the send/receive counts and displacements for technical reasons!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1393,11 +1401,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.8, page 170 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00610">610</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00633">633</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02583">alltoallv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02663">alltoallv()</a>.</p>
 
 </div>
 </div>
@@ -1539,7 +1547,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8hpp_source.html#l01938">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00731">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00697">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, and <a class="el" href="muxer_8hpp_source.html#l00303">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01339">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8hpp_source.html#l01938">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00757">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00723">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, and <a class="el" href="muxer_8hpp_source.html#l00303">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
 
 </div>
 </div>
@@ -1578,7 +1586,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00731">731</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00757">757</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="binary__stream_8hpp_source.html#l00238">FEAT::BinaryStream::container()</a>, and <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>.</p>
 
@@ -1619,7 +1627,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00697">697</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00723">723</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, and <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>.</p>
 
@@ -1723,7 +1731,7 @@ The ranks, which are contained in the new sub-communicator, are given by <em>fir
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l01223">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l01162">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>.</p>
 
 </div>
 </div>
@@ -1750,7 +1758,7 @@ The ranks, which are contained in the new sub-communicator, are given by <em>fir
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, and <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00955">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01162">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01059">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l01003">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01892">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00403">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01814">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>.</p>
 
 </div>
 </div>
@@ -1860,9 +1868,9 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.11.2, page 194 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02957">2957</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03037">3037</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00657">exscan()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00683">exscan()</a>.</p>
 
 </div>
 </div>
@@ -1924,11 +1932,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.11.2, page 194 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00657">657</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00683">683</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, and <a class="el" href="dist_8hpp_source.html#l02957">exscan()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, and <a class="el" href="dist_8hpp_source.html#l03037">exscan()</a>.</p>
 
 </div>
 </div>
@@ -1988,6 +1996,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Blocking gather. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -2000,7 +2009,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.5, page 149 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02049">2049</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02057">2057</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>.</p>
 
@@ -2063,6 +2072,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Blocking gather. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -2081,7 +2091,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8cpp_source.html#l00763">allprint()</a>, <a class="el" href="dist_8hpp_source.html#l02049">gather()</a>, <a class="el" href="muxer_8hpp_source.html#l00380">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00344">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00859">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::serialize_partitioning()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8hpp_source.html#l02057">gather()</a>, <a class="el" href="muxer_8hpp_source.html#l00380">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00344">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>.</p>
 
 </div>
 </div>
@@ -2135,6 +2145,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Nonblocking gather-to-all. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -2147,9 +2158,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.5, page 204 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02341">2341</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02389">2389</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00582">iallgather()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00597">iallgather()</a>.</p>
 
 </div>
 </div>
@@ -2204,6 +2215,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Nonblocking gather-to-all. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -2218,11 +2230,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.5, page 204 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00582">582</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00597">597</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02341">iallgather()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02389">iallgather()</a>.</p>
 
 </div>
 </div>
@@ -2289,9 +2301,9 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.8, page 210 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02839">2839</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02919">2919</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00634">iallreduce()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00660">iallreduce()</a>.</p>
 
 </div>
 </div>
@@ -2354,11 +2366,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.8, page 210 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00634">634</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00660">660</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00101">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, and <a class="el" href="dist_8hpp_source.html#l02839">iallreduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00101">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, and <a class="el" href="dist_8hpp_source.html#l02919">iallreduce()</a>.</p>
 
 </div>
 </div>
@@ -2412,6 +2424,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Nonblocking All-to-All Scatter/Gather. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -2424,9 +2437,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.6, page 206 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02513">2513</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02585">2585</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00599">ialltoall()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00623">ialltoall()</a>.</p>
 
 </div>
 </div>
@@ -2481,6 +2494,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Nonblocking All-to-All Scatter/Gather. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -2495,11 +2509,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.6, page 206 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00599">599</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00623">623</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02513">ialltoall()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02585">ialltoall()</a>.</p>
 
 </div>
 </div>
@@ -2704,6 +2718,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Nonblocking gather. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -2717,9 +2732,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.3, page 200 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02113">2113</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02129">2129</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00558">igather()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>.</p>
 
 </div>
 </div>
@@ -2780,6 +2795,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Nonblocking gather. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>sendbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -2795,11 +2811,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.3, page 200 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00558">558</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00561">561</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02113">igather()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02129">igather()</a>.</p>
 
 </div>
 </div>
@@ -2867,7 +2883,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01889">1889</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00690">irecv()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00716">irecv()</a>.</p>
 
 </div>
 </div>
@@ -2929,11 +2945,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.7.2, page 51 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00690">690</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00716">716</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00085">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01450">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01342">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00391">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00819">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00228">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00126">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00607">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00425">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01889">irecv()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00192">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01141">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00085">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01450">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01342">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00391">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01339">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00819">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00228">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00126">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00607">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00425">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01889">irecv()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00192">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01141">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
 
 </div>
 </div>
@@ -3007,9 +3023,9 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.7, page 209 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02721">2721</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02801">2801</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00621">ireduce()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>.</p>
 
 </div>
 </div>
@@ -3079,11 +3095,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.7, page 209 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00621">621</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00647">647</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02721">ireduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02801">ireduce()</a>.</p>
 
 </div>
 </div>
@@ -3109,7 +3125,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l01162">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>.</p>
 
 </div>
 </div>
@@ -3217,6 +3233,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Nonblocking scatter. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>recvbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -3230,9 +3247,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.4, page 202 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02233">2233</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02265">2265</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00570">iscatter()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>.</p>
 
 </div>
 </div>
@@ -3293,6 +3310,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Nonblocking scatter. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>recvbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> pointer to the send buffer for the operation. The pointer to the buffer is stored internally and must remain valid until the returned request is fulfilled.</td></tr>
@@ -3308,11 +3326,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.4, page 202 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00570">570</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00579">579</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02233">iscatter()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02265">iscatter()</a>.</p>
 
 </div>
 </div>
@@ -3380,7 +3398,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01836">1836</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00678">isend()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00704">isend()</a>.</p>
 
 </div>
 </div>
@@ -3442,11 +3460,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.7.2, page 49 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00678">678</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00704">704</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00085">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01450">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01342">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00391">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00819">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00228">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00126">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00607">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00425">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01836">isend()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00192">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01141">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00085">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01450">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01342">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00391">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01339">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00819">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00228">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00126">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00607">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00425">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01836">isend()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00192">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01141">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
 
 </div>
 </div>
@@ -3617,9 +3635,9 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03028">3028</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03108">3108</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00756">print()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00782">print()</a>.</p>
 
 </div>
 </div>
@@ -3665,11 +3683,11 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00756">756</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00782">782</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="iterative_8hpp_source.html#l00698">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_print_line()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00228">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_args()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00292">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_property_map()</a>, and <a class="el" href="dist_8hpp_source.html#l03028">print()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="iterative_8hpp_source.html#l00698">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_print_line()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00232">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, and <a class="el" href="dist_8hpp_source.html#l03108">print()</a>.</p>
 
 </div>
 </div>
@@ -3704,7 +3722,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__iterative_8hpp_source.html#l00499">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::PartiIterative()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00470">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01223">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00955">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01288">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01162">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01059">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="dist_8cpp_source.html#l00731">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00697">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, <a class="el" href="muxer_8hpp_source.html#l00303">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="runtime_8cpp_source.html#l00038">FEAT::Runtime::initialize()</a>, <a class="el" href="muxer_8hpp_source.html#l00235">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00380">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00344">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00859">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="muxer_8hpp_source.html#l00481">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00445">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="property__map_8cpp_source.html#l00455">FEAT::PropertyMap::write()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00517">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__iterative_8hpp_source.html#l00499">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::PartiIterative()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00470">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01892">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01339">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorV_, MirrorP_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="dist_8cpp_source.html#l00757">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00723">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, <a class="el" href="muxer_8hpp_source.html#l00303">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="runtime_8cpp_source.html#l00038">FEAT::Runtime::initialize()</a>, <a class="el" href="muxer_8hpp_source.html#l00235">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00380">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00344">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="muxer_8hpp_source.html#l00481">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00445">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="property__map_8cpp_source.html#l00455">FEAT::PropertyMap::write()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00517">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -3778,7 +3796,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01748">1748</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00685">recv()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>.</p>
 
 </div>
 </div>
@@ -3845,7 +3863,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01774">1774</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00685">recv()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>.</p>
 
 </div>
 </div>
@@ -3913,11 +3931,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.2.4, page 28 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00685">685</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00711">711</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00316">FEAT::Dist::Status::mpi_status()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00763">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01719">recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01719">recv()</a>.</p>
 
 </div>
 </div>
@@ -3989,7 +4007,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01719">1719</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00685">recv()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>.</p>
 
 </div>
 </div>
@@ -4062,9 +4080,9 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.9.1, page 174 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02652">2652</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02732">2732</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00615">reduce()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>.</p>
 
 </div>
 </div>
@@ -4133,11 +4151,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.9.1, page 174 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00615">615</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00641">641</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02652">reduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02732">reduce()</a>.</p>
 
 </div>
 </div>
@@ -4203,9 +4221,9 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.11.1, page 193 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02894">2894</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02974">2974</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00641">scan()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00667">scan()</a>.</p>
 
 </div>
 </div>
@@ -4267,11 +4285,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.11.1, page 193 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00641">641</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00667">667</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02894">scan()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02974">scan()</a>.</p>
 
 </div>
 </div>
@@ -4331,6 +4349,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p>Blocking scatter. </p>
 <p >This function automatically deducts the datatype of the send/receive buffer(s) (if possible).</p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>recvbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -4343,9 +4362,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.6, page 159 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02169">2169</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02193">2193</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00565">scatter()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>.</p>
 
 </div>
 </div>
@@ -4406,6 +4425,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Blocking scatter. </p>
+<dl class="section note"><dt>Note</dt><dd><code>sendbuf</code> and <code>recvbuf</code> are allowed to be identical; in this case, the <code>recvbuf</code> argument of the MPI function call is set to <code>MPI_IN_PLACE</code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sendbuf</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the send buffer for the operation.</td></tr>
@@ -4420,11 +4440,11 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.6, page 159 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00565">565</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00571">571</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02169">scatter()</a>, <a class="el" href="muxer_8hpp_source.html#l00481">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00445">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02193">scatter()</a>, <a class="el" href="muxer_8hpp_source.html#l00481">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00445">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
 
 </div>
 </div>
@@ -4522,7 +4542,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01667">1667</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00673">send()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00699">send()</a>.</p>
 
 </div>
 </div>
@@ -4583,11 +4603,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.2.1, page 24 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00673">673</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00699">699</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00763">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01667">send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01667">send()</a>.</p>
 
 </div>
 </div>
@@ -4622,7 +4642,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01362">_size</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l01223">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00955">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01288">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01162">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01059">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01540">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00340">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, <a class="el" href="matrix_8hpp_source.html#l00267">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00715">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::create()</a>, <a class="el" href="gate_8hpp_source.html#l00506">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l01186">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="muxer_8hpp_source.html#l00224">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="splitter_8hpp_source.html#l00179">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_single()</a>, <a class="el" href="muxer_8hpp_source.html#l00380">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00344">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="gate_8hpp_source.html#l00274">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00859">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00427">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::set_desired_levels()</a>, <a class="el" href="muxer_8hpp_source.html#l00481">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00445">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00508">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="matrix_8hpp_source.html#l00257">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00517">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01043">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_slag_mask()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00348">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l02011">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01892">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00340">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, <a class="el" href="matrix_8hpp_source.html#l00267">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00657">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="gate_8hpp_source.html#l00506">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l01186">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="muxer_8hpp_source.html#l00224">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="splitter_8hpp_source.html#l00179">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_single()</a>, <a class="el" href="muxer_8hpp_source.html#l00380">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00344">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="gate_8hpp_source.html#l00274">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00329">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, <a class="el" href="muxer_8hpp_source.html#l00481">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00445">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00508">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="matrix_8hpp_source.html#l00257">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00517">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -4684,7 +4704,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01360">1360</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00763">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00621">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00756">print()</a>, <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>, and <a class="el" href="dist_8cpp_source.html#l00615">reduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00782">print()</a>, <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>, and <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>.</p>
 
 </div>
 </div>
@@ -4712,7 +4732,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01362">1362</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00763">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00756">print()</a>, and <a class="el" href="dist_8hpp_source.html#l01508">size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00782">print()</a>, and <a class="el" href="dist_8hpp_source.html#l01508">size()</a>.</p>
 
 </div>
 </div>
@@ -4732,7 +4752,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01355">1355</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00422">~Comm()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l01162">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="dist_8cpp_source.html#l00577">allgather()</a>, <a class="el" href="dist_8cpp_source.html#l00589">allgatherv()</a>, <a class="el" href="dist_8cpp_source.html#l00629">allreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00594">alltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00610">alltoallv()</a>, <a class="el" href="dist_8cpp_source.html#l00529">barrier()</a>, <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00498">comm_create_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00459">comm_dup()</a>, <a class="el" href="dist_8cpp_source.html#l00522">comm_split()</a>, <a class="el" href="dist_8cpp_source.html#l00657">exscan()</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="dist_8cpp_source.html#l00582">iallgather()</a>, <a class="el" href="dist_8cpp_source.html#l00634">iallreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00599">ialltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00534">ibarrier()</a>, <a class="el" href="dist_8cpp_source.html#l00546">ibcast()</a>, <a class="el" href="dist_8cpp_source.html#l00558">igather()</a>, <a class="el" href="dist_8cpp_source.html#l00690">irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00621">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00454">is_null()</a>, <a class="el" href="dist_8cpp_source.html#l00449">is_self()</a>, <a class="el" href="dist_8cpp_source.html#l00444">is_world()</a>, <a class="el" href="dist_8cpp_source.html#l00570">iscatter()</a>, <a class="el" href="dist_8cpp_source.html#l00678">isend()</a>, <a class="el" href="dist_8hpp_source.html#l01441">mpi_comm()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00685">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00615">reduce()</a>, <a class="el" href="dist_8cpp_source.html#l00641">scan()</a>, <a class="el" href="dist_8cpp_source.html#l00565">scatter()</a>, and <a class="el" href="dist_8cpp_source.html#l00673">send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00422">~Comm()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="dist_8cpp_source.html#l00589">allgather()</a>, <a class="el" href="dist_8cpp_source.html#l00607">allgatherv()</a>, <a class="el" href="dist_8cpp_source.html#l00655">allreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00615">alltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00633">alltoallv()</a>, <a class="el" href="dist_8cpp_source.html#l00529">barrier()</a>, <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00498">comm_create_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00459">comm_dup()</a>, <a class="el" href="dist_8cpp_source.html#l00522">comm_split()</a>, <a class="el" href="dist_8cpp_source.html#l00683">exscan()</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="dist_8cpp_source.html#l00597">iallgather()</a>, <a class="el" href="dist_8cpp_source.html#l00660">iallreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00623">ialltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00534">ibarrier()</a>, <a class="el" href="dist_8cpp_source.html#l00546">ibcast()</a>, <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>, <a class="el" href="dist_8cpp_source.html#l00716">irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00454">is_null()</a>, <a class="el" href="dist_8cpp_source.html#l00449">is_self()</a>, <a class="el" href="dist_8cpp_source.html#l00444">is_world()</a>, <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>, <a class="el" href="dist_8cpp_source.html#l00704">isend()</a>, <a class="el" href="dist_8hpp_source.html#l01441">mpi_comm()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>, <a class="el" href="dist_8cpp_source.html#l00667">scan()</a>, <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>, and <a class="el" href="dist_8cpp_source.html#l00699">send()</a>.</p>
 
 </div>
 </div>

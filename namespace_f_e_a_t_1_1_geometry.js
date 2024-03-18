@@ -21,6 +21,7 @@ var namespace_f_e_a_t_1_1_geometry =
     [ "IndexTree", "class_f_e_a_t_1_1_geometry_1_1_index_tree.html", "class_f_e_a_t_1_1_geometry_1_1_index_tree" ],
     [ "IndexTuple", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple.html", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple" ],
     [ "MacroFactory", "class_f_e_a_t_1_1_geometry_1_1_macro_factory.html", null ],
+    [ "MaskedBoundaryFactory", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory" ],
     [ "MeshAtlas", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas" ],
     [ "MeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion" ],
     [ "MeshExtruder", "class_f_e_a_t_1_1_geometry_1_1_mesh_extruder.html", null ],

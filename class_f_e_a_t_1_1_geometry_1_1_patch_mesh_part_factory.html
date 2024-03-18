@@ -151,6 +151,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aed038bcf7b351b7b11f72359c6dab62d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_patch_mesh_part_factory.html#aed038bcf7b351b7b11f72359c6dab62d">PatchMeshPartFactory</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> my_rank, const <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html">Adjacency::Graph</a> &amp;elems_at_rank)</td></tr>
 <tr class="memdesc:aed038bcf7b351b7b11f72359c6dab62d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a factory from a given partitioning.  <a href="class_f_e_a_t_1_1_geometry_1_1_patch_mesh_part_factory.html#aed038bcf7b351b7b11f72359c6dab62d">More...</a><br /></td></tr>
 <tr class="separator:aed038bcf7b351b7b11f72359c6dab62d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af09578497393bb4274a1680b25228ef4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_patch_mesh_part_factory.html#af09578497393bb4274a1680b25228ef4">PatchMeshPartFactory</a> (std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&amp;cells_patch)</td></tr>
+<tr class="separator:af09578497393bb4274a1680b25228ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd463b10e83d0848a2e3b396a070dd01"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_patch_mesh_part_factory.html#afd463b10e83d0848a2e3b396a070dd01">~PatchMeshPartFactory</a> ()</td></tr>
 <tr class="memdesc:afd463b10e83d0848a2e3b396a070dd01"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor  <a href="class_f_e_a_t_1_1_geometry_1_1_patch_mesh_part_factory.html#afd463b10e83d0848a2e3b396a070dd01">More...</a><br /></td></tr>
 <tr class="separator:afd463b10e83d0848a2e3b396a070dd01"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -325,7 +327,7 @@ template&lt;typename MeshType_ &gt; </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aed038bcf7b351b7b11f72359c6dab62d" name="aed038bcf7b351b7b11f72359c6dab62d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed038bcf7b351b7b11f72359c6dab62d">&#9670;&#160;</a></span>PatchMeshPartFactory()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aed038bcf7b351b7b11f72359c6dab62d">&#9670;&#160;</a></span>PatchMeshPartFactory() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -375,6 +377,36 @@ template&lt;typename MeshType_ &gt; </div>
 
 </div>
 </div>
+<a id="af09578497393bb4274a1680b25228ef4" name="af09578497393bb4274a1680b25228ef4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af09578497393bb4274a1680b25228ef4">&#9670;&#160;</a></span>PatchMeshPartFactory() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MeshType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_patch_mesh_part_factory.html">FEAT::Geometry::PatchMeshPartFactory</a>&lt; MeshType_ &gt;::PatchMeshPartFactory </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>cells_patch</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00070">70</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+
+</div>
+</div>
 <a id="afd463b10e83d0848a2e3b396a070dd01" name="afd463b10e83d0848a2e3b396a070dd01"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afd463b10e83d0848a2e3b396a070dd01">&#9670;&#160;</a></span>~PatchMeshPartFactory()</h2>
 
@@ -402,7 +434,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00071">71</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00076">76</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,11 +466,11 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p>Checks whether the patch is empty. </p>
 
-<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00078">78</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00083">83</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00048">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::_cells_patch</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01042">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01200">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
 
 </div>
 </div>
@@ -479,7 +511,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_factory_3_01_mesh_part_3_01_mesh_type___01_4_01_4.html#ad227fd4728e06fb6e50509361947362f">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00107">107</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00112">112</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -520,7 +552,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_factory_3_01_mesh_part_3_01_mesh_type___01_4_01_4.html#ad97c28b35e6866da9c784e5bb051794e">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00121">121</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00126">126</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -561,7 +593,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_factory_3_01_mesh_part_3_01_mesh_type___01_4_01_4.html#aaa76006e8b0669bf01256106b0d14b40">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00135">135</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00140">140</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00048">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::_cells_patch</a>.</p>
 
@@ -604,7 +636,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_factory_3_01_mesh_part_3_01_mesh_type___01_4_01_4.html#aa1df72bacc9830c2975dbc9b665a79d3">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00092">92</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00097">97</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00048">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::_cells_patch</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00044">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::shape_dim</a>, and <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>.</p>
 
@@ -672,7 +704,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mesh__part_8hpp_source.html#l00640">640</a> of file <a class="el" href="mesh__part_8hpp_source.html">mesh_part.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01231">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::create_patch_meshpart()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01042">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01389">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::create_patch_meshpart()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01055">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
 
 </div>
 </div>
@@ -703,7 +735,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00048">48</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00060">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::PatchMeshPartFactory()</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00078">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::empty()</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00135">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::fill_target_sets()</a>, and <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00092">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00060">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::PatchMeshPartFactory()</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00083">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::empty()</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00140">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::fill_target_sets()</a>, and <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00097">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -733,7 +765,7 @@ template&lt;typename MeshType_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00044">44</a> of file <a class="el" href="patch__meshpart__factory_8hpp_source.html">patch_meshpart_factory.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00092">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00097">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>

@@ -10,5 +10,6 @@ var dir_56ea320f36428fc096e6ea8f45d8dae0 =
     [ "statistics.hpp", "control_2statistics_8hpp_source.html", null ],
     [ "stokes_3field.hpp", "stokes__3field_8hpp_source.html", null ],
     [ "stokes_blocked.hpp", "stokes__blocked_8hpp_source.html", null ],
-    [ "stokes_power.hpp", "stokes__power_8hpp_source.html", null ]
+    [ "stokes_power.hpp", "stokes__power_8hpp_source.html", null ],
+    [ "voxel_transfer_assembler.hpp", "voxel__transfer__assembler_8hpp_source.html", null ]
 ];

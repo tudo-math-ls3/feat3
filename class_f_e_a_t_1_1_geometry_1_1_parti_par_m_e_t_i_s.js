@@ -9,7 +9,7 @@ var class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s =
     [ "_execute", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a49b6bb57d5306aff0de58c8c9d03c7b4", null ],
     [ "_gather_coloring", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a712b74bc4c3ec99a7beea68f7a9a9699", null ],
     [ "build_elems_at_rank", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#abc28f41570e4bb90675048f8ae2f7966", null ],
-    [ "execute", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a7f5d9956f63ed48b745cf76ea7605511", null ],
+    [ "execute", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a5e06ddaaa8f18ba6cbabf69807670fb6", null ],
     [ "_coloring", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a54a23987318ebc6e2d1b33a074d778da", null ],
     [ "_comm", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#aba606fd686629d4806d3b0c242a575ad", null ],
     [ "_first_elem", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a45da9c1c6b4fd72979bb63bd6079cee6", null ],
@@ -19,5 +19,6 @@ var class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s =
     [ "_num_parts", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#ab4950dad3f186a43fde1f873013bdaeb", null ],
     [ "_parts", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a2863b1ae9c96cff5318b127dff0633c3", null ],
     [ "_sub_comm", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a110d9ae9100c6850aeed3f145acf6258", null ],
-    [ "_subgraph", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a40f864d7415a84b37f3487061f233dfa", null ]
+    [ "_subgraph", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a40f864d7415a84b37f3487061f233dfa", null ],
+    [ "_weights", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a6207021df939f7675617c7adc59a2922", null ]
 ];

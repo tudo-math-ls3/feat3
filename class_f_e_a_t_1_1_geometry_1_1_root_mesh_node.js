@@ -26,6 +26,7 @@ var class_f_e_a_t_1_1_geometry_1_1_root_mesh_node =
     [ "clone_unique", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a8a26368a46d701797414dad565443809", null ],
     [ "create_patch_meshpart", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a6fa2a2b60f5bf11c42559503cf0324b9", null ],
     [ "create_permutation", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#aada548a249edd9a417fed9c6daaf9d0a", null ],
+    [ "extract_patch", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a1c3fd615b09f5f30b14518eaa46ce02d", null ],
     [ "extract_patch", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a7e65d931ba64305164855f9b8c141349", null ],
     [ "extract_patch", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a692d3308a671ab5313fa97c43b792a3c", null ],
     [ "find_mesh_part", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#ab4579ab741229b50f9cbfa4eaca46a15", null ],
