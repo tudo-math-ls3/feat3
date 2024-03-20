@@ -1,6 +1,6 @@
 # Top-Level FEAT CMakeLists.txt
 
-cmake_minimum_required(VERSION 3.15.5)
+cmake_minimum_required(VERSION 3.18.0)
 if (((CMAKE_MAJOR_VERSION GREATER 3)) OR ((CMAKE_MAJOR_VERSION EQUAL 3) AND (CMAKE_MINOR_VERSION GREATER 0)))
   cmake_policy(SET CMP0054 NEW)
 endif (((CMAKE_MAJOR_VERSION GREATER 3)) OR ((CMAKE_MAJOR_VERSION EQUAL 3) AND (CMAKE_MINOR_VERSION GREATER 0)))
@@ -80,7 +80,6 @@ if (FEAT_HAVE_CUDA)
   #Important: Set cuda flag before enable language call
   set(CMAKE_CUDA_FLAGS "${INTERNAL_CUDA_FLAGS}" CACHE STRING "Cuda compile flag")
   enable_language(CUDA)
-  find_package(CUDAToolkit)
   set (CUDA_PROPAGATE_HOST_FLAGS OFF)
 
   if (FEAT_CUDAMEMCHECK)
