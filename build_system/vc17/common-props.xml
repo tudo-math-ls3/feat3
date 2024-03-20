@@ -11,6 +11,11 @@
   <!-- ********************************************************************* -->
   <!-- CUDA Backend Detection -->
   <!-- ********************************************************************* -->
+  <PropertyGroup Condition="'$(EnableCUDA)'=='true' And '$(FeatHaveCuda)'=='' And '$(CUDA_PATH_V12_4)'!=''">
+    <FeatHaveCuda>true</FeatHaveCuda>
+    <FeatCudaVersion>12.4</FeatCudaVersion>
+    <FeatCudaPath>$(CUDA_PATH_V12_4)</FeatCudaPath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(EnableCUDA)'=='true' And '$(FeatHaveCuda)'=='' And '$(CUDA_PATH_V11_8)'!=''">
     <FeatHaveCuda>true</FeatHaveCuda>
     <FeatCudaVersion>11.8</FeatCudaVersion>
