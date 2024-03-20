@@ -1086,7 +1086,7 @@ namespace FEAT
       /**
        * \brief Returns the assembled function integral info
        */
-      const FunctionIntegralType& result() const
+      FunctionIntegralType& result()
       {
         return _integral;
       }
@@ -1267,7 +1267,7 @@ namespace FEAT
       }
 
       // \returns The integral of the discrete function
-      const FunctionIntegralType& result() const
+      FunctionIntegralType& result()
       {
         return _integral;
       }
@@ -1472,7 +1472,7 @@ namespace FEAT
       }
 
       // \returns The integral of the discrete function
-      const FunctionIntegralType& result() const
+      FunctionIntegralType& result()
       {
         return _integral;
       }

@@ -83,6 +83,9 @@ namespace CCND
 
       // this application has homogeneous RHS
       homogeneous_unsteady_rhs = true;
+
+      // don't start with Picard in case of Newton
+      newton_starts_with_picard = false;
     }
 
     virtual void parse_args() override

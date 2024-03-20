@@ -414,7 +414,7 @@ namespace CCND
         String s;
         const char pc = '.';
         // append coefficients and velocity info
-        s += "Solution Analysis:\n";
+        s += "Solution Analysis:";
         s += String("\nDrag Coefficient (Line)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_line, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(drag_err_line, prec) + " ]";

@@ -14,6 +14,7 @@
 #include <kernel/util/statistics.hpp>
 #include <kernel/geometry/hit_test_factory.hpp>
 #include <kernel/geometry/export_vtk.hpp>
+#include <kernel/geometry/atlas/cgal_surface_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/trafo/isoparam/mapping.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>

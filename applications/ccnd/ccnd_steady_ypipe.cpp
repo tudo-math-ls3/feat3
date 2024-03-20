@@ -297,13 +297,12 @@ namespace CCND
     // initialize solver
     app.init_solver_symbolic();
 
-    // load initial solution or solve Stokes
-    if(!app.load_initial_solution())
-      app.solve_stokes();
+    // load initial solution if desired
+    if(app.load_initial_solution())
+      app.newton_starts_with_picard = false; // skip Picard iteration in first Newton step
 
-    // solve Navier-Stokes if desired
-    if(app.navier)
-      app.solve_navier_stokes();
+    // solve non-linear system
+    app.solve_nonlinear_system();
 
     // collect statistics
     app.collect_solver_statistics();

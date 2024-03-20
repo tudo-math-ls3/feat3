@@ -483,8 +483,12 @@ namespace CCND
       // advance time step
       ++cur_step;
 
-        // compute simulation time
+      // compute simulation time
       cur_time = time_max * DataType(cur_step) / DataType(max_time_steps);
+
+      // print header line
+      //         "     1:  0.10000000 |  1: 4.032408e-03 / 2.160869e-01 / 2.161e-01 |   4: 8.38977e-06 / 2.08058e-03 [1.88287e-05]"
+      comm.print("  Step   Time       |  #  Defect (abs)   Defect (rel)   Improve   |  MG  fin abs Def   fin rel Def  abs Tol");
 
       // keep going
       return true;
@@ -571,9 +575,7 @@ namespace CCND
 
     virtual void setup_burgers_defect_job(Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType>& burgers_def_job) override
     {
-      burgers_def_job.deformation = deformation;
-      burgers_def_job.nu = -nu;
-      burgers_def_job.beta = -DataType(1);
+      BaseClass::setup_burgers_defect_job(burgers_def_job);
       if(cur_step == Index(1))
         burgers_def_job.theta = -DataType(1) / delta_t; // implicit Euler in first time step
       else
@@ -582,21 +584,16 @@ namespace CCND
 
     virtual void setup_burgers_matrix_job(Assembly::BurgersBlockedMatrixAssemblyJob<LocalMatrixBlockA, SpaceVeloType, LocalVeloVector>& burgers_mat_job) override
     {
-      burgers_mat_job.deformation = deformation;
-      burgers_mat_job.nu = nu;
-      burgers_mat_job.beta = DataType(1);
-      burgers_mat_job.frechet_beta = DataType(newton ? 1 : 0);
+      BaseClass::setup_burgers_matrix_job(burgers_mat_job);
       if(cur_step == Index(1))
         burgers_mat_job.theta = DataType(1) / delta_t; // implicit Euler in first time step
       else
         burgers_mat_job.theta = DataType(1.5) / delta_t; // BDF(2) in all further time steps
-      burgers_mat_job.sd_delta = upsam;
-      burgers_mat_job.sd_nu = nu;
     }
 
     virtual bool solve_time_step()
     {
-      return solve_navier_stokes(line_prefix() + " | ");
+      return solve_nonlinear_system(line_prefix() + " | ");
     }
 
     virtual void analyze_time_derivative()

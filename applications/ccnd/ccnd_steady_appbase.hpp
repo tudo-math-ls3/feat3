@@ -43,7 +43,6 @@
 // meshfile itself.
 //
 //
-//
 // ----------------------------
 // System Definition Parameters
 // ----------------------------
@@ -61,6 +60,10 @@
 // Specifies the stabilization parameter <ups> for the streamline diffusion stabilization.
 // Defaults to 0, i.e. unstabilized.
 //
+// --adapt-upsam <up>
+// Specifies the adaptive stabilization parameter <ups> for the streamline diffusion stabilization.
+// Defaults to 0, i.e. unstabilized.
+//
 // --stokes
 // If specified, only the steady-state Stokes equations are solved and the nonlinear iteration
 // for solving the Navier-Stokes equations is skipped entirely.
@@ -72,9 +75,9 @@
 // This section describes the parameters that control the non-linear Newton/Picard solver
 // as well as its multigrid preconditioner and its smoother component.
 //
-// --picard
-// If specified, the nonlinear system in each time step will be solved using a simple
-// Picard iteration instead of the Newton iteration.
+// --nl-solver <picard|newton|alpine>
+// Specifies which type of non-linear solver is to be used. Can be either 'picard' for Picard
+// iteration, 'newton' for Newton iteration or 'alpine' for alternating Picard-Newton iteration.
 //
 // --plot-mg-iter
 // If specified, the convergence plot of the multigrid solver in each nonlinear solver iteration
@@ -103,11 +106,16 @@
 // Specifies the damping parameter for the AmaVanka smoother (if inside a Richardson iteration).
 // Defaults to 0.5.
 //
-// --smooth-gmres
-// Use FGMRES-AmaVanka as smoother (instead of Richardson-AmaVanka).
+// --smooth-gmres [<k>]
+// Use FGMRES[k]-AmaVanka as smoother (instead of Richardson-AmaVanka). If <k> is omitted, then
+// it is set equal to the number of smoothing steps.
 //
-// --solve-gmres
-// Use FGMRES-Multigrid as solver (instead of Richardson-Multigrid).
+// --solve-gmres <k>
+// Use FGMRES[k]-Multigrid as solver (instead of Richardson-Multigrid). If <k> is omitted, then
+// it is set equal to the maximum number of allowed multigrid iterations.
+//
+// --nl-stag-rate <rate>
+// Specifies the stagnation rate for the nonlinear solver. Defaults to 0.97.
 //
 // --nl-tol-abs <tol>
 // Specifies the absolute tolerance for the nonlinear solver. Defaults to 1E-8.
@@ -204,6 +212,28 @@ namespace CCND
   typedef typename SystemLevel::LocalVeloVector LocalVeloVector;
   typedef typename SystemLevel::LocalPresVector LocalPresVector;
 
+  enum class NonlinSolver
+  {
+    picard,  //< Picard iteration
+    newton,  //< Newton iteration
+    alpine   //< alternating Picard-Newton iteration
+  };
+
+  std::ostream& operator<<(std::ostream& os, NonlinSolver nls)
+  {
+    switch(nls)
+    {
+    case NonlinSolver::picard:
+      return os << "Picard";
+    case NonlinSolver::newton:
+      return os << "Newton";
+    case NonlinSolver::alpine:
+      return os << "AlPiNe";
+    default:
+      return os << "???";
+    }
+  }
+
   class SteadyAppBase
   {
   public:
@@ -230,10 +260,13 @@ namespace CCND
     /// is this actually an unsteady simulation?
     bool is_unsteady = false;
 
+    /// is the viscosity parameter 'nu' constant?
+    bool constant_nu = true;
+
     /// solve Navier-Stokes rather than just Stokes?
     bool navier = true;
     /// use Newton or Picard iteration?
-    bool newton = true;
+    NonlinSolver nonlin_solver = NonlinSolver::newton;
     /// use deformation tensor instead of gradient tensor?
     bool deformation = false;
     /// use adaptive Multigrid tolerance?
@@ -243,9 +276,11 @@ namespace CCND
     /// enable extended statistics collection?
     bool ext_stats = false;
     /// use FGMRES for smoother
-    bool smooth_gmres = false;
+    Index smooth_gmres_dim = Index(0);
+    //bool smooth_gmres = false;
     /// use FGMRES as outer solver
-    bool solve_gmres = false;
+    //bool solve_gmres = false;
+    Index solve_gmres_dim = Index(0);
     /// use FGMRES as coarse solver
 #ifdef FEAT_HAVE_UMFPACK
     bool coarse_gmres = false;
@@ -260,10 +295,15 @@ namespace CCND
     /// specifies whether the simulation has a non-zero right-hand-side (always false for unsteady simulations)
     bool homogeneous_rhs = false;
 
+    /// specifies whether a Newton iteration should start with a single Picard step
+    bool newton_starts_with_picard = true;
+
     /// viscosity parameter nu
     DataType nu = DataType(1);
-    /// streamline diffusion parameter
+    /// streamline diffusion parameter (fixed)
     DataType upsam = DataType(0);
+    /// adaptive streamline diffusion parameter
+    DataType adapt_upsam = DataType(0);
     /// minimum non-linear solver iterations
     IndexType min_nl_iter = 1u;
     /// maximum non-linear solver iterations
@@ -280,6 +320,11 @@ namespace CCND
     DataType mg_tol_rel = DataType(1E-2);
     /// absolute tolerance for non-linear solver
     DataType nl_tol_abs = DataType(1E-8);
+    /// stagnation rate for non-linear solver
+    DataType nl_stag_rate = DataType(0.97);
+
+    /// current nonlinear iteration
+    Index nl_step = Index(0);
 
     /// default filename for all kinds of output files (VTK, checkpoints, etc)
     String default_filename;
@@ -290,7 +335,6 @@ namespace CCND
     String cubature_matrix_b = "gauss-legendre:3";
     String cubature_matrix_m = "gauss-legendre:3";
     String cubature_defect   = "gauss-legendre:3";
-
 
     /// name of VTK output file(s)
     String vtk_filename;
@@ -351,6 +395,7 @@ namespace CCND
       args.support("cgal-mesh-chart");
       args.support("nu");
       args.support("upsam");
+      args.support("adapt-upsam");
       args.support("min-nl-iter");
       args.support("max-nl-iter");
       args.support("min-mg-iter");
@@ -363,7 +408,8 @@ namespace CCND
       args.support("coarse-gmres");
       args.support("mg-tol-rel");
       args.support("nl-tol-abs");
-      args.support("picard");
+      args.support("nl-stag-rate");
+      args.support("nl-solver");
       args.support("defo");
       args.support("stokes");
       args.support("ext-stats");
@@ -413,18 +459,19 @@ namespace CCND
     {
       // parse simple bools
       navier = (args.check("stokes") < 0);
-      newton = (args.check("picard") < 0);
       deformation = (args.check("defo") >= 0);
       adapt_mg_tol = (args.check("mg-tol-rel") < 0);
       ext_stats = (args.check("ext-stats") >= 0);
       plot_mg_iter = (args.check("plot-mg-iter") >= 0);
       coarse_gmres = (args.check("coarse-gmres") >= 0);
-      smooth_gmres = (args.check("smooth-gmres") >= 0);
-      solve_gmres = (args.check("solve-gmres") >= 0);
+
+      // parse streamline diffusion parameters
+      args.parse("adapt-upsam", adapt_upsam);
+      upsam = adapt_upsam;
+      args.parse("upsam", upsam);
 
       // parse other parameters
       args.parse("nu", nu);
-      args.parse("upsam", upsam);
       args.parse("min-nl-iter", min_nl_iter);
       args.parse("max-nl-iter", max_nl_iter);
       args.parse("min-mg-iter", min_mg_iter);
@@ -433,6 +480,34 @@ namespace CCND
       args.parse("nl-tol-abs", nl_tol_abs);
       args.parse("smooth-steps", smooth_steps);
       args.parse("smooth-damp", smooth_damp);
+
+      // parse gmres dimensions
+      if(args.check("smooth-gmres") == 0)
+        smooth_gmres_dim = smooth_steps;
+      else
+        args.parse("smooth-gmres", smooth_gmres_dim);
+      if(args.check("solve-gmres") == 0)
+        solve_gmres_dim = max_mg_iter;
+      else
+        args.parse("solve-gmres", solve_gmres_dim);
+
+      // which type of nonlinear solver
+      if(args.check("nl-solver") > 0)
+      {
+        String nls;
+        args.parse("nl-solver", nls);
+        if(nls.compare_no_case("picard") == 0)
+          nonlin_solver = NonlinSolver::picard;
+        else if(nls.compare_no_case("newton") == 0)
+          nonlin_solver = NonlinSolver::newton;
+        else if(nls.compare_no_case("alpine") == 0)
+          nonlin_solver = NonlinSolver::alpine;
+        else
+        {
+          comm.print("ERROR: invalid argument for --nl-solver: " + nls + "\nExpected: 'picard', 'newton' or 'alpine'");
+          Runtime::abort();
+        }
+      }
 
       // want to write VTK?
       refine_vtk = (args.check("refine-vtk") >= 0);
@@ -480,7 +555,7 @@ namespace CCND
       comm.print(String("Mesh Files").pad_back(pad_len, pad_char) + ": '" + stringify_join(mesh_file_names, "' , '") + "'");
       comm.print(String("Mesh Type").pad_back(pad_len, pad_char) + ": " + mesh_file_type);
       if(create_cgal_chart)
-        comm.print(String("CgalMesh Files/Charts").pad_back(pad_len, pad_char) + ": '" + stringify_join(cgal_chart_pairs, "' , '") + "'");
+        comm.print(String("CGAL Mesh Files/Charts").pad_back(pad_len, pad_char) + ": '" + stringify_join(cgal_chart_pairs, "' , '") + "'");
       comm.print(String("Desired Levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels());
       comm.print(String("Chosen Levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels());
 #ifdef FEAT_CCND_APP_ISOPARAM
@@ -491,23 +566,37 @@ namespace CCND
 
       comm.print(String("System").pad_back(pad_len, pad_char) + ": steady " + (navier ? "Navier-Stokes" : "Stokes"));
       comm.print(String("Diffusion Tensor").pad_back(pad_len, pad_char) + ": " + (deformation ? "Deformation" : "Gradient"));
+      comm.print(String("Constant Viscosity").pad_back(pad_len, pad_char) + ": " + (constant_nu ? "yes" : "no"));
       comm.print(String("Fictitious Boundary").pad_back(pad_len, pad_char) + ": " + (enable_fbm ? "yes" : "no"));
-      comm.print(String("Nu").pad_back(pad_len, pad_char) + ": " + stringify(nu));
-      comm.print(String("Upsam").pad_back(pad_len, pad_char) + ": " + stringify(upsam));
-      comm.print(String("Nonlinear Solver").pad_back(pad_len, pad_char) + ": " + (newton ? "Newton" : "Picard"));
-      comm.print(String("AmaVanka Smoother Steps").pad_back(pad_len, pad_char) + ": " + stringify(smooth_steps));
-      comm.print(String("AmaVanka Smoother Damping").pad_back(pad_len, pad_char) + ": " + stringify(smooth_damp));
-      comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": " + (smooth_gmres ? "FGMRES" : "Richardson"));
+      comm.print(String("Viscosity Nu").pad_back(pad_len, pad_char) + ": " + stringify(nu));
+      if(adapt_upsam > DataType(0))
+        comm.print(String("Streamline Diffusion").pad_back(pad_len, pad_char) + ": " + stringify(adapt_upsam) + " (adaptive)");
+      else if(upsam > DataType(0))
+        comm.print(String("Streamline Diffusion").pad_back(pad_len, pad_char) + ": " + stringify(upsam) + " (standard)");
+      else
+        comm.print(String("Streamline Diffusion").pad_back(pad_len, pad_char) + ": disabled");
+      comm.print(String("Nonlinear Solver").pad_back(pad_len, pad_char) + ": " + stringify(nonlin_solver));
       comm.print(String("Nonlinear Absolute Tol").pad_back(pad_len, pad_char) + ": " + stringify_fp_sci(nl_tol_abs));
+      comm.print(String("Nonlinear Stagnation Rate").pad_back(pad_len, pad_char) + ": " + stringify_fp_fix(nl_stag_rate));
+      comm.print(String("Min Nonlinear Iterations").pad_back(pad_len, pad_char) + ": " + stringify(min_nl_iter));
+      comm.print(String("Max Nonlinear Iterations").pad_back(pad_len, pad_char) + ": " + stringify(max_nl_iter));
       comm.print(String("Multigrid Relative Tol").pad_back(pad_len, pad_char) + ": " + (adapt_mg_tol ? String("adaptive") : stringify_fp_sci(mg_tol_rel)));
       comm.print(String("Min Multigrid Iterations").pad_back(pad_len, pad_char) + ": " + stringify(min_mg_iter));
       comm.print(String("Max Multigrid Iterations").pad_back(pad_len, pad_char) + ": " + stringify(max_mg_iter));
-      comm.print(String("Max Nonlinear Iterations").pad_back(pad_len, pad_char) + ": " + stringify(max_nl_iter));
-      comm.print(String("Multigrid Iteration").pad_back(pad_len, pad_char) + ": " + (solve_gmres ? "FGMRES" : "Richardson"));
+      if(solve_gmres_dim > Index(0))
+        comm.print(String("Multigrid Iteration").pad_back(pad_len, pad_char) + ": FGMRES[" + stringify(solve_gmres_dim) + "]-Multigrid");
+      else
+        comm.print(String("Multigrid Iteration").pad_back(pad_len, pad_char) + ": Richardson-Multigrid");
       if(coarse_gmres)
         comm.print(String("Multigrid Coarse Solver").pad_back(pad_len, pad_char) + ": FGMRES-AmaVanka");
       else
         comm.print(String("Multigrid Coarse Solver").pad_back(pad_len, pad_char) + ": Direct Solver (UMFPACK)");
+      comm.print(String("AmaVanka Smoother Steps").pad_back(pad_len, pad_char) + ": " + stringify(smooth_steps));
+      comm.print(String("AmaVanka Smoother Damping").pad_back(pad_len, pad_char) + ": " + stringify(smooth_damp));
+      if(smooth_gmres_dim > Index(0))
+        comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": FGMRES[" + stringify(smooth_gmres_dim) + "]-AmaVanka");
+      else
+        comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": Richardson-AmaVanka");
     }
 
     virtual void create_domain()
@@ -524,11 +613,11 @@ namespace CCND
       mesh_reader.read_root_markup();
       mesh_file_type = mesh_reader.get_meshtype_string();
 
-      //before we create the mesh in our domain, we need to add our charts if required
+      // before we create the mesh in our domain, we need to add our charts if required
       if(create_cgal_chart)
       {
-        //requires create_cgal_chart to be divisble by 2
-        if(cgal_chart_pairs.size()%2 != 0)
+        // requires create_cgal_chart to be divisble by 2
+        if(cgal_chart_pairs.size() % 2 != 0)
         {
           XABORTM("CGAL chart pair names are not pairs.");
         }
@@ -778,7 +867,7 @@ namespace CCND
             comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is finer that fine level");
             Runtime::abort();
           }
-          slidx = fine_level_idx - level_idx;
+          slidx = std::size_t(fine_level_idx - level_idx);
           if(slidx >= system.size())
           {
             comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is coarser than coarse level");
@@ -849,7 +938,7 @@ namespace CCND
             comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is finer that fine level");
             Runtime::abort();
           }
-          std::size_t slidx = fine_level_idx - level_idx;
+          std::size_t slidx = std::size_t(fine_level_idx - level_idx);
           if(slidx >= system.size())
           {
             comm.print("\nERROR: invalid level index for initial solution:" + stringify(level_idx) + " is coarser than coarse level");
@@ -1001,8 +1090,8 @@ namespace CCND
 
           // create smoother: either GMRES or Richardson
           std::shared_ptr<Solver::IterativeSolver<GlobalSystemVector>> smoother;
-          if(smooth_gmres)
-            smoother = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, smooth_steps, 0.0, schwarz);
+          if(smooth_gmres_dim > Index(0))
+            smoother = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, smooth_gmres_dim, 0.0, schwarz);
           else
             smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
           smoother->set_min_iter(smooth_steps);
@@ -1039,8 +1128,8 @@ namespace CCND
       multigrid = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
 
       // create our solver
-      if(solve_gmres)
-        solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, 16, 0.0, multigrid);
+      if(solve_gmres_dim > Index(0))
+        solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.0, multigrid);
       else
         solver = solver_iterative = Solver::new_richardson(matrix_sys, filter_sys, 1.0, multigrid);
 
@@ -1048,8 +1137,8 @@ namespace CCND
       if(solver_iterative)
       {
         // set solver name
-        if(solve_gmres)
-          solver_iterative->set_plot_name("FGMRES-MG");
+        if(solve_gmres_dim > Index(0))
+          solver_iterative->set_plot_name("FGMRES-MG[" + stringify(solve_gmres_dim) + "]");
         else
           solver_iterative->set_plot_name("Multigrid");
 
@@ -1158,7 +1247,7 @@ namespace CCND
     {
       burgers_def_job.deformation = deformation;
       burgers_def_job.nu = -nu;
-      burgers_def_job.beta = -DataType(1);
+      burgers_def_job.beta = -DataType(navier ? 1 : 0);
     }
 
     virtual void initialize_nonlinear_defect()
@@ -1172,7 +1261,7 @@ namespace CCND
         vec_def.format();
     }
 
-    virtual void assemble_nonlinear_defect()
+    virtual void assemble_nonlinear_defect(bool force_reassembly = false)
     {
       // assemble nonlinear defect vector
       watch_nonlin_def_asm.start();
@@ -1183,15 +1272,25 @@ namespace CCND
       if(enable_fbm)
         vec_def_unsynced.format();
 
-      // set up Burgers assembly job for our defect vector
-      Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
-        enable_fbm ? vec_def_unsynced.local().template at<0>() : vec_def.local().template at<0>(),
-        vec_sol.local().template at<0>(),
-        vec_sol.local().template at<0>(), domain.front()->space_velo, cubature_defect);
-      setup_burgers_defect_job(burgers_def_job);
+      // is the system linear?
+      if(force_reassembly || navier || !constant_nu)
+      {
+        // set up Burgers assembly job for our defect vector
+        Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
+          enable_fbm ? vec_def_unsynced.local().template at<0>() : vec_def.local().template at<0>(),
+          vec_sol.local().template at<0>(),
+          vec_sol.local().template at<0>(), domain.front()->space_velo, cubature_defect);
+        setup_burgers_defect_job(burgers_def_job);
 
-      // assemble burgers operator defect
-      domain.front()->domain_asm.assemble(burgers_def_job);
+        // assemble burgers operator defect
+        domain.front()->domain_asm.assemble(burgers_def_job);
+      }
+      else
+      {
+        // our system matrix is constant, so use the pre-assembled matrix block A for the defect computation
+        system.front()->matrix_sys.local().block_a().apply(
+          vec_def.local().template at<0>(), vec_sol.local().template at<0>(), vec_def.local().template at<0>(), -1.0);
+      }
 
       // apply FBM filter if required
       if(enable_fbm)
@@ -1219,10 +1318,35 @@ namespace CCND
     {
       burgers_mat_job.deformation = deformation;
       burgers_mat_job.nu = nu;
-      burgers_mat_job.beta = DataType(1);
-      burgers_mat_job.frechet_beta = DataType(newton ? 1 : 0);
-      burgers_mat_job.sd_delta = upsam;
+      if((adapt_upsam > DataType(0)) && !nonlinear_defects.empty())
+        burgers_mat_job.sd_delta = adapt_upsam * nonlinear_defects.back();
+      else
+        burgers_mat_job.sd_delta = upsam;
       burgers_mat_job.sd_nu = nu;
+      if(navier)
+      {
+        burgers_mat_job.beta = DataType(1);
+        //burgers_mat_job.frechet_beta = DataType(newton ? 1 : 0);
+        switch(nonlin_solver)
+        {
+        case NonlinSolver::picard:
+          burgers_mat_job.frechet_beta = DataType(0);
+          break;
+
+        case NonlinSolver::newton:
+          if(newton_starts_with_picard)
+            burgers_mat_job.frechet_beta = DataType(nl_step > 0u ? 1 : 0);
+          else
+            burgers_mat_job.frechet_beta = DataType(1);
+          break;
+
+        case NonlinSolver::alpine:
+          burgers_mat_job.frechet_beta = DataType(nl_step % 2); // every other iteration is Newton
+          break;
+        }
+      }
+      else
+        burgers_mat_job.beta = burgers_mat_job.frechet_beta = DataType(0);
     }
 
     virtual void assemble_nonlinear_matrices()
@@ -1239,7 +1363,15 @@ namespace CCND
         // loop over all system levels
         for(std::size_t i(0); i < system.size(); ++i)
         {
-          auto& loc_mat_a = system.at(i)->matrix_sys.local().block_a();
+          // just a linear system?
+          if(!navier && constant_nu)
+          {
+            vec_conv = system.at(i)->matrix_a.create_vector_l();
+            vec_conv.format();
+          }
+
+          // get the local system matrix block A
+          typename SystemLevel::LocalMatrixBlockA& loc_mat_a = system.at(i)->matrix_sys.local().block_a();
           loc_mat_a.format();
 
           // set up Burgers assembly job
@@ -1264,22 +1396,26 @@ namespace CCND
           if((i+1) >= domain.size_virtual())
             break;
 
-          // does this process have another system level?
-          if((i+1) < system.size())
+          // do we need to truncate the convection vector?
+          if(navier || !constant_nu)
           {
-            // create a coarse mesh velocity vector
-            auto vec_crs = system.at(i+1)->matrix_a.create_vector_l();
+            // does this process have another system level?
+            if((i+1) < system.size())
+            {
+              // create a coarse mesh velocity vector
+              auto vec_crs = system.at(i+1)->matrix_a.create_vector_l();
 
-            // truncate fine mesh velocity vector
-            system.at(i)->transfer_velo.trunc(vec_conv, vec_crs);
+              // truncate fine mesh velocity vector
+              system.at(i)->transfer_velo.trunc(vec_conv, vec_crs);
 
-            // the coarse vector is our next convection vector
-            vec_conv = std::move(vec_crs);
-          }
-          else
-          {
-            // this process is a child, so send truncation to parent
-            system.at(i)->transfer_velo.trunc_send(vec_conv);
+              // the coarse vector is our next convection vector
+              vec_conv = std::move(vec_crs);
+            }
+            else
+            {
+              // this process is a child, so send truncation to parent
+              system.at(i)->transfer_velo.trunc_send(vec_conv);
+            }
           }
         }
       }
@@ -1288,10 +1424,15 @@ namespace CCND
 
     virtual void choose_nonlinear_tolerances(bool first_iteration, DataType def_nl, DataType def_improve)
     {
-      // specify adaptive tolerance?
-      if(adapt_mg_tol && !first_iteration)
+      // do we have a linear system?
+      if(!navier && constant_nu)
       {
-        if(newton)
+        solver_iterative->set_tol_abs(nl_tol_abs);
+        solver_iterative->set_tol_rel(mg_tol_rel);
+      }
+      else if(adapt_mg_tol && !first_iteration)
+      {
+        if(nonlin_solver != NonlinSolver::picard)
         {
           // We're using Newton as the nonlinear solver, which optimally should
           // result in quadratic convergence, i.e. let def_{j} and def_{j-1}
@@ -1335,22 +1476,53 @@ namespace CCND
       }
     }
 
-    virtual bool solve_navier_stokes(String line_prefix = "")
+    virtual bool solve_nonlinear_system(String line_prefix = "")
     {
-      bool single_line_plot = !line_prefix.empty();
+      // is our system nonlinear?
+      const bool is_nonlinear = navier || !constant_nu;
 
+      const bool single_line_plot = !line_prefix.empty();
       if(!single_line_plot)
-        comm.print("\nSolving Navier-Stokes system...");
+      {
+        if(navier)
+          comm.print("\nSolving Navier-Stokes system...");
+        else if(!constant_nu)
+          comm.print("\nSolving non-linear Stokes system...");
+        else
+          comm.print("\nSolving (linear) Stokes system...");
+      }
 
       if(!plot_mg_iter && (solver_iterative))
         solver_iterative->set_plot_mode(Solver::PlotMode::none);
 
-      // vector of all non-linear defect norms
-
       watch_nonlin_loop.start();
 
+      // if convection is disabled and viscosity is constant, then we can pre-assemble the matrices now
+      if(!is_nonlinear)
+      {
+        if(!single_line_plot)
+          comm.print("INFO: System is linear, so matrices will be pre-assembled");
+
+        // assemble nonlinear matrices
+        assemble_nonlinear_matrices();
+
+        // compile local matrices
+        compile_system_matrices();
+
+        // initialize linear solver
+        init_solver_numeric();
+      }
+
+      if(!single_line_plot)
+      {
+        //           "Newton:  1: 4.019876e-04 / 2.811466e-02 / 2.811e-02 |   7: 1.45665e-08 / 3.62361e-05 [3.17745e-08]"
+        comm.print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  MG  fin abs Def   fin rel Def  abs Tol");
+        comm.print(  "----------------------------------------------------+---------------------------------------------");
+      }
+
       // nonlinear loop
-      for(Index nl_step(0); nl_step <= max_nl_iter; ++nl_step)
+      bool result = false;
+      for(nl_step = 0; nl_step <= max_nl_iter; ++nl_step)
       {
         stats.counts[Counts::nonlin_iter] = nl_step;
 
@@ -1365,7 +1537,14 @@ namespace CCND
 
         String line = line_prefix;
         if(!single_line_plot)
-          line = (newton ? "Newton: " : "Picard: ");
+        {
+          if(!is_nonlinear)
+            line += "Linear: ";
+          else if(nonlin_solver == NonlinSolver::newton && newton_starts_with_picard && (nl_step == Index(0)))
+            line += "Picard: ";
+          else
+            line += stringify(nonlin_solver) + ": ";
+        }
         line += stringify(nl_step).pad_front(2) + ": ";
         line += stringify_fp_sci(def_nl, 6) + " / ";
         line += stringify_fp_sci(def_nl/nonlinear_defects.front()) + " / ";
@@ -1374,9 +1553,7 @@ namespace CCND
         if(def_nl > nonlinear_defects.front() * DataType(1E+3))
         {
           comm.print(line + "\nERROR: NONLINEAR SOLVER DIVERGED !!!\n");
-          //if(testmode)
-            //comm.print("Test-Mode: FAILED");
-          return false;
+          break;
         }
         else if(nl_step < min_nl_iter)
         {
@@ -1389,6 +1566,7 @@ namespace CCND
             comm.print(line + " > converged!");
           else
             comm.print(line + "\nNonlinear solver converged!\n");
+          result = true;
           break;
         }
         else if(nl_step >= max_nl_iter)
@@ -1397,25 +1575,30 @@ namespace CCND
             comm.print(line + " > maximum iterations reached!");
           else
             comm.print(line + "\nMaximum iterations reached!\n");
+          result = true;
           break;
         }
-        else if((nl_step >= 3) && (DataType(0.97)*def_prev < def_nl))
+        else if((nl_step >= 3) && (nl_stag_rate*def_prev < def_nl))
         {
           if(single_line_plot)
             comm.print(line + " > stagnated!");
           else
             comm.print(line + "\nNonlinear solver stagnated!\n");
+          result = true;
           break;
         }
 
         // assemble nonlinear matrices
-        assemble_nonlinear_matrices();
+        if(is_nonlinear)
+        {
+          assemble_nonlinear_matrices();
 
-        // compile local matrices
-        compile_system_matrices();
+          // compile local matrices
+          compile_system_matrices();
 
-        // initialize linear solver
-        init_solver_numeric();
+          // initialize linear solver
+          init_solver_numeric();
+        }
 
         // choose nonlinear tolerances if using an iterative solver
         if(solver_iterative)
@@ -1431,22 +1614,23 @@ namespace CCND
         {
           stats.counts[Counts::linsol_iter] += solver_iterative->get_num_iter();
           line += String(" | ") + stringify(solver_iterative->get_num_iter()).pad_front(3) + ": "
-            + stringify_fp_sci(solver_iterative->get_def_final(), 4) + " / "
-            + stringify_fp_sci(solver_iterative->get_def_final() / solver_iterative->get_def_initial(), 4);
+            + stringify_fp_sci(solver_iterative->get_def_final(), 5) + " / "
+            + stringify_fp_sci(solver_iterative->get_def_final() / solver_iterative->get_def_initial(), 5);
           if(adapt_mg_tol && (nl_step > Index(0)))
-            line += String(" [") + stringify_fp_sci(solver_iterative->get_tol_abs(), 4) + "]";
+            line += String(" [") + stringify_fp_sci(solver_iterative->get_tol_abs(), 5) + "]";
         }
         comm.print(line);
 
         // release linear solver
-        done_solver_numeric();
+        if(is_nonlinear)
+          done_solver_numeric();
 
         if(!Solver::status_success(status))
         {
           comm.print("\nERROR: LINEAR SOLVER BREAKDOWN\n");
           //if(testmode)
             //comm.print("Test-Mode: FAILED");
-          return false;
+          break;
         }
 
         // update solution
@@ -1455,9 +1639,13 @@ namespace CCND
         // next non-linear iteration
       }
 
+      // release linear solver
+      if(!is_nonlinear)
+        done_solver_numeric();
+
       watch_nonlin_loop.stop();
 
-      return true;
+      return result;
     }
 
     virtual void collect_solver_statistics()

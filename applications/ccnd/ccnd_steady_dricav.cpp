@@ -4,43 +4,28 @@
 // see the file 'copyright.txt' in the top level directory for details.
 //
 // ------------------------------------------------------------------------------------------------
-// Steady CCnD solver for 2D Taylor-Green Vortex benchmark
+// Steady CCnD solver for 2D/3D Driven Cavity benchmark
 // ------------------------------------------------------------------------------------------------
-//
-// This application solves the steady-state 2D Taylor-Green benchmark and compares the discrete
-// solution to the analytic solution by computing the H0/H1/H2 errors. The analytical solution
-// for the velocity and pressure is given by
-//
-//  v(x,y) = [ sin(pi*x)*cos(pi*y) ; -cos(pi*x)*sin(pi*y) ]
-//  p(x,y) = (cos(pi*x)^2 + cos(pi*y)^2 - 1) / 2
-//
-// The Taylor-Green benchmark is typically solved on the 2D unit square domain [0,1]x[0,1], but
-// it can be practically defined on any other 2D domain, as long as one prescribes Dirichlet
-// boundary conditions. On the unit square domain the velocity field also fulfills slip boundary
-// conditions, so one may alternatively choose to enforce slip boundary conditions instead of the
-// more restrictive Dirichlet boundary conditions by specifying the --slip parameter.
+// This application implements a parallel steady CCND solver, which is pre-configured to solve
+// the driven cavity benchmark on the unit-square or unit-cube domain, where the X-velocity
+// at the top boundary edge/face (i.e. where y=1) is set to 1 in the unregularized case or to
+// sin(pi*x)^gamma (2D) or (sin(pi*x)*sin(pi*z)^gamma (3D) and all other velocity components are
+// set to 0.
 //
 // This application supports all parameters from the CCND::SteadyAppBase class, so please refer to
 // the documentation of the ccnd_steady_appbase.hpp header file for an up-to-date list of all
 // command line parameters supported by that base class.
 //
 // In addition, this application adds support for the following parameters:
-//
-// --slip
-// Enforce Slip boundary conditions instead of Dirichlet boundary conditions. This only yields the
-// correct results on rectangular domains where the X/Y-coordinates of the boundary edges are
-// integers, such as e.g. the unit square domain.
+// --gamma <gamma>
+// Specifies the regularization parameter gamma for the boundary condition definition for the
+// X-velocity component at the top edge of the domain. Defaults to 0.
+// - If gamma = 0 ==> v_x := 1 at top edge, i.e. where y=1
+// - If gamma > 0 in 2D ==> v_x := sin(pi*x)^gamma at top edge
+// - If gamma > 0 in 3D ==> v_x := (sin(pi*x)*sin(pi*z))^gamma at top edge
 //
 // \author Peter Zajac
 //
-
-#ifdef FEAT_CCND_APP_DIM
-#if FEAT_CCND_APP_DIM != 2
-#error FEAT_CCND_APP_DIM must be equal to 2 for this application
-#endif
-#else
-#define FEAT_CCND_APP_DIM 2
-#endif
 
 // include common CCND header
 #include "ccnd_common.hpp"
@@ -61,6 +46,62 @@ namespace CCND
 
 namespace CCND
 {
+  class DrivenCavityBoundaryFunction :
+    public Analytic::Function
+  {
+  public:
+    typedef DataType DataType;
+    typedef Analytic::Image::Vector<dim> ImageType;
+    static constexpr int domain_dim = dim;
+    static constexpr bool can_value = true;
+    static constexpr bool can_grad = false;
+    static constexpr bool can_hess = false;
+
+    /// regularization parameter
+    DataType _gamma;
+
+    explicit DrivenCavityBoundaryFunction(DataType gamma) :
+      _gamma(gamma)
+    {
+    }
+
+    template<typename EvalTraits_>
+    class Evaluator :
+      public Analytic::Function::Evaluator<EvalTraits_>
+    {
+    public:
+      typedef typename EvalTraits_::DataType DataType;
+      typedef typename EvalTraits_::PointType PointType;
+      typedef typename EvalTraits_::ValueType ValueType;
+
+    private:
+      const DataType _gamma;
+      const DataType _pi;
+      const bool _regularized;
+
+    public:
+      explicit Evaluator(const DrivenCavityBoundaryFunction& function) :
+        _gamma(function._gamma),
+        _pi(Math::pi<DataType>()),
+        _regularized(_gamma > 1E-8)
+      {
+      }
+
+      ValueType value(const PointType& point)
+      {
+        ValueType val;
+        val.format();
+        if(!_regularized)
+          val[0] = DataType(1);
+        else if constexpr(dim == 3)
+          val[0] = Math::pow(Math::sin(_pi * point[0]) * Math::sin(_pi * point[2]), _gamma);
+        else
+          val[0] = Math::pow(Math::sin(_pi * point[0]), _gamma);
+        return val;
+      }
+    };
+  }; // class DrivenCavityBoundaryFunction
+
   /// our actual Application class
   class Application :
     public SteadyAppBase
@@ -69,25 +110,29 @@ namespace CCND
     /// our base class
     typedef SteadyAppBase BaseClass;
 
-    /// slip filter BCs ?
-    bool slip_bc = false;
+    /// boundary condition regularization parameter gamma
+    DataType bc_gamma = DataType(0);
 
     explicit Application(const Dist::Comm& comm_, SimpleArgParser& args_) :
       BaseClass(comm_, args_)
     {
-      args.support("slip");
+      args.support("gamma");
 
-      // this application always has inhomogeneous RHS
-      homogeneous_rhs = false;
+      // this application always has homogeneous RHS
+      homogeneous_rhs = true;
     }
 
     virtual void parse_args() override
     {
-      // use slip BCs ?
-      slip_bc = (args.check("slip") >= 0);
+      args.parse("gamma", bc_gamma);
+      if(bc_gamma < DataType(0))
+      {
+        comm.print("ERROR: invalid bc regularization parameter gamma: " + stringify(bc_gamma));
+        Runtime::abort();
+      }
 
       // set default filename
-      default_filename = String("cc") + stringify(dim) + "d-steady-taygre";
+      default_filename = String("cc") + stringify(dim) + "d-steady-dricav";
 
       // parse remaining arguments
       BaseClass::parse_args();
@@ -96,8 +141,8 @@ namespace CCND
     virtual void print_problem() override
     {
       BaseClass::print_problem();
-      comm.print("\nTaylor-Green Parameters:");
-      comm.print(String("Boundary Conditions").pad_back(pad_len, pad_char) + ": " + (slip_bc ? "Slip" : "Dirichlet"));
+      comm.print("\nDriven Cavity Benchmark Parameters:");
+      comm.print(String("Regularization Gamma").pad_back(pad_len, pad_char) + ": " + stringify(bc_gamma));
     }
 
     virtual void assemble_filters()
@@ -105,10 +150,17 @@ namespace CCND
       // the names of the mesh parts on which to assemble
       std::deque<String> part_names = domain.front()->get_mesh_node()->get_mesh_part_names(true);
 
-      Analytic::Common::TaylorGreenVortexVelo2D<DataType> taylor_green_velo;
+      /*auto top_func = Analytic::create_lambda_function_vector_2d(
+        [](DataType x, DataType ) {return 2.0*x*(1.0-x);},
+        [](DataType, DataType) {return 0.0;}
+      );*/
+
+      DrivenCavityBoundaryFunction dcbc_function(this->bc_gamma);
 
       for(std::size_t i(0); i < domain.size_physical(); ++i)
       {
+        Assembly::UnitFilterAssembler<MeshType> unit_asm_top, unit_asm_noflow;
+
         // loop over all boundary parts except for the right one, which is outflow
         for(const auto& name : part_names)
         {
@@ -120,25 +172,20 @@ namespace CCND
           const auto* mesh_part_node = domain.at(i)->get_mesh_node()->find_mesh_part_node(name);
           XASSERT(mesh_part_node != nullptr);
           const MeshPartType* mesh_part = mesh_part_node->get_mesh();
-
-          if(slip_bc)
+          if(mesh_part)
           {
-            Assembly::SlipFilterAssembler<TrafoType> slip_asm(domain.at(i)->trafo);
-            if(mesh_part)
-              slip_asm.add_mesh_part(*mesh_part);
-            slip_asm.assemble(system.at(i)->get_local_velo_slip_filter_seq().find_or_add(name), domain.at(i)->space_velo);
-          }
-          else
-          {
-            Assembly::UnitFilterAssembler<MeshType> unit_asm;
-            if(mesh_part)
-              unit_asm.add_mesh_part(*mesh_part);
-            unit_asm.assemble(system.at(i)->get_local_velo_unit_filter_seq().find_or_add(name), domain.at(i)->space_velo, taylor_green_velo);
+            if(name == "bnd:t")
+              unit_asm_top.add_mesh_part(*mesh_part);
+            else
+              unit_asm_noflow.add_mesh_part(*mesh_part);
           }
         }
 
+        unit_asm_top.assemble(system.at(i)->get_local_velo_unit_filter_seq().find_or_add("top"), domain.at(i)->space_velo, dcbc_function);
+        unit_asm_noflow.assemble(system.at(i)->get_local_velo_unit_filter_seq().find_or_add("noflow"), domain.at(i)->space_velo);
+
         // assemble pressure mean filter
-        system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, false);
+        system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, "gauss-legendre:2");
 
         // compile system filter
         system.at(i)->compile_system_filter();
@@ -153,25 +200,6 @@ namespace CCND
       vec_sol.format();
       vec_rhs.format();
 
-      // assemble Taylor-Green RHS: the RHS 'f' of the Taylor-Green vortex for the steady-state
-      // Navier-Stokes equations is equal to 2*nu*pi^2*v, where 'v' is the velocity solution
-      Analytic::Common::TaylorGreenVortexVelo2D<DataType> taylor_green_velo;
-      Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().first(), taylor_green_velo,
-        domain.front()->space_velo, "gauss-legendre:3", DataType(2) * this->nu * Math::sqr(Math::pi<DataType>()));
-
-      // if we only solve Stokes rather than Navier-Stokes, then we have to subtract the convective
-      // term from the RHS, which corresponds (by pure coincidence, of course) to -grad(P):
-      if(!navier)
-      {
-        Analytic::Common::TaylorGreenVortexPres2D<DataType> taylor_green_pres;
-        Analytic::Gradient<decltype(taylor_green_pres)> grad_p(taylor_green_pres);
-        Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().first(), grad_p,
-          domain.front()->space_velo, "gauss-legendre:3", DataType(1));
-      }
-
-      // synchronize
-      vec_rhs.sync_0();
-
       // apply filters
       system.front()->filter_sys.filter_sol(vec_sol);
       system.front()->filter_sys.filter_rhs(vec_rhs);
@@ -179,32 +207,18 @@ namespace CCND
 
     virtual void perform_solution_analysis()
     {
-      watch_sol_analysis.start();
+      Assembly::DiscreteFunctionIntegralJob<LocalVeloVector, SpaceVeloType, 1> velo_job(vec_sol.local().template at<0>(), domain.front()->space_velo, "gauss-legendre:3");
+      Assembly::DiscreteFunctionIntegralJob<LocalPresVector, SpacePresType, 0> pres_job(vec_sol.local().template at<1>(), domain.front()->space_pres, "gauss-legendre:2");
+      domain.front()->domain_asm.assemble(velo_job);
+      domain.front()->domain_asm.assemble(pres_job);
 
-      Analytic::Common::TaylorGreenVortexVelo2D<DataType> taylor_green_velo;
-      Analytic::Common::TaylorGreenVortexPres2D<DataType> taylor_green_pres;
+      velo_job.result().synchronize(comm);
+      pres_job.result().synchronize(comm);
 
-      // compute velocity error
-      auto error_v = Assembly::integrate_error_function<2>(domain.front()->domain_asm, taylor_green_velo,
-        vec_sol.local().at<0>(), domain.front()->space_velo, "gauss-legendre:5");
-      auto error_p = Assembly::integrate_error_function<1>(domain.front()->domain_asm, taylor_green_pres,
-        vec_sol.local().at<1>(), domain.front()->space_pres, "gauss-legendre:4");
-
-      error_v.synchronize(comm);
-      error_p.synchronize(comm);
-
-      comm.print("Velocity Errors:\n" + error_v.print_norms() + "\n");
-      comm.print("Pressure Errors:\n" + error_p.print_norms() + "\n");
-
-      // write all relevant errors in a single line for easy parsing
-      comm.print(String("Errors V:H0/H1/H2 P:H0/H1: ")
-        + stringify_fp_sci(Math::sqrt(error_v.norm_h0_sqr)) + " "
-        + stringify_fp_sci(Math::sqrt(error_v.norm_h1_sqr)) + " "
-        + stringify_fp_sci(Math::sqrt(error_v.norm_h2_sqr)) + " "
-        + stringify_fp_sci(Math::sqrt(error_p.norm_h0_sqr)) + " "
-        + stringify_fp_sci(Math::sqrt(error_p.norm_h1_sqr)) + "\n");
-
-      watch_sol_analysis.stop();
+      comm.print("Velocity Field Analysis:\n" + velo_job.result().print_norms());
+      comm.print("Vorticity.: " + stringify_fp_sci(Math::sqrt(velo_job.result().vorticity_l2_sqr)));
+      comm.print("Divergence: " + stringify_fp_sci(Math::sqrt(velo_job.result().divergence_l2_sqr)) + "\n");
+      comm.print("Pressure Function Analysis:\n" + pres_job.result().print_norms() + "\n");
     }
   }; // class Application
 
