@@ -103,8 +103,6 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Use fancy template meta programming to unroll SparseMatrixBanded kernels.")
   print ("--eickt")
   print ("  Explicitly Instanciate all Common Kernel Templates.")
-  print ("--sf_esoteric")
-  print ("  Enable uncommon data/index types in solver factory.")
   print ("--ovr_mpi_ops")
   print ("  Override MPI operations with custom implementations.")
   print ("--in-source")
@@ -312,10 +310,6 @@ for option in extra_options:
   if option.startswith("--eickt"):
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_EICKT:BOOL=TRUE"
-
-  if option.startswith("--sf_esoteric"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_SF_ESOTERIC:BOOL=TRUE"
 
   if option.startswith("--ovr_mpi_ops"):
     unused_extra_options.remove(option)
