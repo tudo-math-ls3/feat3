@@ -503,6 +503,17 @@ namespace PoissonMultigridBench
     comm.print("Chosen Levels.......: " + domain.format_chosen_levels());
     comm.print("Partitioner Info....: " + domain.get_chosen_parti_info());
     comm.print("Preferred Backend...: " + backend);
+    comm.print("Test Mode...........: " + String((args.check("test") >= 0) ? "yes" : "no"));
+    comm.print("Memory Limit........: " + (args.check("memory") > 0 ? args.query("memory")->second.front() : String("-N/A-")));
+    /*if(args.check("memory") > 0)
+      comm.print("Memory Limit........: " + args.query("memory")->second.front());
+    else
+      comm.print("Memory Limit........: -N/A-");*/
+    comm.print("Multigrid Iterations: " + stringify(multigrid_iters));
+    comm.print("Multigrid Cycle.....: " + stringify(multigrid_cycle));
+    comm.print("Smoothing Steps.....: " + stringify(smooth_steps));
+    comm.print("Smoother Damping....: " + stringify(smooth_damp));
+    comm.print("Shink Matrices......: " + String(no_shrink ? "no" : "yes"));
 
     // create benchmark statistics
     BenchStats stats(domain.size_virtual());
