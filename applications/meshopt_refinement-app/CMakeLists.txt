@@ -43,7 +43,7 @@ else (FEAT_HAVE_MPI)
     --build-target meshopt_refinement-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_refinement-app/meshopt_refinement-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes" )
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_refinement-app/meshopt_refinement-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes" )
   SET_PROPERTY(TEST meshopt_refinement_app_test_1_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST meshopt_refinement_app_test_1_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -54,7 +54,7 @@ else (FEAT_HAVE_MPI)
     --build-target meshopt_refinement-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_refinement-app/meshopt_refinement-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes" )
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_refinement-app/meshopt_refinement-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes" )
   SET_PROPERTY(TEST meshopt_refinement_app_test_2_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST meshopt_refinement_app_test_2_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

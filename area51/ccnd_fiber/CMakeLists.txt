@@ -24,7 +24,7 @@ ADD_TEST(tensor_operations-test_all ${CMAKE_CTEST_COMMAND}
   --build-target tensor_operations-test
   --build-nocmake
   --build-noclean
-  --test-command ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test)
+  --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test)
 SET_PROPERTY(TEST tensor_operations-test_all PROPERTY LABELS "all")
 
 if (FEAT_VALGRIND)
@@ -35,7 +35,7 @@ if (FEAT_VALGRIND)
     --build-target tensor_operations-test
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test generic)
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/tensor_operations-test generic)
   SET_PROPERTY(TEST tensor_operations-test_valgrind PROPERTY LABELS "valgrind")
   SET_PROPERTY(TEST tensor_operations-test_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
   SET_PROPERTY(TEST tensor_operations-test_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
@@ -104,7 +104,7 @@ ADD_TEST(ccnd-fiber-time-stepping-test-serial-lagrange1 ${CMAKE_CTEST_COMMAND}
   --build-target ccnd-fiber-time-stepping-test
   --build-nocmake
   --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/ccnd-fiber-time-stepping-test --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-cube-hexa.xml --level 1 0 --n-p 5.3 --n-s 3.9 --mu 0.1 --delta-t 0.0001 --testing-steps 3)
+  --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/ccnd-fiber-time-stepping-test --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-cube-hexa.xml --level 1 0 --n-p 5.3 --n-s 3.9 --mu 0.1 --delta-t 0.0001 --testing-steps 3)
 SET_PROPERTY(TEST ccnd-fiber-time-stepping-test-serial-lagrange1 PROPERTY LABELS "serial")
 SET_PROPERTY(TEST ccnd-fiber-time-stepping-test-serial-lagrange1 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
@@ -115,7 +115,7 @@ ADD_TEST(ccnd-fiber-time-stepping-test-serial-lagrange2 ${CMAKE_CTEST_COMMAND}
   --build-target ccnd-fiber-time-stepping-test
   --build-nocmake
   --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/ccnd-fiber-time-stepping-test --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-cube-hexa.xml --level 1 0 --n-p 5.3 --n-s 3.9 --mu 0.1 --delta-t 0.0001 --testing-steps 3 --orient-space-2)
+  --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/area51/ccnd_fiber/ccnd-fiber-time-stepping-test --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-cube-hexa.xml --level 1 0 --n-p 5.3 --n-s 3.9 --mu 0.1 --delta-t 0.0001 --testing-steps 3 --orient-space-2)
 SET_PROPERTY(TEST ccnd-fiber-time-stepping-test-serial-lagrange2 PROPERTY LABELS "serial")
 SET_PROPERTY(TEST ccnd-fiber-time-stepping-test-serial-lagrange2 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

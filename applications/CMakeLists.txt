@@ -87,7 +87,7 @@ else (FEAT_HAVE_MPI)
     --build-target hierarch_transfer_test-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app 3 0)
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/hierarch_transfer_test-app 3 0)
   SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST hierarch_transfer_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
@@ -144,7 +144,7 @@ else (FEAT_HAVE_MPI)
     --build-target poisson_dirichlet
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/poisson_dirichlet --test-iter 4 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
   SET_PROPERTY(TEST poisson_dirichlet_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_dirichlet_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
@@ -232,7 +232,7 @@ else (FEAT_HAVE_MPI)
     --build-target stokes_poiseuille_2d
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 19 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/stokes_poiseuille_2d --test-iter 19 --level 5 0 --mesh ${FEAT_SOURCE_DIR}/data/meshes/unit-square-quad.xml)
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST stokes_poiseuille_2d_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

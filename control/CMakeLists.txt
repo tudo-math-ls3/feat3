@@ -17,7 +17,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${FEAT_BINARY_DIR}/control/${test})
+    --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/control/${test})
   SET_PROPERTY(TEST ${test}_all PROPERTY LABELS "all")
   if (FEAT_VALGRIND)
     ADD_TEST(${test}_valgrind ${CMAKE_CTEST_COMMAND}
@@ -27,7 +27,7 @@ FOREACH (test ${test_list} )
       --build-target ${test}
       --build-nocmake
       --build-noclean
-      --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/control/${test} generic)
+      --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/control/${test} generic)
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")

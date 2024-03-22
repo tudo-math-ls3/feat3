@@ -78,7 +78,7 @@ else (FEAT_HAVE_MPI)
     --build-target dfg95-ccnd-steady
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-steady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0 --bench 1 --test-mode)
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-steady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0 --bench 1 --test-mode)
   SET_PROPERTY(TEST dfg95-ccnd-steady-test-serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST dfg95-ccnd-steady-test-serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)
@@ -104,7 +104,7 @@ else (FEAT_HAVE_MPI)
     --build-target dfg95-ccnd-unsteady
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-unsteady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0 --bench 2 --test-mode)
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/dfg95_bench/dfg95-ccnd-unsteady --mesh ${FEAT_SOURCE_DIR}/data/meshes/flowbench_c2d_03_quad_64.xml --level 2 0 --bench 2 --test-mode)
   SET_PROPERTY(TEST dfg95-ccnd-unsteady-test-serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST dfg95-ccnd-unsteady-test-serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

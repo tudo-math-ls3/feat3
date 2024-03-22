@@ -43,7 +43,7 @@ else (FEAT_HAVE_MPI)
     --build-target meshopt_boundary-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_boundary-app/meshopt_boundary-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes")
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_boundary-app/meshopt_boundary-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes")
   SET_PROPERTY(TEST meshopt_boundary_app_test_1_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST meshopt_boundary_app_test_1_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   ADD_TEST(meshopt_boundary_app_test_2_serial ${CMAKE_CTEST_COMMAND}
@@ -53,7 +53,7 @@ else (FEAT_HAVE_MPI)
     --build-target meshopt_boundary-app
     --build-nocmake
     --build-noclean
-    --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_boundary-app/meshopt_boundary-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes")
+    --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_boundary-app/meshopt_boundary-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes")
   SET_PROPERTY(TEST meshopt_boundary_app_test_2_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST meshopt_boundary_app_test_2_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

@@ -15,6 +15,9 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT( FEAT )
 
+#wrapper for sequential ctest execution
+set(FEAT_CTEST_RUNNER "")
+
 #if required, overwrite internal cxx flags
 if(FEAT_DELETE_BUILD_FLAGS)
   message(STATUS "Delete internal build-config flags")
@@ -109,6 +112,9 @@ if (FEAT_HAVE_MPI)
   endif()
 
   ADD_DEFINITIONS( -DOMPI_SKIP_MPICXX )
+
+  #set ctest runner to single process mpiexec execution
+  set(FEAT_CTEST_RUNNER ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 1 ${MPIEXEC_PREFLAGS})
 endif (FEAT_HAVE_MPI)
 
 if("${FEAT_COMPILER_ID}" STREQUAL "clang")

@@ -74,7 +74,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${FEAT_BINARY_DIR}/kernel/lafem/${test})
+    --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/kernel/lafem/${test})
   SET_PROPERTY(TEST ${test}_all PROPERTY LABELS "all")
 
   if (FEAT_VALGRIND)
@@ -85,7 +85,7 @@ FOREACH (test ${test_list} )
       --build-target ${test}
       --build-nocmake
       --build-noclean
-      --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} generic mkl)
+      --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} generic mkl)
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
@@ -99,7 +99,7 @@ FOREACH (test ${test_list} )
       --build-target ${test}
       --build-nocmake
       --build-noclean
-      --test-command ${CUDA_MEMCHECK_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} cuda)
+      --test-command ${FEAT_CTEST_RUNNER} ${CUDA_MEMCHECK_EXE} ${FEAT_BINARY_DIR}/kernel/lafem/${test} cuda)
     SET_PROPERTY(TEST ${test}_cuda_memcheck PROPERTY LABELS "cuda_memcheck")
     SET_PROPERTY(TEST ${test}_cuda_memcheck PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
     SET_PROPERTY(TEST ${test}_cuda_memcheck PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")

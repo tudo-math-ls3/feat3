@@ -43,7 +43,7 @@ ADD_TEST(meshopt_r_adapt_app_serial ${CMAKE_CTEST_COMMAND}
   --build-target meshopt_r_adapt-app
   --build-nocmake
   --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app")
+  --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --test 1 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app")
 SET_PROPERTY(TEST meshopt_r_adapt_app_serial PROPERTY LABELS "serial")
 SET_PROPERTY(TEST meshopt_r_adapt_app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ADD_TEST(meshopt_r_adapt_app_alignment_serial ${CMAKE_CTEST_COMMAND}
@@ -53,7 +53,7 @@ ADD_TEST(meshopt_r_adapt_app_alignment_serial ${CMAKE_CTEST_COMMAND}
   --build-target meshopt_r_adapt-app
   --build-nocmake
   --build-noclean
-  --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app")
+  --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/applications/meshopt_r_adapt-app/meshopt_r_adapt-app --test 2 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app")
 SET_PROPERTY(TEST meshopt_r_adapt_app_alignment_serial PROPERTY LABELS "serial")
 SET_PROPERTY(TEST meshopt_r_adapt_app_alignment_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAT_HAVE_MPI)

@@ -30,7 +30,7 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --test-command ${FEAT_BINARY_DIR}/kernel/assembly/${test})
+    --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/kernel/assembly/${test})
   SET_PROPERTY(TEST ${test}_all PROPERTY LABELS "all")
 
   if (FEAT_VALGRIND)
@@ -41,7 +41,7 @@ FOREACH (test ${test_list} )
       --build-target ${test}
       --build-nocmake
       --build-noclean
-      --test-command ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/assembly/${test} generic)
+      --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/assembly/${test} generic)
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
     SET_PROPERTY(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
