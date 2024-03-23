@@ -80,6 +80,7 @@ if (FEAT_HAVE_CUDA)
   #Important: Set cuda flag before enable language call
   set(CMAKE_CUDA_FLAGS "${INTERNAL_CUDA_FLAGS}" CACHE STRING "Cuda compile flag")
   enable_language(CUDA)
+  find_package(CUDAToolkit REQUIRED)
   set (CUDA_PROPAGATE_HOST_FLAGS OFF)
 
   if (FEAT_CUDAMEMCHECK)
