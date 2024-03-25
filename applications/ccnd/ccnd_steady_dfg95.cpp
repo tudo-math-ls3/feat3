@@ -245,10 +245,9 @@ namespace CCND
     {
       watch_sol_analysis.start();
 
-      // compute drag & lift by line integration
-      if(bench == 1)
-        bench_analysis.compute_body_forces_line(comm, vec_sol.local().at<0>(), vec_sol.local().at<1>(),
-          domain.front()->space_velo, domain.front()->space_pres, nu, v_max);
+      // compute drag & lift by surface integration
+      bench_analysis.compute_body_forces_surf(comm, vec_sol.local().at<0>(), vec_sol.local().at<1>(),
+        domain.front()->space_velo, domain.front()->space_pres, nu, v_max, bench);
 
       // compute drag & lift coefficients via volume integration from unsynchronized final defect
       bench_analysis.compute_body_forces_vol(comm, vec_def_unsynced.local().first(), nu, v_max, bench);

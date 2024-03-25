@@ -233,20 +233,15 @@ namespace CCND
 
     // accumulator for benchmark body forces (i.e. drag and lift)
     // this class is used for the computation of the 'line integration' variants of drag and lift
+    // for details see Giles et al: "Adaptive error control for finite element approximations of the lift and drag coefficients in viscous flow"
     class BenchBodyForceAccumulator
     {
-    private:
-      const DataType _nu;
-      const DataType _v_max;
-
     public:
-      DataType drag;
-      DataType lift;
+      Tiny::Matrix<DataType, 3, 2> raw;
 
-      explicit BenchBodyForceAccumulator(DataType nu, DataType v_max) :
-        _nu(nu), _v_max(v_max),
-        drag(DataType(0)), lift(DataType(0))
+      BenchBodyForceAccumulator()
       {
+        raw.format();
       }
 
       /// 2D variant
@@ -259,6 +254,9 @@ namespace CCND
         const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
         const T_ val_p)
       {
+#if 0
+        // Note: This is the old FeatFlow 1.x / FeatFlow 2 way of computing the 2D body forces
+
         // compute normal and tangential
         const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
         const T_ tx = jac(0,0) * n2;
@@ -273,11 +271,18 @@ namespace CCND
         nt(1,1) = ty * ny;
 
         const T_ dut = Tiny::dot(nt, grad_v);
-        const T_ dpf1 = _nu;
-        const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(2.0/3.0)))); // = 2 / (rho * U^2 * D)
 
-        drag += DataType(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-        lift += DataType(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
+        raw(0, 0) += omega * dut * ny;
+        raw(0, 1) -= omega * val_p * nx;
+        raw(1, 0) -= omega * dut * nx;
+        raw(1, 1) -= omega * val_p * ny;
+#endif
+        // compute normal vector
+        const Tiny::Vector<T_, 2> n = Tiny::orthogonal(jac).normalize();
+        raw(0, 0) -= omega * (T_(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1]);
+        raw(1, 0) -= omega * (T_(2) * grad_v(1,1) * n[1] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
+        raw(0, 1) -= omega * val_p * n[0];
+        raw(1, 1) -= omega * val_p * n[1];
       }
 
       /// 3D variant
@@ -290,6 +295,9 @@ namespace CCND
         const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
         const T_ val_p)
       {
+#if 0
+        // Note: This is the old FeatFlow 1.x / FeatFlow 2 way of computing the 3D body forces
+
         // compute normal and tangential
         const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
         const T_ tx = jac(0,0) * n2;
@@ -305,17 +313,43 @@ namespace CCND
         nt(1,1) = ty * ny;
 
         const T_ dut = Tiny::dot(nt, grad_v);
-        const T_ dpf1 = _nu;
-        const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
+        //const T_ dpf1 = _nu;
+        //const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
 
-        drag += DataType(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-        lift += DataType(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
+        raw(0, 0) += omega * dut * ny;
+        raw(0, 1) -= omega * val_p * nx;
+        raw(1, 0) -= omega * dut * nx;
+        raw(1, 1) -= omega * val_p * ny;
+#endif
+
+        // compute normal vector
+        const Tiny::Vector<T_, 3> n = Tiny::orthogonal(jac).normalize();
+        raw(0, 0) -= omega * (T_(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1] + (grad_v(0, 2) + grad_v(2, 0)) * n[2]);
+        raw(1, 0) -= omega * (T_(2) * grad_v(1,1) * n[1] + (grad_v(1, 2) + grad_v(2, 1)) * n[2] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
+        raw(2, 0) -= omega * (T_(2) * grad_v(2,2) * n[2] + (grad_v(2, 0) + grad_v(0, 2)) * n[0] + (grad_v(2, 1) + grad_v(1, 2)) * n[1]);
+        raw(0, 1) -= omega * val_p * n[0];
+        raw(1, 1) -= omega * val_p * n[1];
+        raw(2, 1) -= omega * val_p * n[2];
+      }
+
+      DataType drag(DataType nu) const
+      {
+        return nu * raw(0, 0) - raw(0, 1);
+      }
+
+      DataType lift(DataType nu) const
+      {
+        return nu * raw(1, 0) - raw(1, 1);
+      }
+
+      DataType side(DataType nu) const
+      {
+        return nu * raw(2, 0) - raw(2, 1);
       }
 
       void sync(const Dist::Comm& comm)
       {
-        comm.allreduce(&drag, &drag, std::size_t(1), Dist::op_sum);
-        comm.allreduce(&lift, &lift, std::size_t(1), Dist::op_sum);
+        comm.allreduce(&raw.v[0][0], &raw.v[0][0], std::size_t(2*dim), Dist::op_sum);
       }
     }; // class BenchBodyForces<...,2>
 
@@ -359,8 +393,8 @@ namespace CCND
       /// characteristic vector of obstacle body
       LAFEM::DenseVector<DataType, IndexType> vec_char_obstacle;
 
-      /// cubature rule for line integration of body forces
-      String cubature_body_forces_line = "gauss-legendre:3";
+      /// cubature rule for surface integration of body forces
+      String cubature_body_forces_surf = "gauss-legendre:3";
 
       /// cubature rule for fluxes
       String cubature_flux = "gauss-legendre:3";
@@ -373,11 +407,12 @@ namespace CCND
       // reference values for benchmark values
       DataType ref_drag = DataType(dim == 2 ? 5.57953523384 : 6.18533);
       DataType ref_lift = DataType(dim == 2 ? 0.010618948146 : 0.009401);
+      DataType ref_side = DataType(0.0);
       DataType ref_p_diff = DataType(dim == 2 ? 0.11752016697 : 0.170826996);
-      //DataType ref_p_drop = DataType(dim == 2 ? 1.0 : 1.0);
+      DataType ref_p_drop = DataType(dim == 2 ? 0.06943442 : 0.126759);
 
-      // drag/lift forces by line integration
-      DataType drag_coeff_line, lift_coeff_line, drag_err_line, lift_err_line;
+      // drag/lift forces by surface integration
+      DataType drag_coeff_surf, lift_coeff_surf, side_coeff_surf, drag_err_surf, lift_err_surf, side_err_surf;
 
       // drag/lift forces by volume integration
       DataType drag_coeff_vol, lift_coeff_vol, side_coeff_vol, drag_err_vol, lift_err_vol, side_err_vol;
@@ -397,7 +432,7 @@ namespace CCND
       static constexpr std::size_t padlen = std::size_t(30);
 
       BenchmarkAnalysis() :
-        drag_coeff_line(0.0), lift_coeff_line(0.0), drag_err_line(0.0), lift_err_line(0.0),
+        drag_coeff_surf(0.0), lift_coeff_surf(0.0), side_coeff_surf(0.0), drag_err_surf(0.0), lift_err_surf(0.0), side_err_surf(0.0),
         drag_coeff_vol(0.0), lift_coeff_vol(0.0), side_coeff_vol(0.0), drag_err_vol(0.0), lift_err_vol(0.0), side_err_vol(0.0),
         pres_diff(0.0), pres_diff_err(0.0),
         pres_drop(0.0), pres_drop_err(0.0),
@@ -415,19 +450,22 @@ namespace CCND
         const char pc = '.';
         // append coefficients and velocity info
         s += "Solution Analysis:";
-        s += String("\nDrag Coefficient (Line)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_line, prec);
+        s += String("\nDrag Coefficient (Surface)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_surf, prec);
         if(print_errors)
-          s += "   [ Error: " + stringify_fp_sci(drag_err_line, prec) + " ]";
-        s += String("\nLift Coefficient (Line)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(lift_coeff_line, prec);
+          s += "   [ Error: " + stringify_fp_sci(drag_err_surf, prec) + " ]";
+        s += String("\nLift Coefficient (Surface)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(lift_coeff_surf, prec);
         if(print_errors)
-          s += "   [ Error: " + stringify_fp_sci(lift_err_line, prec) + " ]";
-        s += String("\nDrag Coefficient (Vol)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_vol, prec);
+          s += "   [ Error: " + stringify_fp_sci(lift_err_surf, prec) + " ]";
+        s += String("\nSide Coefficient (Surface)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(side_coeff_surf, prec);
+        if(print_errors)
+          s += "   [ Error: " + stringify_fp_sci(side_err_surf, prec) + " ]";
+        s += String("\nDrag Coefficient (Volume)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(drag_coeff_vol, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(drag_err_vol, prec) + " ]";
-        s += String("\nLift Coefficient (Vol)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(lift_coeff_vol, prec);
+        s += String("\nLift Coefficient (Volume)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(lift_coeff_vol, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(lift_err_vol, prec) + " ]";
-        s += String("\nSide Coefficient (Vol)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(side_coeff_vol, prec);
+        s += String("\nSide Coefficient (Volume)").pad_back(padlen, pc) + ".: " + stringify_fp_fix(side_coeff_vol, prec);
         if(print_errors)
           s += "   [ Error: " + stringify_fp_sci(side_err_vol, prec) + " ]";
         s += String("\nPressure Difference").pad_back(padlen, pc) + ".: " + stringify_fp_fix(pres_diff, prec);
@@ -448,8 +486,8 @@ namespace CCND
       {
         String s;
         //s += prefix + "DCL/LCL/DCV/LCV/SCV/PD: ";
-        s += prefix + "Line Forces (D/L).....: ";
-        s += stringify_fp_fix(drag_coeff_line, prec) + " " + stringify_fp_fix(lift_coeff_line, prec) + " \n";
+        s += prefix + "Surface Forces (D/L/S): ";
+        s += stringify_fp_fix(drag_coeff_surf, prec) + " " + stringify_fp_fix(lift_coeff_surf, prec) + " " + stringify_fp_fix(side_coeff_surf, prec) + " \n";
         s += prefix + "Volume Forces (D/L/S).: ";
         s += stringify_fp_fix(drag_coeff_vol, prec) + " " + stringify_fp_fix(lift_coeff_vol, prec) + " " + stringify_fp_fix(side_coeff_vol, prec) + "\n";
         s += prefix + "Pressure Difference...: ";
@@ -576,18 +614,36 @@ namespace CCND
         }
       }
 
-      virtual void compute_body_forces_line(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const LocalPresVector& vec_sol_p,
-        const SpaceVeloType& space_velo, const SpacePresType& space_pres, DataType nu, DataType v_max)
+      virtual DataType bench_body_factor(int bench, DataType v_max)
       {
-        Cubature::DynamicFactory cubature_factory(cubature_body_forces_line);
-        BenchBodyForceAccumulator body_force_accum(nu, v_max);
+        if(bench == 7)
+          return DataType(2) / (DataType(0.01)*Math::sqr(v_max*(DataType(0.5)))); // = 2 / (rho * U^2 * D^2)
+        else if(dim == 2)
+          return DataType(2) / (DataType(0.100)*Math::sqr(v_max*(DataType(2)/DataType(3)))); // = 2 / (rho * U^2 * D)
+        else if(dim == 3)
+          return DataType(2) / (DataType(0.041)*Math::sqr(v_max*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
+        else
+          return DataType(1);
+      }
+
+      virtual void compute_body_forces_surf(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const LocalPresVector& vec_sol_p,
+        const SpaceVeloType& space_velo, const SpacePresType& space_pres, DataType nu, DataType v_max, int bench)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_body_forces_surf);
+        BenchBodyForceAccumulator body_force_accum;
         body_force_asm->assemble_flow_accum(body_force_accum, vec_sol_v, vec_sol_p, space_velo, space_pres, cubature_factory);
         body_force_accum.sync(comm);
 
-        drag_coeff_line = body_force_accum.drag;
-        lift_coeff_line = body_force_accum.lift;
-        drag_err_line = Math::abs((body_force_accum.drag - ref_drag) / ref_drag);
-        lift_err_line = Math::abs((body_force_accum.lift - ref_lift) / ref_lift);
+        DataType bbf = bench_body_factor(bench, v_max);
+        drag_coeff_surf = bbf * body_force_accum.drag(nu);
+        lift_coeff_surf = bbf * body_force_accum.lift(nu);
+        side_coeff_surf = bbf * body_force_accum.side(nu);
+        if(Math::abs(ref_drag) > DataType(1E-7))
+          drag_err_surf = Math::abs((drag_coeff_surf - ref_drag) / ref_drag);
+        if(Math::abs(ref_lift) > DataType(1E-7))
+          lift_err_surf = Math::abs((lift_coeff_surf - ref_lift) / ref_lift);
+        if(Math::abs(ref_side) > DataType(1E-7))
+          side_err_surf = Math::abs((side_coeff_surf - ref_side) / ref_side);
       }
 
       virtual void compute_body_forces_vol(const Dist::Comm& comm, const LocalVeloVector& vec_def_unsynced, DataType DOXY(nu), DataType v_max, int bench)
@@ -606,24 +662,20 @@ namespace CCND
           frc.axpy(vchr[i], vdef[i]);
         }
 
-        // compute this weird factor
-        DataType dpf2 = DataType(1);
-        if(bench == 7)
-          dpf2 = DataType(2) / (DataType(0.01)*Math::sqr(v_max*(DataType(0.5)))); // = 2 / (rho * U^2 * D^2)
-        else if(dim == 2)
-          dpf2 = DataType(2) / (DataType(0.100)*Math::sqr(v_max*(DataType(2)/DataType(3)))); // = 2 / (rho * U^2 * D)
-        else if(dim == 3)
-          dpf2 = DataType(2) / (DataType(0.041)*Math::sqr(v_max*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
-
         // sum up over all processes
         comm.allreduce(forces.v, forces.v, 3u, Dist::op_sum);
 
         // save the values
-        drag_coeff_vol = dpf2 * forces[0];
-        lift_coeff_vol = dpf2 * forces[1];
-        side_coeff_vol = dpf2 * forces[2];
-        drag_err_vol = Math::abs((drag_coeff_vol - ref_drag) / ref_drag);
-        lift_err_vol = Math::abs((lift_coeff_vol - ref_lift) / ref_lift);
+        DataType bbf = bench_body_factor(bench, v_max);
+        drag_coeff_vol = bbf * forces[0];
+        lift_coeff_vol = bbf * forces[1];
+        side_coeff_vol = bbf * forces[2];
+        if(Math::abs(ref_drag) > 1E-7)
+          drag_err_vol = Math::abs((drag_coeff_vol - ref_drag) / ref_drag);
+        if(Math::abs(ref_lift) > 1E-7)
+          lift_err_vol = Math::abs((lift_coeff_vol - ref_lift) / ref_lift);
+        if(Math::abs(ref_side) > 1E-7)
+          side_err_vol = Math::abs((side_coeff_vol - ref_side) / ref_side);
       }
 
       virtual void compute_pressure_difference(const Dist::Comm& comm, const LocalPresVector& vec_sol_p, const SpacePresType& space_pres)
@@ -639,7 +691,8 @@ namespace CCND
 
         // compute error to reference values
         pres_diff = d_p;
-        pres_diff_err = Math::abs((d_p - ref_p_diff) / ref_p_diff);
+        if(Math::abs(ref_p_diff) > 1E-7)
+          pres_diff_err = Math::abs((d_p - ref_p_diff) / ref_p_diff);
       }
 
       virtual void compute_pressure_drop(const Dist::Comm& comm, const LocalPresVector& vec_sol_p, const SpacePresType& space_pres, int bench)
@@ -661,7 +714,8 @@ namespace CCND
           pres_drop = (pv[0] - pv[1]) / DataType(0.41);
         else if(dim == 3)
           pres_drop = (pv[0] - pv[1]) / DataType(0.41*0.41);
-        pres_drop_err = 0.0;//Math::abs((pres_drop - ref_pres_drop) / ref_pres_drop);
+        if(Math::abs(ref_p_drop) > 1E-7)
+          pres_drop_err = Math::abs((pres_drop - ref_p_drop) / ref_p_drop);
       }
 
       virtual void compute_fluxes(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const SpaceVeloType& space_velo)
