@@ -11,6 +11,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/util/string.hpp>
 
 #ifdef __CUDACC__
 #include <cusparse_v2.h>
@@ -64,6 +65,7 @@ namespace FEAT
     void cuda_set_memory(DT_ * address, const DT_ val, const Index count);
     template <typename DT1_, typename DT2_>
     void cuda_convert(DT1_ * dest, const DT2_ * src, const Index count);
+    String cuda_get_visible_devices();
   }
 }
 #endif // FEAT_HAVE_CUDA

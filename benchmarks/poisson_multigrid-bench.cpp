@@ -503,6 +503,12 @@ namespace PoissonMultigridBench
     comm.print("Chosen Levels.......: " + domain.format_chosen_levels());
     comm.print("Partitioner Info....: " + domain.get_chosen_parti_info());
     comm.print("Preferred Backend...: " + backend);
+#ifdef FEAT_HAVE_CUDA
+    if(backend.compare_no_case("cuda") == 0)
+    {
+      comm.allprint(FEAT::Util::cuda_get_visible_devices());
+    }
+#endif // FEAT_HAVE_CUDA
     comm.print("Test Mode...........: " + String((args.check("test") >= 0) ? "yes" : "no"));
     comm.print("Memory Limit........: " + (args.check("memory") > 0 ? args.query("memory")->second.front() : String("-N/A-")));
     /*if(args.check("memory") > 0)

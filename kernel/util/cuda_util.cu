@@ -260,3 +260,23 @@ template void FEAT::Util::cuda_convert<unsigned int, double>(unsigned int *, con
 template void FEAT::Util::cuda_convert<unsigned long, double>(unsigned long *, const double *, const Index);
 template void FEAT::Util::cuda_convert<unsigned int, float>(unsigned int *, const float *, const Index);
 template void FEAT::Util::cuda_convert<unsigned long, float>(unsigned long *, const float *, const Index);
+
+String FEAT::Util::cuda_get_visible_devices()
+{
+  String result("");
+  int numDevices(-1);
+  if (cudaSuccess != cudaGetDeviceCount(&numDevices))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaGetDeviceCount failed!");
+  result += "Number of visible cuda devices: " + stringify(numDevices) + "\n" ;
+
+  for (int idevice(0); idevice<numDevices; ++idevice)
+  {
+    // get device properties
+    cudaDeviceProp prop;
+    if (cudaSuccess != cudaGetDeviceProperties (&prop, idevice))
+      throw InternalError(__func__, __FILE__, __LINE__, "cudaGetDeviceProperties failed!");
+    // print out device name and compute capabilities
+    result += "Device " + stringify(idevice) + ": " + stringify(prop.name) + "\n";
+  }
+  return result;
+}
