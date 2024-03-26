@@ -50,7 +50,6 @@ namespace CCND
     public Analytic::Function
   {
   public:
-    typedef DataType DataType;
     typedef Analytic::Image::Vector<dim> ImageType;
     static constexpr int domain_dim = dim;
     static constexpr bool can_value = true;
