@@ -184,7 +184,7 @@ namespace CCND
         unit_asm_noflow.assemble(system.at(i)->get_local_velo_unit_filter_seq().find_or_add("noflow"), domain.at(i)->space_velo);
 
         // assemble pressure mean filter
-        system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, "gauss-legendre:2");
+        system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, false);
 
         // compile system filter
         system.at(i)->compile_system_filter();
