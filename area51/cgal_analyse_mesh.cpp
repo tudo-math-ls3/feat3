@@ -425,7 +425,7 @@ namespace AnalyseMeshCGAL
     std::cout<<"Loading the off-file"<<std::endl;
     String off_file_name;
     args.parse("off",off_file_name);
-    Geometry::CGALWrapper cw(off_file_name, Geometry::CGALFileMode::fm_off);
+    Geometry::CGALWrapper<DataType> cw(off_file_name, Geometry::CGALFileMode::fm_off);
 
     // Get the Vertex-Set of the mesh
     typedef typename MeshType::VertexSetType VertexSetType;

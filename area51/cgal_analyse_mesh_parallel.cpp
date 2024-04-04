@@ -180,7 +180,7 @@ namespace AnalyseMeshCGALParallel
     // and hand the stream to the constructor:
     std::stringstream ss_off_file;
     DistFileIO::read_common(ss_off_file,off_file_name,comm);
-    Geometry::CGALWrapper cw(ss_off_file, Geometry::CGALFileMode::fm_off);
+    Geometry::CGALWrapper<DataType> cw(ss_off_file, Geometry::CGALFileMode::fm_off);
     loading_off_file.stop();
     comm.print("Time loading the Off-file: " + loading_off_file.elapsed_string(TimeFormat::s_m));
 

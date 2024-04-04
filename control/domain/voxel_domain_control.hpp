@@ -88,7 +88,7 @@ namespace FEAT
         using typename BaseClass::PointType;
 
       private:
-        const Geometry::CGALWrapper& _cgal_wrapper;
+        const Geometry::CGALWrapper<CoordType_>& _cgal_wrapper;
         const bool _invert;
 
       public:
@@ -101,7 +101,7 @@ namespace FEAT
          * \param[in] invert
          * Specifies whether inside and outside are to be swapped.
          */
-        explicit VoxelSlagCGALMasker(const Geometry::CGALWrapper& cgal_wrapper, bool invert) :
+        explicit VoxelSlagCGALMasker(const Geometry::CGALWrapper<CoordType_>& cgal_wrapper, bool invert) :
           _cgal_wrapper(cgal_wrapper),
           _invert(invert)
         {
@@ -638,7 +638,7 @@ namespace FEAT
           // this only makes sense in 3D...
           XASSERTM(shape_dim == 3, "CGAL OFF slag mask creation is only available in 3D");
 #ifdef FEAT_HAVE_CGAL
-          Geometry::CGALWrapper cgal_wrapper(is, Geometry::CGALFileMode::fm_off);
+          Geometry::CGALWrapper<CoordType> cgal_wrapper(is, Geometry::CGALFileMode::fm_off);
           VoxelSlagCGALMasker<CoordType> slag_masker(cgal_wrapper, invert);
           this->create_slag_mask(slag_masker);
 #else // no FEAT_HAVE_CGAL

@@ -4306,7 +4306,7 @@ namespace FEAT
 
       private:
         /// Wrapper to CGAL library
-        Geometry::CGALWrapper _cgal_wrapper;
+        Geometry::CGALWrapper<DT_> _cgal_wrapper;
       public:
 
         /**
@@ -4341,7 +4341,9 @@ namespace FEAT
           typedef typename EvalTraits_::HessianType HessianType;
 
         private:
-          const Geometry::CGALWrapper* _cgal_wrapper;
+          /// cgal datatype
+          typedef typename CGALDistFunc::DataType IDT_;
+          const Geometry::CGALWrapper<IDT_>* _cgal_wrapper;
 
         public:
           explicit Evaluator(const CGALDistFunc& function) :
@@ -4351,8 +4353,8 @@ namespace FEAT
 
           ValueType value(const PointType& point)
           {
-            return ((_cgal_wrapper->point_inside(double(point[0]), double(point[1]), double(point[2])) ? ValueType(1) : ValueType(-1)) *
-                    ValueType(Math::sqrt(_cgal_wrapper->squared_distance(double(point[0]), double(point[1]), double(point[2])))));
+            return ((_cgal_wrapper->point_inside(IDT_(point[0]), IDT_(point[1]), IDT_(point[2])) ? ValueType(1) : ValueType(-1)) *
+                    ValueType(Math::sqrt(_cgal_wrapper->squared_distance(IDT_(point[0]), IDT_(point[1]), IDT_(point[2])))));
           }
         }; // class CGALDistFunc::Evaluator<...>
       }; // class CGALDistFunc<...>

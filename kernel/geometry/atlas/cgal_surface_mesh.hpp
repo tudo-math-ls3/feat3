@@ -64,7 +64,7 @@ namespace FEAT
 
       private:
         ///Our cgal handler
-        Geometry::CGALWrapper cgal;
+        Geometry::CGALWrapper<CoordType> cgal;
 
       public:
         /// delete default constructor explicitly
@@ -110,10 +110,10 @@ namespace FEAT
         /// \copydoc ChartBase:transform()
         void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
         {
-          // create rotation matrix as double
-          Tiny::Matrix<double, 3, 3> rot;
-          rot.set_rotation_3d(double(angles[0]), double(angles[1]), double(angles[2]));
-          Tiny::Vector<double, 3> trans = (-1) * rot * origin + offset;
+          // create rotation matrix
+          Tiny::Matrix<CoordType, 3, 3> rot;
+          rot.set_rotation_3d(angles[0], angles[1], angles[2]);
+          Tiny::Vector<CoordType, 3> trans = (-1) * rot * origin + offset;
           cgal.transform(rot, trans);
         }
 
@@ -131,7 +131,7 @@ namespace FEAT
          */
         void project_point(WorldPoint& point) const
         {
-          point = WorldPoint(cgal.closest_point(CGALWrapper::PointType(point)));
+          point = cgal.closest_point(point);
         }
 
         /**
@@ -146,9 +146,9 @@ namespace FEAT
          */
         void project_point(WorldPoint& point, WorldPoint& normal) const
         {
-          CGALWrapper::PointType tmp_norm;
-          point = WorldPoint(cgal.closest_point(CGALWrapper::PointType(point), tmp_norm));
-          normal = WorldPoint(tmp_norm);
+          WorldPoint tmp_norm;
+          point = cgal.closest_point(point, tmp_norm);
+          normal = tmp_norm;
         }
 
 
@@ -196,7 +196,7 @@ namespace FEAT
         /// \copydoc ChartBase::dist()
         CoordType compute_dist(const WorldPoint& point) const
         {
-          return CoordType(Math::sqrt(cgal.squared_distance(double(point[0]), double(point[1]), double(point[2]))));
+          return Math::sqrt(cgal.squared_distance(point[0], point[1], point[2]));
         }
 
         /// \copydoc ChartBase::dist()
@@ -227,13 +227,13 @@ namespace FEAT
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point) const
         {
-          return cgal.point_inside(double(point[0]), double(point[1]), double(point[2])) ? -compute_dist(point) : compute_dist(point);
+          return cgal.point_inside(point[0], point[1], point[2]) ? -compute_dist(point) : compute_dist(point);
         }
 
         /// \copydoc ChartBase::signed_dist()
         CoordType compute_signed_dist(const WorldPoint& point, WorldPoint& grad_distance) const
         {
-          return cgal.point_inside(double(point[0]), double(point[1]), double(point[2])) ? -compute_dist(point, grad_distance) : compute_dist(point, grad_distance);
+          return cgal.point_inside(point[0], point[1], point[2]) ? -compute_dist(point, grad_distance) : compute_dist(point, grad_distance);
         }
 #else
       public ChartBase<Mesh_>  //dummy implementation... you should not create a CGALSurfaceMesh chart, if you do not have cgal loaded...
