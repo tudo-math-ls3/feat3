@@ -281,6 +281,7 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       void assign(const Container<DT2_, IT2_> & other)
       {
+        XASSERTM(!other._foreign_memory, "assign/convert is forbidden with foreign memory source objects.");
         if (!this->_foreign_memory)
         {
           for (Index i(0) ; i < this->_elements.size() ; ++i)

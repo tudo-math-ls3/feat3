@@ -790,8 +790,8 @@ namespace FEAT
         virtual void prepare_pre_sync(const VectorTypeR& vec_state, FilterType& filter)
         {
           // Download state if necessary
-          CoordsBufferType vec_buf;
-          vec_buf.convert(vec_state);
+          //CoordsBufferType vec_buf;
+          //vec_buf.convert(vec_state);
 
           // Copy to buffer and mesh
           this->_coords_buffer.copy(vec_state);
