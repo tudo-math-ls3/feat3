@@ -631,8 +631,8 @@ namespace FEAT
         template<typename LambdaFunction_>
         explicit LambdaFunctionEvaluator(const LambdaFunction_& function) :
           lambda_set(function.lambda_set),
-          grad_helper(lambda_set, function.initial_h_grad, function.max_steps_grad),
-          hess_helper(lambda_set, function.initial_h_hess, function.max_steps_hess)
+          grad_helper(lambda_set, DataType(function.initial_h_grad), function.max_steps_grad),
+          hess_helper(lambda_set, DataType(function.initial_h_hess), function.max_steps_hess)
         {
         }
 
