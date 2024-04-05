@@ -404,7 +404,7 @@ namespace FEAT
             }
             XASSERTM(i == trows * tcols, "Dense MTX file did not contain enough entries!");
 
-            this->assign(result);
+            this->move(std::move(result));
             break;
 
           }
@@ -811,7 +811,7 @@ namespace FEAT
         {
           DenseMatrix r(x.columns(), x.rows());
           Arch::Transpose::value(r.elements(), x.elements(), x.rows(), x.columns());
-          this->assign(r);
+          this->move(std::move(r));
         }
       }
 

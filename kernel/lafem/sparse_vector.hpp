@@ -675,8 +675,7 @@ namespace FEAT
               ++pval;
               ++pind;
             }
-            SparseVector<DT_, IT_> tmp(rows, val, ind, false);
-            this->assign(tmp);
+            this->move(SparseVector<DT_, IT_>(rows, val, ind, false));
             break;
           }
           default:
@@ -803,7 +802,7 @@ namespace FEAT
         }
 
         target.sort();
-        this->assign(target);
+        this->move(std::move(target));
       }
 
       /**

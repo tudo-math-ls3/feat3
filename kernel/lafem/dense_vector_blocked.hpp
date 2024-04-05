@@ -669,7 +669,7 @@ namespace FEAT
             *pval = tval;
             ++pval;
           }
-          this->assign(tmp);
+          this->move(std::move(tmp));
           break;
         }
         case FileMode::fm_exp:

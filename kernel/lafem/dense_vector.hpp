@@ -440,7 +440,7 @@ namespace FEAT
       {
         DenseVector vec(a.template size<Perspective::pod>());
         a.set_vec(vec.elements());
-        this->assign(vec);
+        this->move(std::move(vec));
       }
 
       /**
@@ -607,7 +607,7 @@ namespace FEAT
             *pval = tval;
             ++pval;
           }
-          this->assign(tmp);
+          this->move(std::move(tmp));
           break;
         }
         case FileMode::fm_exp:

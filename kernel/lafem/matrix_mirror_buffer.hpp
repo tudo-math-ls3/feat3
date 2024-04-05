@@ -130,7 +130,7 @@ namespace FEAT
           pcol_idx[i] = IT_(img_idx[i]);
 
         // build the matrix
-        this->assign(MatrixMirrorBuffer<DT_, IT_>(num_rows, num_cols, entries_per_nonzero_in, vcol_idx, vdata, vrow_ptr));
+        this->move(MatrixMirrorBuffer<DT_, IT_>(num_rows, num_cols, entries_per_nonzero_in, vcol_idx, vdata, vrow_ptr));
       }
 
       /**

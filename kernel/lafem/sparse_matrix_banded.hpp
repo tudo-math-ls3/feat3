@@ -506,7 +506,7 @@ namespace FEAT
         toffsets_mem.convert(toffsets);
         DenseVector<DT_, IT_> tval_mem(Index(moffsets.size()) * num_rows, DT_(0));
 
-        this->assign(SparseMatrixBanded(num_rows, num_cols, tval_mem, toffsets_mem));
+        this->move(SparseMatrixBanded(num_rows, num_cols, tval_mem, toffsets_mem));
       }
 
       /**
@@ -691,7 +691,7 @@ namespace FEAT
         offset_set.clear();
 
         SparseMatrixBanded<DT_, IT_> temp(nrows, ncolumns, val_new, offsets_new);
-        this->assign(temp);
+        this->move(std::move(temp));
       }
 
 

@@ -371,7 +371,7 @@ namespace FEAT
 
         if (num_nzes == 0)
         {
-          this->assign(SparseMatrixCSCR(num_rows, num_cols));
+          this->move(SparseMatrixCSCR(num_rows, num_cols));
           return;
         }
 
@@ -548,8 +548,7 @@ namespace FEAT
           ta.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
         }
 
-        SparseMatrixCSCR<DT_, IT_> a_cscr(arows, acolumns, tcol_ind, tval, trow_ptr, trow_numbers);
-        this->assign(a_cscr);
+        this->move(SparseMatrixCSCR<DT_, IT_>(arows, acolumns, tcol_ind, tval, trow_ptr, trow_numbers));
       }
 
       /**

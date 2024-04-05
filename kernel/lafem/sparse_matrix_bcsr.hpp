@@ -349,7 +349,7 @@ namespace FEAT
 
         if (num_nnze == 0)
         {
-          this->assign(SparseMatrixBCSR(num_rows, num_cols));
+          this->move(SparseMatrixBCSR(num_rows, num_cols));
           return;
         }
 
@@ -374,7 +374,7 @@ namespace FEAT
           pcol_idx[i] = IT_(img_idx[i]);
 
         // build the matrix
-        this->assign(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
+        this->move(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
       }
 
       /**
@@ -537,8 +537,7 @@ namespace FEAT
        */
       void convert(const Adjacency::Graph & graph)
       {
-        SparseMatrixBCSR temp(graph);
-        this->assign(temp);
+        this->move(SparseMatrixBCSR(graph));
       }
 
       /**
@@ -1203,8 +1202,7 @@ namespace FEAT
         using XType = SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_>;
         if (x.used_elements() == 0)
         {
-          SparseMatrixBCSR r(x.rows(), x.columns());
-          this->assign(r);
+          this->move(SparseMatrixBCSR(x.rows(), x.columns()));
           return;
         }
 
@@ -1254,9 +1252,7 @@ namespace FEAT
         }
         ptrow_ptr[0] = 0;
 
-        SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> tx_t(txcolumns, txrows, tcol_ind, tval, trow_ptr);
-
-        this->assign(tx_t);
+        this->move(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> (txcolumns, txrows, tcol_ind, tval, trow_ptr));
       }
 
       /**

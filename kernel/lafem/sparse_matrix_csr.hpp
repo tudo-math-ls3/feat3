@@ -414,7 +414,7 @@ namespace FEAT
 
         if (num_nnze == 0)
         {
-          this->assign(SparseMatrixCSR(num_rows, num_cols));
+          this->move(SparseMatrixCSR(num_rows, num_cols));
           return;
         }
 
@@ -438,7 +438,7 @@ namespace FEAT
           pcol_idx[i] = IT_(img_idx[i]);
 
         // build the matrix
-        this->assign(SparseMatrixCSR<DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
+        this->move(SparseMatrixCSR<DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
       }
 
       /**
@@ -766,9 +766,7 @@ namespace FEAT
           ta.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
         }
 
-        SparseMatrixCSR<DT_, IT_> a_csr(arows, acolumns, tcol_ind, tval, trow_ptr);
-
-        this->assign(a_csr);
+        this->move(SparseMatrixCSR<DT_, IT_>(arows, acolumns, tcol_ind, tval, trow_ptr));
       }
 
       /**
@@ -780,8 +778,7 @@ namespace FEAT
        */
       void convert(const Adjacency::Graph & graph)
       {
-        SparseMatrixCSR temp(graph);
-        this->assign(temp);
+        this->move(SparseMatrixCSR(graph));
       }
 
       /**
@@ -1614,8 +1611,7 @@ namespace FEAT
       {
         if (x.used_elements() == 0)
         {
-          SparseMatrixCSR r(x.rows(), x.columns());
-          this->assign(r);
+          this->move(SparseMatrixCSR(x.rows(), x.columns()));
           return;
         }
 
@@ -1665,9 +1661,7 @@ namespace FEAT
         }
         ptrow_ptr[0] = 0;
 
-        SparseMatrixCSR<DT_, IT_> tx(txcolumns, txrows, tcol_ind, tval, trow_ptr);
-
-        this->assign(tx);
+        this->move(SparseMatrixCSR<DT_, IT_>(txcolumns, txrows, tcol_ind, tval, trow_ptr));
       }
 
       /**
@@ -2444,8 +2438,7 @@ namespace FEAT
         }
         if (ue == Index(0))
         {
-          SparseMatrixCSR<DT_, IT_> t(this->rows(), this->columns());
-          this->assign(t);
+          this->move(SparseMatrixCSR<DT_, IT_>(this->rows(), this->columns()));
           return;
         }
 
@@ -2473,10 +2466,7 @@ namespace FEAT
             }
           }
         }
-
-        SparseMatrixCSR<DT_, IT_> t(this->rows(), this->columns(), new_col_ind, new_val, new_row_ptr);
-
-        this->assign(t);
+        this->move(SparseMatrixCSR<DT_, IT_>(this->rows(), this->columns(), new_col_ind, new_val, new_row_ptr));
       }
 
       /// Returns a new compatible L-Vector.
