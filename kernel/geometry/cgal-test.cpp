@@ -21,7 +21,7 @@ class CGALTest
 {
 public:
   CGALTest() :
-    UnitTest("CGALTest")
+    UnitTest("CGALTest", Type::Traits<DT_>::name())
   {
   }
 
@@ -34,6 +34,9 @@ public:
 #endif
   virtual void run() const override
   {
+    // choose tolerance, but not tighter than double precision
+    const DT_ tol = DT_(2) * Math::max(Math::eps<DT_>(), DT_(Math::eps<double>()));
+
     {
       std::stringstream mts;
       mts<<"OFF"<<std::endl;
@@ -66,9 +69,9 @@ public:
 
       CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
       auto point = cw.closest_point(spoint);
-      TEST_CHECK_EQUAL_WITHIN_EPS(point[0], DT_(0), Math::eps<DT_>());
-      TEST_CHECK_EQUAL_WITHIN_EPS(point[1], spoint[1], Math::eps<DT_>());
-      TEST_CHECK_EQUAL_WITHIN_EPS(point[2], spoint[2], Math::eps<DT_>());
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[0], DT_(0), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[1], spoint[1], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[2], spoint[2], tol);
       //rotate three times by 2*pi/3 regarding x-axis
       typename CGALWrapper<DT_>::TransformMatrix mat;
       typename CGALWrapper<DT_>::PointType trans{DT_(0),DT_(0),DT_(0)};
@@ -77,18 +80,9 @@ public:
       cw.transform(mat,trans);
       cw.transform(mat,trans);
       auto point2 = cw.closest_point(spoint);
-      if constexpr(std::is_same<__float128, DT_>::value)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[0], point2[0], DT_(2) * Math::eps<double>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[1], point2[1], DT_(2) * Math::eps<double>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[2], point2[2], DT_(2) * Math::eps<double>());
-      }
-      else
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[0], point2[0], DT_(2) * Math::eps<DT_>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[1], point2[1], DT_(2) * Math::eps<DT_>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[2], point2[2], DT_(2) * Math::eps<DT_>());
-      }
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[0], point2[0], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[1], point2[1], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[2], point2[2], tol);
 
       trans[0] = DT_(0.11);
       trans[1] = DT_(0.1);
@@ -96,19 +90,9 @@ public:
       mat.set_identity();
       cw.transform(mat, trans);
       auto point3 = cw.closest_point(spoint);
-
-      if constexpr(std::is_same<__float128, DT_>::value)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[0], point3[0] - trans[0], DT_(2) * Math::eps<double>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[1], point3[1], DT_(2) * Math::eps<double>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[2], point3[2] - trans[2] + spoint[2], DT_(2) * Math::eps<double>());
-      }
-      else
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[0], point3[0] - trans[0], DT_(2) * Math::eps<DT_>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[1], point3[1], DT_(2) * Math::eps<DT_>());
-        TEST_CHECK_EQUAL_WITHIN_EPS(point[2], point3[2] - trans[2] + spoint[2], DT_(2) * Math::eps<DT_>());
-      }
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[0], point3[0] - trans[0], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[1], point3[1], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[2], point3[2] - trans[2] + spoint[2], tol);
     }
 
     {
@@ -130,16 +114,11 @@ public:
       CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
       cw.transform(mat, trans);
       auto point = cw.closest_point(spoint);
-      TEST_CHECK_EQUAL_WITHIN_EPS(point[0], DT_(0.), Math::eps<DT_>());
-      TEST_CHECK_EQUAL_WITHIN_EPS(point[1], spoint[1], Math::eps<DT_>());
-      TEST_CHECK_EQUAL_WITHIN_EPS(point[2], spoint[2], Math::eps<DT_>());
-
-
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[0], DT_(0.), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[1], spoint[1], tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(point[2], spoint[2], tol);
     }
-
-
   }
-
 };
 
 CGALTest<double> cgal_test_double;
