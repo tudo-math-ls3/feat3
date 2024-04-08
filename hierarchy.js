@@ -559,7 +559,7 @@ var hierarchy =
     [ "FEAT::Geometry::Atlas::SphereTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_sphere_traits.html", null ],
     [ "FEAT::Geometry::Atlas::SurfaceMeshTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_surface_mesh_traits.html", null ],
     [ "FEAT::Geometry::AttributeSet< DataType_ >", "class_f_e_a_t_1_1_geometry_1_1_attribute_set.html", null ],
-    [ "FEAT::Geometry::CGALWrapper", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html", null ],
+    [ "FEAT::Geometry::CGALWrapper< DT_ >", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html", null ],
     [ "FEAT::Geometry::ChartHitTestFactory< Mesh_, Chart_ >::ChartHitFunction", "class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html", null ],
     [ "FEAT::Geometry::ConformalMesh< Shape_, num_coords_, Coord_ >", "class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html", null ],
     [ "FEAT::Geometry::ConformalMesh< Shape_, num_coords_, Coord_ >::IndexSet< cell_dim_, face_dim_ >", "struct_f_e_a_t_1_1_geometry_1_1_conformal_mesh_1_1_index_set.html", null ],
@@ -1371,6 +1371,7 @@ var hierarchy =
     [ "std::exception", null, [
       [ "FEAT::Exception", "class_f_e_a_t_1_1_exception.html", [
         [ "FEAT::Analytic::ParsedFunctionEvalError", "class_f_e_a_t_1_1_analytic_1_1_parsed_function_eval_error.html", null ],
+        [ "FEAT::Assembly::GridTransfer::LocalMassMatrixSingularException", "class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html", null ],
         [ "FEAT::Cubature::UnknownRule", "class_f_e_a_t_1_1_cubature_1_1_unknown_rule.html", null ],
         [ "FEAT::FileError", "class_f_e_a_t_1_1_file_error.html", [
           [ "FEAT::FileNotCreated", "class_f_e_a_t_1_1_file_not_created.html", null ],

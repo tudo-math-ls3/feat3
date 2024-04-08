@@ -6,6 +6,7 @@ var dir_7ab5cd9d6a44db3bf3b807f89e50cefe =
     [ "compiler_clang.hpp", "compiler__clang_8hpp.html", null ],
     [ "compiler_gnu.hpp", "compiler__gnu_8hpp.html", null ],
     [ "compiler_intel.hpp", "compiler__intel_8hpp.html", null ],
+    [ "compiler_intel_oneapi.hpp", "compiler__intel__oneapi_8hpp_source.html", null ],
     [ "compiler_microsoft.hpp", "compiler__microsoft_8hpp.html", null ],
     [ "compiler_oracle.hpp", "compiler__oracle_8hpp.html", null ],
     [ "compiler_pgi.hpp", "compiler__pgi_8hpp.html", null ],

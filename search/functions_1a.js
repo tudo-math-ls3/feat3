@@ -3,7 +3,7 @@ var searchData=
   ['_7ealglibmincg_0',['~ALGLIBMinCG',['../class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_c_g.html#a732a41d4722fc45e0cb9aa64319fd380',1,'FEAT::Solver::ALGLIBMinCG']]],
   ['_7ealglibminlbfgs_1',['~ALGLIBMinLBFGS',['../class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#a25544cfa4d64f23bd0593921736dfd58',1,'FEAT::Solver::ALGLIBMinLBFGS']]],
   ['_7eattributeset_2',['~AttributeSet',['../class_f_e_a_t_1_1_geometry_1_1_attribute_set.html#af65d2b690de54184c0a4a5fb031001ab',1,'FEAT::Geometry::AttributeSet']]],
-  ['_7ecgalwrapper_3',['~CGALWrapper',['../class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a374f946fa6642ca2d93fe57e44ea3faa',1,'FEAT::Geometry::CGALWrapper']]],
+  ['_7ecgalwrapper_3',['~CGALWrapper',['../class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#afbe0a9bf35c92e365d50a23e7da9e5da',1,'FEAT::Geometry::CGALWrapper']]],
   ['_7echartbase_4',['~ChartBase',['../class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a7e511deffbf1b1e24282a2c0d7e99f5c',1,'FEAT::Geometry::Atlas::ChartBase']]],
   ['_7echartdistancefunction_5',['~ChartDistanceFunction',['../class_f_e_a_t_1_1_meshopt_1_1_chart_distance_function.html#a047ca64734de8f3ffb259c22a8bfd93d',1,'FEAT::Meshopt::ChartDistanceFunction']]],
   ['_7echebyshev_6',['~Chebyshev',['../class_f_e_a_t_1_1_solver_1_1_chebyshev.html#aefc717842ccdba061db4ae272abfe474',1,'FEAT::Solver::Chebyshev']]],

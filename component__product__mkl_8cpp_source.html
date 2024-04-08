@@ -113,25 +113,27 @@ $(document).ready(function(){initNavTree('component__product__mkl_8cpp_source.ht
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;kernel/lafem/arch/component_product.hpp&gt;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;mkl.h&gt;</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a>;</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html">FEAT::LAFEM</a>;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">using namespace </span>FEAT::LAFEM::Arch;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keywordtype">void</span> ComponentProduct::value_mkl(<span class="keywordtype">float</span> * r, <span class="keyword">const</span> <span class="keywordtype">float</span> * <span class="keyword">const</span> x, <span class="keyword">const</span> <span class="keywordtype">float</span> * <span class="keyword">const</span> y, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>{</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  vsMul((MKL_INT)size, x, y, r);</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>}</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keywordtype">void</span> ComponentProduct::value_mkl(<span class="keywordtype">double</span> * r, <span class="keyword">const</span> <span class="keywordtype">double</span> * <span class="keyword">const</span> x, <span class="keyword">const</span> <span class="keywordtype">double</span> * <span class="keyword">const</span> y, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>{</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  vdMul((MKL_INT)size, x, y, r);</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>}</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>FEAT_DISABLE_WARNINGS</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;mkl.h&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>FEAT_RESTORE_WARNINGS</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a>;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html">FEAT::LAFEM</a>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">using namespace </span>FEAT::LAFEM::Arch;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keywordtype">void</span> ComponentProduct::value_mkl(<span class="keywordtype">float</span> * r, <span class="keyword">const</span> <span class="keywordtype">float</span> * <span class="keyword">const</span> x, <span class="keyword">const</span> <span class="keywordtype">float</span> * <span class="keyword">const</span> y, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>{</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  vsMul((MKL_INT)size, x, y, r);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>}</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keywordtype">void</span> ComponentProduct::value_mkl(<span class="keywordtype">double</span> * r, <span class="keyword">const</span> <span class="keywordtype">double</span> * <span class="keyword">const</span> x, <span class="keyword">const</span> <span class="keywordtype">double</span> * <span class="keyword">const</span> y, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>{</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  vdMul((MKL_INT)size, x, y, r);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html">FEAT::LAFEM</a></div><div class="ttdoc">LAFEM namespace.</div><div class="ttdef"><b>Definition:</b> <a href="apply_8hpp_source.html#l00021">apply.hpp:22</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00118">base_header.hpp:118</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00119">base_header.hpp:119</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

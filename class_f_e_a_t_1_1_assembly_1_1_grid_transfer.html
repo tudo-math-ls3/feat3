@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_assembly_1_1_grid_tr
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Assembly::GridTransfer Class Reference</div></div>
@@ -113,8 +114,22 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_assembly_1_1_grid_tr
 
 <p><code>#include &lt;<a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html">LocalMassMatrixSingularException</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_exception.html" title="Base exception class.">Exception</a> for singular mass matrix errors.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a159c170064fae065520c01536f4c6a39"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </td></tr>
+<tr class="memitem:a159c170064fae065520c01536f4c6a39"><td class="memTemplItemLeft" align="right" valign="top">static int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a159c170064fae065520c01536f4c6a39">assemble_intermesh_transfer</a> (Matrix_ &amp;matrix, Vector_ &amp;vector, const TargetSpace_ &amp;space_target, const SourceSpace_ &amp;space_source, const Target2SourceAdjactor_ &amp;trg2src, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
+<tr class="memdesc:a159c170064fae065520c01536f4c6a39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a generic inter-mesh transfer matrix and its corresponding weight vector.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a159c170064fae065520c01536f4c6a39">More...</a><br /></td></tr>
+<tr class="separator:a159c170064fae065520c01536f4c6a39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ef335b61106bd734b7daca28d76a579"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </td></tr>
+<tr class="memitem:a7ef335b61106bd734b7daca28d76a579"><td class="memTemplItemLeft" align="right" valign="top">static int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a7ef335b61106bd734b7daca28d76a579">assemble_intermesh_transfer_direct</a> (Matrix_ &amp;matrix, const TargetSpace_ &amp;space_target, const SourceSpace_ &amp;space_source, const Target2SourceAdjactor_ &amp;trg2src, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
+<tr class="memdesc:a7ef335b61106bd734b7daca28d76a579"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a generic inter-mesh transfer matrix and its corresponding weight vector.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a7ef335b61106bd734b7daca28d76a579">More...</a><br /></td></tr>
+<tr class="separator:a7ef335b61106bd734b7daca28d76a579"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e747c38d398c0c1fc2729a266e81d2c"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename CoarseSpace_ &gt; </td></tr>
 <tr class="memitem:a5e747c38d398c0c1fc2729a266e81d2c"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a5e747c38d398c0c1fc2729a266e81d2c">assemble_prolongation</a> (Matrix_ &amp;matrix, Vector_ &amp;vector, const FineSpace_ &amp;fine_space, const CoarseSpace_ &amp;coarse_space, const <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_dynamic_factory.html">Cubature::DynamicFactory</a> &amp;cubature_factory)</td></tr>
 <tr class="memdesc:a5e747c38d398c0c1fc2729a266e81d2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a prolongation matrix and its corresponding weight vector.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a5e747c38d398c0c1fc2729a266e81d2c">More...</a><br /></td></tr>
@@ -155,14 +170,183 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae1ad0edaaaf35abe0720a49a526943fd"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#ae1ad0edaaaf35abe0720a49a526943fd">prolongate_vector_direct</a> (Vector_ &amp;vector_f, const Vector_ &amp;vector_c, const FineSpace_ &amp;fine_space, const CoarseSpace_ &amp;coarse_space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
 <tr class="memdesc:ae1ad0edaaaf35abe0720a49a526943fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prolongates a primal vector directly.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#ae1ad0edaaaf35abe0720a49a526943fd">More...</a><br /></td></tr>
 <tr class="separator:ae1ad0edaaaf35abe0720a49a526943fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b63aa2233be35ed49d40532c20a4709"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </td></tr>
+<tr class="memitem:a7b63aa2233be35ed49d40532c20a4709"><td class="memTemplItemLeft" align="right" valign="top">static int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a7b63aa2233be35ed49d40532c20a4709">transfer_intermesh_vector</a> (Vector_ &amp;vector_target, Vector_ &amp;vector_weight, const Vector_ &amp;vector_source, const TargetSpace_ &amp;space_target, const SourceSpace_ &amp;space_source, const Target2SourceAdjactor_ &amp;trg2src, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
+<tr class="memdesc:a7b63aa2233be35ed49d40532c20a4709"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a generic inter-mesh transfer of a primal vector and assembles a compatible weight vector.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a7b63aa2233be35ed49d40532c20a4709">More...</a><br /></td></tr>
+<tr class="separator:a7b63aa2233be35ed49d40532c20a4709"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59b4e33143e1f4b8c60e71a55b28c677"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </td></tr>
+<tr class="memitem:a59b4e33143e1f4b8c60e71a55b28c677"><td class="memTemplItemLeft" align="right" valign="top">static int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a59b4e33143e1f4b8c60e71a55b28c677">transfer_intermesh_vector_direct</a> (Vector_ &amp;vector_target, const Vector_ &amp;vector_source, const TargetSpace_ &amp;space_target, const SourceSpace_ &amp;space_source, const Target2SourceAdjactor_ &amp;trg2src, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
+<tr class="memdesc:a59b4e33143e1f4b8c60e71a55b28c677"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a generic inter-mesh transfer of a primal vector directly.  <a href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#a59b4e33143e1f4b8c60e71a55b28c677">More...</a><br /></td></tr>
+<tr class="separator:a59b4e33143e1f4b8c60e71a55b28c677"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Grid-Transfer assembly class template. </p>
 <p >This class template implements the assembly of grid transfer operators.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00029">29</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00036">36</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a159c170064fae065520c01536f4c6a39" name="a159c170064fae065520c01536f4c6a39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a159c170064fae065520c01536f4c6a39">&#9670;&#160;</a></span>assemble_intermesh_transfer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int FEAT::Assembly::GridTransfer::assemble_intermesh_transfer </td>
+          <td>(</td>
+          <td class="paramtype">Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Vector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const TargetSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SourceSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Target2SourceAdjactor_ &amp;&#160;</td>
+          <td class="paramname"><em>trg2src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assembles a generic inter-mesh transfer matrix and its corresponding weight vector. </p>
+<p >To obtain the final inter-mesh transfer matrix, one needs to invert the weight vector component-wise and scale the matrix rows by the inverted weights afterwards. This can be accomplished by the <code>component_invert</code> and <code>scale_rows</code> operations of the vector and matrix containers, resp.</p>
+<dl class="section note"><dt>Note</dt><dd>This function is parallelized using OpenMP.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>It is strongly recommended to use an open cubature rule, i.e. all points of the cubature rule shall be in the interior of the reference cell. This reduces the risk of point unmapping failures</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the transfer matrix that is to be assembled.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the weight vector for the transfer matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_target</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the target-mesh (test) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the source-mesh (trial) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">target_to_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to a target-to-source mesh adjactor. If the source and/or target meshes are permuted, then the adjactor is assumed to be also permuted consistently.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule to be used for integration of the mass matrices. This should be an open cubature rule, i.e. all point shall be in the interior of the reference cell to avoid unmapping errors.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transfer matrix is assumed to be valid, otherwise the transfer matrix <em>may</em> be invalid. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00856">856</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01226">assemble_intermesh_transfer_direct()</a>.</p>
+
+</div>
+</div>
+<a id="a7ef335b61106bd734b7daca28d76a579" name="a7ef335b61106bd734b7daca28d76a579"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ef335b61106bd734b7daca28d76a579">&#9670;&#160;</a></span>assemble_intermesh_transfer_direct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int FEAT::Assembly::GridTransfer::assemble_intermesh_transfer_direct </td>
+          <td>(</td>
+          <td class="paramtype">Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const TargetSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SourceSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Target2SourceAdjactor_ &amp;&#160;</td>
+          <td class="paramname"><em>trg2src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assembles a generic inter-mesh transfer matrix and its corresponding weight vector. </p>
+<dl class="section attention"><dt>Attention</dt><dd>This function <b>must not</b> be used to assemble transfer matrices for parallel (i.e. global) simulations, as it will be scaled incorrectly due to missing weight synchronization!<br  />
+Use this function only in serial simulations!</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This function is parallelized using OpenMP.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the transfer matrix that is to be assembled.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_target</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the target-mesh (test) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the source-mesh (trial) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">target_to_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to a target-to-source mesh adjactor. If the source and/or target meshes are permuted, then the adjactor is assumed to be also permuted consistently.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule to be used for integration of the mass matrices.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transfer matrix is assumed to be valid, otherwise the transfer matrix <em>may</em> be invalid. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01226">1226</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00856">assemble_intermesh_transfer()</a>.</p>
+
+</div>
+</div>
 <a id="a5e747c38d398c0c1fc2729a266e81d2c" name="a5e747c38d398c0c1fc2729a266e81d2c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e747c38d398c0c1fc2729a266e81d2c">&#9670;&#160;</a></span>assemble_prolongation() <span class="overload">[1/2]</span></h2>
 
@@ -230,9 +414,9 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00099">99</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00122">122</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01037">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01078">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01475">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00780">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00790">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, <a class="el" href="assertion_8hpp_source.html#l00113">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01037">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01078">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01475">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00780">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00790">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -298,16 +482,16 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
     <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the weight vector for the prolongation matrix.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fine_space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the fine-mesh test-space to be used.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">coarse_space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the coarse-mesh trial-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">The</td><td>name of the cubature rule to be used for integration of the mass matrices. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule to be used for integration of the mass matrices. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00060">60</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00083">83</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00060">assemble_prolongation()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00083">assemble_prolongation()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00354">FEAT::Control::VoxelTransferAssembler::_assemble_blocked_transfer()</a>, <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00159">FEAT::Control::VoxelTransferAssembler::_assemble_scalar_transfer()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00060">assemble_prolongation()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00392">assemble_prolongation_direct()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00676">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00354">FEAT::Control::VoxelTransferAssembler::_assemble_blocked_transfer()</a>, <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00159">FEAT::Control::VoxelTransferAssembler::_assemble_scalar_transfer()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00083">assemble_prolongation()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00413">assemble_prolongation_direct()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00676">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>.</p>
 
 </div>
 </div>
@@ -372,9 +556,9 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00392">392</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00413">413</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00060">assemble_prolongation()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00083">assemble_prolongation()</a>.</p>
 
 </div>
 </div>
@@ -439,11 +623,11 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00357">357</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00378">378</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00357">assemble_prolongation_direct()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00378">assemble_prolongation_direct()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00357">assemble_prolongation_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00378">assemble_prolongation_direct()</a>.</p>
 
 </div>
 </div>
@@ -514,9 +698,9 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00478">478</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00499">499</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01037">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01078">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01475">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00780">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00790">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, <a class="el" href="assertion_8hpp_source.html#l00113">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01037">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01078">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01475">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00780">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00790">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -587,11 +771,11 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00439">439</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00460">460</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00439">assemble_truncation()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00460">assemble_truncation()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00354">FEAT::Control::VoxelTransferAssembler::_assemble_blocked_transfer()</a>, <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00159">FEAT::Control::VoxelTransferAssembler::_assemble_scalar_transfer()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00439">assemble_truncation()</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l00771">assemble_truncation_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00354">FEAT::Control::VoxelTransferAssembler::_assemble_blocked_transfer()</a>, <a class="el" href="voxel__transfer__assembler_8hpp_source.html#l00159">FEAT::Control::VoxelTransferAssembler::_assemble_scalar_transfer()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00460">assemble_truncation()</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l00790">assemble_truncation_direct()</a>.</p>
 
 </div>
 </div>
@@ -656,9 +840,9 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00771">771</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00790">790</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00439">assemble_truncation()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00460">assemble_truncation()</a>.</p>
 
 </div>
 </div>
@@ -723,11 +907,11 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00736">736</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00755">755</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00736">assemble_truncation_direct()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00755">assemble_truncation_direct()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00736">assemble_truncation_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00755">assemble_truncation_direct()</a>.</p>
 
 </div>
 </div>
@@ -792,7 +976,7 @@ template&lt;typename Vector_ , typename FineSpace_ , typename CoarseSpace_ &gt; 
 </div><div class="memdoc">
 
 <p>Prolongates a primal vector and assembles a compatible weight vector. </p>
-<p >To obtain the final prolongated vector, one needs to invert the weight vector component-wise and scale it component-wise by the inverted weights afterwards. This can be accomplished by the <code>component_invert</code> and <code>component_product</code> operations of the vector container, resp.</p>
+<p >To obtain the final prolongated vector, one needs to invert the weight vector component-wise and scale the prolongated vector component-wise by the inverted weights afterwards. This can be accomplished by the <code>component_invert</code> and <code>component_product</code> operations of the vector container, resp.</p>
 <dl class="section attention"><dt>Attention</dt><dd>In the case of global vectors, the weight vector has to be synchronized via sync_0 before the component-wise inversion and scaling to obtain the correctly scaled primal vector.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -806,11 +990,11 @@ template&lt;typename Vector_ , typename FineSpace_ , typename CoarseSpace_ &gt; 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00826">826</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01284">1284</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01037">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01078">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01475">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00780">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00790">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, <a class="el" href="assertion_8hpp_source.html#l00113">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00419">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01037">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01078">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01475">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00780">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00790">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01102">prolongate_vector_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01558">prolongate_vector_direct()</a>.</p>
 
 </div>
 </div>
@@ -881,9 +1065,184 @@ template&lt;typename Vector_ , typename FineSpace_ , typename CoarseSpace_ &gt; 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01102">1102</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01558">1558</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l00826">prolongate_vector()</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l01284">prolongate_vector()</a>.</p>
+
+</div>
+</div>
+<a id="a7b63aa2233be35ed49d40532c20a4709" name="a7b63aa2233be35ed49d40532c20a4709"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b63aa2233be35ed49d40532c20a4709">&#9670;&#160;</a></span>transfer_intermesh_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int FEAT::Assembly::GridTransfer::transfer_intermesh_vector </td>
+          <td>(</td>
+          <td class="paramtype">Vector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Vector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector_weight</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Vector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector_source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const TargetSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SourceSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Target2SourceAdjactor_ &amp;&#160;</td>
+          <td class="paramname"><em>trg2src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs a generic inter-mesh transfer of a primal vector and assembles a compatible weight vector. </p>
+<p >To obtain the final transferred vector, one needs to invert the weight vector component-wise and scale the prolongated vector component-wise by the inverted weights afterwards. This can be accomplished by the <code>component_invert</code> and <code>component_product</code> operations of the vector container, resp.</p>
+<dl class="section note"><dt>Note</dt><dd>This function is parallelized using OpenMP.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>It is strongly recommended to use an open cubature rule, i.e. all points of the cubature rule shall be in the interior of the reference cell. This reduces the risk of point unmapping failures</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector_target</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the target vector that is to be assembled. Is assumed to be allocated and formatted to 0.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector_weight</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the weight vector for the transfer matrix. Is assumed to be allocated and formatted to 0.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the source vector that is to be transferred.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_target</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the target-mesh (test) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the source-mesh (trial) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">target_to_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to a target-to-source mesh adjactor. If the source and/or target meshes are permuted, then the adjactor is assumed to be also permuted consistently.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule to be used for integration of the mass matrices. This should be an open cubature rule, i.e. all point shall be in the interior of the reference cell to avoid unmapping errors.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transfer matrix is assumed to be valid, otherwise the transfer matrix <em>may</em> be invalid. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01626">1626</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>, <a class="el" href="math_8hpp_source.html#l01169">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="assertion_8hpp_source.html#l00183">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00184">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a59b4e33143e1f4b8c60e71a55b28c677" name="a59b4e33143e1f4b8c60e71a55b28c677"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59b4e33143e1f4b8c60e71a55b28c677">&#9670;&#160;</a></span>transfer_intermesh_vector_direct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , typename Target2SourceAdjactor_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int FEAT::Assembly::GridTransfer::transfer_intermesh_vector_direct </td>
+          <td>(</td>
+          <td class="paramtype">Vector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Vector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector_source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const TargetSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SourceSpace_ &amp;&#160;</td>
+          <td class="paramname"><em>space_source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Target2SourceAdjactor_ &amp;&#160;</td>
+          <td class="paramname"><em>trg2src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs a generic inter-mesh transfer of a primal vector directly. </p>
+<dl class="section attention"><dt>Attention</dt><dd>This function <b>must not</b> be used to transfer vectors for parallel (i.e. global) simulations, as it will be scaled incorrectly due to missing weight synchronization!<br  />
+Use this function only in serial simulations!</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This function is parallelized using OpenMP.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector_target</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the target vector that is to be assembled. Is assumed to be allocated and formatted to 0.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the source vector that is to be transferred.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_target</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the target-mesh (test) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the source-mesh (trial) space to be used.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">target_to_source</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to a target-to-source mesh adjactor. If the source and/or target meshes are permuted, then the adjactor is assumed to be also permuted consistently.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule to be used for integration of the mass matrices.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transferred vector is assumed to be valid, otherwise the transferred vector <em>may</em> be invalid. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01999">1999</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l01999">transfer_intermesh_vector_direct()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01999">transfer_intermesh_vector_direct()</a>.</p>
 
 </div>
 </div>

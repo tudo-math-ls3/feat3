@@ -4,6 +4,7 @@ var class_f_e_a_t_1_1_assembly_1_1_trace_assembler =
     [ "_find_local_facet", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a7b3e99f4883455936d1144cc905607ad", null ],
     [ "add_facet", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a8977739ddfbcb24a7b957d9f0b117c0e", null ],
     [ "add_mesh_part", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a454e673affb37be022143f9e1d3878f4", null ],
+    [ "assemble_discrete_integral", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a92168e5537609dda849ceabd1f129d19", null ],
     [ "assemble_discrete_integral", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a3abaddeb07b5bbd00a11a2825c1c1ee6", null ],
     [ "assemble_flow_accum", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a56bde240fc6892deb702a167eb3a3e20", null ],
     [ "assemble_functional_vector", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#abb817e8b27489789b529e66be7f1469f", null ],

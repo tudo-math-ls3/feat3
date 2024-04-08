@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>FEAT: FEAT::Geometry::CGALWrapper Class Reference</title>
+<title>FEAT: FEAT::Geometry::CGALWrapper&lt; DT_ &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_c_g_a_l
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">FEAT::Geometry::CGALWrapper Class Reference</div></div>
+  <div class="headertitle"><div class="title">FEAT::Geometry::CGALWrapper&lt; DT_ &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -118,119 +118,152 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_c_g_a_l
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a310f3fb54a4f39081d7496c827674418"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; double, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a310f3fb54a4f39081d7496c827674418">PointType</a></td></tr>
-<tr class="separator:a310f3fb54a4f39081d7496c827674418"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6264af21cb09f5573fbab7625549ed6f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; double, 3, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a6264af21cb09f5573fbab7625549ed6f">TransformMatrix</a></td></tr>
-<tr class="separator:a6264af21cb09f5573fbab7625549ed6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affedf72db532d05a691bdad831ede865"><td class="memItemLeft" align="right" valign="top">typedef DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#affedf72db532d05a691bdad831ede865">DataType</a></td></tr>
+<tr class="separator:affedf72db532d05a691bdad831ede865"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2477767eb0e1d3282dc6a5cb6d2904c3"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DataType, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a2477767eb0e1d3282dc6a5cb6d2904c3">PointType</a></td></tr>
+<tr class="separator:a2477767eb0e1d3282dc6a5cb6d2904c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15777964f6940261f8ad4e8b8b8e2079"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DataType, 3, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a15777964f6940261f8ad4e8b8b8e2079">TransformMatrix</a></td></tr>
+<tr class="separator:a15777964f6940261f8ad4e8b8b8e2079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7808f6f7edde79817f36d9e35e9604ae"><td class="memItemLeft" align="right" valign="top"><a id="a7808f6f7edde79817f36d9e35e9604ae" name="a7808f6f7edde79817f36d9e35e9604ae"></a>
+<tr class="memitem:a12e52802cc9574de2aafcb165f1d76e3"><td class="memItemLeft" align="right" valign="top"><a id="a12e52802cc9574de2aafcb165f1d76e3" name="a12e52802cc9574de2aafcb165f1d76e3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CGALWrapper</b> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;filename, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#abcc16a3ca21fc13d41a4a9af795fb25f">CGALFileMode</a> file_mode)</td></tr>
-<tr class="memdesc:a7808f6f7edde79817f36d9e35e9604ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance and open the provided file in given format. <br /></td></tr>
-<tr class="separator:a7808f6f7edde79817f36d9e35e9604ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ebfbe741b9b0c95254fe8015d86a915"><td class="memItemLeft" align="right" valign="top"><a id="a6ebfbe741b9b0c95254fe8015d86a915" name="a6ebfbe741b9b0c95254fe8015d86a915"></a>
+<tr class="memdesc:a12e52802cc9574de2aafcb165f1d76e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance and open the provided file in given format. <br /></td></tr>
+<tr class="separator:a12e52802cc9574de2aafcb165f1d76e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a604038555709c32d345e5875fd958874"><td class="memItemLeft" align="right" valign="top"><a id="a604038555709c32d345e5875fd958874" name="a604038555709c32d345e5875fd958874"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CGALWrapper</b> (std::istream &amp;file, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#abcc16a3ca21fc13d41a4a9af795fb25f">CGALFileMode</a> file_mode)</td></tr>
-<tr class="memdesc:a6ebfbe741b9b0c95254fe8015d86a915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance and open the provided file stream in given format. <br /></td></tr>
-<tr class="separator:a6ebfbe741b9b0c95254fe8015d86a915"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a374f946fa6642ca2d93fe57e44ea3faa"><td class="memItemLeft" align="right" valign="top"><a id="a374f946fa6642ca2d93fe57e44ea3faa" name="a374f946fa6642ca2d93fe57e44ea3faa"></a>
+<tr class="memdesc:a604038555709c32d345e5875fd958874"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance and open the provided file stream in given format. <br /></td></tr>
+<tr class="separator:a604038555709c32d345e5875fd958874"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbe0a9bf35c92e365d50a23e7da9e5da"><td class="memItemLeft" align="right" valign="top"><a id="afbe0a9bf35c92e365d50a23e7da9e5da" name="afbe0a9bf35c92e365d50a23e7da9e5da"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~CGALWrapper</b> ()</td></tr>
-<tr class="memdesc:a374f946fa6642ca2d93fe57e44ea3faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
-<tr class="separator:a374f946fa6642ca2d93fe57e44ea3faa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0410eb2b74d03db5406f01fb6cde9f8"><td class="memItemLeft" align="right" valign="top"><a id="af0410eb2b74d03db5406f01fb6cde9f8" name="af0410eb2b74d03db5406f01fb6cde9f8"></a>
+<tr class="memdesc:afbe0a9bf35c92e365d50a23e7da9e5da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
+<tr class="separator:afbe0a9bf35c92e365d50a23e7da9e5da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa820ac480b3824d5340b5cb91cad8c34"><td class="memItemLeft" align="right" valign="top"><a id="aa820ac480b3824d5340b5cb91cad8c34" name="aa820ac480b3824d5340b5cb91cad8c34"></a>
 std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>bytes</b> () const</td></tr>
-<tr class="memdesc:af0410eb2b74d03db5406f01fb6cde9f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size in bytes, //TODO: Implement me. <br /></td></tr>
-<tr class="separator:af0410eb2b74d03db5406f01fb6cde9f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af17d58bb894319c4c06c72b6f1028543"><td class="memItemLeft" align="right" valign="top"><a id="af17d58bb894319c4c06c72b6f1028543" name="af17d58bb894319c4c06c72b6f1028543"></a>
+<tr class="memdesc:aa820ac480b3824d5340b5cb91cad8c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size in bytes, //TODO: Implement me. <br /></td></tr>
+<tr class="separator:aa820ac480b3824d5340b5cb91cad8c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca58d6b507384cf831ed6528598540b7"><td class="memItemLeft" align="right" valign="top"><a id="aca58d6b507384cf831ed6528598540b7" name="aca58d6b507384cf831ed6528598540b7"></a>
 <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;point) const</td></tr>
-<tr class="memdesc:af17d58bb894319c4c06c72b6f1028543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
-<tr class="separator:af17d58bb894319c4c06c72b6f1028543"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad56b265806697c51ccbff1a596239625"><td class="memItemLeft" align="right" valign="top"><a id="ad56b265806697c51ccbff1a596239625" name="ad56b265806697c51ccbff1a596239625"></a>
+<tr class="memdesc:aca58d6b507384cf831ed6528598540b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
+<tr class="separator:aca58d6b507384cf831ed6528598540b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a997ff1624507ce93ac82d69d16069c93"><td class="memItemLeft" align="right" valign="top"><a id="a997ff1624507ce93ac82d69d16069c93" name="a997ff1624507ce93ac82d69d16069c93"></a>
 <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;point, <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;primitive_grad) const</td></tr>
-<tr class="separator:ad56b265806697c51ccbff1a596239625"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46548a2537c11e28f10a05b15906ed5d"><td class="memItemLeft" align="right" valign="top"><a id="a46548a2537c11e28f10a05b15906ed5d" name="a46548a2537c11e28f10a05b15906ed5d"></a>
-<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (double x, double y, double z) const</td></tr>
-<tr class="memdesc:a46548a2537c11e28f10a05b15906ed5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
-<tr class="separator:a46548a2537c11e28f10a05b15906ed5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1de4936e34fc19e518e496b5c2149dd"><td class="memItemLeft" align="right" valign="top"><a id="ad1de4936e34fc19e518e496b5c2149dd" name="ad1de4936e34fc19e518e496b5c2149dd"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>point_inside</b> (double x, double y, double z) const</td></tr>
-<tr class="memdesc:ad1de4936e34fc19e518e496b5c2149dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a point is inside the Polyhedron defined at objects' construction. <br /></td></tr>
-<tr class="separator:ad1de4936e34fc19e518e496b5c2149dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90010c7a51a4d43ca97b4dd685396b49"><td class="memItemLeft" align="right" valign="top"><a id="a90010c7a51a4d43ca97b4dd685396b49" name="a90010c7a51a4d43ca97b4dd685396b49"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>squared_distance</b> (double x, double y, double z) const</td></tr>
-<tr class="memdesc:a90010c7a51a4d43ca97b4dd685396b49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minimun squared distance between the query point and all input primitives defined at objects' construction. <br /></td></tr>
-<tr class="separator:a90010c7a51a4d43ca97b4dd685396b49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f917a5d74b89fc62e044a7eae7baee9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a5f917a5d74b89fc62e044a7eae7baee9">transform</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">TransformMatrix</a> &amp;trafo_mat, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;translation, double scale=double(1))</td></tr>
-<tr class="separator:a5f917a5d74b89fc62e044a7eae7baee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a997ff1624507ce93ac82d69d16069c93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69279547b7f6b0b6cfb5a7f9c210a21b"><td class="memItemLeft" align="right" valign="top"><a id="a69279547b7f6b0b6cfb5a7f9c210a21b" name="a69279547b7f6b0b6cfb5a7f9c210a21b"></a>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (DataType x, DataType y, DataType z) const</td></tr>
+<tr class="memdesc:a69279547b7f6b0b6cfb5a7f9c210a21b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
+<tr class="separator:a69279547b7f6b0b6cfb5a7f9c210a21b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a163a2c526c810459165515f98956857c"><td class="memItemLeft" align="right" valign="top"><a id="a163a2c526c810459165515f98956857c" name="a163a2c526c810459165515f98956857c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>point_inside</b> (DataType x, DataType y, DataType z) const</td></tr>
+<tr class="memdesc:a163a2c526c810459165515f98956857c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a point is inside the Polyhedron defined at objects' construction. <br /></td></tr>
+<tr class="separator:a163a2c526c810459165515f98956857c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f59c7a3d1e2ada0f8414c0a1060a3a7"><td class="memItemLeft" align="right" valign="top"><a id="a7f59c7a3d1e2ada0f8414c0a1060a3a7" name="a7f59c7a3d1e2ada0f8414c0a1060a3a7"></a>
+DataType&#160;</td><td class="memItemRight" valign="bottom"><b>squared_distance</b> (DataType x, DataType y, DataType z) const</td></tr>
+<tr class="memdesc:a7f59c7a3d1e2ada0f8414c0a1060a3a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minimun squared distance between the query point and all input primitives defined at objects' construction. <br /></td></tr>
+<tr class="separator:a7f59c7a3d1e2ada0f8414c0a1060a3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11a9dcee8b70993d969023985d0ef3b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a11a9dcee8b70993d969023985d0ef3b5">transform</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">TransformMatrix</a> &amp;trafo_mat, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;translation, DataType scale=DataType(1))</td></tr>
+<tr class="separator:a11a9dcee8b70993d969023985d0ef3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:ad8242ea3674b3b6a7308c64e6c388838"><td class="memItemLeft" align="right" valign="top"><a id="ad8242ea3674b3b6a7308c64e6c388838" name="ad8242ea3674b3b6a7308c64e6c388838"></a>
+<tr class="memitem:a432d6978edf04e111502eb63760eeb8a"><td class="memItemLeft" align="right" valign="top"><a id="a432d6978edf04e111502eb63760eeb8a" name="a432d6978edf04e111502eb63760eeb8a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>_delete_tree</b> ()</td></tr>
-<tr class="memdesc:ad8242ea3674b3b6a7308c64e6c388838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete tree, which also requires to delete the inside tester. <br /></td></tr>
-<tr class="separator:ad8242ea3674b3b6a7308c64e6c388838"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a763f7c403640f8012c6ac73c4d5c7ded"><td class="memItemLeft" align="right" valign="top"><a id="a763f7c403640f8012c6ac73c4d5c7ded" name="a763f7c403640f8012c6ac73c4d5c7ded"></a>
+<tr class="memdesc:a432d6978edf04e111502eb63760eeb8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete tree, which also requires to delete the inside tester. <br /></td></tr>
+<tr class="separator:a432d6978edf04e111502eb63760eeb8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06f6664100410762536b1e08144bb42a"><td class="memItemLeft" align="right" valign="top"><a id="a06f6664100410762536b1e08144bb42a" name="a06f6664100410762536b1e08144bb42a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>_init_wrapper</b> ()</td></tr>
-<tr class="memdesc:a763f7c403640f8012c6ac73c4d5c7ded"><td class="mdescLeft">&#160;</td><td class="mdescRight">initializes tree and inside tester with already initialized polyhedron <br /></td></tr>
-<tr class="separator:a763f7c403640f8012c6ac73c4d5c7ded"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a188ec68d857d69b85d89dfa0aa762bd9"><td class="memItemLeft" align="right" valign="top"><a id="a188ec68d857d69b85d89dfa0aa762bd9" name="a188ec68d857d69b85d89dfa0aa762bd9"></a>
+<tr class="memdesc:a06f6664100410762536b1e08144bb42a"><td class="mdescLeft">&#160;</td><td class="mdescRight">initializes tree and inside tester with already initialized polyhedron <br /></td></tr>
+<tr class="separator:a06f6664100410762536b1e08144bb42a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb701ca3263cc8e87255b3409bf13a03"><td class="memItemLeft" align="right" valign="top"><a id="aeb701ca3263cc8e87255b3409bf13a03" name="aeb701ca3263cc8e87255b3409bf13a03"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>_parse_mesh</b> (std::istream &amp;file, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#abcc16a3ca21fc13d41a4a9af795fb25f">CGALFileMode</a> file_mode)</td></tr>
-<tr class="memdesc:a188ec68d857d69b85d89dfa0aa762bd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">read in stream in prescibed file format and preprocess search tree for in/out test <br /></td></tr>
-<tr class="separator:a188ec68d857d69b85d89dfa0aa762bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:aeb701ca3263cc8e87255b3409bf13a03"><td class="mdescLeft">&#160;</td><td class="mdescRight">read in stream in prescibed file format and preprocess search tree for in/out test <br /></td></tr>
+<tr class="separator:aeb701ca3263cc8e87255b3409bf13a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:aad79f9c74f652313769351e4e8f1b798"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#aad79f9c74f652313769351e4e8f1b798">_cgal_data</a></td></tr>
-<tr class="separator:aad79f9c74f652313769351e4e8f1b798"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe90541b59cba0e1bf6c63813977a4c6"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#afe90541b59cba0e1bf6c63813977a4c6">_cgal_data</a></td></tr>
+<tr class="separator:afe90541b59cba0e1bf6c63813977a4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Wrapper for the CGAL Library. </p>
-<p >This class acts as a wrapper for a small portion of the CGAL Library. As of now, only the interaction with 3d tetrahedral OFF files is implemented.</p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_&gt;<br />
+class FEAT::Geometry::CGALWrapper&lt; DT_ &gt;</div><p >Wrapper for the CGAL Library. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">DT_</td><td>The dataype tp be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This class acts as a wrapper for a small portion of the CGAL Library. As of now, only the interaction with 3d tetrahedral OFF files is implemented.</p>
 <dl class="section note"><dt>Note</dt><dd><a href="https://www.cgal.org/">https://www.cgal.org/</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00037">37</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00039">39</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a310f3fb54a4f39081d7496c827674418" name="a310f3fb54a4f39081d7496c827674418"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a310f3fb54a4f39081d7496c827674418">&#9670;&#160;</a></span>PointType</h2>
+<a id="affedf72db532d05a691bdad831ede865" name="affedf72db532d05a691bdad831ede865"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affedf72db532d05a691bdad831ede865">&#9670;&#160;</a></span>DataType</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt;double, 3&gt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">FEAT::Geometry::CGALWrapper::PointType</a></td>
+          <td class="memname">typedef DT_ <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">FEAT::Geometry::CGALWrapper</a>&lt; DT_ &gt;::DataType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00040">40</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00042">42</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a6264af21cb09f5573fbab7625549ed6f" name="a6264af21cb09f5573fbab7625549ed6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6264af21cb09f5573fbab7625549ed6f">&#9670;&#160;</a></span>TransformMatrix</h2>
+<a id="a2477767eb0e1d3282dc6a5cb6d2904c3" name="a2477767eb0e1d3282dc6a5cb6d2904c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2477767eb0e1d3282dc6a5cb6d2904c3">&#9670;&#160;</a></span>PointType</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt;double, 3, 3&gt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">FEAT::Geometry::CGALWrapper::TransformMatrix</a></td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt;DataType, 3&gt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">FEAT::Geometry::CGALWrapper</a>&lt; DT_ &gt;::PointType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00041">41</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00043">43</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a15777964f6940261f8ad4e8b8b8e2079" name="a15777964f6940261f8ad4e8b8b8e2079"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15777964f6940261f8ad4e8b8b8e2079">&#9670;&#160;</a></span>TransformMatrix</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt;DataType, 3, 3&gt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">FEAT::Geometry::CGALWrapper</a>&lt; DT_ &gt;::TransformMatrix</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00044">44</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a5f917a5d74b89fc62e044a7eae7baee9" name="a5f917a5d74b89fc62e044a7eae7baee9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f917a5d74b89fc62e044a7eae7baee9">&#9670;&#160;</a></span>transform()</h2>
+<a id="a11a9dcee8b70993d969023985d0ef3b5" name="a11a9dcee8b70993d969023985d0ef3b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11a9dcee8b70993d969023985d0ef3b5">&#9670;&#160;</a></span>transform()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void FEAT::Geometry::CGALWrapper::transform </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">FEAT::Geometry::CGALWrapper</a>&lt; DT_ &gt;::transform </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">TransformMatrix</a> &amp;&#160;</td>
           <td class="paramname"><em>trafo_mat</em>, </td>
@@ -244,8 +277,8 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>scale</em> = <code>double(1)</code>&#160;</td>
+          <td class="paramtype">DataType&#160;</td>
+          <td class="paramname"><em>scale</em> = <code>DataType(1)</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -259,17 +292,19 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="aad79f9c74f652313769351e4e8f1b798" name="aad79f9c74f652313769351e4e8f1b798"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad79f9c74f652313769351e4e8f1b798">&#9670;&#160;</a></span>_cgal_data</h2>
+<a id="afe90541b59cba0e1bf6c63813977a4c6" name="afe90541b59cba0e1bf6c63813977a4c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe90541b59cba0e1bf6c63813977a4c6">&#9670;&#160;</a></span>_cgal_data</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void* FEAT::Geometry::CGALWrapper::_cgal_data</td>
+          <td class="memname">void* <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">FEAT::Geometry::CGALWrapper</a>&lt; DT_ &gt;::_cgal_data</td>
         </tr>
       </table>
   </td>
@@ -279,7 +314,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00043">43</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00046">46</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>
