@@ -10,3 +10,15 @@
    fun:_ZNK9HypreTestIN4FEAT3Mem4MainEdmE3runEv
    fun:main
 }
+{
+   openmp_team_start_calloc
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:UnknownInlinedFun
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:pthread_create@@GLIBC_2.34
+   fun:gomp_team_start
+   fun:GOMP_parallel
+}
