@@ -11,7 +11,7 @@ target_link_libraries(navier_stokes_screws-app feat)
 if (NOT FEAT_DEBUG_MODE)
   if (FEAT_HAVE_MPI)
     add_test(sleep1 sleep 2)
-    set_property(TEST sleep1 PROPERTY LABELS "mpi,sleep")
+    set_property(TEST sleep1 PROPERTY LABELS "mpi")
 
     add_test(navier_stokes_screws_app_test_1_mpi_4 ${CMAKE_CTEST_COMMAND}
       --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

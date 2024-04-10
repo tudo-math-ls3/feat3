@@ -9,7 +9,7 @@ target_link_libraries(meshopt_boundary-app feat)
 
 if (FEAT_HAVE_MPI)
   add_test(sleep1 sleep 2)
-  set_property(TEST sleep1 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep1 PROPERTY LABELS "mpi")
 
   add_test(meshopt_boundary_app_test_1_mpi_3 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -23,7 +23,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST meshopt_boundary_app_test_1_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep2 sleep 2)
-  set_property(TEST sleep2 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep2 PROPERTY LABELS "mpi")
 
   add_test(meshopt_boundary_app_test_2_mpi_4 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

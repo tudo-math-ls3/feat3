@@ -120,7 +120,7 @@ endif (FEAT_HAVE_UMFPACK)
 if (FEAT_HAVE_UMFPACK)
   if (FEAT_HAVE_MPI)
     add_test(sleep304 sleep 2)
-    set_property(TEST sleep304 PROPERTY LABELS "mpi,sleep")
+    set_property(TEST sleep304 PROPERTY LABELS "mpi")
 
     add_test(feti-multigrid-mpi-16 ${CMAKE_CTEST_COMMAND}
       --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

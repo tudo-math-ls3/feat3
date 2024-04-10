@@ -43,7 +43,7 @@ endif (FEAT_VALGRIND)
 
 if (FEAT_HAVE_MPI)
   add_test(sleep305 sleep 2)
-  set_property(TEST sleep305 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep305 PROPERTY LABELS "mpi")
   add_test(ccnd-fiber-time-stepping-test-mpi-lagrange1 ${CMAKE_CTEST_COMMAND}
       --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
       --build-generator ${CMAKE_GENERATOR}
@@ -56,7 +56,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST ccnd-fiber-time-stepping-test-mpi-lagrange1 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep307 sleep 2)
-  set_property(TEST sleep307 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep307 PROPERTY LABELS "mpi")
 
   add_test(ccnd-fiber-time-stepping-test-mpi-lagrange2 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -70,7 +70,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST ccnd-fiber-time-stepping-test-mpi-lagrange2 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep308 sleep 2)
-  set_property(TEST sleep308 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep308 PROPERTY LABELS "mpi")
   add_test(ccnd-joined-fiber-time-stepping-test-mpi-lagrange1 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -83,7 +83,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST ccnd-joined-fiber-time-stepping-test-mpi-lagrange1 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep309 sleep 2)
-  set_property(TEST sleep309 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep309 PROPERTY LABELS "mpi")
 
   add_test(ccnd-joined-fiber-time-stepping-test-mpi-lagrange2 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

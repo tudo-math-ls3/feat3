@@ -53,7 +53,7 @@ endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 if (FEAT_HAVE_MPI)
   add_test(sleep317 sleep 2)
-  set_property(TEST sleep317 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep317 PROPERTY LABELS "mpi")
 
   add_test(hierarch_transfer_test-app_mpi_4 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -67,7 +67,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST hierarch_transfer_test-app_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep318 sleep 2)
-  set_property(TEST sleep318 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep318 PROPERTY LABELS "mpi")
 
   add_test(hierarch_transfer_test-app_mpi_16 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -95,7 +95,7 @@ endif (FEAT_HAVE_MPI)
 ######################### poisson_dirichlet
 if (FEAT_HAVE_MPI)
   add_test(sleep1 sleep 2)
-  set_property(TEST sleep1 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep1 PROPERTY LABELS "mpi")
 
   add_test(poisson_dirichlet_mpi_4 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -109,7 +109,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST poisson_dirichlet_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep3 sleep 2)
-  set_property(TEST sleep3 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep3 PROPERTY LABELS "mpi")
 
   add_test(poisson_dirichlet_mpi_3 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -123,7 +123,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST poisson_dirichlet_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep4 sleep 2)
-  set_property(TEST sleep4 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep4 PROPERTY LABELS "mpi")
 
   add_test(poisson_dirichlet_mpi_6 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -152,7 +152,7 @@ endif (FEAT_HAVE_MPI)
 ######################### poisson_mixed
 if (FEAT_HAVE_MPI)
   add_test(sleep1 sleep 2)
-  set_property(TEST sleep1 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep1 PROPERTY LABELS "mpi")
 
   add_test(poisson_mixed_mpi_3 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -183,7 +183,7 @@ endif (FEAT_HAVE_MPI)
 ######################### stokes_poiseuille_2d
 if (FEAT_HAVE_MPI)
   add_test(sleep5 sleep 2)
-  set_property(TEST sleep5 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep5 PROPERTY LABELS "mpi")
 
   add_test(stokes_poiseuille_2d_mpi_4 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -197,7 +197,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST stokes_poiseuille_2d_mpi_4 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep8 sleep 2)
-  set_property(TEST sleep8 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep8 PROPERTY LABELS "mpi")
 
   add_test(stokes_poiseuille_2d_mpi_3 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
@@ -211,7 +211,7 @@ if (FEAT_HAVE_MPI)
   set_property(TEST stokes_poiseuille_2d_mpi_3 PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 
   add_test(sleep19 sleep 2)
-  set_property(TEST sleep19 PROPERTY LABELS "mpi,sleep")
+  set_property(TEST sleep19 PROPERTY LABELS "mpi")
 
   add_test(stokes_poiseuille_2d_mpi_6 ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
