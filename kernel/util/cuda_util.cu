@@ -261,6 +261,14 @@ template void FEAT::Util::cuda_convert<unsigned long, double>(unsigned long *, c
 template void FEAT::Util::cuda_convert<unsigned int, float>(unsigned int *, const float *, const Index);
 template void FEAT::Util::cuda_convert<unsigned long, float>(unsigned long *, const float *, const Index);
 
+int FEAT::Util::cuda_get_device_count()
+{
+  int numDevices(-1);
+  if (cudaSuccess != cudaGetDeviceCount(&numDevices))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaGetDeviceCount failed!");
+  return numDevices;
+}
+
 String FEAT::Util::cuda_get_visible_devices()
 {
   String result("");

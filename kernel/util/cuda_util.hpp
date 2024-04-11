@@ -65,6 +65,7 @@ namespace FEAT
     void cuda_set_memory(DT_ * address, const DT_ val, const Index count);
     template <typename DT1_, typename DT2_>
     void cuda_convert(DT1_ * dest, const DT2_ * src, const Index count);
+    int cuda_get_device_count();
     String cuda_get_visible_devices();
   }
 }
