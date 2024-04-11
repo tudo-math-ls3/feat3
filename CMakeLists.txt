@@ -84,7 +84,7 @@ if (FEAT_HAVE_CUDA)
   set (CUDA_PROPAGATE_HOST_FLAGS OFF)
 
   if (FEAT_CUDAMEMCHECK)
-    find_program(CUDA_MEMCHECK_EXE cuda-memcheck)
+    find_program(CUDA_MEMCHECK_EXE compute-sanitizer)
     set(CUDA_MEMCHECK_EXE ${CUDA_MEMCHECK_EXE} --leak-check full)
   endif (FEAT_CUDAMEMCHECK)
 
