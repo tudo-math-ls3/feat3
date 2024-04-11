@@ -66,6 +66,7 @@ namespace FEAT
     template <typename DT1_, typename DT2_>
     void cuda_convert(DT1_ * dest, const DT2_ * src, const Index count);
     int cuda_get_device_count();
+    int cuda_get_device_id();
     String cuda_get_visible_devices();
   }
 }

@@ -54,7 +54,8 @@ namespace FEAT
 
 void FEAT::Util::cuda_set_device(const int device)
 {
-  cudaSetDevice(device);
+  if (cudaSuccess != cudaSetDevice(device))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDevice failed!");
 }
 
 void FEAT::Util::cuda_check_last_error()
@@ -267,6 +268,14 @@ int FEAT::Util::cuda_get_device_count()
   if (cudaSuccess != cudaGetDeviceCount(&numDevices))
     throw InternalError(__func__, __FILE__, __LINE__, "cudaGetDeviceCount failed!");
   return numDevices;
+}
+
+int FEAT::Util::cuda_get_device_id()
+{
+  int device(-1);
+  if (cudaSuccess != cudaGetDevice(&device))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaGetDevice failed!");
+  return device;
 }
 
 String FEAT::Util::cuda_get_visible_devices()
