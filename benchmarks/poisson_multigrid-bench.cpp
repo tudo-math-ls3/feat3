@@ -58,12 +58,15 @@ namespace PoissonMultigridBench
     static constexpr std::size_t asm_muxer = 2u;
     static constexpr std::size_t asm_transfer = 3u;
     static constexpr std::size_t asm_matrix = 4u;
-    static constexpr std::size_t gmg_total = 5u;
-    static constexpr std::size_t gmg_defect = 6u;
-    static constexpr std::size_t gmg_smooth = 7u;
-    static constexpr std::size_t gmg_transfer = 8u;
-    static constexpr std::size_t gmg_coarse = 9u;
-    static constexpr std::size_t count = 10u;
+    static constexpr std::size_t asm_matrix_sym = 5u;
+    static constexpr std::size_t asm_matrix_num = 6u;
+    static constexpr std::size_t asm_coloring = 7u;
+    static constexpr std::size_t gmg_total = 8u;
+    static constexpr std::size_t gmg_defect = 9u;
+    static constexpr std::size_t gmg_smooth = 10u;
+    static constexpr std::size_t gmg_transfer = 11u;
+    static constexpr std::size_t gmg_coarse = 12u;
+    static constexpr std::size_t count = 13u;
   };
 
   template<typename T_>
@@ -159,12 +162,15 @@ namespace PoissonMultigridBench
       }
 
       s += "\nAssembly Timings:\n";
-      s += "                Gate        Muxer     Transfer       Matrix        Total        RHS\n";
+      s += "                Gate        Muxer     Transfer      Matrix  [ Sym      Num ]     Coloring        Total        RHS\n";
       s += "Overall : " +
         stringify_fp_fix(sum(times, Times::asm_gate), 6, 10) + " / " +
         stringify_fp_fix(sum(times, Times::asm_muxer), 6, 10) + " / " +
         stringify_fp_fix(sum(times, Times::asm_transfer), 6, 10) + " / " +
-        stringify_fp_fix(sum(times, Times::asm_matrix), 6, 10) + " / " +
+        stringify_fp_fix(sum(times, Times::asm_matrix), 6, 8) + "[ " +
+        stringify_fp_fix(sum(times, Times::asm_matrix_sym), 6, 7) + "   " +
+        stringify_fp_fix(sum(times, Times::asm_matrix_num), 6, 7) + "] / " +
+        stringify_fp_fix(sum(times, Times::asm_coloring), 6, 10) + " / " +
         stringify_fp_fix(sum(times, Times::asm_total), 6, 10) + " / " +
         stringify_fp_fix(toe_asm_rhs, 6) + "\n";
       for(std::size_t i(0); i < times.size(); ++i)
@@ -173,7 +179,10 @@ namespace PoissonMultigridBench
           stringify_fp_fix(times[i][Times::asm_gate], 6, 10) + " / " +
           stringify_fp_fix(times[i][Times::asm_muxer], 6, 10) + " / " +
           stringify_fp_fix(times[i][Times::asm_transfer], 6, 10) + " / " +
-          stringify_fp_fix(times[i][Times::asm_matrix], 6, 10) + " / " +
+          stringify_fp_fix(times[i][Times::asm_matrix], 6, 10) + "[ " +
+          stringify_fp_fix(times[i][Times::asm_matrix_sym], 6, 7) + "   " +
+          stringify_fp_fix(times[i][Times::asm_matrix_num], 6, 7) + "] / " +
+          stringify_fp_fix(times[i][Times::asm_coloring], 6, 10) + " / " +
           stringify_fp_fix(times[i][Times::asm_total], 6, 10) + "\n";
       }
 
@@ -324,6 +333,10 @@ namespace PoissonMultigridBench
     args.support("test","\nRuns the benchmark in regression test mode.");
     args.support("backend", "<generic|cuda|mkl>\n"
       "Specifies which backend to use for the actual PCG-GMG solution process; default: generic");
+    args.support("voxel-asm", "\n"
+      "Specifies if voxel assembly is to be used. Voxel assembly supports different backends.");
+    args.support("backend-asm", "<generic|cuda>\n"
+      "Specifies the preferred backend for (matrix) assembly only.");
 
     // no arguments given?
     if(args.num_args() <= 1)
@@ -369,7 +382,7 @@ namespace PoissonMultigridBench
     Index multigrid_iters = 5;
     Index smooth_steps = 5;
     DataType smooth_damp = 0.7;
-    String backend("generic");
+    String backend("generic"), backend_asm("generic");
 
     Solver::MultiGridCycle multigrid_cycle(Solver::MultiGridCycle::V);
 
@@ -380,7 +393,8 @@ namespace PoissonMultigridBench
 
     // choose backend
     args.parse("backend", backend);
-    if(backend.compare_no_case("cuda") == 0)
+    args.parse("backend-asm", backend_asm);
+    if((backend.compare_no_case("cuda") == 0))
     {
 #ifndef FEAT_HAVE_CUDA
       comm.print(std::cerr, "ERROR: 'cuda' backend is only available when FEAT is configured with CUDA support enabled");
@@ -399,6 +413,21 @@ namespace PoissonMultigridBench
       comm.print(std::cerr, "ERROR: unknown backend '" + backend + "'");
       Runtime::abort();
     }
+
+    if((backend_asm.compare_no_case("cuda") == 0))
+    {
+#ifndef FEAT_HAVE_CUDA
+      comm.print(std::cerr, "ERROR: 'cuda' backend is only available when FEAT is configured with CUDA support enabled");
+      Runtime::abort();
+#endif // not FEAT_HAVE_CUDA
+    }
+    else if(backend_asm.compare_no_case("generic") != 0)
+    {
+      comm.print(std::cerr, "ERROR: unknown backend '" + backend + "'");
+      Runtime::abort();
+    }
+    // check if voxel assembly should be used
+    bool use_voxel_assembly = (args.check("voxel-asm") >= 0);
 
     // create domain control
     Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
@@ -503,6 +532,7 @@ namespace PoissonMultigridBench
     comm.print("Chosen Levels.......: " + domain.format_chosen_levels());
     comm.print("Partitioner Info....: " + domain.get_chosen_parti_info());
     comm.print("Preferred Backend...: " + backend);
+    comm.print("Preferred Assembly Backend...: " + backend_asm);
 #ifdef FEAT_HAVE_CUDA
     if(backend.compare_no_case("cuda") == 0)
     {
@@ -539,6 +569,25 @@ namespace PoissonMultigridBench
     }
 
     const Index num_levels = domain.size_physical();
+
+    //if voxel assembly should be used, create the required coloring now
+    std::deque<Adjacency::Coloring> colorings;
+    if(use_voxel_assembly)
+    {
+      for(Index i = 0; i < num_levels; ++i)
+      {
+        TimeStamp ts;
+        const auto& verts_at_elem = domain.at(i)->get_mesh().template get_index_set<ShapeType::dimension, 0>();
+        Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+        Adjacency::Graph elems_at_elem(Adjacency::RenderType::injectify, verts_at_elem, elems_at_vert);
+        colorings.push_back(Adjacency::Coloring(elems_at_elem));
+        double tt = ts.elapsed_now();
+        stats.times[i][Times::asm_coloring] += tt;
+        stats.times[i][Times::asm_total] += tt;
+      }
+
+    }
+
 
     typedef Control::ScalarUnitFilterSystemLevel<DataType, IndexType> SystemLevelType;
 
@@ -582,15 +631,36 @@ namespace PoissonMultigridBench
     }
 
     /* ***************************************************************************************** */
-
+    // Do symbolic and numeric assembly independetly
     for (Index i(0); i < num_levels; ++i)
     {
       TimeStamp ts;
-      system.at(i)->assemble_laplace_matrix(domain.at(i)->domain_asm, domain.at(i)->space, cubature);
+      system.at(i)->symbolic_assembly_std1(domain.at(i)->space);
       double tt = ts.elapsed_now();
       stats.times[i][Times::asm_total] += tt;
       stats.times[i][Times::asm_matrix] += tt;
+      stats.times[i][Times::asm_matrix_sym] += tt;
     }
+    //switch to desired backend
+    if(backend_asm.compare_no_case("cuda") == 0)
+      Backend::set_preferred_backend(FEAT::PreferredBackend::cuda);
+    for (Index i(0); i < num_levels; ++i)
+    {
+      TimeStamp ts;
+      if(use_voxel_assembly)
+      {
+        system.at(i)->assemble_laplace_voxel_based(colorings.at(i), domain.at(i)->space, cubature);
+      }
+      else
+      {
+        system.at(i)->assemble_laplace_matrix(domain.at(i)->domain_asm, domain.at(i)->space, cubature);
+      }
+      double tt = ts.elapsed_now();
+      stats.times[i][Times::asm_total] += tt;
+      stats.times[i][Times::asm_matrix] += tt;
+      stats.times[i][Times::asm_matrix_num] += tt;
+    }
+    Backend::set_preferred_backend(FEAT::PreferredBackend::generic);
 
     /* ***************************************************************************************** */
 

@@ -14,6 +14,7 @@ add_subdirectory( space )
 add_subdirectory( solver )
 add_subdirectory( trafo )
 add_subdirectory( util )
+add_subdirectory( voxel_assembly )
 
 # list of kernel source files
 set(KERNEL_LIBRARY_FILES
@@ -43,6 +44,7 @@ target_link_libraries(feat INTERFACE
   kernel-solver
 # kernel-trafo
   kernel-util
+  kernel-voxel-assembly
   kernel-root
 )
 

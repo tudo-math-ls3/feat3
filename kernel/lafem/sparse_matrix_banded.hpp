@@ -1131,7 +1131,7 @@ namespace FEAT
       {
         if (i == Index(-1))
         {
-          return rows;
+          return rows_in;
         }
         else if (i == noo)
         {

@@ -36,6 +36,7 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/util/property_map.hpp>
+#include <kernel/voxel_assembly/poisson_assembler.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -457,6 +458,36 @@ namespace FEAT
         loc_matrix.format();
         Assembly::Common::LaplaceOperator laplace_op;
         Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_matrix, laplace_op, space, cubature, nu);
+      }
+
+      template<typename Space_>
+      void assemble_laplace_voxel_based(const Adjacency::Coloring& coloring, const Space_& space, const String& cubature, const DataType nu = DataType(1))
+      {
+        // get local matrix
+        auto& loc_matrix = this->matrix_sys.local();
+
+        // assemble structure?
+        if(loc_matrix.empty())
+        {
+          Assembly::SymbolicAssembler::assemble_matrix_std1(loc_matrix, space);
+        }
+
+        // format and assemble Laplace
+        loc_matrix.format();
+        VoxelAssembly::VoxelPoissonAssembler<Space_, DataType, IndexType> voxel_assembler(space, coloring);
+        voxel_assembler.assemble_matrix1(loc_matrix, space, Cubature::DynamicFactory(cubature), nu);
+      }
+
+      template<typename Space_>
+      void symbolic_assembly_std1(const Space_& space)
+      {
+        // get local matrix
+        auto& loc_matrix = this->matrix_sys.local();
+
+        ASSERTM(loc_matrix.empty(), "Called symbolic assembly on non empty matrix");
+        // assemble structure?
+        Assembly::SymbolicAssembler::assemble_matrix_std1(loc_matrix, space);
+
       }
     }; // class ScalarBasicSystemLevel<...>
 
