@@ -76,7 +76,7 @@ void Runtime::initialize(int& argc, char**& argv)
   // initialize memory pool for CUDA memory
   int rank = Dist::Comm::world().rank();
   Util::cuda_initialize(rank, 1, 1, 1);
-  Util::cuda_set_blocksize(256, 256, 256, 256);
+  Util::cuda_set_blocksize(256, 256, 256, 256, 256, 128);
 #endif
 
   _initialized = true;

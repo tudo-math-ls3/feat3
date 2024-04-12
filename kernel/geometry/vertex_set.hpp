@@ -131,6 +131,18 @@ namespace FEAT
         return VertexSet(this->_vertices);
       }
 
+      template<typename DT2_>
+      std::vector<Tiny::Vector<DT2_,num_coords>> clone_internal_vector() const
+      {
+        std::vector<Tiny::Vector<DT2_,num_coords>> tmp(_vertices.size());
+        for(std::size_t i = 0; i < std::size_t(_vertices.size()); ++i)
+        {
+          for(int j = 0; j < num_coords; ++j)
+            tmp[i][j] = DT2_(_vertices[i][j]);
+        }
+        return tmp;
+      }
+
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
@@ -169,6 +181,38 @@ namespace FEAT
       {
         ASSERT(i < get_num_vertices());
         return _vertices[i];
+      }
+
+      /**
+       * \brief Iterator to the first element.
+       *
+       * \return A pointer to the start of the internal vector _vertices.
+       */
+      VertexType* begin()
+      {
+        return &_vertices[0];
+      }
+
+      /** \copydoc begin() */
+      const VertexType* begin() const
+      {
+        return &_vertices[0];
+      }
+
+      /**
+       * \brief Iterator past the last element.
+       *
+       * \return A pointer to the end + 1 of the internal vector _vertices.
+       */
+      VertexType* end()
+      {
+        return &_vertices.back() + 1;
+      }
+
+      /** \copydoc begin() */
+      const VertexType* end() const
+      {
+        return &_vertices.back() + 1;
       }
 
       /**

@@ -116,7 +116,7 @@ namespace FEAT
 
       public:
         explicit ScatterAxpy(VectorType & vector) :
-          _num_entries(vector.size()),
+          _num_entries(IT_(vector.size())),
           _data(vector.elements())
         {
         }

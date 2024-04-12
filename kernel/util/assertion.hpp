@@ -12,6 +12,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/runtime.hpp>
 
 // includes, system
 #include <string>
@@ -36,9 +37,49 @@ namespace FEAT
    * \param[in] msg
    * A custom error message to be displayed in addition to the standard information.
    */
-  [[noreturn]] void abortion(const char* const func, const char* const file, const int line, const char* const msg);
+  // CUDA_FUNC [[noreturn]] void abortion(const char* const func, const char* const file, const int line, const char* const msg);
+  CUDA_FUNC [[noreturn]] inline void abortion(
+    const char * const func,
+    const char * const file,
+    const int line,
+    const char * const msg)
+  {
+    #ifndef __CUDA_ARCH__
+    // write error message if available
+    if(msg != nullptr)
+      fprintf(stderr, "\n>>> FATAL ERROR: %s\n\n", msg);
+    else
+      fprintf(stderr, "\n>>> FATAL ERROR: UNSPECIFIED ABORTION\n\n");
 
-  [[noreturn]] inline void abortion(const char* const func, const char* const file, const int line, const std::string& msg)
+    // write basic information
+    fprintf(stderr, "Function: %s\n", func);
+    fprintf(stderr, "File....: %s\n", file);
+    fprintf(stderr, "Line....: %i\n", line);
+
+    // flush stderr
+    fflush(stderr);
+
+    // abort execution;
+    // this may also write a call-stack dump if possible
+    Runtime::abort();
+    #else
+    // write error message if available
+    if(msg != nullptr)
+      printf("\n>>> FATAL ERROR: %s\n\n", msg);
+    else
+      printf("\n>>> FATAL ERROR: UNSPECIFIED ABORTION\n\n");
+
+    // write basic information
+    printf("Function: %s\n", func);
+    printf("File....: %s\n", file);
+    printf("Line....: %i\n", line);
+
+    // and trap the process
+    __trap();
+    #endif
+  }
+
+  CUDA_HOST [[noreturn]] inline void abortion(const char* const func, const char* const file, const int line, const std::string& msg)
   {
     abortion(func, file, line, msg.c_str());
   }
@@ -73,15 +114,63 @@ namespace FEAT
    * A custom error message to be displayed in addition to the standard information.
    * May be \c nullptr if no additional information is available for the assertion.
    */
-  void assertion(
+  // CUDA_FUNC void assertion(
+  //   bool expr,
+  //   const char * const expr_str,
+  //   const char * const func,
+  //   const char * const file,
+  //   const int line,
+  //   const char * const msg = nullptr);
+  CUDA_FUNC void inline assertion(
     bool expr,
     const char * const expr_str,
     const char * const func,
     const char * const file,
     const int line,
-    const char * const msg = nullptr);
+    const char * const msg = nullptr)
+  {
+    // alright?
+    if(expr)
+      return;
+    #ifndef __CUDA_ARCH__
+    // write error message if available
+    if(msg != nullptr)
+      fprintf(stderr, "\n>>> FATAL ERROR: ASSERTION FAILED: %s\n", msg);
+    else
+      fprintf(stderr, "\n>>> FATAL ERROR: ASSERTION FAILED\n");
 
-  inline void assertion(
+    // write basic information
+    fprintf(stderr, "Expression: %s\n", expr_str);
+    fprintf(stderr, "Function..: %s\n", func);
+    fprintf(stderr, "File......: %s\n", file);
+    fprintf(stderr, "Line......: %i\n", line);
+
+    // flush stderr
+    fflush(stderr);
+
+    // abort execution;
+    // this may also write a call-stack dump if possible
+    Runtime::abort();
+    #else
+    // cuda does only know printf
+    if(msg != nullptr)
+      printf("\n>>> FATAL ERROR: ASSERTION FAILED: %s\n", msg);
+    else
+      printf("\n>>> FATAL ERROR: ASSERTION FAILED\n");
+
+    // write basic information
+    printf("Expression: %s\n", expr_str);
+    printf("Function..: %s\n", func);
+    printf("File......: %s\n", file);
+    printf("Line......: %i\n", line);
+
+    // also cuda should and can not abort our runtime, so we use an internal trap
+    // to send an interupt signal... warning, this could (in theory) be catched and ignored
+    __trap();
+    #endif
+  }
+
+  CUDA_HOST inline void assertion(
     bool expr,
     const char* const expr_str,
     const char* const func,

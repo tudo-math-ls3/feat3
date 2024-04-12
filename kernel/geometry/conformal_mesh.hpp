@@ -15,6 +15,7 @@
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 #include <kernel/geometry/index_calculator.hpp>
 #include <kernel/geometry/facet_flipper.hpp>
+#include <kernel/util/math.hpp>
 
 // includes, system
 #include <memory>

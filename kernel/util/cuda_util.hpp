@@ -49,17 +49,25 @@ namespace FEAT
     /// cuda threading grid blocksize for blas-1 type ops
     extern Index cuda_blocksize_axpy;
 
-    void cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy);
+    /// cuda threading grid blocksize for scalar typed assembly
+    extern Index cuda_blocksize_scalar_assembly;
+
+    /// cuda threading grid blocksize for block typed assembly
+    extern Index cuda_blocksize_blocked_assembly;
+
+    void cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly);
     void cuda_set_device(const int device);
     void cuda_check_last_error();
     void * cuda_get_device_pointer(void * host);
     void * cuda_malloc_managed(const Index bytes);
+    void * cuda_malloc(const Index bytes);
     void cuda_free(void * address);
     void cuda_initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
     void cuda_finalize();
     NOINLINE void cuda_synchronize();
     void cuda_reset_device();
     void cuda_copy(void * dest, const void * src, const Index bytes);
+    void cuda_copy_host_to_device(void * dest, const void * src, const Index bytes);
     void cuda_reset_algos();
     template <typename DT_>
     void cuda_set_memory(DT_ * address, const DT_ val, const Index count);
@@ -68,6 +76,9 @@ namespace FEAT
     int cuda_get_device_count();
     int cuda_get_device_id();
     String cuda_get_visible_devices();
+    void cuda_set_max_cache_thread(const std::size_t bytes);
+    void cuda_start_profiling();
+    void cuda_stop_profiling();
   }
 }
 #endif // FEAT_HAVE_CUDA

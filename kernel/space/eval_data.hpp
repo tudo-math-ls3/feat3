@@ -8,7 +8,11 @@
 #define KERNEL_SPACE_EVAL_DATA_HPP 1
 
 // includes, FEAT
+#include <kernel/base_header.hpp>
 #include <kernel/space/base.hpp>
+#ifndef __CUDA_ARCH__
+#include <kernel/util/math.hpp>
+#endif
 
 namespace FEAT
 {
@@ -51,7 +55,7 @@ namespace FEAT
       // our space config
       static constexpr SpaceTags config = cfg_tags_;
 
-#ifdef DEBUG
+#if defined(DEBUG) || !defined(__CUDA_ARCH__)
       BasisData()
       {
         // format all values to NaN

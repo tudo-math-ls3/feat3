@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/space/evaluator_base.hpp>
+#include <kernel/space/details.hpp>
 
 namespace FEAT
 {
@@ -229,35 +230,19 @@ namespace FEAT
         template<typename SpaceData_, typename TrafoData_>
         static void trans_values(SpaceData_& space_data, const TrafoData_&)
         {
-          // loop over all basis functions
-          for(int i(0); i < SpaceData_::max_local_dofs; ++i)
-          {
-            // and copy the basis function value
-            space_data.phi[i].value = space_data.phi[i].ref_value;
-          }
+          ParametricEvalHelper::trans_values(space_data);
         }
 
         template<typename SpaceData_, typename TrafoData_>
         static void trans_gradients(SpaceData_& space_data, const TrafoData_& trafo_data)
         {
-          // loop over all basis functions
-          for(int i(0); i < SpaceData_::max_local_dofs; ++i)
-          {
-            // and apply the first-order chain rule
-            space_data.phi[i].grad.set_vec_mat_mult(space_data.phi[i].ref_grad, trafo_data.jac_inv);
-          }
+          ParametricEvalHelper::trans_gradients(space_data, trafo_data.jac_inv);
         }
 
         template<typename SpaceData_, typename TrafoData_>
         static void trans_hessians(SpaceData_& space_data, const TrafoData_& trafo_data)
         {
-          // loop over all basis functions
-          for(int i(0); i < SpaceData_::max_local_dofs; ++i)
-          {
-            // and apply the second-order chain rule
-            space_data.phi[i].hess.set_double_mat_mult(space_data.phi[i].ref_hess, trafo_data.jac_inv, trafo_data.jac_inv);
-            space_data.phi[i].hess.add_vec_tensor_mult(space_data.phi[i].ref_grad, trafo_data.hess_inv);
-          }
+          ParametricEvalHelper::trans_hessians(space_data, trafo_data.jac_inv, trafo_data.hess_inv);
         }
       };
     } // namespace Intern

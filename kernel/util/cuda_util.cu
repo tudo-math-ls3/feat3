@@ -10,6 +10,7 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
+#include "cuda_profiler_api.h"
 
 using namespace FEAT;
 
@@ -17,6 +18,8 @@ Index FEAT::Util::cuda_blocksize_misc = 256;
 Index FEAT::Util::cuda_blocksize_reduction = 256;
 Index FEAT::Util::cuda_blocksize_spmv = 256;
 Index FEAT::Util::cuda_blocksize_axpy = 256;
+Index FEAT::Util::cuda_blocksize_scalar_assembly = 256;
+Index FEAT::Util::cuda_blocksize_blocked_assembly = 128;
 
 cusparseHandle_t FEAT::Util::Intern::cusparse_handle;
 cublasHandle_t FEAT::Util::Intern::cublas_handle;
@@ -85,6 +88,20 @@ void * FEAT::Util::cuda_malloc_managed(const Index bytes)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc_managed allocation error\n" + stringify(cudaGetErrorString(status)));
   if (memory == nullptr)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc_managed allocation error (null pointer returned)");
+  return memory;
+}
+
+void * FEAT::Util::cuda_malloc(const Index bytes)
+{
+  void * memory(nullptr);
+  if(bytes == 0)
+    return memory;
+
+  auto status = cudaMalloc((void**)&memory, bytes);
+  if (status != cudaSuccess)
+    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error\n" + stringify(cudaGetErrorString(status)));
+  if (memory == nullptr)
+    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error (null pointer returned)");
   return memory;
 }
 
@@ -181,7 +198,14 @@ void FEAT::Util::cuda_copy(void * dest, const void * src, const Index bytes)
     throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
 }
 
-void FEAT::Util::cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy)
+void FEAT::Util::cuda_copy_host_to_device(void * dest, const void * src, const Index bytes)
+{
+  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyHostToDevice);
+  if (status != cudaSuccess)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
+}
+
+void FEAT::Util::cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly)
 {
   FEAT::Util::cuda_blocksize_misc = misc;
 
@@ -190,6 +214,10 @@ void FEAT::Util::cuda_set_blocksize(Index misc, Index reduction, Index spmv, Ind
   FEAT::Util::cuda_blocksize_spmv = spmv;
 
   FEAT::Util::cuda_blocksize_axpy = axpy;
+
+  FEAT::Util::cuda_blocksize_scalar_assembly = scalar_assembly;
+
+  FEAT::Util::cuda_blocksize_blocked_assembly = blocked_assembly;
 }
 
 void FEAT::Util::cuda_reset_algos()
@@ -296,4 +324,27 @@ String FEAT::Util::cuda_get_visible_devices()
     result += "Device " + stringify(idevice) + ": " + stringify(prop.name) + "\n";
   }
   return result;
+}
+
+void FEAT::Util::cuda_set_max_cache_thread(const std::size_t bytes)
+{
+  std::size_t value = bytes;
+  auto status = cudaDeviceSetLimit(cudaLimit::cudaLimitStackSize, value);
+  if(cudaSuccess != status)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSetLimit failed!");
+  status = cudaDeviceGetLimit(&value, cudaLimit::cudaLimitStackSize);
+  if(cudaSuccess != status)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetLimit failed!");
+  if(value != bytes)
+   XABORTM("Could not set max cache per thread (" +stringify(value)+") to expected amount(" + stringify(bytes) + ")");
+}
+
+void FEAT::Util::cuda_start_profiling()
+{
+  cudaProfilerStart();
+}
+
+void FEAT::Util::cuda_stop_profiling()
+{
+  cudaProfilerStop();
 }

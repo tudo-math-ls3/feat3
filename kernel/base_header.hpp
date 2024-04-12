@@ -125,4 +125,21 @@ namespace FEAT
   typedef double Real;
 } // namespace FEAT
 
+// define macros for nvcc
+// generally these macros have to be prepended to any function or method that could be (implicitly) used by a cuda kernel
+// since we do not always compile with nvcc directly (only cuda kernels themselves), we have to define the nvcc macros so
+// we do not get a compilation error
+#ifdef __NVCC__
+/// Tells nvcc the function should be callable from the host (i.e. CPU)
+#define CUDA_HOST __host__
+/// Tells nvcc the function should be callable from the device (i.e. GPU)
+#define CUDA_DEVICE __device__
+/// Function should be callable from device and host
+#define CUDA_FUNC __host__ __device__
+#else
+#define CUDA_HOST
+#define CUDA_DEVICE
+#define CUDA_FUNC
+#endif
+
 #endif // KERNEL_BASE_HEADER_HPP

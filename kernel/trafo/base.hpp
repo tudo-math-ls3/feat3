@@ -11,6 +11,7 @@
 #include <kernel/shape.hpp>
 #include <kernel/eval_tags.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/math.hpp>
 
 namespace FEAT
 {

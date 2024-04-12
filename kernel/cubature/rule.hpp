@@ -158,10 +158,20 @@ namespace FEAT
         return _weights[i];
       }
 
+      WeightType* get_weights()
+      {
+        return _weights;
+      }
+
       const WeightType& get_weight(int i) const
       {
         ASSERT(i < _num_points);
         return _weights[i];
+      }
+
+      const WeightType* get_weights() const
+      {
+        return _weights;
       }
 
       PointType& get_point(int i)
@@ -170,10 +180,20 @@ namespace FEAT
         return _points[i];
       }
 
+      PointType* get_points()
+      {
+        return _points;
+      }
+
       const PointType& get_point(int i) const
       {
         ASSERT(i < _num_points);
         return _points[i];
+      }
+
+      const PointType* get_points() const
+      {
+        return _points;
       }
 
       CoordType& get_coord(int i, int j)

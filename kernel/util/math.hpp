@@ -52,6 +52,11 @@ extern "C"
     inline double func(double x, double* y) {return std::func(x,y);} \
     inline long double func(long double x, long double* y) {return std::func(x,y);}
 
+#define WRAP_STD_MATH2PTR_NO_CONSTEXPR(func) \
+    inline float func(float x, float* y) {return std::func(x,y);} \
+    inline double func(double x, double* y) {return std::func(x,y);} \
+    inline long double func(long double x, long double* y) {return std::func(x,y);}
+
     // single argument function wrapper, bool return type
 #define WRAP_STD_MATH1BRET(func) \
     inline bool func(float x) {return std::func(x);} \

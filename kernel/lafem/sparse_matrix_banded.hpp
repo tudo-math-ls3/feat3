@@ -1031,7 +1031,7 @@ namespace FEAT
 
         for (Index i(0) ; i < num_of_offsets() ; ++i)
         {
-          if (this->offsets[i] == this->rows() - 1)
+          if (this->offsets()[i] == this->rows() - 1)
           {
             MemoryPool::copy(diag.elements(), val() + i * rows(), rows());
             break;
@@ -1125,16 +1125,51 @@ namespace FEAT
         return VectorTypeR(this->columns());
       }
 
+      template <typename ITX_>
+      inline Index _start_offset(const Index i, const ITX_ * const offsets,
+                                const Index rows_in, const Index columns_in, const Index noo) const
+      {
+        if (i == Index(-1))
+        {
+          return rows;
+        }
+        else if (i == noo)
+        {
+          return Index(0);
+        }
+        else
+        {
+          return Math::max(columns_in + Index(1), rows_in + columns_in - Index(offsets[i])) - columns_in - Index(1);
+        }
+      }
+
+      template <typename ITX_>
+      inline Index _end_offset(const Index i, const ITX_ * const offsets,
+                              const Index rows_in, const Index columns_in, const Index noo) const
+      {
+        if (i == Index (-1))
+        {
+          return rows_in - 1;
+        }
+        else if (i == noo)
+        {
+          return Index(-1);
+        }
+        else
+        {
+          return Math::min(rows_in, columns_in + rows_in - Index(offsets[i]) - Index(1)) - Index(1);
+        }
+      }
       /// Returns first row-index of the diagonal matching to the offset i
       Index start_offset(const Index i) const
       {
-        return Arch::Intern::ApplyBanded::start_offset(i, offsets(), rows(), columns(), num_of_offsets());
+        return this->_start_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
 
       /// Returns last row-index of the diagonal matching to the offset i
       Index end_offset(const Index i) const
       {
-        return Arch::Intern::ApplyBanded::end_offset(i, offsets(), rows(), columns(), num_of_offsets());
+        return this->_end_offset(i, offsets(), rows(), columns(), num_of_offsets());
       }
 
       /* ******************************************************************* */

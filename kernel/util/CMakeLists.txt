@@ -2,7 +2,6 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(KERNEL_LIBRARY_FILES
-  assertion.cpp
   dist.cpp
   dist_file_io.cpp
   kahan_summation.cpp
