@@ -160,7 +160,7 @@ namespace FEAT
 
         _c.reserve(_krylov_dim);
         _s.reserve(_krylov_dim);
-        _q.reserve(_krylov_dim);
+        _q.reserve(_krylov_dim + 1);
         _h.resize(_krylov_dim);
 
         for(Index i(0); i < _krylov_dim; ++i)
