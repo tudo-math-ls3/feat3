@@ -27,8 +27,6 @@
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
-   fun:UnknownInlinedFun
-   fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:pthread_create@@GLIBC_2.2.5
    fun:gomp_team_start
