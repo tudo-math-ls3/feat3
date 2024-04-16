@@ -49,14 +49,18 @@ namespace FEAT
       void _parse_mesh(std::istream & file, CGALFileMode file_mode);
 
     public:
+      /// rule of five
+      CGALWrapper(const CGALWrapper&) = delete;
+      CGALWrapper& operator=(const CGALWrapper&) = delete;
+      CGALWrapper(CGALWrapper&&) noexcept;
+      CGALWrapper& operator=(CGALWrapper&& other) noexcept;
+      virtual ~CGALWrapper();
+
       /// Create a new CGALWrapper Instance and open the provided file in given format.
       explicit CGALWrapper(const String & filename, CGALFileMode file_mode);
 
       /// Create a new CGALWrapper Instance and open the provided file stream in given format.
       explicit CGALWrapper(std::istream & file, CGALFileMode file_mode);
-
-      /// Destructor
-      virtual ~CGALWrapper();
 
       /// Check whether a point is inside the Polyhedron defined at objects' construction.
       bool point_inside(DataType x, DataType y, DataType z) const;

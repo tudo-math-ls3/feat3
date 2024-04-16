@@ -7,9 +7,15 @@
 #include <iomanip>
 #include <test_system/test_system.hpp>
 #include <kernel/util/half.hpp>
+#include <kernel/util/random.hpp>
 
 #ifdef FEAT_HAVE_CGAL
 #include <kernel/geometry/cgal.hpp>
+
+#include <algorithm>
+#ifdef FEAT_HAVE_OMP
+#include "omp.h"
+#endif
 
 using namespace FEAT;
 using namespace FEAT::TestSystem;
@@ -36,6 +42,79 @@ public:
   {
     // choose tolerance, but not tighter than double precision
     const DT_ tol = DT_(2) * Math::max(Math::eps<DT_>(), DT_(Math::eps<double>()));
+    {
+      std::stringstream mts;
+      mts<<"OFF"<<std::endl;
+      mts<<"4 4 6"<<std::endl;
+      mts<<"0.0 0.0 2.0"<<std::endl;
+      mts<<"1.632993 -0.942809 -0.666667"<<std::endl;
+      mts<<"0.000000 1.885618 -0.666667"<<std::endl;
+      mts<<"-1.632993 -0.942809 -0.666667"<<std::endl;
+      mts<<"3 1 0 3"<<std::endl;
+      mts<<"3 2 0 1"<<std::endl;
+      mts<<"3 3 0 2"<<std::endl;
+      mts<<"3 3 2 1"<<std::endl;
+
+      CGALWrapper<DT_> cw2(mts, CGALFileMode::fm_off);
+      CGALWrapper<DT_> cw_alt(std::move(cw2));
+
+      TEST_CHECK_EQUAL(cw_alt.point_inside(DT_(0.1), DT_(0.1), DT_(0.1)), true);
+      TEST_CHECK_EQUAL(cw_alt.point_inside(DT_(50), DT_(50), DT_(50)), false);
+      cw2 = std::move(cw_alt);
+      TEST_CHECK_EQUAL(cw2.point_inside(DT_(0.1), DT_(0.1), DT_(0.1)), true);
+      TEST_CHECK_EQUAL(cw2.point_inside(DT_(50), DT_(50), DT_(50)), false);
+
+    }
+
+    // threadparallel test
+    {
+      constexpr std::size_t num_points = 597;
+      constexpr DT_ range = 3.;
+      // create random points
+      std::vector<Tiny::Vector<DT_, 3>> points(num_points);
+      // create rng object
+
+      Random rng;
+      std::for_each(points.begin(), points.end(), [&rng](Tiny::Vector<DT_,3>& vec){vec = {DT_(rng.next())/DT_(3.14), -DT_(rng.next())/DT_(7.19), DT_(rng.next())/DT_(1.554)};});
+      DT_ max_val = (*std::max_element(points.begin(), points.end(), [](Tiny::Vector<DT_, 3>& a, Tiny::Vector<DT_, 3>& b){return a.norm_euclid_sqr() < b.norm_euclid_sqr();})).norm_euclid();
+      std::transform(points.begin(), points.end(), points.begin(), [&max_val](const Tiny::Vector<DT_, 3>& a){return a * (range/max_val);});
+
+      // setup cgal
+      std::stringstream mts;
+      mts<<"OFF"<<std::endl;
+      mts<<"4 4 6"<<std::endl;
+      mts<<"0.0 0.0 2.0"<<std::endl;
+      mts<<"1.632993 -0.942809 -0.666667"<<std::endl;
+      mts<<"0.000000 1.885618 -0.666667"<<std::endl;
+      mts<<"-1.632993 -0.942809 -0.666667"<<std::endl;
+      mts<<"3 1 0 3"<<std::endl;
+      mts<<"3 2 0 1"<<std::endl;
+      mts<<"3 3 0 2"<<std::endl;
+      mts<<"3 3 2 1"<<std::endl;
+
+      CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+      //evalute points single threaded
+      std::vector<bool> inside_tests(num_points);
+      std::transform(points.begin(), points.end(), inside_tests.begin(), [&cw](Tiny::Vector<DT_, 3>& a){return cw.point_inside(a[0], a[1], a[2]);});
+
+      // now do a omp based loop
+      std::vector<bool> inside_test2(num_points);
+      #pragma omp parallel for
+      for(int i = 0; i < int(num_points); ++i)
+      {
+        // #ifdef FEAT_HAVE_OMP
+        // if(i == 0)
+        //   std::cout << "Num threads are " << omp_get_num_threads() << std::endl;
+        // #endif
+        inside_test2[i] = cw.point_inside(points[i][0], points[i][1], points[i][2]);
+      }
+
+      for(int i = 0; i < int(num_points); ++i)
+      {
+        TEST_CHECK_EQUAL(inside_tests[i], inside_test2[i]);
+      }
+    }
 
     {
       std::stringstream mts;

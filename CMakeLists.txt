@@ -188,6 +188,10 @@ if (FEAT_HAVE_CGAL)
     endif (NOT Boost_FOUND)
   endif (NOT FEAT_HAVE_BOOST)
 
+  if (NOT BOOST_HAS_THREADS AND NOT OpenMP_FOUND)
+    message(FATAL_ERROR "cgal only supported with multithreading capabilities. Please provide a valid boost or openMP application.")
+  endif ()
+
   include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_CGAL}/include")
 endif(FEAT_HAVE_CGAL)
 

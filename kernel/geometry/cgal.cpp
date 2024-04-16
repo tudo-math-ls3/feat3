@@ -32,6 +32,11 @@ FEAT_DISABLE_WARNINGS
 #include <CGAL/Polygon_mesh_processing/compute_normal.h>
 FEAT_RESTORE_WARNINGS
 
+// check if cgal threading support is enabled
+#ifndef CGAL_HAS_THREADS
+static_assert(false, "No cgal multithreading support");
+#endif
+
 
 #ifdef FEAT_COMPILER_INTEL
 #pragma warning disable 3280
@@ -77,6 +82,29 @@ struct CGALWrapperData
     _inside_tester(nullptr)
   {
   }
+
+  CGALWrapperData(const CGALWrapperData&) = delete;
+  CGALWrapperData& operator=(const CGALWrapperData&) = delete;
+
+  void swap(CGALWrapperData& other)
+  {
+    std::swap(this->_polyhedron, other._polyhedron);
+    std::swap(this->_tree, other._tree);
+    std::swap(this->_inside_tester, other._inside_tester);
+  }
+
+  CGALWrapperData(CGALWrapperData&& other) noexcept
+  : _polyhedron(nullptr), _tree(nullptr), _inside_tester(nullptr)
+  {
+    this->swap(other);
+  }
+
+  CGALWrapperData& operator=(CGALWrapperData&& other) noexcept
+  {
+    this->swap(other);
+    return *this;
+  }
+
 
   ~CGALWrapperData()
   {
@@ -130,7 +158,7 @@ FEAT::Geometry::CGALWrapper<DT_>::CGALWrapper(const String & filename, CGALFileM
 }
 
 template<typename DT_>
-FEAT::Geometry::CGALWrapper<DT_>::~CGALWrapper()
+FEAT::Geometry::CGALWrapper<DT_>::CGALWrapper::~CGALWrapper()
 {
   if(_cgal_data)
     delete (CGALWrapperData<DT_>*)_cgal_data;
@@ -266,6 +294,20 @@ void FEAT::Geometry::CGALWrapper<DT_>::_init_wrapper()
   cd->_tree->accelerate_distance_queries();
   // Initialize the point-in-polyhedron tester
   cd->_inside_tester = new typename CGALTypeWrapper<DT_>::Point_inside_(*(cd->_tree));
+}
+
+template<typename DT_>
+FEAT::Geometry::CGALWrapper<DT_>::CGALWrapper(FEAT::Geometry::CGALWrapper<DT_>&& other) noexcept
+ : _cgal_data(nullptr)
+{
+  std::swap(this->_cgal_data, other._cgal_data);
+}
+
+template<typename DT_>
+FEAT::Geometry::CGALWrapper<DT_>& FEAT::Geometry::CGALWrapper<DT_>::operator=(FEAT::Geometry::CGALWrapper<DT_>&& other) noexcept
+{
+  std::swap(this->_cgal_data, other._cgal_data);
+  return *this;
 }
 
 
