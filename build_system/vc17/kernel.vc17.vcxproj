@@ -31,6 +31,8 @@
     <FeatKernelExcludeSource Include="kernel\geometry\test_aux\*.cpp" />
     <!-- exclude MKL sources unless the MKL backend is enabled -->
     <FeatKernelExcludeSource Include="kernel\**\*_mkl.cpp" Condition="'$(EnableMKL)'!='true'" />
+    <!-- exclude CGAL source (this one is included explicitly below) -->
+    <FeatKernelExcludeSource Include="kernel\geometry\cgal.cpp" />
     <!-- exclude OS Windows utility source (this one is included explicitly below) -->
     <FeatKernelExcludeSource Include="kernel\util\os_windows.cpp" />
   </ItemGroup>
@@ -49,6 +51,11 @@
   <!-- C++ Source File List -->
   <ItemGroup>
     <ClCompile Include="@(FeatKernelIncludeSource)" Exclude="@(FeatKernelExcludeSource)" />
+    <!-- CGAL wrapper source file -->
+    <ClCompile Include="kernel\geometry\cgal.cpp">
+      <!-- BOOST threads need language extensions enabled -->
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+    </ClCompile>
     <!-- OS Windows utility source file -->
     <ClCompile Include="kernel\util\os_windows.cpp">
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
