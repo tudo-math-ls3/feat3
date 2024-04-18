@@ -47,17 +47,19 @@ int main(int argc, char** argv)
 
   Control::Domain::VoxelDomainControl<DomainLevelType> domain(comm, true);
 
-  if(argc < 2)
+  /*if(argc < 2)
   {
     std::cout << "USAGE: " << argv[0] << " <OFF-file>" << std::endl;
     return 0;
-  }
+  }*/
 
   SimpleArgParser args(argc, argv);
 
   // create base mesh node
   //domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
-  domain.create_base_mesh_3d(6, 7, 8, -96.0, 96.0, -164.0, 60.0, 0.0, 256.0);
+  //domain.create_base_mesh_3d(4, 4, 4, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
+  //domain.create_base_mesh_3d(6, 7, 8, -96.0, 96.0, -164.0, 60.0, 0.0, 256.0);
+  domain.create_base_mesh_3d(6, 7, 9, -96.0, 96.0, -164.0, 60.0, 0.0, 288.0);
   domain.parse_args(args);
 
   // todo: add base mesh meshparts
@@ -84,19 +86,27 @@ int main(int argc, char** argv)
 #endif
 
   // create slag mask from OFF file
+  if(args.check("off") > 0)
   {
-    std::stringstream sstr;
-    DistFileIO::read_common(sstr, argv[1]);
-    domain.create_slag_mask_from_cgal_off(sstr, false);
+    String off_name = args.query("off")->second.front();
+    comm.print("Creating voxel map from OFF file '" + off_name + "'...");
+    domain.create_voxel_map_from_off(off_name, false, 0.0);
+  }
+  if(args.check("vxl") > 0)
+  {
+    String vxl_name = args.query("vxl")->second.front();
+    comm.print("Loading voxel map from file '" + vxl_name + "'...");
+    domain.read_voxel_map(vxl_name);
   }
 
+  domain.keep_voxel_map();
   domain.create_hierarchy();
 
   comm.print("Desired Levels: " + domain.format_desired_levels());
   comm.print("Chosen  Levels: " + domain.format_chosen_levels());
 
   comm.print("Base-Mesh Creation Time: " + domain.get_watch_base_mesh().elapsed_string().pad_front(7));
-  comm.print("Slag-Mask Creation Time: " + domain.get_watch_slag_mask().elapsed_string().pad_front(7));
+  comm.print("Voxel-Map Creation Time: " + domain.get_watch_voxel_map().elapsed_string().pad_front(7));
   comm.print("Hierarchy Creation Time: " + domain.get_watch_hierarchy().elapsed_string().pad_front(7));
 
 
@@ -126,12 +136,12 @@ int main(int argc, char** argv)
     comm.print(String("Element Counts:\n") + str);
   }
 
-  if(comm.rank() == 0)
+  /*if(comm.rank() == 0)
   {
     std::ofstream ofs("slagmask.bin", std::ios_base::binary);
-    const std::vector<uint64_t>& slagvec = domain.get_slag_mask_vector();
-    ofs.write((const char*)slagvec.data(), std::streamsize(slagvec.size() * 8ull));
-  }
+    const std::vector<char>& slagvec = domain.get_voxel_map().get_map(); //domain.get_slag_mask_vector();
+    ofs.write(slagvec.data(), std::streamsize(slagvec.size() * 8ull));
+  }*/
 
   const Index num_levels = domain.size_physical();
 
@@ -181,8 +191,8 @@ int main(int argc, char** argv)
   for(Index k(0); k < domain.size_physical(); ++k)
   {
     Geometry::ExportVTK<MeshType> vtk(domain.at(k)->get_mesh());
-    std::vector<int> mask = domain.gather_vertex_slag_mask(k);
-    std::vector<Real> weights = domain.gather_element_slag_weights(k);
+    std::vector<int> mask = domain.gather_vertex_voxel_map(k);
+    std::vector<Real> weights = domain.gather_element_voxel_weights(k);
     vtk.add_vertex_scalar("mask", mask.data());
     //vtk.add_vertex_scalar("test", vectors.at(k).local().elements());
     vtk.add_cell_scalar("color", domain.at(k)->element_coloring.get_coloring());

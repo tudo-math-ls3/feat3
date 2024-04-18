@@ -578,28 +578,29 @@ namespace PoissonVoxelMG
     Control::Domain::VoxelDomainControl<VoxelDomainLevelType> domain(comm, true);
 
     if constexpr (MeshType::shape_dim == 2)
-      //domain.create_base_mesh_2d(2, 2, -1.0, 1.0, -1.0, 1.0);
-      domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
-    //if constexpr (MeshType::shape_dim == 3)
-      //domain.create_base_mesh_2d(2, 2, 1, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+      domain.create_base_mesh_2d(2, 2, -1.0, 1.0, -1.0, 1.0);
+      //domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
+    if constexpr (MeshType::shape_dim == 3)
+      domain.create_base_mesh_3d(2, 2, 2, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
 
-    domain.create_slag_mask_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); });
-    //domain.create_slag_mask_from_lambda([](auto p) {return p.norm_euclid_sqr() < 1.0001;});
+    //domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, 0.0);
+    domain.create_voxel_map_from_lambda([](auto p) {return p.norm_euclid_sqr() < 1.0001;}, 0.0);
+    //domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, 0.0);
     domain.create_hierarchy();
 
     // create boundary meshparts on each level
-    /*for(Index i(0); i < domain.size_physical(); ++i)
+    for(Index i(0); i < domain.size_physical(); ++i)
     {
       Geometry::RootMeshNode<MeshType>& mesh_node = *domain.at(i)->get_mesh_node();
       Geometry::MaskedBoundaryFactory<MeshType> boundary_factory(*mesh_node.get_mesh());
       for(const auto& v : mesh_node.get_halo_map())
         boundary_factory.add_mask_meshpart(*v.second);
       boundary_factory.compile();
-      mesh_node.add_mesh_part("bnd", std::make_unique<Geometry::MeshPart<MeshType>>(boundary_factory));
-    }*/
+      mesh_node.add_mesh_part("bnd", boundary_factory.make_unique());
+    }
 
     Statistics::toe_partition = time_stamp.elapsed_now();
 
@@ -609,7 +610,7 @@ namespace PoissonVoxelMG
     comm.print("\nChosen Partitioning Info:\n" + domain.get_chosen_parti_info());
 
     comm.print("Base-Mesh Creation Time: " + domain.get_watch_base_mesh().elapsed_string().pad_front(7));
-    comm.print("Slag-Mask Creation Time: " + domain.get_watch_slag_mask().elapsed_string().pad_front(7));
+    comm.print("Voxel-Map Creation Time: " + domain.get_watch_voxel_map().elapsed_string().pad_front(7));
     comm.print("Hierarchy Creation Time: " + domain.get_watch_hierarchy().elapsed_string().pad_front(7));
 
 

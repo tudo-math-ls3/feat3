@@ -314,7 +314,7 @@ namespace StokesVoxelYPipe
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
 
-    domain.create_slag_mask_from_chart(ypipe_chart, true);
+    domain.create_voxel_map_from_chart(ypipe_chart, true, 0.0);
     domain.create_hierarchy();
 
     auto hit_l = [](auto p) {return p[0] < 0.0001;};
@@ -349,7 +349,7 @@ namespace StokesVoxelYPipe
     comm.print("\nChosen Partitioning Info:\n" + domain.get_chosen_parti_info());
 
     comm.print("Base-Mesh Creation Time: " + domain.get_watch_base_mesh().elapsed_string().pad_front(7));
-    comm.print("Slag-Mask Creation Time: " + domain.get_watch_slag_mask().elapsed_string().pad_front(7));
+    comm.print("Voxel-Map Creation Time: " + domain.get_watch_voxel_map().elapsed_string().pad_front(7));
     comm.print("Hierarchy Creation Time: " + domain.get_watch_hierarchy().elapsed_string().pad_front(7));
 
     // dump domain info if desired

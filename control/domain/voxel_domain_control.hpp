@@ -24,6 +24,7 @@
 #include <kernel/geometry/patch_meshpart_factory.hpp>
 #include <kernel/geometry/patch_meshpart_splitter.hpp>
 #include <kernel/geometry/cgal.hpp>
+#include <kernel/geometry/voxel_map.hpp>
 
 #include <control/domain/parti_domain_control_base.hpp>
 
@@ -33,202 +34,6 @@ namespace FEAT
   {
     namespace Domain
     {
-      /**
-       * \brief Interface for slag masker for the VoxelDomainControl
-       *
-       * \author Peter Zajac
-       */
-      template<typename CoordType_, int dim_>
-      class VoxelSlagMasker
-      {
-      public:
-        /// the coordinate type
-        typedef CoordType_ CoordType;
-        /// the point type
-        typedef Tiny::Vector<CoordType_, dim_> PointType;
-
-        /// virtual destructor
-        virtual ~VoxelSlagMasker()
-        {
-        }
-
-        /**
-         * \brief Computes the mask for an entire X-coordinate row
-         *
-         * \param[inout] mask
-         * The mask vector for the current X-row. Is allocated to correct size, but its contents are undefined upon entry.
-         * Assuming that the length of this vector is n, then the i-th entry of the mask vector is to be set to 1 if
-         * the point with the X-coordinate equal to x_min + i/(n-1)*x_max is inside the mask, otherwise it is to be set to 0.
-         *
-         * \param[in] x_min, x_max
-         * The minimal and maximal X-coordinate of the X-row for which the mask is to be computed.
-         *
-         * \param[in] other_coords
-         * The point that contains the Y- and (in 3D) Z-coordinates of the X-row that for which the mask is to be computed.
-         * The first coordinate, i.e. point[0], is undefined, so only point[1] and (in 3D) point[2] are set to the Y-/Z-coords.
-         */
-        virtual void mask_row(std::vector<int>& mask, const CoordType x_min, const CoordType x_max, const PointType& other_coords) = 0;
-      }; // class VoxelSlagMasker<...>
-
-#ifdef FEAT_HAVE_CGAL
-      /**
-       * \brief Voxel slag masker implementation for CGAL wrappers
-       *
-       * This class implements the voxel slag masker interface by using the I/O test functionality of a CGALWrapper object.
-       *
-       * \author Peter Zajac
-       */
-      template<typename CoordType_>
-      class VoxelSlagCGALMasker :
-        public VoxelSlagMasker<CoordType_, 3>
-      {
-      public:
-        typedef VoxelSlagMasker<CoordType_, 3> BaseClass;
-        using typename BaseClass::CoordType;
-        using typename BaseClass::PointType;
-
-      private:
-        const Geometry::CGALWrapper<CoordType_>& _cgal_wrapper;
-        const bool _invert;
-
-      public:
-        /**
-         * \brief Constructor
-         *
-         * \param[in] cgal_wrapper
-         * A \resident reference to the CGAL wrapper object that is to be used for the inside/outside test.
-         *
-         * \param[in] invert
-         * Specifies whether inside and outside are to be swapped.
-         */
-        explicit VoxelSlagCGALMasker(const Geometry::CGALWrapper<CoordType_>& cgal_wrapper, bool invert) :
-          _cgal_wrapper(cgal_wrapper),
-          _invert(invert)
-        {
-        }
-
-        virtual void mask_row(std::vector<int>& mask, const CoordType x_min, const CoordType x_max, const PointType& other_coords) override
-        {
-          if(mask.empty())
-            return;
-
-          const std::size_t nv = mask.size();
-          const CoordType s =  (x_max - x_min) / CoordType(nv - 1u);
-
-          for(std::size_t i(0); i < nv; ++i)
-          {
-            mask[i] = (this->_cgal_wrapper.point_inside(x_min + CoordType(i) * s, other_coords[1], other_coords[2]) ? int(!_invert) : int(_invert));
-          }
-        }
-      }; // class VoxelSlagCGALMasker<...>
-#endif // FEAT_HAVE_CGAL
-
-      /**
-       * \brief Voxel slag masker implementation for chart classes
-       *
-       * This class implements the voxel slag masker interface by using the signed distance functionality of the Atlas Chart implementations
-       *
-       * \author Peter Zajac
-       */
-      template<typename MeshType>
-      class VoxelSlagChartMasker :
-        public VoxelSlagMasker<typename MeshType::CoordType, MeshType::shape_dim>
-      {
-      public:
-        typedef VoxelSlagMasker<typename MeshType::CoordType, MeshType::shape_dim> BaseClass;
-        using typename BaseClass::CoordType;
-        using typename BaseClass::PointType;
-
-      private:
-        const Geometry::Atlas::ChartBase<MeshType>& _chart;
-        const bool _invert;
-
-      public:
-        /**
-         * \brief Constructor
-         *
-         * \param[in] chart
-         * A \resident reference to the chart object that is to be used for the inside/outside test.
-         *
-         * \param[in] invert
-         * Specifies whether inside and outside are to be swapped.
-         */
-        explicit VoxelSlagChartMasker(const Geometry::Atlas::ChartBase<MeshType>& chart, bool invert) :
-          _chart(chart),
-          _invert(invert)
-        {
-        }
-
-        virtual void mask_row(std::vector<int>& mask, const CoordType x_min, const CoordType x_max, const PointType& other_coords) override
-        {
-          if(mask.empty())
-            return;
-
-          const std::size_t nv = mask.size();
-          const CoordType s =  (x_max - x_min) / CoordType(nv - 1u);
-          PointType point(other_coords);
-
-          for(std::size_t i(0); i < nv; ++i)
-          {
-            point[0] = x_min + CoordType(i) * s;
-            mask[i] = (_chart.signed_dist(point) <= CoordType(0) ? int(!_invert) : int(_invert));
-          }
-        }
-      }; // class VoxelSlagChartMasker<...>
-
-      /**
-       * \brief Voxel slag masker implementation for lambda expression tests
-       *
-       * This class implements the voxel slag masker interface by evaluating a user-supplied lambda expression, which
-       * performs the inside/outside test for each point.
-       *
-       * \author Peter Zajac
-       */
-      template<typename Lambda_, typename CoordType_, int dim_>
-      class VoxelSlagLambdaMasker :
-        public VoxelSlagMasker<CoordType_, dim_>
-      {
-      public:
-        typedef VoxelSlagMasker<CoordType_, dim_> BaseClass;
-        using typename BaseClass::CoordType;
-        using typename BaseClass::PointType;
-
-      public:
-        /// the lambda expression
-        Lambda_ _lambda;
-
-        /**
-         * \brief Constructor
-         *
-         * \param[in] lambda
-         * The lambda expression that is to be used to perform the inside/outside test.
-         * The lambda expression is expected to take a const reference to a PointType object as a sole input
-         * parameter and to return either true or false depending on whether the point is inside or outside.
-         */
-        explicit VoxelSlagLambdaMasker(Lambda_&& lambda) :
-          _lambda(std::forward<Lambda_>(lambda))
-        {
-        }
-
-        virtual void mask_row(std::vector<int>& mask, const CoordType x_min, const CoordType x_max, const PointType& other_coords) override
-        {
-          if(mask.empty())
-            return;
-
-          const std::size_t nv = mask.size();
-          const CoordType s =  (x_max - x_min) / CoordType(nv - 1u);
-          PointType point(other_coords);
-          // define a const reference to ensure that the lambda expression does not modify the point
-          const PointType& cpoint(point);
-
-          for(std::size_t i(0); i < nv; ++i)
-          {
-            point[0] = x_min + CoordType(i) * s;
-            mask[i] = (_lambda(cpoint) ? 1 : 0);
-          }
-        }
-      }; // class VoxelSlagLambdaMasker<...>
-
       /**
        * \brief Wrapper class for domain levels for VoxelDomainControl
        *
@@ -324,21 +129,18 @@ namespace FEAT
         Tiny::Vector<CoordType, shape_dim> _bbox_min, _bbox_max;
         /// number of element slices on base mesh level 0
         std::array<Index, shape_dim> _base_slices;
-        /// number of element slices on slag mask level = fine mesh level
-        std::array<Index, shape_dim> _mask_slices;
 
-        /// length of a single X-row in slag mask = number of vertices in X-row divided by 64 and rounded up
-        std::size_t _slag_mask_row_length;
-        /// total number of X-rows in slag mask = product of number of vertices in Y-row and Z-row
-        std::size_t _slag_mask_row_count;
-        /// the actual slag mask vector
-        std::vector<std::uint64_t> _slag_mask;
+        /// the voxel map
+        std::unique_ptr<Geometry::VoxelMap> _voxel_map;
 
         /// the input base-mesh node on level 0
         std::unique_ptr<MeshNodeType> _base_mesh_node;
 
         /// a bunch of stop-watches
-        StopWatch _watch_create_base_mesh, _watch_create_slag_mask, _watch_create_hierarchy;
+        StopWatch _watch_create_base_mesh, _watch_create_voxel_map, _watch_create_hierarchy;
+
+        /// specifies whether to keep the voxel map after hierarchy creation
+        bool _keep_voxel_map;
 
       public:
         /**
@@ -353,14 +155,30 @@ namespace FEAT
         explicit VoxelDomainControl(const Dist::Comm& comm_, bool support_multi_layered) :
           BaseClass(comm_, support_multi_layered),
           _create_stage(0),
-          _slag_mask_row_length(0u),
-          _slag_mask_row_count(0u)
+          _keep_voxel_map(false)
         {
         }
 
         /// virtual destructor
         virtual ~VoxelDomainControl()
         {
+        }
+
+        /**
+         * \brief Instructs the domain controller to keep the voxel map after hierarchy creation.
+         *
+         * Unless this function is called prior to the call of the create_hierarchy() function,
+         * the voxel map will be released after the hierarchy creation is completed to free up the
+         * memory used by the voxel map.
+         *
+         * It is recommended not to call this function unless it is really necessary; if you want
+         * to use the voxel map for anything after it has been created, e.g. to write it to a file
+         * or to print some statistics to cout, then you can use it before calling the create_hierarchy
+         * function.
+         */
+        void keep_voxel_map()
+        {
+          this->_keep_voxel_map = true;
         }
 
         /**
@@ -500,7 +318,21 @@ namespace FEAT
         }
 
         /**
-         * \brief Creates a voxel slag mask based on a VoxelSlagMasker object
+         * \brief Sets the out-of-bounds value for the voxel map
+         *
+         * The out-of-bounds-value specifies whether the outside of the voxel map bounding box is
+         * being treated as 'inside' (true) or 'outside' (false).
+         *
+         * \param[in] value
+         * The out-of-bounds-value for the voxel map
+         */
+        void set_voxel_map_out_of_bounds_balue(bool value)
+        {
+          this->_voxel_map->set_out_of_bounds_value(value);
+        }
+
+        /**
+         * \brief Creates a voxel map based on a VoxelMasker object
          *
          * This function can only be called after the base-mesh has been created by calling create_base_mesh_2d or
          * create_base_mesh_3d.
@@ -508,26 +340,37 @@ namespace FEAT
          * \attention
          * This function is a "collective" function in distributed parallel (i.e. MPI) simulations and each process
          * must be given the same masker, because this function distributes the actual work over all processes before
-         * gathering the computed slag mask on all processes afterwards!
+         * gathering the computed voxel map on all processes afterwards!
          *
          * \param[in] masker
-         * A \transient reference to the voxel slag masker.
+         * A \transient reference to the voxel map masker.
+         *
+         * \param[in] resolution
+         * Specifies the desired resolution of the voxel map. If set to 0, the resolution will be computed automatically.
+         *
+         * \compilerhack avoid std::make_unique for clang
          */
-        void create_slag_mask(VoxelSlagMasker<CoordType, shape_dim>& masker)
+        void create_voxel_map(Geometry::VoxelMasker<CoordType, shape_dim>& masker, Real resolution = Real(0))
         {
           XASSERTM(this->_create_stage >= 1, "invalid creation stage; create the base-mesh first");
-          XASSERTM(this->_create_stage <= 1, "invalid creation stage: slag mask already set");
+          XASSERTM(this->_create_stage <= 1, "invalid creation stage: voxel map already set");
 
-          this->_watch_create_slag_mask.start();
-          this->_compute_slag_mask(masker);
-          this->_watch_create_slag_mask.stop();
+          this->_watch_create_voxel_map.start();
+#ifdef FEAT_COMPILER_CLANG
+          this->_voxel_map.reset(new Geometry::VoxelMap());
+#else
+          this->_voxel_map = std::make_unique<Geometry::VoxelMap>();
+#endif
+          this->_precreate_voxel_map(resolution);
+          this->_voxel_map->compute_map(this->_comm, masker, true);
+          this->_watch_create_voxel_map.stop();
 
           // update creation stage
           this->_create_stage = 2;
         }
 
         /**
-         * \brief Creates a voxel slag mask based on a lambda expression
+         * \brief Creates a voxel map based on a lambda expression
          *
          * This function can only be called after the base-mesh has been created by calling create_base_mesh_2d or
          * create_base_mesh_3d.
@@ -535,30 +378,43 @@ namespace FEAT
          * \attention
          * This function is a "collective" function in distributed parallel (i.e. MPI) simulations and each process
          * must be given the same lambda expression, because this function distributes the actual work over all
-         * processes before gathering the computed slag mask on all processes afterwards!
+         * processes before gathering the computed voxel map on all processes afterwards!
          *
          * \param[in] lambda
          * A lambda expression that takes a const reference (or a copy) of a Tiny::Vector<CoordType_, shape_dim> that
          * represents the point to be tested and returns \c true, if the point is in the interior of the domain or
          * \c false if it is outside the domain.
+         *
+         * \param[in] resolution
+         * Specifies the desired resolution of the voxel map. If set to 0, the resolution will be computed automatically.
+         *
+         * \compilerhack avoid std::make_unique for clang
          */
         template<typename Lambda_>
-        void create_slag_mask_from_lambda(Lambda_&& lambda)
+        void create_voxel_map_from_lambda(Lambda_&& lambda, Real resolution)
         {
           XASSERTM(this->_create_stage >= 1, "invalid creation stage; create the base-mesh first");
-          XASSERTM(this->_create_stage <= 1, "invalid creation stage: slag mask already set");
+          XASSERTM(this->_create_stage <= 1, "invalid creation stage: voxel map already set");
 
-          this->_watch_create_slag_mask.start();
-          VoxelSlagLambdaMasker<Lambda_, CoordType, shape_dim> masker(std::forward<Lambda_>(lambda));
-          this->_compute_slag_mask(masker);
-          this->_watch_create_slag_mask.stop();
+          this->_watch_create_voxel_map.start();
+#ifdef FEAT_COMPILER_CLANG
+          this->_voxel_map.reset(new Geometry::VoxelMap());
+#else
+          this->_voxel_map = std::make_unique<Geometry::VoxelMap>();
+#endif
+          this->_precreate_voxel_map(resolution);
+          if constexpr(shape_dim == 2)
+            this->_voxel_map->compute_map_from_lambda_2d(this->_comm, std::forward<Lambda_>(lambda), true);
+          else
+            this->_voxel_map->compute_map_from_lambda_3d(this->_comm, std::forward<Lambda_>(lambda), true);
+          this->_watch_create_voxel_map.stop();
 
           // update creation stage
           this->_create_stage = 2;
         }
 
         /**
-         * \brief Creates a voxel slag mask based on a chart
+         * \brief Creates a voxel map based on a chart
          *
          * This function can only be called after the base-mesh has been created by calling create_base_mesh_2d or
          * create_base_mesh_3d.
@@ -566,30 +422,38 @@ namespace FEAT
          * \attention
          * This function is a "collective" function in distributed parallel (i.e. MPI) simulations and each process
          * must be given the same chart, because this function distributes the actual work over all
-         * processes before gathering the computed slag mask on all processes afterwards!
+         * processes before gathering the computed voxel map on all processes afterwards!
          *
          * \param[in] chart
          * A \transient reference to the chart that is to be used for the inside outside test.
          *
          * \param[in] invert
-         * Specifies, whether the inside/outside is to be inverted.
+         * Specifies, whether the definition of inside/outside is to be inverted.
+         *
+         * \param[in] resolution
+         * Specifies the desired resolution of the voxel map. If set to 0, the resolution will be computed automatically.
          */
-        void create_slag_mask_from_chart(const Geometry::Atlas::ChartBase<MeshType>& chart, bool invert)
+        void create_voxel_map_from_chart(const Geometry::Atlas::ChartBase<MeshType>& chart, bool invert, Real resolution)
         {
           XASSERTM(this->_create_stage >= 1, "invalid creation stage; create the base-mesh first");
-          XASSERTM(this->_create_stage <= 1, "invalid creation stage: slag mask already set");
+          XASSERTM(this->_create_stage <= 1, "invalid creation stage: voxel map already set");
 
-          this->_watch_create_slag_mask.start();
-          VoxelSlagChartMasker<MeshType> masker(chart, invert);
-          this->_compute_slag_mask(masker);
-          this->_watch_create_slag_mask.stop();
+          this->_watch_create_voxel_map.start();
+#ifdef FEAT_COMPILER_CLANG
+          this->_voxel_map.reset(new Geometry::VoxelMap());
+#else
+          this->_voxel_map = std::make_unique<Geometry::VoxelMap>();
+#endif
+          this->_precreate_voxel_map(resolution);
+          this->_voxel_map->compute_map_from_chart(this->_comm, chart, invert, true);
+          this->_watch_create_voxel_map.stop();
 
           // update creation stage
           this->_create_stage = 2;
         }
 
         /**
-         * \brief Creates a voxel slag mask based on a surface triangulation stored in an OFF file
+         * \brief Creates a voxel map based on a surface triangulation stored in an OFF file
          *
          * This function can only be called after the base-mesh has been created by calling create_base_mesh_3d.
          *
@@ -605,16 +469,19 @@ namespace FEAT
          *
          * \param[in] invert
          * Specifies, whether the inside/outside is to be inverted.
+         *
+         * \param[in] resolution
+         * Specifies the desired resolution of the voxel map. If set to 0, the resolution will be computed automatically.
          */
-        void create_slag_mask_from_cgal_off(const String& filename, bool invert)
+        void create_voxel_map_from_off(const String& filename, bool invert, Real resolution)
         {
           std::stringstream sstr;
           DistFileIO::read_common(sstr, filename, this->_comm);
-          this->create_slag_mask_from_cgal_off(sstr, invert);
+          this->create_voxel_map_from_off(sstr, invert, resolution);
         }
 
         /**
-         * \brief Creates a voxel slag mask based on a surface triangulation stored in an OFF file
+         * \brief Creates a voxel map based on a surface triangulation stored in an OFF file
          *
          * This function can only be called after the base-mesh has been created by calling create_base_mesh_3d.
          *
@@ -624,39 +491,97 @@ namespace FEAT
          * \attention
          * This function is a "collective" function in distributed parallel (i.e. MPI) simulations and each process
          * must be given the same OFF file content stream, because this function distributes the actual work over all
-         * processes before gathering the computed slag mask on all processes afterwards!
+         * processes before gathering the computed voxel map on all processes afterwards!
          *
          * \param[in] is
-         * The input stream that contains the OFF data; this should ideally be a std::stringstring that was read in
+         * The input stream that contains the OFF data; this should ideally be a std::stringstream that was read in
          * by using the DistFileIO::read_common function to avoid a DDoS attack on the file system.
          *
          * \param[in] invert
          * Specifies, whether the inside/outside is to be inverted.
+         *
+         * \param[in] resolution
+         * Specifies the desired resolution of the voxel map. If set to 0, the resolution will be computed automatically.
          */
-        void create_slag_mask_from_cgal_off(std::istream& is, bool invert)
+        void create_voxel_map_from_off(std::istream& is, bool invert, Real resolution)
         {
+          XASSERTM(this->_create_stage >= 1, "invalid creation stage; create the base-mesh first");
+          XASSERTM(this->_create_stage <= 1, "invalid creation stage: voxel map already set");
+
           // this only makes sense in 3D...
-          XASSERTM(shape_dim == 3, "CGAL OFF slag mask creation is only available in 3D");
-#ifdef FEAT_HAVE_CGAL
-          Geometry::CGALWrapper<CoordType> cgal_wrapper(is, Geometry::CGALFileMode::fm_off);
-          VoxelSlagCGALMasker<CoordType> slag_masker(cgal_wrapper, invert);
-          this->create_slag_mask(slag_masker);
-#else // no FEAT_HAVE_CGAL
-          XABORTM("FEAT is not build and linked against CGAL library!");
-          (void)is;
-          (void)invert;
-#endif // FEAT_HAVE_CGAL
+          XASSERTM(shape_dim == 3, "CGAL OFF voxel map creation is only available in 3D");
+
+          this->_watch_create_voxel_map.start();
+
+#ifdef FEAT_COMPILER_CLANG
+          this->_voxel_map.reset(new Geometry::VoxelMap());
+#else
+          this->_voxel_map = std::make_unique<Geometry::VoxelMap>();
+#endif
+          this->_precreate_voxel_map(resolution);
+          this->_voxel_map->compute_map_from_off_3d(this->_comm, is, invert, true);
+
+          this->_watch_create_voxel_map.stop();
+
+          // update creation stage
+          this->_create_stage = 2;
+        }
+
+        /**
+         * \brief Reads the voxel map from a voxel map file
+         *
+         * \param[in] filename
+         * The filename of the voxel map file.
+         *
+         * \returns
+         * A Geometry::VoxelMap::ReadResult object that contains information about the read file.
+         */
+        Geometry::VoxelMap::ReadResult read_voxel_map(const String& filename)
+        {
+          XASSERTM(this->_create_stage >= 1, "invalid creation stage; create the base-mesh first");
+          XASSERTM(this->_create_stage <= 1, "invalid creation stage: voxel map already set");
+
+          this->_watch_create_voxel_map.start();
+
+#ifdef FEAT_COMPILER_CLANG
+          this->_voxel_map.reset(new Geometry::VoxelMap());
+#else
+          this->_voxel_map = std::make_unique<Geometry::VoxelMap>();
+#endif
+          Geometry::VoxelMap::ReadResult result = this->_voxel_map->read(this->_comm, filename);
+
+          this->_watch_create_voxel_map.stop();
+
+          // update creation stage
+          this->_create_stage = 2;
+
+          return result;
+        }
+
+        /**
+         * \brief Writes the voxel map to a voxel map file
+         *
+         * \param[in] filename
+         * The filename of the voxel map file.
+         *
+         * \returns
+         * A Geometry::VoxelMap::WriteResult object that contains information about the written file.
+         */
+        Geometry::VoxelMap::WriteResult write_voxel_map(const String& filename)
+        {
+          XASSERTM(this->_voxel_map, "voxel map not created yet");
+          return this->_voxel_map->write(filename);
         }
 
         /**
          * \brief Creates the domain level hierarchy
          *
          * This function can only be called after the base-mesh has been created by calling create_base_mesh_2d or
-         * create_base_mesh_3d and after the slag mask has been created by calling create_slag_mask().
+         * create_base_mesh_3d and after the voxel map has been created by calling create_voxel_map().
          */
         void create_hierarchy()
         {
-          XASSERTM(this->_create_stage >= 2, "invalid creation stage; create the base-mesh and slag mask first");
+          XASSERTM(this->_create_stage >= 2, "invalid creation stage; create the base-mesh and voxel map first");
           XASSERTM(this->_create_stage <= 2, "invalid creation stage: domain hierarchy already created");
 
           this->_watch_create_hierarchy.start();
@@ -693,11 +618,15 @@ namespace FEAT
 
           // collect statistics
           FEAT::Statistics::toe_partition = this->_watch_create_base_mesh.elapsed() +
-            this->_watch_create_slag_mask.elapsed() + this->_watch_create_hierarchy.elapsed();
+            this->_watch_create_voxel_map.elapsed() + this->_watch_create_hierarchy.elapsed();
 
           // update creation stage
           this->_create_stage = 3;
           this->_was_created = true;
+
+          // delete the voxel map unless we're meant to keep it
+          if(!this->_keep_voxel_map)
+            this->_voxel_map.reset();
         }
 
         /// Returns a const reference to the StopWatch that measures the base-mesh creation phase.
@@ -706,10 +635,10 @@ namespace FEAT
           return this->_watch_create_base_mesh;
         }
 
-        /// Returns a const reference to the StopWatch that measures the slag-mask creation phase.
-        const StopWatch& get_watch_slag_mask() const
+        /// Returns a const reference to the StopWatch that measures the voxel-map creation phase.
+        const StopWatch& get_watch_voxel_map() const
         {
-          return this->_watch_create_slag_mask;
+          return this->_watch_create_voxel_map;
         }
 
         /// Returns a const reference to the StopWatch that measures the base-mesh creation phase.
@@ -719,23 +648,23 @@ namespace FEAT
         }
 
         /**
-         * \brief Returns a const reference to the internal slag mask vector
+         * \brief Returns a const reference to the internal voxel map
          */
-        const std::vector<std::uint64_t>& get_slag_mask_vector() const
+        const Geometry::VoxelMap& get_voxel_map() const
         {
-          return this->_slag_mask;
+          return *this->_voxel_map;
         }
 
         /**
-         * \brief Gathers the vertex slag mask on a given domain level.
+         * \brief Gathers the vertex voxel map on a given domain level.
          *
          * \param[in] level
          * The physical domain level for which the vertex mask is to be computed.
          *
-         * \returns A vector of ints representing the vertex slag mask on the desired level. The length of the vector
+         * \returns A vector of ints representing the vertex voxel map on the desired level. The length of the vector
          * corresponds to the number of vertices on the patch on the desired domain level.
          */
-        std::vector<int> gather_vertex_slag_mask(Index level) const
+        std::vector<int> gather_vertex_voxel_map(Index level) const
         {
           XASSERTM(this->_create_stage == 3, "domain level hierarchy has to be created before the vertex mask can be computed");
           XASSERT(level < this->size_physical());
@@ -745,16 +674,16 @@ namespace FEAT
           std::vector<int> mask(nv, 0);
 
           for(Index i(0); i < nv; ++i)
-            mask[i] = _check_slag_mask(vtx[i]);
+            mask[i] = this->_voxel_map->check_point(vtx[i]);
 
           return mask;
         }
 
         /**
-         * \brief Gathers the element slag weights on a given domain level.
+         * \brief Gathers the element voxel map weights on a given domain level.
          *
-         * The "slag weight" of an element is defined as the number of slag mask points with a value of 1,
-         * which lie inside the element cuboid, divided by the total number of slag mask points, which lie inside
+         * The "slag weight" of an element is defined as the number of voxel map points with a value of 1,
+         * which lie inside the element cuboid, divided by the total number of voxel map points, which lie inside
          * the element cuboid.
          *
          * \param[in] level
@@ -763,7 +692,7 @@ namespace FEAT
          * \returns A vector of floats in range [0,1] representing the element slag weights on the desired level.
          * The length of the vector corresponds to the number of elements on the patch on the desired domain level.
          */
-        std::vector<WeightType> gather_element_slag_weights(Index level) const
+        std::vector<WeightType> gather_element_voxel_weights(Index level) const
         {
           XASSERT(level < this->size_physical());
           return this->_gather_element_weights(this->at(level)->get_mesh());
@@ -794,351 +723,31 @@ namespace FEAT
 
       protected:
         /**
-         * \brief Compresses a slag mask row into the slag mask map.
-         *
-         * \param[in] mask
-         * The slag mask row as computed by a VoxelSlagMasker implementation
-         *
-         * \param[in] row
-         * The index of the row that is to be compressed.
+         * \brief Pre-creates the voxel map by setting the bounding box and resolution
          */
-        void _compress_slag_mask_row(const std::vector<int>& mask, const Index row)
+        void _precreate_voxel_map(Real resolution)
         {
-          ASSERTM(row < this->_slag_mask_row_count, "invalid drop mask row");
-          const Index n = Index(mask.size());
-          const Index off = row * this->_slag_mask_row_length;
-          for(Index i(0); i < n; ++i)
+          // set voxel map bounding box based on domain's bounding box
+          if constexpr(shape_dim == 2)
+            this->_voxel_map->set_bounding_box_2d(this->_bbox_min[0], this->_bbox_max[0], this->_bbox_min[1], this->_bbox_max[1]);
+          else
+            this->_voxel_map->set_bounding_box_3d(this->_bbox_min[0], this->_bbox_max[0],
+              this->_bbox_min[1], this->_bbox_max[1], this->_bbox_min[2], this->_bbox_max[2]);
+
+          // is the resolution given?
+          if(resolution > Real(0))
           {
-            _slag_mask[off + (i >> 6)] |= std::uint64_t(mask[i] != 0) << (i & 0x3F);
-          }
-        }
-
-        /**
-         * \brief Maps a coordinate to a X-/Y-/Z-index in the slag mask
-         *
-         * \param[in] xyz
-         * The X-/Y-/Z-coordinate that is to be mapped
-         *
-         * \param[in] dim
-         * Specifies which dimension is to be mapped: 0=X, 1=Y, 2=Z
-         */
-        Index _map_slag_idx(CoordType xyz, int dim) const
-        {
-          CoordType t = (xyz - _bbox_min[dim]) / (_bbox_max[dim] - _bbox_min[dim]);
-          int idx = int(std::nearbyint(CoordType(_mask_slices[std::size_t(dim)]) * t));
-          ASSERTM(idx >= 0, "tested vertex coordinate is not inside coarse bounding box");
-          ASSERTM(idx <= int(this->_mask_slices[Index(dim)]), "tested vertex coordinate is not inside coarse bounding box");
-          return Index(idx);
-        }
-
-        /**
-         * \brief Checks the slag mask entry for a 3D vertex
-         *
-         * \param[in] vtx
-         * The coordinates of the vertex whose entry in the slag mask is to be checked.
-         *
-         * \returns
-         * \c true, if the vertex is inside the slag mask domain (i.e. the slag mask entry is 1),
-         * or \c false, if the vertex is outside of the slag mask domain.
-         */
-        bool _check_slag_mask(const Tiny::Vector<CoordType, 3>& vtx) const
-        {
-          Index xidx = _map_slag_idx(vtx[0], 0);
-          Index yidx = _map_slag_idx(vtx[1], 1);
-          Index zidx = _map_slag_idx(vtx[2], 2);
-          Index row = zidx * (this->_mask_slices[1] + 1u) + yidx;
-          return (this->_slag_mask[row * this->_slag_mask_row_length + (xidx >> 6)] >> (xidx & 0x3F)) & 0x1;
-        }
-
-        /**
-         * \brief Checks the slag mask entry for a 2D vertex
-         *
-         * \param[in] vtx
-         * The coordinates of the vertex whose entry in the slag mask is to be checked.
-         *
-         * \returns
-         * \c true, if the vertex is inside the slag mask domain (i.e. the slag mask entry is 1),
-         * or \c false, if the vertex is outside of the slag mask domain.
-         */
-        bool _check_slag_mask(const Tiny::Vector<CoordType, 2>& vtx) const
-        {
-          Index xidx = _map_slag_idx(vtx[0], 0);
-          Index yidx = _map_slag_idx(vtx[1], 1);
-          return (this->_slag_mask[yidx * this->_slag_mask_row_length + (xidx >> 6)] >> (xidx & 0x3F)) & 0x1;
-        }
-
-        /**
-         * \brief Checks the slag mask entry for a 1D vertex
-         *
-         * \param[in] vtx
-         * The coordinates of the vertex whose entry in the slag mask is to be checked.
-         *
-         * \returns
-         * \c true, if the vertex is inside the slag mask domain (i.e. the slag mask entry is 1),
-         * or \c false, if the vertex is outside of the slag mask domain.
-         */
-        bool _check_slag_mask(const Tiny::Vector<CoordType, 1>& vtx) const
-        {
-          Index xidx = _map_slag_idx(vtx[0], 0);
-          return (this->_slag_mask[(xidx >> 6)] >> (xidx & 0x3F)) & 0x1;
-        }
-
-        /**
-         * \brief Computes a range of slag mask rows for a 3D domain
-         *
-         * \param[in] masker
-         * A \transient reference to the masker that is to be used to compute the mask
-         *
-         * \param[in] slices
-         * A reference to the _mask_slices member object; this is only used to choose the correct dimensional overload of this function.
-         *
-         * \param[in] beg
-         * The index of the first slag mask row that is to be computed.
-         *
-         * \param[in] end
-         * The index of the last slag mask row that is to be computed plus one.
-         */
-        void _compute_slag_mask_rows(VoxelSlagMasker<CoordType, shape_dim>& masker,
-          const std::array<Index,3>& DOXY(slices), Index beg, Index end)
-        {
-          std::vector<int> row_mask(this->_mask_slices[0] + 1u, 0);
-          const CoordType sy = (_bbox_max[1] - _bbox_min[1]) / CoordType(this->_mask_slices[1]);
-          const CoordType sz = (_bbox_max[2] - _bbox_min[2]) / CoordType(this->_mask_slices[2]);
-          Tiny::Vector<CoordType, 3> coords;
-
-          for(Index i(beg); i < end; ++i)
-          {
-            // row = iz * (this->_mask_slices[1] + 1u) + iy
-            coords[1] = _bbox_min[1] + CoordType(i % (this->_mask_slices[1] + 1u)) * sy;
-            coords[2] = _bbox_min[2] + CoordType(i / (this->_mask_slices[1] + 1u)) * sz;
-            masker.mask_row(row_mask, _bbox_min[0], _bbox_max[0], coords);
-            this->_compress_slag_mask_row(row_mask, i);
-          }
-        }
-
-        /**
-         * \brief Computes a range of slag mask rows for a 2D domain
-         *
-         * \param[in] masker
-         * A \transient reference to the masker that is to be used to compute the mask
-         *
-         * \param[in] slices
-         * A reference to the _mask_slices member object; this is only used to choose the correct dimensional overload of this function.
-         *
-         * \param[in] beg
-         * The index of the first slag mask row that is to be computed.
-         *
-         * \param[in] end
-         * The index of the last slag mask row that is to be computed plus one.
-         */
-        void _compute_slag_mask_rows(VoxelSlagMasker<CoordType, shape_dim>& masker,
-          const std::array<Index,2>& DOXY(slices), Index beg, Index end)
-        {
-          std::vector<int> row_mask(this->_mask_slices[0] + 1u, 0);
-          const CoordType sy = (_bbox_max[1] - _bbox_min[1]) / CoordType(this->_mask_slices[1]);
-          Tiny::Vector<CoordType, 2> coords;
-          for(Index i(beg); i < end; ++i)
-          {
-            coords[1] = _bbox_min[1] + CoordType(i) * sy;
-            masker.mask_row(row_mask, _bbox_min[0], _bbox_max[0], coords);
-            this->_compress_slag_mask_row(row_mask, i);
-          }
-        }
-
-        /**
-         * \brief Computes a range of slag mask rows for a 1D domain
-         *
-         * \param[in] masker
-         * A \transient reference to the masker that is to be used to compute the mask
-         *
-         * \param[in] slices
-         * A reference to the _mask_slices member object; this is only used to choose the correct dimensional overload of this function.
-         *
-         * \param[in] beg
-         * The index of the first slag mask row that is to be computed. Must be equal to 0 in 1D.
-         *
-         * \param[in] end
-         * The index of the last slag mask row that is to be computed plus one. Must be equal to 1 in 1D.
-         */
-        void _compute_slag_mask_rows(VoxelSlagMasker<CoordType, shape_dim>& masker,
-          const std::array<Index,1>& DOXY(slices), Index DOXY(beg), Index DOXY(end))
-        {
-          std::vector<int> row_mask(this->_mask_slices[0] + 1u, 0);
-          Tiny::Vector<CoordType, 1> coords;
-          masker.mask_row(row_mask, _bbox_min[0], _bbox_max[0], coords);
-          this->_compress_slag_mask_row(row_mask, 0);
-        }
-
-        /**
-         * \brief Gathers the slag mask weight for a 3D bounding box cuboid
-         *
-         * \param[in] box_min, box_max
-         * The minimum and maximum X/Y/Z coordinates that make up the bounding box
-         *
-         * \returns The slag mask weight for the bounding box.
-         */
-        WeightType _gather_slag_mask_weight(const std::array<Index, 3>& box_min, const std::array<Index, 3>& box_max) const
-        {
-          Index count = 0u;
-          for(Index zidx(box_min[2]); zidx <= box_max[2]; ++zidx)
-          {
-            for(Index yidx(box_min[1]); yidx <= box_max[1]; ++yidx)
-            {
-              Index row = zidx * (this->_mask_slices[1] + 1u) + yidx;
-              for(Index xidx(box_min[0]); xidx <= box_max[0]; ++xidx)
-                count += (this->_slag_mask[row * this->_slag_mask_row_length + (xidx >> 6)] >> (xidx & 0x3F)) & 0x1;
-            }
-          }
-          return WeightType(count) / WeightType((box_max[2] - box_min[2] + 1u) * (box_max[1] - box_min[1] + 1u) * (box_max[0] - box_min[0] + 1u));
-        }
-
-        /**
-         * \brief Gathers the slag mask weight for a 2D bounding box rectangle
-         *
-         * \param[in] box_min, box_max
-         * The minimum and maximum X/Y coordinates that make up the bounding box
-         *
-         * \returns The slag mask weight for the bounding box.
-         */
-        WeightType _gather_slag_mask_weight(const std::array<Index, 2>& box_min, const std::array<Index, 2>& box_max) const
-        {
-          Index count = 0u;
-          for(Index yidx(box_min[1]); yidx <= box_max[1]; ++yidx)
-          {
-            for(Index xidx(box_min[0]); xidx <= box_max[0]; ++xidx)
-              count += (this->_slag_mask[yidx * this->_slag_mask_row_length + (xidx >> 6)] >> (xidx & 0x3F)) & 0x1;
-          }
-          return WeightType(count) / WeightType((box_max[1] - box_min[1] + 1u) * (box_max[0] - box_min[0] + 1u));
-        }
-
-        /**
-         * \brief Gathers the slag mask weight for a 1D bounding box interval
-         *
-         * \param[in] box_min, box_max
-         * The minimum and maximum X coordinates that make up the bounding box
-         *
-         * \returns The slag mask weight for the bounding box.
-         */
-        WeightType _gather_slag_mask_weight(const std::array<Index, 1>& box_min, const std::array<Index, 1>& box_max) const
-        {
-          Index count = 0u;
-          for(Index xidx(box_min[0]); xidx <= box_max[0]; ++xidx)
-            count += (this->_slag_mask[(xidx >> 6)] >> (xidx & 0x3F)) & 0x1;
-          return WeightType(count) / WeightType(box_max[0] - box_min[0] + 1u);
-        }
-
-        /**
-         * \brief Computes the slag mask for the domain
-         *
-         * In an MPI-parallel simulation, this function splits the computation of the mask across all processes in the
-         * communicator and gathers the mask on all processes afterwards. In the borderline case where there are more
-         * processes in the communicator than there are slag mask rows in the mask, this function creates a temporary
-         * sub-communicator with as many processes as there are slag mask rows to distribute the work over these
-         * processes and performs a broadcast on the original communicator after gathering the mask on rank 0.
-         *
-         * \param[in] masker
-         * A \transient reference to the masker that is to be used to compute the mask. Must be the same on all
-         * MPI processes
-         */
-        void _compute_slag_mask(VoxelSlagMasker<CoordType, shape_dim>& masker)
-        {
-          const int level_max = this->_desired_levels.front().first;
-
-          // compute number of fine mesh bounding box slices in each dimension and total number of vertices
-          for(Index i(0); i < Index(shape_dim); ++i)
-           this->_mask_slices[i] = this->_base_slices[i] << level_max;
-
-          // compute number of fine mesh bounding box vertices
-          this->_slag_mask_row_length = this->_mask_slices[0] + 1u;
-          this->_slag_mask_row_count = 1u;
-          for(Index i(1); i < Index(shape_dim); ++i)
-            this->_slag_mask_row_count *= (this->_mask_slices[i] + 1u);
-
-          // translate row length from bits to 64-bit integers, i.e. divide by 64 and round up if necessary
-          this->_slag_mask_row_length = (this->_slag_mask_row_length / 64u) + (this->_slag_mask_row_length % 64u != 0);
-
-          // single process or MPI parallel?
-          if(this->_comm.size() <= 1)
-          {
-            // allocate slag mask and format to zero
-            this->_slag_mask.resize(this->_slag_mask_row_length * this->_slag_mask_row_count, 0u);
-
-            // compute all slag mask rows
-            this->_compute_slag_mask_rows(masker, this->_mask_slices, 0u, this->_slag_mask_row_count);
-          }
-          else if(Index(this->_comm.size()) <= this->_slag_mask_row_count)
-          {
-            // there are at least as many rows in the slag mask as there are MPI processes; this is the usual case
-            // we can use the entire communicator (usually MPI_COMM_WORLD) for the slag mask computation
-            Index comm_rank = Index(this->_comm.rank());
-            Index comm_size = Index(this->_comm.size());
-
-            // compute row count for a single process and round up; this may be bigger than _slag_mask_row_count,
-            // so the last process may have less rows to chew through than all other processes
-            Index row_count = (this->_slag_mask_row_count + comm_size - 1u) / comm_size;
-            std::size_t block_len = this->_slag_mask_row_length * row_count;
-
-            // allocate slag mask and format to zero
-            this->_slag_mask.resize(block_len * Index(comm_size), 0u);
-
-            // compute first and last+1 row of this process; make sure the last process doesn't go beyond the total count
-            Index row_beg = comm_rank * row_count;
-            Index row_end = Math::min((comm_rank + 1u) * row_count, this->_slag_mask_row_count);
-
-            // debug output
-            //this->_comm.allprint(String(">>>") + stringify(row_beg).pad_front(6) + ":" + stringify(row_count) + ">" + stringify(row_end).pad_front(6));
-
-            // compute rows for this process
-            this->_compute_slag_mask_rows(masker, this->_mask_slices, row_beg, row_end);
-
-            // perform an in-place allgather to synchronize the slag mask over all processes
-            this->_comm.allgather(this->_slag_mask.data(), block_len, this->_slag_mask.data(), block_len);
-          }
-          else if(this->_slag_mask_row_count < Index(this->_comm.size()))
-          {
-            // more processes than slag rows; this is a borderline scenario, but we have to support it anyways
-            // create a sub-communicator and then compute mask on that sub-communicator
-            Dist::Comm sub_comm = this->_comm.comm_create_range_incl(int(this->_slag_mask_row_count));
-
-            // does this process participate in the sub-communicator?
-            if(!sub_comm.is_null())
-            {
-              // get sub-communicator rank and size
-              Index comm_rank = Index(sub_comm.rank());
-              Index comm_size = Index(sub_comm.size());
-
-              // compute row count for a single process and round up; this may be bigger than _slag_mask_row_count,
-              // so the last process may have less rows to chew through than all other processes
-              Index row_count = (this->_slag_mask_row_count + comm_size - 1u) / comm_size;
-              std::size_t block_len = this->_slag_mask_row_length * row_count;
-
-              // allocate slag mask and format to zero
-              this->_slag_mask.resize(block_len * Index(comm_size), 0u);
-
-              // compute first and last+1 row of this process; make sure the last process doesn't go beyond the total count
-              Index row_beg = comm_rank * row_count;
-              Index row_end = Math::min((comm_rank + 1u) * row_count, this->_slag_mask_row_count);
-
-              // debug output
-              //this->_comm.allprint(String(">>>") + stringify(row_beg).pad_front(6) + ":" + stringify(row_count) + ">" + stringify(row_end).pad_front(6));
-
-              // compute rows for this process
-              this->_compute_slag_mask_rows(masker, this->_mask_slices, row_beg, row_end);
-
-              // perform an in-place gather to synchronize the slag mask on rank 0
-              sub_comm.gather(this->_slag_mask.data(), block_len, this->_slag_mask.data(), block_len, 0);
-            }
-            else
-            {
-              // just allocate the slag mask vector for the following broadcast
-              this->_slag_mask.resize(this->_slag_mask_row_length * this->_slag_mask_row_count, 0u);
-            }
-
-            // broadcast from rank 0 to all processes our entire domain communicator
-            this->_comm.bcast(this->_slag_mask.data(), this->_slag_mask_row_length * this->_slag_mask_row_count, 0);
+            this->_voxel_map->set_resolution(resolution);
+            return;
           }
 
-          // that's it
+          // compute the mesh width on the base mesh level
+          Real base_res = (this->_bbox_max[0] - this->_bbox_min[0]) / Real(this->_base_slices[0]);
+          for(int i(1); i < shape_dim; ++i)
+            base_res = Math::min(base_res, this->_bbox_max[i] - this->_bbox_min[i]) / Real(this->_base_slices[std::size_t(i)]);
+
+          // set resolution for voxel map to base resolution divided by 2^{desired-level-max+1)
+          this->_voxel_map->set_resolution(base_res / Real(2ull << this->get_desired_level_max()));
         }
 
         /**
@@ -1149,11 +758,11 @@ namespace FEAT
          * may yield incorrect results if the mesh violates this assumption!
          *
          * \param[in] mesh
-         * A \transient reference to the mesh whose elements are to be tested against the slag mask
+         * A \transient reference to the mesh whose elements are to be tested against the voxel map
          *
          * \returns
          * A vector containing the indices of all mesh elements that intersect the domain that is represented by
-         * the slag mask.
+         * the voxel map.
          */
         std::vector<Index> _gather_masked_elements(const MeshType& mesh) const
         {
@@ -1169,9 +778,6 @@ namespace FEAT
 
           // element bounding box coordinates
           Tiny::Vector<CoordType, shape_dim> elbox_min, elbox_max;
-
-          // mapped element bounding box slag mask indices
-          std::array<Index, shape_dim> slag_idx_min, slag_idx_max;
 
           // loop over all elements
           for(Index ielem(0); ielem < num_elems; ++ielem)
@@ -1192,16 +798,8 @@ namespace FEAT
                 Math::minimax(v[k], elbox_min[k], elbox_max[k]);
             }
 
-            // map slag mask indices of bounding box in drop row indices
-            for(int k(0); k < shape_dim; ++k)
-            {
-              slag_idx_min[Index(k)] = this->_map_slag_idx(elbox_min[k], k);
-              slag_idx_max[Index(k)] = this->_map_slag_idx(elbox_max[k], k);
-            }
-
-            // gather element weight based on the bounding box; any non-negative weight means that
-            // there was at least one masked domain point in the slag mask covered by the element
-            if(this->_gather_slag_mask_weight(slag_idx_min, slag_idx_max) > 1E-12)
+            // check the bounding box against the voxel map
+            if(this->_voxel_map->check_box(elbox_min, elbox_max))
               masked_elems.push_back(ielem);
           }
 
@@ -1212,8 +810,8 @@ namespace FEAT
         /**
          * \brief Gathers the element slag weights for a given mesh
          *
-         * The "slag weight" of an element is defined as the number of slag mask points with a value of 1,
-         * which lie inside the element cuboid, divided by the total number of slag mask points, which lie inside
+         * The "slag weight" of an element is defined as the number of voxel map points with a value of 1,
+         * which lie inside the element cuboid, divided by the total number of voxel map points, which lie inside
          * the element cuboid.
          *
          * \param[in] mesh
@@ -1236,9 +834,6 @@ namespace FEAT
           // element bounding box coordinates
           Tiny::Vector<CoordType, shape_dim> elbox_min, elbox_max;
 
-          // mapped element bounding box slag mask indices
-          std::array<Index, shape_dim> slag_idx_min, slag_idx_max;
-
           // loop over all elements
           for(Index ielem(0); ielem < num_elems; ++ielem)
           {
@@ -1258,15 +853,8 @@ namespace FEAT
                 Math::minimax(v[k], elbox_min[k], elbox_max[k]);
             }
 
-            // map slag mask indices of bounding box in drop row indices
-            for(int k(0); k < shape_dim; ++k)
-            {
-              slag_idx_min[Index(k)] = this->_map_slag_idx(elbox_min[k], k);
-              slag_idx_max[Index(k)] = this->_map_slag_idx(elbox_max[k], k);
-            }
-
             // gather element weight based on the bounding box
-            weights[ielem] = this->_gather_slag_mask_weight(slag_idx_min, slag_idx_max);
+            weights[ielem] = this->_voxel_map->sample_box(elbox_min, elbox_max);
           }
 
           // returns the element weights

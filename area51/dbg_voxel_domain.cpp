@@ -18,19 +18,21 @@ namespace DbgAdaptDrop
   using namespace FEAT;
 
   class RingDropper :
-    public Control::Domain::VoxelSlagMasker<double, 2>
+    public Geometry::VoxelMasker<double, 2>
   {
   public:
-    virtual void mask_row(std::vector<int>& mask, const double x_min, const double x_max, const Tiny::Vector<double, 2>& other_coords) override
+    typedef Geometry::VoxelMasker<double, 2> BaseClass;
+
+    virtual void mask_line(std::vector<int>& mask, const double x_min, const double x_max, const Tiny::Vector<double, 2>& point) override
     {
       const std::size_t nv = mask.size();
       Tiny::Vector<double, 2> midpoint(0.5);
-      Tiny::Vector<double, 2> point(other_coords);
+      Tiny::Vector<double, 2> pt(point);
 
       for(std::size_t i(0); i < nv; ++i)
       {
-        point[0] = x_min + double(i)/double(nv-1u) * (x_max-x_min);
-        double r = (point - midpoint).norm_euclid();
+        pt[0] = BaseClass::x_coord(x_min, x_max, i, nv);
+        double r = (pt - midpoint).norm_euclid();
         mask[i] = ((r > 0.2) && (r < 0.4) ? 1 : 0);
       }
     }
@@ -99,16 +101,16 @@ int main(int argc, char** argv)
   }
 #endif
 
-  //domain.create(std::make_unique<RingDropper>());
-  domain.create_slag_mask_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); });
-  //domain.create_slag_mask_from_lambda([](auto p) {return p.norm_euclid_sqr() < 1.0001;});
+  domain.keep_voxel_map();
+  //domain.create_voxel_map(*std::make_unique<RingDropper>(), Real(0));
+  domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, Real(0));
   domain.create_hierarchy();
 
   comm.print("Desired Levels: " + domain.format_desired_levels());
   comm.print("Chosen  Levels: " + domain.format_chosen_levels());
 
   comm.print("Base-Mesh Creation Time: " + domain.get_watch_base_mesh().elapsed_string().pad_front(7));
-  comm.print("Slag-Mask Creation Time: " + domain.get_watch_slag_mask().elapsed_string().pad_front(7));
+  comm.print("Voxel-Map Creation Time: " + domain.get_watch_voxel_map().elapsed_string().pad_front(7));
   comm.print("Hierarchy Creation Time: " + domain.get_watch_hierarchy().elapsed_string().pad_front(7));
 
   if(1)
@@ -191,8 +193,8 @@ int main(int argc, char** argv)
   for(Index k(0); k < domain.size_physical(); ++k)
   {
     Geometry::ExportVTK<MeshType> vtk(domain.at(k)->get_mesh());
-    std::vector<int> mask = domain.gather_vertex_slag_mask(k);
-    std::vector<Real> weights = domain.gather_element_slag_weights(k);
+    std::vector<int> mask = domain.gather_vertex_voxel_map(k); //gather_vertex_slag_mask(k);
+    std::vector<Real> weights = domain.gather_element_voxel_weights(k); //gather_element_slag_weights(k);
     vtk.add_vertex_scalar("mask", mask.data());
     //vtk.add_vertex_scalar("test", vectors.at(k).local().elements());
     vtk.add_cell_scalar("weights", weights.data());

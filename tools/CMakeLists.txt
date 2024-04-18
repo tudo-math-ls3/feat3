@@ -58,6 +58,9 @@ target_link_libraries(checkpoint-info feat)
 add_executable(stokes2vtk stokes2vtk/stokes2vtk.cpp)
 target_link_libraries(stokes2vtk feat)
 
+add_executable(voxel-map-gen voxel_map_gen/voxel_map_gen.cpp)
+target_link_libraries(voxel-map-gen feat)
+
 if (FEAT_HAVE_CUDA)
   add_executable(cuda-device-info cuda_device_info/cuda_device_info.cpp)
   set_property(TARGET cuda-device-info APPEND_STRING PROPERTY COMPILE_FLAGS " -isystem${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
