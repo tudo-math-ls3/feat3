@@ -50,12 +50,12 @@ namespace FEAT
           for (Index i(0) ; i < size ; ++i)
             r += x[i] * x[i] * z[i];
         }
-        if (x == z)
+        else if (x == z)
         {
           for (Index i(0) ; i < size ; ++i)
             r += x[i] * x[i] * y[i];
         }
-        if (y == z)
+        else if (y == z)
         {
           for (Index i(0) ; i < size ; ++i)
             r += x[i] * y[i] * y[i];
