@@ -95,9 +95,11 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -xCORE-AVX2"
     elif cpu == "kaby-lake":
       cxxflags += " -xCORE-AVX2"
-    elif cpu == "icelake":
+    elif cpu == "ice-lake":
       cxxflags += " -xCORE-AVX2"
     elif cpu == "sapphirerapids":
+      cxxflags += " -xCORE-AVX512"
+    elif cpu == "alder-lake":
       cxxflags += " -xCORE-AVX512"
     elif cpu == "itanium":
       # no setting necessary, the itanium version of the intel compiler

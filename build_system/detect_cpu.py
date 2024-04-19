@@ -209,13 +209,15 @@ def detect_cpu():
       elif model == 94:
         cputype = "skylake"
       elif model == 106:
-        cputype = "icelake"
-      elif model == 143:
-        cputype = "sapphirerapids"
-      elif model == 158:
-        cputype = "coffee-lake"
+        cputype = "ice-lake"
       elif model == 142:
         cputype = "kaby-lake"
+      elif model == 143:
+        cputype = "sapphirerapids"
+      elif model == 151:
+        cputype = "alder-lake"
+      elif model == 158:
+        cputype = "coffee-lake"
     elif cpu_family == 7:
       cputype ="itanium"
     elif cpu_family == 15:

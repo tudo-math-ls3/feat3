@@ -50,7 +50,7 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -xskylake-avx512 -m64"
     elif cpu == "kaby-lake":
       cxxflags += " -xskylake -m64" #no special kabylake support, yet
-    elif cpu == "icelake":
+    elif cpu == "ice-lake":
       cxxflags += " -xicelake-server -m64"
     elif cpu == "coffee-lake":
       cxxflags += " -xskylake -m64"
@@ -58,6 +58,8 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -xcascadelake -m64"
     elif cpu == "sapphirerapids":
       cxxflags += " -xsapphirerapids -m64"
+    elif cpu == "alder-lake":
+      cxxflags += " -xalderlake -m64"
 
     # AMD
     elif cpu == "zen":
