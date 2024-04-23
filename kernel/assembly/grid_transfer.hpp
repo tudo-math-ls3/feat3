@@ -1704,7 +1704,7 @@ namespace FEAT
         #pragma omp parallel reduction(+:failed_points)
         {
           // create gather/scatter-axpys
-          typename Vector_::GatherAxpy gather_s(vector_target);
+          typename Vector_::GatherAxpy gather_s(vector_source);
           typename Vector_::ScatterAxpy scatter_t(vector_target);
           typename Vector_::ScatterAxpy scatter_w(vector_weight);
 
