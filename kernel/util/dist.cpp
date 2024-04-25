@@ -552,7 +552,7 @@ namespace FEAT
 
     void Comm::gather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
-      if(sendbuf == recvbuf)
+      if((sendbuf == recvbuf) && (root == _rank))
         MPI_Gather(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
       else
         MPI_Gather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
@@ -561,7 +561,7 @@ namespace FEAT
     Request Comm::igather(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      if(sendbuf == recvbuf)
+      if((sendbuf == recvbuf) && (root == _rank))
         MPI_Igather(MPI_IN_PLACE, 0, recvtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
       else
         MPI_Igather(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
@@ -570,7 +570,7 @@ namespace FEAT
 
     void Comm::scatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
-      if(sendbuf == recvbuf)
+      if((sendbuf == recvbuf) && (root == _rank))
         MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, MPI_IN_PLACE, 0, sendtype.dt, root, comm);
       else
         MPI_Scatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm);
@@ -579,7 +579,7 @@ namespace FEAT
     Request Comm::iscatter(const void* sendbuf, std::size_t sendcount, const Datatype& sendtype, void* recvbuf, std::size_t recvcount, const Datatype& recvtype, int root) const
     {
       MPI_Request req(MPI_REQUEST_NULL);
-      if(sendbuf == recvbuf)
+      if((sendbuf == recvbuf) && (root == _rank))
         MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, MPI_IN_PLACE, 0, sendtype.dt, root, comm, &req);
       else
         MPI_Iscatter(sendbuf, int(sendcount), sendtype.dt, recvbuf, int(recvcount), recvtype.dt, root, comm, &req);
