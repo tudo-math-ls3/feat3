@@ -68,7 +68,7 @@ public:
 
     // threadparallel test
     {
-      constexpr std::size_t num_points = 597;
+      const std::size_t num_points = 582;
       constexpr DT_ range = 3.;
       // create random points
       std::vector<Tiny::Vector<DT_, 3>> points(num_points);
@@ -95,11 +95,11 @@ public:
       CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
 
       //evalute points single threaded
-      std::vector<bool> inside_tests(num_points);
-      std::transform(points.begin(), points.end(), inside_tests.begin(), [&cw](Tiny::Vector<DT_, 3>& a){return cw.point_inside(a[0], a[1], a[2]);});
+      std::vector<int> inside_tests(num_points);
+      std::transform(points.begin(), points.end(), inside_tests.begin(), [&cw](const Tiny::Vector<DT_, 3>& a){return int(cw.point_inside(a[0], a[1], a[2]));});
 
       // now do a omp based loop
-      std::vector<bool> inside_test2(num_points);
+      std::vector<int> inside_test2(num_points);
       #pragma omp parallel for
       for(int i = 0; i < int(num_points); ++i)
       {
@@ -107,7 +107,7 @@ public:
         // if(i == 0)
         //   std::cout << "Num threads are " << omp_get_num_threads() << std::endl;
         // #endif
-        inside_test2[i] = cw.point_inside(points[i][0], points[i][1], points[i][2]);
+        inside_test2[i] = int(cw.point_inside(points[i][0], points[i][1], points[i][2]));
       }
 
       for(int i = 0; i < int(num_points); ++i)

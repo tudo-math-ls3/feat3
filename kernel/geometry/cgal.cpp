@@ -37,6 +37,10 @@ FEAT_RESTORE_WARNINGS
 static_assert(false, "No cgal multithreading support");
 #endif
 
+#ifndef BOOST_HAS_THREADS
+static_assert(false, "Boost has no threads");
+#endif
+
 
 #ifdef FEAT_COMPILER_INTEL
 #pragma warning disable 3280
