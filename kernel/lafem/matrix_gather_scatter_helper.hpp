@@ -14,7 +14,7 @@
 namespace FEAT
 {
 
-  namespace Policy
+  namespace Intern
   {
     /**
      * \brief Policy Enum for Gather and Scatter operations
@@ -23,7 +23,7 @@ namespace FEAT
      *
      * \author Maximilian Esser
      */
-    enum MaGaScPolicy
+    enum MatrixGatherScatterPolicy
     {
       useLocalOps = 0,
       useLocalSortHelper = 1,
@@ -46,15 +46,15 @@ namespace FEAT
       * \tparam Space_ The underlying space.
       * \tparam DT_ The datatype to be used.
       * \tparam IT_ The indextype to be used.
-      * \tparam policy Matrix Gather Scatter policy. For details see Policy::MaGaScPolicy
+      * \tparam policy Matrix Gather Scatter policy. For details see Intern::MatrixGatherScatterPolicy
       *
       * \author Maximilian Esser
       */
-    template<typename Space_, typename  DT_, typename IT_, Policy::MaGaScPolicy policy_ = Policy::MaGaScPolicy::useLocalOps>
-    struct MaGaScHelper DOXY({});
+    template<typename Space_, typename  DT_, typename IT_, FEAT::Intern::MatrixGatherScatterPolicy policy_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>
+    struct MatrixGatherScatterHelper DOXY({});
 
     template<typename Space_, typename  DT_, typename IT_>
-    struct MaGaScHelper<Space_, DT_, IT_, Policy::MaGaScPolicy::useLocalOps>
+    struct MatrixGatherScatterHelper<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>
     {
       /// The spacetype
       typedef Space_ SpaceType;
@@ -85,7 +85,7 @@ namespace FEAT
        *         i.e. InnerType_ refers to Tiny::Matrix .
        */
       template<typename InnerType_, int numr_, int numc_ = numr_>
-      CUDA_FUNC static void scatter_matrix_csr(const Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
+      CUDA_HOST_DEVICE static void scatter_matrix_csr(const Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
                                       [[maybe_unused]] Index matrix_num_rows, [[maybe_unused]] Index matrix_num_cols, const IndexType* matrix_row_ptr,
                                       const IndexType* matrix_col_idx, DataType alpha = DataType(1), [[maybe_unused]] IndexType* dummy_ptr = nullptr)
       {
@@ -139,7 +139,7 @@ namespace FEAT
        *         i.e. InnerType_ refers to Tiny::Matrix .
        */
       template<typename InnerType_, int numr_, int numc_ = numr_>
-      CUDA_FUNC static void gather_matrix_csr(Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, const InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
+      CUDA_HOST_DEVICE static void gather_matrix_csr(Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, const InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
                                       [[maybe_unused]] Index matrix_num_rows, [[maybe_unused]] Index matrix_num_cols, const IndexType* matrix_row_ptr,
                                       const IndexType* matrix_col_idx, DataType alpha = DataType(1), [[maybe_unused]] const IndexType* dummy_ptr = nullptr)
       {
@@ -176,10 +176,10 @@ namespace FEAT
           // continue with next row entry
         }
       }
-    }; // struct MaGaScHelper<localOps>
+    }; // struct MatrixGatherScatterHelper<localOps>
 
    template<typename Space_, typename  DT_, typename IT_>
-   struct MaGaScHelper<Space_, DT_, IT_, Policy::MaGaScPolicy::useLocalSortHelper>
+   struct MatrixGatherScatterHelper<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>
    {
       typedef DT_ DataType;
       typedef IT_ IndexType;
@@ -207,7 +207,7 @@ namespace FEAT
        *         i.e. InnerType_ refers to Tiny::Matrix .
        */
       template<typename InnerType_, int numr_, int numc_ = numr_>
-      CUDA_FUNC static void scatter_matrix_csr(const Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
+      CUDA_HOST_DEVICE static void scatter_matrix_csr(const Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
                                       [[maybe_unused]] Index matrix_num_rows, [[maybe_unused]] Index matrix_num_cols, const IndexType* matrix_row_ptr,
                                       const IndexType* matrix_col_idx, DataType alpha, const IndexType* col_map_sorter)
       {
@@ -264,7 +264,7 @@ namespace FEAT
        *         i.e. InnerType_ refers to Tiny::Matrix .
        */
       template<typename InnerType_, int numr_, int numc_ = numr_>
-      CUDA_FUNC static void gather_matrix_csr(Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, const InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
+      CUDA_HOST_DEVICE static void gather_matrix_csr(Tiny::Matrix<InnerType_, numr_, numc_>& loc_mat, const InnerType_* matrix_data, const IndexType* row_map, const IndexType* col_map,
                                       [[maybe_unused]] Index matrix_num_rows, [[maybe_unused]] Index matrix_num_cols, const IndexType* matrix_row_ptr,
                                       const IndexType* matrix_col_idx, DataType alpha, const IndexType* col_map_sorter)
       {
@@ -300,7 +300,7 @@ namespace FEAT
           // continue with next row entry
         }
       }
-   }; // struct MaGaScHelper
+   }; // struct MatrixGatherScatterHelper
   }
 }
 #endif

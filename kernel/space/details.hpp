@@ -12,7 +12,7 @@ namespace FEAT
     struct ParametricEvalHelper
     {
       template<typename SpaceData_>
-      CUDA_FUNC static void trans_values(SpaceData_& space_data)
+      CUDA_HOST_DEVICE static void trans_values(SpaceData_& space_data)
       {
         // loop over all basis functions
         for(int i(0); i < SpaceData_::max_local_dofs; ++i)
@@ -23,7 +23,7 @@ namespace FEAT
       }
 
       template<typename SpaceData_, typename JacInvType_>
-      CUDA_FUNC static void trans_gradients(SpaceData_& space_data, const JacInvType_& jac_inv)
+      CUDA_HOST_DEVICE static void trans_gradients(SpaceData_& space_data, const JacInvType_& jac_inv)
       {
         // loop over all basis functions
         for(int i(0); i < SpaceData_::max_local_dofs; ++i)
@@ -34,7 +34,7 @@ namespace FEAT
       }
 
       template<typename SpaceData_, typename JacInvType_, typename HessInvType_>
-      CUDA_FUNC static void trans_hessians(SpaceData_& space_data, const JacInvType_& jac_inv, const HessInvType_& hess_inv)
+      CUDA_HOST_DEVICE static void trans_hessians(SpaceData_& space_data, const JacInvType_& jac_inv, const HessInvType_& hess_inv)
       {
         // loop over all basis functions
         for(int i(0); i < SpaceData_::max_local_dofs; ++i)

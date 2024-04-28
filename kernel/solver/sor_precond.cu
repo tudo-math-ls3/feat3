@@ -8,6 +8,7 @@
 
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -131,8 +132,7 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreateColorInfo failed with status code: " + stringify(status));
 
-        int * d_coloring;
-        cudaMalloc(&d_coloring, m * sizeof(int));
+        int * d_coloring = (int*)Util::cuda_malloc(m * sizeof(int));
         double one(1.0);
 
         cusparseMatDescr_t descr_M = 0;
@@ -151,8 +151,8 @@ namespace FEAT
 
         //std::cout<<"pre colors: "<<ncolors<<" rows: "<<m<<std::endl;
         int * coloring = new int[m];
-        cudaMemcpy(coloring, d_coloring, m * sizeof(int), cudaMemcpyDeviceToHost);
-        cudaFree(d_coloring);
+        Util::cuda_copy_device_to_host(coloring, d_coloring, m * sizeof(int));
+        Util::cuda_free(d_coloring);
 
         //decrement from non existing colors
         for (int color(0) ; color < ncolors ; ++color)
@@ -236,7 +236,7 @@ namespace FEAT
         int * host_irp = MemoryPool::template allocate_memory<int>(m);
         int * host_crp = MemoryPool::template allocate_memory<int>(2*m);
         int * host_row_ptr = MemoryPool::template allocate_memory<int>(m+1);
-        cudaMemcpy(host_row_ptr, csrRowPtr, (m+1) * sizeof(int), cudaMemcpyDeviceToHost);
+        Util::cuda_copy_device_to_host(host_row_ptr, csrRowPtr, (m+1) * sizeof(int));
 
         //iterate over all colors, by ascending row count
         int crp_i(0); //index into host_crp
@@ -258,11 +258,11 @@ namespace FEAT
 
         MemoryPool::release_memory(host_row_ptr);
 
-        cudaMalloc(&inverse_row_ptr, m * sizeof(unsigned int));
-        cudaMemcpy(inverse_row_ptr, host_irp, m * sizeof(int), cudaMemcpyHostToDevice);
+        inverse_row_ptr = (int*)Util::cuda_malloc(m * sizeof(int));
+        Util::cuda_copy_host_to_device(inverse_row_ptr, host_irp, m * sizeof(int));
 
-        cudaMalloc(&colored_row_ptr, 2 * m * sizeof(int));
-        cudaMemcpy(colored_row_ptr, host_crp, 2 * m * sizeof(int), cudaMemcpyHostToDevice);
+        colored_row_ptr = (int*)Util::cuda_malloc(2 * m * sizeof(int));
+        Util::cuda_copy_host_to_device(colored_row_ptr, host_crp, 2 * m * sizeof(int));
 
         delete[] coloring;
         MemoryPool::release_memory(colors_ascending);
@@ -279,8 +279,8 @@ namespace FEAT
 
       void cuda_sor_done_symbolic(int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
       {
-        cudaFree(colored_row_ptr);
-        cudaFree(inverse_row_ptr);
+        Util::cuda_free(colored_row_ptr);
+        Util::cuda_free(inverse_row_ptr);
         //MemoryPool::release_memory(rows_per_color);
         delete[] rows_per_color;
 

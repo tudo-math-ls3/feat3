@@ -68,11 +68,10 @@ template double DotProduct::value_cuda(const double * const, const double * cons
 template <typename DT_>
 DT_ TripleDotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
 {
-  DT_ * temp;
-  cudaMalloc((void **) &temp, size * sizeof(DT_));
+  DT_ * temp = (DT_*)Util::cuda_malloc(size * sizeof(DT_));
   ComponentProduct::value_cuda(temp, y, z, size);
   DT_ result = DotProduct::value_cuda(x, temp, size);
-  cudaFree(temp);
+  Util::cuda_free(temp);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE

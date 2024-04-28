@@ -97,64 +97,64 @@ namespace FEAT
       typedef Space::EvalData<EvalTraits, config> EvalData;
 
       /// Ref value calculation
-      CUDA_FUNC static inline void eval_ref_values(EvalData& data, const DomainPointType& point)
+      CUDA_HOST_DEVICE static inline void eval_ref_values(EvalData& data, const DomainPointType& point)
       {
         SpaceEvalHelp::eval_ref_values(data, point);
       }
 
       /// Ref value calculation
-      CUDA_FUNC static inline void eval_ref_gradients(EvalData& data, const DomainPointType& point)
+      CUDA_HOST_DEVICE static inline void eval_ref_gradients(EvalData& data, const DomainPointType& point)
       {
         SpaceEvalHelp::eval_ref_gradients(data, point);
       }
 
       /// ref value calculation
-      CUDA_FUNC static inline void eval_ref_hessians(EvalData& data, const DomainPointType& point)
+      CUDA_HOST_DEVICE static inline void eval_ref_hessians(EvalData& data, const DomainPointType& point)
       {
         SpaceEvalHelp::eval_ref_hessians(data, point);
       }
 
-      CUDA_FUNC static inline void set_coefficients(DataType (&coeffs)[dim][num_verts], const IndexType* local_dofs, const VertexPointType* vertex_set)
+      CUDA_HOST_DEVICE static inline void set_coefficients(DataType (&coeffs)[dim][num_verts], const IndexType* local_dofs, const VertexPointType* vertex_set)
       {
         TrafoEvalHelp::set_coefficients(coeffs, local_dofs, vertex_set);
       }
 
-      CUDA_FUNC static inline void map_point(typename TrafoEvalHelp::ImagePointType& img_point, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline void map_point(typename TrafoEvalHelp::ImagePointType& img_point, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
       {
         TrafoEvalHelp::map_point(img_point, dom_point, coeffs);
       }
 
-      CUDA_FUNC static inline void calc_jac_mat(typename TrafoEvalHelp::JacobianMatrixType& jac_mat, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline void calc_jac_mat(typename TrafoEvalHelp::JacobianMatrixType& jac_mat, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
       {
         TrafoEvalHelp::calc_jac_mat(jac_mat, dom_point, coeffs);
       }
 
-      CUDA_FUNC static inline void calc_hess_ten(typename TrafoEvalHelp::HessianTensorType& hess_ten, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline void calc_hess_ten(typename TrafoEvalHelp::HessianTensorType& hess_ten, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
       {
         TrafoEvalHelp::calc_jac_mat(hess_ten, dom_point, coeffs);
       }
 
-      CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[dim][num_verts])
       {
         return TrafoEvalHelp::volume(coeffs);
       }
 
-      CUDA_FUNC static inline DataType width_directed(const typename TrafoEvalHelp::ImagePointType& ray, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline DataType width_directed(const typename TrafoEvalHelp::ImagePointType& ray, const DataType (&coeffs)[dim][num_verts])
       {
         return TrafoEvalHelp::width_directed(ray, coeffs);
       }
 
-      CUDA_FUNC static inline void trans_values(EvalData& data)
+      CUDA_HOST_DEVICE static inline void trans_values(EvalData& data)
       {
         ParamEvalHelp::trans_values(data);
       }
 
-      CUDA_FUNC static inline void trans_gradients(EvalData& data, const typename TrafoEvalHelp::JacobianInverseType& jac_inv)
+      CUDA_HOST_DEVICE static inline void trans_gradients(EvalData& data, const typename TrafoEvalHelp::JacobianInverseType& jac_inv)
       {
         ParamEvalHelp::trans_gradients(data, jac_inv);
       }
 
-      CUDA_FUNC static inline void trans_hessian(EvalData& data, const typename TrafoEvalHelp::JacobianInverseType& jac_inv, const typename TrafoEvalHelp::HessianInverseType& hess_inv)
+      CUDA_HOST_DEVICE static inline void trans_hessian(EvalData& data, const typename TrafoEvalHelp::JacobianInverseType& jac_inv, const typename TrafoEvalHelp::HessianInverseType& hess_inv)
       {
         ParamEvalHelp::trans_gradients(data, jac_inv, hess_inv);
       }

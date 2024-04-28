@@ -37,8 +37,7 @@ namespace FEAT
    * \param[in] msg
    * A custom error message to be displayed in addition to the standard information.
    */
-  // CUDA_FUNC [[noreturn]] void abortion(const char* const func, const char* const file, const int line, const char* const msg);
-  CUDA_FUNC [[noreturn]] inline void abortion(
+  CUDA_HOST_DEVICE [[noreturn]] inline void abortion(
     const char * const func,
     const char * const file,
     const int line,
@@ -114,14 +113,7 @@ namespace FEAT
    * A custom error message to be displayed in addition to the standard information.
    * May be \c nullptr if no additional information is available for the assertion.
    */
-  // CUDA_FUNC void assertion(
-  //   bool expr,
-  //   const char * const expr_str,
-  //   const char * const func,
-  //   const char * const file,
-  //   const int line,
-  //   const char * const msg = nullptr);
-  CUDA_FUNC void inline assertion(
+  CUDA_HOST_DEVICE void inline assertion(
     bool expr,
     const char * const expr_str,
     const char * const func,

@@ -23,21 +23,21 @@ namespace FEAT
 
         // basis function for left vertex
         template<typename T_>
-        CUDA_FUNC inline T_ p0(T_ x)
+        CUDA_HOST_DEVICE inline T_ p0(T_ x)
         {
           return T_(0.5) * x * (x - T_(1));
         }
 
         // basis function for right vertex
         template<typename T_>
-        CUDA_FUNC inline T_ p1(T_ x)
+        CUDA_HOST_DEVICE inline T_ p1(T_ x)
         {
           return T_(0.5) * x * (x + T_(1));
         }
 
         // basis function for edge midpoint
         template<typename T_>
-        CUDA_FUNC inline T_ p2(T_ x)
+        CUDA_HOST_DEVICE inline T_ p2(T_ x)
         {
           return (T_(1) - x) * (T_(1) + x);
         }
@@ -45,19 +45,19 @@ namespace FEAT
         // first order derivatives
 
         template<typename T_>
-        CUDA_FUNC inline T_ d1p0(T_ x)
+        CUDA_HOST_DEVICE inline T_ d1p0(T_ x)
         {
           return x - T_(0.5);
         }
 
         template<typename T_>
-        CUDA_FUNC inline T_ d1p1(T_ x)
+        CUDA_HOST_DEVICE inline T_ d1p1(T_ x)
         {
           return x + T_(0.5);
         }
 
         template<typename T_>
-        CUDA_FUNC inline T_ d1p2(T_ x)
+        CUDA_HOST_DEVICE inline T_ d1p2(T_ x)
         {
           return -T_(2) * x;
         }
@@ -65,19 +65,19 @@ namespace FEAT
         // second order derivatives
 
         template<typename T_>
-        CUDA_FUNC inline T_ d2p0(T_)
+        CUDA_HOST_DEVICE inline T_ d2p0(T_)
         {
           return T_(1);
         }
 
         template<typename T_>
-        CUDA_FUNC inline T_ d2p1(T_)
+        CUDA_HOST_DEVICE inline T_ d2p1(T_)
         {
           return T_(1);
         }
 
         template<typename T_>
-        CUDA_FUNC inline T_ d2p2(T_)
+        CUDA_HOST_DEVICE inline T_ d2p2(T_)
         {
           return -T_(2);
         }
@@ -94,13 +94,13 @@ namespace FEAT
       {
         typedef DataType_ DataType;
 
-        CUDA_FUNC static constexpr int get_num_local_dofs()
+        CUDA_HOST_DEVICE static constexpr int get_num_local_dofs()
         {
           return 6;
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_values(EvalData_& data, const PointType_& point)
+        CUDA_HOST_DEVICE static inline void eval_ref_values(EvalData_& data, const PointType_& point)
         {
             // vertex dofs
             data.phi[0].ref_value = DataType(2) * (point[0] + point[1] - DataType(0.5)) * (point[0] + point[1] - DataType(1));
@@ -113,7 +113,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_gradients(
+        CUDA_HOST_DEVICE static inline void eval_ref_gradients(
           EvalData_& data,
           const PointType_& point)
         {
@@ -134,7 +134,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_hessians(
+        CUDA_HOST_DEVICE static inline void eval_ref_hessians(
           EvalData_& data,
           const PointType_& DOXY(point))
         {
@@ -162,13 +162,13 @@ namespace FEAT
       {
         typedef DataType_ DataType;
 
-        CUDA_FUNC static constexpr int get_num_local_dofs()
+        CUDA_HOST_DEVICE static constexpr int get_num_local_dofs()
         {
           return 10;
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_values(EvalData_& data, const PointType_& point)
+        CUDA_HOST_DEVICE static inline void eval_ref_values(EvalData_& data, const PointType_& point)
         {
           // vertex dofs
           data.phi[0].ref_value = DataType(2) * (point[0] + point[1] + point[2] - DataType(0.5)) * (point[0] + point[1] + point[2] - DataType(1));
@@ -185,7 +185,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_gradients(
+        CUDA_HOST_DEVICE static inline void eval_ref_gradients(
           EvalData_& data,
           const PointType_& point)
         {
@@ -224,7 +224,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_hessians(
+        CUDA_HOST_DEVICE static inline void eval_ref_hessians(
           EvalData_& data,
           const PointType_& DOXY(point))
         {
@@ -307,13 +307,13 @@ namespace FEAT
       {
         typedef DataType_ DataType;
 
-        CUDA_FUNC static constexpr int get_num_local_dofs()
+        CUDA_HOST_DEVICE static constexpr int get_num_local_dofs()
         {
           return 3;
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_values(EvalData_& data, const PointType_& point)
+        CUDA_HOST_DEVICE static inline void eval_ref_values(EvalData_& data, const PointType_& point)
         {
           data.phi[0].ref_value = Intern::p0(point[0]);
           data.phi[1].ref_value = Intern::p1(point[0]);
@@ -321,7 +321,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_gradients(
+        CUDA_HOST_DEVICE static inline void eval_ref_gradients(
           EvalData_& data,
           const PointType_& point)
         {
@@ -331,7 +331,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_hessians(
+        CUDA_HOST_DEVICE static inline void eval_ref_hessians(
           EvalData_& data,
           const PointType_& point)
         {
@@ -346,13 +346,13 @@ namespace FEAT
       {
         typedef DataType_ DataType;
 
-        CUDA_FUNC static constexpr int get_num_local_dofs()
+        CUDA_HOST_DEVICE static constexpr int get_num_local_dofs()
         {
           return 9;
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_values(EvalData_& data, const PointType_& point)
+        CUDA_HOST_DEVICE static inline void eval_ref_values(EvalData_& data, const PointType_& point)
         {
           using namespace Lagrange2::Intern;
 
@@ -371,7 +371,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_gradients(
+        CUDA_HOST_DEVICE static inline void eval_ref_gradients(
           EvalData_& data,
           const PointType_& point)
         {
@@ -401,7 +401,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_hessians(
+        CUDA_HOST_DEVICE static inline void eval_ref_hessians(
           EvalData_& data,
           const PointType_& point)
         {
@@ -454,13 +454,13 @@ namespace FEAT
       {
         typedef DataType_ DataType;
 
-        CUDA_FUNC static constexpr int get_num_local_dofs()
+        CUDA_HOST_DEVICE static constexpr int get_num_local_dofs()
         {
           return 27;
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_values(EvalData_& data, const PointType_& point)
+        CUDA_HOST_DEVICE static inline void eval_ref_values(EvalData_& data, const PointType_& point)
         {
           using namespace Lagrange2::Intern;
 
@@ -498,7 +498,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_gradients(
+        CUDA_HOST_DEVICE static inline void eval_ref_gradients(
           EvalData_& data,
           const PointType_& point)
         {
@@ -591,7 +591,7 @@ namespace FEAT
         }
 
         template<typename EvalData_>
-        CUDA_FUNC static inline void eval_ref_hessians(
+        CUDA_HOST_DEVICE static inline void eval_ref_hessians(
           EvalData_& data,
           const PointType_& point)
         {

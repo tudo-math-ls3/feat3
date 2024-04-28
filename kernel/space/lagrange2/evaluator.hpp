@@ -10,7 +10,7 @@
 // includes, FEAT
 #include <kernel/space/parametric_evaluator.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
-#include "details.hpp"
+#include <kernel/space/lagrange2/details.hpp>
 
 namespace FEAT
 {

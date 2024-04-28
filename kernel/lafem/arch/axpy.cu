@@ -45,8 +45,8 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * con
 
   if (r == x)
   {
-    cudaMalloc((void**)&temp_x, sizeof(DT_) * size);
-    cudaMemcpy(temp_x, x, size * sizeof(DT_), cudaMemcpyDefault);
+    temp_x = Util::cuda_malloc(sizeof(DT_) * size);
+    Util::cuda_copy(temp_x, x, size * sizeof(DT_));
   }
   else
   {
@@ -56,12 +56,12 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * con
   if (r != y)
   {
     ///\todo cuse cublasCopyEx when available
-    cudaMemcpy(r, y, size * sizeof(DT_), cudaMemcpyDefault);
+    Util::cuda_copy(r, y, size * sizeof(DT_));
   }
 
   status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, temp_x, dt, 1, r, dt, 1, et);
   if (r == x)
-    cudaFree (temp_x);
+    Util::cuda_free(temp_x);
 
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));

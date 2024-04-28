@@ -332,9 +332,11 @@ namespace PoissonMultigridBench
     args.support("ext-stats", "\nPrint extended solver and MPI statistics.");
     args.support("test","\nRuns the benchmark in regression test mode.");
     args.support("backend", "<generic|cuda|mkl>\n"
-      "Specifies which backend to use for the actual PCG-GMG solution process; default: generic");
+      "Specifies which overall backend to use for solution and assembly process.\n Mutually exclusive with other backend flags; default: generic");
     args.support("voxel-asm", "\n"
       "Specifies if voxel assembly is to be used. Voxel assembly supports different backends.");
+    args.support("backend-num", "<generic|mkl|cuda>\n"
+      "Specifies the preferred backend for the actual PCG-iteration process only.");
     args.support("backend-asm", "<generic|cuda>\n"
       "Specifies the preferred backend for (matrix) assembly only.");
 
@@ -382,7 +384,7 @@ namespace PoissonMultigridBench
     Index multigrid_iters = 5;
     Index smooth_steps = 5;
     DataType smooth_damp = 0.7;
-    String backend("generic"), backend_asm("generic");
+    String backend_numeric("generic"), backend_assembly("generic");
 
     Solver::MultiGridCycle multigrid_cycle(Solver::MultiGridCycle::V);
 
@@ -392,38 +394,53 @@ namespace PoissonMultigridBench
     bool no_shrink = (args.check("no-shrink") >= 0);
 
     // choose backend
-    args.parse("backend", backend);
-    args.parse("backend-asm", backend_asm);
-    if((backend.compare_no_case("cuda") == 0))
+    args.parse("backend-num", backend_numeric);
+    args.parse("backend-asm", backend_assembly);
+    // if backend option given without anything, set both backends to the same
+    if(args.check("backend") >= 0)
+    {
+      if((args.check("backend-num") >= 0) || (args.check("backend-asm") >= 0))
+      {
+        comm.print(std::cerr, "ERROR: Provided backend parameter and backend-num/asm parameter");
+        Runtime::abort();
+      }
+      args.parse("backend", backend_numeric);
+      backend_assembly = backend_numeric;
+    }
+    if((backend_numeric.compare_no_case("cuda") == 0))
     {
 #ifndef FEAT_HAVE_CUDA
       comm.print(std::cerr, "ERROR: 'cuda' backend is only available when FEAT is configured with CUDA support enabled");
       Runtime::abort();
 #endif // not FEAT_HAVE_CUDA
     }
-    else if(backend.compare_no_case("mkl") == 0)
+    else if(backend_numeric.compare_no_case("mkl") == 0)
     {
 #ifndef FEAT_HAVE_MKL
       comm.print(std::cerr, "ERROR: 'mkl' backend is only available when FEAT is configured with MKL support enabled");
       Runtime::abort();
 #endif // FEAT_HAVE_MKL
     }
-    else if(backend.compare_no_case("generic") != 0)
+    else if(backend_numeric.compare_no_case("generic") != 0)
     {
-      comm.print(std::cerr, "ERROR: unknown backend '" + backend + "'");
+      comm.print(std::cerr, "ERROR: unknown backend '" + backend_numeric + "'");
       Runtime::abort();
     }
 
-    if((backend_asm.compare_no_case("cuda") == 0))
+    if((backend_assembly.compare_no_case("cuda") == 0))
     {
 #ifndef FEAT_HAVE_CUDA
       comm.print(std::cerr, "ERROR: 'cuda' backend is only available when FEAT is configured with CUDA support enabled");
       Runtime::abort();
 #endif // not FEAT_HAVE_CUDA
     }
-    else if(backend_asm.compare_no_case("generic") != 0)
+    else if((backend_assembly.compare_no_case("mkl") == 0))
     {
-      comm.print(std::cerr, "ERROR: unknown backend '" + backend + "'");
+      backend_assembly = "generic";
+    }
+    else if(backend_assembly.compare_no_case("generic") != 0)
+    {
+      comm.print(std::cerr, "ERROR: unknown backend '" + backend_assembly + "'");
       Runtime::abort();
     }
     // check if voxel assembly should be used
@@ -531,10 +548,10 @@ namespace PoissonMultigridBench
     comm.print("Desired Levels......: " + domain.format_desired_levels());
     comm.print("Chosen Levels.......: " + domain.format_chosen_levels());
     comm.print("Partitioner Info....: " + domain.get_chosen_parti_info());
-    comm.print("Preferred Backend...: " + backend);
-    comm.print("Preferred Assembly Backend...: " + backend_asm);
+    comm.print("Preferred Numeric Backend...: " + backend_numeric);
+    comm.print("Preferred Assembly Backend...: " + backend_assembly);
 #ifdef FEAT_HAVE_CUDA
-    if(backend.compare_no_case("cuda") == 0)
+    if(backend_numeric.compare_no_case("cuda") == 0)
     {
       comm.allprint(FEAT::Util::cuda_get_visible_devices());
     }
@@ -642,7 +659,7 @@ namespace PoissonMultigridBench
       stats.times[i][Times::asm_matrix_sym] += tt;
     }
     //switch to desired backend
-    if(backend_asm.compare_no_case("cuda") == 0)
+    if(backend_assembly.compare_no_case("cuda") == 0)
       Backend::set_preferred_backend(FEAT::PreferredBackend::cuda);
     for (Index i(0); i < num_levels; ++i)
     {
@@ -728,9 +745,9 @@ namespace PoissonMultigridBench
     /* ***************************************************************************************** */
 
     // from here on, we can switch to another backend if the user desires this
-    if(backend.compare_no_case("cuda") == 0)
+    if(backend_numeric.compare_no_case("cuda") == 0)
       Backend::set_preferred_backend(FEAT::PreferredBackend::cuda);
-    else if(backend.compare_no_case("mkl") == 0)
+    else if(backend_numeric.compare_no_case("mkl") == 0)
       Backend::set_preferred_backend(FEAT::PreferredBackend::mkl);
 
     auto multigrid_hierarchy = std::make_shared<

@@ -220,12 +220,12 @@ namespace FEAT
       T_ v[s_];
 
       /// default constructor
-      CUDA_FUNC Vector()
+      CUDA_HOST_DEVICE Vector()
       {
       }
 
       /// \brief value-assignment constructor
-      CUDA_FUNC explicit Vector(DataType value)
+      CUDA_HOST_DEVICE explicit Vector(DataType value)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -235,7 +235,7 @@ namespace FEAT
 
       /// copy constructor
       template<int sx_>
-      CUDA_FUNC Vector(const Vector<T_, n_, sx_>& x)
+      CUDA_HOST_DEVICE Vector(const Vector<T_, n_, sx_>& x)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -256,7 +256,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC explicit Vector(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE explicit Vector(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(n_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -265,7 +265,7 @@ namespace FEAT
       }
 
       /// value-assignment operator
-      CUDA_FUNC Vector& operator=(DataType value)
+      CUDA_HOST_DEVICE Vector& operator=(DataType value)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -276,7 +276,7 @@ namespace FEAT
 
       /// copy-assignment operator
       template<int sx_>
-      CUDA_FUNC Vector& operator=(const Vector<T_, n_, sx_>& x)
+      CUDA_HOST_DEVICE Vector& operator=(const Vector<T_, n_, sx_>& x)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -300,7 +300,7 @@ namespace FEAT
        * \returns *this
        */
       template<typename Tx_>
-      CUDA_FUNC Vector& operator=(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE Vector& operator=(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(n_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -317,28 +317,28 @@ namespace FEAT
        *
        * \returns A (const) reference to the <c>i</c>-th entry of the vector.
        */
-      CUDA_FUNC T_& operator()(int i)
+      CUDA_HOST_DEVICE T_& operator()(int i)
       {
         ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      CUDA_FUNC const T_& operator()(int i) const
+      CUDA_HOST_DEVICE const T_& operator()(int i) const
       {
         ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      CUDA_FUNC T_& operator[](int i)
+      CUDA_HOST_DEVICE T_& operator[](int i)
       {
         ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
-      CUDA_FUNC const T_& operator[](int i) const
+      CUDA_HOST_DEVICE const T_& operator[](int i) const
       {
         ASSERTM((i >= 0) && (i < n_), "index i out-of-bounds");
         return v[i];
@@ -356,7 +356,7 @@ namespace FEAT
        * A casted (const) reference of \p *this.
        */
       template<int nn_>
-      CUDA_FUNC Vector<T_, nn_, s_>& size_cast()
+      CUDA_HOST_DEVICE Vector<T_, nn_, s_>& size_cast()
       {
         static_assert((nn_ > 0) && (nn_ <= s_), "invalid cast length");
         return reinterpret_cast<Vector<T_, nn_, s_>&>(*this);
@@ -364,14 +364,14 @@ namespace FEAT
 
       /** \copydoc size_cast() */
       template<int nn_>
-      CUDA_FUNC const Vector<T_, nn_, s_>& size_cast() const
+      CUDA_HOST_DEVICE const Vector<T_, nn_, s_>& size_cast() const
       {
         static_assert((nn_ > 0) && (nn_ <= s_), "invalid cast length");
         return reinterpret_cast<const Vector<T_, nn_, s_>&>(*this);
       }
 
       /// scalar-multiply operator
-      CUDA_FUNC Vector& operator*=(DataType alpha)
+      CUDA_HOST_DEVICE Vector& operator*=(DataType alpha)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -382,7 +382,7 @@ namespace FEAT
 
       /// element-wise-multiply operator
       template <int sx_>
-      CUDA_FUNC Vector& operator*=(const Vector<T_, n_, sx_>& x)
+      CUDA_HOST_DEVICE Vector& operator*=(const Vector<T_, n_, sx_>& x)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -393,7 +393,7 @@ namespace FEAT
 
       /// vector-add operator
       template<int sx_>
-      CUDA_FUNC Vector& operator+=(const Vector<T_, n_, sx_>& x)
+      CUDA_HOST_DEVICE Vector& operator+=(const Vector<T_, n_, sx_>& x)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -404,7 +404,7 @@ namespace FEAT
 
       /// vector-subtract operator
       template<int sx_>
-      CUDA_FUNC Vector& operator-=(const Vector<T_, n_, sx_>& x)
+      CUDA_HOST_DEVICE Vector& operator-=(const Vector<T_, n_, sx_>& x)
       {
         for(int i(0); i < n_; ++i)
         {
@@ -419,7 +419,7 @@ namespace FEAT
        * \param[in] alpha
        * The value that the vector is to be set to.
        */
-      CUDA_FUNC void format(DataType alpha = DataType(0))
+      CUDA_HOST_DEVICE void format(DataType alpha = DataType(0))
       {
         for(int i(0); i < n_; ++i)
         {
@@ -432,7 +432,7 @@ namespace FEAT
        *
        * \returns \c *this
        */
-      CUDA_FUNC Vector& normalize()
+      CUDA_HOST_DEVICE Vector& normalize()
       {
       #ifndef __CUDACC__
         const DataType norm2(this->norm_euclid());
@@ -450,7 +450,7 @@ namespace FEAT
        *
        * \returns \c *this
        */
-      CUDA_FUNC Vector& negate()
+      CUDA_HOST_DEVICE Vector& negate()
       {
         for(int i(0); i < n_; ++i)
           v[i] = -v[i];
@@ -469,7 +469,7 @@ namespace FEAT
        * \returns \c *this
        */
       template<int snx_>
-      CUDA_FUNC Vector& axpy(DataType alpha, const Vector<T_, n_, snx_>& x)
+      CUDA_HOST_DEVICE Vector& axpy(DataType alpha, const Vector<T_, n_, snx_>& x)
       {
         for(int i(0); i < n_; ++i)
           v[i] += alpha * x.v[i];
@@ -494,7 +494,7 @@ namespace FEAT
        * \returns \c *this
        */
       template<int sna_, int snb_>
-      CUDA_FUNC Vector& set_convex(DataType alpha, const Vector<T_, n_, sna_>& a, const Vector<T_, n_, snb_>& b)
+      CUDA_HOST_DEVICE Vector& set_convex(DataType alpha, const Vector<T_, n_, sna_>& a, const Vector<T_, n_, snb_>& b)
       {
         for(int i(0); i < n_; ++i)
           v[i] = (T_(1) - alpha) * a.v[i] + alpha * b.v[i];
@@ -517,7 +517,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int m_, int sma_, int sna_, int sx_>
-      CUDA_FUNC Vector& set_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x)
+      CUDA_HOST_DEVICE Vector& set_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
@@ -549,7 +549,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int m_, int sma_, int sna_, int sx_>
-      CUDA_FUNC Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
@@ -584,7 +584,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int m_, int sma_, int sna_, int sx_>
-      CUDA_FUNC Vector& add_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x, DataType alpha = DataType(1))
+      CUDA_HOST_DEVICE Vector& add_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x, DataType alpha = DataType(1))
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
@@ -618,7 +618,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int m_, int sma_, int sna_, int sx_>
-      CUDA_FUNC Vector& add_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a, DataType alpha = DataType(1))
+      CUDA_HOST_DEVICE Vector& add_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a, DataType alpha = DataType(1))
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
@@ -639,7 +639,7 @@ namespace FEAT
        * \returns
        * The squared euclid norm of the vector.
        */
-      CUDA_FUNC DataType norm_euclid_sqr() const
+      CUDA_HOST_DEVICE DataType norm_euclid_sqr() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
@@ -657,7 +657,7 @@ namespace FEAT
        * \returns
        * The euclid norm of the vector.
        */
-      CUDA_FUNC DataType norm_euclid() const
+      CUDA_HOST_DEVICE DataType norm_euclid() const
       {
       #ifndef __CUDACC__
         return Math::sqrt(norm_euclid_sqr());
@@ -672,7 +672,7 @@ namespace FEAT
        * \returns
        * The l1-norm of the vector.
        */
-      CUDA_FUNC DataType norm_l1() const
+      CUDA_HOST_DEVICE DataType norm_l1() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
@@ -690,7 +690,7 @@ namespace FEAT
        * \returns
        * The max-norm of the vector.
        */
-      CUDA_FUNC DataType norm_max() const
+      CUDA_HOST_DEVICE DataType norm_max() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
@@ -705,7 +705,7 @@ namespace FEAT
       /**
        * \brief Returns a null-vector.
        */
-      CUDA_FUNC static Vector null()
+      CUDA_HOST_DEVICE static Vector null()
       {
         return Vector(DataType(0));
       }
@@ -747,35 +747,35 @@ namespace FEAT
 
     /// scalar-left-multiplication operator
     template<typename T_, int n_, int s_>
-    CUDA_FUNC inline Vector<T_, n_> operator*(typename Vector<T_, n_>::DataType alpha, const Vector<T_, n_, s_>& x)
+    CUDA_HOST_DEVICE inline Vector<T_, n_> operator*(typename Vector<T_, n_>::DataType alpha, const Vector<T_, n_, s_>& x)
     {
       return Vector<T_, n_>(x) *= alpha;
     }
 
     /// scalar-right-multiplication operator
     template<typename T_, int n_, int s_>
-    CUDA_FUNC inline Vector<T_, n_> operator*(const Vector<T_, n_, s_>& x, typename Vector<T_, n_>::DataType alpha)
+    CUDA_HOST_DEVICE inline Vector<T_, n_> operator*(const Vector<T_, n_, s_>& x, typename Vector<T_, n_>::DataType alpha)
     {
       return Vector<T_, n_>(x) *= alpha;
     }
 
     /// vector element-wise-product operator
     template<typename T_, int n_, int sa_, int sb_>
-    CUDA_FUNC inline Vector<T_, n_> component_product(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
+    CUDA_HOST_DEVICE inline Vector<T_, n_> component_product(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       return Vector<T_, n_>(a) *= b;
     }
 
     /// vector addition operator
     template<typename T_, int n_, int sa_, int sb_>
-    CUDA_FUNC inline Vector<T_, n_> operator+(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
+    CUDA_HOST_DEVICE inline Vector<T_, n_> operator+(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       return Vector<T_, n_>(a) += b;
     }
 
     /// vector subtraction operator
     template<typename T_, int n_, int sa_, int sb_>
-    CUDA_FUNC inline Vector<T_, n_> operator-(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
+    CUDA_HOST_DEVICE inline Vector<T_, n_> operator-(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       return Vector<T_, n_>(a) -= b;
     }
@@ -815,12 +815,12 @@ namespace FEAT
       RowType v[sm_];
 
       /// default constructor
-      CUDA_FUNC Matrix()
+      CUDA_HOST_DEVICE Matrix()
       {
       }
 
       /// value-assignment constructor
-      CUDA_FUNC explicit Matrix(DataType value)
+      CUDA_HOST_DEVICE explicit Matrix(DataType value)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -830,7 +830,7 @@ namespace FEAT
 
       /// copy constructor
       template<typename T2_, int sma_, int sna_>
-      CUDA_FUNC Matrix(const Matrix<T2_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix(const Matrix<T2_, m_, n_, sma_, sna_>& a)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -853,7 +853,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC explicit Matrix(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE explicit Matrix(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -875,7 +875,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC explicit Matrix(const std::initializer_list<std::initializer_list<Tx_>>& x)
+      CUDA_HOST_DEVICE explicit Matrix(const std::initializer_list<std::initializer_list<Tx_>>& x)
       {
         XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -884,7 +884,7 @@ namespace FEAT
       }
 
       /// value-assignment operator
-      CUDA_FUNC Matrix& operator=(DataType value)
+      CUDA_HOST_DEVICE Matrix& operator=(DataType value)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -895,7 +895,7 @@ namespace FEAT
 
       /// assignment operator
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& operator=(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& operator=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -917,7 +917,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC Matrix& operator=(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE Matrix& operator=(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -938,7 +938,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC Matrix& operator=(const std::initializer_list<std::initializer_list<Tx_>>& x)
+      CUDA_HOST_DEVICE Matrix& operator=(const std::initializer_list<std::initializer_list<Tx_>>& x)
       {
         XASSERTM(std::size_t(m_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -956,7 +956,7 @@ namespace FEAT
        * \returns
        * A (const) reference to the matrix entry at position (i,j).
        */
-      CUDA_FUNC T_& operator()(int i, int j)
+      CUDA_HOST_DEVICE T_& operator()(int i, int j)
       {
         ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
         ASSERTM( (j >= 0) && (j < n_), "index j out-of-bounds");
@@ -964,7 +964,7 @@ namespace FEAT
       }
 
       /** \copydoc operator()() */
-      CUDA_FUNC const T_& operator()(int i, int j) const
+      CUDA_HOST_DEVICE const T_& operator()(int i, int j) const
       {
         ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
         ASSERTM( (j >= 0) && (j < n_), "index j out-of-bounds");
@@ -980,14 +980,14 @@ namespace FEAT
        * \returns
        * A (const) reference to the <c>i</c>-th row of the matrix.S
        */
-      CUDA_FUNC RowType& operator[](int i)
+      CUDA_HOST_DEVICE RowType& operator[](int i)
       {
         ASSERTM( (i >= 0) && (i <m_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
-      CUDA_FUNC const RowType& operator[](int i) const
+      CUDA_HOST_DEVICE const RowType& operator[](int i) const
       {
         ASSERTM( (i >= 0) && (i <m_), "index i out-of-bounds");
         return v[i];
@@ -1005,7 +1005,7 @@ namespace FEAT
        * A casted (const) reference of \p *this.
        */
       template<int mm_, int nn_>
-      CUDA_FUNC Matrix<T_, mm_, nn_, sm_, sn_>& size_cast()
+      CUDA_HOST_DEVICE Matrix<T_, mm_, nn_, sm_, sn_>& size_cast()
       {
         static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
         static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
@@ -1014,7 +1014,7 @@ namespace FEAT
 
       /** \copydoc size_cast() */
       template<int mm_, int nn_>
-      CUDA_FUNC const Matrix<T_, mm_, nn_, sm_, sn_>& size_cast() const
+      CUDA_HOST_DEVICE const Matrix<T_, mm_, nn_, sm_, sn_>& size_cast() const
       {
         static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
         static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
@@ -1022,7 +1022,7 @@ namespace FEAT
       }
 
       /// scalar-right-multiply-by operator
-      CUDA_FUNC Matrix& operator*=(DataType alpha)
+      CUDA_HOST_DEVICE Matrix& operator*=(DataType alpha)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -1033,7 +1033,7 @@ namespace FEAT
 
       /// matrix component-wise addition operator
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& operator+=(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& operator+=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -1044,7 +1044,7 @@ namespace FEAT
 
       /// matrix component-wise subtraction operator
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& operator-=(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& operator-=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -1059,7 +1059,7 @@ namespace FEAT
        * \param[in] alpha
        * The value that the matrix is to be set to.
        */
-      CUDA_FUNC void format(DataType alpha = DataType(0))
+      CUDA_HOST_DEVICE void format(DataType alpha = DataType(0))
       {
         for(int i(0); i < m_; ++i)
         {
@@ -1078,7 +1078,7 @@ namespace FEAT
        *
        * \returns The Hessian norm square of the matrix.
        */
-      CUDA_FUNC DataType norm_hessian_sqr() const
+      CUDA_HOST_DEVICE DataType norm_hessian_sqr() const
       {
         DataType r(0);
         for(int i(0); i < m_; ++i)
@@ -1108,7 +1108,7 @@ namespace FEAT
        *
        * \returns The Frobenius norm of the matrix.
        */
-      CUDA_FUNC DataType norm_frobenius() const
+      CUDA_HOST_DEVICE DataType norm_frobenius() const
       {
         #ifndef __CUDACC__
         return Math::sqrt(norm_frobenius_sqr());
@@ -1125,7 +1125,7 @@ namespace FEAT
        *
        * \returns The Frobenius norm of the matrix.
        */
-      CUDA_FUNC DataType norm_frobenius_sqr() const
+      CUDA_HOST_DEVICE DataType norm_frobenius_sqr() const
       {
         DataType r(0);
         for(int i(0); i < m_; ++i)
@@ -1147,7 +1147,7 @@ namespace FEAT
        *
        * \returns The Frobenius norm of the difference of this matrix and the identity matrix.
        */
-      CUDA_FUNC DataType norm_sub_id_frobenius() const
+      CUDA_HOST_DEVICE DataType norm_sub_id_frobenius() const
       {
         DataType r(0);
         for(int i(0); i < m_; ++i)
@@ -1177,7 +1177,7 @@ namespace FEAT
        *
        * \returns The trace of the matrix.
        */
-      CUDA_FUNC DataType trace() const
+      CUDA_HOST_DEVICE DataType trace() const
       {
         #ifndef __CUDACC__
         int k = Math::min(m_, n_);
@@ -1199,7 +1199,7 @@ namespace FEAT
        *
        * \returns The determinant of the matrix.
        */
-      CUDA_FUNC DataType det() const
+      CUDA_HOST_DEVICE DataType det() const
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
@@ -1218,7 +1218,7 @@ namespace FEAT
        *
        * \returns The volume of the matrix.
        */
-      CUDA_FUNC DataType vol() const
+      CUDA_HOST_DEVICE DataType vol() const
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
@@ -1237,7 +1237,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& set_inverse(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& set_inverse(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
@@ -1269,7 +1269,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& set_cofactor(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& set_cofactor(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
@@ -1292,7 +1292,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
@@ -1320,7 +1320,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int l_, int sla_, int sna_>
-      CUDA_FUNC Matrix& set_gram(const Matrix<T_, l_, n_, sla_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& set_gram(const Matrix<T_, l_, n_, sla_, sna_>& a)
       {
         static_assert(m_ == n_, "Gram matrices must be square");
 
@@ -1356,7 +1356,7 @@ namespace FEAT
        * The scalar product of \p x and \p y with this matrix.
        */
       template<int snx_, int sny_>
-      CUDA_FUNC DataType scalar_product(const Vector<T_, m_, snx_>& x, const Vector<T_, n_, sny_>& y) const
+      CUDA_HOST_DEVICE DataType scalar_product(const Vector<T_, m_, snx_>& x, const Vector<T_, n_, sny_>& y) const
       {
         DataType r(DataType(0));
         for(int i(0); i < m_; ++i)
@@ -1384,7 +1384,7 @@ namespace FEAT
        * \returns \c *this
        */
       template<int snx_, int sny_>
-      CUDA_FUNC Matrix& add_outer_product(
+      CUDA_HOST_DEVICE Matrix& add_outer_product(
         const Vector<T_, m_, snx_>& x,
         const Vector<T_, n_, sny_>& y,
         const DataType alpha = DataType(1))
@@ -1414,7 +1414,7 @@ namespace FEAT
        * \returns \c *this
        */
       template<int snx_, int sny_>
-      CUDA_FUNC Matrix& set_outer_product(
+      CUDA_HOST_DEVICE Matrix& set_outer_product(
         const Vector<T_, m_, snx_>& x,
         const Vector<T_, n_, sny_>& y)
       {
@@ -1440,7 +1440,7 @@ namespace FEAT
        * \returns \c *this
        */
       template<int sma_, int sna_>
-      CUDA_FUNC Matrix& axpy(DataType alpha, const Matrix<T_, m_, n_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Matrix& axpy(DataType alpha, const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         for(int i(0); i < m_; ++i)
         {
@@ -1458,7 +1458,7 @@ namespace FEAT
        * \param[in] alpha
        * The value that is to be added onto the main diagonal.
        */
-      CUDA_FUNC Matrix& add_scalar_main_diag(DataType alpha)
+      CUDA_HOST_DEVICE Matrix& add_scalar_main_diag(DataType alpha)
       {
         for(int i(0); (i < m_) && (i < n_); ++i)
           v[i][i] += alpha;
@@ -1484,7 +1484,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int la_, int lb_, int sma_, int sna_, int smb_, int snb_>
-      CUDA_FUNC Matrix& add_mat_mat_mult(
+      CUDA_HOST_DEVICE Matrix& add_mat_mat_mult(
         const Matrix<T_, m_, la_, sma_, sna_>& a,
         const Matrix<T_, lb_, n_, smb_, snb_>& b,
         DataType alpha = DataType(1))
@@ -1525,7 +1525,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int la_, int lb_, int sma_, int sna_, int smb_, int snb_>
-      CUDA_FUNC Matrix& set_mat_mat_mult(const Matrix<T_, m_, la_, sma_, sna_>& a, const Matrix<T_, lb_, n_, smb_, snb_>& b)
+      CUDA_HOST_DEVICE Matrix& set_mat_mat_mult(const Matrix<T_, m_, la_, sma_, sna_>& a, const Matrix<T_, lb_, n_, smb_, snb_>& b)
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and multiplicand matrix 'a' must be different objects");
@@ -1558,7 +1558,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, int snd_>
-      CUDA_FUNC Matrix& add_double_mat_mult(
+      CUDA_HOST_DEVICE Matrix& add_double_mat_mult(
         const Matrix<T_, k_, l_, sma_, sna_>& a,
         const Matrix<T_, k_, m_, smb_, snb_>& b,
         const Matrix<T_, l_, n_, smd_, snd_>& d,
@@ -1611,7 +1611,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, int snd_>
-      CUDA_FUNC Matrix& set_double_mat_mult(
+      CUDA_HOST_DEVICE Matrix& set_double_mat_mult(
         const Matrix<T_, k_, l_, sma_, sna_>& a,
         const Matrix<T_, k_, m_, smb_, snb_>& b,
         const Matrix<T_, l_, n_, smd_, snd_>& d,
@@ -1647,7 +1647,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int l_, int snv_, int slt_, int smt_, int snt_>
-      CUDA_FUNC Matrix& add_vec_tensor_mult(
+      CUDA_HOST_DEVICE Matrix& add_vec_tensor_mult(
         const Vector<T_, l_, snv_>& x,
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         DataType alpha = DataType(1))
@@ -1688,7 +1688,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int l_, int snv_, int slt_, int smt_, int snt_>
-      CUDA_FUNC Matrix& set_vec_tensor_mult(
+      CUDA_HOST_DEVICE Matrix& set_vec_tensor_mult(
         const Vector<T_, l_, snv_>& x,
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         DataType alpha = DataType(1))
@@ -1702,7 +1702,7 @@ namespace FEAT
        *
        * \returns \p *this
        */
-      CUDA_FUNC Matrix& set_identity()
+      CUDA_HOST_DEVICE Matrix& set_identity()
       {
         for(int i(0); i < m_; ++i)
           for(int j(0); j < n_; ++j)
@@ -1718,7 +1718,7 @@ namespace FEAT
        *
        * \returns \p *this
        */
-      CUDA_FUNC Matrix& set_rotation_2d(T_ angle)
+      CUDA_HOST_DEVICE Matrix& set_rotation_2d(T_ angle)
       {
         static_assert((m_ == 2) && (n_ == 2), "this function works only for 2x2 matrices");
         #ifndef __CUDACC__
@@ -1745,7 +1745,7 @@ namespace FEAT
        *
        * \returns \p *this
        */
-      CUDA_FUNC Matrix& set_rotation_3d(T_ yaw, T_ pitch, T_ roll)
+      CUDA_HOST_DEVICE Matrix& set_rotation_3d(T_ yaw, T_ pitch, T_ roll)
       {
         static_assert((m_ == 3) && (n_ == 3), "this function works only for 3x3 matrices");
         #ifndef __CUDACC__
@@ -1778,7 +1778,7 @@ namespace FEAT
       /**
        * \brief Returns a null-matrix.
        */
-      CUDA_FUNC static Matrix null()
+      CUDA_HOST_DEVICE static Matrix null()
       {
         return Matrix(DataType(0));
       }
@@ -1831,7 +1831,7 @@ namespace FEAT
 
     /// \cond internal
     template<typename T_, int sm_, int sn_>
-    CUDA_FUNC Vector<T_, 2> orthogonal(const Matrix<T_, 2, 1, sm_, sn_>& tau)
+    CUDA_HOST_DEVICE Vector<T_, 2> orthogonal(const Matrix<T_, 2, 1, sm_, sn_>& tau)
     {
       Vector<T_, 2, sm_> nu(T_(0));
 
@@ -1843,7 +1843,7 @@ namespace FEAT
     }
 
     template<typename T_, int sm_, int sn_>
-    CUDA_FUNC Vector<T_, 3> orthogonal(const Matrix<T_, 3, 2, sm_, sn_>& tau)
+    CUDA_HOST_DEVICE Vector<T_, 3> orthogonal(const Matrix<T_, 3, 2, sm_, sn_>& tau)
     {
       Vector<T_, 3, sm_> nu(T_(0));
 
@@ -1858,49 +1858,49 @@ namespace FEAT
 
     /// matrix-vector-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_, int sx_>
-    CUDA_FUNC inline Vector<T_, m_> operator*(const Matrix<T_, m_, n_, sm_, sn_>& a, const Vector<T_, n_, sx_>& x)
+    CUDA_HOST_DEVICE inline Vector<T_, m_> operator*(const Matrix<T_, m_, n_, sm_, sn_>& a, const Vector<T_, n_, sx_>& x)
     {
       return Vector<T_, m_>().set_mat_vec_mult(a, x);
     }
 
     /// vector-matrix-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_, int sx_>
-    CUDA_FUNC inline Vector<T_, n_> operator*(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sm_, sn_>& a)
+    CUDA_HOST_DEVICE inline Vector<T_, n_> operator*(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sm_, sn_>& a)
     {
       return Vector<T_, n_>().set_vec_mat_mult(x, a);
     }
 
     /// scalar-left-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_>
-    CUDA_FUNC inline Matrix<T_, m_, n_> operator*(typename Matrix<T_, m_, n_>::DataType alpha, const Matrix<T_, m_, n_, sm_, sn_>& a)
+    CUDA_HOST_DEVICE inline Matrix<T_, m_, n_> operator*(typename Matrix<T_, m_, n_>::DataType alpha, const Matrix<T_, m_, n_, sm_, sn_>& a)
     {
       return Matrix<T_, m_, n_>(a) *= alpha;
     }
 
     /// scalar-right-multiply operator
     template<typename T_, int m_, int n_, int sm_, int sn_>
-    CUDA_FUNC inline Matrix<T_, m_, n_, sm_, sn_> operator*(const Matrix<T_, m_, n_, sm_, sn_>& a, typename Matrix<T_, m_, n_>::DataType alpha)
+    CUDA_HOST_DEVICE inline Matrix<T_, m_, n_, sm_, sn_> operator*(const Matrix<T_, m_, n_, sm_, sn_>& a, typename Matrix<T_, m_, n_>::DataType alpha)
     {
       return Matrix<T_, m_, n_>(a) *= alpha;
     }
 
     /// algebraic matrix-matrix-multiply operator
     template<typename T_, int m_, int n_, int l_, int sma_, int sna_, int smb_, int snb_>
-    CUDA_FUNC inline Matrix<T_, m_, n_> operator*(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
+    CUDA_HOST_DEVICE inline Matrix<T_, m_, n_> operator*(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>().set_mat_mat_mult(a, b);
     }
 
     /// matrix addition operator
     template<typename T_, int m_, int n_,int sma_, int sna_, int smb_, int snb_>
-    CUDA_FUNC inline Matrix<T_, m_, n_> operator+(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    CUDA_HOST_DEVICE inline Matrix<T_, m_, n_> operator+(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>(a) += b;
     }
 
     /// matrix subtraction operator
     template<typename T_, int m_, int n_,int sma_, int sna_, int smb_, int snb_>
-    CUDA_FUNC inline Matrix<T_, m_, n_> operator-(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    CUDA_HOST_DEVICE inline Matrix<T_, m_, n_> operator-(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>(a) -= b;
     }
@@ -1946,12 +1946,12 @@ namespace FEAT
       PlaneType v[sl_];
 
       /// default constructor
-      CUDA_FUNC Tensor3()
+      CUDA_HOST_DEVICE Tensor3()
       {
       }
 
       /// value-assignment constructor
-      CUDA_FUNC explicit Tensor3(DataType value)
+      CUDA_HOST_DEVICE explicit Tensor3(DataType value)
       {
         for(int i(0); i < l_; ++i)
           v[i] = value;
@@ -1964,7 +1964,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC explicit Tensor3(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE explicit Tensor3(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -1979,7 +1979,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_FUNC explicit Tensor3(const std::initializer_list<std::initializer_list<std::initializer_list<Tx_>>>& x)
+      CUDA_HOST_DEVICE explicit Tensor3(const std::initializer_list<std::initializer_list<std::initializer_list<Tx_>>>& x)
       {
         XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -1989,14 +1989,14 @@ namespace FEAT
 
       /// copy-constructor
       template<int sla_, int sma_, int sna_>
-      CUDA_FUNC Tensor3(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Tensor3(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
         for(int i(0); i < l_; ++i)
           v[i] = a.v[i];
       }
 
       /// value-assignment operator
-      CUDA_FUNC Tensor3& operator=(DataType value)
+      CUDA_HOST_DEVICE Tensor3& operator=(DataType value)
       {
         for(int i(0); i < l_; ++i)
           v[i] = value;
@@ -2005,7 +2005,7 @@ namespace FEAT
 
       /// copy-assignment operator
       template<int sla_, int sma_, int sna_>
-      CUDA_FUNC Tensor3& operator=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Tensor3& operator=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
         for(int i(0); i < l_; ++i)
           v[i] = a.v[i];
@@ -2021,7 +2021,7 @@ namespace FEAT
        * \returns *this
        */
       template<typename Tx_>
-      CUDA_FUNC Tensor3& operator=(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE Tensor3& operator=(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -2039,7 +2039,7 @@ namespace FEAT
        * \returns *this
        */
       template<typename Tx_>
-      CUDA_FUNC Tensor3& operator=(const std::initializer_list<std::initializer_list<std::initializer_list<Tx_>>>& x)
+      CUDA_HOST_DEVICE Tensor3& operator=(const std::initializer_list<std::initializer_list<std::initializer_list<Tx_>>>& x)
       {
         XASSERTM(std::size_t(l_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -2057,7 +2057,7 @@ namespace FEAT
        * \returns
        * A (const) reference to the tensor entry at position (h,i,j).
        */
-      CUDA_FUNC T_& operator()(int h, int i, int j)
+      CUDA_HOST_DEVICE T_& operator()(int h, int i, int j)
       {
         ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
         ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
@@ -2066,7 +2066,7 @@ namespace FEAT
       }
 
       /** \copydoc operator()() */
-      CUDA_FUNC const T_& operator()(int h, int i, int j) const
+      CUDA_HOST_DEVICE const T_& operator()(int h, int i, int j) const
       {
         ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
         ASSERTM( (i >= 0) && (i < m_), "index i out-of-bounds");
@@ -2083,14 +2083,14 @@ namespace FEAT
        * \returns
        * A (const) reference to the matrix representing the <c>h</c>-th plane of the tensor.
        */
-      CUDA_FUNC PlaneType& operator[](int h)
+      CUDA_HOST_DEVICE PlaneType& operator[](int h)
       {
         ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
         return v[h];
       }
 
       /** \copydoc operator[]() */
-      CUDA_FUNC const PlaneType& operator[](int h) const
+      CUDA_HOST_DEVICE const PlaneType& operator[](int h) const
       {
         ASSERTM( (h >= 0) && (h < l_), "index h out-of-bounds");
         return v[h];
@@ -2109,7 +2109,7 @@ namespace FEAT
        * A casted (const) reference of \p *this.
        */
       template<int ll_, int mm_, int nn_>
-      CUDA_FUNC Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast()
+      CUDA_HOST_DEVICE Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast()
       {
         static_assert((ll_ >= 0) && (ll_ <= sl_), "invalid cast tube count");
         static_assert((mm_ >= 0) && (mm_ <= sm_), "invalid cast row count");
@@ -2119,7 +2119,7 @@ namespace FEAT
 
       /** \copydoc size_cast() */
       template<int ll_, int mm_, int nn_>
-      CUDA_FUNC const Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast() const
+      CUDA_HOST_DEVICE const Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast() const
       {
         static_assert((ll_ >= 0) && (ll_ <= sl_), "invalid cast tube count");
         static_assert((mm_ >= 0) && (mm_ <= sm_), "invalid cast row count");
@@ -2128,7 +2128,7 @@ namespace FEAT
       }
 
       /// scalar right-multiply-by operator
-      CUDA_FUNC Tensor3& operator*=(DataType alpha)
+      CUDA_HOST_DEVICE Tensor3& operator*=(DataType alpha)
       {
         for(int i(0); i < l_; ++i)
           v[i] *= alpha;
@@ -2137,7 +2137,7 @@ namespace FEAT
 
       /// tensor component-wise addition operator
       template<int sla_, int sma_, int sna_>
-      CUDA_FUNC Tensor3& operator+=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Tensor3& operator+=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
         for(int i(0); i < l_; ++i)
           v[i] += a.v[i];
@@ -2146,7 +2146,7 @@ namespace FEAT
 
       /// tensor component-wise subtraction operator
       template<int sla_, int sma_, int sna_>
-      CUDA_FUNC Tensor3& operator-=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      CUDA_HOST_DEVICE Tensor3& operator-=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
         for(int i(0); i < l_; ++i)
           v[i] -= a.v[i];
@@ -2154,7 +2154,7 @@ namespace FEAT
       }
 
       /// formats the tensor
-      CUDA_FUNC void format(DataType alpha = DataType(0))
+      CUDA_HOST_DEVICE void format(DataType alpha = DataType(0))
       {
         (*this) = alpha;
       }
@@ -2180,7 +2180,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int k_, int sma_, int sna_, int slt_, int smt_, int snt_>
-      CUDA_FUNC Tensor3& add_mat_tensor_mult(
+      CUDA_HOST_DEVICE Tensor3& add_mat_tensor_mult(
         const Matrix<T_, l_, k_, sma_, sna_>& a,
         const Tensor3<T_, k_, m_, n_, slt_, smt_, snt_>& t,
         DataType alpha = DataType(1))
@@ -2234,7 +2234,7 @@ namespace FEAT
         int lt_, int mt_, int nt_, // input tensor dimensions
         int slt_, int smt_, int snt_, // input tensor strides
         int smb_, int snb_, int smd_, int snd_> // input matrix strides
-      CUDA_FUNC Tensor3& add_double_mat_mult(
+      CUDA_HOST_DEVICE Tensor3& add_double_mat_mult(
         const Tensor3<T_, lt_, mt_, nt_, slt_, smt_, snt_>& t,
         const Matrix<T_, nt_, n_, smb_, snb_>& b,
         const Matrix<T_, mt_, m_, smd_, snd_>& d,
@@ -2285,7 +2285,7 @@ namespace FEAT
        * \returns \p *this
        */
       template<int slx_, int sma_, int sna_>
-      CUDA_FUNC Tensor3& add_vec_mat_outer_product(
+      CUDA_HOST_DEVICE Tensor3& add_vec_mat_outer_product(
         const Vector<T_, l_, slx_>& x,
         const Matrix<T_, m_, n_, sma_, sna_>& a,
         DataType alpha = DataType(1))
@@ -2306,7 +2306,7 @@ namespace FEAT
       /**
        * \brief Returns a null-tensor.
        */
-      CUDA_FUNC static Tensor3 null()
+      CUDA_HOST_DEVICE static Tensor3 null()
       {
         return Tensor3(DataType(0));
       }
@@ -2314,7 +2314,7 @@ namespace FEAT
 
     /// scalar left-multiply operator
     template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
-    CUDA_FUNC inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(
+    CUDA_HOST_DEVICE inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(
       typename Tensor3<T_, l_, m_, n_>::DataType alpha, const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a)
     {
       return Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>(a) *= alpha;
@@ -2322,7 +2322,7 @@ namespace FEAT
 
     /// scalar right-multiply operator
     template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
-    CUDA_FUNC inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(
+    CUDA_HOST_DEVICE inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(
       const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a, typename Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>::DataType alpha)
     {
       return Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>(a) *= alpha;
@@ -2345,7 +2345,7 @@ namespace FEAT
      * This overload is disabled by SFINAE for Tiny::Vector, Tiny::Matrix and Tiny::Tensor3 types.
      */
     template<typename T_, typename std::enable_if<Intern::DataTypeExtractor<T_>::level == 0, bool>::type = true>
-    CUDA_FUNC inline T_ dot(const T_& a, const T_& b)
+    CUDA_HOST_DEVICE inline T_ dot(const T_& a, const T_& b)
     {
       return a*b;
     }
@@ -2362,7 +2362,7 @@ namespace FEAT
      * \returns The dot-product of \p a and \p b.
      */
     template<typename T_, int n_, int sa_, int sb_>
-    CUDA_FUNC inline typename Vector<T_, n_>::DataType dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
+    CUDA_HOST_DEVICE inline typename Vector<T_, n_>::DataType dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       typename Vector<T_, n_>::DataType r(0);
 
@@ -2385,7 +2385,7 @@ namespace FEAT
      * \returns The dot-product of \p a and \p b.
      */
     template<typename T_, int m_, int n_, int sma_, int sna_, int smb_, int snb_>
-    CUDA_FUNC inline typename Matrix<T_, m_, n_>::DataType dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    CUDA_HOST_DEVICE inline typename Matrix<T_, m_, n_>::DataType dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
     {
       typename Matrix<T_, m_, n_>::DataType r(0);
       for(int i(0); i < m_; ++i)
@@ -2404,7 +2404,7 @@ namespace FEAT
      * \returns The dot-product of \p a and \p b.
      */
     template<typename T_, int l_, int m_, int n_, int sla_ ,int sma_, int sna_, int slb_, int smb_, int snb_>
-    CUDA_FUNC inline typename Tensor3<T_, l_, m_, n_>::DataType dot(
+    CUDA_HOST_DEVICE inline typename Tensor3<T_, l_, m_, n_>::DataType dot(
       const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a,
       const Tensor3<T_, l_, m_, n_, slb_, smb_, snb_>& b)
     {
@@ -2426,7 +2426,7 @@ namespace FEAT
      * The scalar to be added onto \p x
      */
     template<typename T_>
-    CUDA_FUNC inline void add_id(T_& x, const T_& alpha)
+    CUDA_HOST_DEVICE inline void add_id(T_& x, const T_& alpha)
     {
       x += alpha;
     }
@@ -2441,7 +2441,7 @@ namespace FEAT
      * The scalar to be added onto \p x
      */
     template<typename T_, int n_, int sn_>
-    CUDA_FUNC inline void add_id(Vector<T_, n_, sn_>& x, const typename Vector<T_, n_, sn_>::DataType& alpha)
+    CUDA_HOST_DEVICE inline void add_id(Vector<T_, n_, sn_>& x, const typename Vector<T_, n_, sn_>::DataType& alpha)
     {
       for(int i(0); i < n_; ++i)
         add_id(x(i), alpha);
@@ -2457,7 +2457,7 @@ namespace FEAT
      * The scalar to be added onto the main diagonal of \p x
      */
     template<typename T_, int n_, int sm_, int sn_>
-    CUDA_FUNC inline void add_id(Matrix<T_, n_, n_, sm_, sn_>& x, const typename Matrix<T_, n_, n_, sm_, sn_>::DataType& alpha)
+    CUDA_HOST_DEVICE inline void add_id(Matrix<T_, n_, n_, sm_, sn_>& x, const typename Matrix<T_, n_, n_, sm_, sn_>::DataType& alpha)
     {
       for(int i(0); i < n_; ++i)
         add_id(x(i,i), alpha);
@@ -2473,7 +2473,7 @@ namespace FEAT
      * The scalar to be added onto the main diagonal of \p x
      */
     template<typename T_, int n_, int sl_, int sm_, int sn_>
-    CUDA_FUNC inline void add_id(Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>& x, const typename Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>::DataType& alpha)
+    CUDA_HOST_DEVICE inline void add_id(Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>& x, const typename Tensor3<T_, n_, n_, n_, sl_, sm_, sn_>::DataType& alpha)
     {
       for(int i(0); i < n_; ++i)
         add_id(x(i,i,i), alpha);
@@ -2494,7 +2494,7 @@ namespace FEAT
      * The scaling factor for \p x
      */
     template<typename T_>
-    CUDA_FUNC inline void axpy(T_& y, const T_& x, const T_& alpha)
+    CUDA_HOST_DEVICE inline void axpy(T_& y, const T_& x, const T_& alpha)
     {
       y += alpha*x;
     }
@@ -2514,7 +2514,7 @@ namespace FEAT
      * The scaling factor for \p x
      */
     template<typename T_, int n_, int sn_>
-    CUDA_FUNC inline void axpy(
+    CUDA_HOST_DEVICE inline void axpy(
       Vector<T_, n_, sn_>& y,
       const Vector<T_, n_, sn_>& x,
       const typename Vector<T_, n_, sn_>::DataType& alpha)
@@ -2538,7 +2538,7 @@ namespace FEAT
      * The scaling factor for \p x
      */
     template<typename T_, int m_, int n_, int sm_, int sn_>
-    CUDA_FUNC inline void axpy(
+    CUDA_HOST_DEVICE inline void axpy(
       Matrix<T_, m_, n_, sm_, sn_>& y,
       const Matrix<T_, m_, n_, sm_, sn_>& x,
       const typename Matrix<T_, m_, n_, sm_, sn_>::DataType& alpha)
@@ -2562,7 +2562,7 @@ namespace FEAT
      * The scaling factor for \p x
      */
     template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
-    CUDA_FUNC inline void axpy(
+    CUDA_HOST_DEVICE inline void axpy(
       Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& y,
       const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& x,
       const typename Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>::DataType& alpha)
@@ -2584,7 +2584,7 @@ namespace FEAT
       struct CofHelper
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           // Note: We need to specify the template arguments for the 'compute' function explicitly as the
           //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
@@ -2614,7 +2614,7 @@ namespace FEAT
       struct CofHelper<1,1>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ DOXY((&a)[sma_][sna_]))
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ DOXY((&a)[sma_][sna_]))
         {
           b[0][0] = T_(1);
         }
@@ -2624,7 +2624,7 @@ namespace FEAT
       struct CofHelper<2,2>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           b[0][0] =  a[1][1];
           b[0][1] = -a[0][1];
@@ -2637,7 +2637,7 @@ namespace FEAT
       struct CofHelper<3,3>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           b[0][0] = a[1][1]*a[2][2] - a[1][2]*a[2][1];
           b[1][0] = a[1][2]*a[2][0] - a[1][0]*a[2][2];
@@ -2655,7 +2655,7 @@ namespace FEAT
       struct CofHelper<4,4>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ w[6];
           w[0] = a[2][0]*a[3][1]-a[2][1]*a[3][0];
@@ -2698,7 +2698,7 @@ namespace FEAT
       struct CofHelper<5,5>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ w[20];
           w[ 0] = a[3][0]*a[4][1]-a[3][1]*a[4][0];
@@ -2790,7 +2790,7 @@ namespace FEAT
       struct CofHelper<6,6>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ w[35];
           w[ 0] = a[4][0]*a[5][1]-a[4][1]*a[5][0];
@@ -2998,7 +2998,7 @@ namespace FEAT
       struct DetHelper<n_,n_>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // create temporary copy of a and a pivot array
           T_ b[n_*n_];
@@ -3034,7 +3034,7 @@ namespace FEAT
       struct DetHelper<1,1>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           return a[0][0];
         }
@@ -3044,7 +3044,7 @@ namespace FEAT
       struct DetHelper<2,2>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           return a[0][0]*a[1][1] - a[0][1]*a[1][0];
         }
@@ -3054,7 +3054,7 @@ namespace FEAT
       struct DetHelper<3,3>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           return  a[0][0]*(a[1][1]*a[2][2] - a[1][2]*a[2][1])
                 + a[0][1]*(a[1][2]*a[2][0] - a[1][0]*a[2][2])
@@ -3066,7 +3066,7 @@ namespace FEAT
       struct DetHelper<4,4>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // 2x2 determinants of rows 3-4
           T_ w[6] =
@@ -3091,7 +3091,7 @@ namespace FEAT
       struct DetHelper<5,5>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // 2x2 determinants of rows 4-5
           T_ v[10] =
@@ -3135,7 +3135,7 @@ namespace FEAT
       struct DetHelper<6,6>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // 2x2 determinants of rows 5-6
           T_ v[15] =
@@ -3211,7 +3211,7 @@ namespace FEAT
       struct VolHelper
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // generic fallback implementation: compute b := a^T * a and return sqrt(det(b))
           T_ b[n_][n_];
@@ -3238,7 +3238,7 @@ namespace FEAT
       struct VolHelper<n_,n_>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // square matrix special case: vol(a) = abs(det(a))
           #ifndef __CUDACC__
@@ -3253,7 +3253,7 @@ namespace FEAT
       struct VolHelper<2,1>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the only matrix column.
           #ifndef __CUDACC__
@@ -3268,7 +3268,7 @@ namespace FEAT
       struct VolHelper<3,1>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the only matrix column.
           #ifndef __CUDACC__
@@ -3283,7 +3283,7 @@ namespace FEAT
       struct VolHelper<3,2>
       {
         template<typename T_, int sm_, int sn_>
-        CUDA_FUNC static T_ compute(const T_ (&a)[sm_][sn_])
+        CUDA_HOST_DEVICE static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the 3D cross product of the two matrix columns.
           #ifndef __CUDACC__
@@ -3304,7 +3304,7 @@ namespace FEAT
       struct InverseHelper<1,1>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           b[0][0] = T_(1) / a[0][0];
         }
@@ -3314,7 +3314,7 @@ namespace FEAT
       struct InverseHelper<2,2>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ d = T_(1) / (a[0][0]*a[1][1] - a[0][1]*a[1][0]);
           b[0][0] =  d*a[1][1];
@@ -3328,7 +3328,7 @@ namespace FEAT
       struct InverseHelper<3,3>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           b[0][0] = a[1][1]*a[2][2] - a[1][2]*a[2][1];
           b[1][0] = a[1][2]*a[2][0] - a[1][0]*a[2][2];
@@ -3350,7 +3350,7 @@ namespace FEAT
       struct InverseHelper<4,4>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ w[6];
           w[0] = a[2][0]*a[3][1]-a[2][1]*a[3][0];
@@ -3393,7 +3393,7 @@ namespace FEAT
       struct InverseHelper<5,5>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ w[20];
           w[ 0] = a[3][0]*a[4][1]-a[3][1]*a[4][0];
@@ -3484,7 +3484,7 @@ namespace FEAT
       struct InverseHelper<6,6>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           T_ w[35];
           w[ 0] = a[4][0]*a[5][1]-a[4][1]*a[5][0];
@@ -3689,7 +3689,7 @@ namespace FEAT
       struct InverseHelper<n_, n_>
       {
         template<typename T_, int smb_, int snb_, int sma_, int sna_>
-        CUDA_FUNC static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
+        CUDA_HOST_DEVICE static void compute(T_ (&b)[smb_][snb_], const T_ (&a)[sma_][sna_])
         {
           // copy matrix a to b
           for (int i(0); i < n_; ++i)

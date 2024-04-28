@@ -68,6 +68,8 @@ namespace FEAT
     void cuda_reset_device();
     void cuda_copy(void * dest, const void * src, const Index bytes);
     void cuda_copy_host_to_device(void * dest, const void * src, const Index bytes);
+    void cuda_copy_device_to_host(void * dest, const void * src, const Index bytes);
+    void cuda_copy_device_to_device(void * dest, const void * src, const Index bytes);
     void cuda_reset_algos();
     template <typename DT_>
     void cuda_set_memory(DT_ * address, const DT_ val, const Index count);

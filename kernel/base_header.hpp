@@ -130,16 +130,17 @@ namespace FEAT
 // since we do not always compile with nvcc directly (only cuda kernels themselves), we have to define the nvcc macros so
 // we do not get a compilation error
 #ifdef __NVCC__
-/// Tells nvcc the function should be callable from the host (i.e. CPU)
+/// Tells nvcc the function should be callable from the host (i.e. CPU). This is the same as not providing any flag, which is,
+/// if in doubt, what you generally want
 #define CUDA_HOST __host__
 /// Tells nvcc the function should be callable from the device (i.e. GPU)
 #define CUDA_DEVICE __device__
 /// Function should be callable from device and host
-#define CUDA_FUNC __host__ __device__
+#define CUDA_HOST_DEVICE __host__ __device__
 #else
 #define CUDA_HOST
 #define CUDA_DEVICE
-#define CUDA_FUNC
+#define CUDA_HOST_DEVICE
 #endif
 
 #endif // KERNEL_BASE_HEADER_HPP

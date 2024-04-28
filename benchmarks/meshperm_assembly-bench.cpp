@@ -190,9 +190,9 @@ namespace MeshPermAssemblyBench
   void bench_poisson_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index lvl, PreferredBackend backend)
   {
     Backend::set_preferred_backend(backend);
-    #ifdef FEAT_HAVE_CUDA
-    Util::cuda_start_profiling();
-    #endif
+    // #ifdef FEAT_HAVE_CUDA
+    // Util::cuda_start_profiling();
+    // #endif
     typedef Geometry::ConformalMesh<Shape_, nc_, CT_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef PoissonSpace<TrafoType> SpaceType;
@@ -230,9 +230,9 @@ namespace MeshPermAssemblyBench
       bres.num_asm_count += 1;
     } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
     Backend::set_preferred_backend(standard_backend);
-    #ifdef FEAT_HAVE_CUDA
-    Util::cuda_stop_profiling();
-    #endif
+    // #ifdef FEAT_HAVE_CUDA
+    // Util::cuda_stop_profiling();
+    // #endif
   }
 
 
@@ -344,9 +344,9 @@ namespace MeshPermAssemblyBench
   template<typename Shape_, int nc_, typename CT_>
   void bench_burgers_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index lvl, PreferredBackend backend)
   {
-    #ifdef FEAT_HAVE_CUDA
-    Util::cuda_start_profiling();
-    #endif
+    // #ifdef FEAT_HAVE_CUDA
+    // Util::cuda_start_profiling();
+    // #endif
     Backend::set_preferred_backend(backend);
     typedef Geometry::ConformalMesh<Shape_, nc_, CT_> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
@@ -393,9 +393,9 @@ namespace MeshPermAssemblyBench
       bres.num_asm_count += 1;
     } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
     Backend::set_preferred_backend(standard_backend);
-    #ifdef FEAT_HAVE_CUDA
-    Util::cuda_stop_profiling();
-    #endif
+    // #ifdef FEAT_HAVE_CUDA
+    // Util::cuda_stop_profiling();
+    // #endif
   }
 
   template<typename Mesh_>

@@ -18,12 +18,12 @@ void Transpose::value_cuda(float * r, const float * const x, Index rows_x, Index
   cublasStatus_t status;
   float one(1);
   float zero(0);
+  float* temp = nullptr;
 
   if (r == x)
   {
-    float * temp;
-    cudaMalloc((void**)&temp, rows_x * columns_x * sizeof(float));
-    cudaMemcpy(temp, x, rows_x * columns_x * sizeof(float), cudaMemcpyDeviceToDevice);
+    temp = (float*)Util::cuda_malloc(rows_x * columns_x * sizeof(float));
+    Util::cuda_copy_device_to_device(temp, x, rows_x * columns_x * sizeof(float));
     status = cublasSgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, int(rows_x), int(columns_x), &one, temp, int(columns_x), &zero, nullptr, int(columns_x), r, int(rows_x));
   }
   else
@@ -33,12 +33,15 @@ void Transpose::value_cuda(float * r, const float * const x, Index rows_x, Index
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 
+
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
+  //free ptr
+  Util::cuda_free(temp);
 }
 
 void Transpose::value_cuda(double * r, const double * const x, Index rows_x, Index columns_x)
@@ -46,12 +49,12 @@ void Transpose::value_cuda(double * r, const double * const x, Index rows_x, Ind
   cublasStatus_t status;
   double one(1);
   double zero(0);
+  double *temp = nullptr;
 
   if (r == x)
   {
-    double * temp;
-    cudaMalloc((void**)&temp, rows_x * columns_x * sizeof(double));
-    cudaMemcpy(temp, x, rows_x * columns_x * sizeof(double), cudaMemcpyDefault);
+    temp = (double*)Util::cuda_malloc(rows_x * columns_x * sizeof(double));
+    Util::cuda_copy(temp, x, rows_x * columns_x * sizeof(double));
     status = cublasDgeam(Util::Intern::cublas_handle, CUBLAS_OP_T, CUBLAS_OP_N, int(rows_x), int(columns_x), &one, temp, int(columns_x), &zero, nullptr, int(columns_x), r, int(rows_x));
   }
   else
@@ -68,4 +71,5 @@ void Transpose::value_cuda(double * r, const double * const x, Index rows_x, Ind
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
 #endif
+  Util::cuda_free(temp);
 }

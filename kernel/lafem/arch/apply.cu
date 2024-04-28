@@ -240,8 +240,7 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMV_bufferSize failed with status code: " + stringify(cusparseGetErrorString(status)));
 
-  void* buffer;
-  cudaMalloc(&buffer, buffer_size);
+  void* buffer = Util::cuda_malloc(buffer_size);
 
   status = cusparseSpMV(Util::Intern::cusparse_handle, trans, &a, descr, dx, &b, dr, ct, CUSPARSE_SPMV_CSR_ALG1, buffer);
   if (status != CUSPARSE_STATUS_SUCCESS)
@@ -250,7 +249,7 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
   cusparseDestroySpMat(descr);
   cusparseDestroyDnVec(dx);
   cusparseDestroyDnVec(dr);
-  cudaFree(buffer);
+  Util::cuda_free(buffer);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -278,7 +277,7 @@ void Apply::bcsr_intern_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT
 {
   if (r != y)
   {
-    cudaMemcpy(r, y, rows * BlockSize * sizeof(DT_), cudaMemcpyDeviceToDevice);
+    Util::cuda_copy_device_to_device(r, y, rows * BlockSize * sizeof(DT_));
   }
 
   cusparseMatDescr_t descr=0;
@@ -433,7 +432,7 @@ void Apply::dense_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * con
 {
   if (r != y)
   {
-    cudaMemcpy(r, y, rows * sizeof(DT_), cudaMemcpyDeviceToDevice);
+    Util::cuda_copy_device_to_device(r, y, rows * sizeof(DT_));
   }
 
   FEAT::LAFEM::Intern::cublas_apply_dense(CUBLAS_OP_T, (int)rows, (int)columns, &alpha, val, x, &beta, r);

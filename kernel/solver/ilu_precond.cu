@@ -74,7 +74,7 @@ namespace FEAT
         info->m = m;
         info->nnz = nnz;
 
-        cudaMalloc((void**)&(info->z), m * sizeof(double));
+        info->z = (double*)Util::cuda_malloc(m * sizeof(double));
 
 
         cusparseStatus_t status;
@@ -167,7 +167,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_bufferSize failed with status code: " + stringify(status));
 #endif
         info->pBufferSize = max(info->pBufferSize_M, int(max(info->pBufferSize_L, info->pBufferSize_U)));
-        cudaMalloc((void**)&(info->pBuffer), info->pBufferSize_M);
+        info->pBuffer = Util::cuda_malloc(info->pBufferSize_M);
 
         status = cusparseDcsrilu02_analysis(Util::Intern::cusparse_handle, m, nnz, info->descr_M,
                 csrVal, csrRowPtr, csrColInd, info->info_M,
@@ -292,8 +292,8 @@ namespace FEAT
       {
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
 
-        cudaFree(info->z);
-        cudaFree(info->pBuffer);
+        Util::cuda_free(info->z);
+        Util::cuda_free(info->pBuffer);
         cusparseDestroyMatDescr(info->descr_M);
 #if CUSPARSE_VER_MAJOR < 12
         cusparseDestroyMatDescr(info->descr_L);
@@ -338,8 +338,7 @@ namespace FEAT
 
       void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd, const int blocksize)
       {
-        double * z;
-        cudaMalloc((void**)&z, m * blocksize * sizeof(double));
+        double * z = (double*)Util::cuda_malloc(m * blocksize * sizeof(double));
 
         cusparseMatDescr_t descr_M = 0;
         cusparseMatDescr_t descr_L = 0;
@@ -391,7 +390,7 @@ namespace FEAT
 
         pBufferSize = max(pBufferSize_M, max(pBufferSize_L, pBufferSize_U));
 
-        cudaMalloc((void**)&pBuffer, pBufferSize);
+        pBuffer = Util::cuda_malloc(pBufferSize);
 
         status = cusparseDbsrilu02_analysis(Util::Intern::cusparse_handle, dir, m, nnz, descr_M,
                 csrVal, csrRowPtr, csrColInd, blocksize, info_M,
@@ -490,8 +489,8 @@ namespace FEAT
       {
         CudaIluBSolveInfo * info = (CudaIluBSolveInfo *) vinfo;
 
-        cudaFree(info->z);
-        cudaFree(info->pBuffer);
+        Util::cuda_free(info->z);
+        Util::cuda_free(info->pBuffer);
         cusparseDestroyMatDescr(info->descr_M);
         cusparseDestroyMatDescr(info->descr_L);
         cusparseDestroyMatDescr(info->descr_U);

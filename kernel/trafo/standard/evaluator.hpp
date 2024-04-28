@@ -9,7 +9,7 @@
 
 // includes, FEAT
 #include <kernel/trafo/evaluator_base.hpp>
-#include "details.hpp"
+#include <kernel/trafo/standard/details.hpp>
 
 namespace FEAT
 {

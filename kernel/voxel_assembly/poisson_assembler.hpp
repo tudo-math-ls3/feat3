@@ -41,7 +41,7 @@ namespace FEAT
     namespace Kernel
     {
       template<typename SpaceHelp_, typename LocMatType_, int dim_, int num_verts_>
-      CUDA_FUNC void poisson_assembly_kernel(LocMatType_& loc_mat, const typename SpaceHelp_::DataType (&local_coeffs)[dim_][num_verts_],
+      CUDA_HOST_DEVICE void poisson_assembly_kernel(LocMatType_& loc_mat, const typename SpaceHelp_::DataType (&local_coeffs)[dim_][num_verts_],
                                             const typename SpaceHelp_::DomainPointType* cub_pt, const typename SpaceHelp_::DataType* cub_wg, const int num_cubs)
       {
         typedef SpaceHelp_ SpaceHelp;

@@ -12,7 +12,7 @@ namespace FEAT
     namespace Kernel
     {
 
-      template<typename Space_, typename DT_, typename IT_, Policy::MaGaScPolicy pol_ = Policy::MaGaScPolicy::useLocalOps>
+      template<typename Space_, typename DT_, typename IT_, FEAT::Intern::MatrixGatherScatterPolicy pol_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>
       void full_burgers_assembler_matrix1_bcsr_host(DT_* matrix_data, const DT_* conv_data,
                 const IT_*  matrix_row_ptr, const IT_* matrix_col_idx, Index matrix_num_rows, Index matrix_num_cols,
                 const Tiny::Vector<DT_, Space_::world_dim>* cub_pt,
@@ -70,7 +70,7 @@ namespace FEAT
           //if we need to, gather local convection vector
           if(need_convection || need_streamline) //need stream diff or convection?
           {
-            LAFEM::template VecGaScHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_conv_dofs,
+            LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_conv_dofs,
                       (const VecValueType*)conv_data, IndexType(matrix_num_rows), local_dofs,DataType(1));
           }
 
@@ -78,7 +78,7 @@ namespace FEAT
                                       need_streamline, need_convection, tol_eps);
 
           //scatter
-          LAFEM::template MaGaScHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, (MatValueType*)matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
+          LAFEM::template MatrixGatherScatterHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, (MatValueType*)matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
 
         }
       }
@@ -131,20 +131,20 @@ namespace FEAT
           Index cell = Index(coloring_map[idx]);
           const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
           SpaceHelp::set_coefficients(local_coeffs, local_dofs, nodes);
-          LAFEM::template VecGaScHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_prim_dofs,
+          LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_prim_dofs,
                     (const VecValueType*)primal_data, IndexType(vec_size), local_dofs, DataType(1));
 
           //if we need to, gather local convection vector
           if(need_convection) //need stream diff or convection?
           {
-            LAFEM::template VecGaScHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_conv_dofs,
+            LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_conv_dofs,
                       (const VecValueType*)conv_data, IndexType(vec_size), local_dofs, DataType(1));
           }
 
           VoxelAssembly::Kernel::burgers_defect_assembly_kernel<SpaceHelp>(loc_vec, local_prim_dofs, local_conv_dofs, local_coeffs, cub_pt, cub_wg, num_cubs,
                                                          burgers_params, need_convection);
           //scatter
-          LAFEM::template VecGaScHelper<SpaceType, DataType, IndexType>::scatter_vector_dense(loc_vec,
+          LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::scatter_vector_dense(loc_vec,
                     (VecValueType*)vector_data, IndexType(vec_size), local_dofs, alpha);
 
         }
@@ -195,7 +195,7 @@ namespace FEAT
       {
         for(Index col = 0; col < Index(coloring_maps_host.size()); ++col)
         {
-          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_host<Space_, DT_, IT_, Policy::MaGaScPolicy::useLocalSortHelper>(
+          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_host<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>(
               matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
               (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
               cubature.cub_wg, cubature.num_cubs, alpha,

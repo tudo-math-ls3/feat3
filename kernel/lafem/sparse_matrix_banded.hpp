@@ -1125,6 +1125,7 @@ namespace FEAT
         return VectorTypeR(this->columns());
       }
 
+      /// Returns first row-index of the diagonal matching to the offset i
       template <typename ITX_>
       inline Index _start_offset(const Index i, const ITX_ * const offsets,
                                 const Index rows_in, const Index columns_in, const Index noo) const
@@ -1143,6 +1144,7 @@ namespace FEAT
         }
       }
 
+      /// Returns last row-index of the diagonal matching to the offset i
       template <typename ITX_>
       inline Index _end_offset(const Index i, const ITX_ * const offsets,
                               const Index rows_in, const Index columns_in, const Index noo) const
@@ -1160,6 +1162,7 @@ namespace FEAT
           return Math::min(rows_in, columns_in + rows_in - Index(offsets[i]) - Index(1)) - Index(1);
         }
       }
+
       /// Returns first row-index of the diagonal matching to the offset i
       Index start_offset(const Index i) const
       {

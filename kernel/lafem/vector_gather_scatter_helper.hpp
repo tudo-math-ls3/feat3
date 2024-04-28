@@ -30,10 +30,10 @@ namespace FEAT
       * \author Maximilian Esser
       */
     template<typename Space_, typename DT_, typename IT_>
-    struct VecGaScHelper;
+    struct VectorGatherScatterHelper;
 
     template<typename Space_, typename DT_, typename IT_>
-    struct VecGaScHelper
+    struct VectorGatherScatterHelper
     {
       typedef Space_ SpaceType;
       typedef DT_ DataType;
@@ -54,7 +54,7 @@ namespace FEAT
        *         i.e. InnerType_ refers to Tiny::Vector .
        */
       template<typename InnerType_, int numr_>
-      CUDA_FUNC static void scatter_vector_dense(const Tiny::Vector<InnerType_, numr_>& loc_vec, InnerType_* data, [[maybe_unused]] IndexType num_entries, const IndexType* map, DataType alpha = DataType(1))
+      CUDA_HOST_DEVICE static void scatter_vector_dense(const Tiny::Vector<InnerType_, numr_>& loc_vec, InnerType_* data, [[maybe_unused]] IndexType num_entries, const IndexType* map, DataType alpha = DataType(1))
       {
         #ifndef __CUDACC__
         static_assert(std::is_same<typename Tiny::Intern::DataTypeExtractor<InnerType_>::MyDataType, DataType>(), "Inner Datatype does not match!");
@@ -88,7 +88,7 @@ namespace FEAT
        *         i.e. InnerType_ refers to Tiny::Vector .
        */
       template<typename InnerType_, int numr_>
-      CUDA_FUNC static void gather_vector_dense(Tiny::Vector<InnerType_, numr_>& loc_vec, const InnerType_* data, [[maybe_unused]] IndexType num_entries, const IndexType* map, DataType alpha = DataType(1))
+      CUDA_HOST_DEVICE static void gather_vector_dense(Tiny::Vector<InnerType_, numr_>& loc_vec, const InnerType_* data, [[maybe_unused]] IndexType num_entries, const IndexType* map, DataType alpha = DataType(1))
       {
         #ifndef __CUDACC__
         static_assert(std::is_same<typename Tiny::Intern::DataTypeExtractor<InnerType_>::MyDataType, DataType>(), "Inner Datatype does not match!");
@@ -106,7 +106,7 @@ namespace FEAT
           Tiny::axpy(loc_vec[i], data[dof_idx], alpha);
         }
       }
-    }; //struct GPUVecGaScHelper
+    }; //struct GPUVectorGatherScatterHelper
   }
 }
 

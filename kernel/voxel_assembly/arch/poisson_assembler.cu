@@ -21,7 +21,7 @@ namespace FEAT
       * \tparam Space_ The underlying spacetype.
       * \tparam DT_ The datatype used.
       * \tparam IT_ The indextype.
-      * \tparam pol_ The scatter and gather policy. See MaGaScPolicy for details.
+      * \tparam pol_ The scatter and gather policy. See MatrixGatherScatterPolicy for details.
       *
       * \warning All ptr used here have to be unified or device pointer.
       * \param[out] matrix_data The matrix data array initilized as a unified memory array. Is added upon, so format before!
@@ -41,7 +41,7 @@ namespace FEAT
       * \param[in] coloring_size Size of the coloring array.
       * \param[in] cell_to_dof_sorter Depending on the used policy, this should either be nullptr, a local sorted array (or a col_ptr)
       */
-      template<typename Space_, typename DT_, typename IT_, Policy::MaGaScPolicy pol_ = Policy::MaGaScPolicy::useLocalOps>
+      template<typename Space_, typename DT_, typename IT_, FEAT::Intern::MatrixGatherScatterPolicy pol_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>
       __global__ void poisson_assembler_matrix1_csr(DT_* __restrict__ matrix_data,
                 const IT_* __restrict__  matrix_row_ptr, const IT_* __restrict__ matrix_col_idx, Index matrix_num_rows, Index matrix_num_cols,
                 const Tiny::Vector<DT_, Space_::world_dim>* __restrict__ cub_pt,
@@ -96,7 +96,7 @@ namespace FEAT
         VoxelAssembly::Kernel::poisson_assembly_kernel<SpaceHelp, LocMatType>(loc_mat, local_coeffs, cub_pt, cub_wg, num_cubs);
 
         //scatter
-        LAFEM::template MaGaScHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
+        LAFEM::template MatrixGatherScatterHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
 
 
       }
@@ -105,7 +105,7 @@ namespace FEAT
       /*                                       CUDA Host OMP Kernels                                                */
       /**************************************************************************************************************/
       /** \copydoc(poisson_assembler_matrix1_csr())*/
-      template<typename Space_, typename DT_, typename IT_, Policy::MaGaScPolicy pol_ = Policy::MaGaScPolicy::useLocalOps>
+      template<typename Space_, typename DT_, typename IT_, FEAT::Intern::MatrixGatherScatterPolicy pol_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>
       void poisson_assembler_matrix1_csr_host(DT_*  matrix_data,
                 const IT_*  matrix_row_ptr, const IT_*  matrix_col_idx, Index matrix_num_rows, Index matrix_num_cols,
                 const Tiny::Vector<DT_, Space_::world_dim>*  cub_pt,
@@ -151,7 +151,7 @@ namespace FEAT
           VoxelAssembly::Kernel::poisson_assembly_kernel<SpaceHelp, LocMatType>(loc_mat, local_coeffs, cub_pt, cub_wg, num_cubs);
 
           // scatter
-          LAFEM::template MaGaScHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
+          LAFEM::template MatrixGatherScatterHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
         }
 
 
@@ -179,7 +179,7 @@ namespace FEAT
           grid.x = (unsigned int)ceil(double(coloring_maps_host[i].size())/double(block.x));
 
           //kernel call, since this uses the standard stream, sync before next call is enforced:
-          VoxelAssembly::Kernel::template poisson_assembler_matrix1_csr<Space_, DT_, IT_, Policy::MaGaScPolicy::useLocalSortHelper><<< grid, block >>>(
+          VoxelAssembly::Kernel::template poisson_assembler_matrix1_csr<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper><<< grid, block >>>(
               matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
               (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
               cubature.cub_wg, cubature.num_cubs, alpha,
@@ -203,7 +203,7 @@ namespace FEAT
       {
         for(Index col = 0; col < Index(coloring_maps_host.size()); ++col)
         {
-          VoxelAssembly::Kernel::template poisson_assembler_matrix1_csr_host<Space_, DT_, IT_, Policy::MaGaScPolicy::useLocalSortHelper>(
+          VoxelAssembly::Kernel::template poisson_assembler_matrix1_csr_host<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>(
             matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
             (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
             cubature.cub_wg, cubature.num_cubs, alpha, dof_mapping.cell_to_dof, dof_mapping.cell_num,

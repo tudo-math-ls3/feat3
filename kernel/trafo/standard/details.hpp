@@ -86,7 +86,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexType_, typename IndexTupleType_>
-        CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
         {
           typedef VertexType_ VertexType;
 
@@ -114,7 +114,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -134,7 +134,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < img_dim; ++i)
           {
@@ -154,7 +154,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
         {
           hess_ten.format();
         }
@@ -168,7 +168,7 @@ namespace FEAT
          * \returns
          * The volume of the current cell.
          */
-        CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
         {
           DataType v = DataType(0);
           #ifndef __CUDA_ARCH__
@@ -196,7 +196,7 @@ namespace FEAT
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_FUNC static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType (&coeffs)[image_dim][num_verts])
         {
           // in 1D, the width is always equal to the volume
           return volume(coeffs);
@@ -246,7 +246,7 @@ namespace FEAT
          *
          */
         template<typename VertexType_, typename IndexTupleType_>
-        CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
         {
           typedef VertexType_ VertexType;
 
@@ -276,7 +276,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -296,7 +296,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -317,7 +317,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
         {
           hess_ten.format();
         }
@@ -331,7 +331,7 @@ namespace FEAT
          * \returns
          * The volume of the current cell.
          */
-        CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
         {
           JacobianMatrixType jac_mat;
           for(int i(0); i < image_dim; ++i)
@@ -356,7 +356,7 @@ namespace FEAT
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_FUNC static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
         {
           // This one is a little tricky:
           // We follow a similar approach as on quadrilaterals here, i.e. we first map the ray
@@ -440,7 +440,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexType_, typename IndexTupleType_>
-        CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
         {
           // fetch the vertices of the edge
           typedef VertexType_ VertexType;
@@ -472,7 +472,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -494,7 +494,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -516,7 +516,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
         {
           hess_ten.format();
         }
@@ -530,7 +530,7 @@ namespace FEAT
          * \returns
          * The volume of the current cell.
          */
-        CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
         {
           JacobianMatrixType jac_mat;
           for(int i(0); i < image_dim; ++i)
@@ -556,7 +556,7 @@ namespace FEAT
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_FUNC static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
         {
           // We follow the same approach as for triangles here:
           // First, map the ray onto the reference element and then
@@ -638,7 +638,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexType_, typename IndexTupleType_>
-        CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
         {
           typedef VertexType_ VertexType;
 
@@ -666,7 +666,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -686,7 +686,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < img_dim; ++i)
           {
@@ -706,7 +706,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
         {
           hess_ten.format();
         }
@@ -720,7 +720,7 @@ namespace FEAT
          * \returns
          * The volume of the current cell.
          */
-        CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
         {
           DataType v = DataType(0);
           #ifndef __CUDA_ARCH__
@@ -748,7 +748,7 @@ namespace FEAT
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_FUNC static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType (&coeffs)[image_dim][num_verts])
         {
           // in 1D, the width is always equal to the volume
           return volume(coeffs);
@@ -797,7 +797,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexType_, typename IndexTupleType_>
-        CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
         {
           typedef VertexType_ VertexType;
 
@@ -829,7 +829,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -850,7 +850,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -871,7 +871,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -889,7 +889,7 @@ namespace FEAT
          * \returns
          * The volume of the current cell.
          */
-        CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
         {
           // According to Varignon's theorem, the area/volume of a quadrilateral is
           // equal to twice the area of the dual parallelogram of the quadrilateral,
@@ -929,7 +929,7 @@ namespace FEAT
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_FUNC static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
         {
           JacobianMatrixType jac_mat;
           JacobianInverseType jac_inv;
@@ -993,7 +993,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexType_, typename IndexTupleType_>
-        CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
         {
           typedef VertexType_ VertexType;
 
@@ -1035,7 +1035,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -1059,7 +1059,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -1081,7 +1081,7 @@ namespace FEAT
          * \param[in] coeffs
          * A two dimensional array holding the local coefficients of the trafo.
          */
-        CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -1101,7 +1101,7 @@ namespace FEAT
          * \returns
          * The volume of the current cell.
          */
-        CUDA_FUNC static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
         {
           // In contrast to 2D, it is not sufficient to evaluate the Jacobian determinant
           // in the barycentre of the cell to compute the cell's volume, as this will give
@@ -1145,7 +1145,7 @@ namespace FEAT
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_FUNC static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
         {
           JacobianMatrixType jac_mat;
           JacobianInverseType jac_inv;
@@ -1195,7 +1195,7 @@ namespace FEAT
       //   static constexpr int image_dim = img_dim;
 
       //   template<typename VertexSetType_, typename IndexTupleType_>
-      //   CUDA_FUNC static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const IndexTupleType_& DOXY(index_tuple), const VertexSetType_& vertex_set)
+      //   CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const IndexTupleType_& DOXY(index_tuple), const VertexSetType_& vertex_set)
       //   {
       //     const auto& vtx = vertex_set;
 
@@ -1206,7 +1206,7 @@ namespace FEAT
 
       //   }
 
-      //   CUDA_FUNC static inline void map_point(ImagePointType& img_point, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
       //   {
       //     for(int i(0); i < image_dim; ++i)
       //     {
@@ -1214,19 +1214,19 @@ namespace FEAT
       //     }
       //   }
 
-      //   CUDA_FUNC static inline void calc_jac_mat(JacobianMatrixType& DOXY(jac_mat), const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& DOXY(jac_mat), const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
       //   {
       //   }
 
-      //   CUDA_FUNC static inline void calc_hess_ten(HessianTensorType& DOXY(hess_ten), const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& DOXY(hess_ten), const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
       //   {
       //   }
 
-      //   CUDA_FUNC static inline DataType volume(const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline DataType volume(const DataType DOXY(coeffs)[image_dim][num_verts])
       //   {
       //   }
 
-      //   CUDA_FUNC static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType DOXY(coeffs)[image_dim][num_verts])
       //   {
       //   }
       // };

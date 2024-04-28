@@ -63,7 +63,7 @@ namespace FEAT
        * \param[in] tol_eps Tolerance for local stream norm to be regarded as zero.
        */
       template<typename SpaceHelp_, typename LocMatType_, typename LocVecType_, int dim_, int num_verts_>
-      CUDA_FUNC void burgers_mat_assembly_kernel(LocMatType_& loc_mat, const LocVecType_& local_conv_dofs, const typename SpaceHelp_::DataType (&local_coeffs)[dim_][num_verts_],
+      CUDA_HOST_DEVICE void burgers_mat_assembly_kernel(LocMatType_& loc_mat, const LocVecType_& local_conv_dofs, const typename SpaceHelp_::DataType (&local_coeffs)[dim_][num_verts_],
                                           const typename SpaceHelp_::DomainPointType* cub_pt, const typename SpaceHelp_::DataType* cub_wg, const int num_cubs,
                                           const VoxelAssembly::AssemblyBurgersData<typename SpaceHelp_::DataType>& burgers_params,
                                           const bool need_streamline, const bool need_convection, const typename SpaceHelp_::DataType tol_eps)
@@ -321,7 +321,7 @@ namespace FEAT
        * \param[in] need_convection Do we need convection?
        */
       template<typename SpaceHelp_, typename LocVecType_, int dim_, int num_verts_>
-      CUDA_FUNC void burgers_defect_assembly_kernel(LocVecType_& loc_vec, const LocVecType_& local_prim_dofs, const LocVecType_& local_conv_dofs, const typename SpaceHelp_::DataType (&local_coeffs)[dim_][num_verts_],
+      CUDA_HOST_DEVICE void burgers_defect_assembly_kernel(LocVecType_& loc_vec, const LocVecType_& local_prim_dofs, const LocVecType_& local_conv_dofs, const typename SpaceHelp_::DataType (&local_coeffs)[dim_][num_verts_],
                                           const typename SpaceHelp_::DomainPointType* cub_pt, const typename SpaceHelp_::DataType* cub_wg, const int num_cubs,
                                           const VoxelAssembly::AssemblyBurgersData<typename SpaceHelp_::DataType>& burgers_params,
                                           const bool need_convection)

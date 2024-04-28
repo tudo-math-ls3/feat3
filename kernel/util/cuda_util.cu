@@ -205,6 +205,20 @@ void FEAT::Util::cuda_copy_host_to_device(void * dest, const void * src, const I
     throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
 }
 
+void FEAT::Util::cuda_copy_device_to_host(void * dest, const void * src, const Index bytes)
+{
+  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToHost);
+  if (status != cudaSuccess)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
+}
+
+void FEAT::Util::cuda_copy_device_to_device(void * dest, const void * src, const Index bytes)
+{
+  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToDevice);
+  if (status != cudaSuccess)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
+}
+
 void FEAT::Util::cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly)
 {
   FEAT::Util::cuda_blocksize_misc = misc;
