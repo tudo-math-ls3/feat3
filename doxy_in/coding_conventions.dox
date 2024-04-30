@@ -1,0 +1,303 @@
+/** \page coding_conventions Coding Conventions
+This page summarizes the coding conventions used for FEAT.
+
+\note This page is work-in-progress and therefore the information is incomplete.
+
+<b>Contents</b>
+- \ref codeconv_general_conventions
+- \ref codeconv_naming_conventions
+  - \ref codeconv_nameconv_camelcase
+  - \ref codeconv_nameconv_lower_snakecase
+  - \ref codeconv_nameconv_upper_snakecase
+- \ref codeconv_indent_spacing
+- \ref codeconv_preproc
+- \ref codeconv_functions
+- \ref codeconv_classes
+- \ref codeconv_templates
+- \ref codeconv_misc
+
+<hr><hr>
+\section codeconv_general_conventions 1. General Conventions
+\li FEAT 3 is written in the C++17 standard, namely: <b>ISO/IEC 14882:2017</b>.
+\li All code and documentation is to be written in American English.
+\li It is strongly recommended that lines should not exceed 120 characters.
+\li All header and source files shall begin with the copyright disclaimer:
+\code{.cpp}
+// FEAT3: Finite Element Analysis Toolbox, Version 3
+// Copyright (C) 2010 - 2024 by Stefan Turek & the FEAT group
+// FEAT3 is released under the GNU General Public License version 3,
+// see the file 'copyright.txt' in the top level directory for details.
+\endcode
+\li All header files shall begin with a <c>#pragma once</c> directive directly after the initial copyright disclaimer and optional comment blocks.
+\li Includes of FEAT header files are to be given relative to the FEAT root directory.
+\li Included header file paths are to be enclosed in angle brackets < >.
+\li One line shall not contain more than one statement.
+\li Reference (&) and Pointer (*) specifiers are to be positioned directly after the data type and not in front of the variable name.
+\li It is recommended that only one pointer or reference is be defined per statement.
+\li The keyword for the Null-Pointer is the C++11 \c nullptr and not <c>(void)*0</c>, \c 0 or \c NULL.
+\li The usage of the \c goto statement is not allowed.
+\li Assertions shall be implemented by using one of the ASSERT, ASSERTM, XASSERT and XASSERTM macros.
+\li Program abortion shall be implemented by using the XABORTM macro.
+\li The use of platform-dependent code switches -- independent of whether at preprocessortime, compiletime or runtime --
+  is to be kept to a minimum and each platform switch must be documented by using the (custom) <c>\\platformswitch</c> doxygen command.
+\li The use of <em>compiler hacks</em> is to be kept to a minimum and each compiler hack must be documented by using the (custom) <c>\\compilerhack</c> doxygen command.
+
+<hr><hr>
+\section codeconv_naming_conventions 2. Naming Conventions
+The purpose of this section is to define three naming conventions, which are referenced frequently
+throughout the rest of this page.
+
+The following list prescribes what type of naming convention is to be used for each language construct.
+\li preprocessor macros: UPPER_SNAKE_CASE
+\li namespaces: CamelCase
+\li class/struct/type names: CamelCase
+\li template type parameters: CamelCase postfixed by a single underscore
+\li template value parameters: lower_snake_case postfixed by a single underscore
+\li enumeration names: CamelCase
+\li enumeration values: lower_snake_case
+\li variable names: lower_snake_case
+\li function names: lower_snake_case
+\li function parameters: lower_snake_case
+\li public class member variable names: lower_snake_case
+\li public class member function names: lower_snake_case
+\li private/protected class member variable names: lower_snake_case prefixed by a single underscore
+\li private/protected class member function names: lower_snake_case prefixed by a single underscore
+\li everything else not explicitly mentioned above: lower_snake_case
+
+<hr>
+\subsection codeconv_nameconv_camelcase 2.1 Camel-Case
+<b>Character Set</b>
+- latin letters: 'a' - 'z', 'A' - 'Z'
+- decimal digits: '0' - '9'
+
+<b>Definition</b>\n
+A compound of words is written in Camel-Case by capitalizing the first letter of each word and joining all words without
+spaces. Unless stated otherwise, the leading character must be an upper-case latin letter.
+
+<b>Examples</b>
+- \c Convention
+- \c VectorNorm
+- \c MySuperClass
+- \c CPlusPlus2003
+
+\see http://en.wikipedia.org/wiki/CamelCase
+
+<hr>
+\subsection codeconv_nameconv_lower_snakecase 2.2 Lower Snake-Case
+<b>Character Set</b>
+- lower-case latin letters: 'a' - 'z'
+- decimal digits: '0' - '9'
+- underscore: '_'
+
+<b>Definition</b>\n
+A compound of words is written in lower Snake-Case by joining all words, separating them by underscores. Unless stated
+otherwise, the leading character must be a lower-case latin letter.
+
+<b>Examples</b>
+- \c mathematics
+- \c foo_bar
+- \c my_object_pointer
+
+\see https://en.wikipedia.org/wiki/Snake_case
+
+<hr>
+\subsection codeconv_nameconv_upper_snakecase 2.3 Upper Snake-Case
+<b>Character Set</b>
+- upper-case latin letters: 'A' - 'Z'
+- decimal digits: '0' - '9'
+- underscore: '_'
+
+<b>Definition</b>\n
+A compound of words is written in upper Snake-Case by capitalizing each word and joining all words, separating them by
+underscores. Unless stated otherwise, the leading character must be an upper-case latin letter.
+
+<b>Examples</b>
+- \c FOOBAR
+- \c MAKE_MONEY
+- \c PRINT_TO_SCREEN
+
+\see https://en.wikipedia.org/wiki/Snake_case
+
+<hr><hr>
+\section codeconv_indent_spacing 2. Indentation, Spacing and Line Breaks
+
+\li Indents are realized using 2 spaces; leading TABs are not allowed. In fact, leading TABs are rejected by our main repository's pre-commit hook.
+\li Trailing whitespaces are not allowed and are rejected by our main repository's pre-commit hook.
+\li Each source and header file shall contain a single empty line at the end of the file. Multiple empty lines are rejected by our main repository's pre-commit hook.
+\li If line breaks within a statement are necessary, each line of the statement except for the first one shall have
+  one additional indent.
+\li It is permitted to use additional spaces pretty much anywhere inside a statement if the author thinks that this
+  improves the readability of the corresponding code section.
+\li It is permitted to use empty lines if the author thinks that this improves the readability
+  of the corresponding code section. However, multiple consecutive empty lines are to be avoided.
+\li The code inside a pair of curly braces { } is to be indented.
+  - Exception: The \c private, \c protected and \c public keywords in a \c class or \c struct definition as well as the \c case
+    and \c default keywords in a \c switch statement are \b not to be indented.
+\li Each opening curly brace { shall stand alone in a separate line on the same indent as the statement that preceedes
+  the curly brace. The commonly used C-style convention that the opening brace { is appended to the statement opening
+  the scope shall be avoided.
+\li Each closing curly brace } shall stand alone in a separate line on the same indent as the opening curly brace { that
+  forms a pair with the closing curly brace.
+  - If a closing curly brace } denotes the end of a class/struct/union definiton, then the mandatory semicolon shall
+    be placed directly after the curly brace in the same line.
+\li It shall not happen that two closing curly braces } in two consecutive lines differ by more or less than a single indent.
+  This is not a rule by itself, but rather a corollary of the previous indentation rules regarding curly braces.
+\code{.cpp}
+if(k == 0)
+{
+  return 0;
+}
+else
+{
+  while(k > 2)
+  {
+    k = (k+3) >> 2;
+  }
+}
+\endcode
+\li If a function or template parameter list is to be split across several lines, then all lines except for the first one
+  shall to be indented by a single indent.
+\code{.cpp}
+template<
+  typename DataType_,
+  typename IndexType_>
+void foobar1(
+  DataType_* alpha,
+  DataType_* beta,
+  IndexType_ length)
+{
+ ...
+}
+
+template<typename DataType_, typename IndexType_>
+void foobar2(DataType_* alpha, DataType_* beta, IndexType_ length)
+{
+ ...
+}
+\endcode
+\li Binary operators shall be enclosed by single spaces; the spaces around the multiplication asterisks and division slashes may be omitted.
+\code{.cpp}
+  foo = (3*bar + qux/7) >> (k & 3);
+\endcode
+\li Each comma , colon : and semicolon ; is to be followed by a space or a line break.
+\li The \c case and \c default keywords in a \c switch block are to be placed on the same indent as the \c switch keyword,
+  but all statements in a \c case or \c default block are to be indented by a single indent.
+\li All \c case blocks in a \c switch statement shall either end with a \c break or a C++17 <c>[[fallthrough]]</c> statement.
+\li It is recommended to insert a single empty line before each \c case and \c default block in a \c switch statement, except for the first block in that statement.
+\code{.cpp}
+switch(qux)
+{
+case 0:
+  bar = 17;
+  [[fallthrough]];
+
+case 1:
+  {
+    qux += 2;
+  }
+  break;
+
+default:
+  bar = 0;
+  break;
+}
+\endcode
+
+<hr><hr>
+\section codeconv_preproc 3. Preprocessor Directives and Macros
+\li In general, the use of preprocessor macros and directives -- especially dirty preprocessor hacks -- shall be kept to a minimum.
+\li All preprocessor directives, which are supported by FEAT and which are either defined by the build system or the user, must be documented in the \ref preproc_macros page.
+\li Preprocessor directives must always stand in the first column of each line, i.e. preprocessor directives are never indented.
+\li The use of preprocessor directives, including preprocessor if-sections, has no impact on code indendation.
+\li It it recommended that each <c>#else</c> and <c>#endif</c> directive is appropriately commented to indicate to which <c>#if</c> block it belongs to
+\code{.cpp}
+void foobar()
+{
+#ifdef FEAT_HAVE_MPI
+  int my_rank = Dist::Comm::world().rank();
+  if(my_rank == 0)
+  {
+    std::cout << "Hello World from master!" << std::endl;
+  }
+#ifdef DEBUG
+  else
+  {
+    std::cout << "Hello World from slave " << my_rank << " in debug mode!" << std::endl;
+  }
+#endif // DEBUG
+#else // no FEAT_HAVE_MPI
+  std::cout << "Hello Serial World!" << std::endl;
+#endif // FEAT_HAVE_MPI
+}
+
+\endcode
+
+
+<hr><hr>
+\section codeconv_functions 4. Functions
+
+<hr><hr>
+\section codeconv_classes 5. Classes, Structs and Unions
+\li Class, struct and union names are to be written in CamelCase.
+\li Multiple inheritance shall be avoided.
+\li Member variables and member functions are to be written in lower_snake_case.
+\li Private or protected member variable and member function names are to be prefixed by a single underscore.
+\li Nested type declarations (classes, structs, unions, enums, typedefs) are also to be written in CamelCase.
+  Protected and private nested type declarations are \b not to be prefixed by underscores.
+\li User-defined constructors shall be declared \c explicit unless implicit conversion is explicitly desired.
+\li It is encouraged that the contents of a class or struct definition are structured in the following order:
+  -# nested type declarations
+  -# member variables
+  -# member functions
+\li Member variables and nested type declarations shall not be scattered across the class/struct definition body
+  between member functions but instead shall be grouped into coherent blocks even if the author chooses to disobey
+  the previous rule.
+\li The \c private, \c protected and \c public keywords in a \c class or \c struct are to be placed on the same indent as the \c class/struct keyword:
+\code{.cpp}
+class FooBar
+{
+private:
+  int _my_value;
+
+protected:
+  void _reset_value()
+  {
+    _my_value = 0;
+  }
+
+public:
+  explicit FooBar(int value) :
+    _my_value(value)
+  {
+  }
+
+  int get_value() const
+  {
+    return _my_value;
+  }
+}; // class FooBar
+\endcode
+\li It is recommended that the final closing curly brace of a class definition is followed by a short comment containing the class name.
+
+<hr><hr>
+\section codeconv_templates 6. Templates
+
+<hr><hr>
+\section codeconv_namespace 7. Namespaces
+\li The usage of <c>using namespace</c> at namespace scope is not allowed in header files.
+  - However, <c>using namespace</c> is allowed to be used at class or function scope.
+
+<hr><hr>
+\section codeconv_misc 8. Miscellaneous
+\li Enumerations shall be defined as C++11 <c>enum class</c> constructs. The use of the classical C-style non-class enum is not allowed.
+\li Enumeration names are to be written in CamelCase whereas enumeration values are to be written in lower_snake_case:
+\code{.cpp}
+enum class PlaceHolder
+{
+  foo_bar = 0,
+  zumba_dance
+};
+
+
+\endcode
+**/

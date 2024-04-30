@@ -2,6 +2,7 @@
 \mainpage FEAT - Finite Element Analysis Toolbox
 
 \section main_sec_basic Basic Information
+- \ref coding_conventions
 - \ref faq_page
 
 \section main_sec_buildsys Build-System
