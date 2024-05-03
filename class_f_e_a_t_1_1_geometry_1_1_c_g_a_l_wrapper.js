@@ -1,8 +1,8 @@
 var class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper =
 [
+    [ "CGALWrapper", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ac06d240d9f1969af491026b71b431f48", null ],
     [ "CGALWrapper", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a12e52802cc9574de2aafcb165f1d76e3", null ],
     [ "CGALWrapper", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a604038555709c32d345e5875fd958874", null ],
-    [ "~CGALWrapper", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#afbe0a9bf35c92e365d50a23e7da9e5da", null ],
     [ "_delete_tree", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a432d6978edf04e111502eb63760eeb8a", null ],
     [ "_init_wrapper", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a06f6664100410762536b1e08144bb42a", null ],
     [ "_parse_mesh", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#aeb701ca3263cc8e87255b3409bf13a03", null ],

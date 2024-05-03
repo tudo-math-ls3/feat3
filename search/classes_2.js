@@ -46,8 +46,9 @@ var searchData=
   ['convertprecond_43',['ConvertPrecond',['../class_f_e_a_t_1_1_solver_1_1_convert_precond.html',1,'FEAT::Solver']]],
   ['convertprecond_3c_20global_3a_3avector_3c_20localvectorouter_5f_2c_20mirrorouter_5f_20_3e_2c_20global_3a_3avector_3c_20localvectorinner_5f_2c_20mirrorinner_5f_20_3e_20_3e_44',['ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;',['../class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html',1,'FEAT::Solver']]],
   ['cosinetensorstatic_45',['CosineTensorStatic',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html',1,'FEAT::Analytic::Common']]],
-  ['curl_46',['Curl',['../class_f_e_a_t_1_1_analytic_1_1_curl.html',1,'FEAT::Analytic']]],
-  ['cusolverlu_47',['CuSolverLU',['../class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u.html',1,'FEAT::Solver']]],
-  ['cusolverqr_48',['CuSolverQR',['../class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html',1,'FEAT::Solver']]],
-  ['cuthillmckee_49',['CuthillMcKee',['../class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html',1,'FEAT::Adjacency']]]
+  ['csrmatrixdata_46',['CSRMatrixData',['../struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html',1,'FEAT::VoxelAssembly']]],
+  ['curl_47',['Curl',['../class_f_e_a_t_1_1_analytic_1_1_curl.html',1,'FEAT::Analytic']]],
+  ['cusolverlu_48',['CuSolverLU',['../class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u.html',1,'FEAT::Solver']]],
+  ['cusolverqr_49',['CuSolverQR',['../class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html',1,'FEAT::Solver']]],
+  ['cuthillmckee_50',['CuthillMcKee',['../class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html',1,'FEAT::Adjacency']]]
 ];

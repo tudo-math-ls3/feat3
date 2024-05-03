@@ -1,0 +1,6 @@
+var class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_poisson_assembler_3_01_q2_standard_hyper_cube_3_01dimb8f4748e519b8a0db5e2dfec2b4d07be =
+[
+    [ "SpaceType", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_poisson_assembler_3_01_q2_standard_hyper_cube_3_01dimb8f4748e519b8a0db5e2dfec2b4d07be.html#a528566d807726d4f33017f0dabed175f", null ],
+    [ "dim", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_poisson_assembler_3_01_q2_standard_hyper_cube_3_01dimb8f4748e519b8a0db5e2dfec2b4d07be.html#a1ddf3b807a7783d8e86ef656bc27c50d", null ],
+    [ "mesh_data", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_poisson_assembler_3_01_q2_standard_hyper_cube_3_01dimb8f4748e519b8a0db5e2dfec2b4d07be.html#a70fc0f53b3e3ec4f33402442282437de", null ]
+];

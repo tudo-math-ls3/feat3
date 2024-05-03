@@ -6,7 +6,7 @@ var dir_f6ae2f7434b54b47883a194cb018900f =
     [ "basic_assembly_jobs.hpp", "basic__assembly__jobs_8hpp_source.html", null ],
     [ "bilinear_operator.hpp", "bilinear__operator_8hpp_source.html", null ],
     [ "bilinear_operator_assembler.hpp", "bilinear__operator__assembler_8hpp_source.html", null ],
-    [ "burgers_assembler.hpp", "burgers__assembler_8hpp_source.html", null ],
+    [ "burgers_assembler.hpp", "assembly_2burgers__assembler_8hpp_source.html", null ],
     [ "burgers_assembler_carreau.hpp", "burgers__assembler__carreau_8hpp_source.html", null ],
     [ "burgers_assembly_job.hpp", "burgers__assembly__job_8hpp_source.html", null ],
     [ "common_functionals.hpp", "common__functionals_8hpp_source.html", null ],

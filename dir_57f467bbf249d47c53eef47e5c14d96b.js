@@ -11,6 +11,7 @@ var dir_57f467bbf249d47c53eef47e5c14d96b =
     [ "filter_chain.hpp", "filter__chain_8hpp_source.html", null ],
     [ "filter_sequence.hpp", "filter__sequence_8hpp_source.html", null ],
     [ "forward.hpp", "forward_8hpp_source.html", null ],
+    [ "matrix_gather_scatter_helper.hpp", "matrix__gather__scatter__helper_8hpp_source.html", null ],
     [ "matrix_mirror.hpp", "matrix__mirror_8hpp_source.html", null ],
     [ "matrix_mirror_buffer.hpp", "matrix__mirror__buffer_8hpp_source.html", null ],
     [ "mean_filter.hpp", "lafem_2mean__filter_8hpp_source.html", null ],
@@ -50,5 +51,6 @@ var dir_57f467bbf249d47c53eef47e5c14d96b =
     [ "tuple_vector.hpp", "tuple__vector_8hpp_source.html", null ],
     [ "unit_filter.hpp", "unit__filter_8hpp_source.html", null ],
     [ "unit_filter_blocked.hpp", "unit__filter__blocked_8hpp_source.html", null ],
+    [ "vector_gather_scatter_helper.hpp", "vector__gather__scatter__helper_8hpp_source.html", null ],
     [ "vector_mirror.hpp", "vector__mirror_8hpp_source.html", null ]
 ];

@@ -11,6 +11,7 @@ var dir_c6e707307c6bc6a0cfc891043e96ce19 =
     [ "lagrange3", "dir_dfbb5d357e98403d450fc98394a364d1.html", "dir_dfbb5d357e98403d450fc98394a364d1" ],
     [ "p2bubble", "dir_6ecdf32ffbf78c855fda2916b14bcbe4.html", "dir_6ecdf32ffbf78c855fda2916b14bcbe4" ],
     [ "base.hpp", "kernel_2space_2base_8hpp_source.html", null ],
+    [ "details.hpp", "space_2details_8hpp_source.html", null ],
     [ "dof_assignment_base.hpp", "dof__assignment__base_8hpp_source.html", null ],
     [ "dof_assignment_common.hpp", "dof__assignment__common_8hpp_source.html", null ],
     [ "dof_mapping_base.hpp", "dof__mapping__base_8hpp_source.html", null ],

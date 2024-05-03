@@ -82,6 +82,8 @@ var namespace_f_e_a_t =
     [ "Tiny", "namespace_f_e_a_t_1_1_tiny.html", "namespace_f_e_a_t_1_1_tiny" ],
     [ "Trafo", "namespace_f_e_a_t_1_1_trafo.html", "namespace_f_e_a_t_1_1_trafo" ],
     [ "Type", "namespace_f_e_a_t_1_1_type.html", "namespace_f_e_a_t_1_1_type" ],
+    [ "VoxelAssembly", "namespace_f_e_a_t_1_1_voxel_assembly.html", "namespace_f_e_a_t_1_1_voxel_assembly" ],
+    [ "VoxelAssemblyPolicies", "namespace_f_e_a_t_1_1_voxel_assembly_policies.html", null ],
     [ "Windows", "namespace_f_e_a_t_1_1_windows.html", [
       [ "disable_error_prompts", "namespace_f_e_a_t_1_1_windows.html#aa713ecce9ff944173b0e34dcece4ce5c", null ],
       [ "dump_call_stack_to_stderr", "namespace_f_e_a_t_1_1_windows.html#a57527553d02c83968ce9d54fd23436f2", null ],
@@ -150,8 +152,8 @@ var namespace_f_e_a_t =
       [ "hess_inv", "namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66", null ],
       [ "normal", "namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428afea087517c26fadd409bd4b9dc642555", null ]
     ] ],
-    [ "abortion", "namespace_f_e_a_t.html#ac34e9f73b5d3acaeb55cac0c7a2cacf4", null ],
-    [ "assertion", "namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c", null ],
+    [ "abortion", "namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6", null ],
+    [ "assertion", "namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5", null ],
     [ "KahanSum", "namespace_f_e_a_t.html#a57fccaae89889e213be6c76026b5650d", null ],
     [ "operator&", "namespace_f_e_a_t.html#aad5962774e04a08691f4e9ff0d2c353c", null ],
     [ "operator&", "namespace_f_e_a_t.html#acf92a649a38de9336e758d9ef0880668", null ],

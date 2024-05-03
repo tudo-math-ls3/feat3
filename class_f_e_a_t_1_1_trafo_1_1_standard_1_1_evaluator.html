@@ -101,6 +101,12 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_trafo_1_1_standard_1
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -109,13 +115,1313 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_trafo_1_1_standard_1
  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.png" usemap="#FEAT::Trafo::Standard::Evaluator_3C_20Trafo_5F_2C_20EvalPolicy_5F_2C_20Shape_5F_20_3E_map" alt=""/>
+  <map id="FEAT::Trafo::Standard::Evaluator_3C_20Trafo_5F_2C_20EvalPolicy_5F_2C_20Shape_5F_20_3E_map" name="FEAT::Trafo::Standard::Evaluator_3C_20Trafo_5F_2C_20EvalPolicy_5F_2C_20Shape_5F_20_3E_map">
+<area href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html" title="Trafo Evaluator CRTP base-class template." alt="FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;" shape="rect" coords="0,0,710,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a9fd22afc56b12eb14795a3d0adf0f4c1"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">EvaluatorBase</a>&lt; Trafo_, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">Evaluator</a>, EvalPolicy_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a9fd22afc56b12eb14795a3d0adf0f4c1">BaseClass</a></td></tr>
+<tr class="memdesc:a9fd22afc56b12eb14795a3d0adf0f4c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">base-class typedef  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a9fd22afc56b12eb14795a3d0adf0f4c1">More...</a><br /></td></tr>
+<tr class="separator:a9fd22afc56b12eb14795a3d0adf0f4c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99aacf4b77b94a83e0558da0601a233f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a></td></tr>
+<tr class="memdesc:a99aacf4b77b94a83e0558da0601a233f"><td class="mdescLeft">&#160;</td><td class="mdescRight">CellIterator typedef.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">More...</a><br /></td></tr>
+<tr class="separator:a99aacf4b77b94a83e0558da0601a233f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab1c898321ba2d99e6ebc576c0887ff9"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a></td></tr>
+<tr class="memdesc:aab1c898321ba2d99e6ebc576c0887ff9"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluation data type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">More...</a><br /></td></tr>
+<tr class="separator:aab1c898321ba2d99e6ebc576c0887ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ccfac9e81f744cdded6a61fd2c82926"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::DomainPointType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a></td></tr>
+<tr class="memdesc:a4ccfac9e81f744cdded6a61fd2c82926"><td class="mdescLeft">&#160;</td><td class="mdescRight">domain point type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">More...</a><br /></td></tr>
+<tr class="separator:a4ccfac9e81f744cdded6a61fd2c82926"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ea4158ce71b99fd8565e90b403908d4"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper.html">EvalHelper</a>&lt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a17dbe86e0894d5638b0d8a07e7484c7e">JacobianMatrixType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8ae4d8e0d76efafee566c0129d8c6c03">JacobianInverseType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aaf1e85e8ac6325944ea7602b15d116c2">JacobianDeterminantType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad271f0e2e8ea876180c3e4cd949d1244">HessianTensorType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a5c0ef568fb7153c461048ab10e2347bc">HessianInverseType</a>,<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a08450e47e70759b022aba9acd54234b3">ShapeType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">image_dim</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a9ea4158ce71b99fd8565e90b403908d4">EvalHp</a></td></tr>
+<tr class="memdesc:a9ea4158ce71b99fd8565e90b403908d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluation helper, see details.hpp  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a9ea4158ce71b99fd8565e90b403908d4">More...</a><br /></td></tr>
+<tr class="separator:a9ea4158ce71b99fd8565e90b403908d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa765b2d1f1558a72d08002a17feb1c01"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa765b2d1f1558a72d08002a17feb1c01">EvalPolicy</a></td></tr>
+<tr class="memdesc:aa765b2d1f1558a72d08002a17feb1c01"><td class="mdescLeft">&#160;</td><td class="mdescRight">trafo evaluation traits  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa765b2d1f1558a72d08002a17feb1c01">More...</a><br /></td></tr>
+<tr class="separator:aa765b2d1f1558a72d08002a17feb1c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04385656ab1f3e606550f78430ae4b23"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a04385656ab1f3e606550f78430ae4b23">EvalTraits</a></td></tr>
+<tr class="memdesc:a04385656ab1f3e606550f78430ae4b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluation traits; identical to eval policy  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a04385656ab1f3e606550f78430ae4b23">More...</a><br /></td></tr>
+<tr class="separator:a04385656ab1f3e606550f78430ae4b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c0ef568fb7153c461048ab10e2347bc"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::HessianInverseType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a5c0ef568fb7153c461048ab10e2347bc">HessianInverseType</a></td></tr>
+<tr class="memdesc:a5c0ef568fb7153c461048ab10e2347bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">hessian inverse tensor type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a5c0ef568fb7153c461048ab10e2347bc">More...</a><br /></td></tr>
+<tr class="separator:a5c0ef568fb7153c461048ab10e2347bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad271f0e2e8ea876180c3e4cd949d1244"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::HessianTensorType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad271f0e2e8ea876180c3e4cd949d1244">HessianTensorType</a></td></tr>
+<tr class="memdesc:ad271f0e2e8ea876180c3e4cd949d1244"><td class="mdescLeft">&#160;</td><td class="mdescRight">hessian tensor type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad271f0e2e8ea876180c3e4cd949d1244">More...</a><br /></td></tr>
+<tr class="separator:ad271f0e2e8ea876180c3e4cd949d1244"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf25be5707c04ac466aec2d51e76dda9"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::ImagePointType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a></td></tr>
+<tr class="memdesc:acf25be5707c04ac466aec2d51e76dda9"><td class="mdescLeft">&#160;</td><td class="mdescRight">image point type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">More...</a><br /></td></tr>
+<tr class="separator:acf25be5707c04ac466aec2d51e76dda9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf1e85e8ac6325944ea7602b15d116c2"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::JacobianDeterminantType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aaf1e85e8ac6325944ea7602b15d116c2">JacobianDeterminantType</a></td></tr>
+<tr class="memdesc:aaf1e85e8ac6325944ea7602b15d116c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">jacobian determinant type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aaf1e85e8ac6325944ea7602b15d116c2">More...</a><br /></td></tr>
+<tr class="separator:aaf1e85e8ac6325944ea7602b15d116c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ae4d8e0d76efafee566c0129d8c6c03"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::JacobianInverseType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8ae4d8e0d76efafee566c0129d8c6c03">JacobianInverseType</a></td></tr>
+<tr class="memdesc:a8ae4d8e0d76efafee566c0129d8c6c03"><td class="mdescLeft">&#160;</td><td class="mdescRight">jacobian inverse matrix type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8ae4d8e0d76efafee566c0129d8c6c03">More...</a><br /></td></tr>
+<tr class="separator:a8ae4d8e0d76efafee566c0129d8c6c03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17dbe86e0894d5638b0d8a07e7484c7e"><td class="memItemLeft" align="right" valign="top">typedef EvalPolicy::JacobianMatrixType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a17dbe86e0894d5638b0d8a07e7484c7e">JacobianMatrixType</a></td></tr>
+<tr class="memdesc:a17dbe86e0894d5638b0d8a07e7484c7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">jacobian matrix type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a17dbe86e0894d5638b0d8a07e7484c7e">More...</a><br /></td></tr>
+<tr class="separator:a17dbe86e0894d5638b0d8a07e7484c7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada7f4494d17dcd55bf3f1b40809b0189"><td class="memItemLeft" align="right" valign="top">typedef TrafoType::MeshType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ada7f4494d17dcd55bf3f1b40809b0189">MeshType</a></td></tr>
+<tr class="memdesc:ada7f4494d17dcd55bf3f1b40809b0189"><td class="mdescLeft">&#160;</td><td class="mdescRight">type of the underlying mesh  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ada7f4494d17dcd55bf3f1b40809b0189">More...</a><br /></td></tr>
+<tr class="separator:ada7f4494d17dcd55bf3f1b40809b0189"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08450e47e70759b022aba9acd54234b3"><td class="memItemLeft" align="right" valign="top">typedef Shape_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a08450e47e70759b022aba9acd54234b3">ShapeType</a></td></tr>
+<tr class="memdesc:a08450e47e70759b022aba9acd54234b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">shape type  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a08450e47e70759b022aba9acd54234b3">More...</a><br /></td></tr>
+<tr class="separator:a08450e47e70759b022aba9acd54234b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6ecc22b1ae4a574c71ea8475bd2d3be"><td class="memItemLeft" align="right" valign="top">typedef Trafo_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a></td></tr>
+<tr class="memdesc:aa6ecc22b1ae4a574c71ea8475bd2d3be"><td class="mdescLeft">&#160;</td><td class="mdescRight">trafo type using this evaluator  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">More...</a><br /></td></tr>
+<tr class="separator:aa6ecc22b1ae4a574c71ea8475bd2d3be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a274aa88f3a3b58e9a33da58fc33be7b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a274aa88f3a3b58e9a33da58fc33be7b3">Evaluator</a> (const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a> &amp;trafo)</td></tr>
+<tr class="memdesc:a274aa88f3a3b58e9a33da58fc33be7b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a274aa88f3a3b58e9a33da58fc33be7b3">More...</a><br /></td></tr>
+<tr class="separator:a274aa88f3a3b58e9a33da58fc33be7b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add9092926384fb5314de0140b987b0e9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#add9092926384fb5314de0140b987b0e9">begin</a> () const</td></tr>
+<tr class="memdesc:add9092926384fb5314de0140b987b0e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a CellIterator representing the index of the first cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#add9092926384fb5314de0140b987b0e9">More...</a><br /></td></tr>
+<tr class="separator:add9092926384fb5314de0140b987b0e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a357cba752a903cb7f4f6727315e4ea59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a357cba752a903cb7f4f6727315e4ea59">calc_hess_ten</a> (<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad271f0e2e8ea876180c3e4cd949d1244">HessianTensorType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a8588181ff80ed80443b2feb3d8100cfe">hess_ten</a>, const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">dom_point</a>) const</td></tr>
+<tr class="memdesc:a357cba752a903cb7f4f6727315e4ea59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the hessian tensor for a given domain point.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a357cba752a903cb7f4f6727315e4ea59">More...</a><br /></td></tr>
+<tr class="separator:a357cba752a903cb7f4f6727315e4ea59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8c06827a9468d277e4500d8dd31ed80"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad8c06827a9468d277e4500d8dd31ed80">calc_jac_mat</a> (<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a17dbe86e0894d5638b0d8a07e7484c7e">JacobianMatrixType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">jac_mat</a>, const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">dom_point</a>) const</td></tr>
+<tr class="memdesc:ad8c06827a9468d277e4500d8dd31ed80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the jacobian matrix for a given point.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad8c06827a9468d277e4500d8dd31ed80">More...</a><br /></td></tr>
+<tr class="separator:ad8c06827a9468d277e4500d8dd31ed80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0deb166b8a3c39b93b4465ef81ed68df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a0deb166b8a3c39b93b4465ef81ed68df">end</a> () const</td></tr>
+<tr class="memdesc:a0deb166b8a3c39b93b4465ef81ed68df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a CellIterator representing the first index past the last cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a0deb166b8a3c39b93b4465ef81ed68df">More...</a><br /></td></tr>
+<tr class="separator:a0deb166b8a3c39b93b4465ef81ed68df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5153ab6913d5b903a476f58026b9b6ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a5153ab6913d5b903a476f58026b9b6ba">finish</a> ()</td></tr>
+<tr class="memdesc:a5153ab6913d5b903a476f58026b9b6ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finishes the evaluator for the currently active cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a5153ab6913d5b903a476f58026b9b6ba">More...</a><br /></td></tr>
+<tr class="separator:a5153ab6913d5b903a476f58026b9b6ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdb7bfb197ee64e4d83a5901a0aaa456"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#acdb7bfb197ee64e4d83a5901a0aaa456">get_cell_index</a> () const</td></tr>
+<tr class="memdesc:acdb7bfb197ee64e4d83a5901a0aaa456"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the currently active cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#acdb7bfb197ee64e4d83a5901a0aaa456">More...</a><br /></td></tr>
+<tr class="separator:acdb7bfb197ee64e4d83a5901a0aaa456"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bceaf281f00ce592ecd3b60fbf2d1c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a4bceaf281f00ce592ecd3b60fbf2d1c5">get_num_cells</a> () const</td></tr>
+<tr class="memdesc:a4bceaf281f00ce592ecd3b60fbf2d1c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of cells in the mesh.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a4bceaf281f00ce592ecd3b60fbf2d1c5">More...</a><br /></td></tr>
+<tr class="separator:a4bceaf281f00ce592ecd3b60fbf2d1c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38faf7da1b287b6c335dae73267110ba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a38faf7da1b287b6c335dae73267110ba">get_trafo</a> () const</td></tr>
+<tr class="memdesc:a38faf7da1b287b6c335dae73267110ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the trafo object.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a38faf7da1b287b6c335dae73267110ba">More...</a><br /></td></tr>
+<tr class="separator:a38faf7da1b287b6c335dae73267110ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f11b7c954d10bd0eccdfcd12485aa03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a3f11b7c954d10bd0eccdfcd12485aa03">map_point</a> (<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">img_point</a>, const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">dom_point</a>) const</td></tr>
+<tr class="memdesc:a3f11b7c954d10bd0eccdfcd12485aa03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps a point from the reference cell to the selected cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a3f11b7c954d10bd0eccdfcd12485aa03">More...</a><br /></td></tr>
+<tr class="separator:a3f11b7c954d10bd0eccdfcd12485aa03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63bb4db2d02cb15c4a26d76690d7ad5f"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428">TrafoTags</a> cfg_&gt; </td></tr>
+<tr class="memitem:a63bb4db2d02cb15c4a26d76690d7ad5f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a63bb4db2d02cb15c4a26d76690d7ad5f">operator()</a> (<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_eval_data.html">Trafo::EvalData</a>&lt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a04385656ab1f3e606550f78430ae4b23">EvalTraits</a>, cfg_ &gt; &amp;trafo_data, const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">dom_point</a>) const</td></tr>
+<tr class="memdesc:a63bb4db2d02cb15c4a26d76690d7ad5f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_trafo.html" title="Transformation namespace.">Trafo</a> evaluation operator.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a63bb4db2d02cb15c4a26d76690d7ad5f">More...</a><br /></td></tr>
+<tr class="separator:a63bb4db2d02cb15c4a26d76690d7ad5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e20e35337f3f0879235fe4c905dee0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a7e20e35337f3f0879235fe4c905dee0f">prepare</a> (const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a> &amp;cell)</td></tr>
+<tr class="memdesc:a7e20e35337f3f0879235fe4c905dee0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepares the evaluator for a given cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a7e20e35337f3f0879235fe4c905dee0f">More...</a><br /></td></tr>
+<tr class="separator:a7e20e35337f3f0879235fe4c905dee0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34c5a685e838a37fda296c661c522007"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a34c5a685e838a37fda296c661c522007">prepare</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> cell_index)</td></tr>
+<tr class="memdesc:a34c5a685e838a37fda296c661c522007"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepares the evaluator for a given cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a34c5a685e838a37fda296c661c522007">More...</a><br /></td></tr>
+<tr class="separator:a34c5a685e838a37fda296c661c522007"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb5e82dd3513ce385a9b5b0151da7b44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aeb5e82dd3513ce385a9b5b0151da7b44">volume</a> () const</td></tr>
+<tr class="memdesc:aeb5e82dd3513ce385a9b5b0151da7b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes and returns the volume of the current cell.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aeb5e82dd3513ce385a9b5b0151da7b44">More...</a><br /></td></tr>
+<tr class="separator:aeb5e82dd3513ce385a9b5b0151da7b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1c54976aeb0cec0ec0102725cde587a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ae1c54976aeb0cec0ec0102725cde587a">width_directed</a> (const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a> &amp;ray) const</td></tr>
+<tr class="memdesc:ae1c54976aeb0cec0ec0102725cde587a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes and returns the directed mesh width.  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ae1c54976aeb0cec0ec0102725cde587a">More...</a><br /></td></tr>
+<tr class="separator:ae1c54976aeb0cec0ec0102725cde587a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a4c5bccac14946956b08e9cf65ff3d927"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4c5bccac14946956b08e9cf65ff3d927">domain_dim</a> = EvalPolicy::domain_dim</td></tr>
+<tr class="memdesc:a4c5bccac14946956b08e9cf65ff3d927"><td class="mdescLeft">&#160;</td><td class="mdescRight">domain dimension  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4c5bccac14946956b08e9cf65ff3d927">More...</a><br /></td></tr>
+<tr class="separator:a4c5bccac14946956b08e9cf65ff3d927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af70f029ab8801cedd634667ff7d2e409"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428">TrafoTags</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af70f029ab8801cedd634667ff7d2e409">eval_caps</a></td></tr>
+<tr class="separator:af70f029ab8801cedd634667ff7d2e409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af55985b97f332b1729cb4c5046ed2763"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">image_dim</a> = EvalPolicy::image_dim</td></tr>
+<tr class="memdesc:af55985b97f332b1729cb4c5046ed2763"><td class="mdescLeft">&#160;</td><td class="mdescRight">image dimension  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">More...</a><br /></td></tr>
+<tr class="separator:af55985b97f332b1729cb4c5046ed2763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e1a8f8fc482ec7076f56dafe30bd00f"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8e1a8f8fc482ec7076f56dafe30bd00f">num_verts</a> = <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_face_traits.html">Shape::FaceTraits</a>&lt;<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a08450e47e70759b022aba9acd54234b3">ShapeType</a>, 0&gt;::count</td></tr>
+<tr class="memdesc:a8e1a8f8fc482ec7076f56dafe30bd00f"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of verts  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8e1a8f8fc482ec7076f56dafe30bd00f">More...</a><br /></td></tr>
+<tr class="separator:a8e1a8f8fc482ec7076f56dafe30bd00f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:ac80bdf67ee98f7557dec2d66c6be6346"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#ac80bdf67ee98f7557dec2d66c6be6346">_cell_index</a></td></tr>
+<tr class="memdesc:ac80bdf67ee98f7557dec2d66c6be6346"><td class="mdescLeft">&#160;</td><td class="mdescRight">currently active cell index  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#ac80bdf67ee98f7557dec2d66c6be6346">More...</a><br /></td></tr>
+<tr class="separator:ac80bdf67ee98f7557dec2d66c6be6346"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfe0819c44b41acad1a94e9ba126cbb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#adfe0819c44b41acad1a94e9ba126cbb4">_coeff</a> [<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">image_dim</a>][<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8e1a8f8fc482ec7076f56dafe30bd00f">num_verts</a>]</td></tr>
+<tr class="memdesc:adfe0819c44b41acad1a94e9ba126cbb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">the coefficients of the trafo  <a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#adfe0819c44b41acad1a94e9ba126cbb4">More...</a><br /></td></tr>
+<tr class="separator:adfe0819c44b41acad1a94e9ba126cbb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a997be4a421fa226b409f5746b9bf018f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a997be4a421fa226b409f5746b9bf018f">_trafo</a></td></tr>
+<tr class="memdesc:a997be4a421fa226b409f5746b9bf018f"><td class="mdescLeft">&#160;</td><td class="mdescRight">trafo reference  <a href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a997be4a421fa226b409f5746b9bf018f">More...</a><br /></td></tr>
+<tr class="separator:a997be4a421fa226b409f5746b9bf018f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename Trafo_, typename EvalPolicy_, typename Shape_ = typename EvalPolicy_::ShapeType&gt;<br />
 class FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;</div><p ><a class="el" href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html" title="Standard Transformation namespace.">Standard</a> trafo evaluator class template. </p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00028">28</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00029">29</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a9fd22afc56b12eb14795a3d0adf0f4c1" name="a9fd22afc56b12eb14795a3d0adf0f4c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fd22afc56b12eb14795a3d0adf0f4c1">&#9670;&#160;</a></span>BaseClass</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">EvaluatorBase</a>&lt;Trafo_, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">Evaluator</a>, EvalPolicy_&gt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::BaseClass</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>base-class typedef </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00034">34</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a99aacf4b77b94a83e0558da0601a233f" name="a99aacf4b77b94a83e0558da0601a233f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99aacf4b77b94a83e0558da0601a233f">&#9670;&#160;</a></span>CellIterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::CellIterator</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CellIterator typedef. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00080">80</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aab1c898321ba2d99e6ebc576c0887ff9" name="aab1c898321ba2d99e6ebc576c0887ff9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab1c898321ba2d99e6ebc576c0887ff9">&#9670;&#160;</a></span>DataType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::DataType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::DataType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>evaluation data type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00046">46</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4ccfac9e81f744cdded6a61fd2c82926" name="a4ccfac9e81f744cdded6a61fd2c82926"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ccfac9e81f744cdded6a61fd2c82926">&#9670;&#160;</a></span>DomainPointType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::DomainPointType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::DomainPointType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>domain point type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00048">48</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a9ea4158ce71b99fd8565e90b403908d4" name="a9ea4158ce71b99fd8565e90b403908d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ea4158ce71b99fd8565e90b403908d4">&#9670;&#160;</a></span>EvalHp</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper.html">EvalHelper</a>&lt;<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a17dbe86e0894d5638b0d8a07e7484c7e">JacobianMatrixType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8ae4d8e0d76efafee566c0129d8c6c03">JacobianInverseType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aaf1e85e8ac6325944ea7602b15d116c2">JacobianDeterminantType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad271f0e2e8ea876180c3e4cd949d1244">HessianTensorType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a5c0ef568fb7153c461048ab10e2347bc">HessianInverseType</a> ,<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a08450e47e70759b022aba9acd54234b3">ShapeType</a>, <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">image_dim</a>&gt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::EvalHp</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>evaluation helper, see details.hpp </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00071">71</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa765b2d1f1558a72d08002a17feb1c01" name="aa765b2d1f1558a72d08002a17feb1c01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa765b2d1f1558a72d08002a17feb1c01">&#9670;&#160;</a></span>EvalPolicy</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy_ <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::EvalPolicy</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>trafo evaluation traits </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00040">40</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a04385656ab1f3e606550f78430ae4b23" name="a04385656ab1f3e606550f78430ae4b23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04385656ab1f3e606550f78430ae4b23">&#9670;&#160;</a></span>EvalTraits</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy_ <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::EvalTraits</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>evaluation traits; identical to eval policy </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00055">55</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a5c0ef568fb7153c461048ab10e2347bc" name="a5c0ef568fb7153c461048ab10e2347bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c0ef568fb7153c461048ab10e2347bc">&#9670;&#160;</a></span>HessianInverseType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::HessianInverseType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::HessianInverseType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>hessian inverse tensor type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00060">60</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad271f0e2e8ea876180c3e4cd949d1244" name="ad271f0e2e8ea876180c3e4cd949d1244"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad271f0e2e8ea876180c3e4cd949d1244">&#9670;&#160;</a></span>HessianTensorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::HessianTensorType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::HessianTensorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>hessian tensor type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00058">58</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="acf25be5707c04ac466aec2d51e76dda9" name="acf25be5707c04ac466aec2d51e76dda9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf25be5707c04ac466aec2d51e76dda9">&#9670;&#160;</a></span>ImagePointType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::ImagePointType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::ImagePointType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>image point type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00050">50</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aaf1e85e8ac6325944ea7602b15d116c2" name="aaf1e85e8ac6325944ea7602b15d116c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf1e85e8ac6325944ea7602b15d116c2">&#9670;&#160;</a></span>JacobianDeterminantType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::JacobianDeterminantType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::JacobianDeterminantType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>jacobian determinant type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00056">56</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a8ae4d8e0d76efafee566c0129d8c6c03" name="a8ae4d8e0d76efafee566c0129d8c6c03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ae4d8e0d76efafee566c0129d8c6c03">&#9670;&#160;</a></span>JacobianInverseType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::JacobianInverseType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::JacobianInverseType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>jacobian inverse matrix type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00054">54</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a17dbe86e0894d5638b0d8a07e7484c7e" name="a17dbe86e0894d5638b0d8a07e7484c7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17dbe86e0894d5638b0d8a07e7484c7e">&#9670;&#160;</a></span>JacobianMatrixType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EvalPolicy::JacobianMatrixType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::JacobianMatrixType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>jacobian matrix type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00052">52</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ada7f4494d17dcd55bf3f1b40809b0189" name="ada7f4494d17dcd55bf3f1b40809b0189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada7f4494d17dcd55bf3f1b40809b0189">&#9670;&#160;</a></span>MeshType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef TrafoType::MeshType <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::MeshType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>type of the underlying mesh </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00043">43</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a08450e47e70759b022aba9acd54234b3" name="a08450e47e70759b022aba9acd54234b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08450e47e70759b022aba9acd54234b3">&#9670;&#160;</a></span>ShapeType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Shape_ <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::ShapeType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>shape type </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00036">36</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa6ecc22b1ae4a574c71ea8475bd2d3be" name="aa6ecc22b1ae4a574c71ea8475bd2d3be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6ecc22b1ae4a574c71ea8475bd2d3be">&#9670;&#160;</a></span>TrafoType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Trafo_ <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::TrafoType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>trafo type using this evaluator </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00038">38</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a274aa88f3a3b58e9a33da58fc33be7b3" name="a274aa88f3a3b58e9a33da58fc33be7b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a274aa88f3a3b58e9a33da58fc33be7b3">&#9670;&#160;</a></span>Evaluator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::Evaluator </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a> &amp;&#160;</td>
+          <td class="paramname"><em>trafo</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">trafo</td><td>A reference to the trafo using this evaluator. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00091">91</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="add9092926384fb5314de0140b987b0e9" name="add9092926384fb5314de0140b987b0e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add9092926384fb5314de0140b987b0e9">&#9670;&#160;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a CellIterator representing the index of the first cell. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00166">166</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a357cba752a903cb7f4f6727315e4ea59" name="a357cba752a903cb7f4f6727315e4ea59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a357cba752a903cb7f4f6727315e4ea59">&#9670;&#160;</a></span>calc_hess_ten()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::calc_hess_ten </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#ad271f0e2e8ea876180c3e4cd949d1244">HessianTensorType</a> &amp;&#160;</td>
+          <td class="paramname"><em>hess_ten</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>dom_point</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes the hessian tensor for a given domain point. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">hess_ten</td><td>A reference to the hessian tensor that is to be computed.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dom_point</td><td>A reference to the domain point on the reference cell for which the hessian tensor is to be computed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00158">158</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, and <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a8588181ff80ed80443b2feb3d8100cfe">FEAT::hess_ten</a>.</p>
+
+</div>
+</div>
+<a id="ad8c06827a9468d277e4500d8dd31ed80" name="ad8c06827a9468d277e4500d8dd31ed80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8c06827a9468d277e4500d8dd31ed80">&#9670;&#160;</a></span>calc_jac_mat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::calc_jac_mat </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a17dbe86e0894d5638b0d8a07e7484c7e">JacobianMatrixType</a> &amp;&#160;</td>
+          <td class="paramname"><em>jac_mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>dom_point</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates the jacobian matrix for a given point. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">jac_mat</td><td>A reference to the jacobian matrix that is to be computed.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dom_point</td><td>A reference to the point on the reference cell where the jacobian matrix is to be computed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00144">144</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, and <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">FEAT::jac_mat</a>.</p>
+
+</div>
+</div>
+<a id="a0deb166b8a3c39b93b4465ef81ed68df" name="a0deb166b8a3c39b93b4465ef81ed68df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0deb166b8a3c39b93b4465ef81ed68df">&#9670;&#160;</a></span>end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a CellIterator representing the first index past the last cell. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00174">174</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00185">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_num_cells()</a>.</p>
+
+</div>
+</div>
+<a id="a5153ab6913d5b903a476f58026b9b6ba" name="a5153ab6913d5b903a476f58026b9b6ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5153ab6913d5b903a476f58026b9b6ba">&#9670;&#160;</a></span>finish()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::finish </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Finishes the evaluator for the currently active cell. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00213">213</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00145">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_cell_index</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="standard_2mapping_8hpp_source.html#l00096">FEAT::Trafo::Standard::Mapping&lt; Mesh_ &gt;::compute_vol()</a>.</p>
+
+</div>
+</div>
+<a id="acdb7bfb197ee64e4d83a5901a0aaa456" name="acdb7bfb197ee64e4d83a5901a0aaa456"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdb7bfb197ee64e4d83a5901a0aaa456">&#9670;&#160;</a></span>get_cell_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_cell_index </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the index of the currently active cell. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00193">193</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00145">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_cell_index</a>.</p>
+
+</div>
+</div>
+<a id="a4bceaf281f00ce592ecd3b60fbf2d1c5" name="a4bceaf281f00ce592ecd3b60fbf2d1c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bceaf281f00ce592ecd3b60fbf2d1c5">&#9670;&#160;</a></span>get_num_cells()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_num_cells </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the number of cells in the mesh. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of cells in the underlying mesh. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00185">185</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00142">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_trafo</a>, and <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00075">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::domain_dim</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00174">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::end()</a>.</p>
+
+</div>
+</div>
+<a id="a38faf7da1b287b6c335dae73267110ba" name="a38faf7da1b287b6c335dae73267110ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38faf7da1b287b6c335dae73267110ba">&#9670;&#160;</a></span>get_trafo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a> &amp; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_trafo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a reference to the trafo object. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00158">158</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00142">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_trafo</a>.</p>
+
+</div>
+</div>
+<a id="a3f11b7c954d10bd0eccdfcd12485aa03" name="a3f11b7c954d10bd0eccdfcd12485aa03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f11b7c954d10bd0eccdfcd12485aa03">&#9670;&#160;</a></span>map_point()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::map_point </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>img_point</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4ccfac9e81f744cdded6a61fd2c82926">DomainPointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>dom_point</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Maps a point from the reference cell to the selected cell. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">img_point</td><td>A reference to the point on the selected cell that is to be computed.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dom_point</td><td>A reference to the point on the reference cell that is to be mapped. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00130">130</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, and <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>.</p>
+
+</div>
+</div>
+<a id="a63bb4db2d02cb15c4a26d76690d7ad5f" name="a63bb4db2d02cb15c4a26d76690d7ad5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63bb4db2d02cb15c4a26d76690d7ad5f">&#9670;&#160;</a></span>operator()()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<div class="memtemplate">
+template&lt;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428">TrafoTags</a> cfg_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::operator() </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_eval_data.html">Trafo::EvalData</a>&lt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a04385656ab1f3e606550f78430ae4b23">EvalTraits</a>, cfg_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>trafo_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a601ad172eadfb92a988a1d4be331d397">DomainPointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>dom_point</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><a class="el" href="namespace_f_e_a_t_1_1_trafo.html" title="Transformation namespace.">Trafo</a> evaluation operator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">trafo_data</td><td>A reference to the trafo data that is to be computed.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dom_point</td><td>A reference to the domain point on the reference cell in which the trafo is to be evaluated.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="compilerhacks"><dt><b><a class="el" href="compilerhacks.html#_compilerhacks000044">Compiler Hack:</a></b></dt><dd>GCC 6.1 template compiler bug </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00231">231</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">FEAT::hess_inv</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a8588181ff80ed80443b2feb3d8100cfe">FEAT::hess_ten</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">FEAT::jac_inv</a>, and <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">FEAT::jac_mat</a>.</p>
+
+</div>
+</div>
+<a id="a7e20e35337f3f0879235fe4c905dee0f" name="a7e20e35337f3f0879235fe4c905dee0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e20e35337f3f0879235fe4c905dee0f">&#9670;&#160;</a></span>prepare() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::prepare </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html#a99aacf4b77b94a83e0558da0601a233f">CellIterator</a> &amp;&#160;</td>
+          <td class="paramname"><em>cell</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Prepares the evaluator for a given cell. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">cell</td><td>The index of the cell for which the evaluator is to be prepared. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00204">204</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00145">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_cell_index</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00102">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::prepare()</a>, and <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00264">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape::Vertex &gt;::prepare()</a>.</p>
+
+</div>
+</div>
+<a id="a34c5a685e838a37fda296c661c522007" name="a34c5a685e838a37fda296c661c522007"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34c5a685e838a37fda296c661c522007">&#9670;&#160;</a></span>prepare() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::prepare </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>cell_index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Prepares the evaluator for a given cell. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">cell_index</td><td>The index of the cell for which the evaluator is to be prepared. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00102">102</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff</a>, <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00142">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_trafo</a>, and <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00204">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::prepare()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="standard_2mapping_8hpp_source.html#l00096">FEAT::Trafo::Standard::Mapping&lt; Mesh_ &gt;::compute_vol()</a>.</p>
+
+</div>
+</div>
+<a id="aeb5e82dd3513ce385a9b5b0151da7b44" name="aeb5e82dd3513ce385a9b5b0151da7b44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb5e82dd3513ce385a9b5b0151da7b44">&#9670;&#160;</a></span>volume()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::volume </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes and returns the volume of the current cell. </p>
+<dl class="section return"><dt>Returns</dt><dd>The volume of the current cell. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00169">169</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="standard_2mapping_8hpp_source.html#l00096">FEAT::Trafo::Standard::Mapping&lt; Mesh_ &gt;::compute_vol()</a>.</p>
+
+</div>
+</div>
+<a id="ae1c54976aeb0cec0ec0102725cde587a" name="ae1c54976aeb0cec0ec0102725cde587a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1c54976aeb0cec0ec0102725cde587a">&#9670;&#160;</a></span>width_directed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::width_directed </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#acf25be5707c04ac466aec2d51e76dda9">ImagePointType</a> &amp;&#160;</td>
+          <td class="paramname"><em>ray</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes and returns the directed mesh width. </p>
+<p >This function approximates the cell width along a given normalized ray direction vector.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ray</td><td>A (normalized) direction vector. Must not be a null vector.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The mesh width in direction of the input ray vector. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00185">185</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ac80bdf67ee98f7557dec2d66c6be6346" name="ac80bdf67ee98f7557dec2d66c6be6346"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac80bdf67ee98f7557dec2d66c6be6346">&#9670;&#160;</a></span>_cell_index</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_cell_index</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>currently active cell index </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00145">145</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00213">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::finish()</a>, <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00193">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_cell_index()</a>, and <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00204">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::prepare()</a>.</p>
+
+</div>
+</div>
+<a id="adfe0819c44b41acad1a94e9ba126cbb4" name="adfe0819c44b41acad1a94e9ba126cbb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfe0819c44b41acad1a94e9ba126cbb4">&#9670;&#160;</a></span>_coeff</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aab1c898321ba2d99e6ebc576c0887ff9">DataType</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::_coeff[<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">image_dim</a>][<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a8e1a8f8fc482ec7076f56dafe30bd00f">num_verts</a>]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the coefficients of the trafo </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00082">82</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00158">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::calc_hess_ten()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00144">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::calc_jac_mat()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00130">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::map_point()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00296">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape::Vertex &gt;::map_point()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00102">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::prepare()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00264">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape::Vertex &gt;::prepare()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00169">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::volume()</a>, and <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00185">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::width_directed()</a>.</p>
+
+</div>
+</div>
+<a id="a997be4a421fa226b409f5746b9bf018f" name="a997be4a421fa226b409f5746b9bf018f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a997be4a421fa226b409f5746b9bf018f">&#9670;&#160;</a></span>_trafo</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename Evaluator_ , typename EvalPolicy_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#aa6ecc22b1ae4a574c71ea8475bd2d3be">TrafoType</a>&amp; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html">FEAT::Trafo::EvaluatorBase</a>&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::_trafo</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>trafo reference </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00142">142</a> of file <a class="el" href="trafo_2evaluator__base_8hpp_source.html">evaluator_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00185">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_num_cells()</a>, <a class="el" href="trafo_2evaluator__base_8hpp_source.html#l00158">FEAT::Trafo::EvaluatorBase&lt; Trafo_, Evaluator_, EvalPolicy_ &gt;::get_trafo()</a>, <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00102">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape_ &gt;::prepare()</a>, and <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00264">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape::Vertex &gt;::prepare()</a>.</p>
+
+</div>
+</div>
+<a id="a4c5bccac14946956b08e9cf65ff3d927" name="a4c5bccac14946956b08e9cf65ff3d927"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c5bccac14946956b08e9cf65ff3d927">&#9670;&#160;</a></span>domain_dim</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::domain_dim = EvalPolicy::domain_dim</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>domain dimension </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00063">63</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af70f029ab8801cedd634667ff7d2e409" name="af70f029ab8801cedd634667ff7d2e409"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af70f029ab8801cedd634667ff7d2e409">&#9670;&#160;</a></span>eval_caps</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428">TrafoTags</a> <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::eval_caps</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">          <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">TrafoTags::dom_point</a> | <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">TrafoTags::img_point</a> |</div>
+<div class="line">          <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">TrafoTags::jac_mat</a> | <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">TrafoTags::jac_det</a> | <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a8588181ff80ed80443b2feb3d8100cfe">TrafoTags::hess_ten</a> |</div>
+<div class="line">          (<a class="code hl_variable" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4c5bccac14946956b08e9cf65ff3d927">domain_dim</a> == <a class="code hl_variable" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">image_dim</a> ? (<a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">TrafoTags::jac_inv</a> | <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">TrafoTags::hess_inv</a>) : TrafoTags::none)</div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator_html_a4c5bccac14946956b08e9cf65ff3d927"><div class="ttname"><a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a4c5bccac14946956b08e9cf65ff3d927">FEAT::Trafo::Standard::Evaluator::domain_dim</a></div><div class="ttdeci">static constexpr int domain_dim</div><div class="ttdoc">domain dimension</div><div class="ttdef"><b>Definition:</b> <a href="trafo_2standard_2evaluator_8hpp_source.html#l00063">evaluator.hpp:63</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator_html_af55985b97f332b1729cb4c5046ed2763"><div class="ttname"><a href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#af55985b97f332b1729cb4c5046ed2763">FEAT::Trafo::Standard::Evaluator::image_dim</a></div><div class="ttdeci">static constexpr int image_dim</div><div class="ttdoc">image dimension</div><div class="ttdef"><b>Definition:</b> <a href="trafo_2standard_2evaluator_8hpp_source.html#l00065">evaluator.hpp:65</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::TrafoTags::img_point</a></div><div class="ttdeci">@ img_point</div><div class="ttdoc">specifies whether the trafo should supply image point coordinates</div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">FEAT::TrafoTags::hess_inv</a></div><div class="ttdeci">@ hess_inv</div><div class="ttdoc">specifies whether the trafo should supply inverse hessian tensors</div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::TrafoTags::dom_point</a></div><div class="ttdeci">@ dom_point</div><div class="ttdoc">specifies whether the trafo should supply domain point coordinates</div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a8588181ff80ed80443b2feb3d8100cfe"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a8588181ff80ed80443b2feb3d8100cfe">FEAT::TrafoTags::hess_ten</a></div><div class="ttdeci">@ hess_ten</div><div class="ttdoc">specifies whether the trafo should supply hessian tensors</div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">FEAT::TrafoTags::jac_inv</a></div><div class="ttdeci">@ jac_inv</div><div class="ttdoc">specifies whether the trafo should supply inverse jacobian matrices</div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">FEAT::TrafoTags::jac_mat</a></div><div class="ttdeci">@ jac_mat</div><div class="ttdoc">specifies whether the trafo should supply jacobian matrices</div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::TrafoTags::jac_det</a></div><div class="ttdeci">@ jac_det</div><div class="ttdoc">specifies whether the trafo should supply jacobian determinants</div></div>
+</div><!-- fragment --><p >we can compute domain and image points, jacobian matrices and determinants as well as hessian tensors. </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00075">75</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af55985b97f332b1729cb4c5046ed2763" name="af55985b97f332b1729cb4c5046ed2763"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af55985b97f332b1729cb4c5046ed2763">&#9670;&#160;</a></span>image_dim</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::image_dim = EvalPolicy::image_dim</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>image dimension </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00065">65</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00296">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape::Vertex &gt;::map_point()</a>, and <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00264">FEAT::Trafo::Standard::Evaluator&lt; Trafo_, EvalPolicy_, Shape::Vertex &gt;::prepare()</a>.</p>
+
+</div>
+</div>
+<a id="a8e1a8f8fc482ec7076f56dafe30bd00f" name="a8e1a8f8fc482ec7076f56dafe30bd00f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e1a8f8fc482ec7076f56dafe30bd00f">&#9670;&#160;</a></span>num_verts</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename EvalPolicy_ , typename Shape_  = typename EvalPolicy_::ShapeType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html">FEAT::Trafo::Standard::Evaluator</a>&lt; Trafo_, EvalPolicy_, Shape_ &gt;::num_verts = <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_face_traits.html">Shape::FaceTraits</a>&lt;<a class="el" href="class_f_e_a_t_1_1_trafo_1_1_standard_1_1_evaluator.html#a08450e47e70759b022aba9acd54234b3">ShapeType</a>, 0&gt;::count</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>number of verts </p>
+
+<p class="definition">Definition at line <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html#l00067">67</a> of file <a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>kernel/trafo/standard/<a class="el" href="trafo_2standard_2evaluator_8hpp_source.html">evaluator.hpp</a></li>
 </ul>
 </div><!-- contents -->

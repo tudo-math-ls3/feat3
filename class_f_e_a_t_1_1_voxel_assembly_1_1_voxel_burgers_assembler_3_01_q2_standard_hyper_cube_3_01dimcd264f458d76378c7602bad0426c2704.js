@@ -1,0 +1,20 @@
+var class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704 =
+[
+    [ "SpaceType", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a13a10713d7e56c0300bc0e325dbd2184", null ],
+    [ "VoxelBurgersAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a7eda66687b41623799694f676ca15f93", null ],
+    [ "assemble_matrix1", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a1a3f12985ed884b56288251fd8505688", null ],
+    [ "assemble_vector", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a1e4020a465286290ea030c828c4cd563", null ],
+    [ "set_sd_v_norm", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a9d859b76b91ed8e3c45517024037eef8", null ],
+    [ "set_sd_v_norm", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a19f9d6de05ee74ac73ce6e2b8ac5d2e0", null ],
+    [ "wrap_burgers_params", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#ac332c4719973062ab8278ad5e5f2f323", null ],
+    [ "beta", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#ad526b5fd11320acdeef577cf9dbb088e", null ],
+    [ "deformation", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#ab0aa8ee52056e67826d9ee21a10f5bac", null ],
+    [ "dim", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#ae6b42c1bbe570429186f43f314995b10", null ],
+    [ "frechet_beta", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#ae120c4d1c3b6035bd0c8812ce42fcfe6", null ],
+    [ "mesh_data", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a3ecfb8336df7f11b49387e70b7979567", null ],
+    [ "nu", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#afa3d35a364fec4bf4d9ce6edf8ac76a7", null ],
+    [ "sd_delta", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a34ca31f97b86a06c8aaaf3d841adabe4", null ],
+    [ "sd_nu", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a4d7ca863c6ce5eda30dc70c27c319746", null ],
+    [ "sd_v_norm", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a1eaf5af8b2cbaaa36d95163b4b54ae0d", null ],
+    [ "theta", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a9099fdfa24b48282e318b770c5ba5c1f", null ]
+];

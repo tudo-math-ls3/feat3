@@ -29,8 +29,11 @@ var searchData=
   ['asmtraits1_26',['AsmTraits1',['../class_f_e_a_t_1_1_assembly_1_1_asm_traits1.html',1,'FEAT::Assembly']]],
   ['asmtraits2_27',['AsmTraits2',['../class_f_e_a_t_1_1_assembly_1_1_asm_traits2.html',1,'FEAT::Assembly']]],
   ['asmtraits3_28',['AsmTraits3',['../class_f_e_a_t_1_1_assembly_1_1_asm_traits3.html',1,'FEAT::Assembly']]],
-  ['attributeset_29',['AttributeSet',['../class_f_e_a_t_1_1_geometry_1_1_attribute_set.html',1,'FEAT::Geometry']]],
-  ['autoalias_30',['AutoAlias',['../class_f_e_a_t_1_1_cubature_1_1_auto_alias.html',1,'FEAT::Cubature']]],
-  ['autoderive_31',['AutoDerive',['../class_f_e_a_t_1_1_analytic_1_1_auto_derive.html',1,'FEAT::Analytic']]],
-  ['axpy_32',['Axpy',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html',1,'FEAT::LAFEM::Arch']]]
+  ['assemblyburgersdata_29',['AssemblyBurgersData',['../struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html',1,'FEAT::VoxelAssembly']]],
+  ['assemblycubaturedata_30',['AssemblyCubatureData',['../struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html',1,'FEAT::VoxelAssembly']]],
+  ['assemblymappingdata_31',['AssemblyMappingData',['../struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html',1,'FEAT::VoxelAssembly']]],
+  ['attributeset_32',['AttributeSet',['../class_f_e_a_t_1_1_geometry_1_1_attribute_set.html',1,'FEAT::Geometry']]],
+  ['autoalias_33',['AutoAlias',['../class_f_e_a_t_1_1_cubature_1_1_auto_alias.html',1,'FEAT::Cubature']]],
+  ['autoderive_34',['AutoDerive',['../class_f_e_a_t_1_1_analytic_1_1_auto_derive.html',1,'FEAT::Analytic']]],
+  ['axpy_35',['Axpy',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html',1,'FEAT::LAFEM::Arch']]]
 ];

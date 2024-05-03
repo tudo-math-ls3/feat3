@@ -1,6 +1,5 @@
 var dir_7ab5cd9d6a44db3bf3b807f89e50cefe =
 [
-    [ "assertion.cpp", "assertion_8cpp_source.html", null ],
     [ "assertion.hpp", "assertion_8hpp.html", "assertion_8hpp" ],
     [ "binary_stream.hpp", "binary__stream_8hpp_source.html", null ],
     [ "compiler_clang.hpp", "compiler__clang_8hpp.html", null ],

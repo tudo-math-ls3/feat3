@@ -12,6 +12,7 @@ var dir_dc43877d82dd332f9fb2071fcca799d6 =
     [ "space", "dir_c6e707307c6bc6a0cfc891043e96ce19.html", "dir_c6e707307c6bc6a0cfc891043e96ce19" ],
     [ "trafo", "dir_e8d5aa97549ebc0556262437e8a36d40.html", "dir_e8d5aa97549ebc0556262437e8a36d40" ],
     [ "util", "dir_7ab5cd9d6a44db3bf3b807f89e50cefe.html", "dir_7ab5cd9d6a44db3bf3b807f89e50cefe" ],
+    [ "voxel_assembly", "dir_d4afdec45c8da080e49e4c94f0346458.html", "dir_d4afdec45c8da080e49e4c94f0346458" ],
     [ "backend.cpp", "backend_8cpp_source.html", null ],
     [ "backend.hpp", "backend_8hpp_source.html", null ],
     [ "base_header.hpp", "base__header_8hpp.html", "base__header_8hpp" ],

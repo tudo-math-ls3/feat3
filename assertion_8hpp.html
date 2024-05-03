@@ -109,6 +109,7 @@ $(document).ready(function(){initNavTree('assertion_8hpp.html',''); initResizabl
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="base__header_8hpp_source.html">kernel/base_header.hpp</a>&gt;</code><br />
+<code>#include &lt;kernel/runtime.hpp&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div>
 <p><a href="assertion_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -129,28 +130,28 @@ Macros</h2></td></tr>
 <tr class="separator:a6a403a52dc93f43184cb46da5a4c8354"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae39d444734a6769c9dd40c721e8f5fc0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#ae39d444734a6769c9dd40c721e8f5fc0">KERNEL_UTIL_ASSERTION_HPP</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:ae39d444734a6769c9dd40c721e8f5fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33180af240360ec61a3968af89731f12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#a33180af240360ec61a3968af89731f12">XABORTM</a>(msg)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#ac34e9f73b5d3acaeb55cac0c7a2cacf4">FEAT::abortion</a>(__func__, __FILE__, __LINE__, msg)</td></tr>
+<tr class="memitem:a33180af240360ec61a3968af89731f12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#a33180af240360ec61a3968af89731f12">XABORTM</a>(msg)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6">FEAT::abortion</a>(__func__, __FILE__, __LINE__, msg)</td></tr>
 <tr class="memdesc:a33180af240360ec61a3968af89731f12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abortion macro definition with custom message.  <a href="assertion_8hpp.html#a33180af240360ec61a3968af89731f12">More...</a><br /></td></tr>
 <tr class="separator:a33180af240360ec61a3968af89731f12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5c647b0786db55f57452bfc26726bde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a>(expr)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__)</td></tr>
+<tr class="memitem:af5c647b0786db55f57452bfc26726bde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a>(expr)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__)</td></tr>
 <tr class="memdesc:af5c647b0786db55f57452bfc26726bde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion macro definition.  <a href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">More...</a><br /></td></tr>
 <tr class="separator:af5c647b0786db55f57452bfc26726bde"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa48e2beb6db8fae75edc24466481965"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(expr,  msg)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__, msg)</td></tr>
+<tr class="memitem:afa48e2beb6db8fae75edc24466481965"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(expr,  msg)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__, msg)</td></tr>
 <tr class="memdesc:afa48e2beb6db8fae75edc24466481965"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion macro definition with custom message.  <a href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">More...</a><br /></td></tr>
 <tr class="separator:afa48e2beb6db8fae75edc24466481965"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac34e9f73b5d3acaeb55cac0c7a2cacf4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ac34e9f73b5d3acaeb55cac0c7a2cacf4">FEAT::abortion</a> (const char *const func, const char *const file, const int line, const char *const msg)</td></tr>
-<tr class="memdesc:ac34e9f73b5d3acaeb55cac0c7a2cacf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abortion function.  <a href="namespace_f_e_a_t.html#ac34e9f73b5d3acaeb55cac0c7a2cacf4">More...</a><br /></td></tr>
-<tr class="separator:ac34e9f73b5d3acaeb55cac0c7a2cacf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3de24971770c9c8672b180cb83d57ec9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a3de24971770c9c8672b180cb83d57ec9">FEAT::abortion</a> (const char *const func, const char *const file, const int line, const std::string &amp;msg)</td></tr>
-<tr class="separator:a3de24971770c9c8672b180cb83d57ec9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5006cd8813b9771438aaae49c1c8944c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c">FEAT::assertion</a> (bool expr, const char *const expr_str, const char *const func, const char *const file, const int line, const char *const msg=nullptr)</td></tr>
-<tr class="memdesc:a5006cd8813b9771438aaae49c1c8944c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion function.  <a href="namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c">More...</a><br /></td></tr>
-<tr class="separator:a5006cd8813b9771438aaae49c1c8944c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a591942cf88ebd056f66c587141142a8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a591942cf88ebd056f66c587141142a8d">FEAT::assertion</a> (bool expr, const char *const expr_str, const char *const func, const char *const file, const int line, const std::string &amp;msg)</td></tr>
-<tr class="separator:a591942cf88ebd056f66c587141142a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a881f84ab2c02e235ac8b688a6100f1f6"><td class="memItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6">FEAT::abortion</a> (const char *const func, const char *const file, const int line, const char *const msg)</td></tr>
+<tr class="memdesc:a881f84ab2c02e235ac8b688a6100f1f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abortion function.  <a href="namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6">More...</a><br /></td></tr>
+<tr class="separator:a881f84ab2c02e235ac8b688a6100f1f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f3d021d276351f86eabbafb1314a91d"><td class="memItemLeft" align="right" valign="top">CUDA_HOST void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a5f3d021d276351f86eabbafb1314a91d">FEAT::abortion</a> (const char *const func, const char *const file, const int line, const std::string &amp;msg)</td></tr>
+<tr class="separator:a5f3d021d276351f86eabbafb1314a91d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a295d025ff52fcef38ee443016a2bf8f5"><td class="memItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5">FEAT::assertion</a> (bool expr, const char *const expr_str, const char *const func, const char *const file, const int line, const char *const msg=nullptr)</td></tr>
+<tr class="memdesc:a295d025ff52fcef38ee443016a2bf8f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion function.  <a href="namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5">More...</a><br /></td></tr>
+<tr class="separator:a295d025ff52fcef38ee443016a2bf8f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae11b35dde6d055cf8e5dc2b93b0966cd"><td class="memItemLeft" align="right" valign="top">CUDA_HOST void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ae11b35dde6d055cf8e5dc2b93b0966cd">FEAT::assertion</a> (bool expr, const char *const expr_str, const char *const func, const char *const file, const int line, const std::string &amp;msg)</td></tr>
+<tr class="separator:ae11b35dde6d055cf8e5dc2b93b0966cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a28301f76c53b643912da7c538f74e2c6" name="a28301f76c53b643912da7c538f74e2c6"></a>
@@ -179,7 +180,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This macro will only be compiled in debug mode; it is an empty macro in non-debug mode. Use the XASSERT macro if you want to use the assertion in both debug and non-debug modes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00150">150</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00231">231</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +221,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This macro will only be compiled in debug mode; it is an empty macro in non-debug mode. Use the XASSERTM macro if you want to use the assertion in both debug and non-debug modes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00151">151</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00232">232</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +252,7 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">msg</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#ac34e9f73b5d3acaeb55cac0c7a2cacf4">FEAT::abortion</a>(__func__, __FILE__, __LINE__, msg)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6">FEAT::abortion</a>(__func__, __FILE__, __LINE__, msg)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -267,7 +268,7 @@ Functions</h2></td></tr>
 <p>This macro will be compiled in both debug and non-debug mode builds.</p>
 <dl class="compilerhacks"><dt><b><a class="el" href="compilerhacks.html#_compilerhacks000045">Compiler Hack:</a></b></dt><dd>Intel C++ compiler is too dumb for [[noreturn]] attribute, so attach an additional call to std::abort() to silence warning 1011 that complains about missing return statements in non-void functions. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00113">113</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00194">194</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -282,7 +283,7 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">expr</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -297,7 +298,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This macro will be compiled in both debug and non-debug mode builds. Use the ASSERT macro if you want to use the assertion ony in debug builds. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00183">183</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00264">264</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +323,7 @@ Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a5006cd8813b9771438aaae49c1c8944c">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__, msg)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5">FEAT::assertion</a>(expr, #expr, __func__, __FILE__, __LINE__, msg)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -338,7 +339,7 @@ Functions</h2></td></tr>
 </dl>
 <p>This macro will be compiled in both debug and non-debug mode builds. Use the ASSERTM macro if you want to use the assertion ony in debug builds. </p>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00184">184</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00265">265</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>

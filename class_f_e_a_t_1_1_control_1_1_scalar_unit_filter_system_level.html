@@ -200,6 +200,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9adf898223c988fb1da00b1ed00f00ec"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename Cubature_ &gt; </td></tr>
 <tr class="memitem:a9adf898223c988fb1da00b1ed00f00ec"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html#a9adf898223c988fb1da00b1ed00f00ec">assemble_laplace_matrix</a> (const Space_ &amp;space, const Cubature_ &amp;cubature, const DataType nu=DataType(1))</td></tr>
 <tr class="separator:a9adf898223c988fb1da00b1ed00f00ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95bad88bd4d17b7eeb906da2443c47f4"><td class="memTemplParams" colspan="2">template&lt;typename Space_ &gt; </td></tr>
+<tr class="memitem:a95bad88bd4d17b7eeb906da2443c47f4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html#a95bad88bd4d17b7eeb906da2443c47f4">assemble_laplace_voxel_based</a> (const <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_coloring.html">Adjacency::Coloring</a> &amp;coloring, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature, const DataType nu=DataType(1))</td></tr>
+<tr class="separator:a95bad88bd4d17b7eeb906da2443c47f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8ccbd7171cd696e82c6360079f78fea"><td class="memTemplParams" colspan="2">template&lt;typename DomainLevel_ , typename Cubature_ &gt; </td></tr>
 <tr class="memitem:ae8ccbd7171cd696e82c6360079f78fea"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html#ae8ccbd7171cd696e82c6360079f78fea">assemble_transfer</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_fine, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_coarse, const Cubature_ &amp;cubature)</td></tr>
 <tr class="separator:ae8ccbd7171cd696e82c6360079f78fea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,6 +219,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab43e2828986af4e6cb3404b473bd84e8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html#ab43e2828986af4e6cb3404b473bd84e8">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html">ScalarUnitFilterSystemLevel</a>&lt; D_, I_, SM_ &gt; &amp;other)</td></tr>
 <tr class="memdesc:ab43e2828986af4e6cb3404b473bd84e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html#ab43e2828986af4e6cb3404b473bd84e8">More...</a><br /></td></tr>
 <tr class="separator:ab43e2828986af4e6cb3404b473bd84e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cdac2c102055ad93574e88c36fd7839"><td class="memTemplParams" colspan="2">template&lt;typename Space_ &gt; </td></tr>
+<tr class="memitem:a4cdac2c102055ad93574e88c36fd7839"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html#a4cdac2c102055ad93574e88c36fd7839">symbolic_assembly_std1</a> (const Space_ &amp;space)</td></tr>
+<tr class="separator:a4cdac2c102055ad93574e88c36fd7839"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -241,7 +247,7 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename DataType_ = Real, typename IndexType_ = Index, typename ScalarMatrix_ = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;&gt;<br />
 class FEAT::Control::ScalarUnitFilterSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_ &gt;</div>
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00467">467</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00498">498</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a161cb36e3439c0d98bbae41a18638e3b" name="a161cb36e3439c0d98bbae41a18638e3b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a161cb36e3439c0d98bbae41a18638e3b">&#9670;&#160;</a></span>BaseClass</h2>
@@ -257,7 +263,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00471">471</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00502">502</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +285,7 @@ template&lt;typename DT2_ , typename IT2_ , typename ScalarMatrix2_ &gt; </div>
 
 <p>Our class base type. </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00488">488</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00519">519</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +303,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00474">474</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00505">505</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -317,7 +323,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define global filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00484">484</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00515">515</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +351,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define global system matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00094">94</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00095">95</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -373,7 +379,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define global system transfer operator type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00097">97</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00098">98</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -401,7 +407,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define global system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00091">91</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00092">92</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +425,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00475">475</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00506">506</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -447,7 +453,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define local scalar matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00064">64</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00065">65</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -467,7 +473,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define local filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00481">481</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00512">512</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -495,7 +501,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define local system matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00067">67</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00068">68</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -523,7 +529,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define local system transfer operator type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00076">76</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00077">77</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +557,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define local transfer matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00070">70</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00071">71</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -579,7 +585,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define local system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00073">73</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00074">74</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -607,7 +613,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define system gate </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00082">82</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00083">83</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -627,7 +633,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define system mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00478">478</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00509">509</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -655,7 +661,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define system muxer </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00085">85</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00086">86</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -683,7 +689,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>define system splitter </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00088">88</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00089">89</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -715,7 +721,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>CTOR. </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00494">494</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00525">525</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -748,7 +754,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00233">233</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00234">234</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -780,7 +786,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00185">185</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00186">186</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -812,7 +818,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00179">179</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00180">180</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -854,7 +860,7 @@ template&lt;typename DomainLevel_ , typename SpaceType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00145">145</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00146">146</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -896,7 +902,7 @@ template&lt;typename DomainLevel_ , typename Space_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00520">520</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00551">551</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -950,7 +956,7 @@ template&lt;typename Trafo_ , typename Space_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00445">445</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00446">446</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -998,7 +1004,61 @@ template&lt;typename Space_ , typename Cubature_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00427">427</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00428">428</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a95bad88bd4d17b7eeb906da2443c47f4" name="a95bad88bd4d17b7eeb906da2443c47f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95bad88bd4d17b7eeb906da2443c47f4">&#9670;&#160;</a></span>assemble_laplace_voxel_based()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename ScalarMatrix_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;, typename TransferMatrix_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename Space_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html">FEAT::Control::ScalarBasicSystemLevel</a>&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_laplace_voxel_based </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_coloring.html">Adjacency::Coloring</a> &amp;&#160;</td>
+          <td class="paramname"><em>coloring</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DataType&#160;</td>
+          <td class="paramname"><em>nu</em> = <code>DataType(1)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00464">464</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1046,7 +1106,7 @@ template&lt;typename DomainLevel_ , typename Cubature_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00283">283</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00284">284</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1100,7 +1160,7 @@ template&lt;typename DomainLevel_ , typename Cubature_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00335">335</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00336">336</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1131,9 +1191,9 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00500">500</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00531">531</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="scalar__basic_8hpp_source.html#l00128">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="unit__filter_8hpp_source.html#l00136">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::bytes()</a>.</p>
+<p class="reference">References <a class="el" href="scalar__basic_8hpp_source.html#l00129">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="unit__filter_8hpp_source.html#l00136">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -1165,7 +1225,7 @@ template&lt;typename D_ , typename I_ , typename SM_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00135">135</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00136">136</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1200,9 +1260,41 @@ template&lt;typename D_ , typename I_ , typename SM_ &gt; </div>
 <p>Conversion method. </p>
 <p >Use source <a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html">ScalarUnitFilterSystemLevel</a> content as content of current <a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html">ScalarUnitFilterSystemLevel</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00513">513</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00544">544</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="scalar__basic_8hpp_source.html#l00491">FEAT::Control::ScalarUnitFilterSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_ &gt;::filter_sys</a>.</p>
+<p class="reference">References <a class="el" href="scalar__basic_8hpp_source.html#l00522">FEAT::Control::ScalarUnitFilterSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_ &gt;::filter_sys</a>.</p>
+
+</div>
+</div>
+<a id="a4cdac2c102055ad93574e88c36fd7839" name="a4cdac2c102055ad93574e88c36fd7839"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cdac2c102055ad93574e88c36fd7839">&#9670;&#160;</a></span>symbolic_assembly_std1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename ScalarMatrix_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;, typename TransferMatrix_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename Space_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html">FEAT::Control::ScalarBasicSystemLevel</a>&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::symbolic_assembly_std1 </td>
+          <td>(</td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00482">482</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1231,7 +1323,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>our base-mesh multiplexer </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00108">108</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00109">109</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1259,7 +1351,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>our coarse-level system muxer </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00105">105</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00106">106</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1279,9 +1371,9 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>our global system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00491">491</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00522">522</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="scalar__basic_8hpp_source.html#l00513">FEAT::Control::ScalarUnitFilterSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_ &gt;::convert()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="scalar__basic_8hpp_source.html#l00544">FEAT::Control::ScalarUnitFilterSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_ &gt;::convert()</a>.</p>
 
 </div>
 </div>
@@ -1309,7 +1401,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>our system gate </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00102">102</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00103">103</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1337,7 +1429,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>our global system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00111">111</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00112">112</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1365,7 +1457,7 @@ template&lt;typename DataType_  = Real, typename IndexType_  = Index, typename S
 
 <p>our global transfer operator </p>
 
-<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00114">114</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scalar__basic_8hpp_source.html#l00115">115</a> of file <a class="el" href="scalar__basic_8hpp_source.html">scalar_basic.hpp</a>.</p>
 
 </div>
 </div>

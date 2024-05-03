@@ -6,6 +6,9 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "DenseVectorBlocked", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked" ],
     [ "FilterChain", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain" ],
     [ "FilterSequence", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_sequence.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_sequence" ],
+    [ "MatrixGatherScatterHelper", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper.html", null ],
+    [ "MatrixGatherScatterHelper< Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e" ],
+    [ "MatrixGatherScatterHelper< Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_t615360d4651e74a259baaf0968479879.html", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_t615360d4651e74a259baaf0968479879" ],
     [ "MatrixMirror", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror" ],
     [ "MatrixMirrorBuffer", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror_buffer.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror_buffer" ],
     [ "MeanFilter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter" ],
@@ -53,6 +56,7 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "TupleVector", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector" ],
     [ "UnitFilter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter" ],
     [ "UnitFilterBlocked", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked" ],
+    [ "VectorGatherScatterHelper", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_gather_scatter_helper.html", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_gather_scatter_helper" ],
     [ "VectorMirror", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror" ],
     [ "CloneMode", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f", [
       [ "Shallow", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c", null ],

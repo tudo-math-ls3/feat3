@@ -151,8 +151,8 @@ $(document).ready(function(){initNavTree('axpy_8cu_source.html',''); initResizab
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  if (r == x)</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  {</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    cudaMalloc((void**)&amp;temp_x, sizeof(DT_) * size);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    cudaMemcpy(temp_x, x, size * sizeof(DT_), cudaMemcpyDefault);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    temp_x = Util::cuda_malloc(sizeof(DT_) * size);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    Util::cuda_copy(temp_x, x, size * sizeof(DT_));</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  }</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  else</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  {</div>
@@ -162,12 +162,12 @@ $(document).ready(function(){initNavTree('axpy_8cu_source.html',''); initResizab
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  if (r != y)</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  {</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    ///\todo cuse cublasCopyEx when available</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    cudaMemcpy(r, y, size * sizeof(DT_), cudaMemcpyDefault);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    Util::cuda_copy(r, y, size * sizeof(DT_));</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  }</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &amp;a, et, temp_x, dt, 1, r, dt, 1, et);</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  if (r == x)</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    cudaFree (temp_x);</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    Util::cuda_free(temp_x);</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>  if (status != CUBLAS_STATUS_SUCCESS)</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;cuda error: &quot; + stringify(cublasGetStatusString(status)));</div>

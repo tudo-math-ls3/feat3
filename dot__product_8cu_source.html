@@ -174,25 +174,24 @@ $(document).ready(function(){initNavTree('dot__product_8cu_source.html',''); ini
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>template &lt;typename DT_&gt;</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>DT_ TripleDotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>{</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  DT_ * temp;</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  cudaMalloc((void **) &amp;temp, size * sizeof(DT_));</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  ComponentProduct::value_cuda(temp, y, z, size);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  DT_ result = DotProduct::value_cuda(x, temp, size);</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  cudaFree(temp);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  cudaDeviceSynchronize();</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>#ifdef FEAT_DEBUG_MODE</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  cudaError_t last_error(cudaGetLastError());</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  if (cudaSuccess != last_error)</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>#endif</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  return result;</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>}</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>#ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>template Half TripleDotProduct::value_cuda(const Half * const x, const Half * const y, const Half * const z, const Index size);</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>#endif</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>template float TripleDotProduct::value_cuda(const float * const x, const float * const y, const float * const z, const Index size);</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>template double TripleDotProduct::value_cuda(const double * const x, const double * const y, const double * const z, const Index size);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  DT_ * temp = (DT_*)Util::cuda_malloc(size * sizeof(DT_));</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  ComponentProduct::value_cuda(temp, y, z, size);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  DT_ result = DotProduct::value_cuda(x, temp, size);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  Util::cuda_free(temp);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>  cudaDeviceSynchronize();</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>#ifdef FEAT_DEBUG_MODE</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  cudaError_t last_error(cudaGetLastError());</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  if (cudaSuccess != last_error)</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>#endif</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  return result;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>}</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>#ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>template Half TripleDotProduct::value_cuda(const Half * const x, const Half * const y, const Half * const z, const Index size);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>#endif</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>template float TripleDotProduct::value_cuda(const float * const x, const float * const y, const float * const z, const Index size);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>template double TripleDotProduct::value_cuda(const double * const x, const double * const y, const double * const z, const Index size);</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
