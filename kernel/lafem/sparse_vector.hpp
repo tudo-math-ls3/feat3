@@ -715,15 +715,15 @@ namespace FEAT
           case FileMode::fm_mtx:
           {
 
-            file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-            file << this->size() << " " << 1 << " " << this->used_elements() << std::endl;
+            file << "%%MatrixMarket matrix coordinate real general" << "\n";
+            file << this->size() << " " << 1 << " " << this->used_elements() << "\n";
 
             const Index u_elem(this->used_elements());
             const IT_ * pind(this->indices());
             const DT_ * pval(this->elements());
             for (Index i(0) ; i < u_elem ; ++i, ++pind, ++pval)
             {
-              file << *pind+1 << " " << 1 << " " << std::scientific << *pval << std::endl;
+              file << *pind+1 << " " << 1 << " " << std::scientific << *pval << "\n";
             }
             break;
           }

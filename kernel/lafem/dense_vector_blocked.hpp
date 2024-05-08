@@ -756,13 +756,13 @@ namespace FEAT
           temp.convert(*this);
 
           const Index tsize(temp.template size<Perspective::pod>());
-          file << "%%MatrixMarket matrix array real general" << std::endl;
-          file << tsize << " " << 1 << std::endl;
+          file << "%%MatrixMarket matrix array real general" << "\n";
+          file << tsize << " " << 1 << "\n";
 
           const DT_ * pval(temp.template elements<Perspective::pod>());
           for (Index i(0); i < tsize; ++i, ++pval)
           {
-            file << std::scientific << *pval << std::endl;
+            file << std::scientific << *pval << "\n";
           }
           break;
         }
@@ -773,7 +773,7 @@ namespace FEAT
 
           for (Index i(0); i < this->size<Perspective::pod>(); ++i)
           {
-            file << std::scientific << temp[i] << std::endl;
+            file << std::scientific << temp[i] << "\n";
           }
 
           MemoryPool::release_memory(temp);

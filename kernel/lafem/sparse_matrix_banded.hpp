@@ -1289,7 +1289,7 @@ namespace FEAT
        */
       friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBanded & b)
       {
-        lhs << "[" << std::endl;
+        lhs << "[" << "\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           lhs << "[";
@@ -1297,9 +1297,9 @@ namespace FEAT
           {
             lhs << "  " << b(i, j);
           }
-          lhs << "]" << std::endl;
+          lhs << "]" << "\n";
         }
-        lhs << "]" << std::endl;
+        lhs << "]" << "\n";
 
         return lhs;
       }

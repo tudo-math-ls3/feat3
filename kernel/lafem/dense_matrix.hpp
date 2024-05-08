@@ -447,14 +447,14 @@ namespace FEAT
         {
           case FileMode::fm_mtx:
           {
-            file << "%%MatrixMarket matrix array real general" << std::endl;
-            file << this->rows() << " " << this->columns() << " " << this->used_elements() << std::endl;
+            file << "%%MatrixMarket matrix array real general\n";
+            file << this->rows() << " " << this->columns() << " " << this->used_elements() << "\n";
 
             for(IT_ row(0) ; row < rows(); ++row)
             {
               for(IT_ col(0) ; col < columns() ; ++col)
               {
-                file << std::scientific << (*this)(row, col) << std::endl;
+                file << std::scientific << (*this)(row, col) << "\n";
               }
             }
             break;
@@ -907,7 +907,7 @@ namespace FEAT
        */
       friend std::ostream & operator<< (std::ostream & lhs, const DenseMatrix & b)
       {
-        lhs << "[" << std::endl;
+        lhs << "[" << "\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           lhs << "[";
@@ -915,9 +915,9 @@ namespace FEAT
           {
             lhs << "  " << b(i, j);
           }
-          lhs << "]" << std::endl;
+          lhs << "]" << "\n";
         }
-        lhs << "]" << std::endl;
+        lhs << "]" << "\n";
 
         return lhs;
       }

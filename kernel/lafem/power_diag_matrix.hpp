@@ -225,10 +225,10 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket powerdiagmatrix coordinate real general" << std::endl;
+        file << "%%MatrixMarket powerdiagmatrix coordinate real general" << "\n";
         for (Index i(1); i <= blocks_; ++i)
         {
-          file << filename << "_pd" << i << suffix << std::endl;
+          file << filename << "_pd" << i << suffix << "\n";
         }
 
         file.close();
@@ -793,8 +793,8 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket powerdiagmatrix coordinate real general" << std::endl;
-        file << filename << "_pd" << 1 << suffix << std::endl;
+        file << "%%MatrixMarket powerdiagmatrix coordinate real general" << "\n";
+        file << filename << "_pd" << 1 << suffix << "\n";
 
         file.close();
 

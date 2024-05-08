@@ -1068,7 +1068,7 @@ namespace FEAT
           {
             if (symmetric)
             {
-              file << "%%MatrixMarket matrix coordinate real symmetric" << std::endl;
+              file << "%%MatrixMarket matrix coordinate real symmetric" << "\n";
               std::vector<IT_> rowv;
               std::vector<IT_> colv;
               std::vector<DT_> valv;
@@ -1086,23 +1086,23 @@ namespace FEAT
                   }
                 }
               }
-              file << this->rows() << " " << this->columns() << " " << valv.size() << std::endl;
+              file << this->rows() << " " << this->columns() << " " << valv.size() << "\n";
               for (Index i(0) ; i < valv.size() ; ++i)
               {
-                file << rowv.at(i) << " " << colv.at(i) << " " << std::scientific << valv.at(i) << std::endl;
+                file << rowv.at(i) << " " << colv.at(i) << " " << std::scientific << valv.at(i) << "\n";
               }
             }
             else
             {
-              file << "%%MatrixMarket matrix coordinate real general" << std::endl;
-              file << this->rows() << " " << this->columns() << " " << this->used_elements() << std::endl;
+              file << "%%MatrixMarket matrix coordinate real general" << "\n";
+              file << this->rows() << " " << this->columns() << " " << this->used_elements() << "\n";
 
               for (Index row(0) ; row < rows() ; ++row)
               {
                 const IT_ end(this->row_ptr()[row + 1]);
                 for (IT_ i(this->row_ptr()[row]) ; i < end ; ++i)
                 {
-                  file << row + 1 << " " << this->col_ind()[i] + 1 << " " << std::scientific << this->val()[i] << std::endl;
+                  file << row + 1 << " " << this->col_ind()[i] + 1 << " " << std::scientific << this->val()[i] << "\n";
                 }
               }
             }
@@ -2624,7 +2624,7 @@ namespace FEAT
       friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixCSR & b)
       {
 
-        lhs << "[" << std::endl;
+        lhs << "[" << "\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           lhs << "[";
@@ -2632,9 +2632,9 @@ namespace FEAT
           {
             lhs << "  " << b(i, j);
           }
-          lhs << "]" << std::endl;
+          lhs << "]" << "\n";
         }
-        lhs << "]" << std::endl;
+        lhs << "]" << "\n";
 
         return lhs;
       }
