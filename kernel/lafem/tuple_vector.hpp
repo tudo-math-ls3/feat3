@@ -451,7 +451,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
         if (! file.is_open())
@@ -495,7 +495,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file where the vector shall be stored.
        */
-      void write_out(FileMode mode, String filename) const
+      void write_out(FileMode mode, const String& filename) const
       {
         std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
         if (! file.is_open())
@@ -836,7 +836,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         switch(mode)
         {
@@ -871,7 +871,7 @@ namespace FEAT
        *
        * \param[in] filename The file that shall be read in.
        */
-      void read_from_binary(String filename)
+      void read_from_binary(const String& filename)
       {
         std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
         if (! file.is_open())
@@ -905,7 +905,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file where the vector shall be stored.
        */
-      void write_out(FileMode mode, String filename) const
+      void write_out(FileMode mode, const String& filename) const
       {
         switch(mode)
         {
@@ -940,7 +940,7 @@ namespace FEAT
        *
        * \param[in] filename The file where the vector shall be stored.
        */
-      void write_out_binary(String filename) const
+      void write_out_binary(const String& filename) const
       {
         std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
         if (! file.is_open())

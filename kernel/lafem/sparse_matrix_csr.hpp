@@ -449,7 +449,7 @@ namespace FEAT
        *
        * Creates a CSR matrix based on the source file.
        */
-      explicit SparseMatrixCSR(FileMode mode, String filename) :
+      explicit SparseMatrixCSR(FileMode mode, const String& filename) :
         Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
@@ -874,7 +874,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
         if(mode == FileMode::fm_mtx)
@@ -1034,16 +1034,24 @@ namespace FEAT
        * \warning This routine does no check on symmetric properties of the source matrix!
        * \warning Only uses symmetric properties if mode is mtx!
        */
-      void write_out(FileMode mode, String filename, bool symmetric = false) const
+      void write_out(FileMode mode, const String& filename, bool symmetric = false) const
       {
         std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
         if(mode == FileMode::fm_mtx)
           bin = std::ofstream::out;
-        std::ofstream file(filename.c_str(), bin);
-        if (! file.is_open())
+        std::ofstream file;
+        char* buff = nullptr;
+        if(mode == FileMode::fm_mtx)
+        {
+          buff = new char[LAFEM::FileOutStreamBufferSize];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+        }
+        file.open(filename.c_str(), bin);
+        if(! file.is_open())
           XABORTM("Unable to open Matrix file " + filename);
         write_out(mode, file, symmetric);
         file.close();
+        delete[] buff;
       }
 
       /**
@@ -1097,14 +1105,34 @@ namespace FEAT
               file << "%%MatrixMarket matrix coordinate real general" << "\n";
               file << this->rows() << " " << this->columns() << " " << this->used_elements() << "\n";
 
+              // const int max_size = 3u*20u*3000u*(this->used_elements()/this->rows() + 1);
+              // const int stop_point = max_size - 400u;
+
+              // char* buffer = new char[max_size];
+              // int buffer_ptr = 0;
+
               for (Index row(0) ; row < rows() ; ++row)
               {
                 const IT_ end(this->row_ptr()[row + 1]);
                 for (IT_ i(this->row_ptr()[row]) ; i < end ; ++i)
                 {
+                  // const String tmp = stringify(row+1) + " " + stringify(this->col_ind()[i] + 1) + " " + stringify_fp_sci(this->val()[i]) + "\n";
+                  // const auto* data = tmp.data();
+                  // std::memcpy(buffer+buffer_ptr, data, tmp.size());
+                  // buffer_ptr += tmp.size();
+                  // if(buffer_ptr > stop_point)
+                  // {
+                  //   file.write(buffer, buffer_ptr+1);
+                  //   buffer_ptr = 0;
+                  // }
                   file << row + 1 << " " << this->col_ind()[i] + 1 << " " << std::scientific << this->val()[i] << "\n";
                 }
               }
+              // if(buffer_ptr > 0)
+              // {
+              //   file.write(buffer, buffer_ptr+1);
+              // }
+
             }
             break;
           }

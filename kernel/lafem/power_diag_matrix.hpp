@@ -723,13 +723,13 @@ namespace FEAT
       }
 
       /// file-input ctor
-      explicit PowerDiagMatrix(FileMode mode, String filename)
+      explicit PowerDiagMatrix(FileMode mode, const String& filename)
       {
         read_from(mode, filename);
       }
 
       /// filestream-input ctor
-      explicit PowerDiagMatrix(FileMode mode, std::istream& file, String directory = "")
+      explicit PowerDiagMatrix(FileMode mode, std::istream& file, const String& directory = "")
       {
         String line;
         do {
@@ -743,7 +743,7 @@ namespace FEAT
         _first = std::move(tmp_first);
       }
 
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         String directory;
         auto found = filename.rfind("/");
@@ -801,7 +801,7 @@ namespace FEAT
         this->write_out_submatrices(mode, directory, filename, suffix);
       }
 
-      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = 1) const
+      void write_out_submatrices(FileMode mode, const String& directory, const String& prefix, const String& suffix, Index length = 1) const
       {
         _first.write_out(mode, directory + prefix + "_pd" + stringify(length) + suffix);
       }

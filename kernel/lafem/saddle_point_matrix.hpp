@@ -158,7 +158,7 @@ namespace FEAT
        *
        * Creates a saddle-point-matrix based on the source file.
        */
-      explicit SaddlePointMatrix(FileMode mode, String filename)
+      explicit SaddlePointMatrix(FileMode mode, const String& filename)
       {
         read_from(mode, filename);
       }
@@ -169,7 +169,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         String directory;
         auto found = filename.rfind("/");

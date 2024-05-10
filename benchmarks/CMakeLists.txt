@@ -8,6 +8,7 @@ set(benchmarks
   block_product_matvec-bench
   meshperm_assembly-bench
   dot_product-bench
+  io_bench
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
   pcg-bench

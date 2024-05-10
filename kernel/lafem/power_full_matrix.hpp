@@ -117,7 +117,7 @@ namespace FEAT
        *
        * Creates a power-full-point-matrix based on the source file.
        */
-      explicit PowerFullMatrix(FileMode mode, String filename)
+      explicit PowerFullMatrix(FileMode mode, const String& filename)
       {
         ContClass other(mode, filename);
         _container = std::move(other);
@@ -131,7 +131,7 @@ namespace FEAT
        *
        * Creates a power-full-matrix based on the source filestream.
        */
-      explicit PowerFullMatrix(FileMode mode, std::istream& file, String directory = "")
+      explicit PowerFullMatrix(FileMode mode, std::istream& file, const String& directory = "")
       {
         ContClass other(mode, file, directory);
         _container = std::move(other);
@@ -143,7 +143,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         ContClass other(mode, filename);
         _container = std::move(other);
@@ -175,7 +175,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file where the matrix shall be stored.
        */
-      void write_out(FileMode mode, String filename) const
+      void write_out(FileMode mode, const String& filename) const
       {
         _container.write_out(mode, filename);
       }

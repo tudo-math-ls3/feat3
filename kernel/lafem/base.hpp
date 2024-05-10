@@ -120,6 +120,10 @@ namespace FEAT
     {
       return (CompressionModes)(((uint64_t)a) | ((uint64_t)b));
     }
+
+    // Has to be a multiple of 4096 due to clang restrains
+    /// OutStreamBufferSize
+    constexpr std::size_t FileOutStreamBufferSize = 16777216u;
   } // namespace LAFEM
 } // namespace FEAT
 

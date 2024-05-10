@@ -117,7 +117,7 @@ namespace FEAT
        *
        * Creates a tuple-diag-point-matrix based on the source file.
        */
-      explicit TupleDiagMatrix(FileMode mode, String filename)
+      explicit TupleDiagMatrix(FileMode mode, const String& filename)
       {
         read_from(mode, filename);
       }
@@ -132,7 +132,7 @@ namespace FEAT
        *
        * Creates a tuple-diag-matrix based on the source filestream.
        */
-      explicit TupleDiagMatrix(FileMode mode, std::istream& file, String directory = "")
+      explicit TupleDiagMatrix(FileMode mode, std::istream& file, const String& directory = "")
       {
         String line;
         do {
@@ -152,7 +152,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         String directory;
         auto found = filename.rfind("/");
@@ -244,7 +244,7 @@ namespace FEAT
        * \param[in] prefix The prefix of the matrix-files.
        * \param[in] suffix The suffix of the matrix-files.
        */
-      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = num_row_blocks) const
+      void write_out_submatrices(FileMode mode, const String& directory, const String& prefix, const String& suffix, Index length = num_row_blocks) const
       {
         _first.write_out(mode, directory + prefix + "_td" + stringify(length + 1 - num_row_blocks) + suffix);
         _rest.write_out_submatrices(mode, directory, prefix, suffix, length);
@@ -650,13 +650,13 @@ namespace FEAT
       }
 
       /// file-input ctor
-      explicit TupleDiagMatrix(FileMode mode, String filename)
+      explicit TupleDiagMatrix(FileMode mode, const String& filename)
       {
         read_from(mode, filename);
       }
 
       /// filestream-input ctor
-      explicit TupleDiagMatrix(FileMode mode, std::istream& file, String directory = "")
+      explicit TupleDiagMatrix(FileMode mode, std::istream& file, const String& directory = "")
       {
         String line;
         do {
@@ -669,7 +669,7 @@ namespace FEAT
         _first = First_(mode, directory + line);
       }
 
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         String directory;
         auto found = filename.rfind("/");
@@ -737,7 +737,7 @@ namespace FEAT
         this->write_out_submatrices(mode, directory, filename, suffix);
       }
 
-      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = 1) const
+      void write_out_submatrices(FileMode mode, const String& directory, const String& prefix, const String& suffix, Index length = 1) const
       {
         _first.write_out(mode, directory + prefix + "_td" + stringify(length) + suffix);
       }

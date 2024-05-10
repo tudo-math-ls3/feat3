@@ -223,10 +223,10 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket powerrowmatrix coordinate real general" << std::endl;
+        file << "%%MatrixMarket powerrowmatrix coordinate real general" << "\n";
         for (Index i(1); i <= blocks_; ++i)
         {
-          file << filename << "_pr" << i << suffix << std::endl;
+          file << filename << "_pr" << i << suffix << "\n";
         }
 
         file.close();
@@ -637,13 +637,13 @@ namespace FEAT
       }
 
       /// file-input ctor
-      explicit PowerRowMatrix(FileMode mode, String filename)
+      explicit PowerRowMatrix(FileMode mode, const String& filename)
       {
         read_from(mode, filename);
       }
 
       /// filestream-input ctor
-      explicit PowerRowMatrix(FileMode mode, std::istream& file, String directory = "")
+      explicit PowerRowMatrix(FileMode mode, std::istream& file, const String& directory = "")
       {
         String line;
         do {
@@ -657,7 +657,7 @@ namespace FEAT
         _first = std::move(tmp_first);
       }
 
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         String directory;
         auto found = filename.rfind("/");
@@ -717,15 +717,15 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket powerrowmatrix coordinate real general" << std::endl;
-        file << filename << "_pr" << 1 << suffix << std::endl;
+        file << "%%MatrixMarket powerrowmatrix coordinate real general" << "\n";
+        file << filename << "_pr" << 1 << suffix << "\n";
 
         file.close();
 
         this->write_out_submatrices(mode, directory, filename, suffix);
       }
 
-      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = 1) const
+      void write_out_submatrices(FileMode mode, const String& directory, const String& prefix, const String& suffix, Index length = 1) const
       {
         _first.write_out(mode, directory + prefix + "_pr" + stringify(length) + suffix);
       }

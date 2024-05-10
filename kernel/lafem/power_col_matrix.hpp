@@ -112,7 +112,7 @@ namespace FEAT
        *
        * Creates a power-col-point-matrix based on the source file.
        */
-      explicit PowerColMatrix(FileMode mode, String filename)
+      explicit PowerColMatrix(FileMode mode, const String& filename)
       {
         read_from(mode, filename);
       }
@@ -150,7 +150,7 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
         String directory;
         auto found = filename.rfind("/");
@@ -749,7 +749,7 @@ namespace FEAT
         this->write_out_submatrices(mode, directory, filename, suffix);
       }
 
-      void write_out_submatrices(FileMode mode, String directory, String prefix, String suffix, Index length = 1) const
+      void write_out_submatrices(FileMode mode, const String& directory, const String& prefix, const String& suffix, Index length = 1) const
       {
         _first.write_out(mode, directory + prefix + "_pc" + stringify(length) + suffix);
       }

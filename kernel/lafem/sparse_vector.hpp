@@ -189,7 +189,7 @@ namespace FEAT
        *
        * Creates a vector based on the source file.
        */
-      explicit SparseVector(FileMode mode, String filename) :
+      explicit SparseVector(FileMode mode, const String& filename) :
         Container<DT_, IT_>(0)
       {
         read_from(mode, filename);
@@ -565,9 +565,12 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file that shall be read in.
        */
-      void read_from(FileMode mode, String filename)
+      void read_from(FileMode mode, const String& filename)
       {
-        std::ifstream file(filename.c_str(), std::ifstream::in);
+        std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ifstream::in;
+        std::ifstream file(filename.c_str(), bin);
         if (! file.is_open())
           XABORTM("Unable to open Vector file " + filename);
         read_from(mode, file);
@@ -689,13 +692,24 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The file where the matrix shall be stored.
        */
-      void write_out(FileMode mode, String filename) const
+      void write_out(FileMode mode, const String& filename) const
       {
-        std::ofstream file(filename.c_str(), std::ofstream::out);
-        if (! file.is_open())
-          XABORTM("Unable to open Vector file " + filename);
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ofstream::out;
+        std::ofstream file;
+        char* buff = nullptr;
+        if(mode == FileMode::fm_mtx)
+        {
+          buff = new char[LAFEM::FileOutStreamBufferSize];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+        }
+        file.open(filename.c_str(), bin);
+        if(! file.is_open())
+          XABORTM("Unable to open Matrix file " + filename);
         write_out(mode, file);
         file.close();
+        delete[] buff;
       }
 
       /**
