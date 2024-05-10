@@ -270,6 +270,18 @@ namespace FEAT
           }
         }
       }
+
+      /**
+      * \brief concatenates two permutations
+      *
+      * Let P1 be the permutation denoted by this permutation and let P2 denote the permutation p,
+      * then this function computes the contatenation P3 := P1 * P2, such that P3(x) = P1(P2(x)).
+      *
+      * \param[in, out] p
+      * The concatenated permutation of the current permutation and p
+      */
+      void concat(const Permutation& p);
+
     }; // class Permutation
   } // namespace Adjacency
 } // namespace FEAT

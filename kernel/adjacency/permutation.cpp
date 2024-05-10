@@ -148,5 +148,18 @@ namespace FEAT
       // apply swapping to permutation
       this->apply(_perm_pos.data());
     }
+
+    void  Permutation::concat(const Permutation& p)
+    {
+      XASSERT(this->size() == p.size());
+      Index* p1 = this->get_perm_pos();
+      const Index* p2 = p.get_perm_pos();
+
+      for (Index i(0); i < this->size(); ++i)
+      {
+        p1[i] = p2[p1[i]];
+      }
+      this->calc_swap_from_perm();
+    }
   } // namespace Adjacency
 } // namespace FEAT

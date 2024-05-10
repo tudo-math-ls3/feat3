@@ -52,6 +52,16 @@ public:
     return true;
   }
 
+  static bool is_id(const Permutation &p)
+  {
+      for (Index i(0); i < p.size(); ++i)
+      {
+          if (p.get_perm_pos()[i] != i)
+              return false;
+      }
+      return true;
+  }
+
   template<int n_>
   static void copy(Index (&v)[n_], const Index (&w)[n_])
   {
@@ -102,6 +112,15 @@ public:
     return is_id(wp) && is_id(ws);
   }
 
+  template<int n_>
+  static void make_rand_vec(Index(&v)[n_], Random& rng)
+  {
+    for (Index i(0); i < n_; ++i)
+    {
+      v[i] = rng.next();
+    }
+  }
+
   virtual void run() const override
   {
     // create an rng
@@ -116,6 +135,7 @@ public:
     // create two identity arrays
     Index vp[N], vs[N];
     make_id(vs);
+
 
     // apply permutation operator
     prm_rnd.apply(vp, vs);
@@ -141,5 +161,25 @@ public:
     Permutation prm_inv3(N, Permutation::type_inv_swap, prm_rnd.get_swap_pos());
     test_fwd(prm_inv3, vs);
 
+    //Test concat
+    //create random array
+    Index randvec1[N], randvec2[N];
+    make_rand_vec(randvec1, rng);
+    copy(randvec2, randvec1);
+
+    //create two random permutations
+    Permutation prm_rnd1(N, rng);
+    Permutation prm_rnd2 (N, rng);
+
+    //first apply prm_rnd2 then prm_rnd1
+    prm_rnd2.apply(randvec1);
+    prm_rnd1.apply(randvec1);
+
+    //apply the concatenation
+    prm_rnd1.concat(prm_rnd2);
+    prm_rnd1.apply(randvec2);
+
+    //make sure they're equal
+    TEST_CHECK(is_equal(randvec1, randvec2));
   }
 } permutation_test;
