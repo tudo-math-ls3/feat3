@@ -7,7 +7,7 @@ __date__   = "April 2014"
 
 import os
 import subprocess
-import imp
+import importlib
 import inspect
 import glob
 import ssl
@@ -160,10 +160,12 @@ def available_packages(files_path,target_path,name=''):
   available_files = glob.glob(files_path+os.sep+'thirdparty_*.py')
   available_packages = []
   for name in available_files:
-    my_path, filename = os.path.split(name)
-    (f,p,d) = imp.find_module(filename[:-3],[my_path])
-    mod = imp.load_module(filename[:-3],f,p,d)
-    members = inspect.getmembers(mod)
+    filename = os.path.basename(name)
+    loader = importlib.machinery.SourceFileLoader(filename, name)
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    mod = importlib.util.module_from_spec(spec)
+    loader.exec_module(mod)
+    members = inspect.getmembers(mod, inspect.isclass)
     classes = []
     # For all files, find all the classes defined in them...
     for x in members:
