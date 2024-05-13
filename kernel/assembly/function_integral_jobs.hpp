@@ -249,6 +249,11 @@ namespace FEAT
         return s;
       }
 
+      static String _print_val_sqrt(const DataType_& x, int prec)
+      {
+        return stringify_fp_sci(Math::sqrt(x), prec);
+      }
+
       template<int n_, int sn_>
       static String _print_val_sqrt(const Tiny::Vector<DataType_, n_, sn_>& x, int prec)
       {
@@ -578,12 +583,13 @@ namespace FEAT
        * The character used for padding. Defaults to a dot.
        *
        * \note
-       * This function does not print the divergence or vorticity, even if these have been computed.
+       * This function does not print the divergence or vorticity, even if these have been computed;
+       * call print_field_info() to have these printed.
        *
        * \returns
        * A formatted multi-line string that contains all the computed norms.
        */
-      String print_norms(int precision = 0, std::size_t pad_size = 10u, char pad_char = '.') const
+      String print_norms(int precision = 0, std::size_t pad_size = 15u, char pad_char = '.') const
       {
         String s;
         s += String("H0-Norm").pad_back(pad_size, pad_char) + ": "
@@ -598,6 +604,38 @@ namespace FEAT
           + _print_norm(norm_l1, norm_l1_comp, precision) + "\n";
         s += String("Lmax-Norm").pad_back(pad_size, pad_char) + ": "
           + _print_norm(norm_lmax, norm_lmax_comp, precision);
+        return s;
+      }
+
+      /**
+      * \brief Prints the additional field information to a formatted string and returns it.
+      *
+      * This function prints the kinetic energy, the vorticity and the divergence.
+      *
+      * \param[in] precision
+      * The number of digits to print. Default to 0, which prints a default number of digits.
+      *
+      * \param[in] pad_size
+      * The number of characters for the padding. Should be >= 9 to enable a vertically aligned output.
+      *
+      * \param[in] pad_char
+      * The character used for padding. Defaults to a dot.
+      *
+      * \returns
+      * A formatted multi-line string that contains all the additional field information.
+      */
+      String print_field_info(int precision = 0, std::size_t pad_size = 15u, char pad_char = '.') const
+      {
+        String s;
+        s += String("Kinetic Energy").pad_back(pad_size, pad_char) + ": "
+          + _print_val(norm_h0_sqr * DataType(0.5), precision) + "\n";
+        if(max_der >= 1)
+        {
+          s += String("Vorticity").pad_back(pad_size, pad_char) + ": "
+            + _print_val_sqrt(vorticity_l2_sqr, precision) + "\n";
+          s += String("Divergence").pad_back(pad_size, pad_char) + ": "
+            + _print_val_sqrt(divergence_l2_sqr, precision) + "\n";
+        }
         return s;
       }
     }; // class FunctionIntegralInfo<...>

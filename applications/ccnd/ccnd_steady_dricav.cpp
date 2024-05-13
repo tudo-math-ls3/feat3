@@ -214,10 +214,9 @@ namespace CCND
       velo_job.result().synchronize(comm);
       pres_job.result().synchronize(comm);
 
-      comm.print("Velocity Field Analysis:\n" + velo_job.result().print_norms());
-      comm.print("Vorticity.: " + stringify_fp_sci(Math::sqrt(velo_job.result().vorticity_l2_sqr)));
-      comm.print("Divergence: " + stringify_fp_sci(Math::sqrt(velo_job.result().divergence_l2_sqr)) + "\n");
-      comm.print("Pressure Function Analysis:\n" + pres_job.result().print_norms() + "\n");
+      comm.print("Velocity Field Analysis:");
+      comm.print(velo_job.result().print_norms(0, pad_len));
+      comm.print(velo_job.result().print_field_info(0, pad_len));
     }
   }; // class Application
 
