@@ -478,6 +478,7 @@ namespace CCND
       args.parse("max-mg-iter", max_mg_iter);
       args.parse("mg-tol-rel", mg_tol_rel);
       args.parse("nl-tol-abs", nl_tol_abs);
+      args.parse("nl-stag-rate", nl_stag_rate);
       args.parse("smooth-steps", smooth_steps);
       args.parse("smooth-damp", smooth_damp);
 
@@ -1057,7 +1058,10 @@ namespace CCND
           vanka->set_skip_singular(true);
           ama_vankas.push_back(vanka);
           auto schwarz = Solver::new_schwarz_precond(vanka, filter_sys);
-          solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, 16, 0.0, schwarz);
+          if(solve_gmres_dim > Index(0))
+            solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.0, schwarz);
+          else
+            solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, 16, 0.0, schwarz);
 
           // configure solver
           solver_iterative->set_plot_name("FGMRES-AmaVanka");
