@@ -1228,7 +1228,7 @@ namespace FEAT
   {
     // the bounds are chosen such that the output will never have more than 3 leading digits
     if(bytes <= 999ull)
-      return stringify(bytes).pad_front(width) + " Bytes";
+      return stringify(bytes).pad_front(std::size_t(width)) + " Bytes";
     else if(bytes <= 1'022'976ull) // = 999*1024
       return stringify_fp_fix(double(bytes) / (1024.), precision, width) + " KiB";
     else if(bytes <= 1'047'527'424ull)  // = 999*1024^2
