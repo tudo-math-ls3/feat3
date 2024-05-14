@@ -1196,6 +1196,50 @@ namespace FEAT
   }
 #endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
+
+  /**
+   * \brief Prints a byte size to a string using the common units Bytes, KiB, MiB, Gib, TiB or PiB
+   *
+   * The output unit is chosen based in the input value \p bytes in a way, so that there are at
+   * most 3 leading digits and for any size >= 1000 bytes, and the output will contain as many digits
+   * as were specified by the \p precision parameter and it will be padded to the right to as many
+   * characters as specified by the \p width parameter excluding the unit postfix.
+   * For example, the well-known HD 3.5" floppy disk has a size of 1457664 bytes, which results in
+   * an output of "  1.390 MiB", and a standard CD-ROM has a size of 681574400 bytes, which results
+   * in an output of "650.000 MiB".
+   *
+   * \param[in] bytes
+   * The size in bytes that is to be printed
+   *
+   * \param[in] precision
+   * The number of decimal places to be printed; defaults to 3.\n
+   * If set to 0, the default (compiler-dependent) precision will be used.
+   *
+   * \param[in] width
+   * The width that is to be used, i.e. the total number of characters to be printed for the number
+   * excluding the unit postfix. This defaults to 7, which ensures that output will be properly
+   * aligned independent of the number of digits and the selected unit.\n
+   * If set to 0, the default (compiler-dependent) width will be used.
+   *
+   * \returns
+   * A String containing the size in the largest sensible unit for the given size.
+   */
+  inline String stringify_bytes(std::uint64_t bytes, int precision = 3, int width = 7)
+  {
+    // the bounds are chosen such that the output will never have more than 3 leading digits
+    if(bytes <= 999ull)
+      return stringify(bytes).pad_front(width) + " Bytes";
+    else if(bytes <= 1'022'976ull) // = 999*1024
+      return stringify_fp_fix(double(bytes) / (1024.), precision, width) + " KiB";
+    else if(bytes <= 1'047'527'424ull)  // = 999*1024^2
+      return stringify_fp_fix(double(bytes) / (1048576.), precision, width) + " MiB";
+    else if(bytes <= 1'072'668'082'176ull)  // = 999*1024^3
+      return stringify_fp_fix(double(bytes) / (1073741824.), precision, width) + " GiB";
+    else if(bytes <= 1'098'412'116'148'224ull)  // = 999*1024^4
+      return stringify_fp_fix(double(bytes) / (1099511627776.), precision, width) + " TiB";
+    else
+      return stringify_fp_fix(double(bytes) / (1125899906842624.), precision, width) + " PiB";
+  }
 } // namespace FEAT
 
 // operator<<(__float128) must reside in the std namespace because gcc/icc search the namespace of ostream for a fitting op<< first
