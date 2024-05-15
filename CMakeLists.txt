@@ -89,11 +89,7 @@ if (FEAT_HAVE_CUDA)
   endif (FEAT_CUDAMEMCHECK)
 
   if (FEAT_HAVE_HALFMATH)
-    if (CUDA_HAS_FP16)
-      include_directories("${CUDA_TOOLKIT_ROOT_DIR}/include")
-    else (CUDA_HAS_FP16)
-      message(FATAL_ERROR "half support enabled in buildid but your cuda version lacks half support")
-    endif(CUDA_HAS_FP16)
+    include_directories("${CUDA_TOOLKIT_ROOT_DIR}/include")
   endif (FEAT_HAVE_HALFMATH)
 
 endif(FEAT_HAVE_CUDA)
