@@ -89,7 +89,7 @@ if (FEAT_HAVE_CUDA)
   endif (FEAT_CUDAMEMCHECK)
 
   if (FEAT_HAVE_HALFMATH)
-    include_directories("${CUDA_TOOLKIT_ROOT_DIR}/include")
+    include_directories("${CUDAToolkit_INCLUDE_DIRS}")
   endif (FEAT_HAVE_HALFMATH)
 
 endif(FEAT_HAVE_CUDA)
