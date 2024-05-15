@@ -33,7 +33,6 @@
 #include "omp.h"
 #else
 // define omp function if omp is not found
-#pragma message "Running meshperm bench without OMP, leading to wrong results for CPU voxel assembly!"
 inline void omp_set_num_threads(int){}
 #endif
 #include <memory>
@@ -789,6 +788,9 @@ namespace MeshPermAssemblyBench
   template<int dim>
   void run_structured(SimpleArgParser& args)
   {
+    #ifndef FEAT_HAVE_OMP
+      std::cout << "Warning: Running meshperm bench without OMP, leading to wrong results for CPU voxel assembly!\n";
+    #endif
     typedef Shape::Hypercube<dim> ShapeType;
     // parse levels
     Index lvl_min(0);
