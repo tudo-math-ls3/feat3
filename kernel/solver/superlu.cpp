@@ -118,6 +118,9 @@ namespace FEAT
           // don't print statistics to cout
           slu_opts.PrintStat = NO;
 
+          // replace tiny pivots
+          slu_opts.ReplaceTinyPivot = YES;
+
           // initialize scale perm structure
           dScalePermstructInit(int_t(num_global_dofs), int_t(num_global_dofs), &slu_scale_perm);
 
