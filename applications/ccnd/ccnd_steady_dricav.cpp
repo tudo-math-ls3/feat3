@@ -215,8 +215,8 @@ namespace CCND
       pres_job.result().synchronize(comm);
 
       comm.print("Velocity Field Analysis:");
-      comm.print(velo_job.result().print_norms(0, pad_len));
-      comm.print(velo_job.result().print_field_info(0, pad_len));
+      comm.print(velo_job.result().print_norms(15, pad_len));
+      comm.print(velo_job.result().print_field_info(15, pad_len));
     }
   }; // class Application
 

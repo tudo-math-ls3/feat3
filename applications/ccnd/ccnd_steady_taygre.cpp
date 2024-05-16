@@ -193,8 +193,8 @@ namespace CCND
       error_v.synchronize(comm);
       error_p.synchronize(comm);
 
-      comm.print("Velocity Errors:\n" + error_v.print_norms() + "\n");
-      comm.print("Pressure Errors:\n" + error_p.print_norms() + "\n");
+      comm.print("Velocity Errors:\n" + error_v.print_norms(15, pad_len) + "\n");
+      comm.print("Pressure Errors:\n" + error_p.print_norms(15, pad_len) + "\n");
 
       // write all relevant errors in a single line for easy parsing
       comm.print(String("Errors V:H0/H1/H2 P:H0/H1: ")
