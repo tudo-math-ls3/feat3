@@ -275,7 +275,7 @@ public:
       2, 1, 0, 3, 4
     };
 
-    Permutation prm_domain(5, Permutation::type_perm, domain_perm_idx);
+    Permutation prm_domain(5, Permutation::ConstrType::perm, domain_perm_idx);
 
     // define image permutation
     Index image_perm_idx[7] =
@@ -283,7 +283,7 @@ public:
       0, 6, 1, 5, 4, 2, 3
     };
 
-    Permutation prm_image(7, Permutation::type_perm, image_perm_idx);
+    Permutation prm_image(7, Permutation::ConstrType::perm, image_perm_idx);
 
     // create a graph G
     //      0  1  2  3  4  5  6

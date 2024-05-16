@@ -15,19 +15,19 @@ namespace FEAT
     Permutation CuthillMcKee::compute(
       const Graph& graph,
       bool reverse,
-      CuthillMcKee::RootType root_type,
-      CuthillMcKee::SortType sort_type)
+      CuthillMcKee::RootType r_type,
+      CuthillMcKee::SortType s_type)
     {
       std::vector<Index> layers;
-      return compute(layers, graph, reverse, root_type, sort_type);
+      return compute(layers, graph, reverse, r_type, s_type);
     }
 
     Permutation CuthillMcKee::compute(
       std::vector<Index>& layers,
       const Graph& graph,
       bool reverse,
-      CuthillMcKee::RootType root_type,
-      CuthillMcKee::SortType sort_type)
+      CuthillMcKee::RootType r_type,
+      CuthillMcKee::SortType s_type)
     {
       layers.reserve(graph.get_num_nodes_domain() + Index(1));
 
@@ -66,11 +66,11 @@ namespace FEAT
         Index root = num_nodes + 1;
 
         // get the root node
-        switch(root_type)
+        switch(r_type)
         {
 
         // default: choose the first node possible
-        case root_default:
+        case RootType::standard:
           for(Index j(0); j < num_nodes; ++j)
           {
             // check if the node is unmarked
@@ -83,7 +83,7 @@ namespace FEAT
           break;
 
         // choose the node of minimum degree
-        case root_minimum_degree:
+        case RootType::minimum_degree:
           {
             Index min = num_nodes + 1;
             for(Index j(0); j < num_nodes; ++j)
@@ -98,7 +98,7 @@ namespace FEAT
           break;
 
         // choose the node of maximum degree
-        case root_maximum_degree:
+        case RootType::maximum_degree:
           {
             Index max = 0;
             for(Index j(0); j < num_nodes; ++j)
@@ -114,7 +114,7 @@ namespace FEAT
 
         // else: error
         default:
-          XABORTM("Invalid root_type parameter!");
+          XABORTM("Invalid RootType::type parameter!");
         }
 
         // if something very odd has happened
@@ -165,14 +165,14 @@ namespace FEAT
           }
 
           // sorting
-          switch(sort_type)
+          switch(s_type)
           {
           // default: do nothing
-          case sort_default:
+          case SortType::standard:
             break;
 
           // descending order
-          case sort_desc:
+          case SortType::desc:
 
             // if there is nothing to do
             if(lvl2 + 1 >= lvl3)
@@ -195,7 +195,7 @@ namespace FEAT
             break;
 
           // ascending order
-          case sort_asc:
+          case SortType::asc:
 
             // if there is nothing to do
             if(lvl2 + 1 >= lvl3)

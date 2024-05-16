@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
   SparseMatrixCSR<double, Index> best;
   best.clone(orig, CloneMode::Deep);
 
-  Permutation perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_default);
+  Permutation perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::standard);
   auto csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   Index test_radius;
@@ -59,9 +59,9 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_minimum_degree sort_default: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::minimum_degree SortType::standard: "<<best_radius<<std::endl;
   }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_default);
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -69,31 +69,10 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_minimum_degree sort_default: "<<best_radius<<std::endl;
-  }
-
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_maximum_degree, Adjacency::CuthillMcKee::sort_default);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_maximum_degree sort_default: "<<best_radius<<std::endl;
-  }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_maximum_degree, Adjacency::CuthillMcKee::sort_default);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_maximum_degree sort_default: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::minimum_degree SortType::standard: "<<best_radius<<std::endl;
   }
 
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_default, Adjacency::CuthillMcKee::sort_default);
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -101,9 +80,9 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_default sort_default: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::maximum_degree SortType::standard: "<<best_radius<<std::endl;
   }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_default, Adjacency::CuthillMcKee::sort_default);
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -111,32 +90,10 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_default sort_default: "<<best_radius<<std::endl;
-  }
-
-
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_asc);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_minimum_degree sort_asc: "<<best_radius<<std::endl;
-  }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_asc);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_minimum_degree sort_asc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::maximum_degree SortType::standard: "<<best_radius<<std::endl;
   }
 
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_maximum_degree, Adjacency::CuthillMcKee::sort_asc);
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -144,9 +101,9 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_maximum_degree sort_asc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::default SortType::standard: "<<best_radius<<std::endl;
   }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_maximum_degree, Adjacency::CuthillMcKee::sort_asc);
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -154,32 +111,11 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_maximum_degree sort_asc: "<<best_radius<<std::endl;
-  }
-
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_default, Adjacency::CuthillMcKee::sort_asc);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_default sort_asc: "<<best_radius<<std::endl;
-  }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_default, Adjacency::CuthillMcKee::sort_asc);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_default sort_asc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::default SortType::standard: "<<best_radius<<std::endl;
   }
 
 
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_desc);
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -187,9 +123,9 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_minimum_degree sort_desc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::minimum_degree SortType::asc: "<<best_radius<<std::endl;
   }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_desc);
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -197,31 +133,10 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_minimum_degree sort_desc: "<<best_radius<<std::endl;
-  }
-
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_maximum_degree, Adjacency::CuthillMcKee::sort_desc);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_maximum_degree sort_desc: "<<best_radius<<std::endl;
-  }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_maximum_degree, Adjacency::CuthillMcKee::sort_desc);
-  csr = orig.clone(CloneMode::Deep);
-  csr.permute(perm, perm);
-  csr.radius_row(test_radius, test_radius_index);
-  if (test_radius < best_radius)
-  {
-    best_radius = test_radius;
-    best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_maximum_degree sort_desc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::minimum_degree SortType::asc: "<<best_radius<<std::endl;
   }
 
-  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::root_default, Adjacency::CuthillMcKee::sort_desc);
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -229,9 +144,9 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true root_default sort_desc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::maximum_degree SortType::asc: "<<best_radius<<std::endl;
   }
-  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::root_default, Adjacency::CuthillMcKee::sort_desc);
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
   csr.permute(perm, perm);
   csr.radius_row(test_radius, test_radius_index);
@@ -239,7 +154,92 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false root_default sort_desc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::maximum_degree SortType::asc: "<<best_radius<<std::endl;
+  }
+
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::asc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"true RootType::default SortType::asc: "<<best_radius<<std::endl;
+  }
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::asc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"false RootType::standard SortType::asc: "<<best_radius<<std::endl;
+  }
+
+
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::desc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"true RootType::minimum_degree SortType::desc: "<<best_radius<<std::endl;
+  }
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::desc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"false RootType::minimum_degree SortType::desc: "<<best_radius<<std::endl;
+  }
+
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::desc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"true RootType::maximum_degree SortType::desc: "<<best_radius<<std::endl;
+  }
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::desc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"false RootType::maximum_degree SortType::desc: "<<best_radius<<std::endl;
+  }
+
+  perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::desc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"true RootType::standard SortType::desc: "<<best_radius<<std::endl;
+  }
+  perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::desc);
+  csr = orig.clone(CloneMode::Deep);
+  csr.permute(perm, perm);
+  csr.radius_row(test_radius, test_radius_index);
+  if (test_radius < best_radius)
+  {
+    best_radius = test_radius;
+    best.clone(csr, CloneMode::Deep);
+    std::cout<<"false RootType::standard SortType::desc: "<<best_radius<<std::endl;
   }
 
   if (argc != 2)

@@ -29,20 +29,20 @@ namespace FEAT
       using IndexVector = std::vector < Index>;
 
       /// Construction type enumeration
-      enum ConstrType
+      enum class ConstrType
       {
         /// create uninitialized permutation
-        type_none,
+        none,
         /// create identity permutation
-        type_identity,
+        identity,
         /// create from permutation array
-        type_perm,
+        perm,
         /// create from swap array
-        type_swap,
+        swap,
         /// create from inverse permutation array
-        type_inv_perm,
+        inv_perm,
         /// create from inverse swap array
-        type_inv_swap
+        inv_swap
       };
 
     private:
@@ -67,14 +67,14 @@ namespace FEAT
        *
        * \param[in] constr_type
        * Specifies the construction type:
-       * - \c type_none \n Create an uninitialized permutation.\n
+       * - \c ConstrType::none \n Create an uninitialized permutation.\n
        *   The permutation array has to be set up after the object is created.\n
        *   The input array \p v is ignored.
-       * - \c type_identity \n Create an identity permutation.\n The input array \p v is ignored.
-       * - \c type_perm \n Interpret the input vector as a permute-position vector.
-       * - \c type_swap \n Interpret the input vector as a swap-position vector.
-       * - \c type_inv_perm \n Interpret the input array as an inverse permute-position array.
-       * - \c type_inv_swap \n Interpret the input array as an inverse swap-position array.
+       * - \c ConstrType::identity \n Create an identity permutation.\n The input array \p v is ignored.
+       * - \c ConstrType::perm \n Interpret the input vector as a permute-position vector.
+       * - \c ConstrType::swap \n Interpret the input vector as a swap-position vector.
+       * - \c ConstrType::inv_perm \n Interpret the input array as an inverse permute-position array.
+       * - \c ConstrType::inv_swap \n Interpret the input array as an inverse swap-position array.
        *
        * \param[in] v
        * The \transient input array for the initialization. The interpretation of the array's
@@ -82,7 +82,7 @@ namespace FEAT
        */
       explicit Permutation(
         Index num_entries,
-        ConstrType constr_type = type_none,
+        ConstrType constr_type = ConstrType::none,
         const Index* v = nullptr);
 
       /**
@@ -116,7 +116,7 @@ namespace FEAT
       Permutation clone() const
       {
         if(!_perm_pos.empty())
-          return Permutation(this->size(), type_perm, _perm_pos.data());
+          return Permutation(this->size(), ConstrType::perm, _perm_pos.data());
         else
           return Permutation();
       }
@@ -129,7 +129,7 @@ namespace FEAT
       Permutation inverse() const
       {
         if(!_perm_pos.empty())
-          return Permutation(this->size(), type_inv_perm, _perm_pos.data());
+          return Permutation(this->size(), ConstrType::inv_perm, _perm_pos.data());
         else
           return Permutation();
       }

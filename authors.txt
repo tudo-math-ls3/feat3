@@ -14,6 +14,7 @@ to the main development code branch of FEAT3:
 2019 - 2020,   Heiko Poelstra
 2020 - 2021,   Gesa Pottbrock
 2010 - 2024,   Dirk Ribbrock
+       2024,   Pia Ritter
 2014 - 2015,   Malte Schirwon
 2018 - 2019,   Kristina Sax
        2016,   David Schneider

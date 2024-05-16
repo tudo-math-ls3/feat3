@@ -34,28 +34,28 @@ namespace FEAT
       *
       * This enumeration specifies how the root node of the Cuthill-McKee algorithm is chosen.
       */
-     enum RootType
+     enum class RootType
       {
         /**
          * \brief Default root
          *
          * In this mode, the first admissible node is chosen.
          */
-        root_default = 0,
+        standard = 0,
 
         /**
          * \brief Minimum-degree root
          *
          * In this mode, a node of minimum degree is chosen as the root node.
          */
-        root_minimum_degree = 1,
+        minimum_degree = 1,
 
         /**
          * \brief Maximum-degree root
          *
          * In this mode, a node of maximum degree is chosen as the root node.
          */
-        root_maximum_degree = 2
+        maximum_degree = 2
       };
 
       /**
@@ -63,28 +63,28 @@ namespace FEAT
        *
        * This enumeration specifies the order, that is used to arrange the nodes of each level.
        */
-      enum SortType
+      enum class SortType
       {
         /**
          * \brief Default sorting type
          *
          * In this mode, the nodes are not sorted at all.
          */
-        sort_default = 0,
+        standard = 0,
 
         /**
          * \brief Ascending order
          *
          * In this mode, the nodes are arranged in an ascending order corresponding to their degrees.
          */
-        sort_asc = 1,
+        asc = 1,
 
         /**
          * \brief Descending order
          *
          * In this mode, the nodes are arranged in a descending order corresponding to their degrees.
          */
-        sort_desc = 2
+        desc = 2
       };
 
       /**
@@ -99,10 +99,10 @@ namespace FEAT
        * This bool determines, if the reverse Cuthill-McKee permutation should be calculated.
        * If \c true, then the reversed permutation is used.
        *
-       * \param[in] root_type
+       * \param[in] RootType::type
        * This parameter determines the way, the root nodes are chosen.
        *
-       * \param[in] sort_type
+       * \param[in] SortType::type
        * This parameter determines, which sorting is used in each level of the Cuthill-McKee algorithm.
        *
        * \returns
@@ -112,8 +112,8 @@ namespace FEAT
         std::vector<Index>& layers,
         const Graph& graph,
         bool reverse = false,
-        CuthillMcKee::RootType root_type = root_default,
-        CuthillMcKee::SortType sort_type = sort_default);
+        CuthillMcKee::RootType r_type = RootType::standard,
+        CuthillMcKee::SortType t_type = SortType::standard);
 
       /**
        * \brief Cuthill-McKee permutation computation function
@@ -127,10 +127,10 @@ namespace FEAT
        * This bool determines, if the reverse Cuthill-McKee permutation should be calculated.
        * If \c true, then the reversed permutation is used.
        *
-       * \param[in] root_type
+       * \param[in] RootType::type
        * This parameter determines the way, the root nodes are chosen.
        *
-       * \param[in] sort_type
+       * \param[in] SortType::type
        * This parameter determines, which sorting is used in each level of the Cuthill-McKee algorithm.
        *
        * \returns
@@ -139,8 +139,8 @@ namespace FEAT
       static Permutation compute(
         const Graph& graph,
         bool reverse = false,
-        CuthillMcKee::RootType root_type = root_default,
-        CuthillMcKee::SortType sort_type = sort_default);
+        CuthillMcKee::RootType R_type = RootType::standard,
+        CuthillMcKee::SortType s_type = SortType::standard);
     }; // class CuthillMcKee
   } // namespace Adjacency
 } // namespace FEAT

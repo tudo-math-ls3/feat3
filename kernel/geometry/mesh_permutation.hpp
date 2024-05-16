@@ -750,7 +750,7 @@ namespace FEAT
         XASSERT(num_elems == cparti.get_num_indices());
 
         // create element permutation
-        _perms.back() = Adjacency::Permutation(num_elems, Adjacency::Permutation::type_perm, cparti.get_image_idx());
+        _perms.back() = Adjacency::Permutation(num_elems, Adjacency::Permutation::ConstrType::perm, cparti.get_image_idx());
         _inv_perms.back() = _perms.back().inverse();
 
         // store element coloring
@@ -787,7 +787,7 @@ namespace FEAT
 
         // create Cuthill-McKee permutation
         _perms.back() = Adjacency::CuthillMcKee::compute(this->_element_layering, elems_at_elem, reverse,
-          Adjacency::CuthillMcKee::root_minimum_degree, Adjacency::CuthillMcKee::sort_asc);
+          Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::asc);
         _inv_perms.back() = _perms.back().inverse();
 
         // save strategy
@@ -970,7 +970,7 @@ namespace FEAT
 
           // create actual permutation and its inverse
           _perms.at(dim) = Adjacency::Permutation(Index(perms.at(dim).size()),
-            Adjacency::Permutation::type_perm, perms.at(dim).data());
+            Adjacency::Permutation::ConstrType::perm, perms.at(dim).data());
           _inv_perms.at(dim) = _perms.at(dim).inverse();
         }
 

@@ -39,13 +39,13 @@ public:
     Index* perm_array(nullptr);
 
     // create Cuthill-McKee permutation (descending degrees)
-    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::root_default, CuthillMcKee::sort_desc));
+    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::standard, CuthillMcKee::SortType::desc));
 
     // create Cuthill-McKee permutation (ascending degrees)
-    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::root_default, CuthillMcKee::sort_asc));
+    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::standard, CuthillMcKee::SortType::asc));
 
     // create Cuthill-McKee permutation (no sorting)
-    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::root_default, CuthillMcKee::sort_default));
+    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::standard, CuthillMcKee::SortType::standard));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -104,13 +104,13 @@ public:
     Index* perm_array(nullptr);
 
     // create Cuthill-McKee permutation (descending degrees)
-    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_desc));
+    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::minimum_degree, CuthillMcKee::SortType::desc));
 
     // create Cuthill-McKee permutation (ascending degrees)
-    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_asc));
+    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::minimum_degree, CuthillMcKee::SortType::asc));
 
     // create Cuthill-McKee permutation (no sorting)
-    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_default));
+    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::minimum_degree, CuthillMcKee::SortType::standard));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -169,13 +169,13 @@ public:
     Index* perm_array(nullptr);
 
     // create Cuthill-McKee permutation (descending degrees)
-    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_desc));
+    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::maximum_degree, CuthillMcKee::SortType::desc));
 
     // create Cuthill-McKee permutation (ascending degrees)
-    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_asc));
+    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::maximum_degree, CuthillMcKee::SortType::asc));
 
     // create Cuthill-McKee permutation (no sorting)
-    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_default));
+    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::RootType::maximum_degree, CuthillMcKee::SortType::standard));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -234,13 +234,13 @@ public:
     Index* perm_array(nullptr);
 
     // create Cuthill-McKee permutation (descending degrees)
-    Permutation cuth1(CuthillMcKee::compute(g, true, CuthillMcKee::root_default, CuthillMcKee::sort_desc));
+    Permutation cuth1(CuthillMcKee::compute(g, true, CuthillMcKee::RootType::standard, CuthillMcKee::SortType::desc));
 
     // create Cuthill-McKee permutation (ascending degrees)
-    Permutation cuth2(CuthillMcKee::compute(g, true, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_asc));
+    Permutation cuth2(CuthillMcKee::compute(g, true, CuthillMcKee::RootType::maximum_degree, CuthillMcKee::SortType::asc));
 
     // create Cuthill-McKee permutation (no sorting)
-    Permutation cuth3(CuthillMcKee::compute(g, true, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_default));
+    Permutation cuth3(CuthillMcKee::compute(g, true, CuthillMcKee::RootType::minimum_degree, CuthillMcKee::SortType::standard));
 
     // analytic solution (descending degrees)
     Index ref1[12] =

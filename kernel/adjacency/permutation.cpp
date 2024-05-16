@@ -18,11 +18,11 @@ namespace FEAT
       XASSERTM(num_entries > 0, "cannot create empty permutation");
       switch(constr_type)
       {
-      case type_none:
+      case ConstrType::none:
         // leave vectors uninitialized
         return;
 
-      case type_identity:
+      case ConstrType::identity:
         // initialize identity permutation
         for(Index i(0); i < num_entries; ++i)
         {
@@ -40,7 +40,7 @@ namespace FEAT
 
       switch(constr_type)
       {
-      case type_perm:
+      case ConstrType::perm:
         // construct from permutation array
         for(Index i(0); i < num_entries; ++i)
         {
@@ -49,7 +49,7 @@ namespace FEAT
         calc_swap_from_perm();
         break;
 
-      case type_inv_perm:
+      case ConstrType::inv_perm:
         // construct from inverse permutation array
         for(Index i(0); i < num_entries; ++i)
         {
@@ -58,7 +58,7 @@ namespace FEAT
         calc_swap_from_perm();
         break;
 
-      case type_swap:
+      case ConstrType::swap:
         // construct from swap array
         for(Index i(0); i < num_entries; ++i)
         {
@@ -67,7 +67,7 @@ namespace FEAT
         calc_perm_from_swap();
         break;
 
-      case type_inv_swap:
+      case ConstrType::inv_swap:
         // construct from inverse swap array;
         // initialize identity permutation
         for(Index i(0); i < num_entries; ++i)

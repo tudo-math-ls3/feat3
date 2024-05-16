@@ -154,11 +154,11 @@ public:
     test_fwd(prm_inv1, vs);
 
     // create inverse random permutation by inverse permute array
-    Permutation prm_inv2(N, Permutation::type_inv_perm, prm_rnd.get_perm_pos());
+    Permutation prm_inv2(N, Permutation::ConstrType::inv_perm, prm_rnd.get_perm_pos());
     test_fwd(prm_inv2, vs);
 
     // create inverse random permutation by inverse swap array
-    Permutation prm_inv3(N, Permutation::type_inv_swap, prm_rnd.get_swap_pos());
+    Permutation prm_inv3(N, Permutation::ConstrType::inv_swap, prm_rnd.get_swap_pos());
     test_fwd(prm_inv3, vs);
 
     //Test concat

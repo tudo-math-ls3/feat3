@@ -32,12 +32,12 @@ namespace FEAT
       /**
        * \brief Weighting type enumeration
        */
-      enum WeightType
+      enum class WeightType
       {
         /// use arithmetic averaging
-        wt_arithmetic = 0,
+        arithmetic = 0,
         /// use volume-based averaging
-        wt_volume
+        volume
       };
 
       /**
@@ -72,7 +72,7 @@ namespace FEAT
         const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
-        WeightType weight_type = wt_volume)
+        WeightType weight_type = WeightType::volume)
       {
         typedef LAFEM::DenseVector<DT_, IT_> VectorType;
         typedef Function_ FunctionType;
@@ -140,7 +140,7 @@ namespace FEAT
         typename VectorType::ScatterAxpy weight_scatter_axpy(weight);
 
         // format local weight vector
-        if(weight_type == wt_arithmetic)
+        if(weight_type == WeightType::arithmetic)
           lwad.format(DataType(1));
 
         // loop over all cells of the mesh
@@ -205,7 +205,7 @@ namespace FEAT
           lxad.set_mat_vec_mult(mass, lvad);
 
           // choose weight
-          if(weight_type == wt_volume)
+          if(weight_type == WeightType::volume)
           {
             lxad *= volume;
             lwad.format(volume);

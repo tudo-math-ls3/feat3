@@ -344,7 +344,7 @@ namespace FEAT
           {
             // no test permutation, only trial mesh permuted
             // create a dummy identity permutation for the test mesh
-            Adjacency::Permutation id_perm(trial2test_graph.get_num_nodes_image(), Adjacency::Permutation::type_identity);
+            Adjacency::Permutation id_perm(trial2test_graph.get_num_nodes_image(), Adjacency::Permutation::ConstrType::identity);
             permuted_graph = Adjacency::Graph(trial2test_graph, trial_perm, id_perm);
           }
           else
