@@ -164,6 +164,7 @@ var namespace_f_e_a_t =
     [ "string_mapped", "namespace_f_e_a_t.html#a16e4fea104e6fd8d9995686ee5b3ca2c", null ],
     [ "string_mapped_lookup", "namespace_f_e_a_t.html#af08017c03567ed396b65d4018c281b32", null ],
     [ "stringify", "namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535", null ],
+    [ "stringify_bytes", "namespace_f_e_a_t.html#ab7ca21f86822091b795043b8afb9139b", null ],
     [ "stringify_fp_fix", "namespace_f_e_a_t.html#a2f8928fdd8a94e9e3a4971f3231b5e77", null ],
     [ "stringify_fp_sci", "namespace_f_e_a_t.html#abb8ee3d761bb7c3710a943fe34746ad2", null ],
     [ "stringify_join", "namespace_f_e_a_t.html#ac633c320068698769f27c234ea2bc8d6", null ],

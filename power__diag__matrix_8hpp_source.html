@@ -266,10 +266,10 @@ $(document).ready(function(){initNavTree('power__diag__matrix_8hpp_source.html',
 <div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>          filename.erase(0, found + 1);</div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        }</div>
 <div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span> </div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        file &lt;&lt; <span class="stringliteral">&quot;%%MatrixMarket powerdiagmatrix coordinate real general&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        file &lt;&lt; <span class="stringliteral">&quot;%%MatrixMarket powerdiagmatrix coordinate real general&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1); i &lt;= blocks_; ++i)</div>
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        {</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>          file &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;_pd&quot;</span> &lt;&lt; i &lt;&lt; suffix &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>          file &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;_pd&quot;</span> &lt;&lt; i &lt;&lt; suffix &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>        }</div>
 <div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span> </div>
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        file.close();</div>
@@ -625,12 +625,12 @@ $(document).ready(function(){initNavTree('power__diag__matrix_8hpp_source.html',
 <div class="line"><a id="l00722" name="l00722"></a><span class="lineno">  722</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
 <div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span>      }</div>
 <div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span> </div>
-<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span>      <span class="keyword">explicit</span> PowerDiagMatrix(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, String filename)</div>
+<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span>      <span class="keyword">explicit</span> PowerDiagMatrix(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, <span class="keyword">const</span> String&amp; filename)</div>
 <div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span>      {</div>
 <div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span>        <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a88ca329101a83099f1a13d98f80c66f0">read_from</a>(mode, filename);</div>
 <div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>      }</div>
 <div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span> </div>
-<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>      <span class="keyword">explicit</span> PowerDiagMatrix(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, std::istream&amp; file, String directory = <span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>      <span class="keyword">explicit</span> PowerDiagMatrix(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, std::istream&amp; file, <span class="keyword">const</span> String&amp; directory = <span class="stringliteral">&quot;&quot;</span>)</div>
 <div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span>      {</div>
 <div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span>        String line;</div>
 <div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span>        <span class="keywordflow">do</span> {</div>
@@ -644,7 +644,7 @@ $(document).ready(function(){initNavTree('power__diag__matrix_8hpp_source.html',
 <div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a8fd7915eab54cd47d99bd23ad6930f76">_first</a> = std::move(tmp_first);</div>
 <div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span>      }</div>
 <div class="line"><a id="l00745" name="l00745"></a><span class="lineno">  745</span> </div>
-<div class="line"><a id="l00746" name="l00746"></a><span class="lineno">  746</span>      <span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a88ca329101a83099f1a13d98f80c66f0">read_from</a>(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, String filename)</div>
+<div class="line"><a id="l00746" name="l00746"></a><span class="lineno">  746</span>      <span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a88ca329101a83099f1a13d98f80c66f0">read_from</a>(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, <span class="keyword">const</span> String&amp; filename)</div>
 <div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span>      {</div>
 <div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span>        String directory;</div>
 <div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span>        <span class="keyword">auto</span> found = filename.rfind(<span class="stringliteral">&quot;/&quot;</span>);</div>
@@ -691,15 +691,15 @@ $(document).ready(function(){initNavTree('power__diag__matrix_8hpp_source.html',
 <div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span>          filename.erase(0, found + 1);</div>
 <div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span>        }</div>
 <div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span> </div>
-<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>        file &lt;&lt; <span class="stringliteral">&quot;%%MatrixMarket powerdiagmatrix coordinate real general&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>        file &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;_pd&quot;</span> &lt;&lt; 1 &lt;&lt; suffix &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>        file &lt;&lt; <span class="stringliteral">&quot;%%MatrixMarket powerdiagmatrix coordinate real general&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>        file &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;_pd&quot;</span> &lt;&lt; 1 &lt;&lt; suffix &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span> </div>
 <div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>        file.close();</div>
 <div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span> </div>
 <div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span>        this-&gt;<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#ab144f88e6b8cb888343e8895cbae05a4">write_out_submatrices</a>(mode, directory, filename, suffix);</div>
 <div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span>      }</div>
 <div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span> </div>
-<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>      <span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#ab144f88e6b8cb888343e8895cbae05a4">write_out_submatrices</a>(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, String directory, String prefix, String suffix, <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> length = 1)<span class="keyword"> const</span></div>
+<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>      <span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#ab144f88e6b8cb888343e8895cbae05a4">write_out_submatrices</a>(<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646">FileMode</a> mode, <span class="keyword">const</span> String&amp; directory, <span class="keyword">const</span> String&amp; prefix, <span class="keyword">const</span> String&amp; suffix, <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> length = 1)<span class="keyword"> const</span></div>
 <div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span><span class="keyword">      </span>{</div>
 <div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a8fd7915eab54cd47d99bd23ad6930f76">_first</a>.write_out(mode, directory + prefix + <span class="stringliteral">&quot;_pd&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(length) + suffix);</div>
 <div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>      }</div>

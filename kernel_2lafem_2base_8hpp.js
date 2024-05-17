@@ -46,5 +46,6 @@ var kernel_2lafem_2base_8hpp =
       [ "lt_banded", "kernel_2lafem_2base_8hpp.html#aabefea13a94890ded77e859eecd6a638a72009b0b5bf8c72b50704b44e42a37b1", null ]
     ] ],
     [ "operator&", "kernel_2lafem_2base_8hpp.html#aca01e69d025c391d78f9da6e2ab8e7b2", null ],
-    [ "operator|", "kernel_2lafem_2base_8hpp.html#aeac797174e76e1c3df79dea5d70d1b4b", null ]
+    [ "operator|", "kernel_2lafem_2base_8hpp.html#aeac797174e76e1c3df79dea5d70d1b4b", null ],
+    [ "FileOutStreamBufferSize", "kernel_2lafem_2base_8hpp.html#a8c4c378c7a34eb8ccca4252d9bada38b", null ]
 ];
