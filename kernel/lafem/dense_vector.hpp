@@ -704,7 +704,7 @@ namespace FEAT
           const DT_ * pval(temp.elements());
           for (Index i(0); i < tsize; ++i, ++pval)
           {
-            file << std::scientific << *pval << "\n";
+            file << stringify_fp_sci(*pval) << "\n";
           }
           break;
         }
@@ -715,7 +715,7 @@ namespace FEAT
 
           for (Index i(0); i < this->size(); ++i)
           {
-            file << std::scientific << temp[i] << "\n";
+            file << stringify_fp_sci(temp[i]) << "\n";
           }
           MemoryPool::release_memory(temp);
           break;
@@ -1124,7 +1124,7 @@ namespace FEAT
         lhs << "[";
         for (Index i(0); i < b.size(); ++i)
         {
-          lhs << "  " << b(i);
+          lhs << "  " << stringify(b(i));
         }
         lhs << "]";
 

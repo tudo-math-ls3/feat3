@@ -462,7 +462,7 @@ namespace FEAT
             {
               for(IT_ col(0) ; col < columns() ; ++col)
               {
-                file << std::scientific << (*this)(row, col) << "\n";
+                file << stringify_fp_sci((*this)(row, col)) << "\n";
               }
             }
             break;
@@ -921,7 +921,7 @@ namespace FEAT
           lhs << "[";
           for (Index j(0) ; j < b.columns() ; ++j)
           {
-            lhs << "  " << b(i, j);
+            lhs << "  " << stringify(b(i, j));
           }
           lhs << "]" << "\n";
         }

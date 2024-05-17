@@ -841,7 +841,7 @@ namespace FEAT
                 {
                   for (int x(0) ; x < BlockWidth_ ; ++x)
                   {
-                    file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)this->col_ind()[i] * BlockWidth_) + x + 1 << " " << std::scientific << block[y][x] << "\n";
+                    file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)this->col_ind()[i] * BlockWidth_) + x + 1 << " " << stringify_fp_sci(block[y][x]) << "\n";
                   }
                 }
               }
@@ -2307,7 +2307,7 @@ namespace FEAT
             for (Index j(0) ; j < b.columns() ; ++j)
             {
               for (int l(0) ; l < BlockWidth_ ; ++l)
-                lhs << "  " << b(i, j).v[k][l];
+                lhs << "  " << stringify(b(i, j).v[k][l]);
             }
             lhs << "]" << "\n";
           }

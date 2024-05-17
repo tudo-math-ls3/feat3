@@ -1097,7 +1097,7 @@ namespace FEAT
               file << this->rows() << " " << this->columns() << " " << valv.size() << "\n";
               for (Index i(0) ; i < valv.size() ; ++i)
               {
-                file << rowv.at(i) << " " << colv.at(i) << " " << std::scientific << valv.at(i) << "\n";
+                file << rowv.at(i) << " " << colv.at(i) << " " << stringify_fp_sci(valv.at(i)) << "\n";
               }
             }
             else
@@ -1125,7 +1125,7 @@ namespace FEAT
                   //   file.write(buffer, buffer_ptr+1);
                   //   buffer_ptr = 0;
                   // }
-                  file << row + 1 << " " << this->col_ind()[i] + 1 << " " << std::scientific << this->val()[i] << "\n";
+                  file << row + 1 << " " << this->col_ind()[i] + 1 << " " << stringify_fp_sci(this->val()[i]) << "\n";
                 }
               }
               // if(buffer_ptr > 0)
@@ -2658,7 +2658,7 @@ namespace FEAT
           lhs << "[";
           for (Index j(0) ; j < b.columns() ; ++j)
           {
-            lhs << "  " << b(i, j);
+            lhs << "  " << stringify(b(i, j));
           }
           lhs << "]" << "\n";
         }

@@ -566,12 +566,12 @@ public:
     SparseMatrixBCSR<DT_, IT_, 3, 3> smb(2, 2, dv2, dv1, dv3);
 
     auto diag = smb.extract_diag();
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[0], 1);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[1], 5);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[2], 9);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[3], 10);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[4], 14);
-    TEST_CHECK_EQUAL(diag.template elements<Perspective::pod>()[5], 18);
+    TEST_CHECK_EQUAL(int(diag.template elements<Perspective::pod>()[0]), 1);
+    TEST_CHECK_EQUAL(int(diag.template elements<Perspective::pod>()[1]), 5);
+    TEST_CHECK_EQUAL(int(diag.template elements<Perspective::pod>()[2]), 9);
+    TEST_CHECK_EQUAL(int(diag.template elements<Perspective::pod>()[3]), 10);
+    TEST_CHECK_EQUAL(int(diag.template elements<Perspective::pod>()[4]), 14);
+    TEST_CHECK_EQUAL(int(diag.template elements<Perspective::pod>()[5]), 18);
   }
 };
 SparseMatrixBCSRDiagTest <float, std::uint64_t> cpu_sm_bcsr_diag_test_float_uint64(PreferredBackend::generic);
@@ -728,12 +728,12 @@ public:
     DenseVectorBlocked<DT_, IT_, 2> s(a.rows());
     for (Index i(0); i < s.size(); ++i)
     {
-      s(i, Tiny::Vector<DT_, 2>{pi * (i % 3 + 1) - DT_(5.21) + DT_(i),  DT_(i) * DT_(12.31) });
+      s(i, Tiny::Vector<DT_, 2>{pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i),  DT_(i) * DT_(12.31) });
     }
     DenseVectorBlocked<DT_, IT_, 3> t(a.columns());
     for (Index i(0); i < t.size(); ++i)
     {
-      t(i, Tiny::Vector<DT_, 3>{pi * (i % 3 + 1) - DT_(5.21) + DT_(i),  DT_(i) * DT_(12.31), DT_(i) *DT_(-324.21) - DT_(13.37) });
+      t(i, Tiny::Vector<DT_, 3>{pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i),  DT_(i) * DT_(12.31), DT_(i) *DT_(-324.21) - DT_(13.37) });
     }
 
     b.scale_rows(b, s);

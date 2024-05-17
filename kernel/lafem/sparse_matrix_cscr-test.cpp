@@ -328,8 +328,8 @@ public:
       DenseVector<DT_, IT_> ref(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        x(i, DT_(i % 100 * DT_(1.234)));
-        y(i, DT_(2 - DT_(i % 42)));
+        x(i, DT_(i % 100) * DT_(1.234));
+        y(i, DT_(2) - DT_(i % 42));
       }
 
       for (Index row(0) ; row < a_fac.rows() ; ++row)

@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/util/half.hpp>
 
 // includes, system
 #include <locale>
@@ -872,6 +873,16 @@ namespace FEAT
       return true;
     }
 
+  #ifdef FEAT_HAVE_HALFMATH
+    bool parse(Half& t)
+    {
+      float tmp;
+      bool ret = parse(tmp);
+      t = __float2half(tmp);
+      return ret;
+    }
+  #endif
+
 #ifndef __CUDACC__
 #ifdef FEAT_HAVE_QUADMATH
     bool parse(__float128& x) const
@@ -1016,6 +1027,13 @@ namespace FEAT
     return String(item ? "true" : "false");
   }
 
+#ifdef FEAT_HAVE_HALFMATH
+  inline String stringify(const Half& item)
+  {
+    return stringify(__half2float(item));
+  }
+#endif
+
 #ifndef __CUDACC__
   inline String stringify(std::nullptr_t)
   {
@@ -1083,6 +1101,15 @@ namespace FEAT
     return oss.str();
   }
 
+  #ifdef FEAT_HAVE_HALFMATH
+  /// \cond internal
+  inline String stringify_fp_sci(Half value, int precision = 0, int width = 0, bool sign = false)
+  {
+    return stringify_fp_sci(__half2float(value), precision, width, sign);
+  }
+  /// \endcond
+  #endif
+
   /**
    * \brief Prints a floating point value to a string in fixed-point notation.
    *
@@ -1127,6 +1154,15 @@ namespace FEAT
     oss << value;
     return oss.str();
   }
+
+  #ifdef FEAT_HAVE_HALFMATH
+  /// \cond internal
+  inline String stringify_fp_fix(Half value, int precision = 0, int width = 0, bool sign = false)
+  {
+    return stringify_fp_fix(__half2float(value), precision, width, sign);
+  }
+  /// \endcond
+  #endif
 
 #ifndef __CUDACC__
 #ifdef FEAT_HAVE_QUADMATH

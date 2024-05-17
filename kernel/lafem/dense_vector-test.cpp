@@ -303,8 +303,8 @@ public:
       DenseVector<DT_, IT_> ref(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_(i % 100 * DT_(1.234)));
-        b(i, DT_(2 - DT_(i % 42)));
+        a(i, DT_(i % 100) * DT_(1.234));
+        b(i, DT_(2) - DT_(i % 42));
         ref(i, s * a(i) + b(i));
       }
 

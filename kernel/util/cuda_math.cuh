@@ -54,7 +54,11 @@ namespace FEAT
     // /** \copydoc cuda_sqrt() */
     template<> __host__ __device__ __forceinline__ Half cuda_sqrt<Half>(Half val)
     {
+      #ifdef __CUDA_ARCH__
       return hsqrt(val);
+      #else
+      return __float2half(sqrtf(__half2float(val)));
+      #endif
     }
     #endif
 
@@ -85,7 +89,11 @@ namespace FEAT
     // /** \copydoc cuda_sqrt() */
     template<> __host__ __device__ __forceinline__ Half cuda_rsqrt<Half>(Half val)
     {
+      #ifdef __CUDA_ARCH__
       return hrsqrt(val);
+      #else
+      return __float2half(rsqrtf(__half2float(val)));
+      #endif
     }
     #endif
 
@@ -133,7 +141,7 @@ namespace FEAT
     template<>
     __host__ __device__ __forceinline__ Half cuda_abs<Half>(Half val)
     {
-      return _habs(val);
+      return __habs(val);
     }
     #endif
 
@@ -278,7 +286,7 @@ namespace FEAT
     #ifdef FEAT_HAVE_HALFMATH
     template<> __host__ __device__ __forceinline__ bool cuda_isnormal<Half>(Half val)
     {
-      return ((_hisinf(val) || _hisnan(val)) && abs(val) >= CUDART_MIN_DENORM_FP16);
+      return ((__hisinf(val) || __hisnan(val)) && (__habs(val) >= CUDART_MIN_DENORM_FP16));
     }
     #endif
 
@@ -349,7 +357,11 @@ namespace FEAT
     template<>
     __host__ __device__ __forceinline__ Half cuda_sin(Half val)
     {
+      #ifdef __CUDA_ARCH__
       return hsin(val);
+      #else
+      return __float2half(sinf(__half2float(val)));
+      #endif
     }
     #endif
 
@@ -369,7 +381,11 @@ namespace FEAT
     template<>
     __host__ __device__ __forceinline__ Half cuda_cos(Half val)
     {
+      #ifdef __CUDA_ARCH__
       return hcos(val);
+      #else
+      return __float2half(cosf(__half2float(val)));
+      #endif
     }
     #endif
 
@@ -415,7 +431,7 @@ namespace FEAT
     template<>
     __host__ __device__ __forceinline__ Half cuda_max(Half a, Half b)
     {
-      return _hmax(a, b);
+      return __hmax(a, b);
     }
     #endif
 
@@ -457,9 +473,9 @@ namespace FEAT
 
     #ifdef FEAT_HAVE_HALFMATH
     template<>
-    __host__ __device__ Half cuda_min(Half a, Half b)
+    __host__ __device__ __forceinline__ Half cuda_min(Half a, Half b)
     {
-      return _hmin(a, b);
+      return __hmin(a, b);
     }
     #endif
 
@@ -483,7 +499,7 @@ namespace FEAT
     template<>
     __host__ __device__ __forceinline__ Half cuda_get_eps<Half>()
     {
-      return CUDART_ONE_FP16 - CUDART_MIN_DENORM_FP16;
+      return CUDART_ONE_FP16 - Half(0.99951171);
     }
     #endif
 
@@ -506,7 +522,7 @@ namespace FEAT
     template<>
     __host__ __device__ __forceinline__ Half cuda_get_sqrt_eps<Half>()
     {
-      return cuda_sqrt(CUDART_ONE_FP16 - CUDART_MIN_DENORM_FP16);
+      return cuda_sqrt(CUDART_ONE_FP16 - Half(0.99951171));
     }
     #endif
 
@@ -533,6 +549,7 @@ namespace FEAT
      */
     template<typename DT_>
     __device__ __forceinline__ DT_ cuda_atomic_max(DT_* address, DT_ value);
+
     template<>
     __device__ __forceinline__ int cuda_atomic_max(int* address, int value)
     {
@@ -636,7 +653,7 @@ namespace FEAT
     #ifdef FEAT_HAVE_HALFMATH
     //no atomicMax for short, so we have to implement the atomic operation with a CAS loop
     template<>
-    __device__ __forceinline__ double cuda_atomic_max(Half* address, Half value)
+    __device__ __forceinline__ Half cuda_atomic_max(Half* address, Half value)
     {
       static_assert(sizeof(Half) == sizeof(unsigned short), "Short does not have 16 bits");
 
@@ -650,7 +667,7 @@ namespace FEAT
       do
       {
         assumed = old;
-        old = atomicCAS(address_short, assumed, _hmax(value, *(Half*)&assumed));
+        old = atomicCAS(address_short, assumed, __hmax(value, *(Half*)&assumed));
       }while(assumed != old);
 
       return old;

@@ -450,7 +450,7 @@ public:
     const DT_ e_x = Math::exp(-DT_(4) * (x - DT_(1)) * x); // = exp(-4(x-1)x)
 
     // function value, gradient and hessian in 1/4
-    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
+    const DT_ u_x = (Math::exp(-(DT_(2) * x - DT_(1))*(DT_(2) * x - DT_(1))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
     const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
     const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.0625) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
 
@@ -483,8 +483,8 @@ public:
     const DT_ e_y = Math::exp(-DT_(4) * (y - DT_(1)) * y); // = exp(-4(y-1)y)
 
     // function value, gradient and hessian in 1/4 and 1/8
-    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
-    const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
+    const DT_ u_x = (Math::exp(-(DT_(2) * x - DT_(1))*(DT_(2) * x - DT_(1))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
+    const DT_ u_y = (Math::exp(-(DT_(2) * y - DT_(1))*(DT_(2) * y - DT_(1))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
     const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
     const DT_ u_y_grad = -(Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
     const DT_ u_x_hess = (DT_(8) * e_x * (DT_(8) * DT_(0.0625  ) - DT_(8) * x + DT_(1))) / (e_1 - DT_(1)); // = u''(x)
@@ -525,9 +525,9 @@ public:
     const DT_ e_z = Math::exp(-DT_(4) * (z - DT_(1)) * z); // = exp(-4(z-1)z)
 
     // function value, gradient and hessian in 1/2, 1/4 and 1/8
-    const DT_ u_x = (Math::exp(-Math::pow(DT_(2) * x - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
-    const DT_ u_y = (Math::exp(-Math::pow(DT_(2) * y - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
-    const DT_ u_z = (Math::exp(-Math::pow(DT_(2) * z - DT_(1), DT_(2))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(z)
+    const DT_ u_x = (Math::exp(-(DT_(2) * x - DT_(1))*(DT_(2) * x - DT_(1))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(x)
+    const DT_ u_y = (Math::exp(-(DT_(2) * y - DT_(1))*(DT_(2) * y - DT_(1))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(y)
+    const DT_ u_z = (Math::exp(-(DT_(2) * z - DT_(1))*(DT_(2) * z - DT_(1))) - e_neg_1) / (DT_(1) - e_neg_1); // = u(z)
     const DT_ u_x_grad = -(Math::exp(-DT_(4) * (x - DT_(1)) * x) * (DT_(8) * x - DT_(4))) / (e_1 - DT_(1)); // = u'(x)
     const DT_ u_y_grad = -(Math::exp(-DT_(4) * (y - DT_(1)) * y) * (DT_(8) * y - DT_(4))) / (e_1 - DT_(1)); // = u'(y)
     const DT_ u_z_grad = -(Math::exp(-DT_(4) * (z - DT_(1)) * z) * (DT_(8) * z - DT_(4))) / (e_1 - DT_(1)); // = u'(z)
@@ -577,8 +577,8 @@ public:
     const DT_ u_y = (e_10 - e_y) / (e_10 - DT_(1)); // = u(y)
     const DT_ u_x_grad = -(DT_(20) * e_x * x) / (e_10 - DT_(1)); // = u'(x)
     const DT_ u_y_grad = -(DT_(20) * e_y * y) / (e_10 - DT_(1)); // = u'(y)
-    const DT_ u_x_hess = -(DT_(20) * e_x * (DT_(20) * Math::sqr(x) + 1)) / (e_10 - DT_(1)); // = u''(x)
-    const DT_ u_y_hess = -(DT_(20) * e_y * (DT_(20) * Math::sqr(y) + 1)) / (e_10 - DT_(1)); // = u''(y)
+    const DT_ u_x_hess = -(DT_(20) * e_x * (DT_(20) * Math::sqr(x) + DT_(1))) / (e_10 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = -(DT_(20) * e_y * (DT_(20) * Math::sqr(y) + DT_(1))) / (e_10 - DT_(1)); // = u''(y)
 
     // evaluate function value in point (1/4, 1/8)
     DT_ val = Analytic::eval_value_x(func, DT_(0.25), DT_(0.125));
@@ -620,9 +620,9 @@ public:
     const DT_ u_x_grad = -(DT_(20) * e_x * x) / (e_10 - DT_(1)); // = u'(x)
     const DT_ u_y_grad = -(DT_(20) * e_y * y) / (e_10 - DT_(1)); // = u'(y)
     const DT_ u_z_grad = -(DT_(20) * e_z * z) / (e_10 - DT_(1)); // = u'(z)
-    const DT_ u_x_hess = -(DT_(20) * e_x * (DT_(20) * Math::sqr(x) + 1)) / (e_10 - DT_(1)); // = u''(x)
-    const DT_ u_y_hess = -(DT_(20) * e_y * (DT_(20) * Math::sqr(y) + 1)) / (e_10 - DT_(1)); // = u''(y)
-    const DT_ u_z_hess = -(DT_(20) * e_z * (DT_(20) * Math::sqr(z) + 1)) / (e_10 - DT_(1)); // = u''(z)
+    const DT_ u_x_hess = -(DT_(20) * e_x * (DT_(20) * Math::sqr(x) + DT_(1))) / (e_10 - DT_(1)); // = u''(x)
+    const DT_ u_y_hess = -(DT_(20) * e_y * (DT_(20) * Math::sqr(y) + DT_(1))) / (e_10 - DT_(1)); // = u''(y)
+    const DT_ u_z_hess = -(DT_(20) * e_z * (DT_(20) * Math::sqr(z) + DT_(1))) / (e_10 - DT_(1)); // = u''(z)
 
     // evaluate function value in point (1/2, 1/4, 1/8)
     DT_ val = Analytic::eval_value_x(func, DT_(0.5), DT_(0.25), DT_(0.125));
@@ -1100,7 +1100,7 @@ public:
     // evaluate function value in point (1,2,3)
     Tiny::Vector<DT_, 3> val = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(3));
     TEST_CHECK_EQUAL_WITHIN_EPS(val[0], DT_(0.5)*-(DT_(2)-DT_(1)), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0.5) * (DT_(1) - 1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val[1], DT_(0.5) * (DT_(1) - DT_(1)), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(val[2], DT_(0), tol);
 
     // evaluate gradient in point (1,2,3)
@@ -1939,7 +1939,9 @@ public:
     test_heaviside_reg_function_1d();
     test_heaviside_reg_function_2d();
     test_heaviside_reg_function_3d();
+    #ifndef FEAT_HAVE_HALFMATH
     test_goldstein_price_function();
+    #endif
     test_bazaraa_shetty_function();
     test_himmelblau_function();
     test_rosenbrock_function();

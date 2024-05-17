@@ -291,7 +291,7 @@ public:
         a(i, tv1);
         Tiny::Vector<DT_, BS_> tv2;
         for (Index j(0) ; j < BS_ ; ++j)
-          tv2.v[j] = DT_(2 - DT_(i % (42 + j)));
+          tv2.v[j] = DT_(2) - DT_(i % (42 + j));
         b(i, tv2);
         ref(i, s * a(i) + b(i));
       }

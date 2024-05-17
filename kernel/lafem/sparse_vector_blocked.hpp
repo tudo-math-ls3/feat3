@@ -857,7 +857,7 @@ namespace FEAT
         {
           ValueType t = b(i);
           for (int j(0) ; j < BlockSize_ ; ++j)
-            lhs << "  " << t[j];
+            lhs << "  " << stringify(t[j]);
         }
         lhs << "]";
 

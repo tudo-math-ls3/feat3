@@ -300,7 +300,7 @@ namespace FEAT
             {
               Coord_ x = rule_in.get_coord(j,0);
               Coord_ y = rule_in.get_coord(j,1);
-              Coord_ w = 1 - x - y;
+              Coord_ w = Coord_(1) - x - y;
               rule.get_coord(i*n + j, 0) = w*v[i][0][0] + x*v[i][1][0] + y*v[i][2][0];
               rule.get_coord(i*n + j, 1) = w*v[i][0][1] + x*v[i][1][1] + y*v[i][2][1];
               rule.get_weight(i*n + j) = Weight_(0.25) * rule_in.get_weight(j);
@@ -609,7 +609,7 @@ namespace FEAT
               Coord_ x = rule_in.get_coord(j,0);
               Coord_ y = rule_in.get_coord(j,1);
               Coord_ z = rule_in.get_coord(j,2);
-              Coord_ w = 1 - x - y - z;
+              Coord_ w = Coord_(1) - x - y - z;
               rule.get_coord(i*n + j, 0) = w*v[i][0][0] + x*v[i][1][0] + y*v[i][2][0] + z*v[i][3][0];
               rule.get_coord(i*n + j, 1) = w*v[i][0][1] + x*v[i][1][1] + y*v[i][2][1] + z*v[i][3][1];
               rule.get_coord(i*n + j, 2) = w*v[i][0][2] + x*v[i][1][2] + y*v[i][2][2] + z*v[i][3][2];

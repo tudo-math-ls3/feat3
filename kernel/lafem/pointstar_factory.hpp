@@ -1088,7 +1088,7 @@ namespace FEAT
           x += Math::sqr(h) * (DataType_(1.0) - Math::cos(Math::pi<DataType_>() * h / pdim[i]));
         }
 
-        return 2 * x;
+        return DataType_(2) * x;
       }
 
       /**
@@ -1113,7 +1113,7 @@ namespace FEAT
           x += Math::sqr(h) * (DataType_(1.0) + Math::cos(Math::pi<DataType_>() * h / pdim[i]));
         }
 
-        return 2 * x;
+        return DataType_(2) * x;
       }
 
       virtual DenseVector<DataType_, IndexType_> eigenvector_min() const override

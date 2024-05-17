@@ -368,7 +368,7 @@ public:
       for (Index i(0); i < size; ++i)
       {
         x(i, DT_(i % 100) * DT_(1.234));
-        y(i, DT_(2 - DT_(i % 42)));
+        y(i, DT_(2) - DT_(i % 42));
         if (i == 0 && size > 1)
           ax(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i + 1) % 100)));
         else if (i == size - 1 && size > 1)
@@ -723,7 +723,7 @@ public:
       DenseVector<DT_, IT_> s1(a.rows());
       for (Index i(0); i < s1.size(); ++i)
       {
-        s1(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
+        s1(i, pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i));
       }
       b.scale_rows(b, s1);
       for (Index row(0); row < a.rows(); ++row)
@@ -738,7 +738,7 @@ public:
       DenseVector<DT_, IT_> s2(a.columns());
       for (Index i(0); i < s2.size(); ++i)
       {
-        s2(i, pi * (i % 3 + 1) - DT_(5.21) + DT_(i));
+        s2(i, pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i));
       }
       b.scale_cols(a, s2);
       for (Index row(0); row < a.rows(); ++row)

@@ -721,7 +721,7 @@ namespace FEAT
         lhs << "[";
         for (int i(0) ; i < b.n ; ++i)
         {
-          lhs << "  " << b(i);
+          lhs << "  " << stringify(b(i));
         }
         lhs << "]";
 

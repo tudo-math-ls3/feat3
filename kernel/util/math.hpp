@@ -324,6 +324,13 @@ namespace FEAT
 #pragma warning(pop)
 #endif
 
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half sqrt(Half x)
+    {
+      return __float2half(sqrt(__half2float(x)));
+    }
+    #endif
+
     // wrap std::sqrt
     WRAP_STD_MATH1(sqrt)
     WRAP_QUAD_MATH1(sqrt)
@@ -358,6 +365,13 @@ namespace FEAT
 
       return y;
     }
+
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half sin(Half x)
+    {
+      return __float2half(sin(__half2float(x)));
+    }
+    #endif
 
     // wrap std::sin
     WRAP_STD_MATH1(sin)
@@ -397,6 +411,13 @@ namespace FEAT
     // wrap std::cos
     WRAP_STD_MATH1(cos)
     WRAP_QUAD_MATH1(cos)
+
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half cos(Half x)
+    {
+      return __float2half(cos(__half2float(x)));
+    }
+    #endif
 
     /**
      * \brief Returns the tangent of a value.
@@ -452,6 +473,13 @@ namespace FEAT
     WRAP_STD_MATH1(sinh)
     WRAP_QUAD_MATH1(sinh)
 
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half sinh(Half x)
+    {
+      return __float2half(sinh(__half2float(x)));
+    }
+    #endif
+
     /**
      * \brief Returns the hyperbolic cosine of a value.
      *
@@ -486,6 +514,13 @@ namespace FEAT
     // wrap std::cosh
     WRAP_STD_MATH1(cosh)
     WRAP_QUAD_MATH1(cosh)
+
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half cosh(Half x)
+    {
+      return __float2half(cosh(__half2float(x)));
+    }
+    #endif
 
     /**
      * \brief Returns the hyperbolic tangent of a value.
@@ -567,6 +602,18 @@ namespace FEAT
     WRAP_STD_MATH1(log)
     WRAP_QUAD_MATH1(log)
 
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half exp(Half x)
+    {
+      return __float2half(exp(__half2float(x)));
+    }
+
+    inline Half log(Half x)
+    {
+      return __float2half(log(__half2float(x)));
+    }
+    #endif
+
     /**
      * \brief Returns the logarithm to the base 10 of a value.
      *
@@ -644,6 +691,13 @@ namespace FEAT
     WRAP_STD_MATH1(atan)
     WRAP_QUAD_MATH1(atan)
 
+    #ifdef FEAT_HAVE_HALFMATH
+    inline Half atan(Half x)
+    {
+      return __float2half(atan(__half2float(x)));
+    }
+    #endif
+
     /**
      * \brief Returns the arctangent of y/x.
      *
@@ -710,6 +764,14 @@ namespace FEAT
     {
       return 4.0l * std::atan(1.0l);
     }
+
+    #ifdef FEAT_HAVE_HALFMATH
+    template<>
+    inline Half pi<Half>()
+    {
+      return __float2half(pi<float>());
+    }
+    #endif
     /// \endcond
 
     /**
@@ -755,6 +817,14 @@ namespace FEAT
       return FLT128_EPSILON;
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
+
+    #ifdef FEAT_HAVE_HALFMATH
+    template<>
+    inline Half eps<Half>()
+    {
+      return CUDART_ONE_FP16 - Half(0.99951171);
+    }
+    #endif
     /// \endcond
 
     /**
@@ -793,6 +863,20 @@ namespace FEAT
       return FLT128_MIN;
     }
 #endif // FEAT_HAVE_QUADMATH && !__CUDA_CC__
+
+    #ifdef FEAT_HAVE_HALFMATH
+    template<>
+    inline Half huge<Half>()
+    {
+      return CUDART_MAX_NORMAL_FP16;
+    }
+
+    template<>
+    inline Half tiny<Half>()
+    {
+      return CUDART_MIN_DENORM_FP16;
+    }
+    #endif
     /// \endcond
 
     /**
@@ -918,6 +1002,13 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
 
+#ifdef FEAT_HAVE_HALFMATH
+    inline bool isfinite(Half x)
+    {
+      return !(__hisinf(x) || __hisnan(x));
+    }
+#endif
+
     /**
      * \brief Checks whether a value is infinite.
      *
@@ -950,6 +1041,13 @@ namespace FEAT
     }
 #endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
 
+#ifdef FEAT_HAVE_HALFMATH
+    inline bool isinf(Half x)
+    {
+      return __hisinf(x);
+    }
+#endif
+
     /**
      * \brief Checks whether a value is Not-A-Number.
      *
@@ -981,6 +1079,13 @@ namespace FEAT
       return isnan(static_cast<Backend_>(x));
     }
 #endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
+
+    #ifdef FEAT_HAVE_HALFMATH
+    inline bool isnan(Half x)
+    {
+      return __hisnan(x);
+    }
+    #endif
 
     /**
      * \brief Checks whether a value is normal.
@@ -1018,6 +1123,13 @@ namespace FEAT
       return isnormal(static_cast<Backend_>(x));
     }
 #endif // FEAT_HAVE_FLOATX && !__CUDA_CC__
+
+#ifdef FEAT_HAVE_HALFMATH
+    inline bool isnormal(Half x)
+    {
+      return ((__hisinf(x) || __hisnan(x)) && (__habs(x) >= CUDART_MIN_DENORM_FP16));
+    }
+#endif
 
     /**
      * \brief Calculates the (partial) factorial.

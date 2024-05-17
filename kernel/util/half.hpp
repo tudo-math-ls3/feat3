@@ -24,71 +24,78 @@ namespace FEAT
    *
    * \author Dirk Ribbrock
    */
-  class Half : public __half
-  {
-  public:
-    // use constructors from __half parent class
-    using __half::__half;
+  typedef __half Half;
+  // class Half : public __half
+  // {
+  // public:
+  //   // use constructors from __half parent class
+  //   using __half::__half;
 
-    Half(const int & other) : __half(double(other))
-    {
-    }
+  //   // Half(const int & other) : __half(double(other))
+  //   // {
+  //   // }
 
-    Half(const unsigned int & other) : __half(double(other))
-    {
-    }
+  //   // Half(const unsigned int & other) : __half(double(other))
+  //   // {
+  //   // }
 
-    Half(const long & other) : __half(double(other))
-    {
-    }
+  //   // Half(const long & other) : __half(double(other))
+  //   // {
+  //   // }
 
-    Half(const unsigned long & other) : __half(double(other))
-    {
-    }
+  //   // Half(const unsigned long & other) : __half(double(other))
+  //   // {
+  //   // }
 
-    Half& operator+=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis += dother;
-      *this = dthis;
-      return *this;
-    }
+  //   constexpr Half& operator=(const __half& other)
+  //   {
+  //     *this = other;
+  //     return *this;
+  //   }
 
-    Half& operator*=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis *= dother;
-      *this = dthis;
-      return *this;
-    }
+  //   // Half& operator+=(const Half& other)
+  //   // {
+  //   //   float dother(other);
+  //   //   float dthis(*this);
+  //   //   dthis += dother;
+  //   //   *this = dthis;
+  //   //   return *this;
+  //   // }
 
-    Half& operator/=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis /= dother;
-      *this = dthis;
-      return *this;
-    }
+  //   // Half& operator*=(const Half& other)
+  //   // {
+  //   //   float dother(other);
+  //   //   float dthis(*this);
+  //   //   dthis *= dother;
+  //   //   *this = dthis;
+  //   //   return *this;
+  //   // }
 
-    Half& operator-=(const Half& other)
-    {
-      float dother(other);
-      float dthis(*this);
-      dthis -= dother;
-      *this = dthis;
-      return *this;
-    }
+  //   // Half& operator/=(const Half& other)
+  //   // {
+  //   //   float dother(other);
+  //   //   float dthis(*this);
+  //   //   dthis /= dother;
+  //   //   *this = dthis;
+  //   //   return *this;
+  //   // }
 
-    Half operator-()
-    {
-      float dthis(*this);
-      dthis = -dthis;
-      return Half(dthis);
-    }
-  };
+  //   // Half& operator-=(const Half& other)
+  //   // {
+  //   //   float dother(other);
+  //   //   float dthis(*this);
+  //   //   dthis -= dother;
+  //   //   *this = dthis;
+  //   //   return *this;
+  //   // }
+
+  //   // Half operator-()
+  //   // {
+  //   //   float dthis(*this);
+  //   //   dthis = -dthis;
+  //   //   return Half(dthis);
+  //   // }
+  // };
 #endif // FEAT_HAVE_HALFMATH
 
 } // namespace FEAT

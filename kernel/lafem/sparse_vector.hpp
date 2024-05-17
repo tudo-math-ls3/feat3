@@ -737,7 +737,7 @@ namespace FEAT
             const DT_ * pval(this->elements());
             for (Index i(0) ; i < u_elem ; ++i, ++pind, ++pval)
             {
-              file << *pind+1 << " " << 1 << " " << std::scientific << *pval << "\n";
+              file << *pind+1 << " " << 1 << " " << stringify_fp_sci(*pval) << "\n";
             }
             break;
           }
@@ -901,7 +901,7 @@ namespace FEAT
         lhs << "[";
         for (Index i(0) ; i < b.size() ; ++i)
         {
-          lhs << "  " << b(i);
+          lhs << "  " << stringify(b(i));
         }
         lhs << "]";
 

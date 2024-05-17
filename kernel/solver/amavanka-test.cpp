@@ -164,9 +164,9 @@ public:
     // print some information
     std::cout << name << ": ";
     std::cout << stringify_fp_sci(def0) << " > " << stringify_fp_sci(def1);
-    std::cout << " : " << std::fixed << std::setprecision(5) << (def1/def0);
+    std::cout << " : " << stringify_fp_fix(def1/def0, 5);
     std::cout << " | " << stamp2.elapsed_string(stamp1, TimeFormat::s_m);
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // ensure that the defect decreased
     TEST_CHECK_IN_RANGE(def1/def0, DT_(0), DT_(0.5));

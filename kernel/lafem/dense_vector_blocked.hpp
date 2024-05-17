@@ -770,7 +770,7 @@ namespace FEAT
           const DT_ * pval(temp.template elements<Perspective::pod>());
           for (Index i(0); i < tsize; ++i, ++pval)
           {
-            file << std::scientific << *pval << "\n";
+            file << stringify_fp_sci(*pval) << "\n";
           }
           break;
         }
@@ -781,7 +781,7 @@ namespace FEAT
 
           for (Index i(0); i < this->size<Perspective::pod>(); ++i)
           {
-            file << std::scientific << temp[i] << "\n";
+            file << stringify_fp_sci(temp[i]) << "\n";
           }
 
           MemoryPool::release_memory(temp);
@@ -1129,7 +1129,7 @@ namespace FEAT
         {
           Tiny::Vector<DT_, BlockSize_> t = b(i);
           for (int j(0); j < BlockSize_; ++j)
-            lhs << "  " << t[j];
+            lhs << "  " << stringify(t[j]);
         }
         lhs << "]";
 

@@ -1192,7 +1192,7 @@ namespace FEAT
           lhs << "[";
           for (Index j(0) ; j < b.columns() ; ++j)
           {
-            lhs << "  " << b(i, j);
+            lhs << "  " << stringify(b(i, j));
           }
           lhs << "]" << "\n";
         }
