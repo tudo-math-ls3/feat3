@@ -8,6 +8,7 @@ __date__   = "April 2014"
 import os
 import subprocess
 import importlib
+import importlib.util
 import inspect
 import glob
 import ssl
