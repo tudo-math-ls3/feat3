@@ -21,7 +21,7 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
   if system_host_compiler:
     cxxflags += " -gcc-name=" + system_host_compiler
 
-  if "debug" in buildid or "noop" in buildid:
+  if "debug" in buildid or "nopt" in buildid:
     cxxflags += "  -O0 -debug all"
     #TODO missing ftrapuv, not know by icpx: Initializes stack local variables to an unusual value to aid error detection.
 

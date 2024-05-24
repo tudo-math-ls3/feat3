@@ -65,10 +65,10 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   if "deathhandler" in buildid:
     cxxflags += " -ldl"
 
-  if "debug" in buildid or "noop" in buildid:
+  if "debug" in buildid or "nopt" in buildid:
     if "debug" in buildid:
       cxxflags += " -Og "
-    if "noop" in buildid:
+    if "nopt" in buildid:
       cxxflags += " -O0 "
 
     cxxflags += " -fdiagnostics-show-option -fno-omit-frame-pointer"

@@ -29,7 +29,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
   if platform.system() == "Darwin" and major == 14:
     cxxflags += " -no-use-clang-env"
 
-  if "debug" in buildid or "noop" in buildid:
+  if "debug" in buildid or "nopt" in buildid:
     cxxflags += "  -O0 -debug all -ftrapuv"
 
   elif "opt" in buildid or "fast" in buildid:
