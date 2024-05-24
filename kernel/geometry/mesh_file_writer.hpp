@@ -41,16 +41,16 @@ namespace FEAT
           if(skip_empty && (index_set.get_num_entities() == Index(0)))
             return;
 
-          os << sindent << "<Topology dim=\"" << dim_ << "\">" << std::endl;
+          os << sindent << "<Topology dim=\"" << dim_ << "\">\n";
           for(Index i(0); i < index_set.get_num_entities(); ++i)
           {
             const auto& idx = index_set[i];
             os << sind << idx[0];
             for(int j(1); j < index_set.num_indices; ++j)
               os << ' ' << idx[j];
-            os << std::endl;
+            os << '\n';
           }
-          os << sindent << "</Topology>" << std::endl;
+          os << sindent << "</Topology>\n";
         }
       };
 
@@ -83,10 +83,10 @@ namespace FEAT
           if(skip_empty && (target_set.get_num_entities() == Index(0)))
             return;
 
-          os << sindent << "<Mapping dim=\"" << dim_ << "\">" << std::endl;
+          os << sindent << "<Mapping dim=\"" << dim_ << "\">\n";
           for(Index i(0); i < target_set.get_num_entities(); ++i)
-            os << sind << target_set[i] << std::endl;
-          os << sindent << "</Mapping>" << std::endl;
+            os << sind << target_set[i] << '\n';
+          os << sindent << "</Mapping>\n";
         }
       };
 
@@ -106,10 +106,10 @@ namespace FEAT
           if(skip_empty && (target_set.get_num_entities() == Index(0)))
             return;
 
-          os << sindent << "<Mapping dim=\"0\">" << std::endl;
+          os << sindent << "<Mapping dim=\"0\">\n";
           for(Index i(0); i < target_set.get_num_entities(); ++i)
-            os << sind << target_set[i] << std::endl;
-          os << sindent << "</Mapping>" << std::endl;
+            os << sind << target_set[i] << '\n';
+          os << sindent << "</Mapping>\n";
         }
       };
     } // namespace Intern
@@ -208,9 +208,9 @@ namespace FEAT
         if(_indent)
           sind.append("  ");
 
-        _os << _sindent << "<Chart name=\"" << name << "\">" << std::endl;
+        _os << _sindent << "<Chart name=\"" << name << "\">\n";
         chart.write(_os, sind);
-        _os << _sindent << "</Chart>" << std::endl;
+        _os << _sindent << "</Chart>\n";
       }
 
       /**
@@ -249,14 +249,14 @@ namespace FEAT
         _os << " size=\"" << mesh.get_num_entities(0);
         for(int i(1); i <= MeshType::shape_dim; ++i)
            _os << " " << mesh.get_num_entities(i);
-        _os << "\">" << std::endl;
+        _os << "\">\n";
         _push_indent();
 
         _write_vertex_set(mesh.get_vertex_set());
         Intern::TopoWriteHelper<Shape_>::write_topology(_os, mesh.get_index_set_holder(), _sindent, false);
 
         _pop_indent();
-        _os << _sindent << "</Mesh>" << std::endl;
+        _os << _sindent << "</Mesh>\n";
       }
 
       /**
@@ -288,7 +288,7 @@ namespace FEAT
         _os << " size=\"" << meshpart.get_num_entities(0);
         for(int i(1); i <= ShapeType::dimension; ++i)
            _os << " " << meshpart.get_num_entities(i);
-        _os << "\">" << std::endl;
+        _os << "\">\n";
         _push_indent();
 
         // write mapping
@@ -304,7 +304,7 @@ namespace FEAT
           _write_attribute(*(it->second), it->first);
 
         _pop_indent();
-        _os << _sindent << "</MeshPart>" << std::endl;
+        _os << _sindent << "</MeshPart>\n";
       }
 
       /**
@@ -321,23 +321,23 @@ namespace FEAT
         _os << " priority=\"" << partition.get_priority() << "\"";
         _os << " level=\"" << partition.get_level() << "\"";
         _os << " size=\"" << partition.get_num_patches() << ' ' << partition.get_num_elements() << "\"";
-        _os << ">" << std::endl;
+        _os << ">\n";
         _push_indent();
 
         // loop over all patches
         const Adjacency::Graph& graph = partition.get_patches();
         for(Index i(0); i < graph.get_num_nodes_domain(); ++i)
         {
-          _os << _sindent << "<Patch rank=\"" << i << "\" size=\"" << graph.degree(i) << "\">" << std::endl;
+          _os << _sindent << "<Patch rank=\"" << i << "\" size=\"" << graph.degree(i) << "\">\n";
           _push_indent();
           for(auto it = graph.image_begin(i); it != graph.image_end(i); ++it)
-            _os << _sindent << (*it) << std::endl;
+            _os << _sindent << (*it) << '\n';
           _pop_indent();
-          _os << _sindent << "</Patch>" << std::endl;
+          _os << _sindent << "</Patch>\n";
         }
 
         _pop_indent();
-        _os << _sindent << "</Partition>" << std::endl;
+        _os << _sindent << "</Partition>\n";
       }
 
       /**
@@ -386,7 +386,7 @@ namespace FEAT
         _os << "<FeatMeshFile version=\"1\"";
         if(root_mesh != nullptr)
           _os << " mesh=\"" << aux_meshtype_string(*root_mesh) << "\"";
-        _os << ">" << std::endl;
+        _os << ">\n";
 
         // increase indent
         _push_indent();
@@ -430,7 +430,7 @@ namespace FEAT
         _pop_indent();
 
         // write terminator
-        _os << "</FeatMeshFile>" << std::endl;
+        _os << "</FeatMeshFile>\n";
       }
 
     protected:
@@ -442,7 +442,7 @@ namespace FEAT
       template<int num_coords_, typename Coord_>
       void _write_vertex_set(const VertexSet<num_coords_, Coord_>& vertex_set)
       {
-        _os << _sindent << "<Vertices>" << std::endl;
+        _os << _sindent << "<Vertices>\n";
         _push_indent();
         for(Index i(0); i < vertex_set.get_num_vertices(); ++i)
         {
@@ -450,10 +450,10 @@ namespace FEAT
           _os << _sindent << v[0];
           for(int j(1); j < num_coords_; ++j)
             _os << ' ' << v[j];
-          _os << std::endl;
+          _os << '\n';
         }
         _pop_indent();
-        _os << _sindent << "</Vertices>" << std::endl;
+        _os << _sindent << "</Vertices>\n";
       }
 
       /**
@@ -471,17 +471,17 @@ namespace FEAT
         _os << _sindent << "<Attribute";
         _os << " name=\"" << name << "\"";
         _os << " dim=\"" << attr.get_dimension() << "\"";
-        _os << ">" << std::endl;
+        _os << ">\n";
         _push_indent();
         for(Index i(0); i < attr.get_num_values(); ++i)
         {
           _os << _sindent << attr(i, 0);
           for(int j(1); j < attr.get_dimension(); ++j)
             _os << ' ' << attr(i, j);
-          _os << std::endl;
+          _os << '\n';
         }
         _pop_indent();
-        _os << _sindent << "</Attribute>" << std::endl;
+        _os << _sindent << "</Attribute>\n";
       }
     }; // class MeshFileWriter
   } // namespace Geometry

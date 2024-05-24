@@ -336,10 +336,10 @@ namespace FEAT
             const CoordType mult = CoordType(0.5) / pi;
             os << " angles=\"" << (mult*ay) << " " << (mult*ap) << " " << (mult*ar) << "\"";
           }
-          os << ">" << std::endl;
+          os << ">\n";
 
           _sub_chart->write(os, sind);
-          os << sindent << "</Extrude>" << std::endl;
+          os << sindent << "</Extrude>\n";
         }
       };
 

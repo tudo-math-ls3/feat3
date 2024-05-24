@@ -923,15 +923,15 @@ namespace FEAT
 
           os << sindent << "<Bezier dim=\"2\" size=\"" << this->_vtx_ptr.size() << "\"";
           os << " type=\"" << (this->_closed ? "closed" : "open") << "\"";
-          os << (_orientation == -DataType(1) ? " orientation=\"-1\"" : "" )<<">" << std::endl;
+          os << (_orientation == -DataType(1) ? " orientation=\"-1\"" : "" )<<">\n";
 
           // write points
-          os << sind << "<Points>" << std::endl;
+          os << sind << "<Points>\n";
           // write first vertex point
           os << sind2 << 0;
             for(int j(0); j < BaseClass::world_dim; ++j)
               os << " " << _world[_vtx_ptr.front()][j];
-          os << std::endl;
+          os << '\n';
 
           // write remaining points
           for(std::size_t i(1); i < _vtx_ptr.size(); ++i)
@@ -942,21 +942,21 @@ namespace FEAT
             for(std::size_t k(_vtx_ptr[i-1]+1); k <= _vtx_ptr[i]; ++k)
               for(int j(0); j < BaseClass::world_dim; ++j)
                 os << " " << _world[k][j];
-            os << std::endl;
+            os << '\n';
           }
-          os << sind << "</Points>" << std::endl;
+          os << sind << "</Points>\n";
 
           // write parameters
           if(!_param.empty())
           {
-            os << sind << "<Params>" << std::endl;
+            os << sind << "<Params>\n";
             for(std::size_t i(0); i < _param.size(); ++i)
-              os << sind2 << _param[i][0] << std::endl;
-            os << sind << "</Params>" << std::endl;
+              os << sind2 << _param[i][0] << '\n';
+            os << sind << "</Params>\n";
           }
 
           // write terminator
-          os << sindent << "</Bezier>" << std::endl;
+          os << sindent << "</Bezier>\n";
         }
 
       protected:

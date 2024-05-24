@@ -142,14 +142,14 @@ namespace FEAT
           os << indent << "<SurfaceMesh";
           os << " verts=\" " << _surface_mesh->get_num_entities(0) << "\"";
           os << " trias=\" " << _surface_mesh->get_num_entities(ShapeType::dimension) << "\"";
-          os << ">" << std::endl;
+          os << ">\n";
 
           // increase indent
           indent.resize(indent.size()+2, ' ');
 
           const auto& vtx = _surface_mesh->get_vertex_set();
 
-          os << indent << "<Vertices>" << std::endl;
+          os << indent << "<Vertices>\n";
           indent.resize(indent.size()+2, ' ');
 
           for(Index i(0); i < vtx.get_num_vertices(); ++i)
@@ -158,16 +158,16 @@ namespace FEAT
             os << indent << v[0];
             for(int j(1); j < SurfaceMeshType::world_dim; ++j)
               os << ' ' << v[j];
-            os << std::endl;
+            os << '\n';
           }
 
           indent.resize(indent.size()-2);
-          os << indent << "</Vertices>" << std::endl;
+          os << indent << "</Vertices>\n";
 
           // Get vertex at cell index set
           const auto& idx = _surface_mesh->template get_index_set<ShapeType::dimension, 0>();
 
-          os << indent << "<Triangles>" << std::endl;
+          os << indent << "<Triangles>\n";
           indent.resize(indent.size()+2, ' ');
 
           for(Index i(0); i < idx.get_num_entities(); ++i)
@@ -176,11 +176,11 @@ namespace FEAT
             os << indent << idx_loc[0];
             for(int j(1); j < idx.num_indices; ++j)
               os << ' ' << idx_loc[j];
-            os << std::endl;
+            os << '\n';
           }
 
           indent.resize(indent.size()-2);
-          os << indent << "</Triangles>" << std::endl;
+          os << indent << "</Triangles>\n";
 
           indent.resize(indent.size()-2);
           os << indent << "</SurfaceMesh>";

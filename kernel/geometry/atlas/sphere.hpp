@@ -189,7 +189,7 @@ namespace FEAT
           os << sindent << "<Sphere";
           os << " radius=\"" << this->_radius << "\"";
           os << " midpoint=\"" << this->_midpoint[0] << " " << this->_midpoint[1] << " " << this->_midpoint[2] << "\"";
-          os << " />" << std::endl;
+          os << " />\n";
         }
       };
 

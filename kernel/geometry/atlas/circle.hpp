@@ -265,7 +265,7 @@ namespace FEAT
             CoordType param_r(param_l + CoordType(2) * Math::pi<CoordType>() / _trafo_b);
             os << " domain=\"" << param_l << " " << param_r << "\"";
           }
-          os << " />" << std::endl;
+          os << " />\n";
         }
       }; // class Circle
 

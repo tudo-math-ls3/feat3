@@ -101,16 +101,16 @@ namespace FEAT
         const double box_o = 72.0 * extra / 25.4;
 
         // write EPS header
-        os << "%!!PS-Adobe-3.0 EPSF-3.0" << std::endl;
+        os << "%!!PS-Adobe-3.0 EPSF-3.0\n";
 
         // write bounding box
-        os << "%%BoundingBox: 0 0 " << box_x << " " << box_y << std::endl;
+        os << "%%BoundingBox: 0 0 " << box_x << " " << box_y << '\n';
 
         // set stroke width
-        os << (72.0 * stroke / 25.4) << " setlinewidth" << std::endl;
+        os << (72.0 * stroke / 25.4) << " setlinewidth\n";
 
         // begin a new path
-        os << "newpath" << std::endl;
+        os << "newpath\n";
 
         // write all edges
         for(Index i(0); i < idx.get_num_entities(); ++i)
@@ -126,13 +126,13 @@ namespace FEAT
           double v1y = box_o + (double(v1[1]) - y_min) * scale;
 
           // write vertices
-          os << v0x << " " << v0y << " moveto" << std::endl;
-          os << v1x << " " << v1y << " lineto" << std::endl;
+          os << v0x << " " << v0y << " moveto\n";
+          os << v1x << " " << v1y << " lineto\n";
         }
 
         // draw path and show page
-        os << "stroke" << std::endl;
-        os << "showpage" << std::endl;
+        os << "stroke\n";
+        os << "showpage\n";
       }
 
       /**
