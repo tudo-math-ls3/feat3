@@ -372,10 +372,6 @@ for option in extra_options:
   if option.startswith("--ovr_mpi_ops"):
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
-  elif ("quadmath" in buildid) and ("mpi" in buildid):
-    # print a warning that quadmath + mpi requires overriding of MPI operations to function properly
-    print("Warning: both 'quadmath' and 'mpi' are specified in build-id, but MPI operations are not overridden.")
-    print("Please also specify the '--ovr_mpi_ops' argument to enable use of quadmath in combination with MPI.")
 
   if option.startswith("--mpi_thread_multiple"):
     unused_extra_options.remove(option)
