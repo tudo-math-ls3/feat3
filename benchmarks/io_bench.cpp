@@ -38,7 +38,7 @@ using namespace FEAT::Benchmark;
 
 
 
-void run_csr_io(int level)
+void run_csr_io(Index level)
 {
   typedef Shape::Quadrilateral ShapeType;   // 2D, same as Shape::Hypercube<2>
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -99,13 +99,13 @@ int main(int argc, char** argv)
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   SimpleArgParser parser(argc, argv);
   parser.support("lvl");
-  int lvl = 1;
+  Index lvl = 1u;
   if(parser.parse("lvl", lvl) < 0)
   {
     std::cout << "Could not parse lvl\n";
     Runtime::abort();
   }
-  if(lvl < 1)
+  if(lvl < 1u)
   {
     std::cout << "Required to provide positive integer as lvl\n";
     Runtime::abort();
