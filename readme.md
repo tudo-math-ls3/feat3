@@ -102,7 +102,7 @@ commits if the formatting of your code is incorrect, which can be a pain to fix 
 Again, assuming that your git clone of the FEAT3 repository is found under `~/feat3.git`, execute
 the following commands to set up the git hooks in your local repository:
 
-    cd ~/feat3.git/hooks
+    cd ~/feat3.git/.git/hooks
     git init
     git pull .. remotes/origin/hooks
-    cd ..
+    cd ../..
