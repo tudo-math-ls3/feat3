@@ -100,7 +100,6 @@ var namespace_f_e_a_t =
     [ "FileError", "class_f_e_a_t_1_1_file_error.html", "class_f_e_a_t_1_1_file_error" ],
     [ "FileNotCreated", "class_f_e_a_t_1_1_file_not_created.html", "class_f_e_a_t_1_1_file_not_created" ],
     [ "FileNotFound", "class_f_e_a_t_1_1_file_not_found.html", "class_f_e_a_t_1_1_file_not_found" ],
-    [ "Half", "class_f_e_a_t_1_1_half.html", null ],
     [ "InternalError", "class_f_e_a_t_1_1_internal_error.html", "class_f_e_a_t_1_1_internal_error" ],
     [ "KahanAccumulation", "struct_f_e_a_t_1_1_kahan_accumulation.html", null ],
     [ "MemoryPool", "class_f_e_a_t_1_1_memory_pool.html", "class_f_e_a_t_1_1_memory_pool" ],
@@ -118,6 +117,7 @@ var namespace_f_e_a_t =
     [ "SyntaxError", "class_f_e_a_t_1_1_syntax_error.html", "class_f_e_a_t_1_1_syntax_error" ],
     [ "ThreadFence", "class_f_e_a_t_1_1_thread_fence.html", "class_f_e_a_t_1_1_thread_fence" ],
     [ "TimeStamp", "class_f_e_a_t_1_1_time_stamp.html", "class_f_e_a_t_1_1_time_stamp" ],
+    [ "Half", "namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e", null ],
     [ "Index", "namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1", null ],
     [ "Real", "namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9", null ],
     [ "PreferredBackend", "namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029", [

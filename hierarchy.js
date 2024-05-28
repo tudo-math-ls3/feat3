@@ -1,8 +1,5 @@
 var hierarchy =
 [
-    [ "__half", null, [
-      [ "FEAT::Half", "class_f_e_a_t_1_1_half.html", null ]
-    ] ],
     [ "FEAT::Global::AlgDofParti< LocalVectorType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html", null ],
     [ "FEAT::Global::AlgDofPartiMatrix< LocalMatrixType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_matrix.html", null ],
     [ "FEAT::Global::AlgDofPartiVector< LocalVectorType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html", null ],

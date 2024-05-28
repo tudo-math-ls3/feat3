@@ -946,7 +946,6 @@ var annotated_dup =
       [ "FileError", "class_f_e_a_t_1_1_file_error.html", "class_f_e_a_t_1_1_file_error" ],
       [ "FileNotCreated", "class_f_e_a_t_1_1_file_not_created.html", "class_f_e_a_t_1_1_file_not_created" ],
       [ "FileNotFound", "class_f_e_a_t_1_1_file_not_found.html", "class_f_e_a_t_1_1_file_not_found" ],
-      [ "Half", "class_f_e_a_t_1_1_half.html", null ],
       [ "InternalError", "class_f_e_a_t_1_1_internal_error.html", "class_f_e_a_t_1_1_internal_error" ],
       [ "KahanAccumulation", "struct_f_e_a_t_1_1_kahan_accumulation.html", null ],
       [ "MemoryPool", "class_f_e_a_t_1_1_memory_pool.html", "class_f_e_a_t_1_1_memory_pool" ],

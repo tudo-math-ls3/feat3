@@ -1,15 +1,15 @@
 var class_f_e_a_t_1_1_adjacency_1_1_permutation =
 [
     [ "ConstrType", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8e", [
-      [ "type_none", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea7b431ece48b322eba2749a6e127be718", null ],
-      [ "type_identity", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eae1e6cd055f82f6fa6bb4ca1c406f545d", null ],
-      [ "type_perm", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eab13864def972c3e7478775525a7127ca", null ],
-      [ "type_swap", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eab10a260211a107f9716c3b1000bd3e01", null ],
-      [ "type_inv_perm", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea59fb30b5e63ed0e84dbc02fd8f93265f", null ],
-      [ "type_inv_swap", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea52712f56452b6507de60a08ffd491537", null ]
+      [ "none", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "identity", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaff483d1ff591898a9942916050d2ca3f", null ],
+      [ "perm", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaca659200663cf654dc4410ed494451ee", null ],
+      [ "swap", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaf0a1dfdc675b0a14a64099f7ac1cee83", null ],
+      [ "inv_perm", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea058f75cadf5c21772dc599f89b46498a", null ],
+      [ "inv_swap", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea3c12bca8d4f43b9e9b1c01aff91dc1c7", null ]
     ] ],
     [ "Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a5434a8eebe8cf90cae4707221083e1ce", null ],
-    [ "Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a241af6b603ab408b6e3a6d38bbb1e28e", null ],
+    [ "Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#aa2f1ee99f2a97c4fc6dd8ce54a8ea12f", null ],
     [ "Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a9fcb7199f2421039890d285bc402d7bd", null ],
     [ "Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#af825be7452c5cc278700907fcaebf269", null ],
     [ "~Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a3d3224ae981f00822f3f718832639720", null ],
@@ -18,6 +18,7 @@ var class_f_e_a_t_1_1_adjacency_1_1_permutation =
     [ "calc_perm_from_swap", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#ac6ef9b8bc7beff33d90d4874c27ee9bb", null ],
     [ "calc_swap_from_perm", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a2eb73b8e2f256dd3e539298d5933f38a", null ],
     [ "clone", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#aeb5ae17b11907c2481c4ba13bebb7721", null ],
+    [ "concat", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a4447b6f13b40d649d7278b115368260b", null ],
     [ "empty", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a2b95bf7a459a51a99c42af4a0bffaa5c", null ],
     [ "get_perm_pos", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a17887436ffa46e24f6789cba685b7c1f", null ],
     [ "get_perm_pos", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a0cf13087bb9c5639976d47e2a7744695", null ],
