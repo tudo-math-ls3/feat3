@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/analytic/static_wrapper.hpp>
+#include <kernel/analytic/wrappers.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/geometry/cgal.hpp>
 
@@ -4443,6 +4444,225 @@ namespace FEAT
           }
         }; // class BallCapFunction2D::Evaluator<...>
       }; // class BallCapFunction2D
+
+
+
+      /**
+       * \brief Singularity function for a 2D reentry corner with homogenous boundary conditions.
+       *
+       * This function represents the lowest order singular function that occurs for the poisson
+       * equation with a re-entry corner, which has zero boundary conditions in the corner itself.
+       *
+       * The natural space to describe this function is in radial basis and is given by
+       *         \f$ f(r,\varphi) = r^{\frac{\pi}{\theta}}\sin(\frac{\pi}{\theta}\varphi) \f$
+       * where \theta is the (right-handed) opening angle of the re-entry corner.
+       * This function is in \f$ H^1 \f$ but for degrees larger \f$ \frac{\pi}{2} \f$ not in
+       * \f$ H^2 \f$ despite the corresponding Poisson-Equation having homogenous right hand side
+       * and arbitrarily smooth boundary conditions.
+       *
+       * The actual function space is provided in standard euclidean coordinates and requires a center point p
+       * as well as the two directional vectors v_1, v_2 of the re-entry corner provided in a right-hand oriented manner:
+       *
+       *                  \ v_2
+       *                   \
+       *                    \  theta
+       *                     + -----------------
+       *                   p                  v_1
+       *
+       * \note This version directly calculates the values, gradients and hessians in euclidean basis, allowing for a few
+       *       simplifications. There is also a variant based on radial basis function, which has to be wrapped in
+       *       the PolarCoordinate wrapper.
+       * \author Maximilian Esser
+       */
+      template<typename DT_>
+      class CornerSingularity2D :
+        public Analytic::Function
+      {
+      public:
+        typedef DT_ DataType;
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+      private:
+        Tiny::Vector<DataType, 2> base_point;
+        DataType alpha, k, offset;
+      public:
+        CornerSingularity2D() = delete;
+
+        CornerSingularity2D(const Tiny::Vector<DT_, 2>& center, Tiny::Vector<DT_, 2> v_1, Tiny::Vector<DT_, 2> v_2, DT_ alpha_ = DT_(1.)) :
+          base_point(center),
+          alpha(alpha_)
+        {
+          ASSERTM((v_1.norm_euclid_sqr() > Math::eps<DataType>()) && (v_2.norm_euclid_sqr() > Math::eps<DataType>()), "Spanvectors are zero length");
+          k = Math::pi<DataType>() / Tiny::calculate_opening_angle(v_1,v_2);
+          offset = Tiny::calculate_opening_angle(Tiny::Vector<DT_, 2>{DataType(1.0), DataType(0.)}, v_1);
+        }
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        public:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+          typedef typename Traits_::GradientType GradientType;
+          typedef typename Traits_::HessianType HessianType;
+
+
+          Tiny::Vector<DataType, 2> base_point;
+          const DataType alpha, k, offset;
+
+          explicit Evaluator(const CornerSingularity2D& func) :
+            base_point(func.base_point),
+            alpha(func.alpha),
+            k(func.k),
+            offset(func.offset)
+          {
+          }
+
+          ValueType value(const PointType& point) const
+          {
+            //first calculate radius
+            const DataType x = point[0] - base_point[0];
+            const DataType y = point[1] - base_point[1];
+            const DataType r = Math::sqrt(Math::sqr(x) + Math::sqr(y));
+            //TODO: Set x_rel to zero if r is very small?? <- Better conditioning?
+            const DataType x_rel = x/r;
+            DataType phi = Math::acos(x_rel);
+            phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
+            return alpha * Math::pow(r, k) * Math::sin(k * (phi - offset));
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            const DataType x = point[0] - base_point[0];
+            const DataType y = point[1] - base_point[1];
+            const DataType r = Math::sqrt(Math::sqr(x) + Math::sqr(y));
+            const DataType x_rel = x/r;
+            const DataType y_rel = y/r;
+            //Note: While in practice we use a rotated coordinate system to express our polar-coordinate
+            //based function, we have to use the "real" cos(phi) and sin(phi) values
+            //for our base transformation, which are conveniently x_rel and y_rel
+            //TODO: This could be badly conditioned for r -> 0, have to test this...
+            DataType phi = Math::acos(x_rel);
+            phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
+            const DataType ex = k * Math::pow(r, k-1);
+            const DataType sval = Math::sin(k * (phi - offset));
+            const DataType cval = Math::cos(k * (phi - offset));
+            GradientType grad;
+            grad[0] = alpha * ex * (x_rel * sval - y_rel * cval);
+            grad[1] = alpha * ex * (y_rel * sval + x_rel * cval);
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            const DataType x = point[0] - base_point[0];
+            const DataType y = point[1] - base_point[1];
+            const DataType r = Math::sqrt(Math::sqr(x) + Math::sqr(y));
+            const DataType x_rel = x/r;
+            const DataType y_rel = y/r;
+            DataType phi = Math::acos(x_rel);
+            phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
+            const DataType ex = k * (k - DataType(1)) * Math::pow(r, k-2);
+            const DataType sval = Math::sin(k * (phi - offset));
+            const DataType cval = Math::cos(k * (phi - offset));
+            HessianType hess;
+            hess[0][0] = alpha * ex * ((Math::sqr(x_rel) - Math::sqr(y_rel)) * sval - DataType(2) * x_rel * y_rel * cval);
+            hess[1][1] = -hess[0][0];
+            hess[0][1] = hess[1][0] = alpha * ex * (DataType(2) * y_rel * x_rel * sval + (Math::sqr(x_rel) - Math::sqr(y_rel)) * cval);
+            return hess;
+          }
+        }; // class CornerSingularity2D::Evaluator<...>
+      }; // CornerSingularity2D
+
+      /// radial version of the CornerSingularity function... should be used with the PolarCoordinateWrapper
+      template<typename DT_>
+      class CornerSingularity2DRadial :
+        public Analytic::Function
+      {
+      public:
+        typedef DT_ DataType;
+        static constexpr int domain_dim = 2;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+      private:
+        DataType alpha, k;
+
+      public:
+        CornerSingularity2DRadial() = delete;
+
+        CornerSingularity2DRadial(DT_ theta_, DT_ alpha_ = DT_(1.)) :
+          alpha(alpha_),
+          k(Math::pi<DataType>() / theta_)
+        {}
+
+        /// ctor, theta is the angle required to rotate vec_r into vec_l in a counterclockwise manner
+        CornerSingularity2DRadial(const Tiny::Vector<DT_, 2>& vec_r, const Tiny::Vector<DT_, 2>& vec_l, DT_ alpha_ = DT_(1.)) :
+          alpha(alpha_),
+          k(Math::pi<DataType>() / Math::calc_opening_angle(vec_r[0], vec_r[1], vec_l[0], vec_l[1]))
+        {}
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        public:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+          typedef typename Traits_::GradientType GradientType;
+          typedef typename Traits_::HessianType HessianType;
+
+
+          const DataType alpha, k;
+
+          explicit Evaluator(const CornerSingularity2DRadial& func) :
+            alpha(func.alpha),
+            k(func.k)
+          {
+          }
+
+          ValueType value(const PointType& point) const
+          {
+            return alpha * Math::pow(point[0], k) * Math::sin(k * point[1]);
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            const DataType ex = k * Math::pow(point[0], k-1);
+            const DataType sval = Math::sin(k * point[1]);
+            const DataType cval = Math::cos(k * point[1]);
+            GradientType grad;
+            grad[0] = alpha * ex * sval;
+            grad[1] = alpha * ex * cval * point[0];
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            const DataType ex = k * Math::pow(point[0], k-2);
+            const DataType sval = Math::sin(k * point[1]);
+            const DataType cval = Math::cos(k * point[1]);
+            HessianType hess;
+            hess[0][0] = alpha * ex * (k-1) * sval;
+            hess[1][1] = - alpha * ex * Math::sqr(point[0]) * k * sval;
+            hess[0][1] = hess[1][0] = alpha * ex * k * point[0] * cval;
+            return hess;
+          }
+        }; // class CornerSingularity2DRadial::Evaluator<...>
+
+      }; // class CornerSingularity2DRadial
+
+      template<typename DT_>
+      using CornerSingluratity2DSimple = PolarCoordinate<CornerSingularity2DRadial<DT_>>;
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

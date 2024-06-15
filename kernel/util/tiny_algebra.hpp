@@ -780,6 +780,19 @@ namespace FEAT
       return Vector<T_, n_>(a) -= b;
     }
 
+      /**
+       * \brief Calculates the counter-clockwise opening angle between two 2D vectors
+       *
+       * \param[in] x Vector x
+       * \param[in] y Vector y
+       */
+      template<typename T_>
+      CUDA_HOST inline T_ calculate_opening_angle(const Vector<T_,2>& x, const Vector<T_, 2>& y)
+      {
+        return Math::calc_opening_angle(x[0], x[1], y[0], y[1]);
+      }
+
+
     /* ************************************************************************************************************* */
     /* ************************************************************************************************************* */
     // Tiny Matrix implementation

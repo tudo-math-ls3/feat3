@@ -1391,6 +1391,73 @@ namespace FEAT
     }
 
     /**
+     * \brief Calculates the opening angle from the dot and cross product of two 2D vectors
+     *
+     * This function calculates the opening angle between two unit 2D vectors x and y in a right handed matter,
+     * i.e. the angle is returned required to transform x into y in an anti-clockwise rotation.
+     * The angle is calculated on the [0, 2\pi) domain.
+     *
+     * \tparam DT_ The data
+     *
+     * \param[in] cross_prod The cross product of vector x and y.
+     * \param[in] dot_pord The dot product of vector x and y.
+     *
+     * \attention The implicit vectors x and y have to be normalized.
+     */
+    template<typename DT_>
+    DT_ calc_opening_angle_intern(DT_ cross_prod, DT_ dot_prod)
+    {
+      DT_ theta;
+      // We always want to use the version that uses values nearer to 1 for better conditioning
+      if(Math::abs(cross_prod) < DT_(0.5))
+      {
+        theta = Math::asin(cross_prod);
+        // Transform to [0,2pi]
+        if(theta >= DT_(0))
+          theta = (dot_prod >= DT_(0)) ? theta : (Math::pi<DT_>() - theta);
+        else
+          theta = (dot_prod >= DT_(0)) ? (DT_(2) * Math::pi<DT_>() + theta) : (Math::pi<DT_>() - theta);
+      }
+      else
+      {
+        theta = Math::acos(dot_prod);
+        //Transform to [0,2pi]
+        theta = (cross_prod >= DT_(0)) ? theta : (DT_(2) * Math::pi<DT_>() - theta);
+      }
+      return theta;
+    }
+
+    /**
+     * \brief Calculates the opening angle of two 2D vectors
+     *
+     * This function calculates the opening angle between two unit 2D vectors x and y in a right handed matter,
+     * i.e. the angle is returned required to transform x into y in an anti-clockwise rotation.
+     * The angle is calculated on the [0, 2\pi) domain.
+     *
+     * \tparam DT_ The data
+     *
+     * \param[in] x1, x2 The first and second value of x.
+     * \param[in] y1, y2 The first and second value of y.
+     *
+     */
+    template<typename DT_>
+    DT_ calc_opening_angle(DT_ x1, DT_ x2, DT_ y1, DT_ y2)
+    {
+      DT_ norm_x = Math::sqrt(Math::sqr(x1) + Math::sqr(x2));
+      DT_ norm_y = Math::sqrt(Math::sqr(y1) + Math::sqr(y2));
+      x1 /= norm_x;
+      x2 /= norm_x;
+      y1 /= norm_y;
+      y2 /= norm_y;
+
+      DT_ cross = x1*y2 - y1*x2;
+      DT_ dot = x1*y1 + x2*y2;
+
+      return calc_opening_angle_intern(cross, dot);
+    }
+
+
+    /**
      * \brief Math Limits class template
      *
      * This class is an extended version of the <c>std::numeric_limits</c> class template, from which

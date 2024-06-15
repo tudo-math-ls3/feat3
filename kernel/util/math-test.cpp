@@ -152,6 +152,7 @@ public:
     test_asin();
     test_acos();
     test_nan();
+    test_opening_angle();
   }
 
   void test_sqrt() const
@@ -305,6 +306,16 @@ public:
 
     // should not be normal
     TEST_CHECK(!Math::isnormal(q));
+  }
+
+  void test_opening_angle() const
+  {
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::calc_opening_angle_intern(DT_(-0.891006524188368), DT_(-0.453990499739547)), DT_(1.35)*Math::pi<DT_>(), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::calc_opening_angle_intern(DT_(1.224646799147353e-16), DT_(-1)), Math::pi<DT_>(), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::calc_opening_angle(DT_(1.8), DT_(0.6), DT_(-0.007591216126491), DT_(0.999971186303746)), DT_(0.4)*Math::pi<DT_>(), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::calc_opening_angle(DT_(0.5), DT_(0.5), DT_(-0.110615871041237), DT_(-0.698401123333710)), DT_(1.2)*Math::pi<DT_>(), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::calc_opening_angle(DT_(-13.5), DT_(0.14), DT_(-10.839439488740844), DT_(8.048363285160884)), DT_(1.8)*Math::pi<DT_>(), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::calc_opening_angle(DT_(0.0), DT_(2.3), DT_(-0.684547105928689), DT_(-0.728968627421411)), DT_(0.76)*Math::pi<DT_>(), tol);
   }
 };
 

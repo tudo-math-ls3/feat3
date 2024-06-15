@@ -1912,6 +1912,82 @@ public:
   }
 #endif
 
+  void test_corner_singularity_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    {
+      Common::CornerSingularity2DRadial<DT_> corner_nat(Math::pi<DT_>()*DT_(0.5));
+      Common::CornerSingluratity2DSimple<DT_> corner_sing(corner_nat);
+
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, DT_(1.0), DT_(0.)), DT_(0.), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, DT_(0.0), DT_(1.)), DT_(0.), tol);
+      // std::cout << "Val is " << Analytic::eval_hessian_x(corner_sing, DT_(4.0), DT_(4.0)).trace() << "\n";
+
+      Tiny::Vector<DT_, 2> corner{0., 0.}, r_vec{1.0, 0.}, l_vec{0., 1.0};
+      Common::CornerSingularity2D<DT_> n_corner_sing(corner, r_vec, l_vec);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(1.0), DT_(0.)), DT_(0.), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(0.0), DT_(1.)), DT_(0.), tol);
+      {
+        DT_ x(0.4), y(3.1);
+        DT_ val = Analytic::eval_value_x(corner_sing, x, y) - Analytic::eval_value_x(n_corner_sing, x, y);
+        TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(0.), tol);
+      }
+      {
+        DT_ x(0.4), y(3.1);
+        auto val_t = Analytic::eval_gradient_x(corner_sing, x, y)- Analytic::eval_gradient_x(n_corner_sing, x, y);
+        TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_euclid(), DT_(0.), tol);
+      }
+      {
+        DT_ x(0.4), y(3.1);
+        auto val_t = Analytic::eval_hessian_x(corner_sing, x, y)- Analytic::eval_hessian_x(n_corner_sing, x, y);
+        TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_frobenius(), DT_(0.), tol);
+      }
+
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, DT_(0.1), DT_(0.6)), Analytic::eval_value_x(n_corner_sing, DT_(0.1), DT_(0.6)), tol);
+
+      // std::cout << "Val is " << Analytic::eval_hessian_x(corner_sing, DT_(4.0), DT_(4.0)).trace() << "\n";
+    }
+    //shifted and rotated coordinate system
+    {
+      DT_ alpha = DT_(0.4);
+      Tiny::Vector<DT_, 2> corner{0., 1.}, r_vec{0.0, 1.0}, l_vec{1.4, -1.1};
+      DT_ theta = Math::calc_opening_angle(r_vec[0], r_vec[1], l_vec[0], l_vec[1]);
+      DT_ offset = Math::calc_opening_angle(DT_(1), DT_(0), r_vec[0], r_vec[1]);
+      Common::CornerSingularity2DRadial<DT_> corner_nat(theta, alpha);
+      Common::CornerSingularity2DRadial<DT_> corner_alt(r_vec, l_vec, alpha);
+      Common::CornerSingluratity2DSimple<DT_> corner_sing(corner_nat, corner, offset);
+      Common::CornerSingluratity2DSimple<DT_> corner_sing_alt(corner_alt, corner, r_vec);
+
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, DT_(0.0), DT_(1.3)), DT_(0.), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, DT_(1.4), DT_(-0.1)), DT_(0.), tol);
+      // std::cout << "Val is " << Analytic::eval_hessian_x(corner_sing, DT_(4.0), DT_(4.0)).trace() << "\n";
+
+      Common::CornerSingularity2D<DT_> n_corner_sing(corner, r_vec, l_vec, alpha);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(0.0), DT_(1.3)), DT_(0.), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(1.4), DT_(-0.1)), DT_(0.), tol);
+      {
+        DT_ x(-0.4), y(1.1);
+        DT_ val = Analytic::eval_value_x(corner_sing, x, y) - Analytic::eval_value_x(n_corner_sing, x, y);
+        TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(0.), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, x, y), Analytic::eval_value_x(corner_sing_alt, x, y), tol);
+      }
+      {
+        DT_ x(1.2), y(-2.1);
+        auto val_t = Analytic::eval_gradient_x(corner_sing, x, y)- Analytic::eval_gradient_x(n_corner_sing, x, y);
+        TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_euclid(), DT_(0.), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_gradient_x(corner_sing, x, y)[1], Analytic::eval_gradient_x(corner_sing_alt, x, y)[1], tol);
+      }
+      {
+        DT_ x(0.4), y(-3.1);
+        auto val_t = Analytic::eval_hessian_x(corner_sing, x, y)- Analytic::eval_hessian_x(n_corner_sing, x, y);
+        TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_frobenius(), DT_(0.), tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_hessian_x(corner_sing, x, y)[1][0], Analytic::eval_hessian_x(corner_sing_alt, x, y)[0][1], tol);
+        TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_hessian_x(n_corner_sing, x, y).trace(), DT_(0), tol);
+      }
+
+    }
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1974,6 +2050,7 @@ public:
 #ifdef FEAT_HAVE_CGAL
     test_cgal_signed_dist_3d();
 #endif
+    test_corner_singularity_2d();
   }
 };
 
