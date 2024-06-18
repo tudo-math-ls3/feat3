@@ -1436,7 +1436,38 @@ namespace CCND
       }
       else if(adapt_mg_tol && !first_iteration)
       {
-        if(nonlin_solver != NonlinSolver::picard)
+        if(nonlin_solver == NonlinSolver::alpine)
+        {
+          if(nl_step == 1)
+          {
+            DataType abs_tol = def_nl * def_improve * def_improve * DataType(0.1);
+            // We furthermore limit this absolute tolerance to ensure that we do not
+            // overshoot the mark by overoptimistic quadratic convergence expectations.
+            solver_iterative->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
+            // Also make sure that we gain at least 2 digits.
+            solver_iterative->set_tol_rel(1E-2);
+          }
+          else if(nl_step % 2 > 0)
+          {
+            DataType def_prev_imp = nonlinear_defects.at(nonlinear_defects.size()-2)/nonlinear_defects.at(nonlinear_defects.size()-3);
+            DataType abs_tol = def_nl * def_prev_imp * def_prev_imp * def_improve * DataType(0.1);
+            // We furthermore limit this absolute tolerance to ensure that we do not
+            // overshoot the mark by overoptimistic quadratic convergence expectations.
+            solver_iterative->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
+            // Also make sure that we gain at least 4 digits.
+            solver_iterative->set_tol_rel(1E-2);
+          }
+          else
+          {
+            DataType def_prev_imp = def_improve;
+            if(nl_step > 3u)
+              def_prev_imp = nonlinear_defects.at(nonlinear_defects.size()-2)/nonlinear_defects.at(nonlinear_defects.size()-3);
+            DataType abs_tol = def_nl * def_prev_imp * DataType(0.1);
+            solver_iterative->set_tol_abs(Math::max(abs_tol, nl_tol_abs * DataType(0.01)));
+            solver_iterative->set_tol_rel(1E-2);
+          }
+        }
+        else if(nonlin_solver != NonlinSolver::picard)
         {
           // We're using Newton as the nonlinear solver, which optimally should
           // result in quadratic convergence, i.e. let def_{j} and def_{j-1}
