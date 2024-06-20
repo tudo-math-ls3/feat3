@@ -18,6 +18,51 @@ namespace FEAT
 {
   namespace VoxelAssembly
   {
+    template<typename IndexType_>
+    class IndexSetWrapper
+    {
+      public:
+      typedef IndexType_ IndexType;
+      const IndexType* cell_to_dofs;
+      IndexType num_loc_dofs;
+
+      CUDA_HOST_DEVICE IndexType operator()(IndexType cell_index, IndexType vert_index) const
+      {
+        return *(cell_to_dofs + cell_index*num_loc_dofs + vert_index);
+      }
+
+      CUDA_HOST_DEVICE IndexSetWrapper(const IndexType* _cell_t, IndexType numi)
+      :
+      cell_to_dofs(_cell_t),
+      num_loc_dofs(numi)
+      {}
+
+      CUDA_HOST_DEVICE IndexSetWrapper(const IndexSetWrapper&) = delete;
+
+    };//class IndexSetWrapper
+
+
+    template<typename VertexType_>
+    class VertexSetWrapper
+    {
+      public:
+      typedef VertexType_ VertexType;
+      const VertexType* vert_array;
+
+      CUDA_HOST_DEVICE VertexType operator[](Index index) const
+      {
+        return vert_array[index];
+      }
+
+      CUDA_HOST_DEVICE VertexSetWrapper(const VertexType* _verts)
+      :
+      vert_array(_verts)
+      {}
+
+      CUDA_HOST_DEVICE VertexSetWrapper(const VertexSetWrapper&) = delete;
+
+    };//class VertexSetWrapper
+
     /// we only use standard mappings for voxel assembly
     template<typename Shape_>
     using Q2StandardFE = Space::Lagrange2::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape_>>>;
@@ -114,9 +159,9 @@ namespace FEAT
         SpaceEvalHelp::eval_ref_hessians(data, point);
       }
 
-      CUDA_HOST_DEVICE static inline void set_coefficients(DataType (&coeffs)[dim][num_verts], const IndexType* local_dofs, const VertexPointType* vertex_set)
+      CUDA_HOST_DEVICE static inline void set_coefficients(DataType (&coeffs)[dim][num_verts], const IndexSetWrapper<IndexType>& local_dofs, const VertexPointType* vertex_set, IndexType cell_index)
       {
-        TrafoEvalHelp::set_coefficients(coeffs, local_dofs, vertex_set);
+        TrafoEvalHelp::set_coefficients(coeffs, VertexSetWrapper(vertex_set), local_dofs, cell_index);
       }
 
       CUDA_HOST_DEVICE static inline void map_point(typename TrafoEvalHelp::ImagePointType& img_point, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])

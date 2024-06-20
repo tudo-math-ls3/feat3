@@ -789,7 +789,11 @@ namespace FEAT
       template<typename T_>
       CUDA_HOST inline T_ calculate_opening_angle(const Vector<T_,2>& x, const Vector<T_, 2>& y)
       {
+        #ifdef __CUDACC__
+        return T_(0);
+        #else
         return Math::calc_opening_angle(x[0], x[1], y[0], y[1]);
+        #endif
       }
 
 

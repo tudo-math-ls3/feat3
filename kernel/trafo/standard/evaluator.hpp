@@ -115,7 +115,7 @@ namespace FEAT
           typedef typename MeshType::template IndexSet<domain_dim, 0>::Type IndexSetType;
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
-          EvalHp::set_coefficients(_coeff, index_set[cell_index], vertex_set.begin());
+          EvalHp::set_coefficients(_coeff, vertex_set, index_set, cell_index);
         }
 
         /**

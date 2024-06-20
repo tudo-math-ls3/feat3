@@ -85,13 +85,13 @@ namespace FEAT
          * \param[in] vertex_set
          * A pointer to the beginnnig of the vertex set.
          */
-        template<typename VertexType_, typename IndexTupleType_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        template<typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef VertexType_ VertexType;
+          typedef typename VertexSetType_::VertexType VertexType;
 
-          const VertexType& v0 = vertex_set[index_tuple[0]];
-          const VertexType& v1 = vertex_set[index_tuple[1]];
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
 
 
           for(int i(0); i < image_dim; ++i)
@@ -245,14 +245,14 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          *
          */
-        template<typename VertexType_, typename IndexTupleType_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        template<typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef VertexType_ VertexType;
+          typedef typename VertexSetType_::VertexType VertexType;
 
-          const VertexType& v0 = vertex_set[index_tuple[0]];
-          const VertexType& v1 = vertex_set[index_tuple[1]];
-          const VertexType& v2 = vertex_set[index_tuple[2]];
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -439,15 +439,15 @@ namespace FEAT
          * \param[in] vertex_set
          * A pointer to the beginnnig of the vertex set.
          */
-        template<typename VertexType_, typename IndexTupleType_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        template<typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           // fetch the vertices of the edge
-          typedef VertexType_ VertexType;
-          const VertexType& v0 = vertex_set[index_tuple[0]];
-          const VertexType& v1 = vertex_set[index_tuple[1]];
-          const VertexType& v2 = vertex_set[index_tuple[2]];
-          const VertexType& v3 = vertex_set[index_tuple[3]];
+          typedef typename VertexSetType_::VertexType VertexType;
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
+          const VertexType& v3 = vertex_set[index_set(cell_index, 3)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -637,13 +637,13 @@ namespace FEAT
          * \param[in] vertex_set
          * A pointer to the beginnnig of the vertex set.
          */
-        template<typename VertexType_, typename IndexTupleType_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        template<typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef VertexType_ VertexType;
+          typedef typename VertexSetType_::VertexType VertexType;
 
-          const VertexType& v0 = vertex_set[index_tuple[0]];
-          const VertexType& v1 = vertex_set[index_tuple[1]];
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
 
 
           for(int i(0); i < img_dim; ++i)
@@ -796,15 +796,15 @@ namespace FEAT
          * \param[in] vertex_set
          * A pointer to the beginnnig of the vertex set.
          */
-        template<typename VertexType_, typename IndexTupleType_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        template<typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef VertexType_ VertexType;
+          typedef typename VertexSetType_::VertexType VertexType;
 
-          const VertexType& v0 = vertex_set[index_tuple[0]];
-          const VertexType& v1 = vertex_set[index_tuple[1]];
-          const VertexType& v2 = vertex_set[index_tuple[2]];
-          const VertexType& v3 = vertex_set[index_tuple[3]];
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
+          const VertexType& v3 = vertex_set[index_set(cell_index, 3)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -992,19 +992,19 @@ namespace FEAT
          * \param[in] vertex_set
          * A pointer to the beginnnig of the vertex set.
          */
-        template<typename VertexType_, typename IndexTupleType_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const IndexTupleType_& index_tuple, const VertexType_* vertex_set)
+        template<typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef VertexType_ VertexType;
+          typedef typename VertexSetType_::VertexType VertexType;
 
-          const VertexType& v0 = vertex_set[index_tuple[0]];
-          const VertexType& v1 = vertex_set[index_tuple[1]];
-          const VertexType& v2 = vertex_set[index_tuple[2]];
-          const VertexType& v3 = vertex_set[index_tuple[3]];
-          const VertexType& v4 = vertex_set[index_tuple[4]];
-          const VertexType& v5 = vertex_set[index_tuple[5]];
-          const VertexType& v6 = vertex_set[index_tuple[6]];
-          const VertexType& v7 = vertex_set[index_tuple[7]];
+          const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
+          const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
+          const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
+          const VertexType& v3 = vertex_set[index_set(cell_index, 3)];
+          const VertexType& v4 = vertex_set[index_set(cell_index, 4)];
+          const VertexType& v5 = vertex_set[index_set(cell_index, 5)];
+          const VertexType& v6 = vertex_set[index_set(cell_index, 6)];
+          const VertexType& v7 = vertex_set[index_set(cell_index, 7)];
 
           // calculate transformation coefficients
           // j = _coeff[i][j] for all j = 0....7

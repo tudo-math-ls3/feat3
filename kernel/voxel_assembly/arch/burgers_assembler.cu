@@ -76,10 +76,11 @@ namespace FEAT
         // now do work for this cell
         Index cell = Index(coloring_map[idx]);
         // std::cout << "Starting with cell " << cell << std::endl;
+        const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
         const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
         const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;
 
-        SpaceHelp::set_coefficients(local_coeffs, local_dofs, nodes);
+        SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
         //if we need to, gather local convection vector
         if(need_convection || need_streamline) //need stream diff or convection?
         {
@@ -141,8 +142,9 @@ namespace FEAT
 
         //now do work for this cell
         Index cell = Index(coloring_map[idx]);
+        const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
         const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
-        SpaceHelp::set_coefficients(local_coeffs, local_dofs, nodes);
+        SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
         LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_prim_dofs,
                   (const VecValueType*)primal_data, IndexType(vec_size), local_dofs, DataType(1));
 
@@ -271,10 +273,11 @@ namespace FEAT
           // now do work for this cell
           Index cell = Index(coloring_map[idx]);
           // std::cout << "Starting with cell " << cell << std::endl;
+          const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
           const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
           const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;
 
-          SpaceHelp::set_coefficients(local_coeffs, local_dofs, nodes);
+          SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
           //if we need to, gather local convection vector
           if(need_convection || need_streamline) //need stream diff or convection?
           {
@@ -337,8 +340,9 @@ namespace FEAT
 
           //now do work for this cell
           Index cell = Index(coloring_map[idx]);
+          const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
           const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
-          SpaceHelp::set_coefficients(local_coeffs, local_dofs, nodes);
+          SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
           LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_prim_dofs,
                     (const VecValueType*)primal_data, IndexType(vec_size), local_dofs, DataType(1));
 

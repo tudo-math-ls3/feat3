@@ -49,10 +49,11 @@ namespace FEAT
           // now do work for this cell
           Index cell = Index(coloring_map[idx]);
           // std::cout << "Starting with cell " << cell << std::endl;
+          const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
           const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
           const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;
 
-          SpaceHelp::set_coefficients(local_coeffs, local_dofs, nodes);
+          SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
 
           // To minimize code repetition, we call the same kernel from cuda and non cuda build...
           VoxelAssembly::Kernel::defo_assembly_kernel<SpaceHelp, LocalMatrixType>(loc_mat, local_coeffs, cub_pt, cub_wg, num_cubs, nu);
