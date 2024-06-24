@@ -24,7 +24,7 @@ using namespace Geometry;
  *
  * \returns The number of elements currently assigned to this process.
  */
-extern "C" static int feat_zoltan_num_elems(void* data, int* ierr)
+extern "C" int feat_zoltan_num_elems(void* data, int* ierr)
 {
   *ierr = ZOLTAN_OK;
   const Adjacency::Graph& grp = reinterpret_cast<const PartiZoltan::Hypergraph*>(data)->sub_graph;
@@ -42,7 +42,7 @@ extern "C" static int feat_zoltan_num_elems(void* data, int* ierr)
  * \param[out] ierr
  * A pointer to the object that receives the error code
  */
-extern "C" static void feat_zoltan_elem_list(void* data, int size_gid, int size_lid,
+extern "C" void feat_zoltan_elem_list(void* data, int size_gid, int size_lid,
   ZOLTAN_ID_PTR global_id, ZOLTAN_ID_PTR DOXY(local_id), int wgt_dim, float* obj_wgts, int* ierr)
 {
   XASSERT(size_gid == 1);
@@ -69,7 +69,7 @@ extern "C" static void feat_zoltan_elem_list(void* data, int size_gid, int size_
  * \param[out] ierr
  * A pointer to the object that receives the error code
  */
-extern "C" static void feat_zoltan_hypergraph_size(void* data, int* num_lists, int* num_nonzeroes, int* format, int* ierr)
+extern "C" void feat_zoltan_hypergraph_size(void* data, int* num_lists, int* num_nonzeroes, int* format, int* ierr)
 {
   *ierr = ZOLTAN_OK;
   const Adjacency::Graph& grp = reinterpret_cast<const PartiZoltan::Hypergraph*>(data)->sub_graph;
@@ -88,7 +88,7 @@ extern "C" static void feat_zoltan_hypergraph_size(void* data, int* num_lists, i
  * \param[out] ierr
  * A pointer to the object that receives the error code
  */
-extern "C" static void feat_zoltan_hypergraph_data(void* data, int size_gid, int num_edges, int num_nonzeroes,
+extern "C" void feat_zoltan_hypergraph_data(void* data, int size_gid, int num_edges, int num_nonzeroes,
   int format, ZOLTAN_ID_PTR edgeGID, int* vtxPtr, ZOLTAN_ID_PTR vtxGID, int* ierr)
 {
   const Adjacency::Graph& grp = reinterpret_cast<const PartiZoltan::Hypergraph*>(data)->sub_graph;
@@ -247,7 +247,7 @@ namespace FEAT
       Zoltan_Set_Param(zz, "OBJ_WEIGHT_DIM", this->_hypergraph.weights.empty() ? "0" : "1");
       Zoltan_Set_Param(zz, "EDGE_WEIGHT_DIM", "0");
       //Zoltan_Set_Param(zz, "CHECK_GRAPH", "2");
-      Zoltan_Set_Param(zz, "PHG_EDGE_SIZE_THRESHOLD", "0.5");
+      Zoltan_Set_Param(zz, "PHG_EDGE_SIZE_THRESHOLD", "1.0"); // Zoltan keeps complaining for values < 1
 
       // set hypergraph interface callbacks
       Zoltan_Set_Num_Obj_Fn(zz, feat_zoltan_num_elems, &this->_hypergraph);

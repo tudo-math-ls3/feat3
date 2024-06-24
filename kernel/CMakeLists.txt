@@ -48,42 +48,9 @@ target_link_libraries(feat INTERFACE
   kernel-root
 )
 
-if (FEAT_HAVE_TRILINOS)
-  #LINK_DIRECTORIES( ${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
-  target_link_libraries(feat INTERFACE ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
-endif (FEAT_HAVE_TRILINOS)
-
 if (FEAT_HAVE_ALGLIB)
   target_link_libraries(feat INTERFACE thirdparty-alglib)
 endif(FEAT_HAVE_ALGLIB)
-
-if (FEAT_HAVE_FPARSER)
-  target_link_libraries(feat INTERFACE thirdparty-fparser)
-endif(FEAT_HAVE_FPARSER)
-
-if (FEAT_HAVE_UMFPACK)
-  target_link_libraries(feat INTERFACE thirdparty-umfpack)
-endif(FEAT_HAVE_UMFPACK)
-
-if (FEAT_HAVE_PARMETIS)
-  target_link_libraries(feat INTERFACE thirdparty-parmetis)
-endif (FEAT_HAVE_PARMETIS)
-
-if (FEAT_HAVE_ZLIB)
-  target_link_libraries(feat INTERFACE thirdparty-zlib)
-endif (FEAT_HAVE_ZLIB)
-
-if (FEAT_HAVE_TRIANGLE)
-  target_link_libraries(feat INTERFACE thirdparty-triangle)
-endif (FEAT_HAVE_TRIANGLE)
-
-if (FEAT_HAVE_HYPRE)
-  target_link_libraries(feat INTERFACE thirdparty-hypre)
-endif (FEAT_HAVE_HYPRE)
-
-if (FEAT_HAVE_SUPERLU_DIST)
-  target_link_libraries(feat INTERFACE thirdparty-superlu)
-endif(FEAT_HAVE_SUPERLU_DIST)
 
 if (FEAT_HAVE_CGAL)
   target_link_libraries(feat INTERFACE ${Boost_LIBRARIES})
@@ -93,10 +60,46 @@ if (FEAT_HAVE_DEATH_HANDLER)
   target_link_libraries(feat INTERFACE thirdparty-deathhandler)
 endif (FEAT_HAVE_DEATH_HANDLER)
 
+if (FEAT_HAVE_FPARSER)
+  target_link_libraries(feat INTERFACE thirdparty-fparser)
+endif(FEAT_HAVE_FPARSER)
+
+if (FEAT_HAVE_PARMETIS)
+  target_link_libraries(feat INTERFACE thirdparty-parmetis)
+endif (FEAT_HAVE_PARMETIS)
+
+if (FEAT_HAVE_HYPRE)
+  target_link_libraries(feat INTERFACE thirdparty-hypre)
+endif (FEAT_HAVE_HYPRE)
+
+if (FEAT_HAVE_SUPERLU_DIST)
+  target_link_libraries(feat INTERFACE thirdparty-superlu)
+endif(FEAT_HAVE_SUPERLU_DIST)
+
+if (FEAT_HAVE_TRIANGLE)
+  target_link_libraries(feat INTERFACE thirdparty-triangle)
+endif (FEAT_HAVE_TRIANGLE)
+
+if (FEAT_HAVE_TRILINOS)
+  #LINK_DIRECTORIES( ${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
+  target_link_libraries(feat INTERFACE ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
+endif (FEAT_HAVE_TRILINOS)
+
+if (FEAT_HAVE_UMFPACK)
+  target_link_libraries(feat INTERFACE thirdparty-umfpack)
+endif(FEAT_HAVE_UMFPACK)
+
 if (FEAT_HAVE_ZFP)
   target_link_libraries(feat INTERFACE thirdparty-zfp)
 endif (FEAT_HAVE_ZFP)
 
+if (FEAT_HAVE_ZLIB)
+  target_link_libraries(feat INTERFACE thirdparty-zlib)
+endif (FEAT_HAVE_ZLIB)
+
+if (FEAT_HAVE_ZOLTAN)
+  target_link_libraries(feat INTERFACE thirdparty-zoltan)
+endif (FEAT_HAVE_ZOLTAN)
 
 #libquadmath needs to be the last library linked against
 if (FEAT_HAVE_QUADMATH)

@@ -220,6 +220,10 @@ if (FEAT_HAVE_ZLIB)
   include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZLIB}/")
 endif(FEAT_HAVE_ZLIB)
 
+if (FEAT_HAVE_ZOLTAN)
+  include_directories("${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_ZOLTAN}/src/include")
+endif(FEAT_HAVE_ZOLTAN)
+
 # our custom target to build (but not execute) all tests in all directories
 add_custom_target(tests)
 
