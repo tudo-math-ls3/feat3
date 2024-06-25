@@ -80,7 +80,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <SDLCheck>false</SDLCheck>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <!--<EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>-->
       <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
   </ItemDefinitionGroup>
