@@ -37,7 +37,7 @@
       <PreprocessorDefinitions>VISUAL_STUDIO;FEAT_NO_CONFIG;$(FeatDefList);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FeatRootPath);$(FeatIncDirList)</AdditionalIncludeDirectories>
       <CompileAs>Default</CompileAs>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj $(FeatOmpFlag) %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ControlFlowGuard>false</ControlFlowGuard>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
@@ -82,13 +82,6 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <OmitFramePointers>true</OmitFramePointers>
-    </ClCompile>
-  </ItemDefinitionGroup>
-
-  <!-- OpenMP Settings -->
-  <ItemDefinitionGroup Condition="'$(EnableOMP)'=='true'">
-    <ClCompile>
-      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
   </ItemDefinitionGroup>
 

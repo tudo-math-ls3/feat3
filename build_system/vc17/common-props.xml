@@ -29,6 +29,14 @@
     <FeatHaveMKL>true</FeatHaveMKL>
   </PropertyGroup>
 
+  <!-- OpenMP Settings -->
+  <PropertyGroup Condition="'$(EnableOMP)'=='true'">
+    <FeatOmpFlag>/openmp:llvm</FeatOmpFlag>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(EnableOMP)'!='true'">
+    <FeatOmpFlag>/openmp-</FeatOmpFlag>
+  </PropertyGroup>
+
   <!-- ********************************************************************* -->
   <!-- Visual Studio Import Mumbo-Jumbo -->
   <!-- ********************************************************************* -->
