@@ -30,15 +30,16 @@ endif (FEAT_HAVE_ALGLIB)
 if (FEAT_HAVE_FPARSER)
   file(GLOB fparser-list "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_FPARSER}/*.cc")
 
-  # The 'fpoptimizer.cc' can not be compiled with clang++, so we have to disable
-  # it by adding the corresponding pre-processor define
-  if (${FEAT_COMPILER_ID} STREQUAL "clang")
-    add_definitions(-DFP_NO_SUPPORT_OPTIMIZER)
-  endif (${FEAT_COMPILER_ID} STREQUAL "clang")
-
   add_library(thirdparty-fparser STATIC ${fparser-list})
   add_dependencies(thirdparty thirdparty-fparser)
   target_compile_options(thirdparty-fparser PRIVATE -w)
+  target_compile_definitions(thirdparty-fparser PRIVATE FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS FP_USE_THREAD_SAFE_EVAL)
+
+  # The 'fpoptimizer.cc' can not be compiled with clang++, so we have to disable
+  # it by adding the corresponding pre-processor define
+  if (${FEAT_COMPILER_ID} STREQUAL "clang")
+    target_compile_definitions(thirdparty-fparser PRIVATE FP_NO_SUPPORT_OPTIMIZER)
+  endif (${FEAT_COMPILER_ID} STREQUAL "clang")
 endif (FEAT_HAVE_FPARSER)
 
 ########################################################################################################################

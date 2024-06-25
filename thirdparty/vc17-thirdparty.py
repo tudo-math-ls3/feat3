@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ########################################################################################################################
 # FEAT3: Finite Element Analysis Toolbox, Version 3
-# Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
+# Copyright (C) 2010 - 2024 by Stefan Turek & the FEAT group
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 ########################################################################################################################
@@ -513,6 +513,7 @@ class ThirdPartyFParser(ThirdPartyPackage):
     self.url = "http://warp.povusers.org/FunctionParser/" + self.file
     self.page = "http://warp.povusers.org/FunctionParser"
     self.baseflags += ' /wd"4068" /wd"4244" /wd"4838"'
+    self.baseflags += ' /D "FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS" /D "FP_USE_THREAD_SAFE_EVAL"'
     self.baseflags += ' /I"./' + self.dir + '"'
 
   def info(self):
