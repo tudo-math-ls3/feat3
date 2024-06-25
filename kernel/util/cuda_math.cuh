@@ -154,7 +154,7 @@ namespace FEAT
      * \return The value of |val|.
      */
     template<typename DT_, typename IT_>
-    __host__ __device__ DT_ cuda_invert_matrix(const IT_ n, const IT_ stride, DT_ __restrict__ a[], IT_ __restrict__ p[])
+    __host__ __device__ DT_ cuda_invert_matrix(const IT_ n, const IT_ stride, DT_* __restrict__ a, IT_* __restrict__ p)
     {
       // make sure that the parameters are valid
       if((n <= IT_(0)) || (stride < n) || (a == nullptr) || (p == nullptr))
