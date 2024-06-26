@@ -290,7 +290,7 @@ public:
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
 
     DT_ s(DT_(47.11));
-    Index max_size(1e3);
+    Index max_size(1000);
 #ifdef FEAT_HAVE_HALFMATH
     if (typeid(DT_) == typeid(Half))
       max_size = 129;

@@ -1900,13 +1900,13 @@ public:
 
     Common::CGALDistFunc<DT_> func(mts, Geometry::CGALFileMode::fm_off);
 
-    DT_ val_1 = Analytic::eval_value_x(func, 0.0, 0.0, 0.0);
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.0), DT_(0.0), DT_(0.0));
     TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0), tol);
-    DT_ val_2 = Analytic::eval_value_x(func, 0.5, 0.5, 0.5);
+    DT_ val_2 = Analytic::eval_value_x(func, DT_(0.5), DT_(0.5), DT_(0.5));
     TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(0.5), tol);
-    DT_ val_3 = Analytic::eval_value_x(func, 0.1, 0.2, 0.2);
+    DT_ val_3 = Analytic::eval_value_x(func, DT_(0.1), DT_(0.2), DT_(0.2));
     TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(0.1), tol);
-    DT_ val_4 = Analytic::eval_value_x(func, 0.3, 0.2, -0.132);
+    DT_ val_4 = Analytic::eval_value_x(func, DT_(0.3), DT_(0.2), DT_(-0.132));
     TEST_CHECK_EQUAL_WITHIN_EPS(val_4, DT_(-0.132), tol);
 
   }
@@ -1928,18 +1928,18 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(1.0), DT_(0.)), DT_(0.), tol);
       TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(0.0), DT_(1.)), DT_(0.), tol);
       {
-        DT_ x(0.4), y(3.1);
+        DT_ x = DT_(0.4), y = DT_(3.1);
         DT_ val = Analytic::eval_value_x(corner_sing, x, y) - Analytic::eval_value_x(n_corner_sing, x, y);
         TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(0.), tol);
       }
       {
-        DT_ x(0.4), y(3.1);
-        auto val_t = Analytic::eval_gradient_x(corner_sing, x, y)- Analytic::eval_gradient_x(n_corner_sing, x, y);
+        DT_ x = DT_(0.4), y = DT_(3.1);
+        auto val_t = Analytic::eval_gradient_x(corner_sing, x, y) - Analytic::eval_gradient_x(n_corner_sing, x, y);
         TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_euclid(), DT_(0.), tol);
       }
       {
-        DT_ x(0.4), y(3.1);
-        auto val_t = Analytic::eval_hessian_x(corner_sing, x, y)- Analytic::eval_hessian_x(n_corner_sing, x, y);
+        DT_ x = DT_(0.4), y = DT_(3.1);
+        auto val_t = Analytic::eval_hessian_x(corner_sing, x, y) - Analytic::eval_hessian_x(n_corner_sing, x, y);
         TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_frobenius(), DT_(0.), tol);
       }
 
@@ -1966,19 +1966,19 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(0.0), DT_(1.3)), DT_(0.), tol);
       TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(n_corner_sing, DT_(1.4), DT_(-0.1)), DT_(0.), tol);
       {
-        DT_ x(-0.4), y(1.1);
+        DT_ x = DT_(-0.4), y = DT_(1.1);
         DT_ val = Analytic::eval_value_x(corner_sing, x, y) - Analytic::eval_value_x(n_corner_sing, x, y);
         TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(0.), tol);
         TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_value_x(corner_sing, x, y), Analytic::eval_value_x(corner_sing_alt, x, y), tol);
       }
       {
-        DT_ x(1.2), y(-2.1);
+        DT_ x = DT_(1.2), y = DT_(-2.1);
         auto val_t = Analytic::eval_gradient_x(corner_sing, x, y)- Analytic::eval_gradient_x(n_corner_sing, x, y);
         TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_euclid(), DT_(0.), tol);
         TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_gradient_x(corner_sing, x, y)[1], Analytic::eval_gradient_x(corner_sing_alt, x, y)[1], tol);
       }
       {
-        DT_ x(0.4), y(-3.1);
+        DT_ x = DT_(0.4), y = DT_(-3.1);
         auto val_t = Analytic::eval_hessian_x(corner_sing, x, y)- Analytic::eval_hessian_x(n_corner_sing, x, y);
         TEST_CHECK_EQUAL_WITHIN_EPS(val_t.norm_frobenius(), DT_(0.), tol);
         TEST_CHECK_EQUAL_WITHIN_EPS(Analytic::eval_hessian_x(corner_sing, x, y)[1][0], Analytic::eval_hessian_x(corner_sing_alt, x, y)[0][1], tol);
