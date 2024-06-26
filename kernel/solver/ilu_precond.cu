@@ -245,6 +245,9 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsr2_solve failed with status code: " + stringify(status));
 #else
+        (void)csrVal;
+        (void)csrRowPtr;
+        (void)csrColInd;
         //we have to create vector handlers to use the vector data in the new api (or shift them into our vector handlers... lets see whats necessary)
         cusparseConstDnVecDescr_t descr_X;
         cusparseDnVecDescr_t descr_Y, descr_Z;

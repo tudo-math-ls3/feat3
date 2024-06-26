@@ -105,7 +105,7 @@
     <FeatDef Condition="'$(EnableOMP)'=='true'"
       Include="FEAT_HAVE_OMP" />
     <FeatDef Condition="'$(EnableCuda)'=='true'"
-      Include="FEAT_HAVE_CUDA;FEAT_HAVE_CUSOLVER" />
+      Include="FEAT_HAVE_CUDA;FEAT_HAVE_CUSOLVER;DISABLE_CUSPARSE_DEPRECATED" />
     <FeatDef Condition="'$(EnableMKL)'=='true'"
       Include="FEAT_HAVE_MKL;MKL_ILP64" />
   </ItemGroup>

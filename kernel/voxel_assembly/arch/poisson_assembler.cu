@@ -75,8 +75,6 @@ namespace FEAT
         // define local arrays
         Tiny::Matrix<DataType, num_loc_dofs, num_loc_dofs> loc_mat;
 
-        DataType jac_det = DataType(0);
-
         typename SpaceHelp::EvalData basis_data;
 
         // now do work for this cell
@@ -141,16 +139,16 @@ namespace FEAT
           // and local matrix
           Tiny::Matrix<DataType, num_loc_dofs, num_loc_dofs> loc_mat;
           // now do work for this cell
-          Index cell = Index(coloring_map[idx]);
+          int cell = coloring_map[idx];
           // std::cout << "Starting with cell " << cell << std::endl;
           const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
-          const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
-          const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;
+          const IndexType* local_dofs = cell_to_dof + IndexType(cell)*num_loc_dofs;
+          const IndexType* local_dof_sorter = cell_to_dof_sorter + IndexType(cell)*num_loc_dofs;
 
           SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
 
           // To minimize code repetition, we call the same kernel from cuda and non cuda build...
-          VoxelAssembly::Kernel::poisson_assembly_kernel<SpaceHelp, LocMatType>(loc_mat, local_coeffs, cub_pt, cub_wg, num_cubs);
+          VoxelAssembly::Kernel::poisson_assembly_kernel<SpaceHelp, LocMatType>(loc_mat, local_coeffs, cub_pt, cub_wg, int(num_cubs));
 
           // scatter
           LAFEM::template MatrixGatherScatterHelper<SpaceType, DataType, IndexType, pol_>::scatter_matrix_csr(loc_mat, matrix_data, local_dofs, local_dofs, IndexType(matrix_num_rows), IndexType(matrix_num_cols), matrix_row_ptr, matrix_col_idx, alpha, local_dof_sorter);
