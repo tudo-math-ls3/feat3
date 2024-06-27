@@ -61,11 +61,11 @@ namespace FEAT
           LocalMatrixType loc_mat;
           LocalVectorType local_conv_dofs(DataType(0));
           // now do work for this cell
-          int cell = coloring_map[idx];
+          IndexType cell = IndexType(coloring_map[idx]);
           // std::cout << "Starting with cell " << cell << std::endl;
           const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
-          const IndexType* local_dofs = cell_to_dof + IndexType(cell)*num_loc_dofs;
-          const IndexType* local_dof_sorter = cell_to_dof_sorter + IndexType(cell)*num_loc_dofs;
+          const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
+          const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;
 
           SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
           //if we need to, gather local convection vector
@@ -129,9 +129,9 @@ namespace FEAT
           DataType local_coeffs[dim][num_loc_verts];
 
           //now do work for this cell
-          int cell = coloring_map[idx];
+          IndexType cell = IndexType(coloring_map[idx]);
           const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
-          const IndexType* local_dofs = cell_to_dof + IndexType(cell)*num_loc_dofs;
+          const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
           SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
           LAFEM::template VectorGatherScatterHelper<SpaceType, DataType, IndexType>::gather_vector_dense(local_prim_dofs,
                     (const VecValueType*)primal_data, IndexType(vec_size), local_dofs, DataType(1));

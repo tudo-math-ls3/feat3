@@ -47,11 +47,11 @@ namespace FEAT
           // and local matrix
           LocalMatrixType loc_mat;
           // now do work for this cell
-          int cell = coloring_map[idx];
+          IndexType cell = IndexType(coloring_map[idx]);
           // std::cout << "Starting with cell " << cell << std::endl;
           const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
-          const IndexType* local_dofs = cell_to_dof + IndexType(cell)*num_loc_dofs;
-          const IndexType* local_dof_sorter = cell_to_dof_sorter + IndexType(cell)*num_loc_dofs;
+          const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
+          const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;
 
           SpaceHelp::set_coefficients(local_coeffs, local_dofs_w, nodes, cell);
 
