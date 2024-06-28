@@ -7,6 +7,7 @@ set(test_list
   common_function-test
   lambda_function-test
   parsed_function-test
+  distance_function-test
 )
 
 # create all tests
