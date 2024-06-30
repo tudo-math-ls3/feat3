@@ -11,8 +11,10 @@
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/coloring.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/util/thread.hpp>
 #include <kernel/util/likwid_marker.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 // includes, system
 #include <algorithm>

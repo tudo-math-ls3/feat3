@@ -8,6 +8,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(test_list
   bilinear_operator-test
   discrete_evaluator-test
+  error_computer-test
   grid_transfer-test
   grid_transfer-mass-test
   grid_transfer-tip-test

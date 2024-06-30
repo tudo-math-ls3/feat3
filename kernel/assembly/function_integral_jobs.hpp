@@ -338,6 +338,29 @@ namespace FEAT
       }
 
       /**
+       * \brief Format the local values
+       */
+      void format()
+      {
+        max_der = 0;
+        value = ValueType(DataType(0));
+        grad = GradientType(DataType(0));
+        hess = HessianType(DataType(0));
+        norm_h0_sqr = DataType(0);
+        norm_h1_sqr = DataType(0);
+        norm_h2_sqr = DataType(0);
+        norm_l1 = DataType(0);
+        norm_lmax = DataType(0);
+        norm_h0_sqr_comp = ValueType(DataType(0));
+        norm_h1_sqr_comp = GradientType(DataType(0));
+        norm_h2_sqr_comp = HessianType(DataType(0));
+        norm_l1_comp = DataType(0);
+        norm_lmax_comp = DataType(0);
+        divergence_l2_sqr = DataType(0);
+        vorticity_l2_sqr = DataType(0);
+      }
+
+      /**
        * \brief Assembly helper function: adds another info object
        *
        * This function is used by the assembly and is not meant to be used elsewhere.
@@ -639,6 +662,62 @@ namespace FEAT
         return s;
       }
     }; // class FunctionIntegralInfo<...>
+
+    /**
+     * \brief Function cell integral info class
+     *
+     * This class is used to store and manage the results of a AnalyticFunctionCellIntegralJob,
+     * DiscreteCellFunctionIntegralJob or ErrorFunctionCellIntegralJob. It contains all the integral
+     * values as well as a vector of the sqr_Hn norms for each cell assembled on,
+     * as well as a bunch of auxiliary helper functions which are used during the
+     * assembly process.
+     *
+     * \tparam FuncIntInfo_ The base FunctionalIntegralInfo
+     *
+     * \tparam CellVector_ The vectortype for the cell data.
+     *
+     * \author Maximilian Esser
+     */
+    template<typename FuncIntInfo_, typename CellVector_>
+    class FunctionCellIntegralInfo
+    {
+      public:
+      FuncIntInfo_ integral_info;
+      CellVector_ vec;
+
+      FunctionCellIntegralInfo() = default;
+
+      FunctionCellIntegralInfo(const FunctionCellIntegralInfo& other) :
+       integral_info(),
+       vec(other.vec.clone(LAFEM::CloneMode::Weak))
+      {
+        integral_info.push(other.integral_info);
+      }
+
+      FunctionCellIntegralInfo& operator=(const FunctionCellIntegralInfo& other)
+      {
+        if(&other == this)
+          return *this;
+        integral_info.format();
+        integral_info.push(other.integral_info);
+        vec.clone(other.vec, LAFEM::CloneMode::Weak);
+      }
+
+      explicit FunctionCellIntegralInfo(const FuncIntInfo_& info, const CellVector_& in_vec) :
+        integral_info(),
+        vec(in_vec.clone(LAFEM::CloneMode::Weak))
+      {
+        integral_info.push(info);
+      }
+
+      explicit FunctionCellIntegralInfo(const FuncIntInfo_& info, CellVector_&& in_vec) :
+        integral_info(),
+        vec(std::move(in_vec))
+      {
+        integral_info.push(info);
+      }
+
+    }; // class FunctionCellIntegralInfo<...>
 
     /**
      * \brief Helper class to determine the FunctionIntegralInfo type for analytic functions
@@ -1513,6 +1592,267 @@ namespace FEAT
       FunctionIntegralType& result()
       {
         return _integral;
+      }
+    }; // class ErrorFunctionIntegralJob<...>
+
+    namespace Intern
+    {
+      template<typename DT_, typename IT_, int max_der_>
+      struct OutVectorHelper
+      {
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, max_der_+1> VectorType;
+      };
+
+      template<typename DT_, typename IT_>
+      struct OutVectorHelper<DT_, IT_, 0>
+      {
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
+      };
+    }
+
+    /**
+     * \brief Assembly job for the elementwise integration of a analytic vs discrete error function
+     *
+     * This class is used to integrate the error function (u - u_h), where u is an analytic function
+     * and u_h is a discrete finite element function for each cell seperatly and saving this into
+     * a corresponding vector.
+     *
+     * \tparam Function_
+     * The type of the analytic function u that is to be integrated.
+     *
+     * \tparam Vector_
+     * The type of the coefficient vector of the discrete function u_h. May be one of the following:
+     * - LAFEM::DenseVector<...>
+     * - LAFEM::DenseVectorBlocked<...>
+     *
+     * \tparam Space_
+     * The finite element space used for the discretization.
+     *
+     * \tparam max_der_
+     * The maximum derivative order of the integrals that are to be assembled.
+     *
+     * \author Maximilian Esser
+     */
+    template<typename Function_, typename Vector_, typename Space_, int max_der_>
+    class CellErrorFunctionIntegralJob
+    {
+    public:
+      /// the data-type of the vector
+      typedef typename Vector_::DataType DataType;
+      /// the value-type of the vector
+      typedef typename Vector_::ValueType ValueType;
+
+      /// make sure that function and vector are compatible
+      static_assert(Intern::ErrCompatHelper<Function_, Vector_>::valid, "function and vector are incompatible");
+
+      /// our function integral type
+      typedef typename DiscreteFunctionIntegral<Vector_, Space_>::Type FunctionIntegralType;
+
+      /// declare our analytic eval traits
+      typedef Analytic::EvalTraits<DataType, Function_> AnalyticEvalTraits;
+
+      /// our output vectortype
+      typedef typename Intern::OutVectorHelper<DataType, Index, max_der_>::VectorType OutVectorType;
+
+      /// our cell fucntion integral type
+      typedef FunctionCellIntegralInfo<FunctionIntegralType, OutVectorType> FunctionCellIntegralType;
+
+    public:
+      class Task
+      {
+      public:
+        /// this task doesn't need to scatter
+        static constexpr bool need_scatter = false;
+        /// this task needs to combine
+        static constexpr bool need_combine = true;
+
+      protected:
+        static constexpr TrafoTags trafo_config = TrafoTags::img_point | TrafoTags::jac_det;
+        static constexpr SpaceTags space_tags = SpaceTags::value |
+          (max_der_ >= 1 ? SpaceTags::grad : SpaceTags::none) |
+          (max_der_ >= 2 ? SpaceTags::hess : SpaceTags::none);
+
+        /// our assembly traits
+        typedef Assembly::AsmTraits1<DataType, Space_, trafo_config, space_tags> AsmTraits;
+        /// the vector that is to be integrated
+        const Vector_& vector;
+        /// the finite element space to be used
+        const Space_& space;
+        /// the output vector
+        const OutVectorType& out_vector;
+        /// the cubature factory used for integration
+        const typename AsmTraits::TrafoType& trafo;
+        /// the trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval;
+        /// the space evaluator
+        typename AsmTraits::SpaceEvaluator space_eval;
+        /// the space dof-mapping
+        typename AsmTraits::DofMapping dof_mapping;
+        /// the cubature rule used for integration
+        typename AsmTraits::CubatureRuleType cubature_rule;
+        /// the trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+        /// the space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+        /// the local vector to be assembled
+        typename AsmTraits::template TLocalVector<ValueType> local_vector;
+        /// the vector gather object
+        typename Vector_::GatherAxpy gather_axpy;
+        /// the function evaluator
+        typename Function_::template Evaluator<AnalyticEvalTraits> func_eval;
+        /// the local integral
+        FunctionIntegralType loc_integral;
+        /// the function value
+        FunctionIntegralType& job_integral;
+        /// the local integral
+        FunctionIntegralType cell_integral;
+
+      public:
+        explicit Task(CellErrorFunctionIntegralJob& job) :
+          vector(job._vector),
+          space(job._space),
+          out_vector(job._out_vec),
+          trafo(space.get_trafo()),
+          trafo_eval(trafo),
+          space_eval(space),
+          dof_mapping(space),
+          cubature_rule(Cubature::ctor_factory, job._cubature_factory),
+          trafo_data(),
+          space_data(),
+          local_vector(),
+          gather_axpy(vector),
+          func_eval(job._function),
+          loc_integral(),
+          job_integral(job._integral),
+          cell_integral()
+        {
+        }
+
+        void prepare(Index cell)
+        {
+          // prepare dof mapping
+          dof_mapping.prepare(cell);
+
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+        }
+
+        void assemble()
+        {
+          // format local vector
+          local_vector.format();
+
+          // gather local vector data
+          gather_axpy(local_vector, dof_mapping);
+
+          // fetch number of local dofs
+          const int num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // format cell local integral value
+          cell_integral.format();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
+
+            // compute basis function data
+            space_eval(space_data, trafo_data);
+
+            // do the dirty work
+            Intern::ErrFunIntJobHelper<max_der_>::work(cell_integral,
+              cubature_rule.get_weight(k) * trafo_data.jac_det, func_eval, trafo_data.img_point,
+              space_data, local_vector, num_loc_dofs);
+          }
+          // add our cell value
+          loc_integral.push(cell_integral);
+        }
+
+        void scatter()
+        {
+          // get cell index
+          Index cell = dof_mapping.get_current_cell_index();
+          if constexpr(max_der_ == 0)
+          {
+            out_vector.at(cell, cell_integral.norm_h0_sqr);
+          }
+          else
+          {
+            // construct tiny vector
+            Tiny::Vector<DataType, max_der_+1> loc_vec;
+            loc_vec.template at<0>() = cell_integral.norm_h0_sqr;
+            loc_vec.template at<1>() = cell_integral.norm_h1_sqr;
+            if constexpr(max_der_ > 1)
+              loc_vec.template at<2>() = cell_integral.norm_h2_sqr;
+            //scatter the tiny vector
+            out_vector.at(cell, loc_vec);
+          }
+        }
+
+        void finish()
+        {
+          trafo_eval.finish();
+        }
+
+        void combine()
+        {
+          job_integral.push(loc_integral);
+        }
+      }; // class Task
+
+    protected:
+      /// the function to be integrated
+      const Function_& _function;
+      /// the vector that is to be integrated
+      const Vector_& _vector;
+      /// the finite element space to be used
+      const Space_& _space;
+      /// the vector of the cell data
+      OutVectorType _out_vec;
+      /// the cubature factory
+      Cubature::DynamicFactory _cubature_factory;
+      /// the function integral
+      FunctionIntegralType _integral;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] function
+       * A \resident reference to the analytic function u.
+       *
+       * \param[in] vector
+       * A \resident reference to the coefficient vector of the discrete function u_h.
+       *
+       * \param[in] space
+       * A \resident reference to the finite element space used for the discretization of u_h
+       *
+       * \param[in] cubature
+       * The name of the cubature rule to use for integration.
+       */
+      explicit CellErrorFunctionIntegralJob(const Function_& function, const Vector_& vector, const Space_& space, const String& cubature) :
+        _function(function),
+        _vector(vector),
+        _space(space),
+        _cubature_factory(cubature),
+        _integral()
+      {
+        _integral.max_der = max_der_;
+        _out_vec = OutVectorType(_space.get_mesh().get_num_elements());
+        _out_vec.format();
+      }
+
+      /// \returns A cellerror object containing all error data
+      FunctionCellIntegralType result()
+      {
+        FunctionCellIntegralType output(_integral, std::move(_out_vec));
+        _out_vec = OutVectorType(_space.get_mesh().get_num_elements());
+        _out_vec.format();
+        return output;
       }
     }; // class ErrorFunctionIntegralJob<...>
   } // namespace Assembly

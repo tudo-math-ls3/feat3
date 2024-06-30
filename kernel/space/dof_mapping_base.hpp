@@ -76,6 +76,14 @@ namespace FEAT
         _cell_index = ~Index(0);
       }
 
+      /**
+       * \brief Returns the current cell-index.
+       */
+      Index get_current_cell_index() const
+      {
+        return _cell_index;
+      }
+
 #ifdef DOXYGEN
       /**
        * \brief Returns the number of local dofs.
