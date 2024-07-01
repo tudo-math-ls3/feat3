@@ -352,8 +352,8 @@ namespace FEAT
         norm_l1 = DataType(0);
         norm_lmax = DataType(0);
         norm_h0_sqr_comp = ValueType(DataType(0));
-        norm_h1_sqr_comp = GradientType(DataType(0));
-        norm_h2_sqr_comp = HessianType(DataType(0));
+        norm_h1_sqr_comp = ValueType(DataType(0));
+        norm_h2_sqr_comp = ValueType(DataType(0));
         norm_l1_comp = DataType(0);
         norm_lmax_comp = DataType(0);
         divergence_l2_sqr = DataType(0);
@@ -1662,7 +1662,7 @@ namespace FEAT
       {
       public:
         /// this task doesn't need to scatter
-        static constexpr bool need_scatter = false;
+        static constexpr bool need_scatter = true;
         /// this task needs to combine
         static constexpr bool need_combine = true;
 
@@ -1679,7 +1679,7 @@ namespace FEAT
         /// the finite element space to be used
         const Space_& space;
         /// the output vector
-        const OutVectorType& out_vector;
+        OutVectorType& out_vector;
         /// the cubature factory used for integration
         const typename AsmTraits::TrafoType& trafo;
         /// the trafo evaluator
@@ -1778,18 +1778,18 @@ namespace FEAT
           Index cell = dof_mapping.get_current_cell_index();
           if constexpr(max_der_ == 0)
           {
-            out_vector.at(cell, cell_integral.norm_h0_sqr);
+            out_vector(cell, cell_integral.norm_h0_sqr);
           }
           else
           {
             // construct tiny vector
             Tiny::Vector<DataType, max_der_+1> loc_vec;
-            loc_vec.template at<0>() = cell_integral.norm_h0_sqr;
-            loc_vec.template at<1>() = cell_integral.norm_h1_sqr;
+            loc_vec[0] = cell_integral.norm_h0_sqr;
+            loc_vec[1] = cell_integral.norm_h1_sqr;
             if constexpr(max_der_ > 1)
-              loc_vec.template at<2>() = cell_integral.norm_h2_sqr;
+              loc_vec[2] = cell_integral.norm_h2_sqr;
             //scatter the tiny vector
-            out_vector.at(cell, loc_vec);
+            out_vector(cell, loc_vec);
           }
         }
 
