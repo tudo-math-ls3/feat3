@@ -142,6 +142,7 @@ if (FEAT_HAVE_ZLIB)
     cotire(thirdparty-zlib)
   endif (FEAT_COTIRE)
   target_compile_options(thirdparty-zlib PRIVATE -w)
+  target_compile_definitions(thirdparty-zlib PRIVATE HAVE_UNISTD_H)
 #  target_link_options(thirdparty-zlib PRIVATE "LINKER:-w") #useless since static libraries do not use a linker
   #if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   #  set_property(TARGET thirdparty-zlib APPEND_STRING PROPERTY COMPILE_FLAGS " -fno-lto")
