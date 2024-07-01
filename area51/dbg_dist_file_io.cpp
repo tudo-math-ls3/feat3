@@ -56,7 +56,7 @@ namespace DbgDistFileIO
     const String str_shared = "This isn't a Test";
     const String filename = "dist_file_io_combined.tmp";
     const std::uint64_t my_seed = 0xDEADBEEFC0DEBABEull ^ ((unsigned)comm.rank() * 17ull);
-    const std::size_t my_size = 4*(1 + (comm.rank() % 5));
+    const std::size_t my_size = std::size_t(4*(1 + (comm.rank() % 5)));
 
     // initialize shared
     shared1.resize(str_shared.size());

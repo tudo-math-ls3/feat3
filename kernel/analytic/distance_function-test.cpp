@@ -1,5 +1,5 @@
 // FEAT3: Finite Element Analysis Toolbox, Version 3
-// Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
+// Copyright (C) 2010 - 2024 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
@@ -157,7 +157,8 @@ public:
 #ifdef FEAT_HAVE_CGAL
   void test_cgal_signed_dist_3d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    // CGAL uses double internally, so we cannot expect higher precision even with __float128
+    const DT_ tol = Math::pow(Math::max(Math::eps<DT_>(), DT_(1E-16)), DT_(0.7));
     std::stringstream mts;
     mts<<"OFF"<<std::endl;
     mts<<"8 12 18"<<std::endl;
@@ -194,7 +195,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(val_4, DT_(-0.132), tol);
 
   }
-#endif
+#endif // FEAT_HAVE_CGAL
 
   virtual void run() const override
   {
@@ -205,7 +206,7 @@ public:
     test_plane_distance_function_sd();
 #ifdef FEAT_HAVE_CGAL
     test_cgal_signed_dist_3d();
-#endif
+#endif // FEAT_HAVE_CGAL
   }
 };
 
