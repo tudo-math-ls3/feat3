@@ -86,7 +86,7 @@ namespace MeshIndexerTool
     std::cout << "Parsing vertex file '" << filename << "'..." << std::endl;
 
     String line;
-    Index line_no(0), count(0);
+    Index line_no(0);
     std::deque<String> v;
     while(!ifs.eof())
     {
@@ -115,7 +115,6 @@ namespace MeshIndexerTool
         }
         vtx.push_back(t);
       }
-      ++count;
     }
 
     ifs.close();
@@ -137,7 +136,7 @@ namespace MeshIndexerTool
     std::cout << "Parsing index file '" << filename << "'..." << std::endl;
 
     String line;
-    Index line_no(0), count(0);
+    Index line_no(0);
     std::deque<String> v;
     while(!ifs.eof())
     {
@@ -171,7 +170,6 @@ namespace MeshIndexerTool
         }
         idx.push_back(t);
       }
-      ++count;
     }
 
     ifs.close();

@@ -89,7 +89,7 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value, results_cell.integral_info.value, val_tol);
 
       DataType summed_h0{DataType(0)};
-      for(int i = 0; i < int(results_cell.vec.size()); ++i)
+      for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
       {
         auto loc_vec = results_cell.vec(i);
         summed_h0 += loc_vec;
@@ -111,7 +111,7 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value, results_cell.integral_info.value, val_tol);
 
       DataType summed_h0{DataType(0)}, summed_h1{DataType(0)}, summed_h2{DataType(0)};
-      for(int i = 0; i < int(results_cell.vec.size()); ++i)
+      for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
       {
         auto loc_vec = results_cell.vec(i);
         summed_h0 += loc_vec[0];
@@ -137,7 +137,7 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value[0], results_cell.integral_info.value[0], val_tol);
 
       DataType summed_h0{DataType(0)};
-      for(int i = 0; i < int(results_cell.vec.size()); ++i)
+      for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
       {
         auto loc_vec = results_cell.vec(i);
         summed_h0 += loc_vec;
@@ -159,7 +159,7 @@ public:
     //   TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value[0], results_cell.integral_info.value[0], val_tol);
 
     //   DataType summed_h0{DataType(0)}, summed_h1{DataType(0)}, summed_h2{DataType(0)};
-    //   for(int i = 0; i < int(results_cell.vec.size()); ++i)
+    //   for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
     //   {
     //     auto loc_vec = results_cell.vec(i);
     //     summed_h0 += loc_vec[0];
