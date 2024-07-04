@@ -2019,9 +2019,9 @@ class ThirdPartyZlib(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "zlib"
-    self.version = "1.2.13"
-    self.date = "2022-10-13"
-    self.file = self.name + self.version.replace(".", "") + ".zip" # filename without version dots
+    self.version = "1.3.1"
+    self.date = "2024-01-22"
+    self.file = self.name + "-" + self.version + ".tar.gz" # filename without version dots
     self.dir = self.name + "-" + self.version
     self.trunk = "."
     self.license_files = ["LICENSE"]
@@ -2034,7 +2034,7 @@ class ThirdPartyZlib(ThirdPartyPackage):
     #      123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
     print("The Zlib library is small library offering lossless compression algorithms based on the 'deflate'")
     print("method, which is also the backbone of the famous ZIP file format. Installing this package enables")
-    print("FEAT to use ZLIB compression algorithms for the binary I/O of LAFEM containers.")
+    print("FEAT to use ZLIB compression algorithms for the binary I/O of LAFEM containers and voxel maps.")
     print("")
     print("Prerequisites/Constraints: none")
     print("")
