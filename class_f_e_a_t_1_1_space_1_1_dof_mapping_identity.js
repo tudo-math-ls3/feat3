@@ -4,6 +4,7 @@ var class_f_e_a_t_1_1_space_1_1_dof_mapping_identity =
     [ "SpaceType", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#afeedd71694157c54c9e09ca0dbdc38d5", null ],
     [ "DofMappingIdentity", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#a630da8d0ae5626b709fc6e8e01c80419", null ],
     [ "finish", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#a77d9c33810f5d23eec40b43453d22016", null ],
+    [ "get_current_cell_index", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#ac52617aa7ce9ae5aefc98bd862360280", null ],
     [ "get_index", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#a089419c866e060eb7d687fd70e98e560", null ],
     [ "get_num_global_dofs", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#a822a0c4895b2fdaeadf3616b1bb0381b", null ],
     [ "get_num_local_dofs", "class_f_e_a_t_1_1_space_1_1_dof_mapping_identity.html#a593d66d5fd29a2a8eb8a800c7a45011d", null ],

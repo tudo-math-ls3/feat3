@@ -51,5 +51,6 @@ var searchData=
   ['forcefunctional_48',['ForceFunctional',['../class_f_e_a_t_1_1_assembly_1_1_common_1_1_force_functional.html',1,'FEAT::Assembly::Common']]],
   ['forcefunctionalassemblyjob_49',['ForceFunctionalAssemblyJob',['../class_f_e_a_t_1_1_assembly_1_1_force_functional_assembly_job.html',1,'FEAT::Assembly']]],
   ['function_50',['Function',['../class_f_e_a_t_1_1_analytic_1_1_function.html',1,'FEAT::Analytic']]],
-  ['functionintegralinfo_51',['FunctionIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html',1,'FEAT::Assembly']]]
+  ['functioncellintegralinfo_51',['FunctionCellIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html',1,'FEAT::Assembly']]],
+  ['functionintegralinfo_52',['FunctionIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html',1,'FEAT::Assembly']]]
 ];

@@ -1,6 +1,7 @@
 var namespace_f_e_a_t_1_1_analytic =
 [
     [ "Common", "namespace_f_e_a_t_1_1_analytic_1_1_common.html", "namespace_f_e_a_t_1_1_analytic_1_1_common" ],
+    [ "Distance", "namespace_f_e_a_t_1_1_analytic_1_1_distance.html", "namespace_f_e_a_t_1_1_analytic_1_1_distance" ],
     [ "Image", "namespace_f_e_a_t_1_1_analytic_1_1_image.html", "namespace_f_e_a_t_1_1_analytic_1_1_image" ],
     [ "AutoDerive", "class_f_e_a_t_1_1_analytic_1_1_auto_derive.html", "class_f_e_a_t_1_1_analytic_1_1_auto_derive" ],
     [ "Curl", "class_f_e_a_t_1_1_analytic_1_1_curl.html", "class_f_e_a_t_1_1_analytic_1_1_curl" ],
@@ -20,6 +21,7 @@ var namespace_f_e_a_t_1_1_analytic =
     [ "ParsedFunctionParseError", "class_f_e_a_t_1_1_analytic_1_1_parsed_function_parse_error.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_function_parse_error" ],
     [ "ParsedScalarFunction", "class_f_e_a_t_1_1_analytic_1_1_parsed_scalar_function.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_scalar_function" ],
     [ "ParsedVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function" ],
+    [ "PolarCoordinate", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate.html", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate" ],
     [ "ScalarCurl", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl.html", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl" ],
     [ "StaticFunction", "class_f_e_a_t_1_1_analytic_1_1_static_function.html", "class_f_e_a_t_1_1_analytic_1_1_static_function" ],
     [ "StaticWrapperFunction", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function.html", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function" ],

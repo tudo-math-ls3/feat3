@@ -11,6 +11,7 @@ var class_f_e_a_t_1_1_assembly_1_1_function_integral_info =
     [ "add_hess", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#aefae21e8274f85d7832e62f786d1d87e", null ],
     [ "add_value", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#ae384f7593c007a00b12fc36e4b0897a6", null ],
     [ "add_value", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#a65b59d8263a364e3f30e3025c2ae4631", null ],
+    [ "format", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#ab414edf55134143d901fb8de179ec3fc", null ],
     [ "print_field_info", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#aa75e100d055d9af214d39428f3b82752", null ],
     [ "print_norms", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#a8ddc0cf6a94238f5d1274c0e1dd7a6ee", null ],
     [ "push", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html#a0154bf9fc47bfcd5efc7a952892936aa", null ],

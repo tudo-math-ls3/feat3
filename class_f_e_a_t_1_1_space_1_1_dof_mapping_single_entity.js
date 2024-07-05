@@ -7,6 +7,7 @@ var class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity =
     [ "TrafoType", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#a1a956e97e9b4d540a89114ffad092458", null ],
     [ "DofMappingSingleEntity", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#aba54b775d15f0bd68685daab24d7b525", null ],
     [ "finish", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#a77d9c33810f5d23eec40b43453d22016", null ],
+    [ "get_current_cell_index", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#ac52617aa7ce9ae5aefc98bd862360280", null ],
     [ "get_index", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#aa1ca51d4a1b208f94390c347b8a0bd98", null ],
     [ "get_num_global_dofs", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#addf2481557e67bd15126a1fb3793805e", null ],
     [ "get_num_local_dofs", "class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#a19651f57b023b29a93cb2f42e0e435ab", null ],

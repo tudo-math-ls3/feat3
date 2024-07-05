@@ -151,10 +151,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a4db6c92e940b01af3726670edf24d131"><td class="memItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#a4db6c92e940b01af3726670edf24d131">map_point</a> (<a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#a2cdb28a8db0488b7e74b44a368c3c352">ImagePointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">img_point</a>, const <a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#a8582fd110567efa1a8f94c4434df3e39">DomainPointType</a> &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">dom_point</a>, const <a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#adaafbd9354c8d4cf70a97b1cc3527c0d">DataType</a>(&amp;coeffs)[image_dim][num_verts])</td></tr>
 <tr class="memdesc:a4db6c92e940b01af3726670edf24d131"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps a point from the reference cell to the selected cell.  <a href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#a4db6c92e940b01af3726670edf24d131">More...</a><br /></td></tr>
 <tr class="separator:a4db6c92e940b01af3726670edf24d131"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8eca899e68e4c07005741a1e70fc03e"><td class="memTemplParams" colspan="2">template&lt;typename VertexType_ , typename IndexTupleType_ &gt; </td></tr>
-<tr class="memitem:ae8eca899e68e4c07005741a1e70fc03e"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#ae8eca899e68e4c07005741a1e70fc03e">set_coefficients</a> (<a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#adaafbd9354c8d4cf70a97b1cc3527c0d">DataType</a>(&amp;coeffs)[img_dim][num_verts], const IndexTupleType_ &amp;index_tuple, const VertexType_ *vertex_set)</td></tr>
-<tr class="memdesc:ae8eca899e68e4c07005741a1e70fc03e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the coefficient vector based on the underlying standard transformation.  <a href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#ae8eca899e68e4c07005741a1e70fc03e">More...</a><br /></td></tr>
-<tr class="separator:ae8eca899e68e4c07005741a1e70fc03e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfff6ec5def6dca05c3a5bf392686cb9"><td class="memTemplParams" colspan="2">template&lt;typename VertexSetType_ , typename IndexSetType_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:abfff6ec5def6dca05c3a5bf392686cb9"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#abfff6ec5def6dca05c3a5bf392686cb9">set_coefficients</a> (<a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#adaafbd9354c8d4cf70a97b1cc3527c0d">DataType</a>(&amp;coeffs)[img_dim][num_verts], const VertexSetType_ &amp;vertex_set, const IndexSetType_ &amp;index_set, IT_ cell_index)</td></tr>
+<tr class="memdesc:abfff6ec5def6dca05c3a5bf392686cb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the coefficient vector based on the underlying standard transformation.  <a href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#abfff6ec5def6dca05c3a5bf392686cb9">More...</a><br /></td></tr>
+<tr class="separator:abfff6ec5def6dca05c3a5bf392686cb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a038bd16f7b3f471e644d608547d6ad"><td class="memItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE <a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#adaafbd9354c8d4cf70a97b1cc3527c0d">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#a7a038bd16f7b3f471e644d608547d6ad">volume</a> (const <a class="el" href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#adaafbd9354c8d4cf70a97b1cc3527c0d">DataType</a>(&amp;coeffs)[image_dim][num_verts])</td></tr>
 <tr class="memdesc:a7a038bd16f7b3f471e644d608547d6ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes and returns the volume of the current cell.  <a href="struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___002b260e771ecb4737ffdd677d6d46ebb5.html#a7a038bd16f7b3f471e644d608547d6ad">More...</a><br /></td></tr>
 <tr class="separator:a7a038bd16f7b3f471e644d608547d6ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -529,15 +529,15 @@ template&lt;typename DataType_ , typename DomPointType_ , typename ImgPointType_
 
 </div>
 </div>
-<a id="ae8eca899e68e4c07005741a1e70fc03e" name="ae8eca899e68e4c07005741a1e70fc03e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8eca899e68e4c07005741a1e70fc03e">&#9670;&#160;</a></span>set_coefficients()</h2>
+<a id="abfff6ec5def6dca05c3a5bf392686cb9" name="abfff6ec5def6dca05c3a5bf392686cb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfff6ec5def6dca05c3a5bf392686cb9">&#9670;&#160;</a></span>set_coefficients()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename DataType_ , typename DomPointType_ , typename ImgPointType_ , typename JacMatType_ , typename JacMatInvType_ , typename JacDetType_ , typename HessType_ , typename HessInvType_ , int img_dim&gt; </div>
 <div class="memtemplate">
-template&lt;typename VertexType_ , typename IndexTupleType_ &gt; </div>
+template&lt;typename VertexSetType_ , typename IndexSetType_ , typename IT_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -551,14 +551,20 @@ template&lt;typename VertexType_ , typename IndexTupleType_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const IndexTupleType_ &amp;&#160;</td>
-          <td class="paramname"><em>index_tuple</em>, </td>
+          <td class="paramtype">const VertexSetType_ &amp;&#160;</td>
+          <td class="paramname"><em>vertex_set</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const VertexType_ *&#160;</td>
-          <td class="paramname"><em>vertex_set</em>&#160;</td>
+          <td class="paramtype">const IndexSetType_ &amp;&#160;</td>
+          <td class="paramname"><em>index_set</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IT_&#160;</td>
+          <td class="paramname"><em>cell_index</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

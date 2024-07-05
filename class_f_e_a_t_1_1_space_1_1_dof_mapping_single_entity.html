@@ -143,6 +143,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a77d9c33810f5d23eec40b43453d22016"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_space_1_1_dof_mapping_base.html#a77d9c33810f5d23eec40b43453d22016">finish</a> ()</td></tr>
 <tr class="memdesc:a77d9c33810f5d23eec40b43453d22016"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the dof-mapping from the current cell.  <a href="class_f_e_a_t_1_1_space_1_1_dof_mapping_base.html#a77d9c33810f5d23eec40b43453d22016">More...</a><br /></td></tr>
 <tr class="separator:a77d9c33810f5d23eec40b43453d22016"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac52617aa7ce9ae5aefc98bd862360280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_space_1_1_dof_mapping_base.html#ac52617aa7ce9ae5aefc98bd862360280">get_current_cell_index</a> () const</td></tr>
+<tr class="memdesc:ac52617aa7ce9ae5aefc98bd862360280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current cell-index.  <a href="class_f_e_a_t_1_1_space_1_1_dof_mapping_base.html#ac52617aa7ce9ae5aefc98bd862360280">More...</a><br /></td></tr>
+<tr class="separator:ac52617aa7ce9ae5aefc98bd862360280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1ca51d4a1b208f94390c347b8a0bd98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#aa1ca51d4a1b208f94390c347b8a0bd98">get_index</a> (int local_dof_idx) const</td></tr>
 <tr class="memdesc:aa1ca51d4a1b208f94390c347b8a0bd98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the mapped dof index.   <a href="class_f_e_a_t_1_1_space_1_1_dof_mapping_single_entity.html#aa1ca51d4a1b208f94390c347b8a0bd98">More...</a><br /></td></tr>
 <tr class="separator:aa1ca51d4a1b208f94390c347b8a0bd98"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -396,6 +399,39 @@ template&lt;typename Space_ &gt; </div>
 
 </div>
 </div>
+<a id="ac52617aa7ce9ae5aefc98bd862360280" name="ac52617aa7ce9ae5aefc98bd862360280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac52617aa7ce9ae5aefc98bd862360280">&#9670;&#160;</a></span>get_current_cell_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_space_1_1_dof_mapping_base.html">FEAT::Space::DofMappingBase</a>&lt; Space_ &gt;::get_current_cell_index </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the current cell-index. </p>
+
+<p class="definition">Definition at line <a class="el" href="dof__mapping__base_8hpp_source.html#l00082">82</a> of file <a class="el" href="dof__mapping__base_8hpp_source.html">dof_mapping_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="dof__mapping__base_8hpp_source.html#l00048">FEAT::Space::DofMappingBase&lt; Space_ &gt;::_cell_index</a>.</p>
+
+</div>
+</div>
 <a id="aa1ca51d4a1b208f94390c347b8a0bd98" name="aa1ca51d4a1b208f94390c347b8a0bd98"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa1ca51d4a1b208f94390c347b8a0bd98">&#9670;&#160;</a></span>get_index()</h2>
 
@@ -572,7 +608,7 @@ template&lt;typename Space_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dof__mapping__base_8hpp_source.html#l00048">48</a> of file <a class="el" href="dof__mapping__base_8hpp_source.html">dof_mapping_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dof__mapping__base_8hpp_source.html#l00073">FEAT::Space::DofMappingBase&lt; Space_ &gt;::finish()</a>, <a class="el" href="dof__mapping__common_8hpp_source.html#l00058">FEAT::Space::DofMappingIdentity&lt; Space_, dofs_per_cell_ &gt;::get_index()</a>, <a class="el" href="dof__mapping__common_8hpp_source.html#l00135">FEAT::Space::DofMappingSingleEntity&lt; Space_, codim_, dofs_per_cell_ &gt;::get_index()</a>, and <a class="el" href="dof__mapping__base_8hpp_source.html#l00065">FEAT::Space::DofMappingBase&lt; Space_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dof__mapping__base_8hpp_source.html#l00073">FEAT::Space::DofMappingBase&lt; Space_ &gt;::finish()</a>, <a class="el" href="dof__mapping__base_8hpp_source.html#l00082">FEAT::Space::DofMappingBase&lt; Space_ &gt;::get_current_cell_index()</a>, <a class="el" href="dof__mapping__common_8hpp_source.html#l00058">FEAT::Space::DofMappingIdentity&lt; Space_, dofs_per_cell_ &gt;::get_index()</a>, <a class="el" href="dof__mapping__common_8hpp_source.html#l00135">FEAT::Space::DofMappingSingleEntity&lt; Space_, codim_, dofs_per_cell_ &gt;::get_index()</a>, and <a class="el" href="dof__mapping__base_8hpp_source.html#l00065">FEAT::Space::DofMappingBase&lt; Space_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>

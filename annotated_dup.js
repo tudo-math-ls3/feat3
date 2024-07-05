@@ -16,9 +16,9 @@ var annotated_dup =
           [ "BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d" ],
           [ "ConstantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function" ],
           [ "ConstantVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function" ],
+          [ "CornerSingularity2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d" ],
+          [ "CornerSingularity2DRadial", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial" ],
           [ "CosineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static" ],
-          [ "DistanceFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_distance_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_distance_function" ],
-          [ "DistanceFunctionSD", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_distance_function_s_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_distance_function_s_d" ],
           [ "ExpBubbleScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static" ],
           [ "ExpScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static.html", null ],
           [ "GuermondStokesSol", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol" ],
@@ -28,7 +28,6 @@ var annotated_dup =
           [ "ParProfileBase", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_base.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_base" ],
           [ "ParProfileScalar", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_scalar.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_scalar" ],
           [ "ParProfileVector", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_vector.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_vector" ],
-          [ "PlaneDistanceFunctionSD", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_plane_distance_function_s_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_plane_distance_function_s_d" ],
           [ "PoiseuillePipeFlow", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_poiseuille_pipe_flow.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_poiseuille_pipe_flow" ],
           [ "PolynomialFunction1D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_polynomial_function1_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_polynomial_function1_d" ],
           [ "Q2BubbleScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_q2_bubble_scalar_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_q2_bubble_scalar_static" ],
@@ -47,6 +46,11 @@ var annotated_dup =
           [ "TensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_tensor_static" ],
           [ "XYPlaneRotation", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_x_y_plane_rotation.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_x_y_plane_rotation" ],
           [ "YZPlaneParabolic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_y_z_plane_parabolic.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_y_z_plane_parabolic" ]
+        ] ],
+        [ "Distance", "namespace_f_e_a_t_1_1_analytic_1_1_distance.html", [
+          [ "DistanceFunction", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function" ],
+          [ "DistanceFunctionSD", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d" ],
+          [ "PlaneDistanceFunctionSD", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d" ]
         ] ],
         [ "Image", "namespace_f_e_a_t_1_1_analytic_1_1_image.html", [
           [ "Scalar", "struct_f_e_a_t_1_1_analytic_1_1_image_1_1_scalar.html", "struct_f_e_a_t_1_1_analytic_1_1_image_1_1_scalar" ],
@@ -70,6 +74,7 @@ var annotated_dup =
         [ "ParsedFunctionParseError", "class_f_e_a_t_1_1_analytic_1_1_parsed_function_parse_error.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_function_parse_error" ],
         [ "ParsedScalarFunction", "class_f_e_a_t_1_1_analytic_1_1_parsed_scalar_function.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_scalar_function" ],
         [ "ParsedVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function" ],
+        [ "PolarCoordinate", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate.html", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate" ],
         [ "ScalarCurl", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl.html", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl" ],
         [ "StaticFunction", "class_f_e_a_t_1_1_analytic_1_1_static_function.html", "class_f_e_a_t_1_1_analytic_1_1_static_function" ],
         [ "StaticWrapperFunction", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function.html", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function" ]
@@ -92,6 +97,10 @@ var annotated_dup =
           [ "StressDivergenceOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_stress_divergence_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_stress_divergence_operator" ],
           [ "TestDerivativeOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_test_derivative_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_test_derivative_operator" ],
           [ "TrialDerivativeOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_trial_derivative_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_trial_derivative_operator" ]
+        ] ],
+        [ "Intern", null, [
+          [ "OutVectorHelper", "struct_f_e_a_t_1_1_assembly_1_1_intern_1_1_out_vector_helper.html", null ],
+          [ "OutVectorHelper< DT_, IT_, 0 >", "struct_f_e_a_t_1_1_assembly_1_1_intern_1_1_out_vector_helper_3_01_d_t___00_01_i_t___00_010_01_4.html", null ]
         ] ],
         [ "AnalyticCellProjector", "class_f_e_a_t_1_1_assembly_1_1_analytic_cell_projector.html", "class_f_e_a_t_1_1_assembly_1_1_analytic_cell_projector" ],
         [ "AnalyticFunctionIntegral", "struct_f_e_a_t_1_1_assembly_1_1_analytic_function_integral.html", "struct_f_e_a_t_1_1_assembly_1_1_analytic_function_integral" ],
@@ -117,6 +126,7 @@ var annotated_dup =
         [ "BurgersScalarAssemblyTaskBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_assembly_task_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_assembly_task_base" ],
         [ "BurgersScalarMatrixAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_matrix_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_matrix_assembly_job" ],
         [ "BurgersScalarVectorAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_vector_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_vector_assembly_job" ],
+        [ "CellErrorFunctionIntegralJob", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job.html", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job" ],
         [ "DiscreteCellProjector", "class_f_e_a_t_1_1_assembly_1_1_discrete_cell_projector.html", "class_f_e_a_t_1_1_assembly_1_1_discrete_cell_projector" ],
         [ "DiscreteEvaluator", "class_f_e_a_t_1_1_assembly_1_1_discrete_evaluator.html", "class_f_e_a_t_1_1_assembly_1_1_discrete_evaluator" ],
         [ "DiscreteFunctionIntegral", "struct_f_e_a_t_1_1_assembly_1_1_discrete_function_integral.html", null ],
@@ -132,6 +142,7 @@ var annotated_dup =
         [ "FEInterpolator< Space::Lagrange2::Element< Trafo_ >, Space::Lagrange1::Element< Trafo_ > >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space_1_1_lagrange2_1_1_element_3_01_trafoaad41beedc2a09129705ed54a155ebb0.html", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space_1_1_lagrange2_1_1_element_3_01_trafoaad41beedc2a09129705ed54a155ebb0" ],
         [ "FEInterpolator< Space_, Space_ >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space___00_01_space___01_4.html", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space___00_01_space___01_4" ],
         [ "ForceFunctionalAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_force_functional_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_force_functional_assembly_job" ],
+        [ "FunctionCellIntegralInfo", "class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html", null ],
         [ "FunctionIntegralInfo", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info" ],
         [ "GradOperatorAssembler", "class_f_e_a_t_1_1_assembly_1_1_grad_operator_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_grad_operator_assembler" ],
         [ "GradPresDivVeloAssembler", "class_f_e_a_t_1_1_assembly_1_1_grad_pres_div_velo_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_grad_pres_div_velo_assembler" ],
@@ -918,10 +929,12 @@ var annotated_dup =
         [ "AssemblyCubatureData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data" ],
         [ "AssemblyMappingData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data" ],
         [ "CSRMatrixData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html", null ],
+        [ "IndexSetWrapper", "class_f_e_a_t_1_1_voxel_assembly_1_1_index_set_wrapper.html", null ],
         [ "LagrangeDataHandler", "class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler.html", "class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler" ],
         [ "SpaceHelper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper.html", null ],
         [ "SpaceHelper< Q2StandardFE< Shape_ >, DT_, IT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper_3_01_q2_standard_f_e_3_01_shape___01_4_00_01_d_t___00_01_i_t___01_4.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper_3_01_q2_standard_f_e_3_01_shape___01_4_00_01_d_t___00_01_i_t___01_4" ],
         [ "UnitCubeColoring", "struct_f_e_a_t_1_1_voxel_assembly_1_1_unit_cube_coloring.html", null ],
+        [ "VertexSetWrapper", "class_f_e_a_t_1_1_voxel_assembly_1_1_vertex_set_wrapper.html", null ],
         [ "VoxelBurgersAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler.html", null ],
         [ "VoxelBurgersAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704" ],
         [ "VoxelDefoAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_defo_assembler.html", null ],

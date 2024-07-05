@@ -11,6 +11,7 @@ var namespace_f_e_a_t_1_1_tiny =
     [ "axpy", "namespace_f_e_a_t_1_1_tiny.html#a51218bc049812f63bcb8c4a94d302981", null ],
     [ "axpy", "namespace_f_e_a_t_1_1_tiny.html#ab2dfefa7931cb8c3d17990eaf971306d", null ],
     [ "axpy", "namespace_f_e_a_t_1_1_tiny.html#a6ad53ed9caa8145a5086f4d1f1aba469", null ],
+    [ "calculate_opening_angle", "namespace_f_e_a_t_1_1_tiny.html#af1aa8fef4cfe1648828ba994e5afb76c", null ],
     [ "component_product", "namespace_f_e_a_t_1_1_tiny.html#aea96de999082987eb1a88c09807661c8", null ],
     [ "dot", "namespace_f_e_a_t_1_1_tiny.html#ad2f2b4f8c2e6fa85a95764976573606b", null ],
     [ "dot", "namespace_f_e_a_t_1_1_tiny.html#a287f0b84812773341fe8b1f696801a86", null ],

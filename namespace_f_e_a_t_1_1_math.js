@@ -7,6 +7,8 @@ var namespace_f_e_a_t_1_1_math =
     [ "atan", "namespace_f_e_a_t_1_1_math.html#a175bb1b6448883c2535b9585b4572e0e", null ],
     [ "atan2", "namespace_f_e_a_t_1_1_math.html#a1e1ee84638d825cae23133f9d086c13d", null ],
     [ "binomial", "namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277", null ],
+    [ "calc_opening_angle", "namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab", null ],
+    [ "calc_opening_angle_intern", "namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7", null ],
     [ "clamp", "namespace_f_e_a_t_1_1_math.html#a2af61b8fc64b284759c9f400c552a42a", null ],
     [ "cos", "namespace_f_e_a_t_1_1_math.html#ae2ecb430cf43fba96f9e8ed1a7f7dfad", null ],
     [ "cosh", "namespace_f_e_a_t_1_1_math.html#a3c36741669d07b8bcd5102ecf5b663d7", null ],

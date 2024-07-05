@@ -12,7 +12,7 @@ var struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01
     [ "calc_hess_ten", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#aaac403d0271cb4d303b117f21f3b0013", null ],
     [ "calc_jac_mat", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#a2df811513f5c90a9477e201eb177f910", null ],
     [ "map_point", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#a16418295d3c0cdf4c6cbef5f057711d9", null ],
-    [ "set_coefficients", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#a15f081dc190fca87368e6aff272cade4", null ],
+    [ "set_coefficients", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#af729d4ad74f81330ac2ae2818a5f6f58", null ],
     [ "volume", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#afd8ba4b9a73559c4a5b58b62051563a8", null ],
     [ "width_directed", "struct_f_e_a_t_1_1_trafo_1_1_standard_1_1_eval_helper_3_01_data_type___00_01_dom_point_type___00f78f81b86ee7ca50fe24a6c9ff685ed0.html#a7a4f990f71ff0ea9c46c254db05878af", null ]
 ];
