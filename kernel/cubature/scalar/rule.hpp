@@ -11,6 +11,9 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/string.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAT
 {
   namespace Cubature
@@ -48,17 +51,15 @@ namespace FEAT
         /// The total number of points in the cubature rule.
         int _num_points;
         /// Cubature weights array.
-        WeightType* _weights;
+        std::vector<WeightType> _weights;
         /// Cubature point coordinates array.
-        CoordType* _coords;
+        std::vector<CoordType> _coords;
 
       public:
         /// default constructor
         Rule() :
           _name(),
-          _num_points(0),
-          _weights(nullptr),
-          _coords(nullptr)
+          _num_points(0)
         {
         }
 
@@ -75,14 +76,12 @@ namespace FEAT
          */
         explicit Rule(int num_points, String name) :
           _name(name),
-          _num_points(num_points),
-          _weights(nullptr),
-          _coords(nullptr)
+          _num_points(num_points)
         {
           if(num_points > 0)
           {
-            _weights = new WeightType[size_t(num_points)];
-            _coords = new CoordType[size_t(num_points)];
+            _weights.resize(std::size_t(num_points));
+            _coords.resize(std::size_t(num_points));
           }
         }
 
@@ -90,13 +89,11 @@ namespace FEAT
         Rule(Rule&& other) :
           _name(other._name),
           _num_points(other._num_points),
-          _weights(other._weights),
-          _coords(other._coords)
+          _weights(std::forward<std::vector<WeightType>>(other._weights)),
+          _coords(std::forward<std::vector<CoordType>>(other._coords))
         {
           other._name.clear();
           other._num_points = 0;
-          other._weights = nullptr;
-          other._coords = nullptr;
         }
 
         /// move-assign operator
@@ -106,20 +103,13 @@ namespace FEAT
           if(this == &other)
             return *this;
 
-          if(_weights != nullptr)
-            delete [] _weights;
-          if(_coords != nullptr)
-            delete [] _coords;
-
           _name = other._name;
           _num_points = other._num_points;
-          _weights = other._weights;
-          _coords = other._coords;
+          _weights = std::forward<std::vector<WeightType>>(other._weights);
+          _coords = std::forward<std::vector<CoordType>>(other._coords);
 
           other._name.clear();
           other._num_points = 0;
-          other._weights = nullptr;
-          other._coords = nullptr;
 
           return *this;
         }
@@ -127,24 +117,13 @@ namespace FEAT
         /// virtual destructor
         virtual ~Rule()
         {
-          if(_coords != nullptr)
-          {
-            delete [] _coords;
-          }
-          if(_weights != nullptr)
-          {
-            delete [] _weights;
-          }
         }
 
         Rule clone() const
         {
           Rule rule(_num_points, _name);
-          for(int i(0); i < _num_points; ++i)
-          {
-            rule._weights[i] = _weights[i];
-            rule._coords[i] = _coords[i];
-          }
+          rule._weights = this->_weights;
+          rule._coords = this->_coords;
           return rule;
         }
 
@@ -160,30 +139,26 @@ namespace FEAT
 
         WeightType& get_weight(int i)
         {
-          ASSERT(_weights != nullptr);
           ASSERTM(i < _num_points, "weight index out-of-range");
-          return _weights[i];
+          return _weights[std::size_t(i)];
         }
 
         const WeightType& get_weight(int i) const
         {
-          ASSERT(_weights != nullptr);
           ASSERTM(i < _num_points, "weight index out-of-range");
-          return _weights[i];
+          return _weights[std::size_t(i)];
         }
 
         CoordType& get_coord(int i)
         {
-          ASSERT(_coords != nullptr);
           ASSERTM(i < _num_points, "point index out-of-range");
-          return _coords[i];
+          return _coords[std::size_t(i)];
         }
 
         const CoordType& get_coord(int i) const
         {
-          ASSERT(_coords != nullptr);
           ASSERTM(i < _num_points, "point index out-of-range");
-          return _coords[i];
+          return _coords[std::size_t(i)];
         }
       }; // class Rule<...>
     } // namespace Scalar

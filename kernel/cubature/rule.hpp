@@ -11,6 +11,9 @@
 #include <kernel/shape.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAT
 {
   /**
@@ -45,37 +48,31 @@ namespace FEAT
     protected:
       String _name;
       int _num_points;
-      WeightType* _weights;
-      PointType* _points;
+      std::vector<WeightType> _weights;
+      std::vector<PointType> _points;
 
     public:
       Rule() :
         _name(),
-        _num_points(0),
-        _weights(nullptr),
-        _points(nullptr)
+        _num_points(0)
       {
       }
 
       explicit Rule(int num_points, const String& name) :
         _name(name),
-        _num_points(num_points),
-        _weights(nullptr),
-        _points(nullptr)
+        _num_points(num_points)
       {
         if(num_points > 0)
         {
-          _weights = new WeightType[size_t(num_points)];
-          _points = new PointType[size_t(num_points)];
+          _weights.resize(std::size_t(num_points));
+          _points.resize(std::size_t(num_points));
         }
       }
 
       template<typename Factory_>
       Rule(CtorFactory, const Factory_& factory) :
         _name(),
-        _num_points(0),
-        _weights(nullptr),
-        _points(nullptr)
+        _num_points(0)
       {
         factory.create_throw(*this);
       }
@@ -84,13 +81,11 @@ namespace FEAT
       Rule(Rule&& other) :
         _name(other._name),
         _num_points(other._num_points),
-        _weights(other._weights),
-        _points(other._points)
+        _weights(std::forward<std::vector<WeightType>>(other._weights)),
+        _points(std::forward<std::vector<PointType>>(other._points))
       {
         other._name.clear();
         other._num_points = 0;
-        other._weights = nullptr;
-        other._points = nullptr;
       }
 
       /// move-assign operator
@@ -100,45 +95,26 @@ namespace FEAT
         if(this == &other)
           return *this;
 
-        if(_weights != nullptr)
-          delete [] _weights;
-        if(_points != nullptr)
-          delete [] _points;
-
         _name = other._name;
         _num_points = other._num_points;
-        _weights = other._weights;
-        _points = other._points;
+        _weights = std::forward<std::vector<WeightType>>(other._weights);
+        _points = std::forward<std::vector<PointType>>(other._points);
 
         other._name.clear();
         other._num_points = 0;
-        other._weights = nullptr;
-        other._points = nullptr;
 
         return *this;
       }
 
       virtual ~Rule()
       {
-        if(_points != nullptr)
-        {
-          delete [] _points;
-        }
-        if(_weights != nullptr)
-        {
-          delete [] _weights;
-        }
       }
 
       Rule clone() const
       {
         Rule rule(_num_points, _name);
-        for(int i(0); i < _num_points; ++i)
-        {
-          rule._weights[i] = _weights[i];
-          for(int j(0); j < dimension; ++j)
-            rule._points[i][j] = _points[i][j];
-        }
+        rule._weights = this->_weights;
+        rule._points = this->_points;
         return rule;
       }
 
@@ -155,40 +131,40 @@ namespace FEAT
       WeightType& get_weight(int i)
       {
         ASSERT(i < _num_points);
-        return _weights[i];
+        return _weights[std::size_t(i)];
       }
 
       WeightType* get_weights()
       {
-        return _weights;
+        return _weights.data();
       }
 
       const WeightType& get_weight(int i) const
       {
         ASSERT(i < _num_points);
-        return _weights[i];
+        return _weights[std::size_t(i)];
       }
 
       const WeightType* get_weights() const
       {
-        return _weights;
+        return _weights.data();
       }
 
       PointType& get_point(int i)
       {
         ASSERT(i < _num_points);
-        return _points[i];
+        return _points[std::size_t(i)];
       }
 
       PointType* get_points()
       {
-        return _points;
+        return _points.data();
       }
 
       const PointType& get_point(int i) const
       {
         ASSERT(i < _num_points);
-        return _points[i];
+        return _points[std::size_t(i)];
       }
 
       const PointType* get_points() const
@@ -200,14 +176,14 @@ namespace FEAT
       {
         ASSERTM((i >= 0) && (i < _num_points), "point index i out-of-range");
         ASSERTM((j >= 0) && (j < dimension), "coord index j out-of-range");
-        return _points[i][j];
+        return _points[std::size_t(i)][j];
       }
 
       const CoordType& get_coord(int i, int j) const
       {
         ASSERTM((i >= 0) && (i < _num_points), "point index i out-of-range");
         ASSERTM((j >= 0) && (j < dimension), "coord index j out-of-range");
-        return _points[i][j];
+        return _points[std::size_t(i)][j];
       }
     }; // class Rule<...>
   } // namespace Cubature
