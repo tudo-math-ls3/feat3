@@ -19,7 +19,6 @@ from build_system.configure_gcc import configure_gcc
 from build_system.configure_icc import configure_icc
 from build_system.configure_icx import configure_icx
 from build_system.configure_clang import configure_clang
-from build_system.configure_pgi import configure_pgi
 from build_system.configure_cray import configure_cray
 from build_system.feat_util import remove_string
 from build_system.feat_util import remove_substring
@@ -59,8 +58,7 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  - 'icc': use the Intel C/C++ compiler, version 19.0 or newer (binaries 'icc' and 'icpc')")
   print ("  - 'icx': use the oneAPI DPC++/C++ compiler, version 2021 or newer (binaries 'icx' and 'icpx')")
   print ("  - 'clang': use the Clang LLVM compiler, version 19.0 or newer (binaries 'clang' and 'clang++')")
-  print ("  - 'cray': experimental: use the Cray C/C++ compiler")
-  print ("  - 'pgi': experimental: use the PGI C/C++ compiler")
+  print ("  - 'cray': use the Cray C/C++ compiler")
   print ("")
   print ("* Build mode (mutually exclusive):")
   print ("  - 'opt': compile in optimized mode (recommended)")
@@ -537,23 +535,6 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["LD"] = compiler_cxx
   cxxflags += " " + configure_clang (cputype, buildid, compiler_cxx, system_host_compiler, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
-elif "pgi" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "pgc++"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "pgcc"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "pgi")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags += " " + configure_pgi (cputype, buildid, compiler_cxx, restrict_errors)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=pgi"
 elif "cray" in buildid:
   if not compiler_cxx:
     compiler_cxx = "CC"

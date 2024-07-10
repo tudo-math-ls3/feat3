@@ -36,12 +36,11 @@
 /// \endcond
 
 // include compiler detection headers
-#include <kernel/util/compiler_pgi.hpp>        // PGI C/C++ compiler
 #include <kernel/util/compiler_intel_oneapi.hpp>   // Intel(R) OneAPI C/C++ compiler // Needs to be included before classic intel and llvm and gnu compilers
 #include <kernel/util/compiler_intel.hpp>      // Intel(R) C/C++ compiler
 #include <kernel/util/compiler_clang.hpp>      // Clang/LLVM Compiler.
+#include <kernel/util/compiler_cray.hpp>       // Cray C++ Compiler.
 #include <kernel/util/compiler_microsoft.hpp>  // Microsoft(R) (Visual) C/C++ compiler
-#include <kernel/util/compiler_oracle.hpp>     // SunStudio/OracleStudio C/C++ compiler
 // The GNU compiler must be the last one in this list, because other compilers (e.g. Intel and Clang)
 // also define the __GNUC__ macro used to identify the GNU C/C++ compiler, thus leading to incorrect
 // compiler detection.

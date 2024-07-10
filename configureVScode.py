@@ -23,7 +23,6 @@ from build_system.detect_cpu import detect_cpu
 from build_system.configure_gcc import configure_gcc
 from build_system.configure_icc import configure_icc
 from build_system.configure_clang import configure_clang
-from build_system.configure_pgi import configure_pgi
 from build_system.feat_util import remove_string
 from build_system.feat_util import remove_substring
 from build_system.feat_util import is_found
@@ -406,26 +405,6 @@ elif "clang" in buildid or "llvm" in buildid:
   noop_flags = cxxflags + " " + configure_clang (cputype, ['noop',buildid], compiler_cxx, system_host_compiler, restrict_errors)
   fast_flags = cxxflags + " " + configure_clang (cputype, ['fast',buildid], compiler_cxx, system_host_compiler, restrict_errors)
   cmake_flags["FEAT_COMPILER_ID"] = "clang"
-elif "pgi" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "pgc++"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "pgcc"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "pgi")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  debug_flags = cxxflags + " " + configure_pgi (cputype, ['debug',buildid], compiler_cxx, restrict_errors)
-  opt_flags = cxxflags + " " + configure_pgi (cputype, ['opt',buildid], compiler_cxx, restrict_errors)
-  fast_flags = cxxflags + " " + configure_pgi (cputype, ['fast',buildid], compiler_cxx, restrict_errors)
-  noop_flags = cxxflags + " " + configure_pgi (cputype, ['noop',buildid], compiler_cxx, restrict_errors)
-  cmake_flags["FEAT_COMPILER_ID"] = "pgi"
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)
