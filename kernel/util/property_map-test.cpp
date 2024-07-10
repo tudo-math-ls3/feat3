@@ -107,7 +107,6 @@ public:
     int ival = 0;
     TEST_CHECK(yoursec->parse_entry("sqrt4", ival, false)); // exists
     TEST_CHECK(yoursec->parse_entry("foobar", ival, true)); // not exists
-
     // okay, test passed
   } // test_0
 

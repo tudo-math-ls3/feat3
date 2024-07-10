@@ -18,16 +18,6 @@ namespace FEAT
 
   PropertyMap::~PropertyMap()
   {
-    // delete all sub-sections
-    SectionMap::iterator it(_sections.begin());
-    SectionMap::iterator jt(_sections.end());
-    for(; it != jt ; ++it)
-    {
-      if((*it).second != nullptr)
-      {
-        delete (*it).second;
-      }
-    }
   }
 
   bool PropertyMap::add_entry(String key, String value, bool replace)
@@ -57,13 +47,11 @@ namespace FEAT
     // if it has been found
     if(it != _sections.end())
     {
-      return (*it).second;
+      return ((*it).second).get();
     }
 
     // if it was not found, create a new section
-    PropertyMap* sub_section = new PropertyMap(this);
-    _sections.insert(std::make_pair(name, sub_section));
-    return sub_section;
+    return _sections.emplace(name, std::make_shared<PropertyMap>(this)).first->second.get();
   }
 
   bool PropertyMap::erase_entry(String key)
@@ -189,7 +177,7 @@ namespace FEAT
     {
       return nullptr;
     }
-    return iter->second;
+    return (iter->second).get();
   }
 
   PropertyMap* PropertyMap::get_sub_section(String name)
@@ -199,7 +187,7 @@ namespace FEAT
     {
       return nullptr;
     }
-    return iter->second;
+    return (iter->second).get();
   }
 
   void PropertyMap::merge(const PropertyMap& section, bool replace)

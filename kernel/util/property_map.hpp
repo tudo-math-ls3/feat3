@@ -14,6 +14,7 @@
 // includes, system
 #include <iostream>
 #include <map>
+#include <memory>
 
 namespace FEAT
 {
@@ -51,7 +52,7 @@ namespace FEAT
     /// entry-map type
     typedef std::map<String, String, String::NoCaseLess> EntryMap;
     /// section-map type
-    typedef std::map<String, PropertyMap*, String::NoCaseLess> SectionMap;
+    typedef std::map<String, std::shared_ptr<PropertyMap>, String::NoCaseLess> SectionMap;
 
     /// entry iterator type
     typedef EntryMap::iterator EntryIterator;
@@ -281,7 +282,7 @@ namespace FEAT
     }
 
     /** \copydoc get_parent() */
-    const PropertyMap* get_parent() const
+    PropertyMap* get_parent() const
     {
       return _parent;
     }
