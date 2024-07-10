@@ -23,9 +23,11 @@
 
 /// Path to the FEAT binary dir
 #define FEAT_BINARY_DIR "${FEAT_BINARY_DIR}"
+#define FEAT_BUILD_DIR "${FEAT_BINARY_DIR}"
 
 /// provided BUILD-ID being used
 #define BUILD_ID "${BUILD_ID}"
+#define FEAT_BUILD_ID "${BUILD_ID}"
 
 /// CPU microarchitecture being used
 #define FEAT_CPU_TYPE "${FEAT_CPU_TYPE}"

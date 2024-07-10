@@ -43,31 +43,9 @@ This macro is defined if the Intel C++ compiler is detected. Its value coindices
 <hr>
 \subsection ppm_feat_compiler_microsoft FEAT_COMPILER_MICROSOFT
 This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal
-macro <c>_MSC_VER</c>, which is an constant integral expression identifying the compiler version, e.g. the value
-<code>1900</code> identifies the Visual C++ 2015 compiler. See the compiler's documentation for details.
-
-<hr>
-\subsection ppm_feat_compiler_open64 FEAT_COMPILER_OPEN64
-This macro is defined if the Open64 C++ compiler is detected. Its value is defined as
-\verbatim
-(__OPENCC__ * 10000 + __OPENCC_MINOR__ * 100 + __OPENCC_PATCHLEVEL__)
-\endverbatim
-which is a constant integral expression identifying the compiler version, e.g. the value <c>40204</c> identifies the
-Open64 C++ 4.2.4 compiler. See the compiler's documentation for details.
-
-<hr>
-\subsection ppm_feat_compiler_oracle FEAT_COMPILER_ORACLE
-This macro is defined if the OracleStudio/SunStudio C++ compiler is detected. Its value coincides with the compiler's
-internal macro <c>__SUNPRO_CC</c>, which is an constant integral expression identifying the compiler version, e.g. the
-value <code>0x5110</code> identifies the OracleStudio C++ 12.2 compiler. See the compiler's documentation for details.
-
-<hr>
-\subsection ppm_feat_compiler_pgi FEAT_COMPILER_PGI
-This macro is defined if the PGI C++ compiler is detected. Its value is defined as
-\verbatim
-(__PGIC__ * 10000 + __PGIC_MINOR__ * 100 + __PGIC_PATCHLEVEL__)
-\endverbatim
-which is a constant integral expression identifying the compiler version. See the compiler's documentation for details.
+macro <c>_MSC_FULL_VER</c>, which is an constant integral expression identifying the compiler version, e.g. the value
+<code>193030705</code> identifies the initial release version of the Visual C++ 2022 compiler.
+See the compiler's documentation for details.
 
 <hr><hr>
 \section preproc_sec_backends Backend / Library Macros
@@ -175,12 +153,16 @@ This macro is defined by the build system if the FEAT kernel is linked against t
 the SuiteSparse library package.
 
 <hr>
+\subsection ppm_feat_have_zfp FEAT_HAVE_ZFP
+This macro is defined by the build system if the FEAT kernel is linked against the zfp library.
+
+<hr>
 \subsection ppm_feat_have_zlib FEAT_HAVE_ZLIB
 This macro is defined by the build system if the FEAT kernel is linked against the zlib library.
 
 <hr>
-\subsection ppm_feat_have_zlib FEAT_HAVE_ZFP
-This macro is defined by the build system if the FEAT kernel is linked against the zfp library.
+\subsection ppm_feat_have_zoltan FEAT_HAVE_ZOLTAN
+This macro is defined by the build system if the FEAT kernel is linked against the zoltan library.
 
 <hr><hr>
 \section preproc_sec_user_def User-Defineable Macros

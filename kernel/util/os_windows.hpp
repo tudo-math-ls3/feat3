@@ -1,5 +1,5 @@
 // FEAT3: Finite Element Analysis Toolbox, Version 3
-// Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
+// Copyright (C) 2010 - 2024 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
@@ -86,6 +86,13 @@ namespace FEAT
      * \author Peter Zajac
      */
     void disable_error_prompts();
+
+    /**
+     * \brief Returns the Windows process ID for the current process.
+     *
+     * \author Peter Zajac
+     */
+    unsigned long get_current_process_id();
   } // namespace Windows
 } // namespace FEAT
 

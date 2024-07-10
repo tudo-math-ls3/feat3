@@ -216,5 +216,10 @@ namespace FEAT
       // disable handling of abort function
       _set_abort_behavior(0, _WRITE_ABORT_MSG);
     }
+
+    unsigned long get_current_process_id()
+    {
+      return GetCurrentProcessId();
+    }
   } // namespace Windows
 } // namespace FEAT

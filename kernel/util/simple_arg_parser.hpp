@@ -302,6 +302,10 @@ namespace FEAT
         String name = it->first;
         int idx = it->second.first;
 
+        // does the option start with a triple-hyphen? if so then don't check it
+        if(name.starts_with('-'))
+          continue;
+
         // check whether we support that option
         if(_supported.find(name) == _supported.end())
         {

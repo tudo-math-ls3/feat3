@@ -38,10 +38,6 @@
 
 #include <vector>
 
-#ifdef FEAT_COMPILER_MICROSOFT
-extern "C" unsigned long GetCurrentProcessId(void);
-#endif
-
 namespace StokesVoxelYPipe
 {
   using namespace FEAT;
@@ -235,20 +231,6 @@ namespace StokesVoxelYPipe
     args.support("cycle");
     args.support("space");
     args.support("debug");
-
-#ifdef FEAT_COMPILER_MICROSOFT
-    comm.allprint(String("PID:") + stringify(GetCurrentProcessId()).pad_front(6));
-    if(args.check("debug") > 0)
-    {
-      const auto& sdbg = args.query("debug")->second;
-      for(const auto& s : sdbg)
-      {
-        int drank(-1);
-        if(s.parse(drank) && (comm.rank() == drank))
-          __debugbreak();
-      }
-    }
-#endif
 
     // check for unsupported options
     auto unsupported = args.query_unsupported();

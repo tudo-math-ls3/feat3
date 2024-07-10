@@ -9,10 +9,6 @@
 #include <control/scalar_basic.hpp>
 #include <control/voxel_transfer_assembler.hpp>
 
-#ifdef FEAT_COMPILER_MICROSOFT
-extern "C" unsigned long GetCurrentProcessId(void);
-#endif
-
 namespace DbgAdaptDrop
 {
   using namespace FEAT;
@@ -70,20 +66,6 @@ int main(int argc, char** argv)
   //domain.set_desired_levels("4 3:4 2:2 1:1 0");
   //domain.set_desired_levels(5, 2, 0);
   domain.set_desired_levels(args.query("level")->second);
-
-#ifdef FEAT_COMPILER_MICROSOFT
-  comm.allprint(String("PID:") + stringify(GetCurrentProcessId()).pad_front(6));
-  if(args.check("debug") > 0)
-  {
-    const auto& sdbg = args.query("debug")->second;
-    for(const auto& s : sdbg)
-    {
-      int drank(-1);
-      if(s.parse(drank) && (comm.rank() == drank))
-        __debugbreak();
-    }
-  }
-#endif
 
   // create slag mask from OFF file
   if(args.check("off") > 0)

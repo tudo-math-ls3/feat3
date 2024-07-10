@@ -17,7 +17,7 @@
 #if !defined(FEAT_COMPILER) && defined(_MSC_VER)
 
 // define FEAT_COMPILER_MICROSOFT macro
-#  define FEAT_COMPILER_MICROSOFT _MSC_VER
+#define FEAT_COMPILER_MICROSOFT _MSC_FULL_VER
 
 // detect the compiler verson and define the FEAT_COMPILER macro
 #  if (_MSC_VER >= 1930)

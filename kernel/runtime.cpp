@@ -16,6 +16,8 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <cstring>
+#include <cstdlib>
 
 #if defined(__linux) || defined(__unix__)
 #include <execinfo.h>
@@ -67,6 +69,9 @@ void Runtime::initialize(int& argc, char**& argv)
     Runtime::abort();
   }
 
+  // get the MPI world comm rank of this process
+  const int my_rank = Dist::Comm::world().rank();
+
   // initialize likwid marker api
   FEAT_MARKER_INIT;
   // initialize memory pool for main memory
@@ -74,10 +79,295 @@ void Runtime::initialize(int& argc, char**& argv)
 
 #ifdef FEAT_HAVE_CUDA
   // initialize memory pool for CUDA memory
-  int rank = Dist::Comm::world().rank();
-  Util::cuda_initialize(rank, 1, 1, 1);
+  Util::cuda_initialize(my_rank, 1, 1, 1);
   Util::cuda_set_blocksize(256, 256, 256, 256, 256, 128);
 #endif
+
+  // check whether '---debug [<ranks...>]' option is given
+  // if so, then trigger a breakpoint for the specified ranks
+  for(int iarg = 1; iarg < argc; ++iarg)
+  {
+    if(strcmp(argv[iarg], "---build-info") == 0)
+    {
+      // dump some information about our build to the console
+      if(my_rank == 0)
+      {
+        std::cout << "--- FEAT BUILD INFORMATION ---\n";
+        //            123456789-123456789-123456789-
+        std::cout << "__cplusplus...................: " << __cplusplus << "\n";
+#ifdef __STDC_VERSION__
+        std::cout << "__STDC_VERSION__..............: " << __STDC_VERSION__ << "\n";
+#else
+        std::cout << "__STDC_VERSION__..............: -N/A-\n";
+#endif
+#ifdef __STDC_HOSTED__
+        std::cout << "__STDC_HOSTED__...............: " << __STDC_HOSTED__ << "\n";
+#else
+        std::cout << "__STDC_HOSTED__...............: -N/A-\n";
+#endif
+#ifdef __STDCPP_THREADS__
+        std::cout << "__STDCPP_THREADS__............: " << __STDCPP_THREADS__ << "\n";
+#else
+        std::cout << "__STDCPP_THREADS__............: -N/A-\n";
+#endif
+#ifdef _OPENMP
+        std::cout << "_OPENMP.......................: yes\n";
+#else
+        std::cout << "_OPENMP.......................: no\n";
+#endif
+        std::cout << "FEAT Version..................: " << FEAT::version_major << "." << FEAT::version_minor << "." << FEAT::version_patch << "\n";
+#ifdef FEAT_GIT_SHA1
+        std::cout << "FEAT_GIT_SHA1.................: " << FEAT_GIT_SHA1 << "\n";
+#else
+        std::cout << "FEAT_GIT_SHA1.................: -N/A-\n";
+#endif
+#ifdef FEAT_BUILD_ID
+        std::cout << "FEAT_BUILD_ID.................: " << FEAT_BUILD_ID << "\n";
+#else
+        std::cout << "FEAT_BUILD_ID.................: -N/A-\n";
+#endif
+#ifdef FEAT_SOURCE_DIR
+        std::cout << "FEAT_SOURCE_DIR...............: " << FEAT_SOURCE_DIR << "\n";
+#else
+        std::cout << "FEAT_SOURCE_DIR...............: -N/A-\n";
+#endif
+#ifdef FEAT_BUILD_DIR
+        std::cout << "FEAT_BUILD_DIR................: " << FEAT_BUILD_DIR << "\n";
+#else
+        std::cout << "FEAT_BUILD_DIR................: -N/A-\n";
+#endif
+#ifdef FEAT_COMPILER
+        std::cout << "FEAT_COMPILER.................: " << FEAT_COMPILER << "\n";
+#else
+        std::cout << "FEAT_COMPILER.................: -N/A-\n";
+#endif
+#ifdef FEAT_COMPILER_GNU
+        std::cout << "FEAT_COMPILER_GNU.............: " << FEAT_COMPILER_GNU << "\n";
+#else
+        std::cout << "FEAT_COMPILER_GNU.............: -N/A-\n";
+#endif
+#ifdef FEAT_COMPILER_CLANG
+        std::cout << "FEAT_COMPILER_CLANG...........: " << FEAT_COMPILER_CLANG << "\n";
+#else
+        std::cout << "FEAT_COMPILER_CLANG...........: -N/A-\n";
+#endif
+#ifdef FEAT_COMPILER_CRAY
+        std::cout << "FEAT_COMPILER_CRAY............: " << FEAT_COMPILER_CRAY << "\n";
+#else
+        std::cout << "FEAT_COMPILER_CRAY............: -N/A-\n";
+#endif
+#ifdef FEAT_COMPILER_INTEL
+        std::cout << "FEAT_COMPILER_INTEL...........: " << FEAT_COMPILER_INTEL << "\n";
+#else
+        std::cout << "FEAT_COMPILER_INTEL...........: -N/A-\n";
+#endif
+#ifdef FEAT_COMPILER_MICROSOFT
+        std::cout << "FEAT_COMPILER_MICROSOFT.......: " << FEAT_COMPILER_MICROSOFT << "\n";
+#else
+        std::cout << "FEAT_COMPILER_MICROSOFT.......: -N/A-\n";
+#endif
+#ifdef FEAT_DEBUG_MODE
+        std::cout << "FEAT_DEBUG_MODE...............: yes\n";
+#else
+        std::cout << "FEAT_DEBUG_MODE...............: no\n";
+#endif
+#ifdef FEAT_EICKT
+        std::cout << "FEAT_EICKT....................: yes\n";
+#else
+        std::cout << "FEAT_EICKT....................: no\n";
+#endif
+#ifdef FEAT_INDEX_U32
+        std::cout << "FEAT_INDEX_U32................: yes\n";
+#else
+        std::cout << "FEAT_INDEX_U32................: no\n";
+#endif
+#ifdef FEAT_MPI_THREAD_MULTIPLE
+        std::cout << "FEAT_MPI_THREAD_MULTIPLE......: yes\n";
+#else
+        std::cout << "FEAT_MPI_THREAD_MULTIPLE......: no\n";
+#endif
+#ifdef FEAT_NO_CONFIG
+        std::cout << "FEAT_NO_CONFIG................: yes\n";
+#else
+        std::cout << "FEAT_NO_CONFIG................: no\n";
+#endif
+#ifdef FEAT_OVERRIDE_MPI_OPS
+        std::cout << "FEAT_OVERRIDE_MPI_OPS.........: yes\n";
+#else
+        std::cout << "FEAT_OVERRIDE_MPI_OPS.........: no\n";
+#endif
+#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+        std::cout << "FEAT_USE_MKL_SPARSE_EXECUTOR..: yes\n";
+#else
+        std::cout << "FEAT_USE_MKL_SPARSE_EXECUTOR..: no\n";
+#endif
+#ifdef FEAT_UNROLL_BANDED
+        std::cout << "FEAT_UNROLL_BANDED............: yes\n";
+#else
+        std::cout << "FEAT_UNROLL_BANDED............: no\n";
+#endif
+#ifdef FEAT_HAVE_ALGLIB
+        std::cout << "FEAT_HAVE_ALGLIB..............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_ALGLIB..............: no\n";
+#endif
+#ifdef FEAT_HAVE_BOOST
+        std::cout << "FEAT_HAVE_BOOST...............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_BOOST...............: no\n";
+#endif
+#ifdef FEAT_HAVE_CGAL
+        std::cout << "FEAT_HAVE_CGAL................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_CGAL................: no\n";
+#endif
+#ifdef FEAT_HAVE_CUDA
+        std::cout << "FEAT_HAVE_CUDA................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_CUDA................: no\n";
+#endif
+#ifdef FEAT_HAVE_DEATH_HANDLER
+        std::cout << "FEAT_HAVE_DEATH_HANDLER.......: yes\n";
+#else
+        std::cout << "FEAT_HAVE_DEATH_HANDLER.......: no\n";
+#endif
+#ifdef FEAT_HAVE_FPARSER
+        std::cout << "FEAT_HAVE_FPARSER.............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_FPARSER.............: no\n";
+#endif
+#ifdef FEAT_HAVE_FLOATX
+        std::cout << "FEAT_HAVE_FLOATX..............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_FLOATX..............: no\n";
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+        std::cout << "FEAT_HAVE_HALFMATH............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_HALFMATH............: no\n";
+#endif
+#ifdef FEAT_HAVE_HYPRE
+        std::cout << "FEAT_HAVE_HYPRE...............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_HYPRE...............: no\n";
+#endif
+#ifdef FEAT_HAVE_METIS
+        std::cout << "FEAT_HAVE_METIS...............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_METIS...............: no\n";
+#endif
+#ifdef FEAT_HAVE_MKL
+        std::cout << "FEAT_HAVE_MKL.................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_MKL.................: no\n";
+#endif
+#ifdef FEAT_HAVE_MPI
+        std::cout << "FEAT_HAVE_MPI.................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_MPI.................: no\n";
+#endif
+#ifdef FEAT_HAVE_OMP
+        std::cout << "FEAT_HAVE_OMP.................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_OMP.................: no\n";
+#endif
+#ifdef FEAT_HAVE_PARMETIS
+        std::cout << "FEAT_HAVE_PARMETIS............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_PARMETIS............: no\n";
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+        std::cout << "FEAT_HAVE_QUADMATH............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_QUADMATH............: no\n";
+#endif
+#ifdef FEAT_HAVE_SUITESPARSE
+        std::cout << "FEAT_HAVE_SUITESPARSE.........: yes\n";
+#else
+        std::cout << "FEAT_HAVE_SUITESPARSE.........: no\n";
+#endif
+#ifdef FEAT_HAVE_SUPERLU_DIST
+        std::cout << "FEAT_HAVE_SUPERLU_DIST........: yes\n";
+#else
+        std::cout << "FEAT_HAVE_SUPERLU_DIST........: no\n";
+#endif
+#ifdef FEAT_HAVE_TRIANGLE
+        std::cout << "FEAT_HAVE_TRIANGLE............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_TRIANGLE............: no\n";
+#endif
+#ifdef FEAT_HAVE_TRILINOS
+        std::cout << "FEAT_HAVE_TRILINOS............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_TRILINOS............: no\n";
+#endif
+#ifdef FEAT_HAVE_UMFPACK
+        std::cout << "FEAT_HAVE_UMFPACK.............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_UMFPACK.............: no\n";
+#endif
+#ifdef FEAT_HAVE_ZFP
+        std::cout << "FEAT_HAVE_ZFP.................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_ZFP.................: no\n";
+#endif
+#ifdef FEAT_HAVE_ZLIB
+        std::cout << "FEAT_HAVE_ZLIB................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_ZLIB................: no\n";
+#endif
+#ifdef FEAT_HAVE_ZOLTAN
+        std::cout << "FEAT_HAVE_ZOLTAN..............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_ZOLTAN..............: no\n";
+#endif
+        std::cout << "--- END OF FEAT BUILD INFORMATION ---\n";
+        std::cout.flush();
+      }
+    }
+
+#ifdef FEAT_COMPILER_MICROSOFT
+    if(strcmp(argv[iarg], "---debug-break") == 0)
+    {
+#ifdef FEAT_HAVE_MPI
+      // in an MPI case, the ranks to debug have to be specified
+      for(++iarg; iarg < argc; ++iarg)
+      {
+        char* endptr = nullptr;
+        int irank = int(std::strtol(argv[iarg], &endptr, 0));
+        if((endptr != argv[iarg]) && (*endptr == '\0'))
+        {
+          if(irank == my_rank)
+          {
+            __debugbreak();
+            break;
+          }
+        }
+        else // argv[iarg] could not be parsed as a number
+        {
+          --iarg;
+          break;
+        }
+      }
+#else // no  FEAT_HAVE_MPI
+      __debugbreak();
+#endif // FEAT_HAVE_MPI
+      continue;
+    }
+#endif // FEAT_COMPILER_MICROSOFT
+
+#if defined(_WIN32)
+    if(strcmp(argv[iarg], "---print-pid") == 0)
+    {
+#ifdef FEAT_HAVE_MPI
+      // in an MPI case, the ranks to debug have to be specified
+      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << " runs rank " << my_rank << std::endl;
+#else // no FEAT_HAVE_MPI
+      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << std::endl;
+#endif // FEAT_HAVE_MPI
+    }
+#endif // defined(_WIN32)
+  }
 
   _initialized = true;
 }

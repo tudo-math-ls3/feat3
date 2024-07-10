@@ -9,11 +9,7 @@
 #include <control/scalar_basic.hpp>
 #include <control/voxel_transfer_assembler.hpp>
 
-#ifdef FEAT_COMPILER_MICROSOFT
-extern "C" unsigned long GetCurrentProcessId(void);
-#endif
-
-namespace DbgAdaptDrop
+namespace DbgVoxelDomain
 {
   using namespace FEAT;
 
@@ -60,7 +56,7 @@ namespace DbgAdaptDrop
 int main(int argc, char** argv)
 {
   using namespace FEAT;
-  using namespace DbgAdaptDrop;
+  using namespace DbgVoxelDomain;
 
   Runtime::ScopeGuard runtime_guard(argc, argv);
 
@@ -69,6 +65,8 @@ int main(int argc, char** argv)
   SimpleArgParser args(argc, argv);
   args.support("level");
   args.support("debug");
+
+  XASSERT(args.query_unsupported().empty());
 
   Control::Domain::VoxelDomainControl<DomainLevelType> domain(comm, true);
 
@@ -86,20 +84,6 @@ int main(int argc, char** argv)
   //domain.set_desired_levels("6 4:2 2:1 0");
   //domain.set_desired_levels("4 3:4 2:2 1:1 0");
   //domain.set_desired_levels(5, 2, 0);
-
-#ifdef FEAT_COMPILER_MICROSOFT
-  comm.allprint(String("PID:") + stringify(GetCurrentProcessId()).pad_front(6));
-  if(args.check("debug") > 0)
-  {
-    const auto& sdbg = args.query("debug")->second;
-    for(const auto& s : sdbg)
-    {
-      int drank(-1);
-      if(s.parse(drank) && (comm.rank() == drank))
-        __debugbreak();
-    }
-  }
-#endif
 
   domain.keep_voxel_map();
   //domain.create_voxel_map(*std::make_unique<RingDropper>(), Real(0));
