@@ -856,7 +856,8 @@ struct NavierStokesScrewsApp
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("auto-degree:7");
+    String cubature_name("auto-degree:7");
+    Cubature::DynamicFactory cubature(cubature_name);
 
     watch_asm_mat.start();
     /* ***************************************************************************************** */
@@ -875,7 +876,7 @@ struct NavierStokesScrewsApp
     for (Index i(0); (i < num_levels) && ((i+1) < extruded_dom_ctrl.size_virtual()); ++i)
     {
       system_levels.at(i)->assemble_coarse_muxers(extruded_dom_ctrl.at(i+1));
-      system_levels.at(i)->assemble_transfers(extruded_dom_ctrl.at(i), extruded_dom_ctrl.at(i+1), cubature);
+      system_levels.at(i)->assemble_transfers(extruded_dom_ctrl.at(i), extruded_dom_ctrl.at(i+1), cubature_name);
     }
 
     /* ***************************************************************************************** */

@@ -43,6 +43,17 @@
 #include <kernel/global/transfer.hpp>
 #include <kernel/global/splitter.hpp>
 
+#include <control/domain/domain_control.hpp>
+#include <control/asm/gate_asm.hpp>
+#include <control/asm/muxer_asm.hpp>
+#include <control/asm/splitter_asm.hpp>
+#include <control/asm/transfer_asm.hpp>
+#include <control/asm/transfer_voxel_asm.hpp>
+#include <control/asm/unit_filter_asm.hpp>
+#include <control/asm/mean_filter_asm.hpp>
+#include <control/asm/slip_filter_asm.hpp>
+
+
 namespace FEAT
 {
   namespace Control
@@ -57,7 +68,8 @@ namespace FEAT
       typename MatrixBlockD_ = LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 1, dim_>,
       typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
       typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
-      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
+      typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
+      typename TransferMatrixS_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
     >
     class StokesBlockedSystemLevel
     {
@@ -86,12 +98,14 @@ namespace FEAT
       // define local transfer matrix types
       typedef TransferMatrixV_ LocalVeloTransferMatrix;
       typedef TransferMatrixP_ LocalPresTransferMatrix;
+      typedef TransferMatrixS_ LocalScalarTransferMatrix;
       typedef LAFEM::TupleDiagMatrix<TransferMatrixV_, TransferMatrixP_> LocalSystemTransferMatrix;
 
       // define local transfer operators
       typedef LAFEM::Transfer<LocalVeloTransferMatrix> LocalVeloTransfer;
       typedef LAFEM::Transfer<LocalPresTransferMatrix> LocalPresTransfer;
       typedef LAFEM::Transfer<LocalSystemTransferMatrix> LocalSystemTransfer;
+      typedef LAFEM::Transfer<LocalScalarTransferMatrix> LocalScalarTransfer;
 
       // define mirror types
       typedef LAFEM::VectorMirror<DataType, IndexType> ScalarMirror;
@@ -103,16 +117,19 @@ namespace FEAT
       typedef Global::Gate<LocalVeloVector, VeloMirror> VeloGate;
       typedef Global::Gate<LocalPresVector, PresMirror> PresGate;
       typedef Global::Gate<LocalSystemVector, SystemMirror> SystemGate;
+      typedef Global::Gate<LocalScalarVector, ScalarMirror> ScalarGate;
 
       // define muxers
       typedef Global::Muxer<LocalVeloVector, VeloMirror> VeloMuxer;
       typedef Global::Muxer<LocalPresVector, PresMirror> PresMuxer;
       typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
+      typedef Global::Muxer<LocalScalarVector, ScalarMirror> ScalarMuxer;
 
       // define splitters
       typedef Global::Splitter<LocalVeloVector, VeloMirror> VeloSplitter;
       typedef Global::Splitter<LocalPresVector, PresMirror> PresSplitter;
       typedef Global::Splitter<LocalSystemVector, SystemMirror> SystemSplitter;
+      typedef Global::Splitter<LocalScalarVector, ScalarMirror> ScalarSplitter;
 
       // define global vector types
       typedef Global::Vector<LocalVeloVector, VeloMirror> GlobalVeloVector;
@@ -130,6 +147,7 @@ namespace FEAT
       typedef Global::Transfer<LocalVeloTransfer, VeloMirror> GlobalVeloTransfer;
       typedef Global::Transfer<LocalPresTransfer, PresMirror> GlobalPresTransfer;
       typedef Global::Transfer<LocalSystemTransfer, SystemMirror> GlobalSystemTransfer;
+      typedef Global::Transfer<LocalScalarTransfer, ScalarMirror> GlobalScalarTransfer;
 
       /* ***************************************************************************************** */
 
@@ -137,16 +155,19 @@ namespace FEAT
       VeloGate gate_velo;
       PresGate gate_pres;
       SystemGate gate_sys;
+      ScalarGate gate_scalar_velo;
 
       /// our coarse-level system muxer
       VeloMuxer coarse_muxer_velo;
       PresMuxer coarse_muxer_pres;
       SystemMuxer coarse_muxer_sys;
+      ScalarMuxer coarse_muxer_scalar_velo;
 
       /// our base-mesh multiplexer
       VeloSplitter base_splitter_velo;
       PresSplitter base_splitter_pres;
       SystemSplitter base_splitter_sys;
+      ScalarSplitter base_splitter_scalar_velo;
 
       /// our global system matrix
       GlobalSystemMatrix matrix_sys;
@@ -159,6 +180,10 @@ namespace FEAT
       GlobalVeloTransfer transfer_velo;
       GlobalPresTransfer transfer_pres;
       GlobalSystemTransfer transfer_sys;
+      GlobalScalarTransfer transfer_scalar_velo;
+
+      /// local type-1 system matrix
+      LocalSystemMatrix local_matrix_sys_type1;
 
       /// CTOR
       StokesBlockedSystemLevel() :
@@ -169,9 +194,14 @@ namespace FEAT
         matrix_s(&gate_pres, &gate_pres),
         transfer_velo(&coarse_muxer_velo),
         transfer_pres(&coarse_muxer_pres),
-        transfer_sys(&coarse_muxer_sys)
+        transfer_sys(&coarse_muxer_sys),
+        transfer_scalar_velo(&coarse_muxer_scalar_velo)
       {
       }
+
+      // no copies, no problems
+      StokesBlockedSystemLevel(const StokesBlockedSystemLevel&) = delete;
+      StokesBlockedSystemLevel& operator=(const StokesBlockedSystemLevel&) = delete;
 
       virtual ~StokesBlockedSystemLevel()
       {
@@ -201,584 +231,159 @@ namespace FEAT
         transfer_sys.compile();
       }
 
+      void compile_scalar_transfer()
+      {
+        transfer_scalar_velo.get_mat_prol().clone(this->transfer_velo.get_mat_prol().unwrap(), LAFEM::CloneMode::Shallow);
+        transfer_scalar_velo.get_mat_rest().clone(this->transfer_velo.get_mat_rest().unwrap(), LAFEM::CloneMode::Shallow);
+        transfer_scalar_velo.get_mat_trunc().clone(this->transfer_velo.get_mat_trunc().unwrap(), LAFEM::CloneMode::Shallow);
+        transfer_scalar_velo.compile();
+      }
+
       template<typename D_, typename I_, typename SMA_, typename SMB_, typename SMD_, typename SM_, typename TV_, typename TP_>
       void convert(const StokesBlockedSystemLevel<dim_, D_, I_, SMA_, SMB_, SMD_, SM_, TV_, TP_> & other)
       {
         gate_velo.convert(other.gate_velo);
         gate_pres.convert(other.gate_pres);
-        gate_sys.convert(other.gate_sys);
+        Asm::build_gate_tuple(this->gate_sys, this->gate_velo, this->gate_pres);
+        this->gate_scalar_velo.convert(this->gate_velo, LocalScalarVector(this->gate_velo.get_freqs().template size<LAFEM::Perspective::native>()));
 
         coarse_muxer_velo.convert(other.coarse_muxer_velo);
         coarse_muxer_pres.convert(other.coarse_muxer_pres);
-        coarse_muxer_sys.convert(other.coarse_muxer_sys);
+        Asm::build_muxer_tuple(this->coarse_muxer_sys, this->gate_sys.get_freqs(), this->coarse_muxer_velo, this->coarse_muxer_pres);
+        this->coarse_muxer_scalar_velo.convert(this->coarse_muxer_velo, this->gate_scalar_velo.get_freqs().clone(LAFEM::CloneMode::Shallow));
 
         base_splitter_velo.convert(other.base_splitter_velo);
         base_splitter_pres.convert(other.base_splitter_pres);
-        base_splitter_sys.convert(other.base_splitter_sys);
+        Asm::build_splitter_tuple(this->base_splitter_sys, this->gate_sys.get_freqs(), this->base_splitter_velo, this->base_splitter_pres);
+        this->base_splitter_scalar_velo.convert(this->base_splitter_velo, this->gate_scalar_velo.get_freqs().clone(LAFEM::CloneMode::Shallow));
+
+        transfer_velo.convert(&coarse_muxer_velo, other.transfer_velo);
+        transfer_pres.convert(&coarse_muxer_pres, other.transfer_pres);
+        this->compile_system_transfer();
+        this->compile_scalar_transfer();
 
         matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
         matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
         matrix_d.convert(&gate_pres, &gate_velo, other.matrix_d);
         matrix_s.convert(&gate_pres, &gate_pres, other.matrix_s);
-
-        transfer_velo.convert(&coarse_muxer_velo, other.transfer_velo);
-        transfer_pres.convert(&coarse_muxer_pres, other.transfer_pres);
-
         this->compile_system_matrix();
-        this->compile_system_transfer();
       }
 
       template<typename DomainLevel_>
       void assemble_gates(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl)
       {
-        const auto& dom_level = virt_dom_lvl.level();
-        const auto& dom_layer = virt_dom_lvl.layer();
-        const auto& space_velo = dom_level.space_velo;
-        const auto& space_pres = dom_level.space_pres;
-
-        // set the gate comm
-        this->gate_velo.set_comm(dom_layer.comm_ptr());
-        this->gate_pres.set_comm(dom_layer.comm_ptr());
-        this->gate_sys.set_comm(dom_layer.comm_ptr());
-
-        // loop over all ranks
-        for(Index i(0); i < dom_layer.neighbor_count(); ++i)
-        {
-          int rank = dom_layer.neighbor_rank(i);
-
-          // try to find our halo
-          auto* halo = dom_level.find_halo_part(rank);
-          if(halo == nullptr) continue;
-          XASSERT(halo != nullptr);
-
-          // create (empty) velocity mirror
-          VeloMirror mirror_velo;
-          Assembly::MirrorAssembler::assemble_mirror(mirror_velo, space_velo, *halo);
-
-          // create (empty) pressure mirror
-          PresMirror mirror_pres;
-          Assembly::MirrorAssembler::assemble_mirror(mirror_pres, space_pres, *halo);
-
-          // create a system mirror
-          SystemMirror mirror_sys(mirror_velo.clone(), mirror_pres.clone());
-
-          // push mirrors into gates
-          if(!mirror_velo.empty())
-            this->gate_velo.push(rank, std::move(mirror_velo));
-          if(!mirror_pres.empty())
-            this->gate_pres.push(rank, std::move(mirror_pres));
-          if(!mirror_sys.empty())
-            this->gate_sys.push(rank, std::move(mirror_sys));
-        }
-
-        // create local template vectors
-        LocalVeloVector tmpl_v(space_velo.get_num_dofs());
-        LocalPresVector tmpl_p(space_pres.get_num_dofs());
-        LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
-
-        // compile gates
-        this->gate_velo.compile(std::move(tmpl_v));
-        this->gate_pres.compile(std::move(tmpl_p));
-        this->gate_sys.compile(std::move(tmpl_s));
+        Asm::asm_gate(virt_dom_lvl, virt_dom_lvl->space_velo, this->gate_velo, true);
+        Asm::asm_gate(virt_dom_lvl, virt_dom_lvl->space_pres, this->gate_pres, true);
+        Asm::build_gate_tuple(this->gate_sys, this->gate_velo, this->gate_pres);
+        this->gate_scalar_velo.convert(this->gate_velo, LocalScalarVector(virt_dom_lvl->space_velo.get_num_dofs()));
       }
 
       template<typename DomainLevel_>
       void assemble_coarse_muxers(const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse)
       {
-        // assemble muxer parent
-        if(virt_lvl_coarse.is_parent())
-        {
-          XASSERT(virt_lvl_coarse.is_child());
-
-          const auto& layer_c = virt_lvl_coarse.layer_c();
-          const DomainLevel_& level_p = virt_lvl_coarse.level_p();
-
-          // loop over all children
-          for(Index i(0); i < layer_c.child_count(); ++i)
-          {
-            const auto* child = level_p.find_patch_part(int(i));
-            XASSERT(child != nullptr);
-            SystemMirror child_mirror_sys;
-            VeloMirror& child_mirror_v = child_mirror_sys.template at<0>();
-            PresMirror& child_mirror_p = child_mirror_sys.template at<1>();
-            Assembly::MirrorAssembler::assemble_mirror(child_mirror_v, level_p.space_velo, *child);
-            Assembly::MirrorAssembler::assemble_mirror(child_mirror_p, level_p.space_pres, *child);
-            this->coarse_muxer_velo.push_child(child_mirror_v.clone(LAFEM::CloneMode::Shallow));
-            this->coarse_muxer_pres.push_child(child_mirror_p.clone(LAFEM::CloneMode::Shallow));
-            this->coarse_muxer_sys.push_child(std::move(child_mirror_sys));
-          }
-        }
-
-        // assemble muxer child
-        if(virt_lvl_coarse.is_child())
-        {
-          const auto& layer_c = virt_lvl_coarse.layer_c();
-          const DomainLevel_& level_c = virt_lvl_coarse.level_c();
-
-          SystemMirror parent_mirror_sys;
-          VeloMirror& parent_mirror_v = parent_mirror_sys.template at<0>();
-          PresMirror& parent_mirror_p = parent_mirror_sys.template at<1>();
-
-          // manually set up an identity gather/scatter matrix
-          parent_mirror_v = VeloMirror::make_identity(level_c.space_velo.get_num_dofs());
-          parent_mirror_p = PresMirror::make_identity(level_c.space_pres.get_num_dofs());
-
-          // set parent and sibling comms
-          this->coarse_muxer_velo.set_parent(
-            layer_c.sibling_comm_ptr(),
-            layer_c.get_parent_rank(),
-            parent_mirror_v.clone(LAFEM::CloneMode::Shallow)
-          );
-          this->coarse_muxer_pres.set_parent(
-            layer_c.sibling_comm_ptr(),
-            layer_c.get_parent_rank(),
-            parent_mirror_p.clone(LAFEM::CloneMode::Shallow)
-          );
-          this->coarse_muxer_sys.set_parent(
-            layer_c.sibling_comm_ptr(),
-            layer_c.get_parent_rank(),
-            std::move(parent_mirror_sys)
-          );
-
-          // compile muxer
-          LocalVeloVector tmpl_v(level_c.space_velo.get_num_dofs());
-          LocalPresVector tmpl_p(level_c.space_pres.get_num_dofs());
-          LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
-          this->coarse_muxer_velo.compile(tmpl_v);
-          this->coarse_muxer_pres.compile(tmpl_p);
-          this->coarse_muxer_sys.compile(tmpl_s);
-        }
+        Asm::asm_muxer(virt_lvl_coarse, [](const DomainLevel_& dl){return &dl.space_velo;}, this->coarse_muxer_velo);
+        Asm::asm_muxer(virt_lvl_coarse, [](const DomainLevel_& dl){return &dl.space_pres;}, this->coarse_muxer_pres);
+        Asm::build_muxer_tuple(this->coarse_muxer_sys, this->gate_sys.get_freqs(), this->coarse_muxer_velo, this->coarse_muxer_pres);
+        this->coarse_muxer_scalar_velo.convert(this->coarse_muxer_velo, this->gate_scalar_velo.get_freqs().clone(LAFEM::CloneMode::Shallow));
       }
 
       template<typename DomainLevel_>
       void assemble_base_splitters(const Domain::VirtualLevel<DomainLevel_>& virt_lvl)
       {
-        // get the layer
-        const auto& layer = virt_lvl.layer();
-
-        // nothing to assemble?
-        if(layer.comm().size() <= 1)
-          return;
-
-        // ensure that this virtual level has a base-mesh
-        XASSERTM(virt_lvl.has_base(), "cannot assemble base splitter because base level is missing");
-
-        // is this the root process?
-        if(layer.comm().rank() == 0)
-        {
-          const DomainLevel_& level_b = virt_lvl.level_b();
-
-          LocalVeloVector tmpl_v(level_b.space_velo.get_num_dofs());
-          LocalPresVector tmpl_p(level_b.space_pres.get_num_dofs());
-          LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
-
-          // set parent vector template
-          this->base_splitter_velo.set_base_vector_template(std::move(tmpl_v));
-          this->base_splitter_pres.set_base_vector_template(std::move(tmpl_p));
-          this->base_splitter_sys.set_base_vector_template(std::move(tmpl_s));
-
-          // assemble patch mirrors on root process
-          for(int i(0); i < layer.comm().size(); ++i)
-          {
-            const auto* patch = level_b.find_patch_part(i);
-            XASSERT(patch != nullptr);
-            SystemMirror patch_mirror;
-            VeloMirror& patch_mirror_v = patch_mirror.template at<0>();
-            PresMirror& patch_mirror_p = patch_mirror.template at<1>();
-            Assembly::MirrorAssembler::assemble_mirror(patch_mirror_v, level_b.space_velo, *patch);
-            Assembly::MirrorAssembler::assemble_mirror(patch_mirror_p, level_b.space_pres, *patch);
-            this->base_splitter_velo.push_patch(patch_mirror_v.clone(LAFEM::CloneMode::Shallow));
-            this->base_splitter_pres.push_patch(patch_mirror_p.clone(LAFEM::CloneMode::Shallow));
-            this->base_splitter_sys.push_patch(std::move(patch_mirror));
-          }
-        }
-
-        // assemble muxer child
-        const DomainLevel_& level = virt_lvl.level();
-
-        SystemMirror root_mirror_sys;
-        VeloMirror& root_mirror_v = root_mirror_sys.template at<0>();
-        PresMirror& root_mirror_p = root_mirror_sys.template at<1>();
-
-        // manually set up an identity gather/scatter matrix
-        root_mirror_v = VeloMirror::make_identity(level.space_velo.get_num_dofs());
-        root_mirror_p = PresMirror::make_identity(level.space_pres.get_num_dofs());
-
-        // set parent and sibling comms
-        this->base_splitter_velo.set_root(layer.comm_ptr(), 0, root_mirror_v.clone(LAFEM::CloneMode::Shallow));
-        this->base_splitter_pres.set_root(layer.comm_ptr(), 0, root_mirror_p.clone(LAFEM::CloneMode::Shallow));
-        this->base_splitter_sys.set_root(layer.comm_ptr(), 0, std::move(root_mirror_sys));
-
-        // compile muxer
-        LocalVeloVector tmpl_v(level.space_velo.get_num_dofs());
-        LocalPresVector tmpl_p(level.space_pres.get_num_dofs());
-        LocalSystemVector tmpl_s(tmpl_v.clone(), tmpl_p.clone());
-        this->base_splitter_velo.compile(tmpl_v);
-        this->base_splitter_pres.compile(tmpl_p);
-        this->base_splitter_sys.compile(tmpl_s);
+        Asm::asm_splitter(virt_lvl, [](const DomainLevel_& dl){return &dl.space_velo;}, this->base_splitter_velo);
+        Asm::asm_splitter(virt_lvl, [](const DomainLevel_& dl){return &dl.space_pres;}, this->base_splitter_pres);
+        Asm::build_splitter_tuple(this->base_splitter_sys, this->gate_sys.get_freqs(), this->base_splitter_velo, this->base_splitter_pres);
+        this->base_splitter_scalar_velo.convert(this->base_splitter_velo, this->gate_scalar_velo.get_freqs().clone(LAFEM::CloneMode::Shallow));
       }
 
-      template<typename DomainLevel_, typename Cubature_>
-      void assemble_velocity_transfer(
+      template<typename DomainLevel_>
+      void assemble_transfers(
+        const StokesBlockedSystemLevel& sys_lvl_coarse,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature)
+        const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
       {
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+        Asm::asm_transfer_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_velo;},
+          this->transfer_velo.local(), this->coarse_muxer_velo, this->gate_velo, sys_lvl_coarse.gate_velo);
+        Asm::asm_transfer_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_pres;},
+          this->transfer_pres.local(), this->coarse_muxer_pres, this->gate_pres, sys_lvl_coarse.gate_pres);
 
-        const auto& space_f = level_f.space_velo;
-        const auto& space_c = level_c.space_velo;
-
-        // get local transfer operator
-        LocalVeloTransfer& loc_trans = this->transfer_velo.local();
-
-        // get local transfer matrices
-        LocalVeloTransferMatrix& loc_prol_wrapped = loc_trans.get_mat_prol();
-        LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
-
-        // get the unwrapped types
-        typename LocalVeloTransferMatrix::BaseClass& loc_prol = loc_prol_wrapped;
-        typename LocalVeloTransferMatrix::BaseClass& loc_rest = loc_rest_wrapped;
-
-        // assemble structure?
-        if (loc_prol.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
-        }
-
-        // create a local weight vector
-        LocalVeloVector loc_vec_weight = loc_prol_wrapped.create_vector_l();
-
-        // create a scalar weight vector for the assembly
-        LocalScalarVector loc_scal_vec_weight = loc_prol.create_vector_l();
-
-        // get the data arrays of the weight vectors
-        auto* v_wb = loc_vec_weight.elements();
-        auto* v_ws = loc_scal_vec_weight.elements();
-
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_scal_vec_weight.format();
-
-          // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_scal_vec_weight,
-            space_f, space_c, cubature);
-
-          // copy weights from scalar to blocked
-          for(Index i(0); i < loc_prol.rows(); ++i)
-            v_wb[i] = v_ws[i];
-
-          // synchronize blocked weight vector
-          this->gate_velo.sync_0(loc_vec_weight);
-
-          // copy weights from blocked to scalar
-          for(Index i(0); i < loc_prol.rows(); ++i)
-            v_ws[i] = v_wb[i][0];
-
-          // invert weight components
-          loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
-
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_scal_vec_weight);
-
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
-        }
-
-        // compile velocity transfer
         this->transfer_velo.compile();
-      }
-
-      template<typename DomainLevel_, typename Cubature_>
-      void assemble_pressure_transfer(
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature)
-      {
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
-
-        const auto& space_f = level_f.space_pres;
-        const auto& space_c = level_c.space_pres;
-
-        // get local transfer operator
-        LocalPresTransfer& loc_trans = this->transfer_pres.local();
-
-        // get local transfer matrices
-        LocalPresTransferMatrix& loc_prol = loc_trans.get_mat_prol();
-        LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-
-        // assemble structure?
-        if (loc_prol.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
-        }
-
-        // get local pressure weight vector
-        LocalPresVector loc_vec_weight = loc_prol.create_vector_l();
-
-        // assemble prolongation matrix
-        {
-          loc_prol.format();
-          loc_vec_weight.format();
-
-          // assemble prolongation matrix
-          Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight,
-            space_f, space_c, cubature);
-
-          // synchronize weight vector
-          this->gate_pres.sync_0(loc_vec_weight);
-
-          // invert components
-          loc_vec_weight.component_invert(loc_vec_weight);
-
-          // scale prolongation matrix
-          loc_prol.scale_rows(loc_prol, loc_vec_weight);
-
-          // copy and transpose
-          loc_rest = loc_prol.transpose();
-        }
-
-        // compile pressure transfer
         this->transfer_pres.compile();
+        this->compile_system_transfer();
+        this->compile_scalar_transfer();
       }
 
-      template<typename DomainLevel_, typename Cubature_>
+      template<typename DomainLevel_>
       void assemble_transfers(
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature)
-      {
-        this->assemble_velocity_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
-        this->assemble_pressure_transfer(virt_lvl_fine, virt_lvl_coarse, cubature);
-
-        this->compile_system_transfer();
-      }
-
-      template<typename DomainLevel_, typename Cubature_>
-      void assemble_velocity_truncation(
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature,
-        const StokesBlockedSystemLevel* sys_lvl_coarse = nullptr)
+        const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
       {
         // if the coarse level is a parent, then we need the coarse system level
-        XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
+        XASSERT(!virt_lvl_coarse.is_parent());
 
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+        Asm::asm_transfer_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_velo;},
+          this->transfer_velo.local(), this->coarse_muxer_velo, this->gate_velo, this->gate_velo);
+        Asm::asm_transfer_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_pres;},
+          this->transfer_pres.local(), this->coarse_muxer_pres, this->gate_pres, this->gate_pres);
 
-        const auto& space_f = level_f.space_velo;
-        const auto& space_c = level_c.space_velo;
-
-        // get local transfer operator
-        LocalVeloTransfer& loc_trans = this->transfer_velo.local();
-
-        // get local transfer matrices
-        const LocalVeloTransferMatrix& loc_rest_wrapped = loc_trans.get_mat_rest();
-        LocalVeloTransferMatrix& loc_trunc_wrapped = loc_trans.get_mat_trunc();
-
-        // get the matrix blocks
-        const typename LocalVeloTransferMatrix::BaseClass& loc_rest = loc_rest_wrapped;
-        typename LocalVeloTransferMatrix::BaseClass& loc_trunc = loc_trunc_wrapped;
-
-        // restriction matrix must be already assembled
-        XASSERTM(loc_rest.size() > Index(0), "you need to call 'assemble_velocity_transfer' first");
-
-        // clone sparsity pattern of restriction matrix
-        loc_trunc = loc_rest.clone(LAFEM::CloneMode::Layout);
-
-        // create local weight vector
-        LocalVeloVector loc_vec_weight = loc_rest_wrapped.create_vector_l();
-
-        // create a scalar weight vector for the assembly
-        LocalScalarVector loc_scal_vec_weight = loc_rest.create_vector_l();
-
-        // get the data arrays of the weight vectors
-        auto* v_wb = loc_vec_weight.elements();
-        auto* v_ws = loc_scal_vec_weight.elements();
-
-        // format
-        loc_trunc.format();
-        loc_scal_vec_weight.format();
-
-        // assemble truncation matrix
-        Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_scal_vec_weight, space_f, space_c, cubature);
-
-        // copy weights from scalar to blocked
-        for(Index i(0); i < loc_trunc.rows(); ++i)
-          v_wb[i] = v_ws[i];
-
-        // We now need to synchronize the weight vector in analogy to the prolongation matrix assembly.
-        // Note that the weight vector is now a coarse-level vector, so we need to synchronize over
-        // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
-        // level, as in this case we have to join/split around the synch operation.
-
-        // synchronize weight vector using the muxer/gate
-        if(!virt_lvl_coarse.is_child())
-        {
-          // The coarse level is a simple (non-child) level that exists on all processes,
-          // so simply synch over the coarse-level gate:
-          sys_lvl_coarse->gate_velo.sync_0(loc_vec_weight);
-        }
-        else if(virt_lvl_coarse.is_parent())
-        {
-          // The coarse level is a child level and this is one of the parent processes which contain
-          // the coarse-level gate. So we first need to join the weight vector onto the parent processes
-          // first, then synch that joined vector over the parent gate and finally split the result
-          // to all child processes -- this "emulates" a synch over the (non-existent) coarse-level
-          // child gate, which is what we actually require here...
-
-          // create temporary vector on parent partitioning
-          LocalVeloVector loc_tmp = sys_lvl_coarse->gate_velo._freqs.clone(LAFEM::CloneMode::Allocate);
-
-          // join child weights over muxer
-          this->coarse_muxer_velo.join(loc_vec_weight, loc_tmp);
-
-          // sync over coarse gate
-          sys_lvl_coarse->gate_velo.sync_0(loc_tmp);
-
-          // split over muxer
-          this->coarse_muxer_velo.split(loc_vec_weight, loc_tmp);
-        }
-        else // ghost
-        {
-          // The coarse level is a ghost level, i.e. a child but not a parent. In this case, we
-          // only have to participate in the join/send operations of the muxer, which are part
-          // of the operations executed on the parents handled by the else-if case above.
-
-          this->coarse_muxer_velo.join_send(loc_vec_weight);
-
-          // parent performs sync over its gate here (see above else-if)
-
-          this->coarse_muxer_velo.split_recv(loc_vec_weight);
-        }
-
-        // copy weights from blocked to scalar
-        for(Index i(0); i < loc_trunc.rows(); ++i)
-          v_ws[i] = v_wb[i][0];
-
-        // invert components
-        loc_scal_vec_weight.component_invert(loc_scal_vec_weight);
-
-        // scale reduction matrix
-        loc_trunc.scale_rows(loc_trunc, loc_scal_vec_weight);
+        this->transfer_velo.compile();
+        this->transfer_pres.compile();
+        this->compile_system_transfer();
+        this->compile_scalar_transfer();
       }
 
-      template<typename DomainLevel_, typename Cubature_>
-      void assemble_pressure_truncation(
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature,
-        const StokesBlockedSystemLevel* sys_lvl_coarse = nullptr)
+      template<typename DomainLevel_>
+      void assemble_transfers_voxel(
+        const StokesBlockedSystemLevel& sys_lvl_coarse,
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
+      {
+        Asm::asm_transfer_voxel_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_velo;},
+          this->transfer_velo.local(), this->coarse_muxer_velo, this->gate_velo, sys_lvl_coarse.gate_velo);
+        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_pres;},
+          this->transfer_pres.local(), this->coarse_muxer_pres, this->gate_pres, sys_lvl_coarse.gate_pres);
+
+        this->transfer_velo.compile();
+        this->transfer_pres.compile();
+        this->compile_system_transfer();
+        this->compile_scalar_transfer();
+      }
+
+      template<typename DomainLevel_>
+      void assemble_transfers_voxel(
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
       {
         // if the coarse level is a parent, then we need the coarse system level
-        XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
+        XASSERT(!virt_lvl_coarse.is_parent());
 
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+        Asm::asm_transfer_voxel_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_velo;},
+          this->transfer_velo.local(), this->coarse_muxer_velo, this->gate_velo, this->gate_velo);
+        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
+          [](const DomainLevel_& dl) {return &dl.space_pres;},
+          this->transfer_pres.local(), this->coarse_muxer_pres, this->gate_pres, this->gate_pres);
 
-        const auto& space_f = level_f.space_pres;
-        const auto& space_c = level_c.space_pres;
-
-        // get local transfer operator
-        LocalPresTransfer& loc_trans = this->transfer_pres.local();
-
-        // get local transfer matrices
-        const LocalPresTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-        LocalPresTransferMatrix& loc_trunc = loc_trans.get_mat_trunc();
-
-        // restriction matrix must be already assembled
-        XASSERTM(loc_rest.size() > Index(0), "you need to call 'assemble_prescity_transfer' first");
-
-        // clone sparsity pattern of restriction matrix
-        loc_trunc = loc_rest.clone(LAFEM::CloneMode::Layout);
-
-        // create local weight vector
-        LocalPresVector loc_vec_weight = loc_trunc.create_vector_l();
-
-        // format
-        loc_trunc.format();
-        loc_vec_weight.format();
-
-        // assemble truncation matrix
-        Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_vec_weight, space_f, space_c, cubature);
-
-        // We now need to synchronize the weight vector in analogy to the prolongation matrix assembly.
-        // Note that the weight vector is now a coarse-level vector, so we need to synchronize over
-        // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
-        // level, as in this case we have to join/split around the synch operation.
-
-        // synchronize weight vector using the muxer/gate
-        if(!virt_lvl_coarse.is_child())
-        {
-          // The coarse level is a simple (non-child) level that exists on all processes,
-          // so simply synch over the coarse-level gate:
-          sys_lvl_coarse->gate_pres.sync_0(loc_vec_weight);
-        }
-        else if(virt_lvl_coarse.is_parent())
-        {
-          // The coarse level is a child level and this is one of the parent processes which contain
-          // the coarse-level gate. So we first need to join the weight vector onto the parent processes
-          // first, then synch that joined vector over the parent gate and finally split the result
-          // to all child processes -- this "emulates" a synch over the (non-existent) coarse-level
-          // child gate, which is what we actually require here...
-
-          // create temporary vector on parent partitioning
-          LocalPresVector loc_tmp = sys_lvl_coarse->gate_pres._freqs.clone(LAFEM::CloneMode::Allocate);
-
-          // join child weights over muxer
-          this->coarse_muxer_pres.join(loc_vec_weight, loc_tmp);
-
-          // sync over coarse gate
-          sys_lvl_coarse->gate_pres.sync_0(loc_tmp);
-
-          // split over muxer
-          this->coarse_muxer_pres.split(loc_vec_weight, loc_tmp);
-        }
-        else // ghost
-        {
-          // The coarse level is a ghost level, i.e. a child but not a parent. In this case, we
-          // only have to participate in the join/send operations of the muxer, which are part
-          // of the operations executed on the parents handled by the else-if case above.
-
-          this->coarse_muxer_pres.join_send(loc_vec_weight);
-
-          // parent performs sync over its gate here (see above else-if)
-
-          this->coarse_muxer_pres.split_recv(loc_vec_weight);
-        }
-
-        // invert components
-        loc_vec_weight.component_invert(loc_vec_weight);
-
-        // scale reduction matrix
-        loc_trunc.scale_rows(loc_trunc, loc_vec_weight);
-      }
-
-      template<typename DomainLevel_, typename Cubature_>
-      void assemble_truncations(
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature,
-        const StokesBlockedSystemLevel* sys_lvl_coarse = nullptr)
-      {
-        this->assemble_velocity_truncation(virt_lvl_fine, virt_lvl_coarse, cubature, sys_lvl_coarse);
-        this->assemble_pressure_truncation(virt_lvl_fine, virt_lvl_coarse, cubature, sys_lvl_coarse);
+        this->transfer_velo.compile();
+        this->transfer_pres.compile();
         this->compile_system_transfer();
+        this->compile_scalar_transfer();
       }
 
       template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
       void assemble_grad_div_matrices(const SpaceVelo_& space_velo, const SpacePres_& space_pres, const Cubature_& cubature)
       {
-        Assembly::GradPresDivVeloAssembler::assemble(this->matrix_b.local(), this->matrix_d.local(),
-        space_velo, space_pres, cubature);
+        Assembly::GradPresDivVeloAssembler::assemble(this->matrix_b.local(), this->matrix_d.local(), space_velo, space_pres, cubature);
       }
 
       template<typename Trafo_, typename SpaceVelo_, typename SpacePres_>
@@ -810,6 +415,13 @@ namespace FEAT
       {
         // assemble matrix structure
         Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_s.local(), space_pres);
+      }
+
+      void compile_local_matrix_sys_type1()
+      {
+        this->local_matrix_sys_type1.block_a() = matrix_a.convert_to_1();
+        this->local_matrix_sys_type1.block_b() = matrix_b.local().clone(LAFEM::CloneMode::Weak);
+        this->local_matrix_sys_type1.block_d() = matrix_d.local().clone(LAFEM::CloneMode::Weak);
       }
     }; // class StokesBlockedSystemLevel<...>
 
@@ -859,7 +471,7 @@ namespace FEAT
         filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
-    };
+    }; // class StokesBlockedUnitVeloNonePresSystemLevel
 
     template
     <
@@ -909,7 +521,7 @@ namespace FEAT
         filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
-    };
+    }; // class StokesBlockedSlipUnitVeloNonePresSystemLevel
 
     /**
      * \brief System level using a MeanFilter for the pressure
@@ -962,13 +574,6 @@ namespace FEAT
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
 
-      /**
-       *
-       * \brief Conversion method
-       *
-       * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
-       *
-       */
       template<typename D_, typename I_, typename SM_>
       void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
       {
@@ -1056,13 +661,6 @@ namespace FEAT
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
 
-      /**
-        *
-        * \brief Conversion method
-        *
-        * Use source StokesUnitVeloMeanPresSystemLevel content as content of current StokesUnitVeloMeanPresSystemLevel.
-        *
-        */
       template<typename D_, typename I_, typename SM_>
       void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
       {
@@ -1099,54 +697,14 @@ namespace FEAT
         // build the mean filter
         fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
 
-        // Sync the filter vector in the SlipFilter
-        const typename BaseClass::VeloGate& my_col_gate(this->gate_velo);
-
-        // For all slip filters...
-        //for(auto& it : filter_sys.local().template at<0>())
-        //{
-
-        auto& it = filter_velo.local().template at<0>();
-        // get the filter vector
-        auto& slip_filter_vector = it.get_filter_vector();
-
-        if(slip_filter_vector.used_elements() > 0)
-        {
-          // Temporary DenseVector for syncing
-          typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
-
-          auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-          auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
-
-          // Copy sparse filter vector contents to DenseVector
-          for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-          {
-            Index idense(slip_filter_vector.indices()[isparse]);
-            tmp_elements[idense] = sfv_elements[isparse];
-          }
-
-          my_col_gate.sync_0(tmp);
-          // Copy sparse filter vector contents to DenseVector
-          for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-          {
-            Index idense(slip_filter_vector.indices()[isparse]);
-            tmp_elements[idense].normalize();
-            sfv_elements[isparse] = tmp_elements[idense];
-
-          }
-        }
-        else
-        {
-          // Temporary DenseVector for syncing
-          typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
-          my_col_gate.sync_0(tmp);
-        }
+        // synchronize the slip filter
+        Asm::sync_slip_filter(this->gate_velo, filter_velo.local().template at<0>());
       }
-    };
+    }; // class StokesBlockedSlipUnitVeloMeanPresSystemLevel
 
 
     template
-      <
+    <
       int dim_,
       typename DataType_ = Real,
       typename IndexType_ = Index,
@@ -1156,7 +714,7 @@ namespace FEAT
       typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>,
       typename TransferMatrixV_ = LAFEM::SparseMatrixBWrappedCSR<DataType_, IndexType_, dim_>,
       typename TransferMatrixP_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_>
-      >
+    >
     class StokesBlockedCombinedSystemLevel :
       public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
@@ -1232,71 +790,50 @@ namespace FEAT
         return this->filter_pres.local().template at<1>();
       }
 
+      template<typename DomainLevel_, typename Space_>
+      void assemble_velocity_unit_filter(const DomainLevel_& dom_level, const Space_& space, const String& name, const String& mesh_parts)
+      {
+        auto& loc_filter = get_local_velo_unit_filter_seq().find_or_add(name);
+        loc_filter.clear();
+        Asm::asm_unit_filter_blocked_homogeneous(loc_filter, dom_level, space, mesh_parts);
+      }
+
+      template<typename DomainLevel_, typename Space_, typename Function_>
+      void assemble_velocity_unit_filter(const DomainLevel_& dom_level, const Space_& space, const String& name, const String& mesh_parts, const Function_& function)
+      {
+        auto& loc_filter = get_local_velo_unit_filter_seq().find_or_add(name);
+        loc_filter.clear();
+        Asm::asm_unit_filter_blocked(loc_filter, dom_level, space, mesh_parts, function);
+      }
+
+      template<typename DomainLevel_, typename Space_>
+      void assemble_velocity_slip_filter(const DomainLevel_& dom_level, const Space_& space, const String& name, const String& mesh_parts)
+      {
+        auto& loc_filter = get_local_velo_slip_filter_seq().find_or_add(name);
+        loc_filter.clear();
+        Asm::asm_slip_filter(loc_filter, dom_level, space, mesh_parts);
+        Asm::sync_slip_filter(this->gate_velo, loc_filter);
+      }
+
       template<typename SpacePres_>
       void assemble_pressure_mean_filter(const SpacePres_& space_pres, const String& cubature_name)
       {
-        // create two global vectors
-        typename BaseClass::GlobalPresVector vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
-
-        // fetch the local vectors
-        typename BaseClass::LocalPresVector& vec_loc_v = vec_glob_v.local();
-        typename BaseClass::LocalPresVector& vec_loc_w = vec_glob_w.local();
-
-        // fetch the frequency vector of the pressure gate
-        typename BaseClass::LocalPresVector& vec_loc_f = this->gate_pres._freqs;
-
-        // assemble the mean filter
-        Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space_pres, cubature_name);
-
-        // synchronize the vectors
-        vec_glob_v.sync_1();
-        vec_glob_w.sync_0();
-
-        // build the mean filter
-        this->get_local_pres_mean_filter() = LocalPresMeanFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
+        this->get_local_pres_mean_filter() = Asm::asm_mean_filter(this->gate_pres, space_pres, cubature_name);
       }
 
       void sync_velocity_slip_filters()
       {
-        // Sync the filter vector in the SlipFilter
-        const typename BaseClass::VeloGate& my_col_gate(this->gate_velo);
-
-        // For all slip filters...
         for(auto& it : get_local_velo_slip_filter_seq())
+          Asm::sync_slip_filter(this->gate_velo, it.second);
+      }
+
+      void compile_local_matrix_sys_type1()
+      {
+        BaseClass::compile_local_matrix_sys_type1();
+        for(const auto& loc_fil : get_local_velo_unit_filter_seq())
         {
-          // get the filter vector
-          auto& slip_filter_vector = it.second.get_filter_vector();
-
-          if(slip_filter_vector.used_elements() > 0)
-          {
-            // Temporary DenseVector for syncing
-            typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
-
-            auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-            auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
-
-            // Copy sparse filter vector contents to DenseVector
-            for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-            {
-              Index idense(slip_filter_vector.indices()[isparse]);
-              tmp_elements[idense] = sfv_elements[isparse];
-            }
-
-            my_col_gate.sync_0(tmp);
-            // Copy sparse filter vector contents to DenseVector
-            for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-            {
-              Index idense(slip_filter_vector.indices()[isparse]);
-              tmp_elements[idense].normalize();
-              sfv_elements[isparse] = tmp_elements[idense];
-            }
-          }
-          else
-          {
-            // Temporary DenseVector for syncing
-            typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType_(0));
-            my_col_gate.sync_0(tmp);
-          }
+          loc_fil.second.filter_mat(this->local_matrix_sys_type1.block_a());
+          loc_fil.second.filter_offdiag_row_mat(this->local_matrix_sys_type1.block_b());
         }
       }
     }; // class StokesBlockedCombinedSystemLevel<...>

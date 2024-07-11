@@ -72,17 +72,25 @@ namespace PoissonDirichlet
 
     TimeStamp stamp_ass;
 
-    comm.print("Assembling gates, muxers and transfers...");
+    comm.print("Assembling gates...");
 
     for (Index i(0); i < num_levels; ++i)
     {
       domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gate(domain.at(i));
-      if((i+1) < domain.size_virtual())
-      {
-        system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
+    }
+
+    /* ***************************************************************************************** */
+
+    comm.print("Assembling transfers...");
+
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
+    {
+      system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
+      if((i+1) < domain.size_physical())
+        system_levels.at(i)->assemble_transfer(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature);
+      else
         system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
-      }
     }
 
     /* ***************************************************************************************** */

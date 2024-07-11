@@ -73,10 +73,12 @@ namespace FEAT
       typedef typename LocalVector_::DataType DataType;
       /// the index type
       typedef typename LocalVector_::IndexType IndexType;
-      /// the internal buffer vector type (possibly in device memory)
+      /// the local vector type
+      typedef LocalVector_ LocalVectorType;
+      /// the mirror type
+      typedef Mirror_ MirrorType;
+      /// the internal buffer vector type
       typedef LAFEM::DenseVector<DataType, IndexType> BufferType;
-      /// the internal buffer vector type in main memory
-      typedef LAFEM::DenseVector<DataType, IndexType> BufferMain;
 
       /// Our 'base' class type
       template <typename LocalVector2_, typename Mirror2_>
@@ -284,6 +286,26 @@ namespace FEAT
       }
 
       /**
+       * \brief Returns the parent rank
+       *
+       * \returns The parent rank
+       */
+      int get_parent_rank() const
+      {
+        return _parent_rank;
+      }
+
+      /**
+       * \brief Returns the parent mirror
+       *
+       * \returns The parent mirror
+       */
+      const Mirror_& get_parent_mirror() const
+      {
+        return _parent_mirror;
+      }
+
+      /**
        * \brief Adds a child rank and mirror for a parent process.
        *
        * \param[in] child_mirror
@@ -292,6 +314,16 @@ namespace FEAT
       void push_child(Mirror_&& child_mirror)
       {
         _child_mirrors.push_back(std::forward<Mirror_>(child_mirror));
+      }
+
+      /**
+       * \brief Returns the child mirror vector
+       *
+       * \returns The child mirror vector
+       */
+      const std::vector<Mirror_>& get_child_mirrors() const
+      {
+        return _child_mirrors;
       }
 
       /**
@@ -347,25 +379,15 @@ namespace FEAT
         XASSERT(_sibling_comm->size() > 1);
         XASSERT(_sibling_comm->rank() != _parent_rank); // parent must call join() instead
 
-        TimeStamp ts_execute;
-
         // create parent buffer in device memory
         BufferType parent_buffer(_buffer_size);
 
         // gather source to parent buffer
         _parent_mirror.gather(parent_buffer, vec_src);
 
-        // convert buffer to main memory
-        BufferMain parent_buffer_main;
-        parent_buffer_main.convert(parent_buffer);
-
-        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
-
         // gather to parent sibling
-        TimeStamp ts_collective;
         DataType* dummy = nullptr;
-        _sibling_comm->gather(parent_buffer_main.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
-        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
+        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
       }
 
       /**
@@ -390,35 +412,19 @@ namespace FEAT
         XASSERT(_sibling_comm->size() > 0);
         XASSERT(_sibling_comm->rank() == _parent_rank);
 
-        TimeStamp ts_execute;
-
         const Index num_children = Index(_child_mirrors.size());
 
-        // create parent buffer in device memory
+        // allocate parent buffer
         BufferType parent_buffer(_buffer_size);
 
         // gather source to parent buffer
         _parent_mirror.gather(parent_buffer, vec_src);
 
-        // convert buffer to main memory
-        BufferMain parent_buffer_main;
-        parent_buffer_main.convert(parent_buffer);
-
         // allocate child buffers
-        BufferMain child_buffers_main(_buffer_size * num_children);
-
-        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
+        BufferType child_buffers(_buffer_size * num_children);
 
         // gather from siblings
-        TimeStamp ts_collective;
-        _sibling_comm->gather(parent_buffer_main.elements(), _buffer_size, child_buffers_main.elements(), _buffer_size, _parent_rank);
-        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
-
-        ts_execute.stamp();
-
-        // download child buffers to device memory
-        BufferType child_buffers;
-        child_buffers.convert(child_buffers_main);
+        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, child_buffers.elements(), _buffer_size, _parent_rank);
 
         // format target vector
         vec_trg.format();
@@ -429,7 +435,6 @@ namespace FEAT
           // scatter buffers
           _child_mirrors.at(i).scatter_axpy(vec_trg, child_buffers, DataType(1), i*_buffer_size);
         }
-        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
       }
 
       /**
@@ -449,24 +454,15 @@ namespace FEAT
         XASSERT(_sibling_comm->rank() != _parent_rank); // parent must call split() instead
 
         // allocate parent buffer
-        BufferMain parent_buffer_main(_buffer_size);
+        BufferType parent_buffer(_buffer_size);
 
         // receive scatter from parent sibling
-        TimeStamp ts_collective;
         DataType* dummy = nullptr;
-        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer_main.elements(), _buffer_size, _parent_rank);
-        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
-
-        TimeStamp ts_execute;
-
-        // convert to device memory
-        BufferType parent_buffer;
-        parent_buffer.convert(parent_buffer_main);
+        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer.elements(), _buffer_size, _parent_rank);
 
         // scatter into target vector
         vec_trg.format();
         _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
-        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
       }
 
       /**
@@ -504,31 +500,15 @@ namespace FEAT
           _child_mirrors.at(i).gather(child_buffers, vec_src, i*_buffer_size);
         }
 
-        // convert child buffers to main memory
-        BufferMain child_buffers_main;
-        child_buffers_main.convert(child_buffers);
-
         // create parent buffer
-        BufferMain parent_buffer_main(_buffer_size);
-
-        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
+        BufferType parent_buffer(_buffer_size);
 
         // scatter to siblings
-        TimeStamp ts_collective;
-        _sibling_comm->scatter(child_buffers_main.elements(), _buffer_size, parent_buffer_main.elements(), _buffer_size, _parent_rank);
-        Statistics::add_time_mpi_wait_collective(ts_collective.elapsed_now());
-
-        ts_execute.stamp();
-
-        // convert to device memory
-        BufferType parent_buffer;
-        parent_buffer.convert(parent_buffer_main);
+        _sibling_comm->scatter(child_buffers.elements(), _buffer_size, parent_buffer.elements(), _buffer_size, _parent_rank);
 
         // scatter into target vector
         vec_trg.format();
         _parent_mirror.scatter_axpy(vec_trg, parent_buffer);
-
-        Statistics::add_time_mpi_execute_collective(ts_execute.elapsed_now());
       }
     }; // class Muxer<...>
   } // namespace Global

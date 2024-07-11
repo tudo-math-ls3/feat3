@@ -163,6 +163,10 @@ namespace FEAT
       {
       }
 
+      // no copies, no problems
+      StokesPowerSystemLevel(const StokesPowerSystemLevel&) = delete;
+      StokesPowerSystemLevel& operator=(const StokesPowerSystemLevel&) = delete;
+
       virtual ~StokesPowerSystemLevel()
       {
       }

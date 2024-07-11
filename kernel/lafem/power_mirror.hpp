@@ -167,6 +167,20 @@ namespace FEAT
         this->_sub_mirror.convert(other._sub_mirror);
       }
 
+      /**
+       * \brief Creates and returns an empty mirror
+       *
+       * \param[in] tmpl_vec
+       * A \transient reference to a template vector to get the correct size from
+       *
+       * \returns The new empty mirror
+       */
+      template<typename SubVector_>
+      static PowerMirror make_empty(const PowerVector<SubVector_, count_>& tmpl_vec)
+      {
+        return PowerMirror(SubMirrorType::make_empty(tmpl_vec.first()));
+      }
+
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {

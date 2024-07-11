@@ -129,13 +129,40 @@ namespace FEAT
        *
        * \returns The new identity mirror
        */
-      static VectorMirror make_identity(IndexType size_in)
+      static VectorMirror make_identity(Index size_in)
       {
         VectorMirror mir(size_in, size_in);
         IndexType* idx = mir.indices();
-        for(IndexType i(0); i < size_in; ++i)
-          idx[i] = i;
+        for(Index i(0); i < size_in; ++i)
+          idx[i] = IndexType(i);
         return mir;
+      }
+
+      /**
+       * \brief Creates and returns an empty mirror
+       *
+       * \param[in] tmpl_vec
+       * A \transient reference to a template vector to get the correct size from
+       *
+       * \returns The new empty mirror
+       */
+      static VectorMirror make_empty(const DenseVector<DT_, IT_>& tmpl_vec)
+      {
+        return VectorMirror(tmpl_vec.size(), 0u);
+      }
+
+      /**
+       * \brief Creates and returns an empty mirror
+       *
+       * \param[in] tmpl_vec
+       * A \transient reference to a template vector to get the correct size from
+       *
+       * \returns The new empty mirror
+       */
+      template<int block_size_>
+      static VectorMirror make_empty(const DenseVectorBlocked<DT_, IT_, block_size_>& tmpl_vec)
+      {
+        return VectorMirror(tmpl_vec.template size<LAFEM::Perspective::native>(), 0u);
       }
 
       /**

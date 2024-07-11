@@ -373,7 +373,7 @@ namespace HierarchTransferTestApp
     comm.print("\nVirtual Levels:");
     comm.allprint(domain.dump_virt_levels());
 
-    Cubature::DynamicFactory cubature("auto-degree:5");
+    String cubature("auto-degree:5");
 
     std::deque<std::shared_ptr<SystemLevelType>> system;
 
@@ -381,19 +381,15 @@ namespace HierarchTransferTestApp
     {
       system.push_back(std::make_shared<SystemLevelType>());
       system.at(i)->assemble_gate(domain.at(i));
-      if((i+1) < domain.size_virtual())
-      {
-        system.at(i)->assemble_coarse_muxer(domain.at(i+1));
-        system.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
-      }
     }
 
-    for(std::size_t i(0); i < domain.size_physical(); ++i)
+    for (std::size_t i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
     {
-      if(i+1 < domain.size_physical())
-        system.at(i)->assemble_truncation(domain.at(i), domain.at(i+1), cubature, system.at(i+1).get());
-      else if(i+1 < domain.size_virtual())
-        system.at(i)->assemble_truncation(domain.at(i), domain.at(i+1), cubature);
+      system.at(i)->assemble_coarse_muxer(domain.at(i+1));
+      if((i+1) < domain.size_physical())
+        system.at(i)->assemble_transfer(*system.at(i+1), domain.at(i), domain.at(i+1), cubature, true);
+      else
+        system.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature, true);
     }
 
     comm.print(String(60, '='));

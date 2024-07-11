@@ -101,6 +101,25 @@ namespace FEAT
     {
       return TimeStamp::format_micros(elapsed_micros(), format);
     }
+
+    /**
+     * \brief Returns the formatted percentage that this stop watch elapsed time relative to another total runtime stop watch
+     *
+     * \param[in] total_watch
+     * The stop watch that represents the total runtime
+     *
+     * \param[in] prefix
+     * The prefix string
+     *
+     * \param[in] postfix
+     * The postfix string
+     *
+     * \returns The formatted percentage of this stop watch elapsed time relative to watch_total
+     */
+    String percent_of(const StopWatch& total_watch, const String& prefix = " [", const String& postfix = "% ]") const
+    {
+      return prefix + stringify_fp_fix(100.0 * this->elapsed() / total_watch.elapsed(), 3, 7) + postfix;
+    }
   }; // class StopWatch
 } // namespace FEAT
 

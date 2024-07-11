@@ -15,6 +15,8 @@
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/mean_filter.hpp>
 #include <kernel/lafem/none_filter.hpp>
+#include <kernel/lafem/filter_chain.hpp>
+#include <kernel/lafem/filter_sequence.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/transfer.hpp>
 #include <kernel/global/gate.hpp>
@@ -33,12 +35,20 @@
 #include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
+#include <kernel/analytic/lambda_function.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/voxel_assembly/poisson_assembler.hpp>
 
 #include <control/domain/domain_control.hpp>
+#include <control/asm/gate_asm.hpp>
+#include <control/asm/muxer_asm.hpp>
+#include <control/asm/splitter_asm.hpp>
+#include <control/asm/transfer_asm.hpp>
+#include <control/asm/transfer_voxel_asm.hpp>
+#include <control/asm/mean_filter_asm.hpp>
+#include <control/asm/unit_filter_asm.hpp>
 
 #include <deque>
 
@@ -121,6 +131,10 @@ namespace FEAT
       {
       }
 
+      // no copies, no problems
+      ScalarBasicSystemLevel(const ScalarBasicSystemLevel&) = delete;
+      ScalarBasicSystemLevel& operator=(const ScalarBasicSystemLevel&) = delete;
+
       virtual ~ScalarBasicSystemLevel()
       {
       }
@@ -145,283 +159,85 @@ namespace FEAT
       template<typename DomainLevel_, typename SpaceType_>
       void assemble_gate(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl, const SpaceType_& space)
       {
-        const auto& dom_level = virt_dom_lvl.level();
-        const auto& dom_layer = virt_dom_lvl.layer();
-
-        // set the gate comm
-        this->gate_sys.set_comm(dom_layer.comm_ptr());
-
-        // loop over all ranks
-        for(Index i(0); i < dom_layer.neighbor_count(); ++i)
-        {
-          int rank = dom_layer.neighbor_rank(i);
-
-          // try to find our halo
-          auto* halo = dom_level.find_halo_part(rank);
-          if(halo == nullptr) continue;
-          XASSERT(halo != nullptr);
-
-          // assemble the mirror
-          SystemMirror mirror_sys;
-          Assembly::MirrorAssembler::assemble_mirror(mirror_sys, space, *halo);
-
-          // push mirror into gate
-          this->gate_sys.push(rank, std::move(mirror_sys));
-        }
-
-        // create local template vector
-        LocalSystemVector tmpl_s(space.get_num_dofs());
-
-        // compile gate
-        this->gate_sys.compile(std::move(tmpl_s));
+        Asm::asm_gate(virt_dom_lvl, space, this->gate_sys, true);
       }
 
       template<typename DomainLevel_>
       void assemble_gate(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl)
       {
-        assemble_gate(virt_dom_lvl, virt_dom_lvl->space);
+        Asm::asm_gate(virt_dom_lvl, virt_dom_lvl->space, this->gate_sys, true);
       }
 
       template<typename DomainLevel_>
       void assemble_coarse_muxer(const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse)
       {
-        // assemble muxer parent
-        if(virt_lvl_coarse.is_parent())
-        {
-          XASSERT(virt_lvl_coarse.is_child());
-
-          const auto& layer_c = virt_lvl_coarse.layer_c();
-          const DomainLevel_& level_p = virt_lvl_coarse.level_p();
-
-          // loop over all children
-          for(Index i(0); i < layer_c.child_count(); ++i)
-          {
-            const auto* child = level_p.find_patch_part(int(i));
-            XASSERT(child != nullptr);
-            SystemMirror child_mirror;
-            Assembly::MirrorAssembler::assemble_mirror(child_mirror, level_p.space, *child);
-            this->coarse_muxer_sys.push_child(std::move(child_mirror));
-          }
-        }
-
-        // assemble muxer child
-        if(virt_lvl_coarse.is_child())
-        {
-          const auto& layer_c = virt_lvl_coarse.layer_c();
-          const DomainLevel_& level_c = virt_lvl_coarse.level_c();
-
-          // manually set up an identity gather/scatter matrix
-          Index n = level_c.space.get_num_dofs();
-          SystemMirror parent_mirror(n, n);
-          auto* idx = parent_mirror.indices();
-          for(Index i(0); i < n; ++i)
-            idx[i] = i;
-
-          // set parent and sibling comms
-          this->coarse_muxer_sys.set_parent(
-            layer_c.sibling_comm_ptr(),
-            layer_c.get_parent_rank(),
-            std::move(parent_mirror)
-          );
-
-          // compile muxer
-          LocalSystemVector vec_tmp(level_c.space.get_num_dofs());
-          this->coarse_muxer_sys.compile(vec_tmp);
-        }
+        Asm::asm_muxer(virt_lvl_coarse, [](const DomainLevel_& dl){return &dl.space;}, this->coarse_muxer_sys);
       }
 
       template<typename DomainLevel_>
       void assemble_base_splitter(const Domain::VirtualLevel<DomainLevel_>& virt_lvl)
       {
-        // get the layer
-        const auto& layer = virt_lvl.layer();
-
-        // nothing to assemble?
-        if(layer.comm().size() <= 1)
-          return;
-
-        // ensure that this virtual level has a base-mesh
-        XASSERTM(virt_lvl.has_base(), "cannot assemble base splitter because level has no base");
-
-        // is this the root process?
-        if(layer.comm().rank() == 0)
-        {
-          const DomainLevel_& level_b = virt_lvl.level_b();
-
-          // set parent vector template
-          this->base_splitter_sys.set_base_vector_template(LocalSystemVector(level_b.space.get_num_dofs()));
-
-          // assemble patch mirrors on root process
-          for(int i(0); i < layer.comm().size(); ++i)
-          {
-            const auto* patch = level_b.find_patch_part(i);
-            XASSERT(patch != nullptr);
-            SystemMirror patch_mirror;
-            Assembly::MirrorAssembler::assemble_mirror(patch_mirror, level_b.space, *patch);
-            this->base_splitter_sys.push_patch(std::move(patch_mirror));
-          }
-        }
-
-        // assemble muxer child
-        const DomainLevel_& level = virt_lvl.level();
-
-        // manually set up an identity gather/scatter matrix
-        Index n = level.space.get_num_dofs();
-        SystemMirror root_mirror(n, n);
-        auto* idx = root_mirror.indices();
-        for(Index i(0); i < n; ++i)
-          idx[i] = i;
-
-        // set parent and sibling comms
-        this->base_splitter_sys.set_root(layer.comm_ptr(), 0, std::move(root_mirror));
-
-        // compile muxer
-        LocalSystemVector vec_tmp(level.space.get_num_dofs());
-        this->base_splitter_sys.compile(vec_tmp);
+        Asm::asm_splitter(virt_lvl, [](const DomainLevel_& dl){return &dl.space;}, this->base_splitter_sys);
       }
 
-      template<typename DomainLevel_, typename Cubature_>
+      template<typename DomainLevel_>
+      void assemble_transfer(
+        const ScalarBasicSystemLevel& sys_lvl_coarse,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
+        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
+        const String& cubature, bool trunc = false, bool shrink = true)
+      {
+        Asm::asm_transfer_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+          [](const DomainLevel_& dl) {return &dl.space;},
+          this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, sys_lvl_coarse.gate_sys);
+
+        this->transfer_sys.compile();
+      }
+
+      template<typename DomainLevel_>
       void assemble_transfer(
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
         const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature)
-      {
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
-
-        const auto& space_f = level_f.space;
-        const auto& space_c = level_c.space;
-
-        // get local transfer operator
-        LocalSystemTransfer& loc_trans = this->transfer_sys.local();
-
-        // get local transfer matrices
-        LocalSystemTransferMatrix& loc_prol = loc_trans.get_mat_prol();
-        LocalSystemTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-
-        // assemble structure?
-        if (loc_prol.empty())
-        {
-          Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
-        }
-
-        // create local weight vector
-        LocalSystemVector loc_vec_weight = loc_prol.create_vector_l();
-
-        // assemble prolongation matrix
-        loc_prol.format();
-        loc_vec_weight.format();
-
-        // assemble prolongation matrix
-        Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight, space_f, space_c, cubature);
-
-        // synchronize weight vector using the gate
-        this->gate_sys.sync_0(loc_vec_weight);
-
-        // invert components
-        loc_vec_weight.component_invert(loc_vec_weight);
-
-        // scale prolongation matrix
-        loc_prol.scale_rows(loc_prol, loc_vec_weight);
-
-        // copy and transpose
-        loc_rest = loc_prol.transpose();
-
-        // compile global transfer
-        transfer_sys.compile();
-      }
-
-      template<typename DomainLevel_, typename Cubature_>
-      void assemble_truncation(
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_fine,
-        const Domain::VirtualLevel<DomainLevel_>& virt_lvl_coarse,
-        const Cubature_& cubature,
-        const ScalarBasicSystemLevel* sys_lvl_coarse = nullptr)
+        const String& cubature, bool trunc = false, bool shrink = true)
       {
         // if the coarse level is a parent, then we need the coarse system level
-        XASSERT((sys_lvl_coarse != nullptr) || !virt_lvl_coarse.is_parent());
+        XASSERT(!virt_lvl_coarse.is_parent());
 
-        // get fine and coarse domain levels
-        const DomainLevel_& level_f = *virt_lvl_fine;
-        const DomainLevel_& level_c = virt_lvl_coarse.is_child() ? virt_lvl_coarse.level_c() : *virt_lvl_coarse;
+        Asm::asm_transfer_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+          [](const DomainLevel_& dl) {return &dl.space;},
+          this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, this->gate_sys);
 
-        const auto& space_f = level_f.space;
-        const auto& space_c = level_c.space;
+        this->transfer_sys.compile();
+      }
 
-        // get local transfer operator
-        LocalSystemTransfer& loc_trans = this->transfer_sys.local();
+      template<typename DomainLevel_>
+      void assemble_transfer_voxel(
+        const ScalarBasicSystemLevel& sys_lvl_coarse,
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const String& cubature, bool trunc = false, bool shrink = true)
+      {
+        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+          [](const DomainLevel_& dl) {return &dl.space;},
+          this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, sys_lvl_coarse.gate_sys);
 
-        // get local transfer matrices
-        const LocalSystemTransferMatrix& loc_rest = loc_trans.get_mat_rest();
-        LocalSystemTransferMatrix& loc_trunc = loc_trans.get_mat_trunc();
+        this->transfer_sys.compile();
+      }
 
-        // restriction matrix must be already assembled
-        XASSERTM(loc_rest.size() > Index(0), "you need to call 'assemble_transfer' first");
+      template<typename DomainLevel_>
+      void assemble_transfer_voxel(
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const String& cubature, bool trunc = false, bool shrink = true)
+      {
+        // if the coarse level is a parent, then we need the coarse system level
+        XASSERT(!virt_lvl_coarse.is_parent());
 
-        // clone sparsity pattern of restriction matrix
-        loc_trunc = loc_rest.clone(LAFEM::CloneMode::Layout);
+        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+          [](const DomainLevel_& dl) {return &dl.space;},
+          this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, this->gate_sys);
 
-        // create local weight vector
-        LocalSystemVector loc_vec_weight = loc_trunc.create_vector_l();
-
-        // format
-        loc_trunc.format();
-        loc_vec_weight.format();
-
-        // assemble truncation matrix
-        Assembly::GridTransfer::assemble_truncation(loc_trunc, loc_vec_weight, space_f, space_c, cubature);
-
-        // We now need to synchronize the weight vector in analogy to the prolongation matrix assembly.
-        // Note that the weight vector is now a coarse-level vector, so we need to synchronize over
-        // the coarse-level gate. This may be a bit more complicated if the coarse level is a ghost
-        // level, as in this case we have to join/split around the synch operation.
-
-        // synchronize weight vector using the muxer/gate
-        if(!virt_lvl_coarse.is_child())
-        {
-          // The coarse level is a simple (non-child) level that exists on all processes,
-          // so simply synch over the coarse-level gate:
-          sys_lvl_coarse->gate_sys.sync_0(loc_vec_weight);
-        }
-        else if(virt_lvl_coarse.is_parent())
-        {
-          // The coarse level is a child level and this is one of the parent processes which contain
-          // the coarse-level gate. So we first need to join the weight vector onto the parent processes
-          // first, then synch that joined vector over the parent gate and finally split the result
-          // to all child processes -- this "emulates" a synch over the (non-existent) coarse-level
-          // child gate, which is what we actually require here...
-
-          // create temporary vector on parent partitioning
-          LocalSystemVector loc_tmp = sys_lvl_coarse->gate_sys._freqs.clone(LAFEM::CloneMode::Allocate);
-
-          // join child weights over muxer
-          this->coarse_muxer_sys.join(loc_vec_weight, loc_tmp);
-
-          // sync over coarse gate
-          sys_lvl_coarse->gate_sys.sync_0(loc_tmp);
-
-          // split over muxer
-          this->coarse_muxer_sys.split(loc_vec_weight, loc_tmp);
-        }
-        else // ghost
-        {
-          // The coarse level is a ghost level, i.e. a child but not a parent. In this case, we
-          // only have to participate in the join/send operations of the muxer, which are part
-          // of the operations executed on the parents handled by the else-if case above.
-
-          this->coarse_muxer_sys.join_send(loc_vec_weight);
-
-          // parent performs sync over its gate here (see above else-if)
-
-          this->coarse_muxer_sys.split_recv(loc_vec_weight);
-        }
-
-        // invert components
-        loc_vec_weight.component_invert(loc_vec_weight);
-
-        // scale reduction matrix
-        loc_trunc.scale_rows(loc_trunc, loc_vec_weight);
+        this->transfer_sys.compile();
       }
 
       template<typename Space_, typename Cubature_>
@@ -550,29 +366,7 @@ namespace FEAT
       template<typename DomainLevel_, typename Space_>
       void assemble_homogeneous_unit_filter(const DomainLevel_& dom_level, const Space_& space)
       {
-        auto& loc_filter = this->filter_sys.local();
-
-        // create unit-filter assembler
-        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
-
-        std::deque<String> part_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
-        for(const auto& name : part_names)
-        {
-          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(name);
-          XASSERT(mesh_part_node != nullptr);
-
-          // let's see if we have that mesh part
-          // if it is nullptr, then our patch is not adjacent to that boundary part
-          auto* mesh_part = mesh_part_node->get_mesh();
-          if (mesh_part != nullptr)
-          {
-            // add to boundary assembler
-            unit_asm.add_mesh_part(*mesh_part);
-          }
-        }
-
-        // finally, assemble the filter
-        unit_asm.assemble(loc_filter, space);
+        Asm::asm_unit_filter_scalar_homogeneous(this->filter_sys.local(), dom_level, space, "*");
       }
 
     }; // class ScalarUnitFilterSystemLevel<...>
@@ -636,30 +430,99 @@ namespace FEAT
       template<typename Space_, typename Cubature_>
       void assemble_mean_filter(const Space_& space, const Cubature_& cubature)
       {
-        // get our local system filter
-        LocalSystemFilter& loc_filter = this->filter_sys.local();
-
-        // create two global vectors
-        typename BaseClass::GlobalSystemVector vec_glob_v(&this->gate_sys), vec_glob_w(&this->gate_sys);
-
-        // fetch the local vectors
-        typename BaseClass::LocalSystemVector& vec_loc_v = vec_glob_v.local();
-        typename BaseClass::LocalSystemVector& vec_loc_w = vec_glob_w.local();
-
-        // fetch the frequency vector of the system gate
-        typename BaseClass::LocalSystemVector& vec_loc_f = this->gate_sys._freqs;
-
-        // assemble the mean filter
-        Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space, cubature);
-
-        // synchronize the vectors
-        vec_glob_v.sync_1();
-        vec_glob_w.sync_0();
-
-        // build the mean filter
-        loc_filter = LocalSystemFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_sys.get_comm());
+        this->filter_sys.local() = Asm::asm_mean_filter(this->gate_sys, space, cubature);
       }
     }; // class ScalarMeanFilterSystemLevel<...>
+
+    template<
+      typename DataType_ = Real,
+      typename IndexType_ = Index,
+      typename ScalarMatrix_ = LAFEM::SparseMatrixCSR<DataType_, IndexType_> >
+    class ScalarCombinedSystemLevel :
+      public ScalarBasicSystemLevel<DataType_, IndexType_, ScalarMatrix_>
+    {
+    public:
+      typedef ScalarBasicSystemLevel<DataType_, IndexType_, ScalarMatrix_> BaseClass;
+
+      // basic types
+      typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
+
+      /// define system mirror type
+      typedef LAFEM::VectorMirror<DataType, IndexType> SystemMirror;
+
+      /// define local filter types
+      typedef LAFEM::UnitFilter<DataType, IndexType> LocalUnitFilter;
+      typedef Global::MeanFilter<DataType, IndexType> LocalMeanFilter;
+      typedef LAFEM::FilterSequence<LocalUnitFilter> LocalUnitFilterSeq;
+      typedef LAFEM::FilterChain<LocalUnitFilterSeq, LocalMeanFilter> LocalSystemFilter;
+
+      /// define global filter types
+      typedef Global::Filter<LocalSystemFilter, SystemMirror> GlobalSystemFilter;
+
+      /// Our class base type
+      template <typename DT2_, typename IT2_, typename ScalarMatrix2_>
+      using BaseType = ScalarCombinedSystemLevel<DT2_, IT2_, ScalarMatrix2_>;
+
+      /// our global system filter
+      GlobalSystemFilter filter_sys;
+
+      /// CTOR
+      ScalarCombinedSystemLevel() :
+        BaseClass()
+      {
+      }
+
+      /// \brief Returns the total amount of bytes allocated.
+      std::size_t bytes() const
+      {
+        return BaseClass::bytes() + this->filter_sys.local().bytes();
+      }
+
+      template<typename D_, typename I_, typename SM_>
+      void convert(const ScalarMeanFilterSystemLevel<D_, I_, SM_> & other)
+      {
+        BaseClass::convert(other);
+        filter_sys.convert(other.filter_sys);
+      }
+
+      LocalUnitFilterSeq& get_local_unit_filter_seq()
+      {
+        return this->filter_sys.local().template at<0>();
+      }
+
+      LocalUnitFilter& get_local_unit_filter(const String& name)
+      {
+        return get_local_unit_filter_seq().find_or_add(name);
+      }
+
+      LocalMeanFilter& get_local_mean_filter()
+      {
+        return this->filter_sys.local().template at<1>();
+      }
+
+      template<typename DomainLevel_, typename Space_>
+      void assemble_unit_filter(const DomainLevel_& dom_level, const Space_& space, const String& name, const String& mesh_part_names)
+      {
+        auto& loc_filter = get_local_unit_filter(name);
+        loc_filter.clear();
+        Asm::asm_unit_filter_scalar_homogeneous(loc_filter, dom_level, space, mesh_part_names);
+      }
+
+      template<typename DomainLevel_, typename Space_, typename Function_>
+      void assemble_unit_filter(const DomainLevel_& dom_level, const Space_& space, const String& name, const String& mesh_part_names, const Function_& function)
+      {
+        auto& loc_filter = get_local_unit_filter(name);
+        loc_filter.clear();
+        Asm::asm_unit_filter_scalar(loc_filter, dom_level, space, mesh_part_names, function);
+      }
+
+      template<typename Space_>
+      void assemble_mean_filter(const Space_& space, const String& cubature)
+      {
+        get_local_mean_filter() = Asm::asm_mean_filter(this->gate_sys, space, cubature);
+      }
+    }; // class ScalarCombinedSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
 

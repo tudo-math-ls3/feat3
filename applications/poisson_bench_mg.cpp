@@ -295,15 +295,20 @@ namespace PoissonDirichlet
       domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gate(domain.at(i));
       stats.times[i][Times::asm_gate] += ts.elapsed_now();
-      if((i+1) < domain.size_virtual())
-      {
-        TimeStamp ts2;
-        system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
-        stats.times[i][Times::asm_muxer] += ts2.elapsed_now();
-        TimeStamp ts3;
+      stats.times[i][Times::asm_total] += ts.elapsed_now();
+    }
+
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
+    {
+      TimeStamp ts;
+      system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
+      stats.times[i][Times::asm_muxer] += ts.elapsed_now();
+      TimeStamp ts2;
+      if((i+1) < domain.size_physical())
+        system_levels.at(i)->assemble_transfer(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature);
+      else
         system_levels.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
-        stats.times[i][Times::asm_transfer] += ts3.elapsed_now();
-      }
+      stats.times[i][Times::asm_transfer] += ts2.elapsed_now();
       stats.times[i][Times::asm_total] += ts.elapsed_now();
     }
 

@@ -192,8 +192,6 @@
 // \author Peter Zajac
 //
 #pragma once
-#include "applications/ccnd/ccnd_common.hpp"
-#include <iterator>
 #ifndef APPLICATIONS_CCND_STEADY_APPBASE_HPP
 #define APPLICATIONS_CCND_STEADY_APPBASE_HPP 1
 
@@ -726,13 +724,6 @@ namespace CCND
         // assemble gates
         sys_lvl.assemble_gates(domain.at(i));
 
-        // assemble trafo and muxers
-        if((i+1) < domain.size_virtual())
-        {
-          sys_lvl.assemble_coarse_muxers(domain.at(i+1));
-          sys_lvl.assemble_transfers(domain.at(i), domain.at(i+1), cubature_transfer);
-        }
-
         // assemble matrix structures
         sys_lvl.assemble_velo_struct(dom_lvl.space_velo);
         sys_lvl.assemble_pres_struct(dom_lvl.space_pres);
@@ -747,21 +738,18 @@ namespace CCND
         sys_lvl.compile_system_matrix();
       }
 
-      // need velocity truncation matrices?
-      if(need_velocity_truncation)
+      // assemble muxers and transfers
+      for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
       {
-        for (Index i(0); i < num_levels; ++i)
-        {
-          if(i+1 < num_levels)
-            system.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature_transfer, system.at(i+1).get());
-          else if(i+1 < domain.size_virtual())
-            system.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature_transfer);
-        }
+        system.at(i)->assemble_coarse_muxers(domain.at(i+1));
+        if((i+1) < domain.size_physical())
+          system.at(i)->assemble_transfers(*system.at(i+1), domain.at(i), domain.at(i+1), cubature_transfer, need_velocity_truncation);
+        else
+          system.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature_transfer, need_velocity_truncation);
       }
 
       // assemble base splitter on finest level if required
       if(need_base_splitter)
-        //  system.front()->assemble_base_splitters(domain.front());
       {
         for (Index i(0); i < num_levels; ++i)
           system.at(i)->assemble_base_splitters(domain.at(i));

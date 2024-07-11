@@ -66,6 +66,9 @@ namespace FEAT
       /// our local vector type
       typedef LocalVector_ LocalVectorType;
 
+      /// our mirror type
+      typedef Mirror_ MirrorType;
+
       /// our global vector type
       typedef Global::Vector<LocalVector_, Mirror_> GlobalVectorType;
 
@@ -87,6 +90,12 @@ namespace FEAT
       Splitter(Splitter&& other) :
         _muxer(std::forward<MuxerType>(other._muxer)),
         _base_vector_tmpl(std::forward<LocalVector_>(other._base_vector_tmpl))
+      {
+      }
+
+      explicit Splitter(MuxerType&& muxer, LocalVector_&& base_vector_tmpl) :
+        _muxer(std::forward<MuxerType>(muxer)),
+        _base_vector_tmpl(std::forward<LocalVector_>(base_vector_tmpl))
       {
       }
 
@@ -223,6 +232,18 @@ namespace FEAT
       void set_base_vector_template(LocalVector_&& vector_template)
       {
         _base_vector_tmpl = std::forward<LocalVector_>(vector_template);
+      }
+
+      /// Returns the base vector template
+      const LocalVector_& get_base_vector_template() const
+      {
+        return _base_vector_tmpl;
+      }
+
+      /// Returns the internal muxer
+      const MuxerType& get_muxer() const
+      {
+        return _muxer;
       }
 
       /**

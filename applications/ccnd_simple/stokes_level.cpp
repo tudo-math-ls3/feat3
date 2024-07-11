@@ -125,35 +125,8 @@ namespace CCNDSimple
     filter.clear();
     slip_filter_asm.assemble(filter, this->domain_level.space_velo);
 
-    // now we need to synchronize it
-
-    // get the filter vector
-    auto& slip_filter_vector = filter.get_filter_vector();
-
-    // create temporary vector for syncing
-    typename BaseClass::LocalVeloVector tmp(slip_filter_vector.size(), DataType(0));
-
-    if(slip_filter_vector.used_elements() > 0)
-    {
-      auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-      auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
-      const auto* sfv_idx = slip_filter_vector.indices();
-
-      // copy sparse filter vector contents to DenseVector
-      for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-        tmp_elements[sfv_idx[isparse]] = sfv_elements[isparse];
-
-      // synchronize over velocity gate
-      this->gate_velo.sync_0(tmp);
-
-      // copy normalized DenseVector contents to sparse filter vector
-      for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-        sfv_elements[isparse] = tmp_elements[sfv_idx[isparse]].normalize();
-    }
-    else
-    {
-      this->gate_velo.sync_0(tmp);
-    }
+    // synchronize the slip filters
+    this->sync_velocity_slip_filters();
   }
 
   void StokesLevel::assemble_pressure_mean_filter(const String& cubature)

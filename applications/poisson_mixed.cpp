@@ -321,12 +321,15 @@ namespace PoissonMixed
 
     /* ***************************************************************************************** */
 
-    comm.print("Assembling transfers...");
+    comm.print("Assembling muxers and transfers...");
 
-    for (Index i(0); (i+1) < domain.size_virtual(); ++i)
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
     {
       system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-      system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
+      if((i+1) < domain.size_physical())
+        system_levels.at(i)->assemble_transfers(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature);
+      else
+        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
     }
 
     /* ***************************************************************************************** */

@@ -33,7 +33,6 @@
 
 #include <control/domain/voxel_domain_control.hpp>
 #include <control/stokes_blocked.hpp>
-#include <control/voxel_transfer_assembler.hpp>
 #include <control/statistics.hpp>
 
 #include <vector>
@@ -407,23 +406,21 @@ namespace StokesVoxelYPipe
       domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
       stats.times[i][Times::asm_gate] += ts.elapsed_now();
-      if((i+1) < domain.size_virtual())
-      {
-        TimeStamp ts2;
-        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-        stats.times[i][Times::asm_muxer] += ts2.elapsed_now();
-      }
       stats.times[i][Times::asm_total] += ts.elapsed_now();
     }
 
-    for (Index i(0); i < num_levels; ++i)
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
     {
-      TimeStamp ts3;
-      if((i+1) < num_levels)
-        Control::VoxelTransferAssembler::assemble_stokes_blocked_transfers(*system_levels.at(i), *system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature, true, true, true);
-      else if((i+1) < domain.size_virtual())
-        Control::VoxelTransferAssembler::assemble_stokes_blocked_transfers(*system_levels.at(i), domain.at(i), domain.at(i+1), cubature, true, true, true);
-      stats.times[i][Times::asm_transfer] += ts3.elapsed_now();
+      TimeStamp ts;
+      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      stats.times[i][Times::asm_muxer] += ts.elapsed_now();
+      TimeStamp ts2;
+      if((i+1) < domain.size_physical())
+        system_levels.at(i)->assemble_transfers_voxel(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature);
+      else
+        system_levels.at(i)->assemble_transfers_voxel(domain.at(i), domain.at(i+1), cubature);
+      stats.times[i][Times::asm_transfer] += ts2.elapsed_now();
+      stats.times[i][Times::asm_total] += ts.elapsed_now();
     }
 
     /* ***************************************************************************************** */

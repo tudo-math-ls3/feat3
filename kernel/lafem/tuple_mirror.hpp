@@ -126,6 +126,20 @@ namespace FEAT
         this->_rest.convert(other._rest);
       }
 
+      /**
+       * \brief Creates and returns an empty mirror
+       *
+       * \param[in] tmpl_vec
+       * A \transient reference to a template vector to get the correct size from
+       *
+       * \returns The new empty mirror
+       */
+      template<typename Tv_, typename... Tw_>
+      static TupleMirror make_empty(const TupleVector<Tv_, Tw_...>& tmpl_vec)
+      {
+        return TupleMirror(First_::make_empty(tmpl_vec.first()), RestClass::make_empty(tmpl_vec.rest()));
+      }
+
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
@@ -306,6 +320,12 @@ namespace FEAT
       void convert(const TupleMirror<SubMirror2_>& other)
       {
         this->_first.convert(other._first);
+      }
+
+      template<typename Tv_>
+      static TupleMirror make_empty(const TupleVector<Tv_>& tmpl_vec)
+      {
+        return TupleMirror(First_::make_empty(tmpl_vec.first()));
       }
 
       /// \brief Returns the total amount of bytes allocated.

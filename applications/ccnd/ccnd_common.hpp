@@ -47,6 +47,7 @@
 #include <control/statistics.hpp>
 
 #include <vector>
+#include <iterator>
 
 #ifndef FEAT_CCND_APP_DIM
 #error FEAT_CCND_APP_DIM must be defined to either 2 or 3

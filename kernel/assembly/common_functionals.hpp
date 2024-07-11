@@ -195,7 +195,23 @@ namespace FEAT
           void set_point(const TrafoData& tau)
           {
             // compute the function hessian's trace (=laplacian)
-            _func_laplace = - _func_eval.hessian(tau.img_point).trace();
+            //_func_laplace = - _func_eval.hessian(tau.img_point).trace();
+            calc_trace(_func_eval.hessian(tau.img_point));
+          }
+
+          template<typename T_, int m_, int n_, int sm_, int sn_>
+          void calc_trace(const Tiny::Matrix<T_, m_, n_, sm_, sn_>& hess)
+          {
+            _func_laplace = - hess.trace();
+          }
+
+          template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
+          void calc_trace(const Tiny::Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& hess)
+          {
+            _func_laplace.format();
+            for(int i(0); i < hess.l; ++i)
+              for(int j(0); j < hess.m; ++j)
+                _func_laplace[i] -= hess[i][j][j];
           }
 
           // copy pasted since Doxygen does not like the operator part in

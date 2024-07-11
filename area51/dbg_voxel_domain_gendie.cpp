@@ -7,7 +7,6 @@
 
 #include <control/domain/voxel_domain_control.hpp>
 #include <control/scalar_basic.hpp>
-#include <control/voxel_transfer_assembler.hpp>
 
 namespace DbgAdaptDrop
 {

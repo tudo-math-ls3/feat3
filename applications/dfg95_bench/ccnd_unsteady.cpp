@@ -514,17 +514,21 @@ namespace DFG95
 
     TimeStamp stamp_ass;
 
-    // assemble gates, muxers and transfers
+    // assemble gates
     for (Index i(0); i < num_levels; ++i)
     {
       domain.at(i)->domain_asm.compile_all_elements();
       system_levels.at(i)->assemble_gates(domain.at(i));
+    }
 
-      if((i+1) < domain.size_virtual())
-      {
-        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
-      }
+    // assemble muxers and transfers
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
+    {
+      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      if((i+1) < domain.size_physical())
+        system_levels.at(i)->assemble_transfers(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature, true);
+      else
+        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature, true);
     }
 
     // assemble base splitter on finest level if required
@@ -532,16 +536,6 @@ namespace DFG95
       ||(args.check("save-joined-pres") >= 0) || (args.check("save-joined-velo") >= 0))
     {
       system_levels.front()->assemble_base_splitters(domain.front());
-    }
-
-    // assemble velocity truncation operators -- we need those for the assembly of the
-    // non-linear burgers operators on the coarser levels
-    for (Index i(0); i < num_levels; ++i)
-    {
-      if(i+1 < num_levels)
-        system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature, system_levels.at(i+1).get());
-      else if(i+1 < domain.size_virtual())
-        system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature);
     }
 
     // collect some finest-level statistics

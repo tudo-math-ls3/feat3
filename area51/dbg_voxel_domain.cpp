@@ -7,7 +7,6 @@
 
 #include <control/domain/voxel_domain_control.hpp>
 #include <control/scalar_basic.hpp>
-#include <control/voxel_transfer_assembler.hpp>
 
 namespace DbgVoxelDomain
 {
@@ -140,8 +139,7 @@ int main(int argc, char** argv)
       //comm.print(m + v);
     }
 
-    continue;
-    if((i+1) < domain.size_virtual())
+    /*if((i+1) < domain.size_virtual())
     {
       system.at(i)->assemble_coarse_muxer(domain.at(i+1));
       //system.at(i)->assemble_transfer(domain.at(i), domain.at(i+1), cubature);
@@ -150,6 +148,7 @@ int main(int argc, char** argv)
     }
     vectors.at(i) = typename SystemLevelType::GlobalSystemVector(&system.at(i)->gate_sys,
       system.at(i)->gate_sys._freqs.clone(LAFEM::CloneMode::Layout));
+    */
   }
 
   /*

@@ -1,12 +1,11 @@
-
 // FEAT3: Finite Element Analysis Toolbox, Version 3
-// Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
+// Copyright (C) 2010 - 2024 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ANALYTIC_DISTANCE_HPP
-#define KERNEL_ANALYTIC_DISTANCE_HPP 1
+#ifndef KERNEL_ANALYTIC_DISTANCE_FUNCTION_HPP
+#define KERNEL_ANALYTIC_DISTANCE_FUNCTION_HPP 1
 
 // includes, FEAT
 #include <kernel/analytic/static_wrapper.hpp>
@@ -455,10 +454,8 @@ namespace FEAT
           }
         }; // class CGALDistFunc::Evaluator<...>
       }; // class CGALDistFunc<...>
-#endif
-
-    }
-
-  }
-}
-#endif
+#endif // FEAT_HAVE_CGAL
+    } // namespace Distance
+  } // namespace Analytic
+} // namespace FEAT
+#endif // KERNEL_ANALYTIC_DISTANCE_FUNCTION_HPP

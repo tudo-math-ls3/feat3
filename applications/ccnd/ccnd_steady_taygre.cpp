@@ -140,6 +140,10 @@ namespace CCND
         // assemble pressure mean filter
         system.at(i)->assemble_pressure_mean_filter(domain.at(i)->space_pres, false);
 
+        // synchronize slip filters
+        if(slip_bc)
+          system.at(i)->sync_velocity_slip_filters();
+
         // compile system filter
         system.at(i)->compile_system_filter();
       }

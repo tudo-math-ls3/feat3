@@ -1296,7 +1296,8 @@ namespace NavierStokesPP
       system_levels.push_back(std::make_shared<SystemLevelType>());
     }
 
-    Cubature::DynamicFactory cubature("auto-degree:7");
+    String cubature_name("auto-degree:7");
+    Cubature::DynamicFactory cubature(cubature_name);
 
     // compute time-step size
     DataType delta_t = cfg.time_max / DataType(cfg.time_steps);
@@ -1309,21 +1310,15 @@ namespace NavierStokesPP
     for (Index i(0); i < num_levels; ++i)
     {
       system_levels.at(i)->assemble_gates(domain.at(i));
-      if((i+1) < domain.size_virtual())
-      {
-        system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
-      }
     }
 
-    // assemble velocity truncation operators -- we need those for the assembly of the
-    // non-linear burgers operators on the coarser levels
-    for (Index i(0); i < num_levels; ++i)
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
     {
-      if(i+1 < num_levels)
-        system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature, system_levels.at(i+1).get());
-      else if(i+1 < domain.size_virtual())
-        system_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature);
+      system_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      if((i+1) < domain.size_physical())
+        system_levels.at(i)->assemble_transfers(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature_name, true);
+      else
+        system_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature_name, true);
     }
 
     /* ***************************************************************************************** */

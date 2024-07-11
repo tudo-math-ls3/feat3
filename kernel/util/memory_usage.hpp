@@ -10,9 +10,9 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/memory_usage.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/os_windows.hpp>
+#include <kernel/util/dist.hpp>
 
 #ifdef __unix__
 #include <sys/types.h>
@@ -218,6 +218,23 @@ namespace FEAT
       r += String("Current swap:").pad_back(20) + stringify(_current_swap / 1024 / 1024) + " MByte\n";
 
       return r;
+    }
+
+    /**
+     * \brief Returns the formatted peak physical memory usage over an entire communicator
+     *
+     * This function formats the sum of the peak memory usage over all ranks in the communicator
+     * as well as the maximum and the minimum peak memory usage.
+     */
+    static String format_peak_physical_usage(const Dist::Comm& comm)
+    {
+      MemoryUsage mu;
+      std::uint64_t min_p, max_p, sum_p;
+      min_p = max_p = sum_p = mu.get_peak_physical();
+      comm.allreduce(&min_p, &min_p, 1u, Dist::op_min);
+      comm.allreduce(&max_p, &min_p, 1u, Dist::op_max);
+      comm.allreduce(&sum_p, &sum_p, 1u, Dist::op_sum);
+      return stringify_bytes(sum_p, 3, 0) + " [ Max: " + stringify_bytes(max_p, 3, 0) + " / Min: " + stringify_bytes(min_p, 3, 0) + " ]";
     }
   }; //class MemoryUsage
 } // namespace FEAT

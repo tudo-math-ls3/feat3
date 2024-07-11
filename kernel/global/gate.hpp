@@ -52,10 +52,16 @@ namespace FEAT
     class Gate
     {
     public:
+      /// the data type
       typedef typename LocalVector_::DataType DataType;
+      /// the index type
       typedef typename LocalVector_::IndexType IndexType;
-      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
+      /// the local vector type
+      typedef LocalVector_ LocalVectorType;
+      /// the mirror type
       typedef Mirror_ MirrorType;
+      /// the internal buffer vector type
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
 
       typedef SynchScalarTicket<DataType> ScalarTicketType;
       typedef SynchVectorTicket<LocalVector_, Mirror_> VectorTicketType;

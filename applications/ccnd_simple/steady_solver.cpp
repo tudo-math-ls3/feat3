@@ -135,22 +135,16 @@ namespace CCNDSimple
 
       if(assemble_splitters)
         stokes_levels.at(i)->assemble_base_splitters(domain.at(i));
-
-      if((i+1) < domain.size_virtual())
-      {
-        stokes_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
-        stokes_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature);
-      }
     }
 
-    // assemble velocity truncation operators -- we need those for the assembly of the
-    // non-linear burgers operators on the coarser levels
-    for (Index i(0); i < num_levels; ++i)
+    // assemble muxers and transfers
+    for (Index i(0); (i < domain.size_physical()) && ((i+1) < domain.size_virtual()); ++i)
     {
-      if(i+1 < num_levels)
-        stokes_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature, stokes_levels.at(i+1).get());
-      else if(i+1 < domain.size_virtual())
-        stokes_levels.at(i)->assemble_velocity_truncation(domain.at(i), domain.at(i+1), cubature);
+      stokes_levels.at(i)->assemble_coarse_muxers(domain.at(i+1));
+      if((i+1) < domain.size_physical())
+        stokes_levels.at(i)->assemble_transfers(*stokes_levels.at(i+1), domain.at(i), domain.at(i+1), cubature, true);
+      else
+        stokes_levels.at(i)->assemble_transfers(domain.at(i), domain.at(i+1), cubature, true);
     }
 
     // assemble basic stokes matrices on all levels
