@@ -295,6 +295,7 @@ namespace PoissonVoxelMG
 
     TimeStamp stamp_ass;
 
+    // assemble gates and muxers
     for (Index i(0); i < num_levels; ++i)
     {
       TimeStamp ts;
@@ -307,12 +308,18 @@ namespace PoissonVoxelMG
         system_levels.at(i)->assemble_coarse_muxer(domain.at(i+1));
         stats.times[i][Times::asm_muxer] += ts2.elapsed_now();
       }
-      TimeStamp ts3;
+      stats.times[i][Times::asm_total] += ts.elapsed_now();
+    }
+
+    // assemble transfers
+    for (Index i(0); i < num_levels; ++i)
+    {
+      TimeStamp ts;
       if((i+1) < num_levels)
         Control::VoxelTransferAssembler::assemble_scalar_basic_transfer(*system_levels.at(i), *system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature, true, true);
       else if((i+1) < domain.size_virtual())
         Control::VoxelTransferAssembler::assemble_scalar_basic_transfer(*system_levels.at(i), domain.at(i), domain.at(i+1), cubature, true, true);
-      stats.times[i][Times::asm_transfer] += ts3.elapsed_now();
+      stats.times[i][Times::asm_transfer] += ts.elapsed_now();
       stats.times[i][Times::asm_total] += ts.elapsed_now();
     }
 
