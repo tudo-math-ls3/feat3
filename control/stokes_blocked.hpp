@@ -248,6 +248,7 @@ namespace FEAT
 
           // try to find our halo
           auto* halo = dom_level.find_halo_part(rank);
+          if(halo == nullptr) continue;
           XASSERT(halo != nullptr);
 
           // create (empty) velocity mirror
