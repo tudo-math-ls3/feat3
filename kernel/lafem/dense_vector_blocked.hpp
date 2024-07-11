@@ -5,37 +5,37 @@
 
 #pragma once
 #ifndef KERNEL_LAFEM_DENSE_VECTOR_BLOCKED_HPP
-  #define KERNEL_LAFEM_DENSE_VECTOR_BLOCKED_HPP 1
+#define KERNEL_LAFEM_DENSE_VECTOR_BLOCKED_HPP 1
 
-  // includes, FEAT
-  #include <kernel/base_header.hpp>
-  #include <kernel/lafem/forward.hpp>
-  #include <kernel/util/assertion.hpp>
-  #include <kernel/util/type_traits.hpp>
-  #include <kernel/util/math.hpp>
-  #include <kernel/util/random.hpp>
-  #include <kernel/lafem/container.hpp>
-  #include <kernel/lafem/dense_vector.hpp>
-  #include <kernel/lafem/arch/dot_product.hpp>
-  #include <kernel/lafem/arch/norm.hpp>
-  #include <kernel/lafem/arch/scale.hpp>
-  #include <kernel/lafem/arch/axpy.hpp>
-  #include <kernel/lafem/arch/component_product.hpp>
-  #include <kernel/lafem/arch/component_invert.hpp>
-  #include <kernel/lafem/arch/max_abs_index.hpp>
-  #include <kernel/lafem/arch/min_abs_index.hpp>
-  #include <kernel/lafem/arch/max_index.hpp>
-  #include <kernel/lafem/arch/min_index.hpp>
-  #include <kernel/util/tiny_algebra.hpp>
-  #include <kernel/util/statistics.hpp>
-  #include <kernel/util/time_stamp.hpp>
-  #include <kernel/adjacency/permutation.hpp>
-  #include <kernel/util/likwid_marker.hpp>
+// includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/lafem/forward.hpp>
+#include <kernel/util/assertion.hpp>
+#include <kernel/util/type_traits.hpp>
+#include <kernel/util/math.hpp>
+#include <kernel/util/random.hpp>
+#include <kernel/lafem/container.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/arch/dot_product.hpp>
+#include <kernel/lafem/arch/norm.hpp>
+#include <kernel/lafem/arch/scale.hpp>
+#include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/component_product.hpp>
+#include <kernel/lafem/arch/component_invert.hpp>
+#include <kernel/lafem/arch/max_abs_index.hpp>
+#include <kernel/lafem/arch/min_abs_index.hpp>
+#include <kernel/lafem/arch/max_index.hpp>
+#include <kernel/lafem/arch/min_index.hpp>
+#include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
+#include <kernel/adjacency/permutation.hpp>
+#include <kernel/util/likwid_marker.hpp>
 
-  #include <iostream>
-  #include <fstream>
-  #include <string>
-  #include <stdint.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdint.h>
 
 namespace FEAT
 {
