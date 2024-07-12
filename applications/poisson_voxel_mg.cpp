@@ -602,10 +602,10 @@ namespace PoissonVoxelMG
     for(Index i(0); i < domain.size_physical(); ++i)
     {
       Geometry::RootMeshNode<MeshType>& mesh_node = *domain.at(i)->get_mesh_node();
-      Geometry::MaskedBoundaryFactory<MeshType> boundary_factory(*mesh_node.get_mesh());
+      Geometry::GlobalMaskedBoundaryFactory<MeshType> boundary_factory(*mesh_node.get_mesh());
       for(const auto& v : mesh_node.get_halo_map())
-        boundary_factory.add_mask_meshpart(*v.second);
-      boundary_factory.compile();
+        boundary_factory.add_halo(v.first, *v.second);
+      boundary_factory.compile(domain.at(i).layer().comm());
       mesh_node.add_mesh_part("bnd", boundary_factory.make_unique());
     }
 

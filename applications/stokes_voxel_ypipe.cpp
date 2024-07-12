@@ -312,12 +312,12 @@ namespace StokesVoxelYPipe
       auto bnd_l = bnd_factory_l.make_unique();
       auto bnd_r = bnd_factory_r.make_unique();
 
-      Geometry::MaskedBoundaryFactory<MeshType> boundary_factory(*mesh_node.get_mesh());
+      Geometry::GlobalMaskedBoundaryFactory<MeshType> boundary_factory(*mesh_node.get_mesh());
       boundary_factory.add_mask_meshpart(*bnd_l);
       boundary_factory.add_mask_meshpart(*bnd_r);
       for(const auto& v : mesh_node.get_halo_map())
-        boundary_factory.add_mask_meshpart(*v.second);
-      boundary_factory.compile();
+        boundary_factory.add_halo(v.first, *v.second);
+      boundary_factory.compile(domain.at(i).layer().comm());
       mesh_node.add_mesh_part("bnd:w", boundary_factory.make_unique());
       mesh_node.add_mesh_part("bnd:l", std::move(bnd_l));
       mesh_node.add_mesh_part("bnd:r", std::move(bnd_r));

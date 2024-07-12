@@ -44,6 +44,9 @@ target_link_libraries(dbg-cubature feat)
 add_executable(dbg-dist-file-io dbg_dist_file_io.cpp)
 target_link_libraries(dbg-dist-file-io feat)
 
+add_executable(dbg-global-masked-boundary dbg_global_masked_boundary.cpp)
+target_link_libraries(dbg-global-masked-boundary feat)
+
 add_executable(dbg-isoparam-1 dbg_isoparam1.cpp)
 target_link_libraries(dbg-isoparam-1 feat)
 
