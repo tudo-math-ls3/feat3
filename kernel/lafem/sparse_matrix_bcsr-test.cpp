@@ -1079,3 +1079,248 @@ SparseMatrixBCSRPermuteTest <double, std::uint64_t> cuda_sm_bcsr_permute_test_do
 SparseMatrixBCSRPermuteTest <float, std::uint32_t> cuda_sm_bcsr_permute_test_float_uint32_cuda(PreferredBackend::cuda);
 SparseMatrixBCSRPermuteTest <double, std::uint32_t> cuda_sm_bcsr_permute_test_double_uint32_cuda(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class SparseMatrixBCSRMaxAbsElementTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRMaxAbsElementTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRMaxAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRMaxAbsElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+    }
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+
+    DT_ max = a.max_abs_element();
+
+    TEST_CHECK_EQUAL(max, DT_(17));
+  }
+};
+
+SparseMatrixBCSRMaxAbsElementTest <float, std::uint32_t> sm_bcsr_max_abs_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxAbsElementTest <double, std::uint32_t> sm_bcsr_max_abs_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxAbsElementTest <float, std::uint64_t> sm_bcsr_max_abs_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRMaxAbsElementTest <double, std::uint64_t> sm_bcsr_max_abs_element_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRMaxAbsElementTest <float, std::uint64_t> mkl_sm_bcsr_max_abs_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRMaxAbsElementTest <double, std::uint64_t> mkl_sm_bcsr_max_abs_element_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRMaxAbsElementTest <__float128, std::uint32_t> sm_bcsr_max_abs_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxAbsElementTest <__float128, std::uint64_t> sm_bcsr_max_abs_element_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRMaxAbsElementTest <Half, std::uint32_t> sm_bcsr_max_abs_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxAbsElementTest <Half, std::uint64_t> sm_bcsr_max_abs_element_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRMaxAbsElementTest <float, std::uint32_t> cuda_sm_bcsr_max_abs_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMaxAbsElementTest <double, std::uint32_t> cuda_sm_bcsr_max_abs_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMaxAbsElementTest <float, std::uint64_t> cuda_sm_bcsr_max_abs_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRMaxAbsElementTest <double, std::uint64_t> cuda_sm_bcsr_max_abs_element_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class SparseMatrixBCSRMinAbsElementTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRMinAbsElementTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRMinAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRMinAbsElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+    }
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+
+    DT_ min = a.min_abs_element();
+
+    TEST_CHECK_EQUAL(min, DT_(0));
+  }
+};
+
+SparseMatrixBCSRMinAbsElementTest <float, std::uint32_t> sm_bcsr_min_abs_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinAbsElementTest <double, std::uint32_t> sm_bcsr_min_abs_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinAbsElementTest <float, std::uint64_t> sm_bcsr_min_abs_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRMinAbsElementTest <double, std::uint64_t> sm_bcsr_min_abs_element_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRMinAbsElementTest <float, std::uint64_t> mkl_sm_bcsr_min_abs_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRMinAbsElementTest <double, std::uint64_t> mkl_sm_bcsr_min_abs_element_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRMinAbsElementTest <__float128, std::uint32_t> sm_bcsr_min_abs_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinAbsElementTest <__float128, std::uint64_t> sm_bcsr_min_abs_element_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRMinAbsElementTest <Half, std::uint32_t> sm_bcsr_min_abs_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinAbsElementTest <Half, std::uint64_t> sm_bcsr_min_abs_element_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRMinAbsElementTest <float, std::uint32_t> cuda_sm_bcsr_min_abs_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMinAbsElementTest <double, std::uint32_t> cuda_sm_bcsr_min_abs_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMinAbsElementTest <float, std::uint64_t> cuda_sm_bcsr_min_abs_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRMinAbsElementTest <double, std::uint64_t> cuda_sm_bcsr_min_abs_element_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class SparseMatrixBCSRMaxElementTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRMaxElementTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRMaxElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRMaxElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i));
+    }
+    dv1(0, DT_(-20));
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+
+    DT_ max = a.max_element();
+
+    TEST_CHECK_EQUAL(max, DT_(17));
+  }
+};
+
+SparseMatrixBCSRMaxElementTest <float, std::uint32_t> sm_bcsr_max_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxElementTest <double, std::uint32_t> sm_bcsr_max_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxElementTest <float, std::uint64_t> sm_bcsr_max_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRMaxElementTest <double, std::uint64_t> sm_bcsr_max_element_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRMaxElementTest <float, std::uint64_t> mkl_sm_bcsr_max_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRMaxElementTest <double, std::uint64_t> mkl_sm_bcsr_max_element_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRMaxElementTest <__float128, std::uint32_t> sm_bcsr_max_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxElementTest <__float128, std::uint64_t> sm_bcsr_max_element_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRMaxElementTest <Half, std::uint32_t> sm_bcsr_max_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxElementTest <Half, std::uint64_t> sm_bcsr_max_element_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRMaxElementTest <float, std::uint32_t> cuda_sm_bcsr_max_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMaxElementTest <double, std::uint32_t> cuda_sm_bcsr_max_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMaxElementTest <float, std::uint64_t> cuda_sm_bcsr_max_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRMaxElementTest <double, std::uint64_t> cuda_sm_bcsr_max_element_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class SparseMatrixBCSRMinElementTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRMinElementTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRMinElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRMinElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(DT_(i) - DT_(3)));
+    }
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 2, 3> a(2, 2, dv2, dv1, dv3);
+
+    DT_ min = a.min_element();
+
+    TEST_CHECK_EQUAL(min, DT_(-3));
+  }
+};
+
+SparseMatrixBCSRMinElementTest <float, std::uint32_t> sm_bcsr_min_element_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinElementTest <double, std::uint32_t> sm_bcsr_min_element_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinElementTest <float, std::uint64_t> sm_bcsr_min_element_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRMinElementTest <double, std::uint64_t> sm_bcsr_min_element_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRMinElementTest <float, std::uint64_t> mkl_sm_bcsr_min_element_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRMinElementTest <double, std::uint64_t> mkl_sm_bcsr_min_element_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRMinElementTest <__float128, std::uint32_t> sm_bcsr_min_element_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinElementTest <__float128, std::uint64_t> sm_bcsr_min_element_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRMinElementTest <Half, std::uint32_t> sm_bcsr_min_element_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMinElementTest <Half, std::uint64_t> sm_bcsr_min_element_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRMinElementTest <float, std::uint32_t> cuda_sm_bcsr_min_element_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMinElementTest <double, std::uint32_t> cuda_sm_bcsr_min_element_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRMinElementTest <float, std::uint64_t> cuda_sm_bcsr_min_element_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRMinElementTest <double, std::uint64_t> cuda_sm_bcsr_min_element_test_double_uint64(PreferredBackend::cuda);
+#endif

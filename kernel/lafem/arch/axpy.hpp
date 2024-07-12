@@ -26,6 +26,12 @@ namespace FEAT
           value_generic(r, a, x, y, size);
         }
 
+        template <typename ValueType_>
+        static void value_blocked(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const ValueType_ * const y, const Index size)
+        {
+          value_blocked_generic(r, a, x, y, size);
+        }
+
 #ifdef FEAT_HAVE_HALFMATH
         static void value(Half * r, const Half a, const Half * const x, const Half * const y, const Index size)
         {
@@ -51,6 +57,9 @@ namespace FEAT
 
         template <typename DT_>
         static void value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
+
+        template <typename ValueType_>
+        static void value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const ValueType_ * const y, const Index size);
       };
 
 #ifdef FEAT_EICKT

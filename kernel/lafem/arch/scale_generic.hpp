@@ -37,6 +37,31 @@ namespace FEAT
         }
       }
 
+      template <typename ValueType_>
+      void Scale::value_blocked_generic(ValueType_ * r, const ValueType_ * const x, const ValueType_ s, const Index size)
+      {
+        if (x == r)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            for(int j(0); j < ValueType_::n; ++j)
+            {
+              r[i][j] *= s[j];
+            }
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            for(int j(0); j < ValueType_::n; ++j)
+            {
+              r[i][j] = x[i][j] * s[j];
+            }
+          }
+        }
+      }
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

@@ -26,6 +26,12 @@ namespace FEAT
           value_generic(r, x, s, size);
         }
 
+        template <typename ValueType_>
+        static void value_blocked(ValueType_ * r, const ValueType_ * const x, const ValueType_ s, const Index size)
+        {
+          value_blocked_generic(r, x, s, size);
+        }
+
 #ifdef FEAT_HAVE_HALFMATH
         static void value(Half * r, const Half * const x, const Half s, const Index size)
         {
@@ -46,6 +52,9 @@ namespace FEAT
 
         template <typename DT_>
         static void value_generic(DT_ * r, const DT_ * const x, const DT_ s, const Index size);
+
+        template <typename ValueType_>
+        static void value_blocked_generic(ValueType_ * r, const ValueType_ * const x, const ValueType_ s, const Index size);
 
         static void value_mkl(float * r, const float * const x, const float, const Index size);
         static void value_mkl(double * r, const double * const x, const double, const Index size);

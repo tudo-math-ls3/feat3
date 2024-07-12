@@ -26,6 +26,12 @@ namespace FEAT
           return value_generic(x, size);
         }
 
+        template <typename ValueType_>
+        static ValueType_ value_blocked(const ValueType_ * const x, const Index size)
+        {
+          return value_blocked_generic(x, size);
+        }
+
         static Index value(const float * const x, const Index size)
         {
           BACKEND_SKELETON_RETURN(value_cuda, value_mkl, value_generic, x, size)
@@ -38,6 +44,9 @@ namespace FEAT
 
         template <typename DT_>
         static Index value_generic(const DT_ * const x, const Index size);
+
+        template <typename ValueType_>
+        static ValueType_ value_blocked_generic(const ValueType_ * const x, const Index size);
 
         static Index value_mkl(const float * const x, const Index size);
         static Index value_mkl(const double * const x, const Index size);

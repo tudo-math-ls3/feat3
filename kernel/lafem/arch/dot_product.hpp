@@ -26,6 +26,12 @@ namespace FEAT
           return value_generic(x, y, size);
         }
 
+        template <typename ValueType_>
+        static ValueType_ value_blocked(const ValueType_ * const x, const ValueType_ * const y, const Index size)
+        {
+          return value_blocked_generic(x, y, size);
+        }
+
 #ifdef FEAT_HAVE_HALFMATH
         static Half value(const Half * const x, const Half * const y, const Index size)
         {
@@ -45,6 +51,9 @@ namespace FEAT
 
         template <typename DT_>
         static DT_ value_generic(const DT_ * const x, const DT_ * const y, const Index size);
+
+        template <typename ValueType_>
+        static ValueType_ value_blocked_generic(const ValueType_ * const x, const ValueType_ * const y, const Index size);
 
         static float value_mkl(const float * const x, const float * const y, const Index size);
         static double value_mkl(const double * const x, const double * const y, const Index size);
@@ -66,6 +75,12 @@ namespace FEAT
           return value_generic(x, y, z, size);
         }
 
+        template <typename ValueType_>
+        static ValueType_ value_blocked(const ValueType_ * const x, const ValueType_ * const y, const ValueType_ * const z, const Index size)
+        {
+          return value_blocked_generic(x, y, z, size);
+        }
+
 #ifdef FEAT_HAVE_HALFMATH
         static Half value(const Half * const x, const Half * const y, const Half * const z, const Index size)
         {
@@ -85,6 +100,9 @@ namespace FEAT
 
         template <typename DT_>
         static DT_ value_generic(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size);
+
+        template <typename ValueType_>
+        static ValueType_ value_blocked_generic(const ValueType_ * const x, const ValueType_ * const y, const ValueType_ * const z, const Index size);
 
         static float value_mkl(const float * const x, const float * const y, const float * const z, const Index size);
         static double value_mkl(const double * const x, const double * const y, const double * const z, const Index size);

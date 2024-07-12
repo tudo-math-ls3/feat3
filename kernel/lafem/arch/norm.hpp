@@ -26,6 +26,12 @@ namespace FEAT
           return value_generic(x, size);
         }
 
+        template <typename ValueType_>
+        static ValueType_ value_blocked(const ValueType_ * const x, const Index size)
+        {
+          return value_blocked_generic(x, size);
+        }
+
 #ifdef FEAT_HAVE_HALFMATH
         static Half value(const Half * const x, const Index size)
         {
@@ -46,6 +52,9 @@ namespace FEAT
         template <typename DT_>
         static DT_ value_generic(const DT_ * const x, const Index size);
 
+        template <typename ValueType_>
+        static ValueType_ value_blocked_generic(const ValueType_ * const x, const Index size);
+
         static float value_mkl(const float * const x, const Index size);
         static double value_mkl(const double * const x, const Index size);
 
@@ -57,7 +66,16 @@ namespace FEAT
       extern template float Norm2::value_generic(const float * const, const Index);
       extern template double Norm2::value_generic(const double * const, const Index);
 #endif
-
+      struct Norm2Sqr
+      {
+        template <typename ValueType_>
+        static ValueType_ value_blocked(const ValueType_ * const x, const Index size)
+        {
+          return value_blocked_generic(x, size);
+        }
+        template <typename ValueType_>
+        static ValueType_ value_blocked_generic(const ValueType_ * const x, const Index size);
+      };
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

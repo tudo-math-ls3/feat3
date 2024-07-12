@@ -37,6 +37,27 @@ namespace FEAT
         return max_i;
       }
 
+      template <typename ValueType_>
+      ValueType_ MaxIndex::value_blocked_generic(const ValueType_ * const x, const Index size)
+      {
+        ValueType_ max(0);
+        Index max_i(0);
+        for(int j(0); j < ValueType_::n; ++j)
+        {
+          max[j] = x[0][j];
+          for (Index i(0) ; i < size ; ++i)
+          {
+            if(x[i][j] > x[max_i][j])
+            {
+              max[j] = x[i][j];
+              max_i = i;
+            }
+          }
+          max_i=Index(0);
+        }
+        return max;
+      }
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

@@ -37,6 +37,27 @@ namespace FEAT
         return min_i;
       }
 
+      template <typename ValueType_>
+      ValueType_ MinIndex::value_blocked_generic(const ValueType_ * const x, const Index size)
+      {
+        ValueType_ min(0);
+        Index min_i(0);
+        for(int j(0); j < ValueType_::n; ++j)
+        {
+          min[j] = x[0][j];
+          for (Index i(0) ; i < size ; ++i)
+          {
+            if(x[i][j] < x[min_i][j])
+            {
+              min[j] = x[i][j];
+              min_i = i;
+            }
+          }
+          min_i=Index(0);
+        }
+        return min;
+      }
+
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

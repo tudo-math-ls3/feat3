@@ -1187,6 +1187,88 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the absolute maximum value of this matrix.
+       *
+       * \return The largest absolute value.
+       */
+      DT_ max_abs_element() const
+      {
+        TimeStamp ts_start;
+
+        Index max_abs_index = Arch::MaxAbsIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        ASSERT(max_abs_index < this->template used_elements<Perspective::pod>());
+        DT_ result;
+        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + max_abs_index, 1);
+        result = Math::abs(result);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
+       * \brief Retrieve the absolute minimum value of this matrix.
+       *
+       * \return The smallest absolute value.
+       */
+      DT_ min_abs_element() const
+      {
+        TimeStamp ts_start;
+
+        Index min_abs_index = Arch::MinAbsIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        ASSERT(min_abs_index < this->template used_elements<Perspective::pod>());
+        DT_ result;
+        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + min_abs_index, 1);
+        result = Math::abs(result);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
+       * \brief Retrieve the maximum value of this matrix.
+       *
+       * \return The largest value.
+       */
+      DT_ max_element() const
+      {
+        TimeStamp ts_start;
+
+        Index max_index = Arch::MaxIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        ASSERT(max_index < this->template used_elements<Perspective::pod>());
+        DT_ result;
+        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + max_index, 1);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+       /**
+       * \brief Retrieve the minimum value of this matrix.
+       *
+       * \return The smallest value.
+       */
+      DT_ min_element() const
+      {
+        TimeStamp ts_start;
+
+        Index min_index = Arch::MinIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        ASSERT(min_index < this->template used_elements<Perspective::pod>());
+        DT_ result;
+        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + min_index, 1);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
        * \brief Calculate \f$this^\top \f$
        *
        * \return The transposed matrix

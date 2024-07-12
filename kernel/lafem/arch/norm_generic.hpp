@@ -31,6 +31,35 @@ namespace FEAT
 
         return (DT_)Math::sqrt(r);
       }
+
+      template <typename ValueType_>
+      ValueType_ Norm2::value_blocked_generic(const ValueType_ * const x, const Index size)
+      {
+        ValueType_ r(0);
+        for(int j(0); j<ValueType_::n; ++j)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r[j] += x[i][j] * x[i][j];
+          }
+          r[j] = Math::sqrt(r[j]);
+        }
+        return r;
+      }
+
+      template <typename ValueType_>
+      ValueType_ Norm2Sqr::value_blocked_generic(const ValueType_ * const x, const Index size)
+      {
+        ValueType_ r(0);
+        for(int j(0); j<ValueType_::n; ++j)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r[j] += x[i][j] * x[i][j];
+          }
+        }
+        return r;
+      }
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

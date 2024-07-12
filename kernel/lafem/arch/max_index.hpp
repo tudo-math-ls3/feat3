@@ -24,8 +24,17 @@ namespace FEAT
           return value_generic(x, size);
         }
 
+        template <typename ValueType_>
+        static ValueType_ value_blocked(const ValueType_ * const x, const Index size)
+        {
+          return value_blocked_generic(x, size);
+        }
+
         template <typename DT_>
         static Index value_generic(const DT_ * const x, const Index size);
+
+        template <typename ValueType_>
+        static ValueType_ value_blocked_generic(const ValueType_ * const x, const Index size);
       };
 
 #ifdef FEAT_EICKT

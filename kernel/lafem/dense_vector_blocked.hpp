@@ -831,6 +831,32 @@ namespace FEAT
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
+      /**
+       * \brief Calculate \f$this \leftarrow \alpha~ x + y\f$
+       *
+       * \param[in] x The first summand vector to be scaled.
+       * \param[in] y The second summand vector
+       * \param[in] alpha A Tiny::Vector to multiply x with.
+       */
+      void axpy_blocked(
+        const DenseVectorBlocked & x,
+        const DenseVectorBlocked & y,
+        const ValueType alpha)
+      {
+        XASSERTM(x.size() == y.size(), "Vector size does not match!");
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+
+        FEAT_KERNEL_MARKER_START("DV_axpy");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        Arch::Axpy::value_blocked(elements<Perspective::native>(), alpha, x.template elements<Perspective::native>(), y.template elements<Perspective::native>(), this->size<Perspective::native>());
+
+        FEAT_KERNEL_MARKER_STOP("DV_axpy");
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
 
       /**
        * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i\f$
@@ -894,6 +920,25 @@ namespace FEAT
       }
 
       /**
+       * \brief Calculate \f$this \leftarrow \alpha~ x \f$
+       *
+       * \param[in] x The vector to be scaled.
+       * \param[in] alpha A Tiny::Vector to scale x with.
+       */
+      void scale_blocked(const DenseVectorBlocked & x, const ValueType alpha)
+      {
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+
+        TimeStamp ts_start;
+
+        Arch::Scale::value_blocked(elements<Perspective::native>(), x.template elements<Perspective::native>(), alpha, this->size<Perspective::native>());
+        Statistics::add_flops(this->size<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$result \leftarrow x^T \mathrm{diag}(this) y \f$
        *
        * \param[in] x The first vector.
@@ -911,6 +956,31 @@ namespace FEAT
 
         Statistics::add_flops(this->template size<Perspective::pod>() * 3);
         DataType result = Arch::TripleDotProduct::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
+       * \brief Calculate \f$result \leftarrow x^T \mathrm{diag}(this) y \f$
+       *
+       * \param[in] x The first vector.
+       *
+       * \param[in] y The second vector.
+       *
+       * \return The computed blocked triple dot product (A Tiny::Vector).
+       */
+      ValueType triple_dot_blocked(const DenseVectorBlocked & x, const DenseVectorBlocked & y) const
+      {
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+        XASSERTM(y.size() == this->size(), "Vector size does not match!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->template size<Perspective::pod>() * 3);
+        ValueType result = Arch::TripleDotProduct::value_blocked(elements<Perspective::native>(), x.template elements<Perspective::native>(), y.template elements<Perspective::native>(), this->size<Perspective::native>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -941,6 +1011,28 @@ namespace FEAT
       }
 
       /**
+       * \brief Calculate \f$this \leftarrow this \cdot x\f$
+       *
+       * \param[in] x The other vector.
+       *
+       * \return The calculated blocked dot product (A Tiny::Vector).
+       */
+      ValueType dot_blocked(const DenseVectorBlocked & x) const
+      {
+        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        ValueType result = Arch::DotProduct::value_blocked(elements<Perspective::native>(), x.template elements<Perspective::native>(), this->size<Perspective::native>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
        * \brief Calculates and returns the euclid norm of this vector.
        *
        * \return The calculated norm.
@@ -951,6 +1043,24 @@ namespace FEAT
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
         DataType result = Arch::Norm2::value(elements<Perspective::pod>(), this->size<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
+       * \brief Calculates and returns the euclid norm of this vector.
+       *
+       * \return The calculated blocked norm (A Tiny::Vector).
+       */
+      ValueType norm2_blocked() const
+      {
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        ValueType result = Arch::Norm2::value_blocked(elements<Perspective::native>(), this->size<Perspective::native>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -970,6 +1080,24 @@ namespace FEAT
       }
 
       /**
+       * \brief Calculates and returns the squared euclid norm of this vector.
+       *
+       * \return The calculated blocked norm (A Tiny::Vector).
+       */
+      ValueType norm2sqr_blocked() const
+      {
+        TimeStamp ts_start;
+
+        Statistics::add_flops(this->size<Perspective::pod>() * 2);
+        ValueType result = Arch::Norm2Sqr::value_blocked(elements<Perspective::native>(), this->size<Perspective::native>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
        * \brief Retrieve the absolute maximum value of this vector.
        *
        * \return The largest absolute value.
@@ -983,6 +1111,23 @@ namespace FEAT
         DT_ result;
         MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
         result = Math::abs(result);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
+       * \brief Retrieve the absolute maximum value of this vector.
+       *
+       * \return The largest blocked absolute value (A Tiny::Vector).
+       */
+      ValueType max_abs_element_blocked() const
+      {
+        TimeStamp ts_start;
+
+        ValueType result = Arch::MaxAbsIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1012,6 +1157,23 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the absolute minimum value of this vector.
+       *
+       * \return The smallest blocked absolute value (A Tiny::Vector).
+       */
+      ValueType min_abs_element_blocked() const
+      {
+        TimeStamp ts_start;
+
+        ValueType result = Arch::MinAbsIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
        * \brief Retrieve the maximum value of this vector.
        *
        * \return The largest value.
@@ -1032,6 +1194,23 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the maximum value of this vector.
+       *
+       * \return The largest blocked value (A Tiny::Vector).
+       */
+      ValueType max_element_blocked() const
+      {
+        TimeStamp ts_start;
+
+        ValueType result = Arch::MaxIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
        * \brief Retrieve the minimum value of this vector.
        *
        * \return The smallest value.
@@ -1044,6 +1223,23 @@ namespace FEAT
         ASSERT(min_index < this->template size<Perspective::pod>());
         DT_ result;
         MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + min_index, 1);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return result;
+      }
+
+      /**
+       * \brief Retrieve the minimum value of this vector.
+       *
+       * \return The smallest blocked value (A Tiny::Vector).
+       */
+      ValueType min_element_blocked() const
+      {
+        TimeStamp ts_start;
+
+        ValueType result = Arch::MinIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));

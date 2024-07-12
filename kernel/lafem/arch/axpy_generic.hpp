@@ -47,6 +47,38 @@ namespace FEAT
           }
         }
       }
+
+      template <typename ValueType_>
+      void Axpy::value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const ValueType_ * const y, const Index size)
+      {
+        if (r == y)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            for(int j(0); j < ValueType_::n; ++j)
+              r[i][j] += a[j] * x[i][j];
+          }
+        }
+        else if (r == x)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            for(int j(0); j < ValueType_::n; ++j)
+            {
+              r[i][j] *= a[j];
+              r[i][j] += y[i][j];
+            }
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            for(int j(0); j < ValueType_::n; ++j)
+              r[i][j] = (a[j] * x[i][j]) + y[i][j];
+          }
+        }
+      }
     } // namespace Arch
   } // namespace LAFEM
 } // namespace FEAT

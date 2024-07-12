@@ -261,7 +261,7 @@ DenseVectorBlockedSerializeTest <double, std::uint64_t> cuda_dense_vector_blocke
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedAxpyTest
   : public UnitTest
 {
@@ -279,42 +279,55 @@ public:
   {
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DT_ s(DT_(0.4711));
+    Tiny::Vector<DT_, block_size_> bs;
+    for(int j(0); j < block_size_; ++j)
+      bs[j] = s + DT_(j);
+
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
-      DenseVectorBlocked<DT_, IT_, BS_> b(size);
-      DenseVectorBlocked<DT_, IT_, BS_> ref(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_bs(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
           tv1.v[j] = DT_(i % 100) * DT_(1.234) + DT_(j);
         a(i, tv1);
-        Tiny::Vector<DT_, BS_> tv2;
-        for (Index j(0) ; j < BS_ ; ++j)
+        Tiny::Vector<DT_, block_size_> tv2;
+        for (Index j(0) ; j < block_size_ ; ++j)
           tv2.v[j] = DT_(2) - DT_(i % (42 + j));
         b(i, tv2);
         ref(i, s * a(i) + b(i));
+
+        ref_bs(i, Tiny::component_product(bs, a(i)) + ref(i));
       }
 
-      DenseVectorBlocked<DT_, IT_, BS_> c(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> c(size);
       c.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
+        for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_EQUAL_WITHIN_EPS(c(i).v[j], ref(i).v[j], DT_(eps));
 
-      DenseVectorBlocked<DT_, IT_, BS_> a_tmp(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
       a_tmp.copy(a);
       a.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
+        for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_EQUAL_WITHIN_EPS(a(i).v[j], ref(i).v[j], DT_(eps));
 
       a.copy(a_tmp);
       b.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < BS_ ; ++j)
+        for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_EQUAL_WITHIN_EPS(b(i).v[j], ref(i).v[j], DT_(eps));
+
+      a.copy(a_tmp);
+      b.axpy_blocked(a, b, bs);
+      for (Index i(0) ; i < size ; ++i)
+        for (Index j(0) ; j < block_size_ ; ++j)
+          TEST_CHECK_EQUAL_WITHIN_EPS(b(i).v[j], ref_bs(i).v[j], DT_(eps));
     }
   }
 };
@@ -344,7 +357,7 @@ DenseVectorBlockedAxpyTest <double, std::uint64_t, 3> cuda_dv_axpy_test_double_u
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedDotTest
   : public UnitTest
 {
@@ -364,19 +377,45 @@ public:
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
-      DenseVectorBlocked<DT_, IT_, BS_> b(size);
-      const DT_ den(DT_(1) / DT_(size * BS_));
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a2(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      const DT_ den(DT_(1) / DT_(size * block_size_));
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(i * BS_ + j + 1) * den;
+        Tiny::Vector<DT_, block_size_> tv1;
+        Tiny::Vector<DT_, block_size_> tv3;
+        for (Index j(0) ; j < block_size_ ; ++j)
+        {
+          tv1.v[j] = DT_(i * block_size_ + j + 1) * den;
+          tv3.v[j] = Math::sqrt(DT_(i))*j;
+        }
         a(i, tv1);
-        Tiny::Vector<DT_, BS_> tv2;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv2.v[j] = DT_(1) / DT_(i * BS_ + j + 1);
+        a2(i, tv3);
+
+        Tiny::Vector<DT_, block_size_> tv2;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv2.v[j] = DT_(1) / DT_(i * block_size_ + j + 1);
         b(i, tv2);
+      }
+
+      Tiny::Vector<DT_, block_size_> d(a.dot_blocked(b));
+      Tiny::Vector<DT_, block_size_> e(b.dot_blocked(a));
+      Tiny::Vector<DT_, block_size_> f(a2.dot_blocked(a2));
+
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      Tiny::Vector<DT_, block_size_> ref2_bs;
+      for (Index j(0) ; j < block_size_ ; ++j)
+      {
+        ref_bs.v[j] = DT_(size)/DT_(size*block_size_);
+        ref2_bs.v[j] = DT_(j*j)*(DT_(size*size)-DT_(size))/DT_(2);
+      }
+
+      for (Index j(0) ; j < block_size_ ; ++j)
+      {
+       TEST_CHECK_EQUAL_WITHIN_EPS(ref_bs.v[j], d.v[j], eps);
+       TEST_CHECK_EQUAL_WITHIN_EPS(ref_bs.v[j], e.v[j], eps);
+       TEST_CHECK_EQUAL_WITHIN_EPS(ref2_bs.v[j], f.v[j], eps);
       }
 
       // a*b = 1
@@ -389,6 +428,7 @@ public:
       ref = b.norm2();
       ref *= ref;
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+
     }
   }
 };
@@ -418,7 +458,7 @@ DenseVectorBlockedDotTest <double, std::uint64_t, 2> cuda_dv_dot_product_test_do
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedTripleDotTest
   : public UnitTest
 {
@@ -438,24 +478,39 @@ public:
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
-      DenseVectorBlocked<DT_, IT_, BS_> b(size);
-      DenseVectorBlocked<DT_, IT_, BS_> c(size);
-      const DT_ den(DT_(1) / DT_(size * BS_));
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> c(size);
+      Tiny::Vector<DT_, block_size_> ref_bs(0);
+      const DT_ den(DT_(1) / DT_(size * block_size_));
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(i * BS_ + j + 1) * den;
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j] = DT_(i * block_size_ + j + 1) * den;
         a(i, tv1);
-        Tiny::Vector<DT_, BS_> tv2;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv2.v[j] = DT_(1) / DT_(i * BS_ + j + 1);
+        Tiny::Vector<DT_, block_size_> tv2;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv2.v[j] = DT_(1) / DT_(i * block_size_ + j + 1);
         b(i, tv2);
-        Tiny::Vector<DT_, BS_> tv3;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv3.v[j] = DT_(3) / DT_(i * BS_ + j + 1);
+        Tiny::Vector<DT_, block_size_> tv3;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv3.v[j] =  DT_(i * block_size_ + j + 1);
         c(i, tv3);
+      }
+
+      for(int j(0); j<block_size_; ++j)
+        ref_bs.v[j] = DT_(size-1)/DT_(2)+DT_(j+1)/DT_(block_size_);
+
+      Tiny::Vector<DT_, block_size_> d(a.triple_dot_blocked(b, c));
+      Tiny::Vector<DT_, block_size_> e(b.triple_dot_blocked(a, c));
+      Tiny::Vector<DT_, block_size_> f(c.triple_dot_blocked(a, b));
+
+      for(int j(0); j<block_size_; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(d.v[j], ref_bs.v[j], eps*DT_(250));
+        TEST_CHECK_EQUAL_WITHIN_EPS(e.v[j], ref_bs.v[j], eps*DT_(250));
+        TEST_CHECK_EQUAL_WITHIN_EPS(f.v[j], ref_bs.v[j], eps*DT_(250));
       }
 
       DenseVector<DT_, IT_> ref_a;
@@ -501,7 +556,7 @@ DenseVectorBlockedTripleDotTest <double, std::uint64_t, 2> cuda_dv_triple_dot_pr
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedComponentProductTest
   : public UnitTest
 {
@@ -521,30 +576,30 @@ public:
     {
       DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
-      DenseVectorBlocked<DT_, IT_, BS_> b(size);
-      DenseVectorBlocked<DT_, IT_, BS_> ref(size);
-      DenseVectorBlocked<DT_, IT_, BS_> ref2(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref2(size);
 
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
           tv1.v[j] = DT_((DT_(j) + DT_(i)) * DT_(1.234) / DT_(size));
         a(i, tv1);
-        Tiny::Vector<DT_, BS_> tv2;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv2.v[j] = DT_(size*2*BS_ - i + 2*j);
+        Tiny::Vector<DT_, block_size_> tv2;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv2.v[j] = DT_(size*2*block_size_ - i + 2*j);
         b(i, tv2);
         ref(i, component_product(a(i), b(i)) );
         ref2(i, component_product(a(i), a(i)) );
       }
 
-      DenseVectorBlocked<DT_, IT_, BS_> a_tmp(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
       a_tmp.copy(a);
-      DenseVectorBlocked<DT_, IT_, BS_> b_tmp(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b_tmp(size);
       b_tmp.copy(b);
-      DenseVectorBlocked<DT_, IT_, BS_> c(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> c(size);
 
       c.component_product(a, b);
       for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
@@ -599,7 +654,7 @@ DenseVectorBlockedComponentProductTest <double, std::uint64_t, 2> cuda_dv_blocke
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedScaleTest
   : public UnitTest
 {
@@ -618,24 +673,33 @@ public:
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
-      DenseVectorBlocked<DT_, IT_, BS_> ref(size);
+      Tiny::Vector<DT_, block_size_> bs;
+      for(Index j(0); j < block_size_; ++j)
+        bs[j] = s + DT_(j);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_bs(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = DT_(DT_(i) * DT_(BS_) + DT_(j) * DT_(1.234));
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j] = DT_(DT_(i) * DT_(block_size_) + DT_(j) * DT_(1.234));
         a(i, tv1);
         ref(i, a(i) * s);
+
+        ref_bs(i, Tiny::component_product(bs, s*a(i)));
       }
 
-      DenseVectorBlocked<DT_, IT_, BS_> b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
 
       b.scale(a, s);
       TEST_CHECK_EQUAL(b, ref);
 
       a.scale(a, s);
       TEST_CHECK_EQUAL(a, ref);
+
+      a.scale_blocked(a, bs);
+      TEST_CHECK_EQUAL(a, ref_bs);
     }
   }
 };
@@ -665,7 +729,7 @@ DenseVectorBlockedScaleTest <double, std::uint64_t, 2> cuda_dv_scale_test_double
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedNorm2Test
   : public UnitTest
 {
@@ -685,24 +749,39 @@ public:
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
+      Tiny::Vector<DT_, block_size_> ref_bs(0);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+
       for (Index i(0) ; i < size ; ++i)
       {
         // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j] = Math::pow(DT_(0.5), DT_(0.5) * DT_(i * BS_ + j));
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j] = Math::pow(DT_(0.5), DT_(0.5) * DT_(i * block_size_ + j));
         a(i, tv1);
       }
 
       // ||a||_2 = sqrt(2 - 2^{1-n})
-      const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size*BS_-1))));
+      const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size*block_size_-1))));
+      for (Index j(0) ; j < block_size_ ; ++j)
+      {
+        ref_bs.v[j] = Math::pow(DT_(0.5), DT_(j))*(DT_(1)-Math::pow(DT_(0.5), DT_(block_size_*size)))/(DT_(1)-Math::pow(DT_(0.5), DT_(block_size_)));
+        ref_bs.v[j] = Math::sqrt(ref_bs.v[j]);
+      }
 
       DT_ c = a.norm2();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 
       c = a.norm2sqr();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref*ref, eps);
+
+      Tiny::Vector<DT_, block_size_> d(a.norm2_blocked());
+      for(Index j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL_WITHIN_EPS(d.v[j], ref_bs.v[j], eps);
+
+      Tiny::Vector<DT_, block_size_> e(a.norm2sqr_blocked());
+      for(Index j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL_WITHIN_EPS(e.v[j], ref_bs.v[j]*ref_bs.v[j], eps);
     }
   }
 };
@@ -732,7 +811,7 @@ DenseVectorBlockedNorm2Test <double, std::uint64_t, 3> cuda_dv_norm2_test_double
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedMaxAbsElementTest
   : public UnitTest
 {
@@ -750,24 +829,31 @@ public:
   {
     for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * BS_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j]  = DT_(DT_((i * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
         a(i, tv1);
       }
+
+      Tiny::Vector<DT_, block_size_> b(a.max_abs_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (Index j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_((size-1) * block_size_  + j);
+
+      for(Index j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
-
       DT_ max = a.max_abs_element();
 
-      TEST_CHECK_EQUAL(max, DT_((size*BS_) -1));
+      TEST_CHECK_EQUAL(max, DT_((size*block_size_) -1));
     }
   }
 };
@@ -797,7 +883,7 @@ DenseVectorBlockedMaxAbsElementTest <double, std::uint64_t, 3> cuda_dv_max_abs_e
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
 class DenseVectorBlockedMinAbsElementTest
   : public UnitTest
 {
@@ -815,14 +901,22 @@ public:
   {
     for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * BS_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j]  = DT_(DT_((i * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
         a(i, tv1);
       }
+
+      Tiny::Vector<DT_, block_size_> b(a.min_abs_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (Index j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_(j);
+
+      for(Index j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
       std::cout << "seed: " << seed << std::endl;
@@ -862,7 +956,153 @@ DenseVectorBlockedMinAbsElementTest <double, std::uint64_t, 3> cuda_dv_min_abs_e
 template<
   typename DT_,
   typename IT_,
-  Index BS_>
+  int block_size_>
+class DenseVectorBlockedMaxElementTest
+  : public UnitTest
+{
+public:
+  DenseVectorBlockedMaxElementTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMaxElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorBlockedMaxElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j]  = DT_(DT_((i * block_size_ + j)));
+        a(i, tv1);
+      }
+
+      Tiny::Vector<DT_, block_size_> b(a.max_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (Index j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_((size-1)*block_size_+j);
+
+      for(Index j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
+
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ max = a.max_element();
+
+      TEST_CHECK_EQUAL(max, DT_((size*block_size_) -1));
+    }
+  }
+};
+DenseVectorBlockedMaxElementTest <float, std::uint32_t, 2> dv_max_element_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxElementTest <double, std::uint32_t, 2> dv_max_element_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxElementTest <float, std::uint64_t, 3> dv_max_element_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedMaxElementTest <double, std::uint64_t, 3> dv_max_element_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseVectorBlockedMaxElementTest <float, std::uint64_t, 2> mkl_dv_max_element_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedMaxElementTest <double, std::uint64_t, 3> mkl_dv_max_element_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedMaxElementTest <__float128, std::uint32_t, 2> dv_max_element_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxElementTest <__float128, std::uint64_t, 3> dv_max_element_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorBlockedMaxElementTest <Half, std::uint32_t, 2> dv_blocked_max_element_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxElementTest <Half, std::uint64_t, 3> dv_blocked_max_element_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedMaxElementTest <float, std::uint32_t, 2> cuda_dv_max_element_test_float_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxElementTest <double, std::uint32_t, 2> cuda_dv_max_element_test_double_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxElementTest <float, std::uint64_t, 3> cuda_dv_max_element_test_float_uint64(PreferredBackend::cuda);
+DenseVectorBlockedMaxElementTest <double, std::uint64_t, 3> cuda_dv_max_element_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMinElementTest
+  : public UnitTest
+{
+public:
+  DenseVectorBlockedMinElementTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMinElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorBlockedMinElementTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j]  = DT_(DT_((i * block_size_ + j)));
+        a(i, tv1);
+      }
+
+      Tiny::Vector<DT_, block_size_> b(a.min_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (Index j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_(j);
+
+      for(Index j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
+
+      Random::SeedType seed(Random::SeedType(time(nullptr)));
+      std::cout << "seed: " << seed << std::endl;
+      Random rng(seed);
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      DT_ min = a.min_element();
+
+      TEST_CHECK_EQUAL(min, DT_(0));
+    }
+  }
+};
+DenseVectorBlockedMinElementTest <float, std::uint32_t, 2> dv_min_element_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedMinElementTest <double, std::uint32_t, 2> dv_min_element_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedMinElementTest <float, std::uint64_t, 3> dv_min_element_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedMinElementTest <double, std::uint64_t, 3> dv_min_element_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseVectorBlockedMinElementTest <float, std::uint64_t, 2> mkl_dv_min_element_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedMinElementTest <double, std::uint64_t, 3> mkl_dv_min_element_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedMinElementTest <__float128, std::uint32_t, 2> dv_min_element_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedMinElementTest <__float128, std::uint64_t, 3> dv_min_element_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorBlockedMinElementTest <Half, std::uint32_t, 2> dv_blocked_min_element_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedMinElementTest <Half, std::uint64_t, 3> dv_blocked_min_element_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedMinElementTest <float, std::uint32_t, 2> cuda_dv_min_element_test_float_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMinElementTest <double, std::uint32_t, 2> cuda_dv_min_element_test_double_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMinElementTest <float, std::uint64_t, 3> cuda_dv_min_element_test_float_uint64(PreferredBackend::cuda);
+DenseVectorBlockedMinElementTest <double, std::uint64_t, 3> cuda_dv_min_element_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
 class DenseVectorBlockedPermuteTest
   : public UnitTest
 {
@@ -882,16 +1122,16 @@ public:
 
     for (Index size(10) ; size < Index(1e4) ; size*=2)
     {
-      DenseVectorBlocked<DT_, IT_, BS_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, BS_> tv1;
-        for (Index j(0) ; j < BS_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * BS_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        Tiny::Vector<DT_, block_size_> tv1;
+        for (Index j(0) ; j < block_size_ ; ++j)
+          tv1.v[j]  = DT_(DT_((i * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
         a(i, tv1);
       }
 
-      DenseVectorBlocked<DT_, IT_, BS_> ref(a.size());
+      DenseVectorBlocked<DT_, IT_, block_size_> ref(a.size());
       ref.copy(a);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
