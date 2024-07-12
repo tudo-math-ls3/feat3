@@ -9,10 +9,12 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#ifndef __CUDACC__
+#ifndef __CUDA_ARCH__
 #include <kernel/util/math.hpp>
+#endif
 
 // includes, system
+#ifndef __CUDACC__
 #include <initializer_list>
 #else
 #include <kernel/util/cuda_math.cuh>
