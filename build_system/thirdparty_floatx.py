@@ -17,3 +17,4 @@ class FParser(ThirdpartyPackage):
     self.cmake_flags = " -DFEAT_HAVE_FLOATX:BOOL=ON -DFEAT_DIRNAME_FLOATX:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname+os.sep+self.dirname
+    self.cmake_find_package_avail = False

@@ -18,3 +18,4 @@ class PARMETIS(ThirdpartyPackage):
     self.cmake_flags = " -DFEAT_HAVE_PARMETIS:BOOL=ON -DFEAT_DIRNAME_PARMETIS:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname
+    self.cmake_find_package_avail = False

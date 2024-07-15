@@ -177,6 +177,9 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  Decide in a comma separated list, which performance markers are activated.")
   print ("  Current choices: kernel app special cuda . Defaults to app.")
   print ("")
+  print ("--prefer_system_libraries")
+  print ("  If available, prefer libraries included in system path and do not download thirdparties.")
+  print ("")
   print ("Note that the first gcc(g++) in $PATH is chosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
@@ -296,6 +299,7 @@ cuda_verbose = False
 restrict_errors = False
 trilinos_path = ""
 marker_options = ""
+prefer_system_libs = False
 
 unused_extra_options = copy.copy(extra_options)
 for option in extra_options:
@@ -429,6 +433,11 @@ for option in extra_options:
       print ("Error: No valid marker options in " + option)
       print ("Valid options are: kernel app special")
       exit(1)
+
+  if option.startswith("--prefer_system_libraries"):
+    unused_extra_options.remove(option)
+    prefer_system_libs = True
+    cmake_flags += " -DFEAT_PREFER_SYSTEM_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release"
 
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
@@ -691,7 +700,7 @@ if platform.system() == "Darwin":
 for package in available_packages(trunk_dirname+os.sep+"build_system", trunk_dirname+os.sep+"thirdparty"):
   for name in package.names:
     if name in buildid:
-      package.add()
+      package.add(prefer_system_libs)
       cmake_flags += package.cmake_flags
       remove_string(unused_tokens, name)
       continue

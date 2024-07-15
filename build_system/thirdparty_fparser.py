@@ -18,3 +18,4 @@ class FParser(ThirdpartyPackage):
     self.cmake_flags = " -DFEAT_HAVE_FPARSER:BOOL=ON -DFEAT_DIRNAME_FPARSER:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = os.path.join(trunk_dirname, self.dirname)
+    self.cmake_find_package_avail = False

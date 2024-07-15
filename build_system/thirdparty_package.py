@@ -33,9 +33,15 @@ class ThirdpartyPackage(object):
     self.target_dirname = trunk_dirname
     # This is added to the cmake_flags
     self.cmake_flags = "NullCmakeFlags"
+    # CMake find package available
+    self.cmake_find_package_avail = False
 
   # How to add a third party package to the build process
-  def add(self):
+  def add(self, prefer_system_libs = False):
+    if(prefer_system_libs and self.cmake_find_package_avail):
+      #TODO: for now, this is an extremly stupid approach, and we should start by simply providing Cmakeconfigure implementations...
+      print(self.names[0] + "enabled, and findpackage available, trying to use findPackage...")
+      return
     # Directory where the package is expected
     target_filename = os.path.join(self.trunk_dirname, self.filename)
     # This is the folder where the third party package is assumed to be. Not to be confused with self.target_dirname
