@@ -41,6 +41,7 @@ class ThirdpartyPackage(object):
     if(prefer_system_libs and self.cmake_find_package_avail):
       #TODO: for now, this is an extremly stupid approach, and we should start by simply providing Cmakeconfigure implementations...
       print(self.names[0] + "enabled, and findpackage available, trying to use findPackage...")
+      self.cmake_flags = " " + " ".join([st for st in self.cmake_flags.split() if "DIRNAME" not in st])
       return
     # Directory where the package is expected
     target_filename = os.path.join(self.trunk_dirname, self.filename)
