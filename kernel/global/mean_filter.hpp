@@ -35,7 +35,7 @@ namespace FEAT
       template<typename DT2_, typename IT2_>
       using FilterType = MeanFilter<DT2_, IT2_>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 

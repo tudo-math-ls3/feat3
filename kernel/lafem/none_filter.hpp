@@ -42,7 +42,7 @@ namespace FEAT
       template <typename DT2_ = DataType_, typename IT2_ = IndexType_>
       using FilterType = NoneFilter<DT2_, IT2_>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
@@ -155,7 +155,7 @@ namespace FEAT
       template <typename DT2_ = DataType_, typename IT2_ = IndexType_, int BS_ = BlockSize_>
       using FilterType = NoneFilterBlocked<DT2_, IT2_, BS_>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_, int BlockSize2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_, BlockSize2_>;
 

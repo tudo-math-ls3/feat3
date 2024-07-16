@@ -52,7 +52,7 @@ namespace FEAT
         typename First_::template FilterType<DT2_, IT2_>,
         typename Rest_::template FilterType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a matrix container with new Datatape and Index types
+      /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using FilterTypeByDI = FilterType<DT2_, IT2_>;
 

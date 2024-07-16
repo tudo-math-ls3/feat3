@@ -64,7 +64,7 @@ namespace FEAT
       template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<DT2_, IT2_>, blocks_>;
 
-      /// this typedef lets you create a matrix container with new Datatape and Index types
+      /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
@@ -678,7 +678,7 @@ namespace FEAT
       template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using ContainerType = PowerDiagMatrix<typename SubType_::template ContainerType<DT2_, IT2_>, 1>;
 
-      /// this typedef lets you create a matrix container with new Datatape and Index types
+      /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 

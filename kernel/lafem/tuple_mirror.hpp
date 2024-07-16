@@ -261,7 +261,7 @@ namespace FEAT
       template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using MirrorType = TupleMirror<typename First_::template MirrorType<DT2_, IT2_> >;
 
-      /// this typedef lets you create a mirror with new Datatape and Index types
+      /// this typedef lets you create a mirror with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using MirrorTypeByDI = MirrorType<DataType2_, IndexType2_>;
 

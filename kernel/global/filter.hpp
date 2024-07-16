@@ -30,7 +30,7 @@ namespace FEAT
       template <typename LocalFilter2_, typename Mirror2_ = Mirror_>
       using FilterType = Filter<LocalFilter2_, Mirror2_>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using FilterTypeByDI = Filter<typename LocalFilter_::template FilterType<DataType2_, IndexType2_>, typename Mirror_::template MirrorType<DataType2_, IndexType2_> >;
 

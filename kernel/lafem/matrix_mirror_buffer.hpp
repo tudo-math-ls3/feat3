@@ -54,7 +54,7 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = MatrixMirrorBuffer<DT2_, IT2_>;
 
-      /// this typedef lets you create a buffer container with new Datatape and Index types
+      /// this typedef lets you create a buffer container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 

@@ -59,7 +59,7 @@ namespace FEAT
         typename First_::template ContainerType<DT2_, IT2_>,
         typename Rest_::template ContainerType<DT2_, IT2_>...>;
 
-      /// this typedef lets you create a matrix container with new Datatape and Index types
+      /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DT2_, typename IT2_>
       using ContainerTypeByDI = TupleDiagMatrix<
         typename First_::template ContainerType<DT2_, IT2_>,

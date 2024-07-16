@@ -294,7 +294,7 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = SparseMatrixCSR<DT2_, IT2_>;
 
-      /// this typedef lets you create a matrix container with new Datatape and Index types
+      /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 

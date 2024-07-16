@@ -93,7 +93,7 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = DenseVectorBlocked<DT2_, IT2_, BlockSize_>;
 
-      /// this typedef lets you create a vector container with new Datatape and Index types
+      /// this typedef lets you create a vector container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 

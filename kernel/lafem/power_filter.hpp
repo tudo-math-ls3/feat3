@@ -63,7 +63,7 @@ namespace FEAT
       template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using FilterType = PowerFilter<typename SubFilterType::template FilterType<DT2_, IT2_>, count_>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
@@ -237,7 +237,7 @@ namespace FEAT
       template <typename DT2_ = DataType, typename IT2_ = IndexType>
       using FilterType = PowerFilter<typename SubFilterType::template FilterType<DT2_, IT2_>, Index(1)>;
 
-      /// this typedef lets you create a filter with new Datatape and Index types
+      /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_>;
 
