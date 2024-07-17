@@ -513,11 +513,11 @@ namespace FEAT
       }; // Evaluator<..., Shape::Quadrilateral>
 
 
-         /**
-         * \brief Implementation of standard non-parametric quadrilateral Rannacher-Turek evaluator
-         *
-         * \author Peter Zajac
-         */
+      /**
+       * \brief Implementation of standard non-parametric hexahedral Rannacher-Turek evaluator
+       *
+       * \author Peter Zajac
+       */
       template<
         typename Space_,
         typename TrafoEvaluator_,
