@@ -1813,6 +1813,66 @@ public:
     }
   }
 
+  void test_frankes_function() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    // create goldstein-price-function object
+    Analytic::Common::FrankesFunction<DT_> func;
+
+    // evaluate function value in point (1,2)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(FEAT_F128C(0.014574258847493253357381166783366)), tol);
+
+    // evaluate gradient in point (1,2)
+    Tiny::Vector<DT_, 2> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(FEAT_F128C(-0.053538093725485420496502610127097)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(FEAT_F128C(-0.013116832962743928021647611368389)), tol);
+
+    // evaluate hessian in point (1,2)
+    Tiny::Matrix<DT_, 2,2> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(FEAT_F128C(0.14848626402639731929540320127819)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(FEAT_F128C(0.048184284352936878446893400485549)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(FEAT_F128C(0.048184284352936878446893400485549)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(FEAT_F128C(0.011805149666469535219787961767313)), tol);
+
+  }
+
+  void test_frankes_3d_variant_function() const
+  {
+    #ifdef FEAT_HAVE_QUADMATH
+      const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    #else
+      const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    #endif
+
+    // create goldstein-price-function object
+    Analytic::Common::Frankes3DVariantFunction<DT_> func;
+
+    // evaluate function value in point (1,2, 0.5)
+    DT_ val = Analytic::eval_value_x(func, DT_(1), DT_(2), DT_(0.5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val, DT_(FEAT_F128C(0.010168115367927312326141809033119)), tol);
+
+    // evaluate gradient in point (1,2, 0.5)
+    Tiny::Vector<DT_, 3> grad = Analytic::eval_gradient_x(func, DT_(1), DT_(2), DT_(0.5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(FEAT_F128C(-0.037352260535243188136847716266949)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(FEAT_F128C(-0.00915130383113458109353081041527)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], DT_(FEAT_F128C(-0.024403476883025549582740341679484)), tol);
+
+    // evaluate hessian in point (1,2, 0.5)
+    Tiny::Matrix<DT_, 3,3> hess = Analytic::eval_hessian_x(func, DT_(1), DT_(2), DT_(0.5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(FEAT_F128C(0.10359535115794998505709471473385)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(FEAT_F128C(0.033617034481718869323191585210066)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], DT_(FEAT_F128C(0.089645425284583651528434519040676)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(FEAT_F128C(0.033617034481718869323191585210066)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(FEAT_F128C(0.0082361734480211229843905984690556)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], DT_(FEAT_F128C(0.021963129194722994624473944996648)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], DT_(FEAT_F128C(0.089645425284583651528434519040676)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], DT_(FEAT_F128C(0.021963129194722994624473944996648)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], DT_(FEAT_F128C(-0.022776578424157179610557652234185)), tol);
+
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1868,6 +1928,8 @@ public:
     test_sine_ring_vortex_rhs_2d();
     test_ball_cap_function_2d();
     test_corner_singularity_2d();
+    test_frankes_function();
+    test_frankes_3d_variant_function();
   }
 };
 
