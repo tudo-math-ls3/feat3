@@ -188,10 +188,7 @@ var annotated_dup =
           [ "UnitCubeDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control" ],
           [ "VirtualLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html", null ],
           [ "VoxelDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control" ],
-          [ "VoxelDomainLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper" ],
-          [ "VoxelSlagChartMasker", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_chart_masker.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_chart_masker" ],
-          [ "VoxelSlagLambdaMasker", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_lambda_masker.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_lambda_masker" ],
-          [ "VoxelSlagMasker", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_masker.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_slag_masker" ]
+          [ "VoxelDomainLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper" ]
         ] ],
         [ "Meshopt", "namespace_f_e_a_t_1_1_control_1_1_meshopt.html", [
           [ "ControlFactory", "struct_f_e_a_t_1_1_control_1_1_meshopt_1_1_control_factory.html", "struct_f_e_a_t_1_1_control_1_1_meshopt_1_1_control_factory" ],
@@ -358,6 +355,7 @@ var annotated_dup =
         [ "Factory< ConformalMesh< Shape_, num_coords_, CoordType_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_conformal_mesh_3_01_shape___00_01num__coords___00_01_coord_type___01_4_01_4.html", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_conformal_mesh_3_01_shape___00_01num__coords___00_01_coord_type___01_4_01_4" ],
         [ "Factory< MeshPart< MeshType_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_mesh_part_3_01_mesh_type___01_4_01_4.html", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_mesh_part_3_01_mesh_type___01_4_01_4" ],
         [ "Factory< StructuredMesh< shape_dim_, num_coords_, Coord_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_structured_mesh_3_01shape__dim___00_01num__coords___00_01_coord___01_4_01_4.html", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_structured_mesh_3_01shape__dim___00_01num__coords___00_01_coord___01_4_01_4" ],
+        [ "GlobalMaskedBoundaryFactory", "class_f_e_a_t_1_1_geometry_1_1_global_masked_boundary_factory.html", "class_f_e_a_t_1_1_geometry_1_1_global_masked_boundary_factory" ],
         [ "HitTestFactory", "class_f_e_a_t_1_1_geometry_1_1_hit_test_factory.html", "class_f_e_a_t_1_1_geometry_1_1_hit_test_factory" ],
         [ "IndexCalculator", "class_f_e_a_t_1_1_geometry_1_1_index_calculator.html", "class_f_e_a_t_1_1_geometry_1_1_index_calculator" ],
         [ "IndexSet", "class_f_e_a_t_1_1_geometry_1_1_index_set.html", "class_f_e_a_t_1_1_geometry_1_1_index_set" ],
@@ -417,7 +415,15 @@ var annotated_dup =
         [ "StructIndexSet", "class_f_e_a_t_1_1_geometry_1_1_struct_index_set.html", "class_f_e_a_t_1_1_geometry_1_1_struct_index_set" ],
         [ "StructuredMesh", "class_f_e_a_t_1_1_geometry_1_1_structured_mesh.html", "class_f_e_a_t_1_1_geometry_1_1_structured_mesh" ],
         [ "TargetSet", "class_f_e_a_t_1_1_geometry_1_1_target_set.html", "class_f_e_a_t_1_1_geometry_1_1_target_set" ],
-        [ "VertexSet", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set" ]
+        [ "VertexSet", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set" ],
+        [ "VoxelCGALMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_c_g_a_l_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_c_g_a_l_masker" ],
+        [ "VoxelChartMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_chart_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_chart_masker" ],
+        [ "VoxelFormulaMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_formula_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_formula_masker" ],
+        [ "VoxelLambdaMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_lambda_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_lambda_masker" ],
+        [ "VoxelMap", "class_f_e_a_t_1_1_geometry_1_1_voxel_map.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map" ],
+        [ "VoxelMapFileError", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_file_error.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_file_error" ],
+        [ "VoxelMapFormulaParseError", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_formula_parse_error.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_formula_parse_error" ],
+        [ "VoxelMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker" ]
       ] ],
       [ "Global", "namespace_f_e_a_t_1_1_global.html", [
         [ "AlgDofParti", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html", null ],
@@ -709,6 +715,17 @@ var annotated_dup =
           [ "Evaluator", "class_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_evaluator.html", null ],
           [ "Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 1 > >", "class_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_evaluator_3_01_space___00_01_trafo_evaluator__802e55c907078015a390ad2e449f9e5b.html", "class_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_evaluator_3_01_space___00_01_trafo_evaluator__802e55c907078015a390ad2e449f9e5b" ],
           [ "Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 2 > >", "class_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_evaluator_3_01_space___00_01_trafo_evaluator__cefb60ca526d73ea9fbcb2c4bda04e64.html", "class_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_evaluator_3_01_space___00_01_trafo_evaluator__cefb60ca526d73ea9fbcb2c4bda04e64" ]
+        ] ],
+        [ "CaiDouSanSheYe", "namespace_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye.html", [
+          [ "DofTraits", "struct_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_dof_traits.html", "struct_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_dof_traits" ],
+          [ "DofTraits< Shape::Hypercube< dim_ >, dim_ >", "struct_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01dim___01_4_00_01dim___01_4.html", "struct_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01dim___01_4_00_01dim___01_4" ],
+          [ "DofTraits< Shape::Hypercube< dim_+1 >, dim_ >", "struct_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01dim___091_01_4_00_01dim___01_4.html", "struct_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01dim___091_01_4_00_01dim___01_4" ],
+          [ "Element", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_element.html", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_element" ],
+          [ "Evaluator", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_evaluator.html", null ],
+          [ "Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_evaluator_3_01_space___00_01_trafo_evaluator_cd584e2ae53d2b4306ff680d7265a0ec.html", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_evaluator_3_01_space___00_01_trafo_evaluator_cd584e2ae53d2b4306ff680d7265a0ec" ],
+          [ "NodeFunctional", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_node_functional.html", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_node_functional" ],
+          [ "NodeFunctional< Space_, Shape::Hypercube< shape_dim_ >, 0, DataType_ >", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_node_functional_3_01_space___00_01_shape_1_1_d215266554069458711a15ecd1479e21.html", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_node_functional_3_01_space___00_01_shape_1_1_d215266554069458711a15ecd1479e21" ],
+          [ "NodeFunctional< Space_, Shape::Hypercube< shape_dim_ >, 1, DataType_ >", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_node_functional_3_01_space___00_01_shape_1_1_19e50c1472d62363091f828c6d82ab47.html", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_node_functional_3_01_space___00_01_shape_1_1_19e50c1472d62363091f828c6d82ab47" ]
         ] ],
         [ "CroRavRanTur", "namespace_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur.html", [
           [ "DofTraits", "struct_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur_1_1_dof_traits.html", "struct_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur_1_1_dof_traits" ],

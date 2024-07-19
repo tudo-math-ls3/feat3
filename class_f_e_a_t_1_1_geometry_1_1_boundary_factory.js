@@ -10,6 +10,9 @@ var class_f_e_a_t_1_1_geometry_1_1_boundary_factory =
     [ "fill_index_sets", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#a9f5d7e0f58fa15e4d10c6fe41e8825d1", null ],
     [ "fill_target_sets", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#aabfaf26d72966c81b147c85334152f47", null ],
     [ "get_num_entities", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#a9bf9bea5fa6c6b843dffd42f797f59b2", null ],
+    [ "_bnd_masks", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#a79dd677e5c544884f79880d2b6c86982", null ],
     [ "_face_computer", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#a15595e932c1a271b839c1f19f4ff7cf1", null ],
-    [ "_mesh_in", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#abb3e9d6204e1f744c5e8dc1566ad1d41", null ]
+    [ "_face_idx", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#a8350255f4ab704c206a9f85e00cf0867", null ],
+    [ "_mesh_in", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#abb3e9d6204e1f744c5e8dc1566ad1d41", null ],
+    [ "shape_dim", "class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html#a3e5a280b4b5867f96031808c542f1c1f", null ]
 ];

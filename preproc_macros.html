@@ -110,9 +110,6 @@ $(document).ready(function(){initNavTree('preproc_macros.html',''); initResizabl
 <li class="level2"><a href="#ppm_feat_compiler_clang">FEAT_COMPILER_CLANG</a></li>
 <li class="level2"><a href="#ppm_feat_compiler_intel">FEAT_COMPILER_INTEL</a></li>
 <li class="level2"><a href="#ppm_feat_compiler_microsoft">FEAT_COMPILER_MICROSOFT</a></li>
-<li class="level2"><a href="#ppm_feat_compiler_open64">FEAT_COMPILER_OPEN64</a></li>
-<li class="level2"><a href="#ppm_feat_compiler_oracle">FEAT_COMPILER_ORACLE</a></li>
-<li class="level2"><a href="#ppm_feat_compiler_pgi">FEAT_COMPILER_PGI</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#preproc_sec_backends">Backend / Library Macros</a><ul><li class="level2"><a href="#ppm_feat_have_alglib">FEAT_HAVE_ALGLIB</a></li>
@@ -134,7 +131,9 @@ $(document).ready(function(){initNavTree('preproc_macros.html',''); initResizabl
 <li class="level2"><a href="#ppm_feat_have_triangle">FEAT_HAVE_TRIANGLE</a></li>
 <li class="level2"><a href="#ppm_feat_have_trilinos">FEAT_HAVE_TRILINOS</a></li>
 <li class="level2"><a href="#ppm_feat_have_umfpack">FEAT_HAVE_UMFPACK</a></li>
+<li class="level2"><a href="#ppm_feat_have_zfp">FEAT_HAVE_ZFP</a></li>
 <li class="level2"><a href="#ppm_feat_have_zlib">FEAT_HAVE_ZLIB</a></li>
+<li class="level2"><a href="#ppm_feat_have_zoltan">FEAT_HAVE_ZOLTAN</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#preproc_sec_user_def">User-Defineable Macros</a><ul><li class="level2"><a href="#ppm_feat_eickt">FEAT_EICKT</a></li>
@@ -217,21 +216,7 @@ FEAT_COMPILER_INTEL</h2>
 <hr  />
  <h2><a class="anchor" id="ppm_feat_compiler_microsoft"></a>
 FEAT_COMPILER_MICROSOFT</h2>
-<p >This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal macro <code>_MSC_VER</code>, which is an constant integral expression identifying the compiler version, e.g. the value <code>1900</code> identifies the Visual C++ 2015 compiler. See the compiler's documentation for details.</p>
-<hr  />
- <h2><a class="anchor" id="ppm_feat_compiler_open64"></a>
-FEAT_COMPILER_OPEN64</h2>
-<p >This macro is defined if the Open64 C++ compiler is detected. Its value is defined as </p><pre class="fragment">(__OPENCC__ * 10000 + __OPENCC_MINOR__ * 100 + __OPENCC_PATCHLEVEL__)
-</pre><p> which is a constant integral expression identifying the compiler version, e.g. the value <code>40204</code> identifies the Open64 C++ 4.2.4 compiler. See the compiler's documentation for details.</p>
-<hr  />
- <h2><a class="anchor" id="ppm_feat_compiler_oracle"></a>
-FEAT_COMPILER_ORACLE</h2>
-<p >This macro is defined if the OracleStudio/SunStudio C++ compiler is detected. Its value coincides with the compiler's internal macro <code>__SUNPRO_CC</code>, which is an constant integral expression identifying the compiler version, e.g. the value <code>0x5110</code> identifies the OracleStudio C++ 12.2 compiler. See the compiler's documentation for details.</p>
-<hr  />
- <h2><a class="anchor" id="ppm_feat_compiler_pgi"></a>
-FEAT_COMPILER_PGI</h2>
-<p >This macro is defined if the PGI C++ compiler is detected. Its value is defined as </p><pre class="fragment">(__PGIC__ * 10000 + __PGIC_MINOR__ * 100 + __PGIC_PATCHLEVEL__)
-</pre><p> which is a constant integral expression identifying the compiler version. See the compiler's documentation for details.</p>
+<p >This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal macro <code>_MSC_FULL_VER</code>, which is an constant integral expression identifying the compiler version, e.g. the value <code>193030705</code> identifies the initial release version of the Visual C++ 2022 compiler. See the compiler's documentation for details.</p>
 <hr  />
 <hr  />
  <h1><a class="anchor" id="preproc_sec_backends"></a>
@@ -320,13 +305,17 @@ FEAT_HAVE_TRILINOS</h2>
 FEAT_HAVE_UMFPACK</h2>
 <p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the UMFPACK library, which is part of the SuiteSparse library package.</p>
 <hr  />
+ <h2><a class="anchor" id="ppm_feat_have_zfp"></a>
+FEAT_HAVE_ZFP</h2>
+<p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the zfp library.</p>
+<hr  />
  <h2><a class="anchor" id="ppm_feat_have_zlib"></a>
 FEAT_HAVE_ZLIB</h2>
 <p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the zlib library.</p>
 <hr  />
- <h2><a class="anchor" id="ppm_feat_have_zlib"></a>
-FEAT_HAVE_ZLIB</h2>
-<p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the zfp library.</p>
+ <h2><a class="anchor" id="ppm_feat_have_zoltan"></a>
+FEAT_HAVE_ZOLTAN</h2>
+<p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the zoltan library.</p>
 <hr  />
 <hr  />
  <h1><a class="anchor" id="preproc_sec_user_def"></a>

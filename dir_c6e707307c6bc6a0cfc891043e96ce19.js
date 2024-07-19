@@ -3,6 +3,7 @@ var dir_c6e707307c6bc6a0cfc891043e96ce19 =
     [ "argyris", "dir_2fee0ff3879706a48bc5baab5d5b4b33.html", "dir_2fee0ff3879706a48bc5baab5d5b4b33" ],
     [ "bernstein2", "dir_39721c825dcf6410293de19005befe1b.html", "dir_39721c825dcf6410293de19005befe1b" ],
     [ "bogner_fox_schmit", "dir_30be80d9aa0d1d4fb3a15bbeae799b19.html", "dir_30be80d9aa0d1d4fb3a15bbeae799b19" ],
+    [ "cai_dou_san_she_ye", "dir_f8b16c880db654ecbbb3b9eaa39629e5.html", "dir_f8b16c880db654ecbbb3b9eaa39629e5" ],
     [ "cro_rav_ran_tur", "dir_0e98c89384eb53cf1f42a3b178785eaf.html", "dir_0e98c89384eb53cf1f42a3b178785eaf" ],
     [ "discontinuous", "dir_68bf70cfd8f17d3702e0e952fe96332b.html", "dir_68bf70cfd8f17d3702e0e952fe96332b" ],
     [ "hermite3", "dir_8dd346b22079a3a09491483b6cfbe3b3.html", "dir_8dd346b22079a3a09491483b6cfbe3b3" ],

@@ -12,8 +12,11 @@ var class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory =
     [ "fill_index_sets", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a40f091d92699b61a249859866c02b6bb", null ],
     [ "fill_target_sets", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae23c14b07e0eb7ae3cbabb5483535e55", null ],
     [ "get_num_entities", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#af7be80d26b0affac9cfb1d943cba99ed", null ],
+    [ "_bnd_masks", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367db18608d626634ffeb183b5927ed", null ],
     [ "_face_computer", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae0b531a9cb2030d6ed688917a9648e69", null ],
+    [ "_face_idx", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae22d4b118cff52a99ee17cb7f68f98dc", null ],
     [ "_facet_mask", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a80a5b6e438e41dc8c88f8c97b2d4d1ca", null ],
     [ "_mesh_in", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#aa8510ad41a43885b47bce7a5938c4a1b", null ],
-    [ "facet_dim", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a66452a19a648e5b10e94b2ad58f199f4", null ]
+    [ "facet_dim", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a66452a19a648e5b10e94b2ad58f199f4", null ],
+    [ "shape_dim", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974", null ]
 ];

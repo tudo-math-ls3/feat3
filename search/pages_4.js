@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['deprecated_20list_0',['Deprecated List',['../deprecated.html',1,'']]],
-  ['description_20of_20the_20geometric_20multigrid_20solver_1',['Description of the geometric MultiGrid solver',['../multigrid_design.html',1,'']]],
-  ['description_20of_20the_20mesh_20optimization_20tools_2',['Description of the mesh optimization tools',['../meshopt_design.html',1,'']]]
+  ['feat_20_2d_20finite_20element_20analysis_20toolbox_0',['FEAT - Finite Element Analysis Toolbox',['../index.html',1,'']]],
+  ['feat_20for_20visual_20studio_202022_20on_20windows_20systems_1',['FEAT for Visual Studio 2022 on Windows systems',['../feat_for_win_vs17.html',1,'']]],
+  ['feat_20for_20visual_20studio_20code_20on_20unix_20and_20windows_20systems_2',['FEAT for Visual Studio Code on Unix and Windows Systems',['../feat_for_vscode.html',1,'']]],
+  ['feat_20mesh_20file_20format_3',['FEAT Mesh File Format',['../mesh_file_format.html',1,'']]],
+  ['feat_20voxel_20map_20file_20format_4',['FEAT Voxel Map File Format',['../voxel_map_file_format.html',1,'']]],
+  ['frequently_20asked_20questions_5',['Frequently Asked Questions',['../faq_page.html',1,'']]]
 ];

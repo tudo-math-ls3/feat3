@@ -178,17 +178,17 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:ad565f0e6f0dac7115567e8fbdf738828"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a337a3351d17498ce1b616f61fd0795c4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html#a337a3351d17498ce1b616f61fd0795c4">_num_points</a></td></tr>
 <tr class="separator:a337a3351d17498ce1b616f61fd0795c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a897829e23281abdad3d706b3be3cb4b3"><td class="memItemLeft" align="right" valign="top">PointType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html#a897829e23281abdad3d706b3be3cb4b3">_points</a></td></tr>
-<tr class="separator:a897829e23281abdad3d706b3be3cb4b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad66ca2a9e0eb4a490cce114a85bc3eec"><td class="memItemLeft" align="right" valign="top">WeightType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html#ad66ca2a9e0eb4a490cce114a85bc3eec">_weights</a></td></tr>
-<tr class="separator:ad66ca2a9e0eb4a490cce114a85bc3eec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8b35e1c8137c27ae7d3466545126eae"><td class="memItemLeft" align="right" valign="top">std::vector&lt; PointType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html#aa8b35e1c8137c27ae7d3466545126eae">_points</a></td></tr>
+<tr class="separator:aa8b35e1c8137c27ae7d3466545126eae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb09d31fd97bd0e36d790fa4c6e956ab"><td class="memItemLeft" align="right" valign="top">std::vector&lt; WeightType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html#aeb09d31fd97bd0e36d790fa4c6e956ab">_weights</a></td></tr>
+<tr class="separator:aeb09d31fd97bd0e36d790fa4c6e956ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename Shape_, typename Weight_ = Real, typename Coord_ = Real, typename Point_ = Tiny::Vector&lt;Coord_, Shape_::dimension&gt;&gt;<br />
 class FEAT::Cubature::Rule&lt; Shape_, Weight_, Coord_, Point_ &gt;</div><p ><a class="el" href="namespace_f_e_a_t_1_1_cubature.html" title="Cubature namespace.">Cubature</a> <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html" title="Cubature Rule class template.">Rule</a> class template. </p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00036">36</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00039">39</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a41ae25172abfe4c3808e622c71a7ff63" name="a41ae25172abfe4c3808e622c71a7ff63"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a41ae25172abfe4c3808e622c71a7ff63">&#9670;&#160;</a></span>CoordType</h2>
@@ -204,7 +204,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00041">41</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00044">44</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -222,7 +222,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00042">42</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00045">45</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -240,7 +240,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00039">39</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00042">42</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -258,7 +258,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00040">40</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00043">43</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +288,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00052">52</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00055">55</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +328,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00060">60</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00061">61</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +370,7 @@ template&lt;typename Factory_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00074">74</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00073">73</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +402,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 
 <p>move ctor </p>
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00084">84</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00081">81</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -431,7 +431,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00121">121</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00109">109</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +461,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00133">133</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00113">113</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +501,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00199">199</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00175">175</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +541,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00206">206</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00182">182</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -570,7 +570,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00145">145</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00121">121</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00150">150</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00126">126</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -629,7 +629,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00177">177</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00153">153</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -659,7 +659,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00188">188</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00164">164</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -688,7 +688,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00183">183</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00159">159</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -717,7 +717,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00194">194</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00170">170</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -747,7 +747,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00155">155</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00131">131</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -777,7 +777,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00166">166</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00142">142</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -806,7 +806,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00161">161</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00137">137</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -835,7 +835,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00172">172</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00148">148</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -867,7 +867,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 
 <p>move-assign operator </p>
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00097">97</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00092">92</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -894,7 +894,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00046">46</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00049">49</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -920,12 +920,12 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00047">47</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00050">50</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a897829e23281abdad3d706b3be3cb4b3" name="a897829e23281abdad3d706b3be3cb4b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a897829e23281abdad3d706b3be3cb4b3">&#9670;&#160;</a></span>_points</h2>
+<a id="aa8b35e1c8137c27ae7d3466545126eae" name="aa8b35e1c8137c27ae7d3466545126eae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8b35e1c8137c27ae7d3466545126eae">&#9670;&#160;</a></span>_points</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -936,7 +936,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">PointType* <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html">FEAT::Cubature::Rule</a>&lt; Shape_, Weight_, Coord_, Point_ &gt;::_points</td>
+          <td class="memname">std::vector&lt;PointType&gt; <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html">FEAT::Cubature::Rule</a>&lt; Shape_, Weight_, Coord_, Point_ &gt;::_points</td>
         </tr>
       </table>
   </td>
@@ -946,12 +946,12 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00049">49</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00052">52</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ad66ca2a9e0eb4a490cce114a85bc3eec" name="ad66ca2a9e0eb4a490cce114a85bc3eec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad66ca2a9e0eb4a490cce114a85bc3eec">&#9670;&#160;</a></span>_weights</h2>
+<a id="aeb09d31fd97bd0e36d790fa4c6e956ab" name="aeb09d31fd97bd0e36d790fa4c6e956ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb09d31fd97bd0e36d790fa4c6e956ab">&#9670;&#160;</a></span>_weights</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -962,7 +962,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">WeightType* <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html">FEAT::Cubature::Rule</a>&lt; Shape_, Weight_, Coord_, Point_ &gt;::_weights</td>
+          <td class="memname">std::vector&lt;WeightType&gt; <a class="el" href="class_f_e_a_t_1_1_cubature_1_1_rule.html">FEAT::Cubature::Rule</a>&lt; Shape_, Weight_, Coord_, Point_ &gt;::_weights</td>
         </tr>
       </table>
   </td>
@@ -972,7 +972,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00048">48</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00051">51</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>
@@ -998,7 +998,7 @@ template&lt;typename Shape_ , typename Weight_  = Real, typename Coord_  = Real,
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00043">43</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rule_8hpp_source.html#l00046">46</a> of file <a class="el" href="rule_8hpp_source.html">rule.hpp</a>.</p>
 
 </div>
 </div>

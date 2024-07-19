@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['lafem_20design_20description_0',['LAFEM design description',['../lafem_design.html',1,'']]]
+  ['platform_20depenendend_20code_20branches_0',['Platform depenendend code branches',['../platformswitches.html',1,'']]],
+  ['preprocessor_20macros_1',['Preprocessor Macros',['../preproc_macros.html',1,'']]]
 ];

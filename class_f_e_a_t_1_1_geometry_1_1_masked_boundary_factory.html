@@ -151,7 +151,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af07ee70407e7673f23fca5d37405afab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#af07ee70407e7673f23fca5d37405afab">add_mask_facet</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> facet_idx)</td></tr>
 <tr class="separator:af07ee70407e7673f23fca5d37405afab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1367a1a99a43f8ac9cef8ee96827e605"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367a1a99a43f8ac9cef8ee96827e605">add_mask_meshpart</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a43853d18ed7403e25539d76ea86cb9ee">ParentMeshType</a> &gt; &amp;part)</td></tr>
-<tr class="memdesc:a1367a1a99a43f8ac9cef8ee96827e605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds all facets in a mesh-part to the mask.  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367a1a99a43f8ac9cef8ee96827e605">More...</a><br /></td></tr>
+<tr class="memdesc:a1367a1a99a43f8ac9cef8ee96827e605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds all facets in a mesh-part to the boundary facet mask.  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367a1a99a43f8ac9cef8ee96827e605">More...</a><br /></td></tr>
 <tr class="separator:a1367a1a99a43f8ac9cef8ee96827e605"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2de1e44f7c79ea26748b61b9cd6a157"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ad2de1e44f7c79ea26748b61b9cd6a157">compile</a> ()</td></tr>
 <tr class="memdesc:ad2de1e44f7c79ea26748b61b9cd6a157"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiles the factory.  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ad2de1e44f7c79ea26748b61b9cd6a157">More...</a><br /></td></tr>
@@ -171,15 +171,24 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a66452a19a648e5b10e94b2ad58f199f4"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a66452a19a648e5b10e94b2ad58f199f4">facet_dim</a> = ShapeType::dimension - 1</td></tr>
+<tr class="memitem:a66452a19a648e5b10e94b2ad58f199f4"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a66452a19a648e5b10e94b2ad58f199f4">facet_dim</a> = <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a> - 1</td></tr>
 <tr class="memdesc:a66452a19a648e5b10e94b2ad58f199f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">the facet dimension  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a66452a19a648e5b10e94b2ad58f199f4">More...</a><br /></td></tr>
 <tr class="separator:a66452a19a648e5b10e94b2ad58f199f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a555516051ed72ec59befab7d07ce1974"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a> = ShapeType::dimension</td></tr>
+<tr class="memdesc:a555516051ed72ec59befab7d07ce1974"><td class="mdescLeft">&#160;</td><td class="mdescRight">the shape dimension  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">More...</a><br /></td></tr>
+<tr class="separator:a555516051ed72ec59befab7d07ce1974"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr class="memitem:a1367db18608d626634ffeb183b5927ed"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::vector&lt; int &gt;, std::size_t(<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a>)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367db18608d626634ffeb183b5927ed">_bnd_masks</a></td></tr>
+<tr class="memdesc:a1367db18608d626634ffeb183b5927ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">the face masks for each face dimensions  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367db18608d626634ffeb183b5927ed">More...</a><br /></td></tr>
+<tr class="separator:a1367db18608d626634ffeb183b5927ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0b531a9cb2030d6ed688917a9648e69"><td class="memItemLeft" align="right" valign="top">Intern::BoundaryFaceComputer&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#aeda333d1f82264b0fb18f0fd37ae28ae">ShapeType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae0b531a9cb2030d6ed688917a9648e69">_face_computer</a></td></tr>
 <tr class="memdesc:ae0b531a9cb2030d6ed688917a9648e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">a boundary face computer object for the dirty work  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae0b531a9cb2030d6ed688917a9648e69">More...</a><br /></td></tr>
 <tr class="separator:ae0b531a9cb2030d6ed688917a9648e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae22d4b118cff52a99ee17cb7f68f98dc"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt;, std::size_t(<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a>)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae22d4b118cff52a99ee17cb7f68f98dc">_face_idx</a></td></tr>
+<tr class="memdesc:ae22d4b118cff52a99ee17cb7f68f98dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">the (cell_dim_-1)-dimensional boundary face indices for each face dimension  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ae22d4b118cff52a99ee17cb7f68f98dc">More...</a><br /></td></tr>
+<tr class="separator:ae22d4b118cff52a99ee17cb7f68f98dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80a5b6e438e41dc8c88f8c97b2d4d1ca"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a80a5b6e438e41dc8c88f8c97b2d4d1ca">_facet_mask</a></td></tr>
 <tr class="memdesc:a80a5b6e438e41dc8c88f8c97b2d4d1ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">a mask vector for the facets  <a href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a80a5b6e438e41dc8c88f8c97b2d4d1ca">More...</a><br /></td></tr>
 <tr class="separator:a80a5b6e438e41dc8c88f8c97b2d4d1ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -190,10 +199,11 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename ParentMesh_&gt;<br />
 class FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;</div><p ><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html" title="MaskedBoundaryFactory implementation.">MaskedBoundaryFactory</a> implementation. </p>
-<p >This class is an extension of the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html" title="BoundaryFactory implementation.">BoundaryFactory</a> class, which creates a mesh part containing the set of all unmasked boundary faces for a given mesh. Facets of the mesh can be masked by added them individually using the add_mask_facet() function or by adding an entire mesh part by using the #add_mask_mehspart() function. Once all masked facets/meshparts have been added, one has to call the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ad2de1e44f7c79ea26748b61b9cd6a157" title="Compiles the factory.">compile()</a> function before creating the mesh part using this factory.</p>
+<p >This class is an extension of the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_boundary_factory.html" title="BoundaryFactory implementation.">BoundaryFactory</a> class, which creates a mesh part containing the set of all unmasked boundary faces for a given mesh. Facets of the mesh can be masked by adding them individually using the add_mask_facet() function or by adding an entire mesh part by using the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a1367a1a99a43f8ac9cef8ee96827e605" title="Adds all facets in a mesh-part to the boundary facet mask.">add_mask_meshpart()</a> function. Once all masked facets/meshparts have been added, one has to call the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#ad2de1e44f7c79ea26748b61b9cd6a157" title="Compiles the factory.">compile()</a> function before creating the mesh part using this factory.</p>
+<dl class="section attention"><dt>Attention</dt><dd>This class <b>must not</b> be used for partitioned meshes, because it may miss certain parts of the boundary! In the case of partitioned meshes, use the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_global_masked_boundary_factory.html" title="GlobalMaskedBoundaryFactory implementation.">GlobalMaskedBoundaryFactory</a> instead! Please consider the documentation of the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_global_masked_boundary_factory.html" title="GlobalMaskedBoundaryFactory implementation.">GlobalMaskedBoundaryFactory</a> for a simple example where this <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html" title="MaskedBoundaryFactory implementation.">MaskedBoundaryFactory</a> class would fail to create the correct boundary meshpart in a partitioned mesh case.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00098">98</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00113">113</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aa9804577489291dcc49d0fb28575958f" name="aa9804577489291dcc49d0fb28575958f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa9804577489291dcc49d0fb28575958f">&#9670;&#160;</a></span>BaseClass</h2>
@@ -211,7 +221,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>Our base class. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00103">103</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00118">118</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -231,7 +241,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>The <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html" title="Class template for partial meshes.">MeshPart</a> type. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00107">107</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00122">122</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +261,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>the parent mesh type </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00105">105</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00120">120</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -271,7 +281,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>the shape type </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00109">109</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00124">124</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +301,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>target set holder type </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00111">111</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00126">126</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -330,7 +340,7 @@ template&lt;typename ParentMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00130">130</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00151">151</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -361,7 +371,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00137">137</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00158">158</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -391,11 +401,17 @@ template&lt;typename ParentMesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Adds all facets in a mesh-part to the mask. </p>
+<p>Adds all facets in a mesh-part to the boundary facet mask. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">part</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh-part to be added </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00143">143</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00169">169</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00121">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_facet_mask</a>, and <a class="el" href="target__set_8hpp_source.html#l00094">FEAT::Geometry::TargetSet::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00138">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_facet_mask</a>, and <a class="el" href="target__set_8hpp_source.html#l00094">FEAT::Geometry::TargetSet::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -426,9 +442,9 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>Compiles the factory. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00151">151</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00177">177</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00119">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_computer</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00121">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_facet_mask</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00117">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_mesh_in</a>.</p>
+<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00140">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_bnd_masks</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00136">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_computer</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00142">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_idx</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00138">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_facet_mask</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00134">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_mesh_in</a>.</p>
 
 </div>
 </div>
@@ -460,7 +476,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>Fills the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html" title="Class template for partial meshes.">MeshPart</a>'s target set, except that it doesn't. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00163">163</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00193">193</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -492,7 +508,7 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>Fills the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html" title="Class template for partial meshes.">MeshPart</a>'s index_set_holder, except that it doesn't as there is no topology. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00168">168</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00198">198</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -524,9 +540,9 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>Fills the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html" title="Class template for partial meshes.">MeshPart</a>'s target set. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00173">173</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00203">203</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00119">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_computer</a>.</p>
+<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00136">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_computer</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00142">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_idx</a>.</p>
 
 </div>
 </div>
@@ -558,13 +574,43 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>Returns the number of entities. </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00157">157</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00184">184</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00119">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_computer</a>.</p>
+<p class="reference">References <a class="el" href="boundary__factory_8hpp_source.html#l00142">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::_face_idx</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00128">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::shape_dim</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a1367db18608d626634ffeb183b5927ed" name="a1367db18608d626634ffeb183b5927ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1367db18608d626634ffeb183b5927ed">&#9670;&#160;</a></span>_bnd_masks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ParentMesh_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;std::vector&lt;int&gt;, std::size_t(<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a>)&gt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html">FEAT::Geometry::MaskedBoundaryFactory</a>&lt; ParentMesh_ &gt;::_bnd_masks</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the face masks for each face dimensions </p>
+
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00140">140</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00177">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>.</p>
+
+</div>
+</div>
 <a id="ae0b531a9cb2030d6ed688917a9648e69" name="ae0b531a9cb2030d6ed688917a9648e69"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae0b531a9cb2030d6ed688917a9648e69">&#9670;&#160;</a></span>_face_computer</h2>
 
@@ -589,9 +635,39 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>a boundary face computer object for the dirty work </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00119">119</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00136">136</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00151">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00173">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::fill_target_sets()</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00157">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00177">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00203">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::fill_target_sets()</a>.</p>
+
+</div>
+</div>
+<a id="ae22d4b118cff52a99ee17cb7f68f98dc" name="ae22d4b118cff52a99ee17cb7f68f98dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae22d4b118cff52a99ee17cb7f68f98dc">&#9670;&#160;</a></span>_face_idx</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ParentMesh_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;std::vector&lt;<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&gt;, std::size_t(<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a>)&gt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html">FEAT::Geometry::MaskedBoundaryFactory</a>&lt; ParentMesh_ &gt;::_face_idx</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the (cell_dim_-1)-dimensional boundary face indices for each face dimension </p>
+
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00142">142</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00177">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00203">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::fill_target_sets()</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00184">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -619,9 +695,9 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>a mask vector for the facets </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00121">121</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00138">138</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00143">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::add_mask_meshpart()</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00151">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00169">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::add_mask_meshpart()</a>, and <a class="el" href="boundary__factory_8hpp_source.html#l00177">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>.</p>
 
 </div>
 </div>
@@ -649,9 +725,9 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>a reference to the input mesh </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00117">117</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00134">134</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00151">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00177">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::compile()</a>.</p>
 
 </div>
 </div>
@@ -667,7 +743,7 @@ template&lt;typename ParentMesh_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html">FEAT::Geometry::MaskedBoundaryFactory</a>&lt; ParentMesh_ &gt;::facet_dim = ShapeType::dimension - 1</td>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html">FEAT::Geometry::MaskedBoundaryFactory</a>&lt; ParentMesh_ &gt;::facet_dim = <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html#a555516051ed72ec59befab7d07ce1974">shape_dim</a> - 1</td>
         </tr>
       </table>
   </td>
@@ -679,7 +755,37 @@ template&lt;typename ParentMesh_ &gt; </div>
 
 <p>the facet dimension </p>
 
-<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00113">113</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00130">130</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a555516051ed72ec59befab7d07ce1974" name="a555516051ed72ec59befab7d07ce1974"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a555516051ed72ec59befab7d07ce1974">&#9670;&#160;</a></span>shape_dim</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ParentMesh_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html">FEAT::Geometry::MaskedBoundaryFactory</a>&lt; ParentMesh_ &gt;::shape_dim = ShapeType::dimension</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the shape dimension </p>
+
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00128">128</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="boundary__factory_8hpp_source.html#l00184">FEAT::Geometry::MaskedBoundaryFactory&lt; ParentMesh_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>

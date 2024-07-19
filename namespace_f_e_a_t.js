@@ -87,6 +87,7 @@ var namespace_f_e_a_t =
     [ "Windows", "namespace_f_e_a_t_1_1_windows.html", [
       [ "disable_error_prompts", "namespace_f_e_a_t_1_1_windows.html#aa713ecce9ff944173b0e34dcece4ce5c", null ],
       [ "dump_call_stack_to_stderr", "namespace_f_e_a_t_1_1_windows.html#a57527553d02c83968ce9d54fd23436f2", null ],
+      [ "get_current_process_id", "namespace_f_e_a_t_1_1_windows.html#aa79563e0c90d32c873af44ad388e6956", null ],
       [ "install_seh_filter", "namespace_f_e_a_t_1_1_windows.html#a140331e08f5cf7cfb82e6fff60f04f3e", null ],
       [ "query_memory_usage", "namespace_f_e_a_t_1_1_windows.html#a8600a9842ba75b7efedc674ed46f7d59", null ],
       [ "query_performance_counter", "namespace_f_e_a_t_1_1_windows.html#ace71d32a51d5f170810bce006dca5be8", null ],

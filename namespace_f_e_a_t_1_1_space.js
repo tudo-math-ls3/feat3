@@ -3,6 +3,7 @@ var namespace_f_e_a_t_1_1_space =
     [ "Argyris", "namespace_f_e_a_t_1_1_space_1_1_argyris.html", "namespace_f_e_a_t_1_1_space_1_1_argyris" ],
     [ "Bernstein2", "namespace_f_e_a_t_1_1_space_1_1_bernstein2.html", "namespace_f_e_a_t_1_1_space_1_1_bernstein2" ],
     [ "BognerFoxSchmit", "namespace_f_e_a_t_1_1_space_1_1_bogner_fox_schmit.html", "namespace_f_e_a_t_1_1_space_1_1_bogner_fox_schmit" ],
+    [ "CaiDouSanSheYe", "namespace_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye.html", "namespace_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye" ],
     [ "CroRavRanTur", "namespace_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur.html", "namespace_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur" ],
     [ "Discontinuous", "namespace_f_e_a_t_1_1_space_1_1_discontinuous.html", "namespace_f_e_a_t_1_1_space_1_1_discontinuous" ],
     [ "Hermite3", "namespace_f_e_a_t_1_1_space_1_1_hermite3.html", "namespace_f_e_a_t_1_1_space_1_1_hermite3" ],
