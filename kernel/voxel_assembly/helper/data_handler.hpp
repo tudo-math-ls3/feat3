@@ -57,10 +57,8 @@ namespace FEAT
       /// device pointer to array of nodes. Node data is saved sequentially
       void* _d_nodes = nullptr;
 
-      /// The resulting coloring mapping, i.e. each std::vector contains the cell indices of one color
-      std::vector<std::vector<int>> _coloring_maps;
-      /// Device pointer to the single coloring maps
-      std::vector<void*> _d_coloring_maps;
+      /// Datahanlder for the coloring data.
+      Adjacency::ColoringDataHandler coloring_data;
 
     public:
       inline AssemblyMappingData<DataType, IndexType> get_host_assembly_field() const
@@ -77,54 +75,54 @@ namespace FEAT
 
       Index get_num_colors() const
       {
-        return _coloring_maps.size();
+        return coloring_data.get_num_colors();
       }
 
       std::vector<int>& get_color_map(Index k)
       {
-        return _coloring_maps.at(k);
+        return coloring_data.get_color_map(k);
       }
 
       const std::vector<int>& get_color_map(Index k) const
       {
-        return _coloring_maps.at(k);
+        return coloring_data.get_color_map(k);
       }
 
       void* get_color_map_device(Index k)
       {
-        return _d_coloring_maps.at(k);
+        return coloring_data.get_color_map_device(k);
       }
 
       const void* get_color_map_device(Index k) const
       {
-        return _d_coloring_maps.at(k);
+        return coloring_data.get_color_map_device(k);
       }
 
       std::vector<std::vector<int>>& get_coloring_maps()
       {
-        return _coloring_maps;
+        return coloring_data.get_coloring_maps();
       }
 
       const std::vector<std::vector<int>>& get_coloring_maps() const
       {
-        return _coloring_maps;
+        return coloring_data.get_coloring_maps();
       }
 
       std::vector<void*>& get_coloring_maps_device()
       {
-        return _d_coloring_maps;
+        return coloring_data.get_coloring_maps_device();
       }
 
       const std::vector<void*>& get_coloring_maps_device() const
       {
-        return _d_coloring_maps;
+        return coloring_data.get_coloring_maps_device();
       }
 
     protected:
-      inline void _init_device()
+      void _init_device()
       {
         #ifdef FEAT_HAVE_CUDA
-          if(_d_cell_to_dof != nullptr || _d_nodes != nullptr || _d_coloring_maps.size() > 0)
+          if(_d_cell_to_dof != nullptr || _d_nodes != nullptr || coloring_data.initialized())
             XABORTM("Device Memory already initialized!");
           _d_cell_to_dof = Util::cuda_malloc(_cell_to_dof.size()*sizeof(IndexType));
           Util::cuda_copy_host_to_device(_d_cell_to_dof, (void*)_cell_to_dof.data(), _cell_to_dof.size()*sizeof(IndexType));
@@ -135,23 +133,14 @@ namespace FEAT
           _d_nodes = Util::cuda_malloc(_nodes.size() * dim * sizeof(DataType));
           Util::cuda_copy_host_to_device(_d_nodes, (void*)_nodes.data(), _nodes.size() * dim * sizeof(DataType));
 
-          _d_coloring_maps.resize(_coloring_maps.size());
-          for(Index i = 0; i < _coloring_maps.size(); ++i)
-          {
-            _d_coloring_maps[i] = Util::cuda_malloc(_coloring_maps[i].size() * sizeof(int));
-            Util::cuda_copy_host_to_device(_d_coloring_maps[i], _coloring_maps[i].data(), _coloring_maps[i].size() * sizeof(int));
-          }
+          coloring_data.init_device();
         #endif
       }
 
-      inline void _free_device()
+      void _free_device()
       {
         #ifdef FEAT_HAVE_CUDA
-          for(Index i = 0; i < _d_coloring_maps.size(); ++i)
-          {
-            Util::cuda_free(_d_coloring_maps[i]);
-          }
-          _d_coloring_maps.clear();
+          coloring_data.free_device();
           Util::cuda_free(_d_nodes);
           _d_nodes = nullptr;
           Util::cuda_free(_d_cell_to_dof_sorter);
@@ -179,6 +168,7 @@ namespace FEAT
 
       bool _test_coloring() const
       {
+        const auto _coloring_maps = coloring_data.get_coloring_maps();
         for(int i = 0; i < int(_coloring_maps.size()); ++i)
         {
           for(int l = 0; l < int(_coloring_maps[std::size_t(i)].size()); ++l)
@@ -226,38 +216,18 @@ namespace FEAT
 
       void _fill_color(const std::vector<int>& coloring, int hint)
       {
-        int num_colors = hint;
-        if(hint < 0)
-        {
-          num_colors = *std::max_element(coloring.begin(), coloring.end());
-        }
-        _coloring_maps.resize(std::size_t(num_colors));
-        for(std::size_t i = 0; i < coloring.size(); ++i)
-        {
-          _coloring_maps.at(std::size_t(coloring.at(i))).push_back(int(i));
-        }
+        coloring_data.fill_color(coloring, hint);
         #ifdef DEBUG
         _test_coloring();
         #endif
-
       }
 
       void _fill_color(const Adjacency::Coloring& coloring, int hint)
       {
-        int num_colors = int(coloring.get_num_colors());
-        if(hint >= 0)
-        {
-          ASSERTM(num_colors == hint, "Hint and number of colors do not fit!");
-        }
-        _coloring_maps.resize(std::size_t(num_colors));
-        for(int i = 0; i < int(coloring.get_num_nodes()); ++i)
-        {
-          _coloring_maps.at(coloring[Index(i)]).push_back(i);
-        }
+        coloring_data.fill_color(coloring, hint);
         #ifdef DEBUG
         _test_coloring();
         #endif
-
       }
 
     public:
