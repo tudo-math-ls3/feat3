@@ -18,6 +18,7 @@ set(benchmarks
   product_matcsrmat-file-bench
   product_matvec-bench
   product_matvec_dense-bench
+  saddle_point_assembly-bench
   stokes_multigrid-bench
 )
 

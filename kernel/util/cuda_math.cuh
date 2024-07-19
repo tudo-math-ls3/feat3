@@ -674,6 +674,118 @@ namespace FEAT
 
     }
     #endif
+
+    template<typename DT_, typename IT_>
+    __host__ __device__ inline DT_ invert_matrix(const IT_ n, const IT_ stride, DT_* __restrict__ a, IT_* __restrict__ p)
+    {
+      #ifndef __CUDA_ARCH__
+      // make sure that the parameters are valid
+      if((n <= IT_(0)) || (stride < n) || (a == nullptr) || (p == nullptr))
+        return DT_(0);
+      #endif
+
+      #ifndef __CUDA_ARCH__
+      // invert 1x1 explicitly
+      if(n == IT_(1))
+      {
+        DT_ det = a[0];
+        a[0] = DT_(1) / det;
+        return det;
+      }
+      #endif
+
+      // initialize identity permutation
+      for(IT_ i = 0; i < n; ++i)
+      {
+        p[i] = i;
+      }
+
+      // initialize determinant to 1
+      DT_ det = DT_(1);
+
+      // primary column elimination loop
+      for(IT_ k(0); k < n; ++k)
+      {
+        // step 1: find a pivot for the elimination of column k
+        {
+          // for this, we only check the rows p[j] with j >= k, as all
+          // rows p[j] with j < k have already been eliminated and are
+          // therefore not candidates for pivoting
+          DT_ pivot = CudaMath::cuda_abs(a[p[k]*stride + p[k]]);
+          IT_ i = k;
+
+          // loop over all unprocessed rows
+          for(IT_ j(k+1); j < n; ++j)
+          {
+            // get our matrix value and check whether it can be a pivot
+            DT_ abs_val = CudaMath::cuda_abs(a[p[j]*stride + p[j]]);
+            if(abs_val > pivot)
+            {
+              pivot = abs_val;
+              i = j;
+            }
+          }
+
+          // do we have to swap rows i and k?
+          if(i > k)
+          {
+            // swap rows "virtually" by exchanging their permutation positions
+            IT_ t = p[k];
+            p[k] = p[i];
+            p[i] = t;
+          }
+        }
+
+        // compute pivot row offset
+        const IT_ pk_off = p[k]*stride;
+
+        // step 2: process pivot row
+        {
+          // update determinant by multiplying with the pivot element
+          det *= a[pk_off + p[k]];
+
+          // get our inverted pivot element
+          const DT_ pivot = DT_(1) / a[pk_off + p[k]];
+
+          // replace column entry by unit column entry
+          a[pk_off + p[k]] = DT_(1);
+
+          // divide the whole row by the inverted pivot
+          for(IT_ j(0); j < n; ++j)
+          {
+            a[pk_off+j] *= pivot;
+          }
+        }
+
+        // step 3: eliminate pivot column
+
+        // loop over all rows of the matrix
+        for(IT_ i(0); i < n; ++i)
+        {
+          // skip the pivot row
+          if(i == p[k])
+            continue;
+
+          // compute row and pivot offsets
+          const IT_ row_off = i*stride;
+
+          // fetch elimination factor
+          const DT_ factor =  a[row_off + p[k]];
+
+          // replace by unit column entry
+          a[row_off + p[k]] = DT_(0);
+
+          // process the row
+          for(IT_ j(0); j < n; ++j)
+          {
+            a[row_off + j] -= a[pk_off + j] * factor;
+          }
+        }
+      }
+
+      // return determinant
+      return det;
+    }
   }
 }
 #endif // KERNEL_UTIL_CUDA_MATH_CUH

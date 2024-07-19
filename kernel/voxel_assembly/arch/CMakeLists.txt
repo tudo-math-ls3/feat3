@@ -31,5 +31,6 @@ if (FEAT_HAVE_CUDA)
   )
 
   target_compile_options(kernel-voxel-assembly-arch-cuda PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:$<$<BOOL:FEAT_HAVE_OMP>:-Xcompiler=-fopenmp>>) #-dc for relocatable device code...
+  target_compile_options(kernel-voxel-assembly-arch-cuda PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-suppress-stack-size-warning>)
   target_link_libraries(kernel-voxel-assembly-arch PRIVATE kernel-voxel-assembly-arch-cuda)
 endif (FEAT_HAVE_CUDA)

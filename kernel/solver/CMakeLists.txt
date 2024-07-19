@@ -6,6 +6,7 @@ set(kernel-solver-list
   hypre.cpp
   superlu.cpp
   umfpack.cpp
+  voxel_amavanka.cpp
   )
 
 add_library(kernel-solver STATIC ${kernel-solver-list})
@@ -45,8 +46,9 @@ if (FEAT_HAVE_CUDA)
     ilu_precond.cu
     sor_precond.cu
     ssor_precond.cu
+    voxel_amavanka.cu
   )
-  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY})
+  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} kernel-util-cuda)
   target_link_libraries(kernel-solver PRIVATE kernel-solver-cuda)
 endif (FEAT_HAVE_CUDA)
 
@@ -60,6 +62,7 @@ set(test_list
   superlu-test
   umfpack-test
   vanka-test
+  voxel_amavanka-test
 )
 
 # create all tests

@@ -18,6 +18,7 @@
 // includes, system
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 namespace FEAT
 {
@@ -193,6 +194,12 @@ namespace FEAT
         return Index(_coloring.size());
       }
 
+      /// \copydoc get_num_nodes()
+      auto size() const -> decltype(_coloring.size())
+      {
+        return _coloring.size();
+      }
+
       /**
        * \brief Returns the maximum color index.
        *
@@ -275,6 +282,11 @@ namespace FEAT
       Index get_num_colors() const
       {
         return _coloring_maps.size();
+      }
+
+      Index get_color_size(Index k) const
+      {
+        return _coloring_maps.at(k).size();
       }
 
       /// Get the k-th color map
@@ -395,6 +407,11 @@ namespace FEAT
       bool initialized() const
       {
         return _d_coloring_maps.size() > 0u;
+      }
+
+      Index get_max_size() const
+      {
+        return std::accumulate(_coloring_maps.begin(), _coloring_maps.end(), Index(0), [](const auto& a, const auto& b){return std::max(a, b.size());});
       }
     }; // class ColoringDataHandler
   } // namespace Adjacency

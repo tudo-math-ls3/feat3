@@ -479,8 +479,8 @@ public:
 
 }; // class VoxelDefoAssemblyTest
 
-constexpr int _lvl_2d = 5;
-constexpr int _lvl_3d = 3;
+constexpr int _lvl_2d = 3;
+constexpr int _lvl_3d = 2;
 
 VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
 VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);

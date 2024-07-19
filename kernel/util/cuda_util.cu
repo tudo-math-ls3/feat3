@@ -20,6 +20,7 @@ Index FEAT::Util::cuda_blocksize_spmv = 256;
 Index FEAT::Util::cuda_blocksize_axpy = 256;
 Index FEAT::Util::cuda_blocksize_scalar_assembly = 256;
 Index FEAT::Util::cuda_blocksize_blocked_assembly = 128;
+Index FEAT::Util::cuda_blocksize_vanka_assembly = 64;
 
 cusparseHandle_t FEAT::Util::Intern::cusparse_handle;
 cublasHandle_t FEAT::Util::Intern::cublas_handle;
@@ -105,6 +106,20 @@ void * FEAT::Util::cuda_malloc(const Index bytes)
   return memory;
 }
 
+void * FEAT::Util::cuda_malloc_host(const Index bytes)
+{
+  void * memory(nullptr);
+  if(bytes == 0)
+    return memory;
+
+  auto status = cudaMallocHost((void**)&memory, bytes);
+  if (status != cudaSuccess)
+    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error\n" + stringify(cudaGetErrorString(status)));
+  if (memory == nullptr)
+    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error (null pointer returned)");
+  return memory;
+}
+
 void FEAT::Util::cuda_free(void * address)
 {
   if (address == nullptr)
@@ -113,6 +128,16 @@ void FEAT::Util::cuda_free(void * address)
   auto status = cudaFree(address);
   if (cudaSuccess != status)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_free: cudaFree failed!\n" + stringify(cudaGetErrorString(status)));
+}
+
+void FEAT::Util::cuda_free_host(void * address)
+{
+  if (address == nullptr)
+    return;
+
+  auto status = cudaFreeHost(address);
+  if (cudaSuccess != status)
+    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_free_host: cudaFreeHost failed!\n" + stringify(cudaGetErrorString(status)));
 }
 
 void FEAT::Util::cuda_initialize(int rank, int /*ranks_per_node*/, int /*ranks_per_uma*/, int gpus_per_node)
@@ -267,6 +292,9 @@ template void FEAT::Util::cuda_set_memory(double * , const double, const Index);
 template void FEAT::Util::cuda_set_memory(unsigned int * , const unsigned int, const Index);
 template void FEAT::Util::cuda_set_memory(unsigned long * , const unsigned long, const Index);
 template void FEAT::Util::cuda_set_memory(unsigned long long * , const unsigned long long, const Index);
+template void FEAT::Util::cuda_set_memory(int * , const int, const Index);
+template void FEAT::Util::cuda_set_memory(long * , const long, const Index);
+template void FEAT::Util::cuda_set_memory(long long * , const long long, const Index);
 
 template <typename DT1_, typename DT2_>
 void FEAT::Util::cuda_convert(DT1_ * dest, const DT2_ * src, const Index count)

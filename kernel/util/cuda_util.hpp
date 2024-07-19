@@ -55,13 +55,18 @@ namespace FEAT
     /// cuda threading grid blocksize for block typed assembly
     extern Index cuda_blocksize_blocked_assembly;
 
+    /// cuda threading grid blocksize for block typed assembly
+    extern Index cuda_blocksize_vanka_assembly;
+
     void cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly);
     void cuda_set_device(const int device);
     void cuda_check_last_error();
     void * cuda_get_device_pointer(void * host);
     void * cuda_malloc_managed(const Index bytes);
     void * cuda_malloc(const Index bytes);
+    void * cuda_malloc_host(const Index bytes);
     void cuda_free(void * address);
+    void cuda_free_host(void * address);
     void cuda_initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
     void cuda_finalize();
     NOINLINE void cuda_synchronize();
