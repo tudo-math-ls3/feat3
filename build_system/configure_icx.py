@@ -3,6 +3,7 @@
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 import platform
+import sys
 from build_system.feat_util import get_output
 
 def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors):
