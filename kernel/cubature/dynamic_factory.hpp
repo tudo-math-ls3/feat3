@@ -24,7 +24,7 @@ namespace FEAT
         Exception(String("Unknown cubature rule '") + rule + "' for shape " + shape)
       {
       }
-      virtual ~UnknownRule() throw()
+      virtual ~UnknownRule() noexcept
       {
       }
     };

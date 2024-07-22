@@ -67,7 +67,7 @@ namespace FEAT
 
   public:
     /// DTOR
-    virtual ~Exception() throw()
+    virtual ~Exception() noexcept
     {
     }
 
@@ -78,7 +78,7 @@ namespace FEAT
     }
 
     /// return descriptive exception name
-    virtual const char * what() const throw() override
+    virtual const char * what() const noexcept override
     {
       return _message.empty() ? std::exception::what() : _message.c_str();
     }
@@ -161,7 +161,7 @@ namespace FEAT
     {
     }
 
-    virtual ~ParseError() throw()
+    virtual ~ParseError() noexcept
     {
     }
   }; // class ParseError
@@ -183,7 +183,7 @@ namespace FEAT
       Exception(message_in)
     {
     }
-    virtual ~FileError() throw()
+    virtual ~FileError() noexcept
     {
     }
   }; // class FileError
@@ -208,7 +208,7 @@ namespace FEAT
       FileError("File not found: '" + filename + "'")
     {
     }
-    virtual ~FileNotFound() throw()
+    virtual ~FileNotFound() noexcept
     {
     }
   }; // class FileNotFound
@@ -233,7 +233,7 @@ namespace FEAT
       FileError("Could not create file: '" + filename + "'")
     {
     }
-    virtual ~FileNotCreated() throw()
+    virtual ~FileNotCreated() noexcept
     {
     }
   }; // class FileNotCreated
@@ -273,7 +273,7 @@ namespace FEAT
     }
 
     /// virtual destructor
-    virtual ~SyntaxError() throw()
+    virtual ~SyntaxError() noexcept
     {
     }
 

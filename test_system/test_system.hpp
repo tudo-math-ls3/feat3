@@ -80,12 +80,12 @@ namespace FEAT
       }
 
       /// DTOR
-      virtual ~TestFailedException() throw ()
+      virtual ~TestFailedException() noexcept
       {
       }
 
       /// description
-      virtual const char* what() const throw() override
+      virtual const char* what() const noexcept override
       {
         return _message.c_str();
       }

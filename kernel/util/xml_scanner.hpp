@@ -75,7 +75,7 @@ namespace FEAT
       }
 
       /// \returns the what message
-      virtual const char * what() const throw() override
+      virtual const char * what() const noexcept override
       {
         return my_what.c_str();
       }
