@@ -761,6 +761,10 @@ namespace FEAT
         if(!Math::isfinite(this->_def_init))
           return Status::aborted;
 
+        // check against low absolute tolerance; this may be fulfilled if we have only a handful of dofs
+        if(this->_def_init < this->_tol_abs_low)
+          return Status::success;
+
         // check if the initial defect is zero; we test against eps^2 here
         if(this->_def_init <= Math::sqr(Math::eps<DataType>()))
           return Status::success;

@@ -997,6 +997,7 @@ namespace FEAT
           // get matrix arrays
           DT_* vals = matrix.val();
           const IT_* row_ptr = matrix.row_ptr();
+          const IT_* col_idx = matrix.col_ind();
 
           // get the dofs for our row blocks
           const Adjacency::Graph& row_blocks = dof_macros.at(row_block);
@@ -1022,9 +1023,19 @@ namespace FEAT
                 n += Index(macro_mask[row_img_idx[j]]);
             }
 
-            const DT_ sc = omega / DT_(Math::max(n,Index(1)));
-            for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
-              vals[j] *= sc;
+            if(n > 0u)
+            {
+              const DT_ sc = omega / DT_(Math::max(n,Index(1)));
+              for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+                vals[j] *= sc;
+            }
+            else // null row: replace by unit row
+            {
+              for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+              {
+                vals[j] = DataType(col_idx[j] == i ? 1 : 0);
+              }
+            }
           }
         }
 
@@ -1036,6 +1047,7 @@ namespace FEAT
           // get matrix arrays
           Tiny::Matrix<DT_, bh_, bw_>* vals = matrix.val();
           const IT_* row_ptr = matrix.row_ptr();
+          const IT_* col_idx = matrix.col_ind();
 
           // get the dofs for our row blocks
           const Adjacency::Graph& row_blocks = dof_macros.at(row_block);
@@ -1061,9 +1073,20 @@ namespace FEAT
                 n += Index(macro_mask[row_img_idx[j]]);
             }
 
-            const DT_ sc = omega / DT_(Math::max(n,Index(1)));
-            for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
-              vals[j] *= sc;
+            if(n > 0u)
+            {
+              const DT_ sc = omega / DT_(n);
+              for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+                vals[j] *= sc;
+            }
+            else // null row: replace by unit row
+            {
+              for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
+              {
+                if(col_idx[j] == i)
+                  vals[j].set_identity();
+              }
+            }
           }
         }
 
