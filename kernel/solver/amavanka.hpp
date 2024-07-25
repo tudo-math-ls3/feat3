@@ -1033,7 +1033,7 @@ namespace FEAT
             {
               for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
               {
-                vals[j] = DataType(col_idx[j] == i ? 1 : 0);
+                vals[j] = DT_(col_idx[j] == i ? 1 : 0);
               }
             }
           }
