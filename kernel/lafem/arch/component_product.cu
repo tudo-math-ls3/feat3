@@ -23,8 +23,7 @@ namespace FEAT
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
-        ///\todo skip conversion step
-        r[idx] = float(x[idx] * y[idx]);
+        r[idx] = x[idx] * y[idx];
       }
     }
   }

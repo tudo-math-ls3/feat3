@@ -266,7 +266,7 @@ public:
       auto precon_r = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_pcgnr(matrix, filter, precon_l, precon_r);
       solver->set_tol_rel(1e-7);
-      test_solver("PCGNR-JAC-JAC", *solver, vec_sol, vec_ref, vec_rhs, Backend::get_preferred_backend()!=PreferredBackend::cuda ? 42 : 48);
+      test_solver("PCGNR-JAC-JAC", *solver, vec_sol, vec_ref, vec_rhs, 42);
     }
 
     // test PCGNRILU

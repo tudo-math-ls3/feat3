@@ -277,7 +277,8 @@ public:
 
   virtual void run() const override
   {
-    DT_ s(DT_(4711.1));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ s(DT_(0.4711));
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVectorBlocked<DT_, IT_, BS_> a(size);
@@ -300,20 +301,20 @@ public:
       c.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(c(i).v[j], ref(i).v[j], DT_(1e-2));
+          TEST_CHECK_EQUAL_WITHIN_EPS(c(i).v[j], ref(i).v[j], DT_(eps));
 
       DenseVectorBlocked<DT_, IT_, BS_> a_tmp(size);
       a_tmp.copy(a);
       a.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(a(i).v[j], ref(i).v[j], DT_(1e-2));
+          TEST_CHECK_EQUAL_WITHIN_EPS(a(i).v[j], ref(i).v[j], DT_(eps));
 
       a.copy(a_tmp);
       b.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < BS_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(i).v[j], ref(i).v[j], DT_(1e-2));
+          TEST_CHECK_EQUAL_WITHIN_EPS(b(i).v[j], ref(i).v[j], DT_(eps));
     }
   }
 };
@@ -433,7 +434,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -519,8 +520,6 @@ public:
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
-      if (Backend::get_preferred_backend() == PreferredBackend::cuda)
-        eps = Math::pow(Math::eps<DT_>(), DT_(0.2));
 
       DenseVectorBlocked<DT_, IT_, BS_> a(size);
       DenseVectorBlocked<DT_, IT_, BS_> b(size);

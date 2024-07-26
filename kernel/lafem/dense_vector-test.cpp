@@ -287,9 +287,9 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    DT_ s(DT_(47.11));
+    DT_ s(DT_(0.4711));
     Index max_size(1000);
 #ifdef FEAT_HAVE_HALFMATH
     if (typeid(DT_) == typeid(Half))
@@ -317,6 +317,7 @@ public:
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(a(i), ref(i), DT_(eps));
 
+      s *= DT_(0.5);
       for (Index i(0) ; i < size ; ++i)
       {
         ref(i, s * a(i) + b(i));
@@ -446,8 +447,6 @@ public:
   virtual void run() const override
   {
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
-    if (Backend::get_preferred_backend() == PreferredBackend::cuda)
-      eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -533,8 +532,6 @@ public:
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
-      if (Backend::get_preferred_backend() == PreferredBackend::cuda)
-        eps = Math::pow(Math::eps<DT_>(), DT_(0.2));
 
       DenseVector<DT_, IT_> a(size);
       DenseVector<DT_, IT_> b(size);
@@ -750,8 +747,6 @@ public:
   virtual void run() const override
   {
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
-    if (Backend::get_preferred_backend() == PreferredBackend::cuda)
-      eps = Math::pow(Math::eps<DT_>(), DT_(0.4));
 
     const DT_ alpha(Math::pi<DT_>());
 
