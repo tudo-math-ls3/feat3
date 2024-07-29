@@ -1805,13 +1805,6 @@ namespace FEAT
        * if the sparsity pattern of the output matrix is incomplete unless
        * \p allow_incomplete is set to \c true.
        *
-       * \note
-       * This function currently only supports data in main memory.
-       *
-       * \note
-       * This version of the add_double_mat_product operation works on d and b as scalar csr matrices.
-       * Their values are treaded as beeing a fully filled block.
-       *
        * \param[in] d, a, b
        * The three matrices to be multiplied
        *
@@ -1867,9 +1860,7 @@ namespace FEAT
               const IT_ l = col_idx_a[kl];
 
               // pre-compute factor (alpha * D_ik * A_kl)
-              ValueType omega;
-              omega.set_mat_mat_mult(ValueType(data_d[ik]), data_a[kl]);
-              omega *= alpha;
+              ValueType omega = (alpha * data_d[ik]) * data_a[kl];
 
               // loop over all non-zeros B_lj in row j of B and
               // loop over all non-zeros X_ij in row i of X and
@@ -1892,9 +1883,7 @@ namespace FEAT
                 else if(col_idx_x[ij] == col_idx_b[lj])
                 {
                   // okay: B_lj contributes to X_ij
-                  ValueType temp;
-                  temp.set_mat_mat_mult(omega, ValueType(data_b[lj]));
-                  data_x[ij] += temp;
+                  Tiny::axpy(data_x[ij], omega, data_b[lj]);
                   ++ij;
                   ++lj;
                 }
