@@ -1032,6 +1032,19 @@ namespace FEAT
       }
     }; // class DirectStokesCore
 
+    /// specifies whether at least one backend for the DirectStokesSolver class is available
+    static constexpr bool direct_stokes_solver_available =
+#ifdef FEAT_HAVE_CUDSS
+      true ||
+#endif
+#ifdef FEAT_HAVE_MKL
+      true ||
+#endif
+#ifdef FEAT_HAVE_UMFPACK
+      true ||
+#endif
+      false;
+
     /**
      * \brief Direct Stokes solver class template
      *
@@ -1047,9 +1060,6 @@ namespace FEAT
      *
      * This specialization implements a direct solver for (Navier-)Stokes systems, which are discretized into a (local)
      * SaddlePointMatrix consisting of matrix blocks A, B and D.
-     *
-     * \attention
-     * Currently, this solver class can only be used if FEAT is compiled and linked with support for the UMFPACK library.
      *
      * \author Peter Zajac
      */
@@ -1077,6 +1087,27 @@ namespace FEAT
       typedef typename StokesCoreType::SolverVectorType SolverVectorType;
       /// the solver filter type; this is always a NoneFilter
       typedef typename StokesCoreType::SolverFilterType SolverFilterType;
+
+      /// specifies whether the cuDSS backend solver is available
+#if defined(FEAT_HAVE_CUDSS) || defined(DOXYGEN)
+      static constexpr bool have_backend_cudss = true;
+#else
+      static constexpr bool have_backend_cudss = false;
+#endif // FEAT_HAVE_CUDSS
+
+      /// specifies whether the MKL DSS backend solver is available
+#if defined(FEAT_HAVE_MKL) || defined(DOXYGEN)
+      static constexpr bool have_backend_mkldss = true;
+#else
+      static constexpr bool have_backend_mkldss = false;
+#endif // FEAT_HAVE_MKL
+
+      /// specifies whether the UMFPACK backend solver is available
+#if defined(FEAT_HAVE_UMFPACK) || defined(DOXYGEN)
+      static constexpr bool have_backend_umfpack = true;
+#else
+      static constexpr bool have_backend_umfpack = false;
+#endif // FEAT_HAVE_UMFPACK
 
     protected:
       /// the system matrix
@@ -1115,37 +1146,53 @@ namespace FEAT
        *
        * \param[in] filter_sys
        * A \resident reference to the system filter object. The filter does not need to be initialized yet.
+       *
+       * \param[in] backend
+       * Specifies the preferred backend to determine which solver backend to choose from:
+       * - PreferredBackend::cuda : use Solver::CUDSS as solver backend if available
+       * - PreferredBackend::mkl : use Solver::MKLDSS as solver backend if available
+       * - PreferredBackend::generic : use Solver::Umpfack as solver backend if available
+       *
+       * \note
+       * If the preferred backend solver is not available, because FEAT was not linked against the corresponding
+       * third-party library, then this constructor will check if another backend is available and, if so, use
+       * that backend instead. If available, Umfpack is always chosen as a "last resort" if no other backend is
+       * available.
        */
-      explicit DirectStokesSolver(const SystemMatrixType& matrix_sys, const SystemFilterType& filter_sys) :
+      explicit DirectStokesSolver(const SystemMatrixType& matrix_sys, const SystemFilterType& filter_sys, PreferredBackend backend) :
         _matrix_sys(matrix_sys),
         _filter_sys(filter_sys),
         _stokes_core(_matrix_sys.block_a(), _matrix_sys.block_b(), _matrix_sys.block_d()),
         _direct_solver()
       {
 #ifdef FEAT_HAVE_CUDSS
-        if(Backend::get_preferred_backend() == PreferredBackend::cuda)
+        // create a CUDSS solver if this is the desired backend or if the desired backend is not available
+        if((backend == PreferredBackend::cuda) ||
+          ((backend == PreferredBackend::mkl) && !have_backend_mkldss) ||
+          ((backend == PreferredBackend::generic) && !have_backend_umfpack))
         {
-          // create a CUDSS solver
           _cudss_solver = Solver::new_cudss(_stokes_core.get_solver_matrix());
           _direct_solver = _cudss_solver;
-          // main diagonal is not absolutely necessary for CUDSS, but it seems to improve precision a bit
+          // main diagonal is not absolutely necessary for cuDSS, but it seems to improve precision a bit
           _stokes_core.set_need_main_diagonal(true);
         }
         else
 #endif // FEAT_HAVE_CUDSS
 #ifdef FEAT_HAVE_MKL
-        if(Backend::get_preferred_backend() == PreferredBackend::mkl)
+        // create a MKL DSS solver if this is the desired backend or if the desired backend is not available
+        if((backend == PreferredBackend::mkl) ||
+          ((backend == PreferredBackend::cuda) && !have_backend_cudss) ||
+          ((backend == PreferredBackend::generic) && !have_backend_umfpack))
         {
-          // create a MKLDSS solver
           _mkldss_solver = Solver::new_mkl_dss(_stokes_core.get_solver_matrix());
           _direct_solver = _mkldss_solver;
-          // MKL emphasized that main diagonal is absolutely mandatory
+          // MKL emphasizes that main diagonal is absolutely mandatory
           _stokes_core.set_need_main_diagonal(true);
         }
         else
 #endif // FEAT_HAVE_MKL
 #ifdef FEAT_HAVE_UMFPACK
-        // fallback or generic: try to create UMFPACK solver
+        // fallback or generic: create an UMFPACK solver
         {
           // create an UMFPACK solver
           _umfpack_solver = Solver::new_umfpack(_stokes_core.get_solver_matrix());
@@ -1153,9 +1200,27 @@ namespace FEAT
         }
 #else
         {
-          XABORTM("DirectStokesSolver can only be used if UMFPACK is available");
+          XABORTM("DirectStokesSolver can only be used if at least one of {cuDSS, MKL DSS, UMFPACK} is available");
         }
 #endif
+        // ensure that compilers don't warn about unused parameters
+        (void)backend;
+      }
+
+      /**
+       * \brief Constructor for preferred backend
+       *
+       * This constructor checks Backend::get_preferred_backend() to determine which backend to choose.
+       *
+       * \param[in] matrix_sys
+       * A \resident reference to the system matrix object. The matrix does not need to be initialized yet.
+       *
+       * \param[in] filter_sys
+       * A \resident reference to the system filter object. The filter does not need to be initialized yet.
+       */
+      explicit DirectStokesSolver(const SystemMatrixType& matrix_sys, const SystemFilterType& filter_sys) :
+        DirectStokesSolver(matrix_sys, filter_sys, Backend::get_preferred_backend())
+      {
       }
 
       /// Returns the name of the solver.

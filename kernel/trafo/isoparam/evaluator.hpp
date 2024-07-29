@@ -783,10 +783,10 @@ namespace FEAT
           static constexpr int n = degree_;
 
           // store vertex points
-          _iso_coeff[0][0] = vertex_set[index_set(cell_index, 0)];
-          _iso_coeff[0][n] = vertex_set[index_set(cell_index, 1)];
-          _iso_coeff[n][0] = vertex_set[index_set(cell_index, 2)];
-          _iso_coeff[n][n] = vertex_set[index_set(cell_index, 3)];
+          _iso_coeff[0][0].convert(vertex_set[index_set(cell_index, 0)]);
+          _iso_coeff[0][n].convert(vertex_set[index_set(cell_index, 1)]);
+          _iso_coeff[n][0].convert(vertex_set[index_set(cell_index, 2)]);
+          _iso_coeff[n][n].convert(vertex_set[index_set(cell_index, 3)]);
 
           // vN0---vNN
           //  |     |    ^ y
@@ -817,6 +817,9 @@ namespace FEAT
           const int ix[4] = {1, 1, 0, 0};
           const int iy[4] = {0, 0, 1, 1};
 
+          // an auxiliary world point for conversion
+          typename ChartType::WorldPoint point;
+
           // loop over all four edges of the element
           for(int e = 0; e < 4; ++e)
           {
@@ -837,7 +840,10 @@ namespace FEAT
             // loop over all edge points and project them
             for(int k(1); k < degree_; ++k, y += iy[e], x += ix[e])
             {
-              _iso_coeff[y][x] = chart->project(_iso_coeff[y][x]);
+              // _iso_coeff and point may have different data types
+              point.convert(_iso_coeff[y][x]);
+              point = chart->project(point);
+              _iso_coeff[y][x].convert(point);
             }
           }
 
@@ -874,7 +880,10 @@ namespace FEAT
             {
               for(int j(1); j < degree_; ++j)
               {
-                _iso_coeff[i][j] = chart->project(_iso_coeff[i][j]);
+                // _iso_coeff and point may have different data types
+                point.convert(_iso_coeff[i][j]);
+                point = chart->project(point);
+                _iso_coeff[i][j].convert(point);
               }
             }
           }
@@ -1178,14 +1187,14 @@ namespace FEAT
           static constexpr int n = degree_;
 
           // store vertex points
-          _iso_coeff[0][0][0] = vertex_set[index_set(cell_index, 0)];
-          _iso_coeff[0][0][n] = vertex_set[index_set(cell_index, 1)];
-          _iso_coeff[0][n][0] = vertex_set[index_set(cell_index, 2)];
-          _iso_coeff[0][n][n] = vertex_set[index_set(cell_index, 3)];
-          _iso_coeff[n][0][0] = vertex_set[index_set(cell_index, 4)];
-          _iso_coeff[n][0][n] = vertex_set[index_set(cell_index, 5)];
-          _iso_coeff[n][n][0] = vertex_set[index_set(cell_index, 6)];
-          _iso_coeff[n][n][n] = vertex_set[index_set(cell_index, 7)];
+          _iso_coeff[0][0][0].convert(vertex_set[index_set(cell_index, 0)]);
+          _iso_coeff[0][0][n].convert(vertex_set[index_set(cell_index, 1)]);
+          _iso_coeff[0][n][0].convert(vertex_set[index_set(cell_index, 2)]);
+          _iso_coeff[0][n][n].convert(vertex_set[index_set(cell_index, 3)]);
+          _iso_coeff[n][0][0].convert(vertex_set[index_set(cell_index, 4)]);
+          _iso_coeff[n][0][n].convert(vertex_set[index_set(cell_index, 5)]);
+          _iso_coeff[n][n][0].convert(vertex_set[index_set(cell_index, 6)]);
+          _iso_coeff[n][n][n].convert(vertex_set[index_set(cell_index, 7)]);
 
           //     vNN0------vNNN
           //    ./'|      ./'|
@@ -1239,6 +1248,9 @@ namespace FEAT
           const int eiy[12] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0};
           const int eiz[12] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1};
 
+          // an auxiliary world point for conversion
+          typename ChartType::WorldPoint point;
+
           // loop over all twelve edges of the element
           for(int e = 0; e < 12; ++e)
           {
@@ -1260,7 +1272,10 @@ namespace FEAT
             // loop over all edge points and project them
             for(int i(1); i < degree_; ++i, z += eiz[e], y += eiy[e], x += eix[e])
             {
-              _iso_coeff[z][y][x] = chart->project(_iso_coeff[z][y][x]);
+              //_iso_coeff[z][y][x] = chart->project(_iso_coeff[z][y][x]);
+              point.convert(_iso_coeff[z][y][x]);
+              point = chart->project(point);
+              _iso_coeff[z][y][x].convert(point);
             }
           }
 
@@ -1333,7 +1348,10 @@ namespace FEAT
             {
               for(int j(1); j < degree_; ++j, z += qjz[q], y += qjy[q], x += qjx[q])
               {
-                _iso_coeff[z][y][x] = chart->project(_iso_coeff[z][y][x]);
+                //_iso_coeff[z][y][x] = chart->project(_iso_coeff[z][y][x]);
+                point.convert(_iso_coeff[z][y][x]);
+                point = chart->project(point);
+                _iso_coeff[z][y][x].convert(point);
               }
             }
           }
@@ -1367,7 +1385,10 @@ namespace FEAT
               {
                 for(int k(1); k < degree_; ++k)
                 {
-                  _iso_coeff[i][j][k] = chart->project(_iso_coeff[i][j][k]);
+                  //_iso_coeff[i][j][k] = chart->project(_iso_coeff[i][j][k]);
+                  point.convert(_iso_coeff[i][j][k]);
+                  point = chart->project(point);
+                  _iso_coeff[i][j][k].convert(point);
                 }
               }
             }

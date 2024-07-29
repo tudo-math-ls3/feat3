@@ -267,6 +267,21 @@ namespace FEAT
         this->compile_system_matrix();
       }
 
+      GlobalSystemVector create_global_vector_sys() const
+      {
+        return GlobalSystemVector(&this->gate_sys, this->gate_sys.get_freqs().clone(LAFEM::CloneMode::Layout));
+      }
+
+      GlobalVeloVector create_global_vector_velo() const
+      {
+        return GlobalVeloVector(&this->gate_velo, this->gate_velo.get_freqs().clone(LAFEM::CloneMode::Layout));
+      }
+
+      GlobalPresVector create_global_vector_pres() const
+      {
+        return GlobalPresVector(&this->gate_pres, this->gate_pres.get_freqs().clone(LAFEM::CloneMode::Layout));
+      }
+
       template<typename DomainLevel_>
       void assemble_gates(const Domain::VirtualLevel<DomainLevel_>& virt_dom_lvl)
       {
@@ -441,7 +456,7 @@ namespace FEAT
     {
     public:
       typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
-      MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
       typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloFilter;
@@ -468,6 +483,15 @@ namespace FEAT
       {
         filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
+      }
+
+      void compile_local_matrix_sys_type1()
+      {
+        BaseClass::compile_local_matrix_sys_type1();
+
+        // apply filter to A and B
+        this->filter_velo.local().filter_mat(this->local_matrix_sys_type1.block_a());
+        this->filter_velo.local().filter_offdiag_row_mat(this->local_matrix_sys_type1.block_b());
       }
     }; // class StokesBlockedUnitVeloNonePresSystemLevel
 
@@ -519,6 +543,15 @@ namespace FEAT
         filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
+
+      void compile_local_matrix_sys_type1()
+      {
+        BaseClass::compile_local_matrix_sys_type1();
+
+        // apply filter to A and B
+        this->filter_velo.local().template at<1>().filter_mat(this->local_matrix_sys_type1.block_a());
+        this->filter_velo.local().template at<1>().filter_offdiag_row_mat(this->local_matrix_sys_type1.block_b());
+      }
     }; // class StokesBlockedSlipUnitVeloNonePresSystemLevel
 
     /**
@@ -542,8 +575,9 @@ namespace FEAT
       public StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
         MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_>
     {
+    public:
       typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
-      MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
       typedef LAFEM::UnitFilterBlocked<DataType_, IndexType_, dim_> LocalVeloFilter;
@@ -608,6 +642,15 @@ namespace FEAT
         // build the mean filter
         fil_loc_p = LocalPresFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
       }
+
+      void compile_local_matrix_sys_type1()
+      {
+        BaseClass::compile_local_matrix_sys_type1();
+
+        // apply filter to A and B
+        this->filter_velo.local().filter_mat(this->local_matrix_sys_type1.block_a());
+        this->filter_velo.local().filter_offdiag_row_mat(this->local_matrix_sys_type1.block_b());
+      }
     }; // struct StokesBlockedUnitVeloMeanPresSystemLevel<...>
 
     template
@@ -628,7 +671,7 @@ namespace FEAT
     {
     public:
       typedef StokesBlockedSystemLevel<dim_, DataType_, IndexType_,
-      MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
+        MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_> BaseClass;
 
       // define local filter types
       typedef LAFEM::SlipFilter<DataType_, IndexType_, dim_> LocalVeloSlipFilter;
@@ -698,9 +741,22 @@ namespace FEAT
         // synchronize the slip filter
         Asm::sync_slip_filter(this->gate_velo, filter_velo.local().template at<0>());
       }
+
+      void compile_local_matrix_sys_type1()
+      {
+        BaseClass::compile_local_matrix_sys_type1();
+
+        // apply filter to A and B
+        this->filter_velo.local().template at<1>().filter_mat(this->local_matrix_sys_type1.block_a());
+        this->filter_velo.local().template at<1>().filter_offdiag_row_mat(this->local_matrix_sys_type1.block_b());
+      }
     }; // class StokesBlockedSlipUnitVeloMeanPresSystemLevel
 
-
+    /**
+     * \brief Stokes blocked System level combining all supported types of boundary conditions
+     *
+     * \author Peter Zajac
+     */
     template
     <
       int dim_,

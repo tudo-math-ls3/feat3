@@ -314,6 +314,14 @@ namespace FEAT
         return *this;
       }
 
+      /// conversion operator
+      template<typename Tx_, int sx_>
+      CUDA_HOST_DEVICE void convert(const Vector<Tx_, n_, sx_>& x)
+      {
+        for(int i(0); i < n_; ++i)
+          v[i] = T_(x.v[i]);
+      }
+
       /**
        * \brief Access operator.
        *
@@ -1387,6 +1395,14 @@ namespace FEAT
         for(int i(0); i < m_; ++i, ++it)
           v[i] = *it;
         return *this;
+      }
+
+      /// conversion operator
+      template<typename Tx_, int sma_, int sna_>
+      CUDA_HOST_DEVICE void convert(const Matrix<Tx_, m_, n_, sma_, sna_>& a)
+      {
+        for(int i(0); i < m_; ++i)
+          v[i].convert(a.v[i]);
       }
 
       /**
@@ -2540,6 +2556,14 @@ namespace FEAT
         for(int i(0); i < l_; ++i, ++it)
           v[i] = *it;
         return *this;
+      }
+
+      /// conversion operator
+      template<typename Tx_, int sla_, int sma_, int sna_>
+      CUDA_HOST_DEVICE void convert(const Tensor3<Tx_, l_, m_, n_, sla_, sma_, sna_>& a)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i].convert(a.v[i]);
       }
 
       /**

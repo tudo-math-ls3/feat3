@@ -176,6 +176,24 @@ namespace FEAT
       }; // class DomainLayer
 
       /**
+       * \brief Virtual Level Lambda type enumeration
+       *
+       * This enumeration is used by the VirtualLevel::apply_lambda() function, see its
+       * documentation for details.
+       */
+      enum class VirtualLevelLambda
+      {
+        /// indicates that the level is a normal level
+        normal,
+        /// indicates that the level is a parent level
+        parent,
+        /// indicates that the level is a child level
+        child,
+        /// indicates that the level is a base level
+        base
+      };
+
+      /**
        * \brief Virtual Domain Level class template
        *
        * This class acts as a wrapper around the actual domain levels, which contain the
@@ -385,6 +403,31 @@ namespace FEAT
         {
           XASSERT(bool(_level_base));
           return *_level_base;
+        }
+
+        /**
+         * \brief Applies a lambda expression onto every level object in this virtual level
+         *
+         * \param[in] lambda
+         * The lambda expression that has to be applied onto each level object
+         *
+         * The lambda expression is expected to take 3 parameters, where the first one is
+         * a LevelType& reference, the second one is a LayerType& reference, which represents
+         * the layer corresponding to the level object, and the third parameter is a
+         * VirtualLevelLambda enumeration value which specifies whether the lambda is being
+         * applied onto a normal level, a parent level, a child level or a base level.
+         */
+        template<typename Lambda_>
+        void apply_lambda(Lambda_&& lambda)
+        {
+          if(_level_parent)
+            lambda(*_level_parent, *_layer_parent, VirtualLevelLambda::parent);
+          if(_level_child)
+            lambda(*_level_child, *_layer_child, VirtualLevelLambda::child);
+          else
+            lambda(*_level, *_layer, VirtualLevelLambda::normal);
+          if(_level_base)
+            lambda(*_level_base, *_layer, VirtualLevelLambda::base);
         }
 
         std::size_t bytes() const

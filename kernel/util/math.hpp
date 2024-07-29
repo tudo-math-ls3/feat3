@@ -748,26 +748,34 @@ namespace FEAT
     template<>
     inline float pi<float>()
     {
-      return 4.0f * std::atan(1.0f);
+      return 3.141592654f;
     }
 
     template<>
     inline double pi<double>()
     {
-      return 4.0 * std::atan(1.0);
+      return 3.1415926535897932385;
     }
 
     template<>
     inline long double pi<long double>()
     {
-      return 4.0l * std::atan(1.0l);
+      return 3.141592653589793238462643383279502884197l;
     }
+
+#ifdef FEAT_HAVE_QUADMATH
+    template<>
+    inline __float128 pi<__float128>()
+    {
+      return 3.141592653589793238462643383279502884197q;
+    }
+#endif
 
     #ifdef FEAT_HAVE_HALFMATH
     template<>
     inline Half pi<Half>()
     {
-      return __float2half(pi<float>());
+      return __float2half(3.141592654f);
     }
     #endif
     /// \endcond

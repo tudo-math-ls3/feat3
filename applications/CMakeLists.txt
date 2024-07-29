@@ -52,6 +52,44 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set_source_files_properties(navier_stokes_cp2d_q2pq.cpp APPEND_STRING PROPERTIES COMPILE_FLAGS " -fno-var-tracking-assignments")
 endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
+######################### dfg95_bench1 applications
+
+add_executable(dfg95-bench1-2d-dp dfg95_bench1.cpp)
+add_executable(dfg95-bench1-2d-dp-sp dfg95_bench1.cpp)
+add_executable(dfg95-bench1-3d-dp dfg95_bench1.cpp)
+add_executable(dfg95-bench1-3d-dp-sp dfg95_bench1.cpp)
+
+target_compile_definitions(dfg95-bench1-2d-dp    PUBLIC FEAT_DFG95_BENCH1_DIM=2 FEAT_DFG95_BENCH1_DOUBLE)
+target_compile_definitions(dfg95-bench1-2d-dp-sp PUBLIC FEAT_DFG95_BENCH1_DIM=2 FEAT_DFG95_BENCH1_DOUBLE_SINGLE)
+target_compile_definitions(dfg95-bench1-3d-dp    PUBLIC FEAT_DFG95_BENCH1_DIM=3 FEAT_DFG95_BENCH1_DOUBLE)
+target_compile_definitions(dfg95-bench1-3d-dp-sp PUBLIC FEAT_DFG95_BENCH1_DIM=3 FEAT_DFG95_BENCH1_DOUBLE_SINGLE)
+
+set(dfg95_bench1_list dfg95-bench1-2d-dp dfg95-bench1-2d-dp-sp dfg95-bench1-3d-dp dfg95-bench1-3d-dp-sp)
+
+if (FEAT_HAVE_QUADMATH)
+  add_executable(dfg95-bench1-2d-qp dfg95_bench1.cpp)
+  add_executable(dfg95-bench1-2d-qp-dp dfg95_bench1.cpp)
+  add_executable(dfg95-bench1-3d-qp dfg95_bench1.cpp)
+  add_executable(dfg95-bench1-3d-qp-dp dfg95_bench1.cpp)
+
+  target_compile_definitions(dfg95-bench1-2d-qp    PUBLIC FEAT_DFG95_BENCH1_DIM=2 FEAT_DFG95_BENCH1_QUAD)
+  target_compile_definitions(dfg95-bench1-2d-qp-dp PUBLIC FEAT_DFG95_BENCH1_DIM=2 FEAT_DFG95_BENCH1_QUAD_DOUBLE)
+  target_compile_definitions(dfg95-bench1-3d-qp    PUBLIC FEAT_DFG95_BENCH1_DIM=3 FEAT_DFG95_BENCH1_QUAD)
+  target_compile_definitions(dfg95-bench1-3d-qp-dp PUBLIC FEAT_DFG95_BENCH1_DIM=3 FEAT_DFG95_BENCH1_QUAD_DOUBLE)
+
+  set(dfg95_bench1_list ${dfg95_bench1_list} dfg95-bench1-2d-qp dfg95-bench1-2d-qp-dp dfg95-bench1-3d-qp dfg95-bench1-3d-qp-dp)
+endif (FEAT_HAVE_QUADMATH)
+
+foreach (app ${dfg95_bench1_list} )
+  target_link_libraries(${app} feat)
+  if (MPI_C_COMPILE_FLAGS)
+    set_target_properties(${app} PROPERTIES COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
+  endif ()
+  if (MPI_C_LINK_FLAGS)
+    set_target_properties(${app} PROPERTIES LINK_FLAGS "${MPI_C_LINK_FLAGS}")
+  endif ()
+endforeach (app)
+
 ######################### hierarch_transfer_test-app
 
 if (FEAT_HAVE_MPI)

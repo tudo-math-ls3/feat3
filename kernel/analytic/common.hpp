@@ -4652,6 +4652,60 @@ namespace FEAT
           _origin = origin;
         }
       }; // class HarmonicShellFunction
+
+      /**
+       * \brief Steady-State inflow function used in DFG95 flow-around-a-cylinder benchmarks
+       *
+       * \author Peter Zajac
+       */
+      template<int dim_, typename DataType_>
+      class DFG95SteadyInflowFunction:
+        public Analytic::Function
+      {
+      public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Vector<dim_> ImageType;
+        static constexpr bool can_value = true;
+
+        DataType_ v_max;
+
+      public:
+        explicit DFG95SteadyInflowFunction(DataType_ vmax) :
+          v_max(vmax)
+        {
+        }
+
+        template<typename Traits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<Traits_>
+        {
+        protected:
+          typedef typename Traits_::DataType DataType;
+          typedef typename Traits_::PointType PointType;
+          typedef typename Traits_::ValueType ValueType;
+
+          const DataType _d, _scal;
+
+        public:
+          explicit Evaluator(const DFG95SteadyInflowFunction& function) :
+            _d(DataType(0.41)),
+            _scal(DataType(function.v_max) / Math::pow(_d, DataType_(2*(dim_-1))))
+          {
+          }
+
+          ValueType value(const PointType& point)
+          {
+            ValueType val;
+            val[0] = _scal;
+            for(int i = 1; i < dim_; ++i)
+            {
+              val[0] *= DataType(4) * point[i] * (_d - point[i]);
+              val[i] = DataType(0);
+            }
+            return val;
+          }
+        };
+      }; // class DFG95SteadyInflowFunction
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

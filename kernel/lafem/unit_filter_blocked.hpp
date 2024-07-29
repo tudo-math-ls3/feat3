@@ -151,7 +151,7 @@ namespace FEAT
       void clone(const UnitFilterBlocked & other, CloneMode clone_mode = CloneMode::Deep)
       {
         _sv.clone(other.get_filter_vector(), clone_mode);
-        _ignore_nans = other._ignore_nans;
+        _ignore_nans = other.get_ignore_nans();
       }
 
       /// \brief Converts data from another UnitFilter
@@ -159,7 +159,7 @@ namespace FEAT
       void convert(const UnitFilterBlocked<DT2_, IT2_, BS_>& other)
       {
         _sv.convert(other.get_filter_vector());
-        _ignore_nans = other._ignore_nans;
+        _ignore_nans = other.get_ignore_nans();
       }
 
       /// \brief Clears the underlying data (namely the SparseVector)
@@ -194,6 +194,12 @@ namespace FEAT
       void set_ignore_nans(bool ignore_nans)
       {
         _ignore_nans = ignore_nans;
+      }
+
+      /// Specifies whether the filter should ignore NaNs filter values
+      bool get_ignore_nans() const
+      {
+        return _ignore_nans;
       }
 
       /**

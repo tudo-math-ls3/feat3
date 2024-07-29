@@ -392,6 +392,25 @@ namespace FEAT
       return _parse(it->second, std::size_t(0), std::forward<Prms_>(prms)...);
     }
 
+    /**
+     * \brief Parses a single parameter of an option and returns it or, if not given, a default value
+     *
+     * \param[in] option
+     * The name of the option (without the leading <c>\--</c>) that is to be queried.
+     *
+     * \param[in] default_value
+     * A default value that is to be returned if the parameter parsing failed or the option was not given.
+     *
+     * \returns
+     * The parsed option parameter or the default_value if parsing failed or the option was not given.
+     */
+    template<typename T_>
+    T_ parse_default(const String& option, T_ default_value) const
+    {
+      T_ val(default_value);
+      return parse(option, val) == 1 ? val : default_value;
+    }
+
   private:
     /// \cond internal
     void _process()
