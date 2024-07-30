@@ -1515,8 +1515,8 @@ namespace CCND
           comm.print("\nSolving (linear) Stokes system...");
       }
 
-      if(!plot_mg_iter && (solver_iterative))
-        solver_iterative->set_plot_mode(Solver::PlotMode::none);
+      if(solver_iterative)
+        solver_iterative->set_plot_mode(plot_mg_iter ? Solver::PlotMode::iter : Solver::PlotMode::none);
 
       watch_nonlin_loop.start();
 
