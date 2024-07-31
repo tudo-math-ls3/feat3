@@ -252,6 +252,7 @@ public:
 
   virtual void run() const override
   {
+    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
     DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
@@ -327,32 +328,32 @@ public:
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     // &r == &y
     r.copy(y);
     c.apply(r, x, r, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(r, xb, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(rb, xb, y, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
   }
 };
 SparseMatrixBCSRApplyTest <float, std::uint64_t> cpu_sm_bcsr_apply_test_float_uint64(PreferredBackend::generic);
@@ -403,6 +404,7 @@ public:
 
   virtual void run() const override
   {
+    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
     DenseVector<DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
@@ -482,32 +484,32 @@ public:
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     // &r == &y
     r.copy(y);
     c.apply(r, x, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(r, xb, y, alpha);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
     c.apply(rb, xb, y, alpha);
     r.convert(rb);
     for (Index i(0) ; i < r.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-3));
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
   }
 };
 SparseMatrixBCSRApplySquareTest <float, std::uint64_t> cpu_sm_bcsr_apply_square_test_float_uint64(PreferredBackend::generic);
@@ -750,7 +752,7 @@ public:
           {
             auto bv = bb(irow, icol);
             auto av = ab(irow, icol);
-            TEST_CHECK_EQUAL_WITHIN_EPS(bv, av * sb(irow), eps);
+            TEST_CHECK_RELATIVE(bv, av * sb(irow), eps);
           }
         }
       }
@@ -771,7 +773,7 @@ public:
           {
             auto bv = bb(irow, icol);
             auto av = ab(irow, icol);
-            TEST_CHECK_EQUAL_WITHIN_EPS(bv, av * tb(icol), eps);
+            TEST_CHECK_RELATIVE(bv, av * tb(icol), eps);
           }
         }
       }
@@ -1008,6 +1010,7 @@ public:
 
   virtual void run() const override
   {
+    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
     DenseVector<DT_, IT_> dv1(18);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1));
@@ -1048,7 +1051,7 @@ public:
     std::cout<<xb<<std::endl;
     a.apply(rb, xb);
     DT_ norm = r.norm2();
-    TEST_CHECK_EQUAL_WITHIN_EPS(norm, ref_norm, DT_(1e-4));
+    TEST_CHECK_RELATIVE(norm, ref_norm, eps);
 
     a = a_backup.clone(CloneMode::Deep);
     auto perm_inv = perm.inverse();

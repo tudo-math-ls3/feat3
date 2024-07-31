@@ -45,6 +45,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DenseMatrix<DT_, IT_> zero1;
     DenseMatrix<DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
@@ -88,7 +89,7 @@ public:
     {
       for (Index j(0); j < l.rows(); ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(m(i, j), l(i, j), Math::template eps<DT_>() * DT_(100));
+        TEST_CHECK_RELATIVE(m(i, j), l(i, j), eps);
       }
     }
 
@@ -141,6 +142,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DenseMatrix<DT_, IT_> test_mat(40, 40);
     for (Index i(0); i < test_mat.rows(); ++i)
     {
@@ -164,7 +166,7 @@ public:
     {
       for (Index j(0); j < k2.rows(); ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(k2(i, j), test_mat(i, j), (DT_)1e-6);
+        TEST_CHECK_EQUAL_WITHIN_EPS(k2(i, j), test_mat(i, j), DT_(1e-6));
       }
     }
 #endif
@@ -188,7 +190,7 @@ public:
       {
         for (Index j(0); j < u.columns(); ++j)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test(i, j), Math::template eps<DT_>() * DT_(100));
+          TEST_CHECK_RELATIVE(u(i, j), test(i, j), eps);
         }
       }
     }
@@ -201,7 +203,7 @@ public:
       {
         for (Index j(0); j < u.columns(); ++j)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test2(i, j), Math::template eps<DT_>() * DT_(100));
+          TEST_CHECK_RELATIVE(u(i, j), test2(i, j), eps);
         }
       }
     }
@@ -216,7 +218,7 @@ public:
       {
         for (Index j(0); j < u.columns(); ++j)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test3(i, j), Math::template eps<DT_>() * DT_(100));
+          TEST_CHECK_RELATIVE(u(i, j), test3(i, j), eps);
         }
       }
       std::remove(filename.c_str());
@@ -230,7 +232,7 @@ public:
       {
         for (Index j(0); j < u.columns(); ++j)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(u(i, j), test4(i, j), Math::template eps<DT_>() * DT_(100));
+          TEST_CHECK_RELATIVE(u(i, j), test4(i, j), eps);
         }
       }
       std::remove(filename.c_str());
@@ -282,6 +284,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
     DT_ s(DT_(0.123));
     for (Index size(16); size < 100; size *= 2)
     {
@@ -309,7 +312,7 @@ public:
       // apply-test for alpha = 0.0
       a.apply(result, x, y, DT_(0.0));
       for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(y(i), result(i), DT_(_eps));
+        TEST_CHECK_RELATIVE(y(i), result(i), eps);
 
       //apply-test for reduced apply call
       a.apply(result, x);
@@ -323,7 +326,7 @@ public:
         ref(i, sum);
       }
       for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
+        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
 
       //apply-test for alpha = -1.0
       a.apply(result, x, y, DT_(-1.0));
@@ -338,7 +341,7 @@ public:
       }
 
       for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
+        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
 
       // apply-test for s = 0.123
       a.apply(result, x, y, s);
@@ -348,7 +351,7 @@ public:
       ref.axpy(ref, y, s);
 
       for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(result(i), ref(i), DT_(_eps));
+        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
     }
   }
 };
@@ -401,7 +404,7 @@ public:
 
   virtual void run() const override
   {
-    double eps(_eps);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1); size < 65; size *= 2)
     {
@@ -430,7 +433,7 @@ public:
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+          TEST_CHECK_RELATIVE(result(i, j), ref(i, j),eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
       if (typeid(DT_) == typeid(Half))
@@ -488,7 +491,7 @@ public:
 
   virtual void run() const override
   {
-    double eps(_eps);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1); size < 32; size *= 2)
     {
@@ -524,7 +527,7 @@ public:
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
       if (typeid(DT_) == typeid(Half))
@@ -582,7 +585,7 @@ public:
 
   virtual void run() const override
   {
-    double eps(_eps);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1); size < 32; size *= 2)
     {
@@ -618,7 +621,7 @@ public:
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
       if (typeid(DT_) == typeid(Half))
@@ -676,7 +679,7 @@ public:
 
   virtual void run() const override
   {
-    double eps(_eps);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1); size < 65; size *= 2)
     {
@@ -720,7 +723,7 @@ public:
       for (Index i(0); i < result.rows(); ++i)
       {
         for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(result(i, j), ref(i, j), DT_(eps));
+          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
       if (typeid(DT_) == typeid(Half))
@@ -778,7 +781,7 @@ public:
 
   virtual void run() const override
   {
-    double eps(_eps);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1); size < 65; size *= 2)
     {
@@ -835,7 +838,7 @@ public:
       for (Index i(0); i < z.rows(); ++i)
       {
         for (Index j(0); j < z.columns(); ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(z(i, j), ref(i, j), DT_(eps));
+          TEST_CHECK_EQUAL_WITHIN_EPS(z(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
       if (typeid(DT_) == typeid(Half))

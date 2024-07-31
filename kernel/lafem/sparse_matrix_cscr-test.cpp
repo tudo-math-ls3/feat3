@@ -269,7 +269,7 @@ public:
     {
       for (Index col(0) ; col < a.columns() ; ++col)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), a(row, col), DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), a(row, col), Math::eps<DT_>());
       }
     }
 #endif
@@ -319,6 +319,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -363,7 +364,7 @@ public:
       a.apply(r, x, y, DT_(0.0));
       ref.copy(y);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -371,13 +372,13 @@ public:
       ref.scale(ref, DT_(-1.0));
       ref.axpy(ref, y);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = -1.0 and &r==&y
       r.copy(y);
       a.apply(r, x, r, DT_(-1.0));
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = 4711.1
       //r.axpy(s, a, x, y);
@@ -387,18 +388,18 @@ public:
       ref.scale(ref, s);
       ref.axpy(ref, y);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(5e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = 4711.1 and &r==&y
       r.copy(y);
       a.apply(r, x, r, s);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(5e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       a.apply(r, x);
       a.apply(ref, x);
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
     }
   }
 };

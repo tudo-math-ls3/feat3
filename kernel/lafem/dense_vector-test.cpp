@@ -311,11 +311,11 @@ public:
       DenseVector<DT_, IT_> c(size);
       c.axpy(a, b, s); //a != b != r
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(c(i), ref(i), DT_(eps));
+        TEST_CHECK_RELATIVE(c(i), ref(i), eps);
 
       a.axpy(a, b, s); //r == a
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(a(i), ref(i), DT_(eps));
+        TEST_CHECK_RELATIVE(a(i), ref(i), eps);
 
       s *= DT_(0.5);
       for (Index i(0) ; i < size ; ++i)
@@ -325,7 +325,7 @@ public:
 
       b.axpy(a, b, s); //r == b
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(b(i), ref(i), DT_(eps));
+        TEST_CHECK_RELATIVE(b(i), ref(i), eps);
     }
   }
 };
@@ -446,7 +446,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -467,19 +467,19 @@ public:
       DT_ ref(DT_(1));
 
       DT_ res  = a.triple_dot(b,c);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
       res  = a.triple_dot(c,b);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
 
       res = b.triple_dot(a,c);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
       res = b.triple_dot(c,a);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
 
       res = c.triple_dot(a,b);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
       res = c.triple_dot(b,a);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
 
     }
   }
@@ -531,7 +531,7 @@ public:
   {
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
       DenseVector<DT_, IT_> a(size);
       DenseVector<DT_, IT_> b(size);
@@ -549,21 +549,21 @@ public:
       c.component_product(a, b);
       for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
       //TEST_CHECK_EQUAL(c, ref);
 
       b.component_product(a, b);
       for (Index i(0); i < b.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
       //TEST_CHECK_EQUAL(b, ref);
 
       a.component_product(a, a);
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
       }
       //TEST_CHECK_EQUAL(a, ref2);
     }
@@ -746,7 +746,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     const DT_ alpha(Math::pi<DT_>());
 
@@ -764,14 +764,14 @@ public:
       vec2.component_product(vec2, vec);
       for (Index i(0); i < size; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(vec2(i), alpha, eps);
+        TEST_CHECK_RELATIVE(vec2(i), alpha, eps);
       }
 
       DenseVector<DT_, IT_>  vec3(size);
       vec3.component_invert(vec);
       for (Index i(0); i < size; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(vec3(i), DT_(1.0) / vec(i), eps);
+        TEST_CHECK_RELATIVE(vec3(i), DT_(1.0) / vec(i), eps);
       }
     }
   }

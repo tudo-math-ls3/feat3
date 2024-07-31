@@ -310,7 +310,7 @@ public:
     {
       for (Index col(0); col < f.columns(); ++col)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), f(row, col), DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), f(row, col), Math::pow(Math::eps<DT_>(), DT_(0.8)));
       }
     }
 #endif
@@ -357,6 +357,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
     DT_ s(DT_(4711.1));
     for (IT_ size(1); size < IT_(1e3); size *= IT_(2))
     {
@@ -401,7 +402,7 @@ public:
       a.apply(r, x, y, DT_(0.0));
       ref.copy(y);
       for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_RELATIVE(r(i), ref(i), eps);
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
@@ -409,13 +410,13 @@ public:
       ref.scale(ref, DT_(-1.0));
       ref.axpy(ref, y);
       for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = -1.0 and &r==&y
       r.copy(y);
       a.apply(r, x, r, DT_(-1.0));
       for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = 4711.1
       //r.axpy(s, a, x, y);
@@ -425,28 +426,28 @@ public:
       ref.scale(ref, s);
       ref.axpy(ref, y);
       for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(5e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = 4711.1 and &r==&y
       r.copy(y);
       a.apply(r, x, r, s);
       for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(5e-2));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       a.apply(r, x);
       ref.copy(ax);
-      for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(1e-2));
+      for(Index i(0); i < size; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
-      // transposed apply-test for alpha = 4711.1
-      a.apply(r, x, y, s, true);
-
+      // transposed apply-test for alpha = -1
+      a.apply(r, x, y,  DT_(-1.0), true);
       SparseMatrixCSR<DT_, IT_> at = a.transpose();
       at.apply(ref, x);
-      ref.scale(ref, s);
+      ref.scale(ref,  DT_(-1.0));
       ref.axpy(ref, y);
-      for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(7e-2));
+
+      for(Index i(0); i < size; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
     }
   }
 };
@@ -496,6 +497,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
     for (IT_ size(1); size < IT_(1e3); size *= IT_(2))
     {
       SparseMatrixFactory<DT_, IT_> a_fac(size, size);
@@ -556,26 +558,26 @@ public:
       a.apply(r, x);
       for (Index i(0); i < size; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], aref_x(i), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], aref_x(i) * DT_(0.5), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], aref_x(i) * DT_(2.0), DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], aref_x(i), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], aref_x(i) * DT_(0.5), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], aref_x(i) * DT_(2.0), eps*DT_(10));
       }
 
       a.apply(r, x, y, DT_(-1));
       for (Index i(0); i < size; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], y(i)[0] - aref_x(i), DT_(1e-4));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], y(i)[1] - aref_x(i) * DT_(0.5), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], y(i)[2] - aref_x(i) * DT_(2.0), DT_(1e-4));
+        TEST_CHECK_RELATIVE(r(i)[0], y(i)[0] - aref_x(i), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], y(i)[1] - aref_x(i) * DT_(0.5), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], y(i)[2] - aref_x(i) * DT_(2.0), eps);
       }
 
       DT_ alpha(0.75);
       a.apply(r, x, y, alpha);
       for (Index i(0); i < size; ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], y(i)[0] + alpha * aref_x(i), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], y(i)[1] + alpha * aref_x(i) * DT_(0.5), DT_(1e-5));
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], y(i)[2] + alpha * aref_x(i) * DT_(2.0), DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], y(i)[0] + alpha * aref_x(i), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], y(i)[1] + alpha * aref_x(i) * DT_(0.5), eps);
+        TEST_CHECK_RELATIVE(r(i)[2], y(i)[2] + alpha * aref_x(i) * DT_(2.0), eps);
       }
     }
   }

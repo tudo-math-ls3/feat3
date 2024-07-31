@@ -144,6 +144,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     SparseVector<DT_, IT_> a(10);
     a(3, DT_(7));
     a(3, DT_(3));
@@ -165,18 +166,18 @@ public:
     auto op = a.serialize(LAFEM::SerialConfig(false, false));
     SparseVector<DT_, IT_> o(op);
     for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), a(i), DT_(1e-5));
+      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), a(i), eps);
 #ifdef FEAT_HAVE_ZLIB
     auto zl = a.serialize(LAFEM::SerialConfig(true, false));
     SparseVector<DT_, IT_> zlib(zl);
     for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), a(i), DT_(1e-5));
+      TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), a(i), eps);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseVector<DT_, IT_> zfp(zf);
     for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), a(i), DT_(1e-4));
+      TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), a(i), eps);
 #endif
   }
 };

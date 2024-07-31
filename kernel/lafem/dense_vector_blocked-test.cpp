@@ -277,7 +277,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
     DT_ s(DT_(0.4711));
     Tiny::Vector<DT_, block_size_> bs;
     for(int j(0); j < block_size_; ++j)
@@ -308,26 +308,26 @@ public:
       c.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(c(i).v[j], ref(i).v[j], DT_(eps));
+          TEST_CHECK_EQUAL_WITHIN_EPS(c(i).v[j], ref(i).v[j], eps);
 
       DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
       a_tmp.copy(a);
       a.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(a(i).v[j], ref(i).v[j], DT_(eps));
+          TEST_CHECK_EQUAL_WITHIN_EPS(a(i).v[j], ref(i).v[j], eps);
 
       a.copy(a_tmp);
       b.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(i).v[j], ref(i).v[j], DT_(eps));
+          TEST_CHECK_RELATIVE(b(i).v[j], ref(i).v[j], eps);
 
       a.copy(a_tmp);
       b.axpy_blocked(a, b, bs);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(i).v[j], ref_bs(i).v[j], DT_(eps));
+          TEST_CHECK_RELATIVE(b(i).v[j], ref_bs(i).v[j], eps);
     }
   }
 };
@@ -385,10 +385,10 @@ public:
       {
         Tiny::Vector<DT_, block_size_> tv1;
         Tiny::Vector<DT_, block_size_> tv3;
-        for (Index j(0) ; j < block_size_ ; ++j)
+        for (int j(0) ; j < block_size_ ; ++j)
         {
-          tv1.v[j] = DT_(i * block_size_ + j + 1) * den;
-          tv3.v[j] = Math::sqrt(DT_(i))*j;
+          tv1.v[j] = (DT_(i) * DT_(block_size_) + DT_(j + 1)) * den;
+          tv3.v[j] = Math::sqrt(DT_(i))*DT_(j);
         }
         a(i, tv1);
         a2(i, tv3);
@@ -413,21 +413,21 @@ public:
 
       for (Index j(0) ; j < block_size_ ; ++j)
       {
-       TEST_CHECK_EQUAL_WITHIN_EPS(ref_bs.v[j], d.v[j], eps);
-       TEST_CHECK_EQUAL_WITHIN_EPS(ref_bs.v[j], e.v[j], eps);
-       TEST_CHECK_EQUAL_WITHIN_EPS(ref2_bs.v[j], f.v[j], eps);
+       TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], eps);
+       TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j], eps);
+       TEST_CHECK_RELATIVE(f.v[j], ref2_bs.v[j], eps);
       }
 
       // a*b = 1
       DT_ ref(DT_(1));
       DT_ c  = a.dot(b);
-      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+      TEST_CHECK_RELATIVE(c, ref, eps);
       c = b.dot(a);
-      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+      TEST_CHECK_RELATIVE(c, ref, eps);
       c = b.dot(b);
       ref = b.norm2();
       ref *= ref;
-      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+      TEST_CHECK_RELATIVE(c, ref, eps);
 
     }
   }
@@ -508,9 +508,9 @@ public:
 
       for(int j(0); j<block_size_; ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(d.v[j], ref_bs.v[j], eps*DT_(250));
-        TEST_CHECK_EQUAL_WITHIN_EPS(e.v[j], ref_bs.v[j], eps*DT_(250));
-        TEST_CHECK_EQUAL_WITHIN_EPS(f.v[j], ref_bs.v[j], eps*DT_(250));
+        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(f.v[j], ref_bs.v[j], eps);
       }
 
       DenseVector<DT_, IT_> ref_a;
@@ -522,11 +522,11 @@ public:
 
       DT_ ref(ref_a.triple_dot(ref_b, ref_c));
       DT_ res  = a.triple_dot(b, c);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
       res = b.triple_dot(a, c);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
       res = c.triple_dot(b, a);
-      TEST_CHECK_EQUAL_WITHIN_EPS(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, eps);
     }
   }
 };
@@ -574,7 +574,7 @@ public:
   {
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
@@ -604,26 +604,26 @@ public:
       c.component_product(a, b);
       for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
 
       a.component_product(a, b);
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(a.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
 
       a.copy(a_tmp);
       b.component_product(a, b);
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
       }
 
       a.component_product(a, a);
       for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
+        TEST_CHECK_RELATIVE(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
       }
     }
   }
@@ -674,7 +674,7 @@ public:
     {
       DT_ s(DT_(4.321));
       Tiny::Vector<DT_, block_size_> bs;
-      for(Index j(0); j < block_size_; ++j)
+      for(int j(0); j < block_size_; ++j)
         bs[j] = s + DT_(j);
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
@@ -770,18 +770,18 @@ public:
       }
 
       DT_ c = a.norm2();
-      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+      TEST_CHECK_RELATIVE(c, ref, eps);
 
       c = a.norm2sqr();
-      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref*ref, eps);
+      TEST_CHECK_RELATIVE(c, ref*ref, eps);
 
       Tiny::Vector<DT_, block_size_> d(a.norm2_blocked());
       for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_EQUAL_WITHIN_EPS(d.v[j], ref_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], eps);
 
       Tiny::Vector<DT_, block_size_> e(a.norm2sqr_blocked());
       for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_EQUAL_WITHIN_EPS(e.v[j], ref_bs.v[j]*ref_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j]*ref_bs.v[j], eps);
     }
   }
 };

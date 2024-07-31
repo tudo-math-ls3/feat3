@@ -46,7 +46,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.6));
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.8));
 
     const Index n00 = 5;
     const Index n01 = 10;
@@ -78,13 +78,13 @@ public:
     DataType x_norm2(Math::sqrt(x_dot_x));
 
     // test x*y
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.dot(y), x_dot_y, tol);
+    TEST_CHECK_RELATIVE(x.dot(y), x_dot_y, tol);
 
     // test x*x
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.dot(x), x_dot_x, tol);
+    TEST_CHECK_RELATIVE(x.dot(x), x_dot_x, tol);
 
     // test norm2(x)
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.norm2(), x_norm2, tol);
+    TEST_CHECK_RELATIVE(x.norm2(), x_norm2, tol);
   }
 };
 
@@ -150,7 +150,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.3));
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.8));
 
     const Index n00 = 7;
     const Index n01 = 10;
@@ -178,16 +178,16 @@ public:
     }
 
     // test y^T diag(x) z
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.triple_dot(y, z), tdot, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.triple_dot(z, y), tdot, tol);
+    TEST_CHECK_RELATIVE(x.triple_dot(y, z), tdot, tol);
+    TEST_CHECK_RELATIVE(x.triple_dot(z, y), tdot, tol);
 
     // test x^T diag(y) z
-    TEST_CHECK_EQUAL_WITHIN_EPS(y.triple_dot(x, z), tdot, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(y.triple_dot(z, x), tdot, tol);
+    TEST_CHECK_RELATIVE(y.triple_dot(x, z), tdot, tol);
+    TEST_CHECK_RELATIVE(y.triple_dot(z, x), tdot, tol);
 
     // test x^T diag(z) y
-    TEST_CHECK_EQUAL_WITHIN_EPS(z.triple_dot(x, y), tdot, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(z.triple_dot(y, x), tdot, tol);
+    TEST_CHECK_RELATIVE(z.triple_dot(x, y), tdot, tol);
+    TEST_CHECK_RELATIVE(z.triple_dot(y, x), tdot, tol);
   }
 };
 

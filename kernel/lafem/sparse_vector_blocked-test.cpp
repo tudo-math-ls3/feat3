@@ -155,7 +155,7 @@ public:
     {
       for(int j(0) ; j < a(i).n ; ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i)[j], a(i)[j], DT_(1e-4));
+        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i)[j], a(i)[j], Math::pow(Math::eps<DT_>(), DT_(0.7)));
       }
     }
 #endif

@@ -221,7 +221,7 @@ public:
     {
       for(Index j(0) ; j < c.columns() ; ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(c(i,j), zfp(i,j), DT_(1e-5));
+        TEST_CHECK_EQUAL_WITHIN_EPS(c(i,j), zfp(i,j), Math::pow(Math::eps<DT_>(), DT_(0.7)));
       }
     }
 #endif
@@ -278,7 +278,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.5)));
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.7)));
 
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);

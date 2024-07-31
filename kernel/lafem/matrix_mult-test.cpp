@@ -129,7 +129,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
     // create 3 matrices a,b and d
     LAFEM::PointstarFactoryFD<DT_, IT_> psf(17, 2);
@@ -207,7 +207,7 @@ public:
   }
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
     // create CSR matrix D of dimension (7x8)
     SparseMatrixFactory<DT_, IT_> factory_D(IT_(7), IT_(8));
