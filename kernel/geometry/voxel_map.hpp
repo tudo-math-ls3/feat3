@@ -1438,7 +1438,7 @@ namespace FEAT
           if(ibox_min[i] == ~Index(0))
             ibox_min[i] = Index(0);
           if(ibox_max[i] == ~Index(0))
-            ibox_max[i] = Math::max(this->_num_slices[i], Index(1)) - Index(1);
+            ibox_max[i] = Math::max(Index(this->_num_slices[i]), Index(1)) - Index(1);
         }
 
         // gather weight of all selected voxels
@@ -1905,7 +1905,7 @@ namespace FEAT
           // compute all voxel map lines
           this->_compute_voxel_map_lines(masker, 0u, this->_num_lines, 0u);
         }
-        else if(Index(comm.size()) <= this->_num_lines)
+        else if(u64(comm.size()) <= this->_num_lines)
         {
           // there are at least as many lines in the voxel map as there are MPI processes; this is the usual case
           // we can use the entire communicator (usually MPI_COMM_WORLD) for the voxel map computation
@@ -1926,7 +1926,7 @@ namespace FEAT
 
           // compute first and last+1 line of this process; make sure the last process doesn't go beyond the total count
           Index line_beg = comm_rank * line_count;
-          Index line_end = Math::min((comm_rank + 1u) * line_count, this->_num_lines);
+          Index line_end = Math::min((comm_rank + 1u) * line_count, Index(this->_num_lines));
 
           // debug output
           //this->_comm.allprint(String(">>>") + stringify(line_beg).pad_front(6) + ":" + stringify(line_count) + ">" + stringify(line_end).pad_front(6));
@@ -1967,7 +1967,7 @@ namespace FEAT
 
             // compute first and last+1 line of this process; make sure the last process doesn't go beyond the total count
             Index line_beg = comm_rank * line_count;
-            Index line_end = Math::min((comm_rank + 1u) * line_count, this->_num_lines);
+            Index line_end = Math::min((comm_rank + 1u) * line_count, Index(this->_num_lines));
 
             // debug output
             //this->_comm.allprint(String(">>>") + stringify(line_beg).pad_front(6) + ":" + stringify(line_count) + ">" + stringify(line_end).pad_front(6));
