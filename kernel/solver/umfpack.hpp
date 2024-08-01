@@ -634,74 +634,6 @@ namespace FEAT
       return std::make_shared<SaddleUmfpackMean<DT_, IT_, dim_>>(matrix, filter);
     }
 
-    /// \cond internal
-    namespace Intern
-    {
-      // This helper is class is required if the data/index type pair of
-      // the system vector is not double/Index. In this case, the system
-      // vector has to be converted to a DenseVector with the same data/index
-      // type pair first and then converted to a double/Index dense vector
-      // in a second step.
-      template<typename DT_, typename IT_>
-      class GenericUmfpackVectorHelper
-      {
-      private:
-        LAFEM::DenseVector<DT_, IT_> _vec_tmp;
-
-      public:
-        void init(const LAFEM::DenseVector<double, Index>& v)
-        {
-          _vec_tmp.convert(v);
-        }
-
-        void done()
-        {
-          _vec_tmp.clear();
-        }
-
-        template<typename VT_>
-        void download(LAFEM::DenseVector<double, Index>& vo, const VT_& vi)
-        {
-          _vec_tmp.copy(vi);
-          vo.convert(_vec_tmp);
-        }
-
-        template<typename VT_>
-        void upload(VT_& vo, const LAFEM::DenseVector<double, Index>& vi)
-        {
-          _vec_tmp.convert(vi);
-          _vec_tmp.copy_inv(vo);
-        }
-      };
-
-      // specialization for double/Index vectors; no intermediate conversion is necessary here
-      template<>
-      class GenericUmfpackVectorHelper<double, Index>
-      {
-      public:
-        void init(const LAFEM::DenseVector<double, Index>&)
-        {
-        }
-
-        void done()
-        {
-        }
-
-        template<typename VT_>
-        void download(LAFEM::DenseVector<double, Index>& vo, const VT_& vi)
-        {
-          vo.copy(vi);
-        }
-
-        template<typename VT_>
-        void upload(VT_& vo, const LAFEM::DenseVector<double, Index>& vi)
-        {
-          vi.copy_inv(vo);
-        }
-      };
-    } // namespace Intern
-    /// \endcond
-
     /**
      * \brief Generic UMFPACK solver class
      *
@@ -732,8 +664,8 @@ namespace FEAT
       typename Umfpack::MatrixType _umf_matrix;
       /// the vectors for our Umfpack solver (DenseVector<double, Index>)
       typename Umfpack::VectorType _umf_vsol, _umf_vrhs;
-      /// vector helper
-      Intern::GenericUmfpackVectorHelper<typename VectorType::DataType, typename VectorType::IndexType> _vec_helper;
+      /// temporary vectors for datatype conversion
+      LAFEM::DenseVector<typename VectorType::DataType, typename VectorType::IndexType> _tmp_vsol, _tmp_vrhs;
       /// the actual Umfpack solver object
       Umfpack _umfpack;
 
@@ -762,15 +694,18 @@ namespace FEAT
         // convert our system matrix to <double, Index> (if necessary)
         typename MatrixType::template ContainerType<double, Index> mat_double;
         mat_double.convert(_matrix);
+
         // convert matrix to obtain the structure
         _umf_matrix.convert(mat_double);
 
-        // create vectors
+        // create umfpack vectors
         _umf_vsol = _umf_matrix.create_vector_l();
         _umf_vrhs = _umf_matrix.create_vector_l();
 
-        // initialiase vector helper
-        _vec_helper.init(_umf_vsol);
+        // convert to temporary vectors; note that these share their data arrays
+        // with the umfpack vectors if their datatype is also 'double'
+        _tmp_vsol.convert(_umf_vsol);
+        _tmp_vrhs.convert(_umf_vrhs);
 
         // factorize symbolic
         _umfpack.init_symbolic();
@@ -780,8 +715,8 @@ namespace FEAT
       {
         _umfpack.done_symbolic();
 
-        _vec_helper.done();
-
+        _tmp_vrhs.clear();
+        _tmp_vsol.clear();
         _umf_vrhs.clear();
         _umf_vsol.clear();
         _umf_matrix.clear();
@@ -819,13 +754,15 @@ namespace FEAT
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // convert RHS vector
-        _vec_helper.download(_umf_vrhs, vec_rhs);
+        _tmp_vrhs.copy(vec_rhs);
+        _umf_vrhs.convert(_tmp_vrhs);
 
         // solve
         Status status = _umfpack.apply(_umf_vsol, _umf_vrhs);
 
         // convert sol vector
-        _vec_helper.upload(vec_sol, _umf_vsol);
+        _tmp_vsol.convert(_umf_vsol);
+        _tmp_vsol.copy_inv(vec_sol);
 
         return status;
       }
