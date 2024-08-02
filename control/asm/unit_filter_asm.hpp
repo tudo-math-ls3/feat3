@@ -19,6 +19,61 @@ namespace FEAT
       /**
        * \brief Assembles a scalar homogeneous unit filter for a set of mesh-parts given by their names
        *
+       *       *
+       * \param[in] dom_level
+       * A \transient reference to the domain level on which is to be assembled
+       *
+       * \param[in] mesh_part_names
+       * A string containing all mesh part names on which the unit filter is to be assembled.
+       * If set to "*", all mesh-parts with be added to the filter.
+       */
+      template<typename DomainLevel_>
+      Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> create_unit_filter_asm(const DomainLevel_& dom_level, const std::deque<String>& mesh_part_names)
+      {
+
+        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
+        // loop over all mesh parts
+        for(const auto& mp_name : mesh_part_names)
+        {
+          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(mp_name);
+          XASSERT(mesh_part_node != nullptr);
+
+          // let's see if we have that mesh part
+          // if it is nullptr, then our patch is not adjacent to that boundary part
+          auto* mesh_part = mesh_part_node->get_mesh();
+          if (mesh_part != nullptr)
+          {
+            // add to boundary assembler
+            unit_asm.add_mesh_part(*mesh_part);
+          }
+        }
+        return unit_asm;
+      }
+
+
+      /**
+       * \brief Assembles a scalar homogeneous unit filter for a set of mesh-parts given by their names
+       *
+       *
+       * \param[in] mesh_part_names
+       * A string containing all mesh part names on which the unit filter is to be assembled.
+       * If set to "*", all mesh-parts with be added to the filter.
+       */
+      template<typename DomainLevel_>
+       Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> create_unit_filter_asm(const DomainLevel_& dom_level, const String& mesh_part_names)
+      {
+        std::deque<String> mp_names;
+        if(mesh_part_names == "*")
+          mp_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
+        else
+          mp_names = mesh_part_names.split_by_whitespaces();
+
+        return create_unit_filter_asm(dom_level, mp_names);
+      }
+
+      /**
+       * \brief Assembles a scalar homogeneous unit filter for a set of mesh-parts given by their names
+       *
        * \param[inout] filter
        * A \transient reference to the filter to be assembled
        *
@@ -36,32 +91,7 @@ namespace FEAT
       void asm_unit_filter_scalar_homogeneous(LAFEM::UnitFilter<DataType_, IndexType_>& filter,
         const DomainLevel_& dom_level, const Space_& space, const String& mesh_part_names)
       {
-        // create unit-filter assembler
-        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
-
-        std::deque<String> mp_names;
-        if(mesh_part_names == "*")
-          mp_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
-        else
-          mp_names = mesh_part_names.split_by_whitespaces();
-
-        // loop over all mesh parts
-        for(const auto& mp_name : mp_names)
-        {
-          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(mp_name);
-          XASSERT(mesh_part_node != nullptr);
-
-          // let's see if we have that mesh part
-          // if it is nullptr, then our patch is not adjacent to that boundary part
-          auto* mesh_part = mesh_part_node->get_mesh();
-          if (mesh_part != nullptr)
-          {
-            // add to boundary assembler
-            unit_asm.add_mesh_part(*mesh_part);
-          }
-        }
-
-        // finally, assemble the filter
+        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm = create_unit_filter_asm(dom_level, mesh_part_names);
         unit_asm.assemble(filter, space);
       }
 
@@ -88,32 +118,7 @@ namespace FEAT
       void asm_unit_filter_scalar(LAFEM::UnitFilter<DataType_, IndexType_>& filter,
         const DomainLevel_& dom_level, const Space_& space, const String& mesh_part_names, const Function_& function)
       {
-        // create unit-filter assembler
-        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
-
-        std::deque<String> mp_names;
-        if(mesh_part_names == "*")
-          mp_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
-        else
-          mp_names = mesh_part_names.split_by_whitespaces();
-
-        // loop over all mesh parts
-        for(const auto& mp_name : mp_names)
-        {
-          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(mp_name);
-          XASSERT(mesh_part_node != nullptr);
-
-          // let's see if we have that mesh part
-          // if it is nullptr, then our patch is not adjacent to that boundary part
-          auto* mesh_part = mesh_part_node->get_mesh();
-          if (mesh_part != nullptr)
-          {
-            // add to boundary assembler
-            unit_asm.add_mesh_part(*mesh_part);
-          }
-        }
-
-        // finally, assemble the filter
+        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm = create_unit_filter_asm(dom_level, mesh_part_names);
         unit_asm.assemble(filter, space, function);
       }
 
@@ -137,32 +142,7 @@ namespace FEAT
       void asm_unit_filter_blocked_homogeneous(LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>& filter,
         const DomainLevel_& dom_level, const Space_& space, const String& mesh_part_names)
       {
-        // create unit-filter assembler
-        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
-
-        std::deque<String> mp_names;
-        if(mesh_part_names == "*")
-          mp_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
-        else
-          mp_names = mesh_part_names.split_by_whitespaces();
-
-        // loop over all mesh parts
-        for(const auto& mp_name : mp_names)
-        {
-          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(mp_name);
-          XASSERT(mesh_part_node != nullptr);
-
-          // let's see if we have that mesh part
-          // if it is nullptr, then our patch is not adjacent to that boundary part
-          auto* mesh_part = mesh_part_node->get_mesh();
-          if (mesh_part != nullptr)
-          {
-            // add to boundary assembler
-            unit_asm.add_mesh_part(*mesh_part);
-          }
-        }
-
-        // finally, assemble the filter
+        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm = create_unit_filter_asm(dom_level, mesh_part_names);
         unit_asm.assemble(filter, space);
       }
 
@@ -189,32 +169,7 @@ namespace FEAT
       void asm_unit_filter_blocked(LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>& filter,
         const DomainLevel_& dom_level, const Space_& space, const String& mesh_part_names, const Function_& function)
       {
-        // create unit-filter assembler
-        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm;
-
-        std::deque<String> mp_names;
-        if(mesh_part_names == "*")
-          mp_names = dom_level.get_mesh_node()->get_mesh_part_names(true);
-        else
-          mp_names = mesh_part_names.split_by_whitespaces();
-
-        // loop over all mesh parts
-        for(const auto& mp_name : mp_names)
-        {
-          auto* mesh_part_node = dom_level.get_mesh_node()->find_mesh_part_node(mp_name);
-          XASSERT(mesh_part_node != nullptr);
-
-          // let's see if we have that mesh part
-          // if it is nullptr, then our patch is not adjacent to that boundary part
-          auto* mesh_part = mesh_part_node->get_mesh();
-          if (mesh_part != nullptr)
-          {
-            // add to boundary assembler
-            unit_asm.add_mesh_part(*mesh_part);
-          }
-        }
-
-        // finally, assemble the filter
+        Assembly::UnitFilterAssembler<typename DomainLevel_::MeshType> unit_asm = create_unit_filter_asm(dom_level, mesh_part_names);
         unit_asm.assemble(filter, space, function);
       }
     } // namespace Asm
