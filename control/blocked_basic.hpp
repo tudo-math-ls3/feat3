@@ -251,8 +251,7 @@ namespace FEAT
       template<typename DomainLevel_, typename Space_>
       void assemble_homogeneous_unit_filter(const DomainLevel_& dom_level, const Space_& space)
       {
-        Asm::asm_unit_filter_blocked_homogeneous(this->filter_sys.local(), dom_level, space,
-          dom_level.get_mesh_node()->get_mesh_part_names(true));
+        Asm::asm_unit_filter_blocked_homogeneous(this->filter_sys.local(), dom_level, space, "*");
       }
     }; // class BlockedUnitFilterSystemLevel<...>
 
