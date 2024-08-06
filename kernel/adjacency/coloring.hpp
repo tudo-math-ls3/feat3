@@ -411,7 +411,7 @@ namespace FEAT
 
       Index get_max_size() const
       {
-        return std::accumulate(_coloring_maps.begin(), _coloring_maps.end(), Index(0), [](const auto& a, const auto& b){return std::max(a, b.size());});
+        return std::accumulate(_coloring_maps.begin(), _coloring_maps.end(), Index(0), [](const auto& a, const auto& b){return std::max(a, Index(b.size()));});
       }
     }; // class ColoringDataHandler
   } // namespace Adjacency
