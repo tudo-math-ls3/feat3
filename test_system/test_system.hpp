@@ -13,6 +13,7 @@
 #include <kernel/backend.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/math.hpp>
 
 // includes, system
 #include <string>
@@ -39,7 +40,7 @@ namespace FEAT
   /// TestSystem namespace
   namespace TestSystem
   {
-    // Forwared declaration
+    // Forward declaration
     class UnitTest;
 
     /// exception thrown by the check method in UnitTest
@@ -373,6 +374,17 @@ namespace FEAT
         this->_id + "\n" + "Expected '|" #a " - " #b \
         "|' <= '" + FEAT::stringify(eps) + "' but was '" + \
         FEAT::stringify((a) < (b) ? (b) - (a) : (a) - (b)) + "'" \
+        + ", with " #a "=" + FEAT::stringify(a) + " and " #b "=" + FEAT::stringify(b))\
+  } while (false)
+
+/// checks if |a - b| <= epsilon*|b|
+#define TEST_CHECK_RELATIVE(a, b, eps) \
+  do { \
+    CHECK_INTERNAL(Math::abs((a) - (b)) <= (eps)*Math::abs(b), \
+        this->_id + "\n" + "Expected '|" #a " - " #b \
+        "|' <= '" + FEAT::stringify(eps) + "*|" #b "|' = '" + \
+        FEAT::stringify((eps)*Math::abs(b)) + "' but was '" + \
+        FEAT::stringify(Math::abs((a) - (b))) + "'" \
         + ", with " #a "=" + FEAT::stringify(a) + " and " #b "=" + FEAT::stringify(b))\
   } while (false)
 
