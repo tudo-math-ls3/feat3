@@ -104,7 +104,7 @@ namespace FEAT
       template<>
       void cublas_getrfBatched(double** __restrict__ a_array, int* __restrict__ pivot, int* __restrict__ info_array, Index batch_size, Index leading_dimension, Index n)
       {
-        cublasStatus_t status =  cublasDgetrfBatched(Util::Intern::cublas_handle, n, a_array, leading_dimension, pivot, info_array, batch_size);
+        cublasStatus_t status =  cublasDgetrfBatched(Util::Intern::cublas_handle, int(n), a_array, int(leading_dimension), pivot, info_array, int(batch_size));
         if(status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDgetrfBatched failed with status code: " + stringify(status));
       }
@@ -112,7 +112,7 @@ namespace FEAT
       template<>
       void cublas_getrfBatched(float** __restrict__ a_array, int* __restrict__ pivot, int* __restrict__ info_array, Index batch_size, Index leading_dimension, Index n)
       {
-        cublasStatus_t status =  cublasSgetrfBatched(Util::Intern::cublas_handle, n, a_array, leading_dimension, pivot, info_array, batch_size);
+        cublasStatus_t status =  cublasSgetrfBatched(Util::Intern::cublas_handle, int(n), a_array, int(leading_dimension), pivot, info_array, int(batch_size));
         if(status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSgetrfBatched failed with status code: " + stringify(status));
       }
@@ -123,7 +123,7 @@ namespace FEAT
       template<>
       void cublas_getriBatched(double** __restrict__ a_array, double** __restrict__ c_array, int* __restrict__ pivot, int* __restrict__ info_array, Index batch_size, Index leading_dimension_a, Index n, Index leading_dimension_c)
       {
-        cublasStatus_t status =  cublasDgetriBatched(Util::Intern::cublas_handle, n, a_array, leading_dimension_a, pivot, c_array, leading_dimension_c, info_array, batch_size);
+        cublasStatus_t status =  cublasDgetriBatched(Util::Intern::cublas_handle, int(n), a_array, int(leading_dimension_a), pivot, c_array, int(leading_dimension_c), info_array, int(batch_size));
         if(status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasDgetriBatched failed with status code: " + stringify(status));
       }
@@ -131,7 +131,7 @@ namespace FEAT
       template<>
       void cublas_getriBatched(float** __restrict__ a_array, float** __restrict__ c_array, int* __restrict__ pivot, int* __restrict__ info_array, Index batch_size, Index leading_dimension_a, Index n, Index leading_dimension_c)
       {
-        cublasStatus_t status =  cublasSgetriBatched(Util::Intern::cublas_handle, n, a_array, leading_dimension_a, pivot, c_array, leading_dimension_c, info_array, batch_size);
+        cublasStatus_t status =  cublasSgetriBatched(Util::Intern::cublas_handle, int(n), a_array, int(leading_dimension_a), pivot, c_array, int(leading_dimension_c), info_array, int(batch_size));
         if(status != CUBLAS_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cublasSgetriBatched failed with status code: " + stringify(status));
       }
@@ -413,7 +413,6 @@ namespace FEAT
             degree_macros.max_degree_macros[i] = max_degree_macros.at(i);
           }
           auto& coloring_map = coloring_data.get_coloring_maps_device();
-          const Index max_color_size = coloring_data.get_max_size();
           // allocate arrays for local matrix
           DataType* local = (DataType*)Util::cuda_malloc(num_macros*stride*stride*sizeof(DataType));
           Util::cuda_set_memory(local, DataType(0), num_macros*stride*stride);

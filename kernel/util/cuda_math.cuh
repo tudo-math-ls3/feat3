@@ -427,6 +427,17 @@ namespace FEAT
       return max(a, b);
     }
 
+    template<>
+    __host__ __device__ __forceinline__ long long cuda_max(long long a, long long b)
+    {
+      return max(a, b);
+    }
+
+    template<>
+    __host__ __device__ __forceinline__ unsigned long long cuda_max(unsigned long long a, unsigned long long b)
+    {
+      return max(a, b);
+    }
     #ifdef FEAT_HAVE_HALFMATH
     template<>
     __host__ __device__ __forceinline__ Half cuda_max(Half a, Half b)
@@ -467,6 +478,18 @@ namespace FEAT
 
     template<>
     __host__ __device__ __forceinline__ unsigned long cuda_min(unsigned long a, unsigned long b)
+    {
+      return min(a, b);
+    }
+
+    template<>
+    __host__ __device__ __forceinline__ long long cuda_min(long long a, long long b)
+    {
+      return min(a, b);
+    }
+
+    template<>
+    __host__ __device__ __forceinline__ unsigned long long cuda_min(unsigned long long a, unsigned long long b)
     {
       return min(a, b);
     }
@@ -561,6 +584,19 @@ namespace FEAT
     {
       return atomicMax(address, value);
     }
+
+    // no atomic max provided for long ... if explicitly required, do it by cas loop
+    // template<>
+    // __device__ __forceinline__ long cuda_atomic_max(long* address, long value)
+    // {
+    //   return atomicMax(address, value);
+    // }
+
+    // template<>
+    // __device__ __forceinline__ unsigned long cuda_atomic_max(unsigned long* address, unsigned long value)
+    // {
+    //   return atomicMax(address, value);
+    // }
 
     template<>
     __device__ __forceinline__ long long cuda_atomic_max(long long* address, long long value)
