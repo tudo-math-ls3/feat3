@@ -4,8 +4,6 @@
 #include <kernel/solver/voxel_amavanka.hpp>
 #include <vector>
 
-#include "omp.h"
-
 namespace FEAT
 {
   namespace Solver
@@ -15,7 +13,7 @@ namespace FEAT
       template<typename DT_, typename IT_, int n_, bool skip_singular_>
       void assemble_unscaled_vanka_host(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
         Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap,
-        const Adjacency::Graph* macro_dofs[n_], int* macro_mask,
+        const Adjacency::Graph** macro_dofs, int* macro_mask,
         const int* coloring_map, Index color_size,
         Index stride, DT_ eps)
       {
@@ -126,7 +124,7 @@ namespace FEAT
 
       template<typename DT_, typename  IT_, int n_, bool skip_singular_>
       void scale_vanka_rows_host(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const DT_ omega,
-                                  const Adjacency::Graph* graphs_dof_macros[n_], const int* _m_mask)
+                                  const Adjacency::Graph** graphs_dof_macros, const int* _m_mask)
       {
         for(int i = 0; i < n_; ++i)
         {

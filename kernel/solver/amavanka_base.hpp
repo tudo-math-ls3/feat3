@@ -547,9 +547,9 @@ namespace FEAT
        * \brief AmaVanka main operations helper class
        *
        * This class contains the implementations of the main components of the AmaVanka smoother including the
-       * necessary template wrapping magic to support a wide variety of meta-matrices on host and device side.
+       * necessary template wrapping magic to support a wide variety of meta-matrices.
        *
-       * \author Peter Zajac and Maximilian Esser
+       * \author Peter Zajac
        */
       class AmaVankaCore
       {
@@ -1592,6 +1592,14 @@ namespace FEAT
 
       }; // struct AmaVankaCore
 
+      /**
+       * \brief VoxelAmaVanka main operations helper class
+       *
+       * This class contains the implementations of the main components of the VoxelAmaVanka smoother including the
+       * necessary template wrapping magic to support a wide variety of meta-matrix wrappers on host and device side.
+       *
+       * \author Maximilian Esser
+       */
       struct VoxelAmaVankaCore
       {
         template<typename DT_, typename IT_>
@@ -1647,7 +1655,7 @@ namespace FEAT
         // ##################### HOST VARIANT ################################
         template<typename DT_, typename IT_, int n_>
         CUDA_HOST static std::pair<Index,Index> gather_loc(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          DT_* local, const Index stride, const Index macro, const Adjacency::Graph* macro_dofs[n_],
+          DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           //gather arrays
@@ -1683,7 +1691,7 @@ namespace FEAT
 
         template<typename DT_, typename IT_, int n_>
         CUDA_HOST static std::pair<Index,Index> gather_row(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          DT_* local, const Index stride, const Index macro, const Adjacency::Graph* macro_dofs[n_],
+          DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           std::pair<Index, Index> nrc_r{0,0};
@@ -1700,7 +1708,7 @@ namespace FEAT
 
         template<typename DT_, typename IT_, int n_>
         CUDA_HOST static std::pair<Index,Index> gather(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          DT_* local, const Index stride, const Index macro, const Adjacency::Graph* macro_dofs[n_],
+          DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           std::pair<Index, Index> nrc_f{0,0};
@@ -1841,7 +1849,7 @@ namespace FEAT
         //################## Host Version#####################
         template<typename DT_, typename IT_, int n_>
         CUDA_HOST static std::pair<Index,Index> scatter_add_loc(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          const DT_* local, const Index stride, const Index macro, const Adjacency::Graph* macro_dofs[n_],
+          const DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           //gather arrays
@@ -1877,7 +1885,7 @@ namespace FEAT
 
         template<typename DT_, typename IT_, int n_>
         CUDA_HOST static std::pair<Index,Index> scatter_add_row(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          const DT_* local, const Index stride, const Index macro, const Adjacency::Graph* macro_dofs[n_],
+          const DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           std::pair<Index, Index> nrc_r{0,0};
@@ -1894,7 +1902,7 @@ namespace FEAT
 
         template<typename DT_, typename IT_, int n_>
         CUDA_HOST static std::pair<Index,Index> scatter_add(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          const DT_* local, const Index stride, const Index macro, const Adjacency::Graph* macro_dofs[n_],
+          const DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           std::pair<Index, Index> nrc_f{0,0};
