@@ -457,6 +457,8 @@ namespace FEAT
         {
           ASSERTM(is_explicit, "cannot map point: Chart is not explicit");
           WorldPoint wp;
+          if constexpr(is_implicit)
+            wp = CoordType(0);
           ParamPoint pp(param.template size_cast<param_dim>());
           Intern::ExplicitChartHelper<is_explicit>::map(cast(), wp, pp);
           return wp;
@@ -467,6 +469,8 @@ namespace FEAT
         {
           ASSERTM(is_implicit, "cannot project point: Chart is not implicit");
           WorldPoint wp(point);
+          if constexpr(is_explicit)
+            wp = CoordType(0);
           Intern::ImplicitChartHelper<is_implicit>::project(cast(), wp);
           return wp;
         }

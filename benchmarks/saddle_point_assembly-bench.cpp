@@ -492,9 +492,9 @@ namespace SaddlePointAssemblyBench
         {
           PreferredBackend backend_asm = PreferredBackend::generic;
           PreferredBackend backend_calc = PreferredBackend::mkl;
-          omp_set_num_threads(num_threads[i]);
-          run_bench_amavanka<Space_, DT_ , IT_, dim_>(lvl, result.at(i).at(0), backend_asm, backend_calc);
-          run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(lvl, result.at(i).at(1), backend_asm, backend_calc);
+          omp_set_num_threads(int(num_threads[i]));
+          run_bench_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(0), backend_asm, backend_calc);
+          run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(1), backend_asm, backend_calc);
         }
       }
       #ifdef FEAT_HAVE_CUDA
@@ -506,9 +506,9 @@ namespace SaddlePointAssemblyBench
         {
           PreferredBackend backend_asm = PreferredBackend::generic;
           PreferredBackend backend_calc = PreferredBackend::cuda;
-          omp_set_num_threads(num_threads[i]);
-          run_bench_amavanka<Space_, DT_ , IT_, dim_>(lvl, result.at(i).at(0), backend_asm, backend_calc);
-          run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(lvl, result.at(i).at(1), backend_asm, backend_calc);
+          omp_set_num_threads(int(num_threads[i]));
+          run_bench_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(0), backend_asm, backend_calc);
+          run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(1), backend_asm, backend_calc);
         }
       }
       {
@@ -519,9 +519,9 @@ namespace SaddlePointAssemblyBench
         {
           PreferredBackend backend_asm = PreferredBackend::cuda;
           PreferredBackend backend_calc = PreferredBackend::cuda;
-          omp_set_num_threads(num_threads[i]);
-          run_bench_amavanka<Space_, DT_ , IT_, dim_>(lvl, result.at(i).at(0), backend_asm, backend_calc);
-          run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(lvl, result.at(i).at(1), backend_asm, backend_calc);
+          omp_set_num_threads(int(num_threads[i]));
+          run_bench_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(0), backend_asm, backend_calc);
+          run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(1), backend_asm, backend_calc);
         }
       }
       #endif

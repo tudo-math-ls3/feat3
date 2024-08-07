@@ -66,7 +66,8 @@ public:
     TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
     TEST_CHECK_EQUAL_WITHIN_EPS(25., 23., 2.2);
     TEST_CHECK_EQUAL_WITHIN_EPS(6, 7, 1);
-    TEST_CHECK_THROWS(String("0").at(10), std::exception);
+    TEST_CHECK_THROWS(auto a = String("0").at(10);(void)a, std::exception);
+
 
     TEST_CHECK_RELATIVE(1235., 1234., 0.001);
     TEST_CHECK_RELATIVE(-5673., -5678., 0.001);
