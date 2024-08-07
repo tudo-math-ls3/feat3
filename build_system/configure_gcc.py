@@ -93,7 +93,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       if major >= 6 and major != 9 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
         if "sanitizer" in buildid:
           cxxflags += " -fsanitize=address"
-      if major >= 9:
+      if major >= 9 and major < 12:
         cxxflags += " -lrt"
 
   elif "opt" in buildid or "fast" in buildid:
