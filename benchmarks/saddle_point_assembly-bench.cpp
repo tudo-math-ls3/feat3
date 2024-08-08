@@ -203,16 +203,16 @@ namespace SaddlePointAssemblyBench
 
     asm_sym_vanka_watch.start();
     auto vanka = Solver::new_amavanka(matrix, filter, omega);
-    auto fgmres = Solver::new_fgmres(matrix, filter, std::min(num_solver_iterations,16), DataType(0), vanka);
+    auto fgmres = Solver::new_fgmres(matrix, filter, Index(std::min(num_solver_iterations,16)), DataType(0), vanka);
     fgmres->set_min_iter(num_solver_iterations);
     fgmres->set_max_iter(num_solver_iterations);
     fgmres->skip_defect_calc(true);
     fgmres->set_plot_mode(Solver::PlotMode::none);
     fgmres->init_symbolic();
     asm_sym_vanka_watch.stop();
-    bres.matrix_nnz = matrix.template used_elements<LAFEM::Perspective::pod>();
-    bres.vanka_nnz = vanka->data_size();
-    bres.num_elements = mesh.get_num_elements();
+    bres.matrix_nnz = int(matrix.template used_elements<LAFEM::Perspective::pod>());
+    bres.vanka_nnz = int(vanka->data_size());
+    bres.num_elements = int(mesh.get_num_elements());
 
     for(int k = 0; k < num_outer_iterations; ++k)
     {
@@ -350,16 +350,16 @@ namespace SaddlePointAssemblyBench
 
     asm_sym_vanka_watch.start();
     auto vanka = Solver::new_voxel_amavanka<MatrixType, FilterType, Adjacency::Coloring, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, FEAT::Intern::VankaMacroPolicy::uniformMacros>(matrix, filter, col, omega);
-    auto fgmres = Solver::new_fgmres(matrix, filter, std::min(num_solver_iterations, 16), DataType(0), vanka);
+    auto fgmres = Solver::new_fgmres(matrix, filter, Index(std::min(num_solver_iterations, 16)), DataType(0), vanka);
     fgmres->set_min_iter(num_solver_iterations);
     fgmres->set_max_iter(num_solver_iterations);
     fgmres->skip_defect_calc(true);
     fgmres->set_plot_mode(Solver::PlotMode::none);
     fgmres->init_symbolic();
     asm_sym_vanka_watch.stop();
-    bres.matrix_nnz = matrix.template used_elements<LAFEM::Perspective::pod>();
-    bres.vanka_nnz = vanka->data_size();
-    bres.num_elements = mesh.get_num_elements();
+    bres.matrix_nnz = int(matrix.template used_elements<LAFEM::Perspective::pod>());
+    bres.vanka_nnz = int(vanka->data_size());
+    bres.num_elements = int(mesh.get_num_elements());
 
     for(int k = 0; k < num_outer_iterations; ++k)
     {
