@@ -1498,15 +1498,13 @@ namespace FEAT
           Index* ptr = ancestor.parti_graph.get_domain_ptr();
           Index* idx = ancestor.parti_graph.get_image_idx();
 
-          // unweighted partitioning?
+          // weighted partitioning?
           if(!weights.empty())
           {
             // compute total number of non-zero weight elements
-            Index num_nonzero = 0u;
             WeightType weight_sum(0.0);
             for(auto w : weights)
             {
-              num_nonzero += (w > 1E-8);
               weight_sum += w;
             }
 
@@ -1514,6 +1512,7 @@ namespace FEAT
             WeightType weight_count(0.);
             for(Index i(1), last(0); i < num_parts; ++i)
             {
+              // add as many elements as we need to achieve the target weight for this partition
               WeightType target_weight = weight_sum * WeightType(i) / WeightType(num_parts);
               for(; (weight_count < target_weight) && (last < num_elems); ++last)
                 weight_count += weights[last];
