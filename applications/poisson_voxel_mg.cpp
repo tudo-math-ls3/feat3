@@ -333,7 +333,7 @@ namespace PoissonVoxelMG
     /* ***************************************************************************************** */
 
     //SaddleFunction sol_func;
-    Analytic::Common::BallCapFunction2D sol_func;
+    Analytic::Common::SphereCapFunction<2, 2> sol_func;
 
     for (Index i(0); i < num_levels; ++i)
     {
@@ -385,14 +385,9 @@ namespace PoissonVoxelMG
 
     if(1)
     {
-      // assemble the constant force functional
-      //Analytic::Common::ConstantFunction<ShapeType::dimension, DataType> one_func(DataType(1));
-      //Assembly::assemble_force_function_vector(the_domain_level.domain_asm, vec_rhs.local(),
-        //one_func, the_domain_level.space, cubature);
+      // assemble the force functional
       Assembly::Common::LaplaceFunctional<decltype(sol_func)> functional(sol_func);
 
-      //Assembly::assemble_functional_vector(the_domain_level.domain_asm, vec_rhs.local(),
-      //one_func, the_domain_level.space, cubature);
       Assembly::assemble_linear_functional_vector(the_domain_level.domain_asm, vec_rhs.local(),
         functional, the_domain_level.space, cubature);
 

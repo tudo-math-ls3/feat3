@@ -654,6 +654,9 @@ namespace CCND
       // try to create the domain
       domain.create(mesh_reader);
 
+      // add mesh-part charts to (isoparametric) trafo
+      domain.add_trafo_mesh_part_charts();
+
       // print partitioning info
       comm.print(domain.get_chosen_parti_info());
 
@@ -668,37 +671,6 @@ namespace CCND
       }
 
       watch_create_domain.stop();
-    }
-
-    virtual void add_all_isoparam_parts()
-    {
-#ifdef FEAT_CCND_APP_ISOPARAM
-      watch_create_domain.start();
-      for(std::size_t i(0); i < domain.size_physical(); ++i)
-      {
-        DomainLevel& dom_lvl = *domain.at(i);
-
-        // get all mesh-parts in our mesh node
-        const MeshNodeType& mesh_node = *dom_lvl.get_mesh_node();
-        std::deque<String> part_names = mesh_node.get_mesh_part_names(true);
-
-        // loop over all mesh parts
-        for(const auto& p_n : part_names)
-        {
-          // get the mesh part and its charts
-          const MeshPartType* part = mesh_node.find_mesh_part(p_n);
-          const ChartBaseType* chart = mesh_node.find_mesh_part_chart(p_n);
-
-          // note: part may be a nullptr if the mesh part does not intersect with the patch of this process, which
-          // is not an error case, since the mesh part exists on at least one other process -- just not this one
-
-          // if both exist, then we're adding them to the trafo
-          if((part != nullptr) && (chart != nullptr))
-            dom_lvl.trafo.add_meshpart_chart(*part, *chart);
-        }
-      }
-      watch_create_domain.stop();
-#endif // FEAT_CCND_SIMPLE_ISOPARAM
     }
 
     virtual void create_system(bool need_velo_mass = false)

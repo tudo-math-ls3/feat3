@@ -205,6 +205,7 @@ int main(int argc, char* argv [])
   domain.parse_args(args);
   domain.set_desired_levels(args.query("level")->second);
   domain.create(args.query("mesh")->second);
+  domain.add_trafo_mesh_part_charts();
 
   watch_domain_setup.stop();
 

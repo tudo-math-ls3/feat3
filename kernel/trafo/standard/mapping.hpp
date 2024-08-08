@@ -10,6 +10,8 @@
 // includes, FEAT
 #include <kernel/trafo/mapping_base.hpp>
 #include <kernel/trafo/standard/evaluator.hpp>
+#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/geometry/atlas/chart.hpp>
 
 namespace FEAT
 {
@@ -123,6 +125,21 @@ namespace FEAT
           }
 
           return vol;
+        }
+
+        /**
+         * \brief Adds a mesh-part and its associated chart to the trafo.
+         *
+         * \param[in] mesh_part
+         * The \transient mesh-part that is to be added.
+         *
+         * \param[in] chart
+         * The \transient chart that the mesh part is associated with.
+         */
+        void add_meshpart_chart(const Geometry::MeshPart<MeshType>& DOXY(mesh_part), const Geometry::Atlas::ChartBase<MeshType>& DOXY(chart))
+        {
+          // nothing to do here; the only purpose of this function is to supply
+          // the same interface as the Trafo::Isoparam::Mapping class
         }
       }; // class Mapping<...>
     } // namespace Standard

@@ -98,9 +98,6 @@ namespace CCND
     {
       BaseClass::create_domain();
 
-      // add all isoparametric mesh-parts
-      BaseClass::add_all_isoparam_parts();
-
       // create FBM meshpart?
       if(enable_fbm)
       {

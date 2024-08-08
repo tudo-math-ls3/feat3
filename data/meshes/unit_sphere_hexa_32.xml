@@ -1,5 +1,5 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:3:3">
-  <Chart name="sphere">
+  <Chart name="outer">
     <Sphere radius="1.0" midpoint="0 0 0"/>
   </Chart>
   <Mesh type="conformal:hypercube:3:3" size="53 128 108 32">
@@ -333,7 +333,7 @@
       52 47 48 36 51 43 44 27
     </Topology>
   </Mesh>
-  <MeshPart name="bnd:o" parent="root" topology="none" chart="sphere" size="26 48 24 0">
+  <MeshPart name="bnd:o" parent="root" topology="none" chart="outer" size="26 48 24 0">
     <Mapping dim="0">
       0
       1

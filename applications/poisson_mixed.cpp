@@ -743,6 +743,7 @@ namespace PoissonMixed
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
     domain.create(args.query("mesh")->second);
+    domain.add_trafo_mesh_part_charts();
 
     // print partitioning info
     comm.print(domain.get_chosen_parti_info());

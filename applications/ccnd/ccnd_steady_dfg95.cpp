@@ -148,9 +148,6 @@ namespace CCND
           domain.at(i)->create_fbm_assembler(domain.at(i).layer().comm(), "fbm");
         }
       }
-
-      // add all isoparametric mesh-parts
-      BaseClass::add_all_isoparam_parts();
     }
 
     virtual void create_benchmark_analysis()

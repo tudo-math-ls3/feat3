@@ -710,6 +710,24 @@ namespace FEAT
           _comm.allreduce(&my_virt_size, &_virt_size, std::size_t(1), Dist::op_max);
         }
 
+        void add_trafo_mesh_part_charts()
+        {
+          for(auto& bl : _base_levels)
+            bl->add_trafo_mesh_part_charts();
+          for(auto& ll : _layer_levels)
+            for(auto& l : ll)
+              l->add_trafo_mesh_part_charts();
+          /*for(auto it = _virt_levels.begin(); it != _virt_levels.end(); ++it)
+          {
+            if(it->is_parent())
+              it->level_p().add_trafo_mesh_part_charts();
+            if(it->is_child())
+              it->level_c().add_trafo_mesh_part_charts();
+            else
+              it->level().add_trafo_mesh_part_charts();
+          }*/
+        }
+
         String dump_layers() const
         {
           String msg;

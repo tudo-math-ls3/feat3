@@ -34,6 +34,11 @@
 //          2D: u(x,y)   = (exp(-(2*x-1)^2) - exp(-1)) / (1 - exp(-1)) * (exp(-(2*y-1)^2) - exp(-1)) / (1 - exp(-1))
 //          3D: u(x,y,z) = u(x,y) * (exp(-(2*z-1)^2) - exp(-1)) / (1 - exp(-1))
 //          Note: this solution has homogeneous Dirichlet BCs on [0,1]^d
+// * "hus": solve --Laplace(u) = 0 with "harmonic unit-shell" solution
+//          2D: u(x,y) = 1 - ln(x^2 + y^2)/(2*ln(2))
+//          3D: u(x,y,z) = 1 / sqrt(x^2 + y^2 + z^2)
+//          Note: this solution fulfills u(p) = 1 for |p|_2 = 1 and u(p) = 2 for |p|_2 = 1/2,
+//          which is used to prescribe the inhomogeneous Dirichlet BCs for this problem
 // * "sad": solve -Laplace(u) = 0 with analytic solution (2D only)
 //          2D: u(x,y)   = x^2 - y^2
 //
@@ -167,15 +172,17 @@ int main(int argc, char* argv [])
   static constexpr int shape_dim = ShapeType::dimension;
 
   // parse our problem type
+  const String supported_problems = "one sin cos exp sad hus";
   String problem;
   if(args.parse("problem", problem) < 1)
   {
     comm.print(std::cerr, "ERROR: Mandatory option '--problem <problem>' is missing!");
     FEAT::Runtime::abort();
   }
-  if(!problem.is_one_of("one sin cos exp sad"))
+  if(!problem.is_one_of(supported_problems))
   {
     comm.print(std::cerr, "ERROR: Invalid problem type: '" + problem + "'");
+    comm.print(std::cerr, "Expected one of the following problem types: " + supported_problems);
     FEAT::Runtime::abort();
   }
   if constexpr(shape_dim != 2)
@@ -199,6 +206,7 @@ int main(int argc, char* argv [])
   domain.parse_args(args);
   domain.set_desired_levels(args.query("level")->second);
   domain.create(args.query("mesh")->second);
+  domain.add_trafo_mesh_part_charts();
 
   watch_domain_setup.stop();
 
@@ -224,8 +232,15 @@ int main(int argc, char* argv [])
   Analytic::Common::SineBubbleFunction<shape_dim> func_sin;
   Analytic::Common::CosineWaveFunction<shape_dim> func_cos;
   Analytic::Common::ExpBubbleFunction<shape_dim> func_exp;
+  Analytic::Common::HarmonicShellFunction<shape_dim, DataType> func_hus;
   Analytic::Common::ConstantFunction<shape_dim, DataType> func_null(DataType(0));
   Analytic::Common::ConstantFunction<shape_dim, DataType> func_one(DataType(1));
+
+  // boundary condition functions for harmonic unit-shell
+  auto func_hus_bc_2d = Analytic::create_lambda_function_scalar_2d(
+    [](DataType x, DataType y) {return DataType(x*x + y*y < DataType(0.5625) ? 2 : 1);});
+  auto func_hus_bc_3d = Analytic::create_lambda_function_scalar_3d(
+    [](DataType x, DataType y, DataType z) {return DataType(x*x + y*y + z*z < DataType(0.5625) ? 2 : 1);});
 
   // create saddle function (2D only): x^2 - y^2
   auto func_sad = Analytic::create_lambda_function_scalar_2d(
@@ -302,6 +317,13 @@ int main(int argc, char* argv [])
       {
         system_levels.at(i)->assemble_unit_filter(*domain.at(i), domain.at(i)->space, "dirichlet", dirichet_bnd_names, func_exp);
       }
+      else if(problem == "hus")
+      {
+        if constexpr (shape_dim == 2)
+          system_levels.at(i)->assemble_unit_filter(*domain.at(i), domain.at(i)->space, "dirichlet", dirichet_bnd_names, func_hus_bc_2d);
+        if constexpr (shape_dim == 3)
+          system_levels.at(i)->assemble_unit_filter(*domain.at(i), domain.at(i)->space, "dirichlet", dirichet_bnd_names, func_hus_bc_3d);
+      }
       else if(problem == "sad")
       {
         if constexpr (shape_dim == 2)
@@ -353,6 +375,10 @@ int main(int argc, char* argv [])
   {
     Assembly::Common::LaplaceFunctional<decltype(func_exp)> force_exp(func_exp);
     Assembly::assemble_linear_functional_vector(the_domain_level.domain_asm, vec_rhs.local(), force_exp, the_domain_level.space, cubature);
+  }
+  else if(problem == "hus")
+  {
+    // rhs = 0
   }
   else if(problem == "sad")
   {
@@ -458,7 +484,7 @@ int main(int argc, char* argv [])
   if (args.check("no-err") < 0)
   {
     // use a cubature formula of higher order for error computation
-    const String cubature_error("auto-degree:" + stringify(2*SpaceType::local_degree+2));
+    const String cubature_error("auto-degree:" + stringify(2*SpaceType::local_degree+3));
 
     // create errors result structure
     Assembly::DiscreteFunctionIntegral<LocalSystemVector, SpaceType>::Type errors;
@@ -480,6 +506,10 @@ int main(int argc, char* argv [])
     else if(problem == "exp")
     {
       errors = Assembly::integrate_error_function<1>(the_domain_level.domain_asm, func_exp, vec_sol.local(), the_domain_level.space, cubature_error);
+    }
+    else if(problem == "hus")
+    {
+      errors = Assembly::integrate_error_function<1>(the_domain_level.domain_asm, func_hus, vec_sol.local(), the_domain_level.space, cubature_error);
     }
     else if(problem == "sad")
     {

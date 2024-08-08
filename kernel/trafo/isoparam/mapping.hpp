@@ -160,7 +160,7 @@ namespace FEAT
         /**
          * \brief Clears all added mesh-part/chart pairs.
          */
-        void clear()
+        void clear_charts()
         {
           for(int dim(1); dim <= shape_dim; ++dim)
           {

@@ -1710,7 +1710,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(val_1[1], DT_(-23.693995515706431689), tol);
   }
 
-  void test_ball_cap_function_2d() const
+  void test_sphere_cap_function_2d() const
   {
     // skip this test for quad precision
     if(sizeof(DT_) > 8u)
@@ -1718,23 +1718,56 @@ public:
 
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
 
-    Analytic::Common::BallCapFunction2D func;
+    Analytic::Common::SphereCapFunction<2, 2> func;
 
     // evaluate function
     DT_ val_1 = Analytic::eval_value_x(func, DT_(0.6), DT_(0.7));
-    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0.02138656368050375964), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0.0723805294763608305), tol);
 
     // evaluate gradient
     Tiny::Vector<DT_, 2> grad_1 = Analytic::eval_gradient_x(func, DT_(0.6), DT_(0.7));
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(-0.16903085094570331550), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.19720265943665386808), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(-0.55950288494418825937), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.65275336576821963593), tol);
 
     // evaluate hessian
     Tiny::Matrix<DT_, 2, 2> hess_1 = Analytic::eval_hessian_x(func, DT_(0.6), DT_(0.7));
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0], DT_(-0.31391443747059187164), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1], DT_(-0.037562411321267403442), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0], DT_(-0.037562411321267403442), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1], DT_(-0.32554089811765082985), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0], DT_(-1.2244193569068467705), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1], DT_(-0.34056697344428850569), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0], DT_(-0.34056697344428850569), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1], DT_(-1.3298329439253170223), tol);
+  }
+
+  void test_sphere_cap_function_3d() const
+  {
+    // skip this test for quad precision
+    if(sizeof(DT_) > 8u)
+      return;
+
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+
+    Analytic::Common::SphereCapFunction<3, 2> func;
+
+    // evaluate function
+    DT_ val_1 = Analytic::eval_value_x(func, DT_(0.4), DT_(0.5), DT_(0.6));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0.1090536506409417162), tol);
+
+    // evaluate gradient
+    Tiny::Vector<DT_, 3> grad_1 = Analytic::eval_gradient_x(func, DT_(0.4), DT_(0.5), DT_(0.6));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[0], DT_(-0.36066785386697291584), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[1], DT_(-0.45083481733371614480), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad_1[2], DT_(-0.54100178080045937376), tol);
+
+    // evaluate hessian
+    Tiny::Matrix<DT_, 3, 3> hess_1 = Analytic::eval_hessian_x(func, DT_(0.4), DT_(0.5), DT_(0.6));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][0], DT_(-1.0189599936485616931), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][1], DT_(-0.14661294872641175441), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[0][2], DT_(-0.17593553847169410529), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][0], DT_(-0.14661294872641175441), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][1], DT_(-1.0849358205754469826), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[1][2], DT_(-0.21991942308961763161), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][0], DT_(-0.17593553847169410529), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][1], DT_(-0.21991942308961763161), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][2], DT_(-1.1655729423749734475), tol);
   }
 
   void test_corner_singularity_2d() const
@@ -1873,6 +1906,98 @@ public:
 
   }
 
+  void test_harmonic_shell_function_1d() const
+  {
+    // don't test this for higher precision than double
+    if(sizeof(DT_) > 8u)
+      return;
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Tiny::Vector<DT_, 1> origin;
+    origin[0] = DT_(0.3);
+    Analytic::Common::HarmonicShellFunction<1, DT_> the_function(origin);
+
+    auto val_1 = Analytic::eval_value_x(the_function, DT_(0.5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(2.6), tol);
+    auto val_2 = Analytic::eval_value_x(the_function, DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(2), tol);
+    auto val_3 = Analytic::eval_value_x(the_function, DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(1), tol);
+
+    auto grad = Analytic::eval_gradient_x(the_function, DT_(0.5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-2), tol);
+
+    auto hess = Analytic::eval_hessian_x(the_function, DT_(0.5));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(0), tol);
+  }
+
+  void test_harmonic_shell_function_2d() const
+  {
+    // don't test this for higher precision than double
+    if(sizeof(DT_) > 8u)
+      return;
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Tiny::Vector<DT_, 2> origin;
+    origin[0] = DT_(0.1);
+    origin[1] = DT_(0.3);
+    Analytic::Common::HarmonicShellFunction<2, DT_> the_function(origin);
+
+    auto val_1 = Analytic::eval_value_x(the_function, DT_(0.5), DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(1.6431520925783205013), tol);
+    auto val_2 = Analytic::eval_value_x(the_function, DT_(0.5), DT_(0.6));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(2), tol);
+    auto val_3 = Analytic::eval_value_x(the_function, DT_(0.9), DT_(0.9));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(1), tol);
+
+    auto grad = Analytic::eval_gradient_x(the_function, DT_(0.5), DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-1.4075073569648423487), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(-1.7593841962060529358), tol);
+
+    auto hess = Analytic::eval_hessian_x(the_function, DT_(0.5), DT_(0.8));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(-0.77241257394412080116), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(3.4329447730849813381), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(3.4329447730849813381), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(0.77241257394412080116), tol);
+  }
+
+  void test_harmonic_shell_function_3d() const
+  {
+    // don't test this for higher precision than double
+    if(sizeof(DT_) > 8u)
+      return;
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Tiny::Vector<DT_, 3> origin;
+    origin[0] = DT_(0.1);
+    origin[1] = DT_(0.2);
+    origin[2] = DT_(0.4);
+    Analytic::Common::HarmonicShellFunction<3, DT_> the_function(origin);
+
+    auto val_1 = Analytic::eval_value_x(the_function, DT_(0.5), DT_(0.7), DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_1, DT_(0.90535746042518530938), tol);
+    auto val_2 = Analytic::eval_value_x(the_function, DT_(0.31213203435596425732), DT_(0.48284271247461900976), DT_(0.75355339059327376220));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_2, DT_(2), tol);
+    auto val_3 = Analytic::eval_value_x(the_function, DT_(0.52426406871192851464), DT_(0.76568542494923801952), DT_(1.1071067811865475244));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val_3, DT_(1), tol);
+
+    auto grad = Analytic::eval_gradient_x(the_function, DT_(0.5), DT_(0.7), DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[0], DT_(-0.29683851161481485554), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[1], DT_(-0.37104813951851856943), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad[2], DT_(-0.66788665113333342495), tol);
+
+    auto hess = Analytic::eval_hessian_x(the_function, DT_(0.5), DT_(0.7), DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][0], DT_(-0.45012397253066187110), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][1], DT_(0.36496538313296908470), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[0][2], DT_(0.65693768963934435246), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][0], DT_(0.36496538313296908470), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][1], DT_(-0.28588955012082578298), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[1][2], DT_(0.82117211204918044058), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][0], DT_(0.65693768963934435246), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][1], DT_(0.82117211204918044058), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess[2][2], DT_(0.73601352265148765414), tol);
+  }
+
   virtual void run() const override
   {
     test_par_profile_scalar();
@@ -1926,10 +2051,14 @@ public:
     test_sine_ring_vortex_velo_2d();
     test_sine_ring_vortex_pres_2d();
     test_sine_ring_vortex_rhs_2d();
-    test_ball_cap_function_2d();
+    test_sphere_cap_function_2d();
+    test_sphere_cap_function_3d();
     test_corner_singularity_2d();
     test_frankes_function();
     test_frankes_3d_variant_function();
+    test_harmonic_shell_function_1d();
+    test_harmonic_shell_function_2d();
+    test_harmonic_shell_function_3d();
   }
 };
 

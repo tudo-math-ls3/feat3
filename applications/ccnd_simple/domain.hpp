@@ -61,9 +61,11 @@ namespace CCNDSimple
     /// destructor
     virtual ~DomainLevel();
 
-    virtual bool add_isoparam_part(const String& part_name);
-
-    virtual std::deque<String> add_all_isoparam_parts();
+    /// helper function to add mesh-part charts to trafo
+    void add_trafo_mesh_part_charts()
+    {
+      BaseClass::_add_trafo_mesh_part_charts(trafo);
+    }
   }; // class DomainLevel<...>
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,9 +90,6 @@ namespace CCNDSimple
 
     /// the names of the mesh files
     std::deque<String> mesh_file_names;
-
-    /// the iso-parametric parts to be added
-    std::deque<String> isoparam_part_names;
 
   public:
     /**

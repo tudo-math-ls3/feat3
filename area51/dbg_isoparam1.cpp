@@ -236,15 +236,14 @@ namespace DbgIsoParam
     return err / DataType(trg.get_num_entities());
   }
 
-  void run(int argc, char* argv[])
+  void run()
   {
-    SimpleArgParser args(argc, argv);
-
-    auto atlas = make_atlas_2d();
+    auto atlas = make_atlas_3d();
     typedef typename std::remove_reference<decltype(*atlas)>::type AtlasType;
     typedef typename AtlasType::MeshType MeshType;
 
-    typedef Trafo::Standard::Mapping<MeshType> TrafoDeg1;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoStd;
+    typedef Trafo::Isoparam::Mapping<MeshType, 1> TrafoDeg1;
     typedef Trafo::Isoparam::Mapping<MeshType, 2> TrafoDeg2;
     typedef Trafo::Isoparam::Mapping<MeshType, 3> TrafoDeg3;
 
@@ -256,7 +255,7 @@ namespace DbgIsoParam
     Index lvl_min = 0;
     Index lvl_max = 5;
 
-    static constexpr std::size_t ns = 3;
+    static constexpr std::size_t ns = 4;
     std::vector<std::array<DT,ns>> vols(lvl_max+1), verrs(lvl_max+1);
     std::vector<std::array<DT,ns>> cirs(lvl_max+1), cerrs(lvl_max+1), merrs(lvl_max+1);
 
@@ -275,11 +274,13 @@ namespace DbgIsoParam
       const auto& mpart = *node->find_mesh_part("bnd");
 
       // create trafos
+      TrafoStd  trafo_0(mesh);
       TrafoDeg1 trafo_1(mesh);
       TrafoDeg2 trafo_2(mesh);
       TrafoDeg3 trafo_3(mesh);
 
       // add chart and boundary mesh part
+      trafo_1.add_meshpart_chart(mpart, chart);
       trafo_2.add_meshpart_chart(mpart, chart);
       trafo_3.add_meshpart_chart(mpart, chart);
 
@@ -288,19 +289,22 @@ namespace DbgIsoParam
       const DT ref_cir = pi * DT(2);
 
       // volume errors
-      verrs.at(lvl)[0] = Math::abs(ref_vol - calc_vol(trafo_1, 2));
-      verrs.at(lvl)[1] = Math::abs(ref_vol - calc_vol(trafo_2, 3));
-      verrs.at(lvl)[2] = Math::abs(ref_vol - calc_vol(trafo_3, 4));
+      verrs.at(lvl)[0] = Math::abs(ref_vol - calc_vol(trafo_0, 3));
+      verrs.at(lvl)[1] = Math::abs(ref_vol - calc_vol(trafo_1, 3));
+      verrs.at(lvl)[2] = Math::abs(ref_vol - calc_vol(trafo_2, 4));
+      verrs.at(lvl)[3] = Math::abs(ref_vol - calc_vol(trafo_3, 5));
 
       // circumference errors
-      cerrs.at(lvl)[0] = Math::abs(ref_cir - calc_circum(trafo_1, mpart, 2));
-      cerrs.at(lvl)[1] = Math::abs(ref_cir - calc_circum(trafo_2, mpart, 3));
-      cerrs.at(lvl)[2] = Math::abs(ref_cir - calc_circum(trafo_3, mpart, 4));
+      cerrs.at(lvl)[0] = Math::abs(ref_cir - calc_circum(trafo_0, mpart, 3));
+      cerrs.at(lvl)[1] = Math::abs(ref_cir - calc_circum(trafo_1, mpart, 3));
+      cerrs.at(lvl)[2] = Math::abs(ref_cir - calc_circum(trafo_2, mpart, 4));
+      cerrs.at(lvl)[3] = Math::abs(ref_cir - calc_circum(trafo_3, mpart, 5));
 
       // mean distance errors
-      merrs.at(lvl)[0] = calc_mean_dist(trafo_1, mpart, 2);
-      merrs.at(lvl)[1] = calc_mean_dist(trafo_2, mpart, 3);
-      merrs.at(lvl)[2] = calc_mean_dist(trafo_3, mpart, 4);
+      merrs.at(lvl)[0] = calc_mean_dist(trafo_0, mpart, 3);
+      merrs.at(lvl)[1] = calc_mean_dist(trafo_1, mpart, 3);
+      merrs.at(lvl)[2] = calc_mean_dist(trafo_2, mpart, 4);
+      merrs.at(lvl)[3] = calc_mean_dist(trafo_3, mpart, 5);
     }
 
     std::cout << "Volume Errors" << std::endl;
@@ -309,7 +313,7 @@ namespace DbgIsoParam
       std::cout << stringify(lvl).pad_front(2) << ":";
 
       for(std::size_t i(0); i < ns; ++i)
-        std::cout << stringify_fp_sci(verrs.at(lvl)[i], 4, 12);
+        std::cout << stringify_fp_sci(verrs.at(lvl)[i], 7, 15);
       if(lvl > lvl_min)
       {
         std::cout << " ||";
@@ -326,7 +330,7 @@ namespace DbgIsoParam
       std::cout << stringify(lvl).pad_front(2) << ":";
 
       for(std::size_t i(0); i < ns; ++i)
-        std::cout << stringify_fp_sci(cerrs.at(lvl)[i], 4, 12);
+        std::cout << stringify_fp_sci(cerrs.at(lvl)[i], 7, 15);
       if(lvl > lvl_min)
       {
         std::cout << " ||";
@@ -343,7 +347,7 @@ namespace DbgIsoParam
       std::cout << stringify(lvl).pad_front(2) << ":";
 
       for(std::size_t i(0); i < ns; ++i)
-        std::cout << stringify_fp_sci(merrs.at(lvl)[i], 4, 12);
+        std::cout << stringify_fp_sci(merrs.at(lvl)[i], 7, 15);
       if(lvl > lvl_min)
       {
         std::cout << " ||";
@@ -360,6 +364,6 @@ namespace DbgIsoParam
 int main(int argc, char* argv[])
 {
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
-  DbgIsoParam::run(argc, argv);
+  DbgIsoParam::run();
   return 0;
 }

@@ -45,75 +45,158 @@ namespace DbgIsoParam
   typedef double DT;
 #endif
 
-  typedef Shape::Quadrilateral ShapeType;
-  typedef ConformalMesh<ShapeType, 2, DT> MeshType;
-  typedef MeshPart<MeshType> MeshPartType;
-  typedef MeshAtlas<MeshType> AtlasType;
-  typedef RootMeshNode<MeshType> MeshNodeType;
+  typedef Shape::Quadrilateral ShapeType2D;
+  typedef ConformalMesh<ShapeType2D, 2, DT> MeshType2D;
+  typedef MeshPart<MeshType2D> MeshPartType2D;
+  typedef MeshAtlas<MeshType2D> AtlasType2D;
+  typedef RootMeshNode<MeshType2D> MeshNodeType2D;
+
+  typedef Shape::Hexahedron ShapeType3D;
+  typedef ConformalMesh<ShapeType3D, 3, DT> MeshType3D;
+  typedef MeshPart<MeshType3D> MeshPartType3D;
+  typedef MeshAtlas<MeshType3D> AtlasType3D;
+  typedef RootMeshNode<MeshType3D> MeshNodeType3D;
 
   typedef LAFEM::SparseMatrixCSR<DT, Index> MatrixType;
   typedef LAFEM::DenseVector<DT, Index> VectorType;
   typedef LAFEM::UnitFilter<DT, Index> FilterType;
 
-  static constexpr int nt = 3;
+  static constexpr int nt = 4;
   static constexpr int ns = 3;
 
-  typedef Tiny::Tensor3<DT, nt, ns, 2> ErrorTensor;
-  typedef Tiny::Matrix<DT, ns, 2> ErrorMatrix;
-  typedef Tiny::Vector<DT, 2> ErrorVector;
+  typedef Tiny::Tensor3<DT, nt, ns, 3> ErrorTensor;
+  typedef Tiny::Matrix<DT, ns, 3> ErrorMatrix;
+  typedef Tiny::Vector<DT, 3> ErrorVector;
 
-  template<typename T_>
+  /*template<typename T_, int ai = 2>
   struct StaticSolFunction
   {
+    static_assert(ai >= 2, "ai must be >= 2");
+    static constexpr T_ a = T_(ai);
+
     static T_ eval(T_ x, T_ y)
     {
-      return Math::sqrt(T_(2) - x*x - y*y) - T_(1);
+      return Math::sqrt(T_(2) - x*x - y*y) - Math::sqrt(a - T_(1));
     }
 
     static T_ der_x(T_ x, T_ y)
     {
-      return  -x / Math::sqrt(T_(2) - x*x - y*y);
+      return  -x / Math::sqrt(a - x*x - y*y);
     }
 
     static T_ der_y(T_ x, T_ y)
     {
-      return  -y / Math::sqrt(T_(2) - x*x - y*y);
+      return  -y / Math::sqrt(a - x*x - y*y);
     }
 
     static T_ der_xx(T_ x, T_ y)
     {
-      return  (y*y - T_(2)) / Math::pow(T_(2) - x*x - y*y, T_(1.5));
+      return  (y*y - a) / Math::pow(a - x*x - y*y, T_(1.5));
     }
 
     static T_ der_yy(T_ x, T_ y)
     {
-      return  (x*x - T_(2)) / Math::pow(T_(2) - x*x - y*y, T_(1.5));
+      return  (x*x - a) / Math::pow(a - x*x - y*y, T_(1.5));
     }
 
     static T_ der_xy(T_ x, T_ y)
     {
-      return  (x*y - T_(2)) / Math::pow(T_(2) - x*x - y*y, T_(1.5));
+      return  (-x*y) / Math::pow(a - x*x - y*y, T_(1.5));
     }
 
     static T_ der_yx(T_ x, T_ y)
     {
-      return  (x*y - T_(2)) / Math::pow(T_(2) - x*x - y*y, T_(1.5));
+      return  (-x*y) / Math::pow(a - x*x - y*y, T_(1.5));
     }
-  };
 
-  typedef Analytic::StaticWrapperFunction<2, StaticSolFunction, true, true, true> SolFunction;
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
-  std::unique_ptr<AtlasType> make_atlas()
+    static T_ eval(T_ x, T_ y, T_ z)
+    {
+      return Math::sqrt(a - x*x - y*y - z*z) - Math::sqrt(a - T_(1));
+    }
+
+    static T_ der_x(T_ x, T_ y, T_ z)
+    {
+      return  -x / Math::sqrt(a - x*x - y*y - z*z);
+    }
+
+    static T_ der_y(T_ x, T_ y, T_ z)
+    {
+      return  -y / Math::sqrt(a - x*x - y*y - z*z);
+    }
+
+    static T_ der_z(T_ x, T_ y, T_ z)
+    {
+      return  -z / Math::sqrt(a - x*x - y*y - z*z);
+    }
+
+    static T_ der_xx(T_ x, T_ y, T_ z)
+    {
+      return  (y*y + z*z - a) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_yy(T_ x, T_ y, T_ z)
+    {
+      return  (x*x + z*z - a) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_zz(T_ x, T_ y, T_ z)
+    {
+      return  (x*x + y*y - a) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_xy(T_ x, T_ y, T_ z)
+    {
+      return  (-x*y) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_xz(T_ x, T_ y, T_ z)
+    {
+      return  (-x*z) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_yx(T_ x, T_ y, T_ z)
+    {
+      return  (-x*y) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_yz(T_ x, T_ y, T_ z)
+    {
+      return  (-y*z) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_zx(T_ x, T_ y, T_ z)
+    {
+      return  (-x*z) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+
+    static T_ der_zy(T_ x, T_ y, T_ z)
+    {
+      return  (-y*z) / Math::pow(a - x*x - y*y - z*z, T_(1.5));
+    }
+  };*/
+
+  std::unique_ptr<AtlasType2D> make_atlas_2d()
   {
-    auto atlas = Geometry::MeshAtlas<MeshType>::make_unique();
-    atlas->add_mesh_chart("circle",
-      std::unique_ptr<Geometry::Atlas::Circle<MeshType>>(new Geometry::Atlas::Circle<MeshType>(0.0, 0.0, 1.0)));
+    auto atlas = Geometry::MeshAtlas<MeshType2D>::make_unique();
+    atlas->add_mesh_chart("chart",
+      std::unique_ptr<Geometry::Atlas::Circle<MeshType2D>>(new Geometry::Atlas::Circle<MeshType2D>(0.0, 0.0, 1.0)));
     return atlas;
   }
 
-  std::unique_ptr<MeshNodeType> make_mesh_node(AtlasType* atlas)
+  std::unique_ptr<AtlasType3D> make_atlas_3d()
   {
-    Geometry::UnitStarCubeFactory<MeshType> factory;
+    auto atlas = Geometry::MeshAtlas<MeshType3D>::make_unique();
+    atlas->add_mesh_chart("chart",
+      std::unique_ptr<Geometry::Atlas::Sphere<MeshType3D>>(new Geometry::Atlas::Sphere<MeshType3D>(0.0, 0.0, 0.0, 1.0)));
+    return atlas;
+  }
+
+
+  std::unique_ptr<MeshNodeType2D> make_mesh_node(AtlasType2D* atlas)
+  {
+    Geometry::UnitStarCubeFactory<MeshType2D> factory;
     auto mesh = factory.make_unique();
 
     // move coords from [0,1] to [-0.7,+0.7]
@@ -126,18 +209,50 @@ namespace DbgIsoParam
       }
     }
 
-    auto node = Geometry::RootMeshNode<MeshType>::make_unique(std::move(mesh), atlas);
+    auto node = Geometry::RootMeshNode<MeshType2D>::make_unique(std::move(mesh), atlas);
 
-    Geometry::BoundaryFactory<MeshType> bnd_factory(*node->get_mesh());
-    node->add_mesh_part("bnd", bnd_factory.make_unique(), "circle", atlas->find_mesh_chart("circle"));
+    Geometry::BoundaryFactory<MeshType2D> bnd_factory(*node->get_mesh());
+    node->add_mesh_part("bnd", bnd_factory.make_unique(), "chart", atlas->find_mesh_chart("chart"));
 
     return node;
   }
 
-  template<typename Space_>
-  void run_space(ErrorVector& err, Space_& space, const MeshPartType& bnd, const String& name)
+  std::unique_ptr<MeshNodeType3D> make_mesh_node(AtlasType3D* atlas)
   {
-    SolFunction sol_function;
+    Geometry::UnitCubeFactory<MeshType3D> factory_3d;
+    auto mesh = factory_3d.make_unique();
+
+    // move coords from [0,1] to [-0.7,+0.7]
+    {
+      auto& vtx = mesh->get_vertex_set();
+      for(Index i(0); i < vtx.get_num_vertices(); ++i)
+      {
+        (vtx[i][0] *= 1.4) -= 0.7;
+        (vtx[i][1] *= 1.4) -= 0.7;
+        (vtx[i][2] *= 1.4) -= 0.7;
+      }
+    }
+
+    auto node = Geometry::RootMeshNode<MeshType3D>::make_unique(std::move(mesh), atlas);
+
+    Geometry::BoundaryFactory<MeshType3D> bnd_factory(*node->get_mesh());
+    node->add_mesh_part("bnd", bnd_factory.make_unique(), "chart", atlas->find_mesh_chart("chart"));
+
+    node->adapt();
+
+    return node;
+  }
+
+  //template<typename T_>
+  //using FooFunction = StaticSolFunction<T_, 2>;
+
+  template<typename Space_, typename MeshPart_>
+  void run_space(ErrorVector& err, Space_& space, const MeshPart_& bnd, const String& name)
+  {
+    typedef typename Space_::MeshType MeshType;
+    Analytic::Common::SphereCapFunction<MeshType::shape_dim, 2> sol_function;
+    //Analytic::StaticWrapperFunction<MeshType::shape_dim, FooFunction, true, true, true> sol_function;
+
     Cubature::DynamicFactory cubature("gauss-legendre:5");
 
     std::cout << String(80, '#') << std::endl;
@@ -163,7 +278,7 @@ namespace DbgIsoParam
 
     FilterType filter;
 
-    Assembly::UnitFilterAssembler<MeshType> unit_asm;
+    Assembly::UnitFilterAssembler<typename Space_::MeshType> unit_asm;
     unit_asm.add_mesh_part(bnd);
     unit_asm.assemble(filter, space);
 
@@ -174,7 +289,7 @@ namespace DbgIsoParam
     auto jacobi = Solver::new_jacobi_precond(matrix, filter);
     auto solver = Solver::new_pcg(matrix, filter, jacobi);
     solver->set_tol_rel(Math::sqrt(Math::eps<DT>()));
-    solver->set_max_iter(10000);
+    solver->set_max_iter(50000);
     solver->set_plot_mode(Solver::PlotMode::summary);
 
     solver->init();
@@ -182,14 +297,16 @@ namespace DbgIsoParam
     solver->done();
 
     // compute errors
-    auto e = Assembly::ScalarErrorComputer<1>::compute(vec_sol, sol_function, space, cubature);
+    static constexpr int max_err = (Space_::local_degree >= 2) ? 2 : 1;
+    auto e = Assembly::ScalarErrorComputer<max_err>::compute(vec_sol, sol_function, space, cubature);
 
     err[0] = e.norm_h0;
     err[1] = e.norm_h1;
+    err[2] = e.norm_h2;
   }
 
-  template<typename Trafo_>
-  void run_trafo(ErrorMatrix& err, Trafo_& trafo, const MeshPartType& bnd, const String& name)
+  template<typename Trafo_, typename MeshPart_>
+  void run_trafo(ErrorMatrix& err, Trafo_& trafo, const MeshPart_& bnd, const String& name)
   {
     typedef Space::Lagrange1::Element<Trafo_> SpaceQ1;
     typedef Space::Lagrange2::Element<Trafo_> SpaceQ2;
@@ -213,18 +330,26 @@ namespace DbgIsoParam
   {
     SimpleArgParser args(argc, argv);
 
-    typedef Trafo::Standard::Mapping<MeshType> TrafoDeg1;
+    //auto atlas = make_atlas_2d();
+    auto atlas = make_atlas_3d();
+
+    typedef typename std::remove_reference<decltype(*atlas)>::type AtlasType;
+    typedef typename AtlasType::MeshType MeshType;
+
+    static constexpr int dim = MeshType::shape_dim;
+
+    typedef Trafo::Standard::Mapping<MeshType> TrafoStd;
+    typedef Trafo::Isoparam::Mapping<MeshType, 1> TrafoDeg1;
     typedef Trafo::Isoparam::Mapping<MeshType, 2> TrafoDeg2;
     typedef Trafo::Isoparam::Mapping<MeshType, 3> TrafoDeg3;
 
     // create an empty atlas and a root mesh node
-    auto atlas = make_atlas();
     auto node = make_mesh_node(atlas.get());
 
-    const auto& chart = *atlas->find_mesh_chart("circle");
+    const auto& chart = *atlas->find_mesh_chart("chart");
 
     Index lvl_min = 0;
-    Index lvl_max = 5;
+    Index lvl_max = 7 - dim;
 
     std::vector<ErrorTensor> errs(lvl_max+1u);
 
@@ -243,17 +368,20 @@ namespace DbgIsoParam
       const auto& mpart = *node->find_mesh_part("bnd");
 
       // create trafos
+      TrafoStd trafo_0(mesh);
       TrafoDeg1 trafo_1(mesh);
       TrafoDeg2 trafo_2(mesh);
       TrafoDeg3 trafo_3(mesh);
 
       // add chart and boundary mesh part
+      trafo_1.add_meshpart_chart(mpart, chart);
       trafo_2.add_meshpart_chart(mpart, chart);
       trafo_3.add_meshpart_chart(mpart, chart);
 
-      run_trafo(err[0], trafo_1, mpart, String("Trafo1 on Level ") + stringify(lvl));
-      run_trafo(err[1], trafo_2, mpart, String("Trafo2 on Level ") + stringify(lvl));
-      run_trafo(err[2], trafo_3, mpart, String("Trafo3 on Level ") + stringify(lvl));
+      run_trafo(err[0], trafo_0, mpart, String("Trafo0 on Level ") + stringify(lvl));
+      run_trafo(err[1], trafo_1, mpart, String("Trafo1 on Level ") + stringify(lvl));
+      run_trafo(err[2], trafo_2, mpart, String("Trafo2 on Level ") + stringify(lvl));
+      run_trafo(err[3], trafo_3, mpart, String("Trafo3 on Level ") + stringify(lvl));
     }
 
     std::cout << String(80, '#') << std::endl;
@@ -261,11 +389,11 @@ namespace DbgIsoParam
     std::cout << String(80, '#') << std::endl;
 
     std::cout << "H0 Errors" << std::endl << "     ";
-    for(int k(0); k < 9; ++k)
-      std::cout << "T" << (1+k/3) << ":Q" << (1+k%3) << "       ";
-    std::cout << "    ";
-    for(int k(0); k < 9; ++k)
-      std::cout << "T" << (1+k/3) << ":Q" << (1+k%3) << "   ";
+    for(int k(0); k < 12; ++k)
+      std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
+    std::cout << "   ";
+    for(int k(0); k < 12; ++k)
+      std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "  ";
     std::cout << std::endl;
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
@@ -279,7 +407,7 @@ namespace DbgIsoParam
         std::cout << " ||";
         for(int i(0); i < nt; ++i)
           for(int  j(0); j < ns; ++j)
-            std::cout << stringify_fp_fix(errs.at(lvl-1)(i,j,0) / errs.at(lvl)(i,j,0), 3, 8);
+            std::cout << stringify_fp_fix(errs.at(lvl-1)(i,j,0) / errs.at(lvl)(i,j,0), 3, 7);
       }
       std::cout << std::endl;
     }
@@ -287,11 +415,11 @@ namespace DbgIsoParam
 
 
     std::cout << "H1 Errors" << std::endl << "     ";
-    for(int k(0); k < 9; ++k)
-      std::cout << "T" << (1+k/3) << ":Q" << (1+k%3) << "       ";
-    std::cout << "    ";
-    for(int k(0); k < 9; ++k)
-      std::cout << "T" << (1+k/3) << ":Q" << (1+k%3) << "   ";
+    for(int k(0); k < 12; ++k)
+      std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
+    std::cout << "   ";
+    for(int k(0); k < 12; ++k)
+      std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "  ";
     std::cout << std::endl;
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
@@ -305,7 +433,32 @@ namespace DbgIsoParam
         std::cout << " ||";
         for(int i(0); i < nt; ++i)
           for(int  j(0); j < ns; ++j)
-            std::cout << stringify_fp_fix(errs.at(lvl-1)(i,j,1) / errs.at(lvl)(i,j,1), 3, 8);
+            std::cout << stringify_fp_fix(errs.at(lvl-1)(i,j,1) / errs.at(lvl)(i,j,1), 3, 7);
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::cout << "H2 Errors" << std::endl << "     ";
+    for(int k(0); k < 12; ++k)
+      std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
+    std::cout << "   ";
+    for(int k(0); k < 12; ++k)
+      std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "  ";
+    std::cout << std::endl;
+    for(Index lvl(0); lvl <= lvl_max; ++lvl)
+    {
+      std::cout << stringify(lvl).pad_front(2) << ":";
+      for(int i(0); i < nt; ++i)
+        for(int  j(0); j < ns; ++j)
+          std::cout << stringify_fp_sci(errs.at(lvl)(i,j,2), 4, 12);
+
+      if(lvl > lvl_min)
+      {
+        std::cout << " ||";
+        for(int i(0); i < nt; ++i)
+          for(int  j(0); j < ns; ++j)
+            std::cout << stringify_fp_fix(errs.at(lvl)(i,j,2) > 0.0 ? errs.at(lvl-1)(i,j,2) / errs.at(lvl)(i,j,2) : 0.0, 3, 7);
       }
       std::cout << std::endl;
     }

@@ -154,6 +154,66 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(grad3d[2], DT_(0), tol);
   }
 
+  void test_inverse_distance_function_2d() const
+  {
+    // don't test this for higher precision than double
+    if(sizeof(DT_) > 8u)
+      return;
+
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Tiny::Vector<DT_, 2> orig2d;
+    orig2d[0] = DT_(0.1);
+    orig2d[1] = DT_(0.2);
+    Analytic::Distance::InverseDistanceFunction<2, DT_> dfunc2d(orig2d);
+
+    auto val2d = Analytic::eval_value_x(dfunc2d, DT_(0.5), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val2d, DT_(1.5617376188860606552), tol);
+
+    auto grad2d = Analytic::eval_gradient_x(dfunc2d, DT_(0.5), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad2d[0], DT_(-1.5236464574498152734), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad2d[1], DT_(-1.9045580718122690918), tol);
+
+    auto hess2d = Analytic::eval_hessian_x(dfunc2d, DT_(0.5), DT_(0.7));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[0][0], DT_(0.6503369025700431045), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[0][1], DT_(5.5743163077432266100), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[1][0], DT_(5.5743163077432266100), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess2d[1][1], DT_(3.1587792410544950790), tol);
+  }
+
+  void test_inverse_distance_function_3d() const
+  {
+    // don't test this for higher precision than double
+    if(sizeof(DT_) > 8u)
+      return;
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    Tiny::Vector<DT_, 3> orig3d;
+    orig3d[0] = DT_(0.1);
+    orig3d[1] = DT_(0.2);
+    orig3d[2] = DT_(0.4);
+    Analytic::Distance::InverseDistanceFunction<3, DT_> dfunc3d(orig3d);
+
+    auto val3d = Analytic::eval_value_x(dfunc3d, DT_(0.5), DT_(0.7), DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(val3d, DT_(0.90535746042518530938), tol);
+
+    auto grad3d = Analytic::eval_gradient_x(dfunc3d, DT_(0.5), DT_(0.7), DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad3d[0], DT_(-0.29683851161481485554), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad3d[1], DT_(-0.37104813951851856943), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(grad3d[2], DT_(-0.66788665113333342495), tol);
+
+    auto hess3d = Analytic::eval_hessian_x(dfunc3d, DT_(0.5), DT_(0.7), DT_(1.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[0][0], DT_(-0.45012397253066187110), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[0][1], DT_(0.36496538313296908470), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[0][2], DT_(0.65693768963934435246), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[1][0], DT_(0.36496538313296908470), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[1][1], DT_(-0.28588955012082578298), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[1][2], DT_(0.82117211204918044058), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[2][0], DT_(0.65693768963934435246), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[2][1], DT_(0.82117211204918044058), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[2][2], DT_(0.73601352265148765414), tol);
+  }
+
 #ifdef FEAT_HAVE_CGAL
   void test_cgal_signed_dist_3d() const
   {
@@ -203,6 +263,8 @@ public:
     test_distance_function_3d();
     test_distance_function_sd_2d();
     test_distance_function_sd_3d();
+    test_inverse_distance_function_2d();
+    test_inverse_distance_function_3d();
     test_plane_distance_function_sd();
 #ifdef FEAT_HAVE_CGAL
     test_cgal_signed_dist_3d();

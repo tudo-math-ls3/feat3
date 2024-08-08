@@ -905,11 +905,14 @@ namespace FEAT
           /// Evaluator for the second AnalyticFunction
           typename AnalyticFunctionType2::template Evaluator<EvalTraits_> _f2_eval;
 
+          const DataType _eps;
+
         public:
           /// Constructor
           explicit Evaluator(const MinOfTwoFunctions& function) :
             _f1_eval(function._f1),
-            _f2_eval(function._f2)
+            _f2_eval(function._f2),
+            _eps(Math::eps<DataType>())
           {
           }
 
@@ -923,7 +926,7 @@ namespace FEAT
             ValueType val1 = _f1_eval.value(point);
             ValueType val2 = _f2_eval.value(point);
 
-            if(Math::abs(val1-val2) < Math::eps<DataType>())
+            if(Math::abs(val1-val2) < _eps)
               return GradientType::null();
             else if(val1 < val2)
               return _f1_eval.gradient(point);
@@ -936,7 +939,7 @@ namespace FEAT
             ValueType val1 = _f1_eval.value(point);
             ValueType val2 = _f2_eval.value(point);
 
-            if(Math::abs(val1-val2) < Math::eps<DataType>())
+            if(Math::abs(val1-val2) < _eps)
               return HessianType::null();
             else if(val1 < val2)
               return _f1_eval.hessian(point);
@@ -3954,20 +3957,25 @@ namespace FEAT
       }; // class SineRingVortexRHS2D<...>
 
       /**
-       * \brief Ball-Cap Function on the 2D unit circle
+       * \brief Sphere-Cap Function on the 2D unit circle / 3D unit ball
        *
-       * This function represents the upper quarter manifold of a ball of radius 4 on the unit circle domain of radius
-       * 1 around the origin. This function in homogeneous on the boundary of the unit circle domain.
+       * This function is given by the formula \f$ (\sqrt{a - \|x\|_2^2} - \sqrt{a-1}) \f$,
+       * which represents the upper half-sphere for a_ = 1. For a_ > 1, this function represents
+       * just a part of the upper half-sphere, which is regular even for \f$\|x\|_2=1\f$.
        *
-       * This function is given by the formula \f$ (\sqrt{4 - x^2 - y^2} - \sqrt{3}) / 2 \f$.
+       * It is recommended to use this function with a_ = 2, which yields a sufficiently regular
+       * function on the 2D/3D unit circle/ball.
        *
        * \author Peter Zajac
        */
-      class BallCapFunction2D :
+      template<int dim_, int a_ = 2>
+      class SphereCapFunction :
         public Analytic::Function
       {
       public:
-        static constexpr int domain_dim = 2;
+        static_assert(a_ >= 1, "parameter a_ must be >= 1");
+
+        static constexpr int domain_dim = dim_;
         typedef Analytic::Image::Scalar ImageType;
         static constexpr bool can_value = true;
         static constexpr bool can_grad = true;
@@ -3984,40 +3992,53 @@ namespace FEAT
           typedef typename Traits_::GradientType GradientType;
           typedef typename Traits_::HessianType HessianType;
 
-          explicit Evaluator(const BallCapFunction2D& )
+          static constexpr DataType a = DataType(a_);
+          const DataType sa;
+
+          explicit Evaluator(const SphereCapFunction&) :
+            sa(Math::sqrt(a - DataType(1)))
           {
           }
 
           ValueType value(const PointType& point) const
           {
-            return DataType(0.5) * (Math::sqrt(DataType(4) - point.norm_euclid_sqr()) - Math::sqrt(DataType(3)));
+            return Math::sqrt(a - point.norm_euclid_sqr()) - sa;
           }
 
           GradientType gradient(const PointType& point) const
           {
-            const DataType s = DataType(0.5) / Math::sqrt(DataType(4) - point.norm_euclid_sqr());
-            GradientType grad;
-            grad[0] = -s * point[0];
-            grad[1] = -s * point[1];
-            return grad;
+            return (DataType(-1) / Math::sqrt(a - point.norm_euclid_sqr())) * point;
           }
 
           HessianType hessian(const PointType& point) const
           {
-            const DataType s = DataType(0.5) / Math::cub(Math::sqrt(DataType(4) - point.norm_euclid_sqr()));
+            const DataType s = DataType(1) / Math::cub(Math::sqrt(a - point.norm_euclid_sqr()));
+            //const DataType s = DataType(1) / Math::pow(a - point.norm_euclid_sqr(), DataType(1.5));
             HessianType hess;
-            hess[0][0] = s * (Math::sqr(point[1]) - DataType(4));
-            hess[1][1] = s * (Math::sqr(point[0]) - DataType(4));
-            hess[0][1] = hess[1][0] = -s * point[0] * point[1];
+            hess.format();
+            for(int i = 0; i < dim_; ++i)
+            {
+              for(int j = 0; j < dim_; ++j)
+              {
+                if(i == j)
+                {
+                  hess[i][j] = DataType(0);
+                  for(int k = 0; k < dim_; ++k)
+                    hess[i][j] += (k == i ? -a : Math::sqr(point[k])) * s;
+                }
+                else
+                {
+                  hess[i][j] = -point[i] * point[j] * s;
+                }
+              }
+            }
             return hess;
           }
-        }; // class BallCapFunction2D::Evaluator<...>
-      }; // class BallCapFunction2D
-
-
+        }; // class SphereCapFunction::Evaluator<...>
+      }; // class SphereCapFunction
 
       /**
-       * \brief Singularity function for a 2D reentry corner with homogenous boundary conditions.
+       * \brief Singularity function for a 2D reentry corner with homogeneous boundary conditions.
        *
        * This function represents the lowest order singular function that occurs for the poisson
        * equation with a re-entry corner, which has zero boundary conditions in the corner itself.
@@ -4026,7 +4047,7 @@ namespace FEAT
        *         \f$ f(r,\varphi) = r^{\frac{\pi}{\theta}}\sin(\frac{\pi}{\theta}\varphi) \f$
        * where \theta is the (right-handed) opening angle of the re-entry corner.
        * This function is in \f$ H^1 \f$ but for degrees larger \f$ \frac{\pi}{2} \f$ not in
-       * \f$ H^2 \f$ despite the corresponding Poisson-Equation having homogenous right hand side
+       * \f$ H^2 \f$ despite the corresponding Poisson-Equation having homogeneous right hand side
        * and arbitrarily smooth boundary conditions.
        *
        * The actual function space is provided in standard euclidean coordinates and requires a center point p
@@ -4058,6 +4079,7 @@ namespace FEAT
       private:
         Tiny::Vector<DataType, 2> base_point;
         DataType alpha, k, offset;
+
       public:
         CornerSingularity2D() = delete;
 
@@ -4084,12 +4106,14 @@ namespace FEAT
 
           Tiny::Vector<DataType, 2> base_point;
           const DataType alpha, k, offset;
+          const DataType eps;
 
           explicit Evaluator(const CornerSingularity2D& func) :
             base_point(func.base_point),
             alpha(func.alpha),
             k(func.k),
-            offset(func.offset)
+            offset(func.offset),
+            eps(Math::eps<DataType>())
           {
           }
 
@@ -4100,7 +4124,7 @@ namespace FEAT
             const DataType y = point[1] - base_point[1];
             const DataType r = Math::sqrt(Math::sqr(x) + Math::sqr(y));
             //TODO: Set x_rel to zero if r is very small?? <- Better conditioning?
-            const DataType x_rel = r > DataType(10.)* Math::eps<DataType>() ? x/r : DataType(0);
+            const DataType x_rel = r > DataType(10.)* eps ? x/r : DataType(0);
             DataType phi = Math::acos(x_rel);
             phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
             return alpha * Math::pow(r, k) * Math::sin(k * (phi - offset));
@@ -4111,8 +4135,8 @@ namespace FEAT
             const DataType x = point[0] - base_point[0];
             const DataType y = point[1] - base_point[1];
             const DataType r = Math::sqrt(Math::sqr(x) + Math::sqr(y));
-            const DataType x_rel = r > DataType(10.)* Math::eps<DataType>() ? x/r : DataType(0);
-            const DataType y_rel = r > DataType(10.)* Math::eps<DataType>() ? y/r : DataType(0);
+            const DataType x_rel = r > DataType(10.)* eps ? x/r : DataType(0);
+            const DataType y_rel = r > DataType(10.)* eps ? y/r : DataType(0);
             //Note: While in practice we use a rotated coordinate system to express our polar-coordinate
             //based function, we have to use the "real" cos(phi) and sin(phi) values
             //for our base transformation, which are conveniently x_rel and y_rel
@@ -4133,8 +4157,8 @@ namespace FEAT
             const DataType x = point[0] - base_point[0];
             const DataType y = point[1] - base_point[1];
             const DataType r = Math::sqrt(Math::sqr(x) + Math::sqr(y));
-            const DataType x_rel = r > DataType(10.)* Math::eps<DataType>() ? x/r : DataType(0);
-            const DataType y_rel = r > DataType(10.)* Math::eps<DataType>() ? y/r : DataType(0);
+            const DataType x_rel = r > DataType(10.)* eps ? x/r : DataType(0);
+            const DataType y_rel = r > DataType(10.)* eps ? y/r : DataType(0);
             DataType phi = Math::acos(x_rel);
             phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
             const DataType ex = k * (k - DataType(1)) * Math::pow(r, k-2);
@@ -4234,7 +4258,7 @@ namespace FEAT
       using CornerSingluratity2DSimple = PolarCoordinate<CornerSingularity2DRadial<DT_>>;
 
       /**
-       * \brief Saddlpe-Point-Gauß type interpolation test function
+       * \brief Saddle-Point-Gauss type interpolation test function
        *
        * \tparam DT_
        * The floating point type
@@ -4286,16 +4310,13 @@ namespace FEAT
           {
           }
 
-          template<int>
-          inline DataType pow(DataType x) const {return x*x;}
-
           ValueType value(const PointType& point)
           {
             const DataType x = point[0];
             const DataType y = point[1];
 
-            DataType val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) -
-                  pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
+            DataType val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) -
+                  Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
 
             return val;
           }
@@ -4306,11 +4327,11 @@ namespace FEAT
             const DataType x = point[0];
             const DataType y = point[1];
             grad.format();
-            grad[0] = (Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72))) / DataType(5) -(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) -
-                      (Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
+            grad[0] = (Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72))) / DataType(5) -(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) -
+                      (Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
                       DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4);
-            grad[1] = (Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * y - DataType(126))) / DataType(5) -(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) -
-                      (Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(DataType(27) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
+            grad[1] = (Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * y - DataType(126))) / DataType(5) -(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) -
+                      (Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(DataType(27) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
                       DataType(10)))) / DataType(40);
             return grad;
           }
@@ -4321,17 +4342,17 @@ namespace FEAT
             const DataType x = point[0];
             const DataType y = point[1];
             hess.format();
-            hess[0][0] = (DataType(162) *(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(98) -(DataType(243) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) /
-                          DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) /
-                          DataType(49) - DataType(1) / DataType(10)) * pow<2>((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4) +(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) * pow<2>((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(-
-                          pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) * pow<2>((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) * pow<2>(DataType(162) * x - DataType(72))) / DataType(5);
-            hess[0][1] = hess[1][0] = (DataType(27) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(40) +(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) /
-                          DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2)) *((DataType(81) *
-                          y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72)) *(DataType(162) * y - DataType(126))) / DataType(5);
-            hess[1][1] = (DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(400) +(DataType(162) *(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) /
-                          DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y -
-                          DataType(2)) / DataType(4)) * pow<2>((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) * pow<2>((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- pow<2>(DataType(9) * x -
-                          DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) * pow<2>(DataType(162) * y - DataType(126))) / DataType(5);
+            hess[0][0] = (DataType(162) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(98) -(DataType(243) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) /
+                          DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) /
+                          DataType(49) - DataType(1) / DataType(10)) * Math::sqr((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4) +(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) * Math::sqr((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(-
+                          Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) * Math::sqr((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) * Math::sqr(DataType(162) * x - DataType(72))) / DataType(5);
+            hess[0][1] = hess[1][0] = (DataType(27) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(40) +(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) /
+                          DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2)) *((DataType(81) *
+                          y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72)) *(DataType(162) * y - DataType(126))) / DataType(5);
+            hess[1][1] = (DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(400) +(DataType(162) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) /
+                          DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y -
+                          DataType(2)) / DataType(4)) * Math::sqr((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) * Math::sqr((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- Math::sqr(DataType(9) * x -
+                          DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) * Math::sqr(DataType(162) * y - DataType(126))) / DataType(5);
             return hess;
           }
 
@@ -4394,18 +4415,15 @@ namespace FEAT
           {
           }
 
-          template<int>
-          inline DataType pow(DataType x) const {return x*x;}
-
           ValueType value(const PointType& point)
           {
             const DataType x = point[0];
             const DataType y = point[1];
             const DataType z = point[2];
 
-            DataType val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) -
-                  pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
-            val *= Math::exp(-pow<2>(DataType(2)*z-DataType(0.4)));
+            DataType val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) -
+                  Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
+            val *= Math::exp(-Math::sqr(DataType(2)*z-DataType(0.4)));
 
             return val;
           }
@@ -4417,19 +4435,19 @@ namespace FEAT
             const DataType y = point[1];
             const DataType z = point[2];
 
-            const DataType franks_val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) -
-                  pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
+            const DataType franks_val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) -
+                  Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
 
 
-            const DataType zexp = Math::exp(-pow<2>(DataType(2)*z-DataType(0.4)));
+            const DataType zexp = Math::exp(-Math::sqr(DataType(2)*z-DataType(0.4)));
             const DataType dzexp = -DataType(4)*(DataType(2)*z - DataType(0.4)) * zexp;
 
             grad.format();
-            grad[0] = zexp * ((Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72))) / DataType(5) -(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) -
-                      (Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
+            grad[0] = zexp * ((Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72))) / DataType(5) -(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) -
+                      (Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
                       DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4));
-            grad[1] = zexp * ((Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * y - DataType(126))) / DataType(5) -(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) -
-                      (Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(DataType(27) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
+            grad[1] = zexp * ((Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * y - DataType(126))) / DataType(5) -(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) -
+                      (Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(DataType(27) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
                       DataType(10)))) / DataType(40));
             grad[2] = dzexp * franks_val;
             return grad;
@@ -4441,29 +4459,29 @@ namespace FEAT
             const DataType x = point[0];
             const DataType y = point[1];
             const DataType z = point[2];
-            const DataType zexp = Math::exp(-pow<2>(DataType(2)*z-DataType(0.4)));
+            const DataType zexp = Math::exp(-Math::sqr(DataType(2)*z-DataType(0.4)));
             const DataType dzexp = -DataType(4)*(DataType(2)*z - DataType(0.4)) * zexp;
-            const DataType franks_val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) -
-                  pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
+            const DataType franks_val = (DataType(3) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(4) - Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) / DataType(5) +(DataType(3) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) -
+                  Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(4) + Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) / DataType(2);
             hess.format();
-            hess[0][0] = zexp * ((DataType(162) *(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(98) -(DataType(243) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) /
-                          DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) /
-                          DataType(49) - DataType(1) / DataType(10)) * pow<2>((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4) +(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) * pow<2>((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(-
-                          pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) * pow<2>((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) * pow<2>(DataType(162) * x - DataType(72))) / DataType(5));
-            hess[0][1] = hess[1][0] = zexp * ((DataType(27) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(40) +(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) /
-                          DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2)) *((DataType(81) *
-                          y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72)) *(DataType(162) * y - DataType(126))) / DataType(5));
-            hess[1][1] = zexp * ((DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(400) +(DataType(162) *(Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(- pow<2>(DataType(9) * x - DataType(2)) /
-                          DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y -
-                          DataType(2)) / DataType(4)) * pow<2>((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) * pow<2>((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- pow<2>(DataType(9) * x -
-                          DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) * pow<2>(DataType(162) * y - DataType(126))) / DataType(5));
-            hess[0][2] = hess[2][0] = dzexp * ((Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72))) / DataType(5) -(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) -
-                          (Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
+            hess[0][0] = zexp * ((DataType(162) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(98) -(DataType(243) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) /
+                          DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) /
+                          DataType(49) - DataType(1) / DataType(10)) * Math::sqr((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4) +(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) * Math::sqr((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(-
+                          Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) * Math::sqr((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) * Math::sqr(DataType(162) * x - DataType(72))) / DataType(5));
+            hess[0][1] = hess[1][0] = zexp * ((DataType(27) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(40) +(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) /
+                          DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2)) *((DataType(81) *
+                          y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72)) *(DataType(162) * y - DataType(126))) / DataType(5));
+            hess[1][1] = zexp * ((DataType(243) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) / DataType(10)))) / DataType(400) +(DataType(162) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))))) / DataType(5) -(DataType(243) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) /
+                          DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)))) / DataType(8) -(DataType(81) *(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)))) / DataType(4) +(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y -
+                          DataType(2)) / DataType(4)) * Math::sqr((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) +(Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) * Math::sqr((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(Math::exp(- Math::sqr(DataType(9) * x -
+                          DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) * Math::sqr(DataType(162) * y - DataType(126))) / DataType(5));
+            hess[0][2] = hess[2][0] = dzexp * ((Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * x - DataType(72))) / DataType(5) -(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(9))) / DataType(4) -
+                          (Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * x) / DataType(2) - DataType(63) / DataType(2))) / DataType(2) -(DataType(3) * Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
                           DataType(10)) *((DataType(162) * x) / DataType(49) + DataType(18) / DataType(49))) / DataType(4));
-            hess[1][2] = hess[2][1] = dzexp * ((Math::exp(- pow<2>(DataType(9) * x - DataType(4)) - pow<2>(DataType(9) * y - DataType(7))) *(DataType(162) * y - DataType(126))) / DataType(5) -(DataType(3) * Math::exp(- pow<2>(DataType(9) * x - DataType(2)) / DataType(4) - pow<2>(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) -
-                      (Math::exp(- pow<2>(DataType(9) * x - DataType(7)) / DataType(4) - pow<2>(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(DataType(27) *(Math::exp(-(DataType(9) * y) / DataType(10) - pow<2>(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
+            hess[1][2] = hess[2][1] = dzexp * ((Math::exp(- Math::sqr(DataType(9) * x - DataType(4)) - Math::sqr(DataType(9) * y - DataType(7))) *(DataType(162) * y - DataType(126))) / DataType(5) -(DataType(3) * Math::exp(- Math::sqr(DataType(9) * x - DataType(2)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(2)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(9))) / DataType(4) -
+                      (Math::exp(- Math::sqr(DataType(9) * x - DataType(7)) / DataType(4) - Math::sqr(DataType(9) * y - DataType(3)) / DataType(4)) *((DataType(81) * y) / DataType(2) - DataType(27) / DataType(2))) / DataType(2) -(DataType(27) *(Math::exp(-(DataType(9) * y) / DataType(10) - Math::sqr(DataType(9) * x + DataType(1)) / DataType(49) - DataType(1) /
                       DataType(10)))) / DataType(40));
-            hess[2][2] = franks_val * (pow<2>(DataType(4)*(DataType(2)*z - DataType(0.4))) - DataType(8)) * zexp;
+            hess[2][2] = franks_val * (Math::sqr(DataType(4)*(DataType(2)*z - DataType(0.4))) - DataType(8)) * zexp;
             return hess;
           }
 
@@ -4472,6 +4490,171 @@ namespace FEAT
       public:
         explicit Frankes3DVariantFunction() = default;
       }; // class FrankesFunction
+
+      /**
+       * \brief Harmonic shell function
+       *
+       * This class implements a harmonic function u, which fulfills u(x) = 1 for |x - x_0|_2 = 1 and u(x) = 2 for |x - x_0|_2 = 1/2.
+       *
+       * This function is given by the following formulae:
+       * - 1D: u(x) := 3 - 2*|x-x_0|
+       * - 2D: u(x,y) := 1 - ln((x-x_0)^2 + (y-y_0)^2)/(2*ln(2))
+       * - 3D: u(x,y,z) := 1/sqrt((x-x_0)^2 + (y-y_0)^2 + (z-z0)^2)
+       *
+       * \note This function is harmonic and it is basically a scaled Green's function for the Laplace operator,
+       * therefore it can be used as an analytical solution for the Laplace equation on the unit ring/shell domain
+       * with Dirichlet boundary conditions u=1 for the outer boundary and u=2 for the inner boundary.
+       *
+       * \warning Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
+       * someone wants to compute the gradient or hessian there, as the functions return 0.
+       *
+       * \tparam ImgPointType_
+       * The type of \f$ x_0 \f$.
+       *
+       * \author Peter Zajac
+       */
+      template<int dim_, typename DataType_>
+      class HarmonicShellFunction :
+        public Analytic::Function
+      {
+      public:
+        static_assert((1 <= dim_) && (dim_ <= 3), "harmonic shell function is only implemented in 1D, 2D and 3D");
+
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+        typedef Tiny::Vector<DataType_, dim_> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// our origin
+          const PointType _origin;
+          const DataType _eps;
+          const DataType _ln2; // = ln(2)
+          const DataType _i2ln2; // = 1 /(2*ln(2))
+
+        public:
+          /// Constructor
+          explicit Evaluator(const HarmonicShellFunction& function) :
+            _origin(function._origin),
+            _eps(Math::eps<DataType>()),
+            _ln2(Math::log(DataType(2))),
+            _i2ln2(DataType(0.5)/_ln2)
+          {
+          }
+
+          ValueType value(const PointType& point) const
+          {
+            if constexpr (dim_ == 1)
+              return DataType(3)  - DataType(2) * Math::abs(point[0] - _origin[0]);
+            else if constexpr(dim_ == 2)
+              return DataType(1) - _i2ln2 * Math::log((point - _origin).norm_euclid_sqr());
+            else if constexpr(dim_ == 3)
+              return DataType(1) / (point - _origin).norm_euclid();
+            else
+              return DataType(0);
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            const DataType norm_sqr = (point - _origin).norm_euclid_sqr();
+            if(norm_sqr < _eps)
+              return GradientType::null();
+
+            GradientType grad(DataType(0));
+            if constexpr (dim_ == 1)
+              grad[0] = DataType(-2) * Math::signum(point[0] - _origin[0]);
+            else if constexpr(dim_ == 2)
+              grad = (DataType(-1) / (_ln2 * norm_sqr)) * (point - _origin);
+            else if constexpr(dim_ == 3)
+              grad = (DataType(1) / Math::pow(norm_sqr, DataType(1.5))) * (_origin - point);
+
+            return grad;
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            const DataType norm_sqr = (point - _origin).norm_euclid_sqr();
+            if(norm_sqr < _eps)
+              return HessianType::null();
+
+            HessianType hess(DataType(0));
+            if constexpr(dim_ == 1)
+            {
+              // 1D hessian is null
+            }
+            else if constexpr(dim_ == 2)
+            {
+              const DataType denom = DataType(1) / (_ln2 * Math::sqr(norm_sqr));
+              hess[0][0] = denom * (Math::sqr(point[0] - _origin[0]) - Math::sqr(point[1] - _origin[1]));
+              hess[1][1] = denom * (Math::sqr(point[1] - _origin[1]) - Math::sqr(point[0] - _origin[0]));
+              hess[0][1] = hess[1][0] = denom * DataType(2) * (point[0] - _origin[0]) * (point[1] - _origin[1]);
+            }
+            else if constexpr(dim_ == 3)
+            {
+              const DataType denom = DataType(1) / Math::pow(norm_sqr, DataType(2.5));
+              for(int i(0); i < dim_; ++i)
+              {
+                for(int j(0); j < dim_; ++j)
+                {
+                  if(i == j)
+                  {
+                    for(int k(0); k < dim_; ++k)
+                      hess[i][j] += DataType(k == i ? 2 : -1) * Math::sqr(point[k] - _origin[k]) * denom;
+                  }
+                  else
+                  {
+                    hess[i][j] = DataType(3) * (point[i] - _origin[i]) * (point[j] - _origin[j]) * denom;
+                  }
+                }
+              }
+            }
+            return hess;
+          }
+        }; // class HarmonicShellFunction::Evaluator<...>
+
+      public:
+        /// Point to calculate the distance from
+        PointType _origin;
+
+      public:
+        /// default constructor
+        HarmonicShellFunction()
+        {
+          _origin.format();
+        }
+
+        /// Constructor
+        explicit HarmonicShellFunction(const PointType& origin) :
+          _origin(origin)
+        {
+        }
+
+        /// Sets _point to x0_
+        void set_point(const PointType& origin)
+        {
+          _origin = origin;
+        }
+      }; // class HarmonicShellFunction
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT

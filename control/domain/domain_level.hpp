@@ -25,6 +25,7 @@ namespace FEAT
         typedef typename MeshType::ShapeType ShapeType;
         typedef Geometry::MeshPart<Mesh_> PartType;
         typedef Geometry::RootMeshNode<MeshType> MeshNodeType;
+        typedef Geometry::Atlas::ChartBase<MeshType> ChartType;
 
       protected:
         int _level_index;
@@ -89,6 +90,25 @@ namespace FEAT
         {
           return this->_mesh_node->get_patch(rank);
         }
+
+      protected:
+        template<typename Trafo_>
+        void _add_trafo_mesh_part_charts(Trafo_& trafo)
+        {
+          XASSERT(&trafo.get_mesh() == &this->get_mesh());
+
+          // loop over all mesh-parts in the mesh node and check whether they are attached to a chart
+          const std::deque<String>& mesh_part_names = this->_mesh_node->get_mesh_part_names(true);
+          for(const String& part_name : mesh_part_names)
+          {
+            // chart may be nullptr if the mesh-part is not assigned to a chart at all
+            const ChartType* chart = this->_mesh_node->find_mesh_part_chart(part_name);
+            // mesh_part may be nullptr if this patch does not contain this mesh part
+            PartType* mesh_part = this->_mesh_node->find_mesh_part(part_name);
+            if((chart != nullptr) && (mesh_part != nullptr))
+              trafo.add_meshpart_chart(*mesh_part, *chart);
+          }
+        }
       }; // class DomainLevel<...>
 
       template<typename Mesh_, typename Trafo_, typename Space_>
@@ -114,6 +134,11 @@ namespace FEAT
           space(trafo),
           domain_asm(trafo)
         {
+        }
+
+        void add_trafo_mesh_part_charts()
+        {
+          this->_add_trafo_mesh_part_charts(trafo);
         }
       }; // class SimpleDomainLevel<...>
 
@@ -143,6 +168,11 @@ namespace FEAT
           space_pres(trafo),
           domain_asm(trafo)
         {
+        }
+
+        void add_trafo_mesh_part_charts()
+        {
+          this->_add_trafo_mesh_part_charts(trafo);
         }
       }; // class StokesDomainLevel<...>
 
@@ -175,6 +205,11 @@ namespace FEAT
           space_stress(trafo),
           domain_asm(trafo)
         {
+        }
+
+        void add_trafo_mesh_part_charts()
+        {
+          this->_add_trafo_mesh_part_charts(trafo);
         }
       }; // class Stokes3FieldDomainLevel<...>
     } // namespace Domain

@@ -564,6 +564,8 @@ namespace PoissonDirichlet
 
     domain.create(mesh_reader);
 
+    domain.add_trafo_mesh_part_charts();
+
     Statistics::toe_partition = time_stamp.elapsed_now();
 
     comm.print("\nDesired Levels: " + domain.format_desired_levels());

@@ -124,6 +124,12 @@ namespace FEAT
         PointType _origin;
 
       public:
+        /// default constructor
+        DistanceFunction()
+        {
+          _origin.format();
+        }
+
         /// Constructor
         explicit DistanceFunction(const PointType& origin) :
           _origin(origin)
@@ -365,6 +371,129 @@ namespace FEAT
           _origin = origin;
         }
       }; // class PlaneDistanceFunctionSD
+
+      /**
+       * \brief Analytic inverse distance function
+       *
+       * This class implements the AnalyticFunction interface representing the inverse distance function
+       * \f$ f(x) = \frac{1}{\| x - x_0 \|_2} \f$
+       *
+       * This class supports function values, gradient and hessians for all dimensions.
+       *
+       * \warning Because the function is differentiable everywhere except for x_0, Bad Things (TM) might happen if
+       * someone wants to compute the gradient or hessian there, as the functions return 0.
+       *
+       * \tparam ImgPointType_
+       * The type of \f$ x_0 \f$.
+       *
+       * \author Peter Zajac
+       */
+      template<int dim_, typename DataType_>
+      class InverseDistanceFunction :
+        public Analytic::Function
+      {
+      public:
+        static constexpr int domain_dim = dim_;
+        typedef Analytic::Image::Scalar ImageType;
+        static constexpr bool can_value = true;
+        static constexpr bool can_grad = true;
+        static constexpr bool can_hess = true;
+
+        typedef Tiny::Vector<DataType_, dim_> PointType;
+
+        /** \copydoc AnalyticFunction::Evaluator */
+        template<typename EvalTraits_>
+        class Evaluator :
+          public Analytic::Function::Evaluator<EvalTraits_>
+        {
+        public:
+          /// coefficient data type
+          typedef typename EvalTraits_::DataType DataType;
+          /// evaluation point type
+          typedef typename EvalTraits_::PointType PointType;
+          /// value type
+          typedef typename EvalTraits_::ValueType ValueType;
+          /// gradient type
+          typedef typename EvalTraits_::GradientType GradientType;
+          /// hessian type
+          typedef typename EvalTraits_::HessianType HessianType;
+
+        private:
+          /// our origin
+          const PointType _origin;
+
+        public:
+          /// Constructor
+          explicit Evaluator(const InverseDistanceFunction& function) :
+            _origin(function._origin)
+          {
+          }
+
+          ValueType value(const PointType& point) const
+          {
+            return DataType(1) / (point - _origin).norm_euclid();
+          }
+
+          GradientType gradient(const PointType& point) const
+          {
+            const DataType norm_sqr = (point - _origin).norm_euclid_sqr();
+
+            if(norm_sqr < Math::eps<DataType>())
+              return GradientType::null();
+
+            return (DataType(1) / Math::pow(norm_sqr, DataType(1.5))) * (_origin - point);
+          }
+
+          HessianType hessian(const PointType& point) const
+          {
+            const DataType norm_sqr = (point - _origin).norm_euclid_sqr();
+            if(norm_sqr < Math::eps<DataType>())
+              return HessianType::null();
+
+            const DataType denom = DataType(1) / Math::pow(norm_sqr, DataType(2.5));
+            HessianType hess (DataType(0));
+            for(int i(0); i < dim_; ++i)
+            {
+              for(int j(0); j < dim_; ++j)
+              {
+                if(i == j)
+                {
+                  for(int k(0); k < dim_; ++k)
+                    hess[i][j] += DataType(k == i ? 2 : -1) * Math::sqr(point[k] - _origin[k]) * denom;
+                }
+                else
+                {
+                  hess[i][j] = DataType(3) * (point[i] - _origin[i]) * (point[j] - _origin[j]) * denom;
+                }
+              }
+            }
+            return hess;
+          }
+        }; // class InverseDistanceFunction::Evaluator<...>
+
+      public:
+        /// Point to calculate the distance from
+        PointType _origin;
+
+      public:
+        /// default constructor
+        InverseDistanceFunction()
+        {
+          _origin.format();
+        }
+
+        /// Constructor
+        explicit InverseDistanceFunction(const PointType& origin) :
+          _origin(origin)
+        {
+        }
+
+        /// Sets _point to x0_
+        void set_point(const PointType& origin)
+        {
+          _origin = origin;
+        }
+      }; // class InverseDistanceFunction
 
 #ifdef FEAT_HAVE_CGAL
       /**
