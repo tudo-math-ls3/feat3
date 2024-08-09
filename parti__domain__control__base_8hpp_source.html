@@ -1280,56 +1280,55 @@ $(document).ready(function(){initNavTree('parti__domain__control__base_8hpp_sour
 <div class="line"><a id="l01498" name="l01498"></a><span class="lineno"> 1498</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>* ptr = ancestor.<a class="code hl_variable" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#ad78b93c4b69d419cdc616f971228ea09">parti_graph</a>.<a class="code hl_function" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a8a87e6dd2f0db7f8aa95c2ba2dda2c71">get_domain_ptr</a>();</div>
 <div class="line"><a id="l01499" name="l01499"></a><span class="lineno"> 1499</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>* idx = ancestor.<a class="code hl_variable" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#ad78b93c4b69d419cdc616f971228ea09">parti_graph</a>.<a class="code hl_function" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#aa21920504d75a3b75324da3de9ae24b7">get_image_idx</a>();</div>
 <div class="line"><a id="l01500" name="l01500"></a><span class="lineno"> 1500</span> </div>
-<div class="line"><a id="l01501" name="l01501"></a><span class="lineno"> 1501</span>          <span class="comment">// unweighted partitioning?</span></div>
+<div class="line"><a id="l01501" name="l01501"></a><span class="lineno"> 1501</span>          <span class="comment">// weighted partitioning?</span></div>
 <div class="line"><a id="l01502" name="l01502"></a><span class="lineno"> 1502</span>          <span class="keywordflow">if</span>(!weights.empty())</div>
 <div class="line"><a id="l01503" name="l01503"></a><span class="lineno"> 1503</span>          {</div>
 <div class="line"><a id="l01504" name="l01504"></a><span class="lineno"> 1504</span>            <span class="comment">// compute total number of non-zero weight elements</span></div>
-<div class="line"><a id="l01505" name="l01505"></a><span class="lineno"> 1505</span>            <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_nonzero = 0u;</div>
-<div class="line"><a id="l01506" name="l01506"></a><span class="lineno"> 1506</span>            <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> weight_sum(0.0);</div>
-<div class="line"><a id="l01507" name="l01507"></a><span class="lineno"> 1507</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span> w : weights)</div>
-<div class="line"><a id="l01508" name="l01508"></a><span class="lineno"> 1508</span>            {</div>
-<div class="line"><a id="l01509" name="l01509"></a><span class="lineno"> 1509</span>              num_nonzero += (w &gt; 1E-8);</div>
-<div class="line"><a id="l01510" name="l01510"></a><span class="lineno"> 1510</span>              weight_sum += w;</div>
-<div class="line"><a id="l01511" name="l01511"></a><span class="lineno"> 1511</span>            }</div>
-<div class="line"><a id="l01512" name="l01512"></a><span class="lineno"> 1512</span> </div>
-<div class="line"><a id="l01513" name="l01513"></a><span class="lineno"> 1513</span>            ptr[0] = <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0);</div>
-<div class="line"><a id="l01514" name="l01514"></a><span class="lineno"> 1514</span>            <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> weight_count(0.);</div>
-<div class="line"><a id="l01515" name="l01515"></a><span class="lineno"> 1515</span>            <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1), last(0); i &lt; num_parts; ++i)</div>
-<div class="line"><a id="l01516" name="l01516"></a><span class="lineno"> 1516</span>            {</div>
-<div class="line"><a id="l01517" name="l01517"></a><span class="lineno"> 1517</span>              <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> target_weight = weight_sum * <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a>(i) / <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a>(num_parts);</div>
-<div class="line"><a id="l01518" name="l01518"></a><span class="lineno"> 1518</span>              <span class="keywordflow">for</span>(; (weight_count &lt; target_weight) &amp;&amp; (last &lt; num_elems); ++last)</div>
-<div class="line"><a id="l01519" name="l01519"></a><span class="lineno"> 1519</span>                weight_count += weights[last];</div>
-<div class="line"><a id="l01520" name="l01520"></a><span class="lineno"> 1520</span> </div>
-<div class="line"><a id="l01521" name="l01521"></a><span class="lineno"> 1521</span>              ptr[i] = last;</div>
-<div class="line"><a id="l01522" name="l01522"></a><span class="lineno"> 1522</span>            }</div>
-<div class="line"><a id="l01523" name="l01523"></a><span class="lineno"> 1523</span>            ptr[num_parts] = num_elems;</div>
-<div class="line"><a id="l01524" name="l01524"></a><span class="lineno"> 1524</span>          }</div>
-<div class="line"><a id="l01525" name="l01525"></a><span class="lineno"> 1525</span>          <span class="keywordflow">else</span></div>
-<div class="line"><a id="l01526" name="l01526"></a><span class="lineno"> 1526</span>          {</div>
-<div class="line"><a id="l01527" name="l01527"></a><span class="lineno"> 1527</span>            <span class="comment">// unweighted partitioning</span></div>
-<div class="line"><a id="l01528" name="l01528"></a><span class="lineno"> 1528</span>            ptr[0] = <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0);</div>
-<div class="line"><a id="l01529" name="l01529"></a><span class="lineno"> 1529</span>            <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1); i &lt; num_parts; ++i)</div>
-<div class="line"><a id="l01530" name="l01530"></a><span class="lineno"> 1530</span>              ptr[i] = (i*num_elems) / num_parts;</div>
-<div class="line"><a id="l01531" name="l01531"></a><span class="lineno"> 1531</span>            ptr[num_parts] = num_elems;</div>
-<div class="line"><a id="l01532" name="l01532"></a><span class="lineno"> 1532</span>          }</div>
-<div class="line"><a id="l01533" name="l01533"></a><span class="lineno"> 1533</span> </div>
-<div class="line"><a id="l01534" name="l01534"></a><span class="lineno"> 1534</span>          <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j(0); j &lt; num_elems; ++j)</div>
-<div class="line"><a id="l01535" name="l01535"></a><span class="lineno"> 1535</span>            idx[j] = j;</div>
-<div class="line"><a id="l01536" name="l01536"></a><span class="lineno"> 1536</span> </div>
-<div class="line"><a id="l01537" name="l01537"></a><span class="lineno"> 1537</span>          <span class="comment">// set info string</span></div>
-<div class="line"><a id="l01538" name="l01538"></a><span class="lineno"> 1538</span>          ancestor.<a class="code hl_variable" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#aa24b4e49f6ae86f2c80f3b2353c83044">parti_info</a> = <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a>(<span class="stringliteral">&quot;Applied naive partitioner&quot;</span>);</div>
-<div class="line"><a id="l01539" name="l01539"></a><span class="lineno"> 1539</span> </div>
-<div class="line"><a id="l01540" name="l01540"></a><span class="lineno"> 1540</span>          <span class="comment">// partitioning found</span></div>
-<div class="line"><a id="l01541" name="l01541"></a><span class="lineno"> 1541</span>          ancestor.<a class="code hl_variable" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#ac5404399dd67bbd6faf18c483245a948">parti_found</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01542" name="l01542"></a><span class="lineno"> 1542</span> </div>
-<div class="line"><a id="l01543" name="l01543"></a><span class="lineno"> 1543</span>          <span class="comment">// okay</span></div>
-<div class="line"><a id="l01544" name="l01544"></a><span class="lineno"> 1544</span>          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01545" name="l01545"></a><span class="lineno"> 1545</span>        }</div>
-<div class="line"><a id="l01546" name="l01546"></a><span class="lineno"> 1546</span><span class="preprocessor">#endif </span><span class="comment">// defined(FEAT_HAVE_MPI) || defined(DOXYGEN)</span></div>
-<div class="line"><a id="l01547" name="l01547"></a><span class="lineno"> 1547</span>      }; <span class="comment">// class HierarchDomainControl&lt;...&gt;</span></div>
-<div class="line"><a id="l01548" name="l01548"></a><span class="lineno"> 1548</span>    } <span class="comment">// namespace Domain</span></div>
-<div class="line"><a id="l01549" name="l01549"></a><span class="lineno"> 1549</span>  } <span class="comment">// namespace Control</span></div>
-<div class="line"><a id="l01550" name="l01550"></a><span class="lineno"> 1550</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l01505" name="l01505"></a><span class="lineno"> 1505</span>            <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> weight_sum(0.0);</div>
+<div class="line"><a id="l01506" name="l01506"></a><span class="lineno"> 1506</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span> w : weights)</div>
+<div class="line"><a id="l01507" name="l01507"></a><span class="lineno"> 1507</span>            {</div>
+<div class="line"><a id="l01508" name="l01508"></a><span class="lineno"> 1508</span>              weight_sum += w;</div>
+<div class="line"><a id="l01509" name="l01509"></a><span class="lineno"> 1509</span>            }</div>
+<div class="line"><a id="l01510" name="l01510"></a><span class="lineno"> 1510</span> </div>
+<div class="line"><a id="l01511" name="l01511"></a><span class="lineno"> 1511</span>            ptr[0] = <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0);</div>
+<div class="line"><a id="l01512" name="l01512"></a><span class="lineno"> 1512</span>            <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> weight_count(0.);</div>
+<div class="line"><a id="l01513" name="l01513"></a><span class="lineno"> 1513</span>            <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1), last(0); i &lt; num_parts; ++i)</div>
+<div class="line"><a id="l01514" name="l01514"></a><span class="lineno"> 1514</span>            {</div>
+<div class="line"><a id="l01515" name="l01515"></a><span class="lineno"> 1515</span>              <span class="comment">// add as many elements as we need to achieve the target weight for this partition</span></div>
+<div class="line"><a id="l01516" name="l01516"></a><span class="lineno"> 1516</span>              <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> target_weight = weight_sum * <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a>(i) / <a class="code hl_typedef" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a>(num_parts);</div>
+<div class="line"><a id="l01517" name="l01517"></a><span class="lineno"> 1517</span>              <span class="keywordflow">for</span>(; (weight_count &lt; target_weight) &amp;&amp; (last &lt; num_elems); ++last)</div>
+<div class="line"><a id="l01518" name="l01518"></a><span class="lineno"> 1518</span>                weight_count += weights[last];</div>
+<div class="line"><a id="l01519" name="l01519"></a><span class="lineno"> 1519</span> </div>
+<div class="line"><a id="l01520" name="l01520"></a><span class="lineno"> 1520</span>              ptr[i] = last;</div>
+<div class="line"><a id="l01521" name="l01521"></a><span class="lineno"> 1521</span>            }</div>
+<div class="line"><a id="l01522" name="l01522"></a><span class="lineno"> 1522</span>            ptr[num_parts] = num_elems;</div>
+<div class="line"><a id="l01523" name="l01523"></a><span class="lineno"> 1523</span>          }</div>
+<div class="line"><a id="l01524" name="l01524"></a><span class="lineno"> 1524</span>          <span class="keywordflow">else</span></div>
+<div class="line"><a id="l01525" name="l01525"></a><span class="lineno"> 1525</span>          {</div>
+<div class="line"><a id="l01526" name="l01526"></a><span class="lineno"> 1526</span>            <span class="comment">// unweighted partitioning</span></div>
+<div class="line"><a id="l01527" name="l01527"></a><span class="lineno"> 1527</span>            ptr[0] = <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0);</div>
+<div class="line"><a id="l01528" name="l01528"></a><span class="lineno"> 1528</span>            <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1); i &lt; num_parts; ++i)</div>
+<div class="line"><a id="l01529" name="l01529"></a><span class="lineno"> 1529</span>              ptr[i] = (i*num_elems) / num_parts;</div>
+<div class="line"><a id="l01530" name="l01530"></a><span class="lineno"> 1530</span>            ptr[num_parts] = num_elems;</div>
+<div class="line"><a id="l01531" name="l01531"></a><span class="lineno"> 1531</span>          }</div>
+<div class="line"><a id="l01532" name="l01532"></a><span class="lineno"> 1532</span> </div>
+<div class="line"><a id="l01533" name="l01533"></a><span class="lineno"> 1533</span>          <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j(0); j &lt; num_elems; ++j)</div>
+<div class="line"><a id="l01534" name="l01534"></a><span class="lineno"> 1534</span>            idx[j] = j;</div>
+<div class="line"><a id="l01535" name="l01535"></a><span class="lineno"> 1535</span> </div>
+<div class="line"><a id="l01536" name="l01536"></a><span class="lineno"> 1536</span>          <span class="comment">// set info string</span></div>
+<div class="line"><a id="l01537" name="l01537"></a><span class="lineno"> 1537</span>          ancestor.<a class="code hl_variable" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#aa24b4e49f6ae86f2c80f3b2353c83044">parti_info</a> = <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a>(<span class="stringliteral">&quot;Applied naive partitioner&quot;</span>);</div>
+<div class="line"><a id="l01538" name="l01538"></a><span class="lineno"> 1538</span> </div>
+<div class="line"><a id="l01539" name="l01539"></a><span class="lineno"> 1539</span>          <span class="comment">// partitioning found</span></div>
+<div class="line"><a id="l01540" name="l01540"></a><span class="lineno"> 1540</span>          ancestor.<a class="code hl_variable" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#ac5404399dd67bbd6faf18c483245a948">parti_found</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01541" name="l01541"></a><span class="lineno"> 1541</span> </div>
+<div class="line"><a id="l01542" name="l01542"></a><span class="lineno"> 1542</span>          <span class="comment">// okay</span></div>
+<div class="line"><a id="l01543" name="l01543"></a><span class="lineno"> 1543</span>          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01544" name="l01544"></a><span class="lineno"> 1544</span>        }</div>
+<div class="line"><a id="l01545" name="l01545"></a><span class="lineno"> 1545</span><span class="preprocessor">#endif </span><span class="comment">// defined(FEAT_HAVE_MPI) || defined(DOXYGEN)</span></div>
+<div class="line"><a id="l01546" name="l01546"></a><span class="lineno"> 1546</span>      }; <span class="comment">// class HierarchDomainControl&lt;...&gt;</span></div>
+<div class="line"><a id="l01547" name="l01547"></a><span class="lineno"> 1547</span>    } <span class="comment">// namespace Domain</span></div>
+<div class="line"><a id="l01548" name="l01548"></a><span class="lineno"> 1548</span>  } <span class="comment">// namespace Control</span></div>
+<div class="line"><a id="l01549" name="l01549"></a><span class="lineno"> 1549</span>} <span class="comment">// namespace FEAT</span></div>
 <div class="ttc" id="aassertion_8hpp_html_af5c647b0786db55f57452bfc26726bde"><div class="ttname"><a href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a></div><div class="ttdeci">#define XASSERT(expr)</div><div class="ttdoc">Assertion macro definition.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00264">assertion.hpp:264</a></div></div>
 <div class="ttc" id="aassertion_8hpp_html_afa48e2beb6db8fae75edc24466481965"><div class="ttname"><a href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a></div><div class="ttdeci">#define XASSERTM(expr, msg)</div><div class="ttdoc">Assertion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00265">assertion.hpp:265</a></div></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>

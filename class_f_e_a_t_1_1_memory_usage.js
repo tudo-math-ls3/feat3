@@ -1,5 +1,6 @@
 var class_f_e_a_t_1_1_memory_usage =
 [
+    [ "format_peak_physical_usage", "class_f_e_a_t_1_1_memory_usage.html#ad789529f1be28589906ceb1cf9f45d1f", null ],
     [ "get_current_physical", "class_f_e_a_t_1_1_memory_usage.html#a5af240e4280dadc64deda23392939022", null ],
     [ "get_current_swap", "class_f_e_a_t_1_1_memory_usage.html#a58b40a5c7ea56ec3db74188a007cc1aa", null ],
     [ "get_current_virtual", "class_f_e_a_t_1_1_memory_usage.html#ae03545944cee1d918e77f4b320b3c186", null ],

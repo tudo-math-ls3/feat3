@@ -51,7 +51,8 @@ var searchData=
   ['floatingclass_48',['FloatingClass',['../class_f_e_a_t_1_1_type_1_1_floating_class.html',1,'FEAT::Type']]],
   ['forcefunctional_49',['ForceFunctional',['../class_f_e_a_t_1_1_assembly_1_1_common_1_1_force_functional.html',1,'FEAT::Assembly::Common']]],
   ['forcefunctionalassemblyjob_50',['ForceFunctionalAssemblyJob',['../class_f_e_a_t_1_1_assembly_1_1_force_functional_assembly_job.html',1,'FEAT::Assembly']]],
-  ['function_51',['Function',['../class_f_e_a_t_1_1_analytic_1_1_function.html',1,'FEAT::Analytic']]],
-  ['functioncellintegralinfo_52',['FunctionCellIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html',1,'FEAT::Assembly']]],
-  ['functionintegralinfo_53',['FunctionIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html',1,'FEAT::Assembly']]]
+  ['frankesfunction_51',['FrankesFunction',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html',1,'FEAT::Analytic::Common']]],
+  ['function_52',['Function',['../class_f_e_a_t_1_1_analytic_1_1_function.html',1,'FEAT::Analytic']]],
+  ['functioncellintegralinfo_53',['FunctionCellIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html',1,'FEAT::Assembly']]],
+  ['functionintegralinfo_54',['FunctionIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html',1,'FEAT::Assembly']]]
 ];

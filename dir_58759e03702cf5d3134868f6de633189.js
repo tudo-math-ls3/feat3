@@ -4,6 +4,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "adp_solver_base.hpp", "adp__solver__base_8hpp_source.html", null ],
     [ "alglib_wrapper.hpp", "alglib__wrapper_8hpp_source.html", null ],
     [ "amavanka.hpp", "amavanka_8hpp_source.html", null ],
+    [ "amavanka_base.hpp", "amavanka__base_8hpp_source.html", null ],
     [ "base.hpp", "kernel_2solver_2base_8hpp_source.html", null ],
     [ "bicgstab.hpp", "bicgstab_8hpp_source.html", null ],
     [ "bicgstabl.hpp", "bicgstabl_8hpp_source.html", null ],
@@ -59,5 +60,8 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "umfpack.cpp", "umfpack_8cpp_source.html", null ],
     [ "umfpack.hpp", "umfpack_8hpp_source.html", null ],
     [ "uzawa_precond.hpp", "uzawa__precond_8hpp_source.html", null ],
-    [ "vanka.hpp", "vanka_8hpp_source.html", null ]
+    [ "vanka.hpp", "vanka_8hpp_source.html", null ],
+    [ "voxel_amavanka.cpp", "voxel__amavanka_8cpp_source.html", null ],
+    [ "voxel_amavanka.cu", "voxel__amavanka_8cu_source.html", null ],
+    [ "voxel_amavanka.hpp", "voxel__amavanka_8hpp_source.html", null ]
 ];

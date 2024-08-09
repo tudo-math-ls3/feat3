@@ -185,12 +185,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4b3aef6ca7548713c5de9981ae6b599a"><td class="memTemplParams" colspan="2">template&lt;typename DomainLevel_ , typename Space_ &gt; </td></tr>
 <tr class="memitem:a4b3aef6ca7548713c5de9981ae6b599a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html#a4b3aef6ca7548713c5de9981ae6b599a">assemble_homogeneous_unit_filter</a> (const DomainLevel_ &amp;dom_level, const Space_ &amp;space)</td></tr>
 <tr class="separator:a4b3aef6ca7548713c5de9981ae6b599a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac07a4a9aed2614c9412169ee76802241"><td class="memTemplParams" colspan="2">template&lt;typename DomainLevel_ , typename Cubature_ &gt; </td></tr>
-<tr class="memitem:ac07a4a9aed2614c9412169ee76802241"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html#ac07a4a9aed2614c9412169ee76802241">assemble_transfer</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_fine, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_coarse, const Cubature_ &amp;cubature)</td></tr>
-<tr class="separator:ac07a4a9aed2614c9412169ee76802241"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01dcd9e60df7c5c3e836de4cdd57bfe3"><td class="memTemplParams" colspan="2">template&lt;typename DomainLevel_ , typename Cubature_ &gt; </td></tr>
-<tr class="memitem:a01dcd9e60df7c5c3e836de4cdd57bfe3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html#a01dcd9e60df7c5c3e836de4cdd57bfe3">assemble_truncation</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_fine, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_coarse, const Cubature_ &amp;cubature, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">BlockedBasicSystemLevel</a> *sys_lvl_coarse=nullptr)</td></tr>
-<tr class="separator:a01dcd9e60df7c5c3e836de4cdd57bfe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a853e31d1ef72b10aa0de457f9c4c6051"><td class="memTemplParams" colspan="2">template&lt;typename Trafo_ , typename Space_ &gt; </td></tr>
+<tr class="memitem:a853e31d1ef72b10aa0de457f9c4c6051"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html#a853e31d1ef72b10aa0de457f9c4c6051">assemble_laplace_matrix</a> (<a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html">Assembly::DomainAssembler</a>&lt; Trafo_ &gt; &amp;dom_asm, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature, const DataType nu=DataType(1))</td></tr>
+<tr class="separator:a853e31d1ef72b10aa0de457f9c4c6051"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb329c02e99fb398fc4ba8d146a130ba"><td class="memTemplParams" colspan="2">template&lt;typename DomainLevel_ &gt; </td></tr>
+<tr class="memitem:abb329c02e99fb398fc4ba8d146a130ba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html#abb329c02e99fb398fc4ba8d146a130ba">assemble_transfer</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">BlockedBasicSystemLevel</a> &amp;sys_lvl_coarse, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_fine, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_coarse, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature, bool trunc=false, bool shrink=true)</td></tr>
+<tr class="separator:abb329c02e99fb398fc4ba8d146a130ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64d2d25e1c76ea1bc3915a5b3c530b59"><td class="memTemplParams" colspan="2">template&lt;typename DomainLevel_ &gt; </td></tr>
+<tr class="memitem:a64d2d25e1c76ea1bc3915a5b3c530b59"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html#a64d2d25e1c76ea1bc3915a5b3c530b59">assemble_transfer</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_fine, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;virt_lvl_coarse, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature, bool trunc=false, bool shrink=true)</td></tr>
+<tr class="separator:a64d2d25e1c76ea1bc3915a5b3c530b59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ccf4288666a8bcda1a7a070f5e435b"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html#a92ccf4288666a8bcda1a7a070f5e435b">bytes</a> () const</td></tr>
 <tr class="memdesc:a92ccf4288666a8bcda1a7a070f5e435b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total amount of bytes allocated.  <a href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html#a92ccf4288666a8bcda1a7a070f5e435b">More...</a><br /></td></tr>
 <tr class="separator:a92ccf4288666a8bcda1a7a070f5e435b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -199,7 +202,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af51d549e83589c6066eebc196c60e97f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7109b333862e53b7bec22007ac780eba"><td class="memTemplParams" colspan="2">template&lt;typename M_ , typename D_ , typename I_ , typename SM_ &gt; </td></tr>
 <tr class="memitem:a7109b333862e53b7bec22007ac780eba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html#a7109b333862e53b7bec22007ac780eba">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html">BlockedUnitFilterSystemLevel</a>&lt; dim_, M_, D_, I_, SM_ &gt; &amp;other)</td></tr>
-<tr class="memdesc:a7109b333862e53b7bec22007ac780eba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html#a7109b333862e53b7bec22007ac780eba">More...</a><br /></td></tr>
 <tr class="separator:a7109b333862e53b7bec22007ac780eba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -228,7 +230,7 @@ Static Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;int dim_, typename DataType_ = Real, typename IndexType_ = Index, typename BlockedMatrix_ = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, dim_&gt;, typename TransferMatrix_ = LAFEM::SparseMatrixBWrappedCSR&lt;DataType_, IndexType_, dim_&gt;&gt;<br />
 class FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;</div>
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00394">394</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00206">206</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aa36ed2b76622d4d906851e7d6e009e6e" name="aa36ed2b76622d4d906851e7d6e009e6e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa36ed2b76622d4d906851e7d6e009e6e">&#9670;&#160;</a></span>BaseClass</h2>
@@ -244,7 +246,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00398">398</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00210">210</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -266,7 +268,7 @@ template&lt;typename DT2_ , typename IT2_ , typename BlockedMatrix2_ &gt; </div>
 
 <p>Our class base type. </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00415">415</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00227">227</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -284,7 +286,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00401">401</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00213">213</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -304,7 +306,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define global filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00411">411</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00223">223</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +334,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define global system matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00077">77</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00088">88</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +362,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define global system operator type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00080">80</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00091">91</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +390,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define global system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00074">74</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00085">85</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +408,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00402">402</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00214">214</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +436,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define local blocked matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00050">50</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00061">61</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -454,7 +456,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define local filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00408">408</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00220">220</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -482,7 +484,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define local system matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00053">53</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00064">64</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -510,7 +512,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define local system transfer operator type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00062">62</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00073">73</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -538,7 +540,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define local transfer matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00056">56</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00067">67</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -566,7 +568,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define local system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00059">59</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00070">70</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +596,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define system gate </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00068">68</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00079">79</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -614,7 +616,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>define system mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00405">405</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00217">217</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -640,7 +642,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00071">71</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00082">82</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +674,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>CTOR. </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00421">421</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00233">233</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -705,7 +707,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00158">158</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00145">145</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -737,7 +739,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00124">124</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00139">139</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -779,19 +781,139 @@ template&lt;typename DomainLevel_ , typename Space_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00448">448</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00252">252</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ac07a4a9aed2614c9412169ee76802241" name="ac07a4a9aed2614c9412169ee76802241"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac07a4a9aed2614c9412169ee76802241">&#9670;&#160;</a></span>assemble_transfer()</h2>
+<a id="a853e31d1ef72b10aa0de457f9c4c6051" name="a853e31d1ef72b10aa0de457f9c4c6051"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a853e31d1ef72b10aa0de457f9c4c6051">&#9670;&#160;</a></span>assemble_laplace_matrix()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, typename BlockedMatrix_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, dim_&gt;, typename TransferMatrix_  = LAFEM::SparseMatrixBWrappedCSR&lt;DataType_, IndexType_, dim_&gt;&gt; </div>
 <div class="memtemplate">
-template&lt;typename DomainLevel_ , typename Cubature_ &gt; </div>
+template&lt;typename Trafo_ , typename Space_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">FEAT::Control::BlockedBasicSystemLevel</a>&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::assemble_laplace_matrix </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html">Assembly::DomainAssembler</a>&lt; Trafo_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dom_asm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DataType&#160;</td>
+          <td class="paramname"><em>nu</em> = <code>DataType(1)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00181">181</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abb329c02e99fb398fc4ba8d146a130ba" name="abb329c02e99fb398fc4ba8d146a130ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb329c02e99fb398fc4ba8d146a130ba">&#9670;&#160;</a></span>assemble_transfer() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, typename BlockedMatrix_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, dim_&gt;, typename TransferMatrix_  = LAFEM::SparseMatrixBWrappedCSR&lt;DataType_, IndexType_, dim_&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DomainLevel_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">FEAT::Control::BlockedBasicSystemLevel</a>&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::assemble_transfer </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">BlockedBasicSystemLevel</a>&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>sys_lvl_coarse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>virt_lvl_fine</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>virt_lvl_coarse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>trunc</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>shrink</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00151">151</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a64d2d25e1c76ea1bc3915a5b3c530b59" name="a64d2d25e1c76ea1bc3915a5b3c530b59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64d2d25e1c76ea1bc3915a5b3c530b59">&#9670;&#160;</a></span>assemble_transfer() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, typename BlockedMatrix_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, dim_&gt;, typename TransferMatrix_  = LAFEM::SparseMatrixBWrappedCSR&lt;DataType_, IndexType_, dim_&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DomainLevel_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -811,62 +933,20 @@ template&lt;typename DomainLevel_ , typename Cubature_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Cubature_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00206">206</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a01dcd9e60df7c5c3e836de4cdd57bfe3" name="a01dcd9e60df7c5c3e836de4cdd57bfe3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01dcd9e60df7c5c3e836de4cdd57bfe3">&#9670;&#160;</a></span>assemble_truncation()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, typename BlockedMatrix_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, dim_&gt;, typename TransferMatrix_  = LAFEM::SparseMatrixBWrappedCSR&lt;DataType_, IndexType_, dim_&gt;&gt; </div>
-<div class="memtemplate">
-template&lt;typename DomainLevel_ , typename Cubature_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">FEAT::Control::BlockedBasicSystemLevel</a>&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::assemble_truncation </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>virt_lvl_fine</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">Domain::VirtualLevel</a>&lt; DomainLevel_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>virt_lvl_coarse</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Cubature_ &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
           <td class="paramname"><em>cubature</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html">BlockedBasicSystemLevel</a>&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt; *&#160;</td>
-          <td class="paramname"><em>sys_lvl_coarse</em> = <code>nullptr</code>&#160;</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>trunc</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>shrink</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -881,7 +961,7 @@ template&lt;typename DomainLevel_ , typename Cubature_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00277">277</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00165">165</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -912,9 +992,9 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00427">427</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00239">239</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="blocked__basic_8hpp_source.html#l00108">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="filter_8hpp_source.html#l00079">FEAT::Global::Filter&lt; LocalFilter_, Mirror_ &gt;::bytes()</a>, and <a class="el" href="blocked__basic_8hpp_source.html#l00418">FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::filter_sys</a>.</p>
+<p class="reference">References <a class="el" href="blocked__basic_8hpp_source.html#l00123">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="filter_8hpp_source.html#l00079">FEAT::Global::Filter&lt; LocalFilter_, Mirror_ &gt;::bytes()</a>, and <a class="el" href="blocked__basic_8hpp_source.html#l00230">FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::filter_sys</a>.</p>
 
 </div>
 </div>
@@ -946,7 +1026,7 @@ template&lt;typename M_ , typename D_ , typename I_ , typename SM_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00115">115</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00130">130</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -978,12 +1058,7 @@ template&lt;typename M_ , typename D_ , typename I_ , typename SM_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Conversion method. </p>
-<p >Use source <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html">BlockedUnitFilterSystemLevel</a> content as content of current <a class="el" href="class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html">BlockedUnitFilterSystemLevel</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00440">440</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="blocked__basic_8hpp_source.html#l00418">FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::filter_sys</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00245">245</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1012,7 +1087,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>our coarse-level system muxer </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00088">88</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00099">99</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1038,7 +1113,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00047">47</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00058">58</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1058,9 +1133,9 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>our global system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00418">418</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00230">230</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="blocked__basic_8hpp_source.html#l00427">FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="blocked__basic_8hpp_source.html#l00440">FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::convert()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="blocked__basic_8hpp_source.html#l00239">FEAT::Control::BlockedUnitFilterSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -1088,7 +1163,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>our system gate </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00085">85</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00096">96</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1116,7 +1191,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>our global system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00091">91</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00102">102</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>
@@ -1144,7 +1219,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>our global transfer operator </p>
 
-<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00094">94</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="blocked__basic_8hpp_source.html#l00105">105</a> of file <a class="el" href="blocked__basic_8hpp_source.html">blocked_basic.hpp</a>.</p>
 
 </div>
 </div>

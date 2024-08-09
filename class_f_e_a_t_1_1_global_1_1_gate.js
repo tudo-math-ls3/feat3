@@ -1,7 +1,12 @@
 var class_f_e_a_t_1_1_global_1_1_gate =
 [
+    [ "BufferVectorType", "class_f_e_a_t_1_1_global_1_1_gate.html#a2fc6a0b0bb66bb55e8ab496f4bd38198", null ],
+    [ "DataType", "class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5", null ],
     [ "GateType", "class_f_e_a_t_1_1_global_1_1_gate.html#a87a63d734e171396caacdc153c0d4e74", null ],
     [ "GateTypeByDI", "class_f_e_a_t_1_1_global_1_1_gate.html#ad77c84fa49e485aa8528a97852638d52", null ],
+    [ "IndexType", "class_f_e_a_t_1_1_global_1_1_gate.html#a2ac858caac5e9af28a2d5b6b2f71a079", null ],
+    [ "LocalVectorType", "class_f_e_a_t_1_1_global_1_1_gate.html#a6e5a9d3e7e071e7fd2f5dbb4ba61ae23", null ],
+    [ "MirrorType", "class_f_e_a_t_1_1_global_1_1_gate.html#aaf93fec763c4654ac0047e9603abbe17", null ],
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html#a42ba9f45b7b886947cd31da44e50037d", null ],
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html#afe7c5f082239560169055369165952fb", null ],
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html#ad617af511bed171cf241422788233de5", null ],

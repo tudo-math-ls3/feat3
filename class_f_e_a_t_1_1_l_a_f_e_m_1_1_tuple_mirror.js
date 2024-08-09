@@ -17,6 +17,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror =
     [ "create_buffer", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a553a942a032ec40ad8644a815ad1d484", null ],
     [ "empty", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a0391b5908013144feca8a144a1d9bae2", null ],
     [ "gather", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a96ebd51ab88bab5384e77af4079b1087", null ],
+    [ "make_empty", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a9a966a0591abe85c7bcb5c8c2610e3ed", null ],
     [ "mask_scatter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a7562f4a8956b88041f40bdeefe4149ab", null ],
     [ "operator=", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a6ec3e9d96bb7b568309a253e54fee83d", null ],
     [ "scatter_axpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a67aabb354b1eaf68d8dd3031310dc37b", null ],

@@ -424,6 +424,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka_factor_error.html">VankaFactorError</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> Factorization Error.  <a href="class_f_e_a_t_1_1_solver_1_1_vanka_factor_error.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">VoxelAmaVanka</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Additive Macro-wise Matrix-based <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> preconditioner/smoother.  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -881,6 +884,10 @@ Functions</h2></td></tr>
 <tr class="memitem:ab0d16cb5da09d09a13d1680c576ccf22"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html">Vanka</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab0d16cb5da09d09a13d1680c576ccf22">new_vanka</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt; &amp;matrix, const Filter_ &amp;filter, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a56a1737a447bf0816faf68de552c2064">VankaType</a> type, typename MatrixA_::DataType omega=typename MatrixA_::DataType(1), <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter=<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(1))</td></tr>
 <tr class="memdesc:ab0d16cb5da09d09a13d1680c576ccf22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#ab0d16cb5da09d09a13d1680c576ccf22">More...</a><br /></td></tr>
 <tr class="separator:ab0d16cb5da09d09a13d1680c576ccf22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT::Intern::VankaAssemblyPolicy pol_threading_ = FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, FEAT::Intern::VankaMacroPolicy macro_type_ = FEAT::Intern::VankaMacroPolicy::uniformMacros&gt; </td></tr>
+<tr class="memitem:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9c46ebafdde9ce5b47a825ae6943e7b5">new_voxel_amavanka</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, const ColoringType_ &amp;coloring, typename Matrix_::DataType omega=typename Matrix_::DataType(1), <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_steps=<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(1))</td></tr>
+<tr class="memdesc:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">VoxelAmaVanka</a> smoother object.  <a href="namespace_f_e_a_t_1_1_solver.html#a9c46ebafdde9ce5b47a825ae6943e7b5">More...</a><br /></td></tr>
+<tr class="separator:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e6b79b11fc66593e4336d1259a158b7"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename Matrix_ , typename Filter_ &gt; </td></tr>
 <tr class="memitem:a8e6b79b11fc66593e4336d1259a158b7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a8e6b79b11fc66593e4336d1259a158b7">solve</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">IterativeSolver</a>&lt; Vector_ &gt; &amp;solver, Vector_ &amp;vec_sol, const Vector_ &amp;vec_rhs, const Matrix_ &amp;matrix, const Filter_ &amp;filter)</td></tr>
 <tr class="memdesc:a8e6b79b11fc66593e4336d1259a158b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override of <a class="el" href="namespace_f_e_a_t_1_1_solver.html#afaf7fb5797216195651b6d22eaadc8d2" title="Solve linear system with initial solution guess.">solve()</a> for <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html" title="Abstract base-class for iterative solvers.">IterativeSolver</a> solvers.  <a href="namespace_f_e_a_t_1_1_solver.html#a8e6b79b11fc66593e4336d1259a158b7">More...</a><br /></td></tr>
@@ -1572,7 +1579,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">AmaVanka</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l01613">1613</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00490">490</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -2753,7 +2760,7 @@ template&lt;typename Matrix_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html" title="Generic UMFPACK solver class.">GenericUmfpack</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00844">844</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00781">781</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -6784,6 +6791,69 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 </div>
 </div>
+<a id="a9c46ebafdde9ce5b47a825ae6943e7b5" name="a9c46ebafdde9ce5b47a825ae6943e7b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c46ebafdde9ce5b47a825ae6943e7b5">&#9670;&#160;</a></span>new_voxel_amavanka()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT::Intern::VankaAssemblyPolicy pol_threading_ = FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, FEAT::Intern::VankaMacroPolicy macro_type_ = FEAT::Intern::VankaMacroPolicy::uniformMacros&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt; &gt; FEAT::Solver::new_voxel_amavanka </td>
+          <td>(</td>
+          <td class="paramtype">const Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Filter_ &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ColoringType_ &amp;&#160;</td>
+          <td class="paramname"><em>coloring</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename Matrix_::DataType&#160;</td>
+          <td class="paramname"><em>omega</em> = <code>typename&#160;Matrix_::DataType(1)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>num_steps</em> = <code><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(1)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">VoxelAmaVanka</a> smoother object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The system matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>The system filter</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring</td><td>The coloring of the voxel array.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">omega</td><td>The damping parameter.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_steps</td><td>The number of <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> iterations to be performed.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">AmaVanka</a> object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00650">650</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a8e6b79b11fc66593e4336d1259a158b7" name="a8e6b79b11fc66593e4336d1259a158b7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8e6b79b11fc66593e4336d1259a158b7">&#9670;&#160;</a></span>solve() <span class="overload">[1/2]</span></h2>
 
@@ -6840,7 +6910,7 @@ template&lt;typename Vector_ , typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Override of <a class="el" href="namespace_f_e_a_t_1_1_solver.html#afaf7fb5797216195651b6d22eaadc8d2" title="Solve linear system with initial solution guess.">solve()</a> for <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html" title="Abstract base-class for iterative solvers.">IterativeSolver</a> solvers. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00930">930</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00934">934</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1feb792955098cf117423f18dfd0db8f">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::correct()</a>.</p>
 
@@ -6966,7 +7036,7 @@ template&lt;typename Vector_ , typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa520882cd714abbd1bf9f72d23990f0e">max_iter</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa3d1e0a7dd736bc430ba471d9dfdf3a2">stagnated</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076">success</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="multigrid_8hpp_source.html#l01526">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::_apply_coarse()</a>, <a class="el" href="iterative_8hpp_source.html#l01067">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00125">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00100">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00204">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::apply()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00349">solve()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="multigrid_8hpp_source.html#l01526">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::_apply_coarse()</a>, <a class="el" href="iterative_8hpp_source.html#l01071">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00125">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00100">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00204">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::apply()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00349">solve()</a>.</p>
 
 </div>
 </div>

@@ -19,6 +19,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror =
     [ "gather", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a3a3850933597e6f108c1d989f9935539", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a88f43190f3ac53db1b6e40bbaf4b97da", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#ac5b50c50262ef0c75885e51a492582bf", null ],
+    [ "make_empty", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a83316953b075233629f14ca1802ff128", null ],
     [ "mask_scatter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a0bca7518789b830f17a679d6f626157c", null ],
     [ "operator=", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a1684dbd3fbda1d39402d247d46ef6295", null ],
     [ "scatter_axpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#aee6fc9d8b3d61b419c248dfd51b29153", null ],

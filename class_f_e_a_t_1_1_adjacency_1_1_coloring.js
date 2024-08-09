@@ -19,6 +19,7 @@ var class_f_e_a_t_1_1_adjacency_1_1_coloring =
     [ "operator=", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a04483933f1f500fd8e26bc9bd2082e2d", null ],
     [ "operator[]", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a070f7f261e97cd98e0cbd6ff42eee788", null ],
     [ "operator[]", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a023e645b77082e8196107a8be67dccd0", null ],
+    [ "size", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a931965eae706fa35a9fbd3e9ed73dc12", null ],
     [ "_coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a0e4feb73b9cbfe87254329a0de31994d", null ],
     [ "_num_colors", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html#a25ea2362191019a206f7093bfb8e3780", null ]
 ];

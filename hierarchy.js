@@ -36,6 +36,7 @@ var hierarchy =
     [ "FEAT::LAFEM::Container< double, unsigned int >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
     [ "FEAT::LAFEM::Container< DT_, Index >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
     [ "FEAT::LAFEM::Container< SolverDataType, SolverIndexType >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
+    [ "FEAT::LAFEM::Container< typename VectorType::DataType, typename VectorType::IndexType >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
     [ "FEAT::Solver::DirectStokesCore< double, Index, MatrixA_, MatrixB_, MatrixD_ >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core.html", null ],
     [ "FEAT::Solver::DirectStokesSolver< LocalMatrix_, LocalFilter_ >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html", null ],
     [ "FEAT::Assembly::DomainAssembler< TrafoType >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html", null ],
@@ -77,6 +78,7 @@ var hierarchy =
     [ "FEAT::Analytic::Function::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_function_1_1_evaluator.html", [
       [ "FEAT::Analytic::Common::ConstantFunction< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ConstantVectorFunction< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::Common::FrankesFunction< DT_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSol< DT_, dim_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSolPressure< DT_, dim_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSolRhs< DT_, dim_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs_1_1_evaluator.html", null ],
@@ -200,6 +202,7 @@ var hierarchy =
     [ "FEAT::Adjacency::Adjactor::IndexImageIterator", "class_f_e_a_t_1_1_adjacency_1_1_adjactor_1_1_index_image_iterator.html", null ],
     [ "FEAT::Adjacency::Adjactor::NullImageIterator", "class_f_e_a_t_1_1_adjacency_1_1_adjactor_1_1_null_image_iterator.html", null ],
     [ "FEAT::Adjacency::Coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html", null ],
+    [ "FEAT::Adjacency::ColoringDataHandler", "class_f_e_a_t_1_1_adjacency_1_1_coloring_data_handler.html", null ],
     [ "FEAT::Adjacency::CompositeAdjactor< Adj1_, Adj2_ >", "class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html", null ],
     [ "FEAT::Adjacency::CompositeAdjactor< Adj1_, Adj2_ >::ImageIterator", "class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor_1_1_image_iterator.html", null ],
     [ "FEAT::Adjacency::CuthillMcKee", "class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html", null ],
@@ -222,6 +225,7 @@ var hierarchy =
       [ "FEAT::Analytic::Common::ConstantVectorFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2DRadial< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial.html", null ],
+      [ "FEAT::Analytic::Common::FrankesFunction< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSol< DT_, dim_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSolPressure< DT_, dim_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSolRhs< DT_, dim_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs.html", null ],
@@ -415,6 +419,7 @@ var hierarchy =
     [ "FEAT::Assembly::VelocityInfo< DataType_, dim_ >", "struct_f_e_a_t_1_1_assembly_1_1_velocity_info.html", null ],
     [ "FEAT::Backend", "class_f_e_a_t_1_1_backend.html", null ],
     [ "FEAT::Control::BlockedBasicSystemLevel< dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ >", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html", [
+      [ "FEAT::Control::BlockedCombinedSystemLevel< dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ >", "class_f_e_a_t_1_1_control_1_1_blocked_combined_system_level.html", null ],
       [ "FEAT::Control::BlockedUnitFilterSystemLevel< dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ >", "class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html", null ]
     ] ],
     [ "FEAT::Control::Checkpointable", "class_f_e_a_t_1_1_control_1_1_checkpointable.html", [
@@ -442,13 +447,14 @@ var hierarchy =
       [ "FEAT::Control::Meshopt::QuadraticSystemLevel< DT_, IT_, Functional_ >", "class_f_e_a_t_1_1_control_1_1_meshopt_1_1_quadratic_system_level.html", null ]
     ] ],
     [ "FEAT::Control::ScalarBasicSystemLevel< DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ >", "class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html", [
+      [ "FEAT::Control::ScalarCombinedSystemLevel< DataType_, IndexType_, ScalarMatrix_ >", "class_f_e_a_t_1_1_control_1_1_scalar_combined_system_level.html", null ],
       [ "FEAT::Control::ScalarMeanFilterSystemLevel< DataType_, IndexType_, ScalarMatrix_ >", "class_f_e_a_t_1_1_control_1_1_scalar_mean_filter_system_level.html", null ],
       [ "FEAT::Control::ScalarUnitFilterSystemLevel< DataType_, IndexType_, ScalarMatrix_ >", "class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html", null ]
     ] ],
     [ "FEAT::Control::ScalarMixedSystemLevel< dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ >", "class_f_e_a_t_1_1_control_1_1_scalar_mixed_system_level.html", null ],
     [ "FEAT::Control::Statistics", "class_f_e_a_t_1_1_control_1_1_statistics.html", null ],
     [ "FEAT::Control::Stokes3FieldSystemLevel< dim_, nsc_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, MatrixBlockM_, MatrixBlockK_, MatrixBlockL_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ >", "class_f_e_a_t_1_1_control_1_1_stokes3_field_system_level.html", null ],
-    [ "FEAT::Control::StokesBlockedSystemLevel< dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html", [
+    [ "FEAT::Control::StokesBlockedSystemLevel< dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html", [
       [ "FEAT::Control::StokesBlockedCombinedSystemLevel< dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_combined_system_level.html", null ],
       [ "FEAT::Control::StokesBlockedSlipUnitVeloMeanPresSystemLevel< dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_slip_unit_velo_mean_pres_system_level.html", null ],
       [ "FEAT::Control::StokesBlockedSlipUnitVeloNonePresSystemLevel< dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_slip_unit_velo_none_pres_system_level.html", null ],
@@ -460,7 +466,6 @@ var hierarchy =
       [ "FEAT::Control::StokesPowerUnitVeloNonePresSystemLevel< dim_, DataType_, IndexType_, ScalarMatrix_ >", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level.html", null ]
     ] ],
     [ "FEAT::Control::Time::NvsBdfQ< DT_ >", "class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html", null ],
-    [ "FEAT::Control::VoxelTransferAssembler", "class_f_e_a_t_1_1_control_1_1_voxel_transfer_assembler.html", null ],
     [ "FEAT::Cubature::AutoAlias< Shape_ >", "class_f_e_a_t_1_1_cubature_1_1_auto_alias.html", null ],
     [ "FEAT::Cubature::BarycentreDriver< Shape_ >", "class_f_e_a_t_1_1_cubature_1_1_barycentre_driver.html", null ],
     [ "FEAT::Cubature::DriverBase< Shape_ >", "class_f_e_a_t_1_1_cubature_1_1_driver_base.html", null ],
@@ -695,6 +700,7 @@ var hierarchy =
       [ "FEAT::LAFEM::DenseVector< DataType, IndexType >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html", null ],
       [ "FEAT::LAFEM::DenseVector< DT_, IT_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html", null ],
       [ "FEAT::LAFEM::DenseVector< double, Index >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html", null ],
+      [ "FEAT::LAFEM::DenseVector< typename VectorType::DataType, typename VectorType::IndexType >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html", null ],
       [ "FEAT::LAFEM::DenseVectorBlocked< CoordType, IndexType, MeshType::world_dim >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html", null ],
       [ "FEAT::LAFEM::DenseVectorBlocked< CoordType, Index, MeshType::world_dim *Shape::FaceTraits< ShapeType, 0 >::count >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html", null ],
       [ "FEAT::LAFEM::DenseVectorBlocked< CoordType, Index, MeshType::world_dim >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html", null ],
@@ -1335,6 +1341,7 @@ var hierarchy =
       [ "FEAT::Meshopt::DuDvFunctional< DT_, IT_, TrafoType_, MatrixType_ >", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html", null ]
     ] ],
     [ "FEAT::Global::Muxer< LocalPresVector, PresMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
+    [ "FEAT::Global::Muxer< LocalScalarVector, ScalarMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
     [ "FEAT::Global::Muxer< LocalStressVector, StressMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
     [ "FEAT::Global::Muxer< LocalSystemVector, SystemMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
     [ "FEAT::Global::Muxer< LocalSystemVectorR, SystemMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
@@ -1350,6 +1357,7 @@ var hierarchy =
     [ "FEAT::LAFEM::PowerRowMatrix< SubType_, width_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_row_matrix.html", null ],
     [ "FEAT::Cubature::Rule< FacetType, DataType_, DataType_, DomainPointType >", "class_f_e_a_t_1_1_cubature_1_1_rule.html", null ],
     [ "FEAT::Cubature::Rule< ShapeType, DataType_, DataType_, DomainPointType >", "class_f_e_a_t_1_1_cubature_1_1_rule.html", null ],
+    [ "FEAT::LAFEM::SaddlePointMatrix< LocalMatrixBlockA, LocalMatrixBlockB, LocalMatrixBlockD >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html", null ],
     [ "FEAT::Control::ScalarBasicSystemLevel< Real, Index, LAFEM::SparseMatrixCSR< Real, Index > >", "class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html", null ],
     [ "FEAT::Solver::SolverBase< Functional_::VectorTypeR >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", null ],
     [ "FEAT::Solver::SolverBase< Global::Vector< LAFEM::TupleVector< MatrixB_::VectorTypeL, MatrixD_::VectorTypeL >, LAFEM::TupleMirror< MirrorV_, MirrorP_ > > >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", [
@@ -1381,7 +1389,9 @@ var hierarchy =
       [ "FEAT::Solver::Vanka< LAFEM::SaddlePointMatrix< MatrixA_, MatrixB_, MatrixD_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_vanka_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_matrix_a___00_01_9ced3bd73ff865688c51cd8e1ad52f3a.html", null ]
     ] ],
     [ "FEAT::Solver::SolverBase< Matrix_::VectorTypeL >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", [
-      [ "FEAT::Solver::AmaVanka< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html", null ],
+      [ "FEAT::Solver::AmaVanka< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html", [
+        [ "FEAT::Solver::VoxelAmaVanka< Matrix_, Filter_, pol_threading_, macro_type_ >", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html", null ]
+      ] ],
       [ "FEAT::Solver::GenericUmfpack< Matrix_ >", "class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html", null ],
       [ "FEAT::Solver::ILUPrecond< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_i_l_u_precond.html", null ],
       [ "FEAT::Solver::JacobiPrecond< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_jacobi_precond.html", null ],
@@ -1419,6 +1429,7 @@ var hierarchy =
       [ "FEAT::Solver::SORPrecondWithBackend< PreferredBackend::generic, LAFEM::SparseMatrixCSR< DT_, IT_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_b01c4c6795db9d1026723694e15647be.html", null ]
     ] ],
     [ "FEAT::Global::Splitter< LocalPresVector, PresMirror >", "class_f_e_a_t_1_1_global_1_1_splitter.html", null ],
+    [ "FEAT::Global::Splitter< LocalScalarVector, ScalarMirror >", "class_f_e_a_t_1_1_global_1_1_splitter.html", null ],
     [ "FEAT::Global::Splitter< LocalSystemVector, SystemMirror >", "class_f_e_a_t_1_1_global_1_1_splitter.html", null ],
     [ "FEAT::Global::Splitter< LocalVeloVector, VeloMirror >", "class_f_e_a_t_1_1_global_1_1_splitter.html", null ],
     [ "FEAT::Solver::SSORPrecondBase< LAFEM::SparseMatrixBCSR< DT_, IT_, BlockHeight_, BlockWidth_ > >", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_base.html", [
@@ -1473,6 +1484,7 @@ var hierarchy =
     [ "FEAT::Control::StokesBlockedSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixBCSR< Real, Index, dim_, dim_ >, LAFEM::SparseMatrixBCSR< Real, Index, dim_, 1 >, LAFEM::SparseMatrixBCSR< Real, Index, 1, dim_ >, LAFEM::SparseMatrixCSR< Real, Index >, LAFEM::SparseMatrixBWrappedCSR< Real, Index, dim_ >, LAFEM::SparseMatrixCSR< Real, Index > >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html", null ],
     [ "FEAT::Control::StokesPowerSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixCSR< Real, Index > >", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html", null ],
     [ "FEAT::Global::Transfer< LocalPresTransfer, PresMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
+    [ "FEAT::Global::Transfer< LocalScalarTransfer, ScalarMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Transfer< LocalStressTransfer, StressMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Transfer< LocalSystemTransfer, SystemMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Transfer< LocalVeloTransfer, VeloMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],

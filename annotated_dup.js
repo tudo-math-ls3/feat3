@@ -4,6 +4,7 @@ var annotated_dup =
       [ "Adjacency", "namespace_f_e_a_t_1_1_adjacency.html", [
         [ "Adjactor", "class_f_e_a_t_1_1_adjacency_1_1_adjactor.html", "class_f_e_a_t_1_1_adjacency_1_1_adjactor" ],
         [ "Coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html", "class_f_e_a_t_1_1_adjacency_1_1_coloring" ],
+        [ "ColoringDataHandler", "class_f_e_a_t_1_1_adjacency_1_1_coloring_data_handler.html", "class_f_e_a_t_1_1_adjacency_1_1_coloring_data_handler" ],
         [ "CompositeAdjactor", "class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html", "class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor" ],
         [ "CuthillMcKee", "class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html", "class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee" ],
         [ "DynamicGraph", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph.html", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph" ],
@@ -21,6 +22,7 @@ var annotated_dup =
           [ "CosineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static" ],
           [ "ExpBubbleScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static" ],
           [ "ExpScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static.html", null ],
+          [ "FrankesFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function" ],
           [ "GuermondStokesSol", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol" ],
           [ "GuermondStokesSolPressure", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure" ],
           [ "GuermondStokesSolRhs", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs" ],
@@ -205,11 +207,13 @@ var annotated_dup =
           [ "NvsBdfQ", "class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html", "class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q" ]
         ] ],
         [ "BlockedBasicSystemLevel", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level" ],
+        [ "BlockedCombinedSystemLevel", "class_f_e_a_t_1_1_control_1_1_blocked_combined_system_level.html", "class_f_e_a_t_1_1_control_1_1_blocked_combined_system_level" ],
         [ "BlockedUnitFilterSystemLevel", "class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html", "class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level" ],
         [ "Checkpointable", "class_f_e_a_t_1_1_control_1_1_checkpointable.html", "class_f_e_a_t_1_1_control_1_1_checkpointable" ],
         [ "CheckpointableWrapper", "class_f_e_a_t_1_1_control_1_1_checkpointable_wrapper.html", "class_f_e_a_t_1_1_control_1_1_checkpointable_wrapper" ],
         [ "CheckpointControl", "class_f_e_a_t_1_1_control_1_1_checkpoint_control.html", "class_f_e_a_t_1_1_control_1_1_checkpoint_control" ],
         [ "ScalarBasicSystemLevel", "class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level.html", "class_f_e_a_t_1_1_control_1_1_scalar_basic_system_level" ],
+        [ "ScalarCombinedSystemLevel", "class_f_e_a_t_1_1_control_1_1_scalar_combined_system_level.html", "class_f_e_a_t_1_1_control_1_1_scalar_combined_system_level" ],
         [ "ScalarMeanFilterSystemLevel", "class_f_e_a_t_1_1_control_1_1_scalar_mean_filter_system_level.html", "class_f_e_a_t_1_1_control_1_1_scalar_mean_filter_system_level" ],
         [ "ScalarMixedSystemLevel", "class_f_e_a_t_1_1_control_1_1_scalar_mixed_system_level.html", "class_f_e_a_t_1_1_control_1_1_scalar_mixed_system_level" ],
         [ "ScalarUnitFilterSystemLevel", "class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level.html", "class_f_e_a_t_1_1_control_1_1_scalar_unit_filter_system_level" ],
@@ -223,8 +227,7 @@ var annotated_dup =
         [ "StokesBlockedUnitVeloNonePresSystemLevel", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_unit_velo_none_pres_system_level.html", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_unit_velo_none_pres_system_level" ],
         [ "StokesPowerSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level" ],
         [ "StokesPowerUnitVeloMeanPresSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_mean_pres_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_mean_pres_system_level" ],
-        [ "StokesPowerUnitVeloNonePresSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level" ],
-        [ "VoxelTransferAssembler", "class_f_e_a_t_1_1_control_1_1_voxel_transfer_assembler.html", "class_f_e_a_t_1_1_control_1_1_voxel_transfer_assembler" ]
+        [ "StokesPowerUnitVeloNonePresSystemLevel", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level.html", "struct_f_e_a_t_1_1_control_1_1_stokes_power_unit_velo_none_pres_system_level" ]
       ] ],
       [ "Cubature", "namespace_f_e_a_t_1_1_cubature.html", [
         [ "Scalar", "namespace_f_e_a_t_1_1_cubature_1_1_scalar.html", [
@@ -677,7 +680,8 @@ var annotated_dup =
         [ "UzawaPrecond< Global::Matrix< MatrixA_, MirrorV_, MirrorV_ >, Global::Matrix< MatrixB_, MirrorV_, MirrorP_ >, Global::Matrix< MatrixD_, MirrorP_, MirrorV_ >, Global::Filter< FilterV_, MirrorV_ >, Global::Filter< FilterP_, MirrorP_ > >", "class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300.html", "class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300" ],
         [ "Vanka", "class_f_e_a_t_1_1_solver_1_1_vanka.html", null ],
         [ "Vanka< LAFEM::SaddlePointMatrix< MatrixA_, MatrixB_, MatrixD_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_vanka_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_matrix_a___00_01_9ced3bd73ff865688c51cd8e1ad52f3a.html", "class_f_e_a_t_1_1_solver_1_1_vanka_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_matrix_a___00_01_9ced3bd73ff865688c51cd8e1ad52f3a" ],
-        [ "VankaFactorError", "class_f_e_a_t_1_1_solver_1_1_vanka_factor_error.html", "class_f_e_a_t_1_1_solver_1_1_vanka_factor_error" ]
+        [ "VankaFactorError", "class_f_e_a_t_1_1_solver_1_1_vanka_factor_error.html", "class_f_e_a_t_1_1_solver_1_1_vanka_factor_error" ],
+        [ "VoxelAmaVanka", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka" ]
       ] ],
       [ "Space", "namespace_f_e_a_t_1_1_space.html", [
         [ "Argyris", "namespace_f_e_a_t_1_1_space_1_1_argyris.html", [

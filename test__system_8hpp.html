@@ -112,6 +112,7 @@ $(document).ready(function(){initNavTree('test__system_8hpp.html',''); initResiz
 <code>#include &lt;kernel/backend.hpp&gt;</code><br />
 <code>#include &lt;kernel/util/type_traits.hpp&gt;</code><br />
 <code>#include &lt;<a class="el" href="exception_8hpp_source.html">kernel/util/exception.hpp</a>&gt;</code><br />
+<code>#include &lt;kernel/util/math.hpp&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;exception&gt;</code><br />
 <code>#include &lt;list&gt;</code><br />
@@ -171,6 +172,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a6153fa6708f27e2294595086ead3927b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__system_8hpp.html#a6153fa6708f27e2294595086ead3927b">TEST_CHECK_NOT_EQUAL</a>(a,  b)</td></tr>
 <tr class="memdesc:a6153fa6708f27e2294595086ead3927b"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks if a != b  <a href="test__system_8hpp.html#a6153fa6708f27e2294595086ead3927b">More...</a><br /></td></tr>
 <tr class="separator:a6153fa6708f27e2294595086ead3927b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9b1cfc8f38cdb393ed4cdfd3a90e159"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__system_8hpp.html#ae9b1cfc8f38cdb393ed4cdfd3a90e159">TEST_CHECK_RELATIVE</a>(a,  b,  eps)</td></tr>
+<tr class="memdesc:ae9b1cfc8f38cdb393ed4cdfd3a90e159"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks if |a - b| &lt;= epsilon*|b|  <a href="test__system_8hpp.html#ae9b1cfc8f38cdb393ed4cdfd3a90e159">More...</a><br /></td></tr>
+<tr class="separator:ae9b1cfc8f38cdb393ed4cdfd3a90e159"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84c9168a9746502205cff6a348296825"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__system_8hpp.html#a84c9168a9746502205cff6a348296825">TEST_CHECK_STRINGIFY_EQUAL</a>(a,  b)</td></tr>
 <tr class="memdesc:a84c9168a9746502205cff6a348296825"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks if stringify(a) == stringify(b)  <a href="test__system_8hpp.html#a84c9168a9746502205cff6a348296825">More...</a><br /></td></tr>
 <tr class="separator:a84c9168a9746502205cff6a348296825"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -213,9 +217,9 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">        <span class="keywordflow">if</span>(! (was_ok))\</div>
 <div class="line">          <span class="keywordflow">throw</span> <a class="code hl_class" href="class_f_e_a_t_1_1_test_system_1_1_test_failed_exception.html">FEAT::TestSystem::TestFailedException</a>(__func__, __FILE__, __LINE__, message);</div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_test_system_1_1_test_failed_exception_html"><div class="ttname"><a href="class_f_e_a_t_1_1_test_system_1_1_test_failed_exception.html">FEAT::TestSystem::TestFailedException</a></div><div class="ttdoc">exception thrown by the check method in UnitTest</div><div class="ttdef"><b>Definition:</b> <a href="test__system_8hpp_source.html#l00046">test_system.hpp:48</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_test_system_1_1_test_failed_exception_html"><div class="ttname"><a href="class_f_e_a_t_1_1_test_system_1_1_test_failed_exception.html">FEAT::TestSystem::TestFailedException</a></div><div class="ttdoc">exception thrown by the check method in UnitTest</div><div class="ttdef"><b>Definition:</b> <a href="test__system_8hpp_source.html#l00047">test_system.hpp:49</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00027">27</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00028">28</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -262,7 +266,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>runs the given test with pre- and postprocessing </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00380">380</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00392">392</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +291,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if a is true </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00335">335</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00336">336</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +327,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if a == b </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00309">309</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00310">310</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -368,7 +372,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if |a - b| &lt;= epsilon </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00370">370</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00371">371</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -409,7 +413,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if a &lt;= x &lt;= b </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00321">321</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00322">322</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -444,7 +448,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if <code>a</code> is true; prints <code>msg</code> if <code>a</code> is false </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00341">341</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00342">342</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -479,7 +483,53 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if a != b </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00315">315</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00316">316</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae9b1cfc8f38cdb393ed4cdfd3a90e159" name="ae9b1cfc8f38cdb393ed4cdfd3a90e159"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9b1cfc8f38cdb393ed4cdfd3a90e159">&#9670;&#160;</a></span>TEST_CHECK_RELATIVE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TEST_CHECK_RELATIVE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">a, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">b, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">eps&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> { \</div>
+<div class="line">    CHECK_INTERNAL(Math::abs((a) - (b)) &lt;= (eps)*Math::abs(b), \</div>
+<div class="line">        this-&gt;_id + <span class="stringliteral">&quot;\n&quot;</span> + <span class="stringliteral">&quot;Expected &#39;|&quot;</span> #a <span class="stringliteral">&quot; - &quot;</span> #b \</div>
+<div class="line">        <span class="stringliteral">&quot;|&#39; &lt;= &#39;&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>(eps) + <span class="stringliteral">&quot;*|&quot;</span> #b <span class="stringliteral">&quot;|&#39; = &#39;&quot;</span> + \</div>
+<div class="line">        <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>((eps)*Math::abs(b)) + <span class="stringliteral">&quot;&#39; but was &#39;&quot;</span> + \</div>
+<div class="line">        <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>(Math::abs((a) - (b))) + <span class="stringliteral">&quot;&#39;&quot;</span> \</div>
+<div class="line">        + <span class="stringliteral">&quot;, with &quot;</span> #a <span class="stringliteral">&quot;=&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>(a) + <span class="stringliteral">&quot; and &quot;</span> #b <span class="stringliteral">&quot;=&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>(b))\</div>
+<div class="line">  } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p>checks if |a - b| &lt;= epsilon*|b| </p>
+
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00381">381</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -516,7 +566,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if stringify(a) == stringify(b) </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00327">327</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00328">328</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -568,7 +618,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>checks if a throws an exception of type b </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00347">347</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00348">348</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>

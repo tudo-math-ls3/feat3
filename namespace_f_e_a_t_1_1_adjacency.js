@@ -2,6 +2,7 @@ var namespace_f_e_a_t_1_1_adjacency =
 [
     [ "Adjactor", "class_f_e_a_t_1_1_adjacency_1_1_adjactor.html", "class_f_e_a_t_1_1_adjacency_1_1_adjactor" ],
     [ "Coloring", "class_f_e_a_t_1_1_adjacency_1_1_coloring.html", "class_f_e_a_t_1_1_adjacency_1_1_coloring" ],
+    [ "ColoringDataHandler", "class_f_e_a_t_1_1_adjacency_1_1_coloring_data_handler.html", "class_f_e_a_t_1_1_adjacency_1_1_coloring_data_handler" ],
     [ "CompositeAdjactor", "class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html", "class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor" ],
     [ "CuthillMcKee", "class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html", "class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee" ],
     [ "DynamicGraph", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph.html", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph" ],

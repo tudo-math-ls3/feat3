@@ -2,6 +2,7 @@ var class_f_e_a_t_1_1_global_1_1_splitter =
 [
     [ "GlobalVectorType", "class_f_e_a_t_1_1_global_1_1_splitter.html#a82f587cf3341c9985021d7f5e75623d3", null ],
     [ "LocalVectorType", "class_f_e_a_t_1_1_global_1_1_splitter.html#a6eb2ec757f7e0e58fee41ca1ecaa8599", null ],
+    [ "MirrorType", "class_f_e_a_t_1_1_global_1_1_splitter.html#a97809034e69cceee8a0000a3d4f1347d", null ],
     [ "MuxerType", "class_f_e_a_t_1_1_global_1_1_splitter.html#a2555ad8837810418f5187aaeb2dd47ab", null ],
     [ "Splitter", "class_f_e_a_t_1_1_global_1_1_splitter.html#a686df90e7739303e563bcf2e647dea77", null ],
     [ "Splitter", "class_f_e_a_t_1_1_global_1_1_splitter.html#a81a9e5be48659ff08e5b1b770af7881a", null ],
@@ -11,6 +12,8 @@ var class_f_e_a_t_1_1_global_1_1_splitter =
     [ "convert", "class_f_e_a_t_1_1_global_1_1_splitter.html#a6c2786006a9031007f8f6ffdefd18519", null ],
     [ "convert", "class_f_e_a_t_1_1_global_1_1_splitter.html#a6a2cf0b7313afca4c1270f52bb89990b", null ],
     [ "create_base_vector", "class_f_e_a_t_1_1_global_1_1_splitter.html#ab130d48748fc4f3c695962391617a832", null ],
+    [ "get_base_vector_template", "class_f_e_a_t_1_1_global_1_1_splitter.html#ae6f3338aaa1eb1efb6e24a39e7be14b3", null ],
+    [ "get_muxer", "class_f_e_a_t_1_1_global_1_1_splitter.html#af9e214ff0a07380b78580532e90deaf1", null ],
     [ "is_root", "class_f_e_a_t_1_1_global_1_1_splitter.html#ad74de94f63931736eea5927e09ee5351", null ],
     [ "is_single", "class_f_e_a_t_1_1_global_1_1_splitter.html#ac99854c3cc8563cb2aca17c8a6781960", null ],
     [ "join", "class_f_e_a_t_1_1_global_1_1_splitter.html#a312e90e1d2faf815c30084311563d586", null ],

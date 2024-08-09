@@ -109,6 +109,7 @@ var namespace_f_e_a_t_1_1_solver =
     [ "Vanka", "class_f_e_a_t_1_1_solver_1_1_vanka.html", null ],
     [ "Vanka< LAFEM::SaddlePointMatrix< MatrixA_, MatrixB_, MatrixD_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_vanka_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_matrix_a___00_01_9ced3bd73ff865688c51cd8e1ad52f3a.html", "class_f_e_a_t_1_1_solver_1_1_vanka_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_matrix_a___00_01_9ced3bd73ff865688c51cd8e1ad52f3a" ],
     [ "VankaFactorError", "class_f_e_a_t_1_1_solver_1_1_vanka_factor_error.html", "class_f_e_a_t_1_1_solver_1_1_vanka_factor_error" ],
+    [ "VoxelAmaVanka", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka" ],
     [ "BiCGStabLPreconVariant", "namespace_f_e_a_t_1_1_solver.html#ab3701336d3327b2a233a089c5ae17ef7", [
       [ "left", "namespace_f_e_a_t_1_1_solver.html#ab3701336d3327b2a233a089c5ae17ef7a811882fecd5c7618d7099ebbd39ea254", null ],
       [ "right", "namespace_f_e_a_t_1_1_solver.html#ab3701336d3327b2a233a089c5ae17ef7a7c4f29407893c334a6cb7a87bf045c0d", null ]
@@ -272,6 +273,7 @@ var namespace_f_e_a_t_1_1_solver =
     [ "new_umfpack_mean", "namespace_f_e_a_t_1_1_solver.html#aa452c9e3a871162b9d112beaa4bcfb09", null ],
     [ "new_uzawa_precond", "namespace_f_e_a_t_1_1_solver.html#a2958bd09bea2573890967fceb38cb8ae", null ],
     [ "new_vanka", "namespace_f_e_a_t_1_1_solver.html#ab0d16cb5da09d09a13d1680c576ccf22", null ],
+    [ "new_voxel_amavanka", "namespace_f_e_a_t_1_1_solver.html#a9c46ebafdde9ce5b47a825ae6943e7b5", null ],
     [ "solve", "namespace_f_e_a_t_1_1_solver.html#a8e6b79b11fc66593e4336d1259a158b7", null ],
     [ "solve", "namespace_f_e_a_t_1_1_solver.html#afaf7fb5797216195651b6d22eaadc8d2", null ],
     [ "status_success", "namespace_f_e_a_t_1_1_solver.html#a06d657f3235d3857164ec176b6958d87", null ]

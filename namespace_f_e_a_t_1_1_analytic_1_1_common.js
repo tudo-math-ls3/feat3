@@ -8,6 +8,7 @@ var namespace_f_e_a_t_1_1_analytic_1_1_common =
     [ "CosineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static" ],
     [ "ExpBubbleScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static" ],
     [ "ExpScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static.html", null ],
+    [ "FrankesFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function" ],
     [ "GuermondStokesSol", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol" ],
     [ "GuermondStokesSolPressure", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_pressure" ],
     [ "GuermondStokesSolRhs", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol_rhs" ],

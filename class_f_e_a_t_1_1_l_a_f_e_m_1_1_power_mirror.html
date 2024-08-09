@@ -104,6 +104,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror-members.html">List of all members</a>  </div>
@@ -197,6 +198,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aee6fc9d8b3d61b419c248dfd51b29153"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#aee6fc9d8b3d61b419c248dfd51b29153">scatter_axpy</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">LAFEM::PowerVector</a>&lt; Tv_, count_ &gt; &amp;vector, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a6c03dcb66af57e1693cfa16c4893ad1d">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a5afa64fd35761337d880ac0075e1e1d3">IndexType</a> &gt; &amp;buffer, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a6c03dcb66af57e1693cfa16c4893ad1d">DataType</a> alpha=<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a6c03dcb66af57e1693cfa16c4893ad1d">DataType</a>(1), const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> buffer_offset=<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0)) const</td></tr>
 <tr class="memdesc:aee6fc9d8b3d61b419c248dfd51b29153"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scatters the buffer entries onto a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">DenseVector</a>.   <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#aee6fc9d8b3d61b419c248dfd51b29153">More...</a><br /></td></tr>
 <tr class="separator:aee6fc9d8b3d61b419c248dfd51b29153"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a83316953b075233629f14ca1802ff128"><td class="memTemplParams" colspan="2">template&lt;typename SubVector_ &gt; </td></tr>
+<tr class="memitem:a83316953b075233629f14ca1802ff128"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html">PowerMirror</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a83316953b075233629f14ca1802ff128">make_empty</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a>&lt; SubVector_, count_ &gt; &amp;tmpl_vec)</td></tr>
+<tr class="memdesc:a83316953b075233629f14ca1802ff128"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and returns an empty mirror.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html#a83316953b075233629f14ca1802ff128">More...</a><br /></td></tr>
+<tr class="separator:a83316953b075233629f14ca1802ff128"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -360,7 +368,7 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00122">122</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__mirror_8hpp_source.html#l00153">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::clone()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__mirror_8hpp_source.html#l00153">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::clone()</a>, and <a class="el" href="power__mirror_8hpp_source.html#l00179">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::make_empty()</a>.</p>
 
 </div>
 </div>
@@ -465,7 +473,7 @@ template&lt;int i_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the sub-mirror at position <code>i_</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00220">220</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00234">234</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
@@ -507,7 +515,7 @@ template&lt;int i_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the sub-mirror at position <code>i_</code>.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00228">228</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00242">242</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
@@ -549,11 +557,11 @@ template&lt;typename SubVector_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00193">193</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00207">207</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__mirror_8hpp_source.html#l00205">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::create_buffer()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__mirror_8hpp_source.html#l00219">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::create_buffer()</a>.</p>
 
 </div>
 </div>
@@ -584,7 +592,7 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00171">171</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00185">185</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
@@ -623,7 +631,7 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00122">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::PowerMirror()</a>, and <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00212">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00216">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>.</p>
 
 </div>
 </div>
@@ -703,9 +711,9 @@ template&lt;typename SubVector_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00205">205</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00219">219</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00193">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::buffer_size()</a>.</p>
+<p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00207">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::buffer_size()</a>.</p>
 
 </div>
 </div>
@@ -737,9 +745,9 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 <p>Checks whether the mirror is empty. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if there are no indices in the mirror, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00181">181</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00195">195</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00212">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00216">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>.</p>
 
 </div>
 </div>
@@ -797,7 +805,7 @@ template&lt;typename Tv_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00258">258</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00272">272</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
@@ -838,7 +846,7 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the sub-mirror at position <code>i</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00243">243</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00257">257</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
 
@@ -879,9 +887,52 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the sub-mirror at position <code>i</code>.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00250">250</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00264">264</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a83316953b075233629f14ca1802ff128" name="a83316953b075233629f14ca1802ff128"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83316953b075233629f14ca1802ff128">&#9670;&#160;</a></span>make_empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubMirror_ , int count_&gt; </div>
+<div class="memtemplate">
+template&lt;typename SubVector_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html">PowerMirror</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html">FEAT::LAFEM::PowerMirror</a>&lt; SubMirror_, count_ &gt;::make_empty </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a>&lt; SubVector_, count_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>tmpl_vec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates and returns an empty mirror. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmpl_vec</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to a template vector to get the correct size from</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The new empty mirror </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00179">179</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00122">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::PowerMirror()</a>.</p>
 
 </div>
 </div>
@@ -948,7 +999,7 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The size of the input template vector.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00279">279</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00293">293</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
@@ -1049,7 +1100,7 @@ template&lt;typename Tv_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00268">268</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00282">282</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__mirror_8hpp_source.html#l00119">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::_sub_mirror</a>.</p>
 
@@ -1074,7 +1125,7 @@ template&lt;typename SubMirror_ , int count_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="power__mirror_8hpp_source.html#l00119">119</a> of file <a class="el" href="power__mirror_8hpp_source.html">power_mirror.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__mirror_8hpp_source.html#l00220">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::at()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00193">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::buffer_size()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00171">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::bytes()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00153">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::clone()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00258">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::gather()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00243">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::get()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00279">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::mask_scatter()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00139">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::operator=()</a>, and <a class="el" href="power__mirror_8hpp_source.html#l00268">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::scatter_axpy()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__mirror_8hpp_source.html#l00234">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::at()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00207">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::buffer_size()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00185">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::bytes()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00153">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::clone()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00272">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::gather()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00257">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::get()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00293">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::mask_scatter()</a>, <a class="el" href="power__mirror_8hpp_source.html#l00139">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::operator=()</a>, and <a class="el" href="power__mirror_8hpp_source.html#l00282">FEAT::LAFEM::PowerMirror&lt; SubMirror_, count_ &gt;::scatter_axpy()</a>.</p>
 
 </div>
 </div>

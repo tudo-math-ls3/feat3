@@ -1,9 +1,10 @@
 var class_f_e_a_t_1_1_global_1_1_muxer =
 [
-    [ "BufferMain", "class_f_e_a_t_1_1_global_1_1_muxer.html#a5d19ae2c4ef32578873765f694470d2e", null ],
     [ "BufferType", "class_f_e_a_t_1_1_global_1_1_muxer.html#af8d76a53029f1978cdb38ede3cc67f99", null ],
     [ "DataType", "class_f_e_a_t_1_1_global_1_1_muxer.html#a856bfd983d139d5439df8c4dc5a61f6f", null ],
     [ "IndexType", "class_f_e_a_t_1_1_global_1_1_muxer.html#a07305c8dead88e0023cfbc720ee33f7b", null ],
+    [ "LocalVectorType", "class_f_e_a_t_1_1_global_1_1_muxer.html#abad078c40f6a96871eeb369b7f40e198", null ],
+    [ "MirrorType", "class_f_e_a_t_1_1_global_1_1_muxer.html#a418fab5a0ed2ebbe2c30da393abf6610", null ],
     [ "MuxerType", "class_f_e_a_t_1_1_global_1_1_muxer.html#a41a4e05af9cd6be92674ba1d73f6c2eb", null ],
     [ "MuxerTypeByDI", "class_f_e_a_t_1_1_global_1_1_muxer.html#a1aca65a1e0552547b7b9dd3a3ab089f7", null ],
     [ "Muxer", "class_f_e_a_t_1_1_global_1_1_muxer.html#a7b8ff955b4bca7610b79b8e8e98d5344", null ],
@@ -13,6 +14,9 @@ var class_f_e_a_t_1_1_global_1_1_muxer =
     [ "compile", "class_f_e_a_t_1_1_global_1_1_muxer.html#a5160c51a0933b8b11509c2c9f3f095ca", null ],
     [ "convert", "class_f_e_a_t_1_1_global_1_1_muxer.html#aa5baeabafc5e0f2dc2111a9d5aee5364", null ],
     [ "convert", "class_f_e_a_t_1_1_global_1_1_muxer.html#a5b6df7acb5d4600d78bcf91f3a7ba045", null ],
+    [ "get_child_mirrors", "class_f_e_a_t_1_1_global_1_1_muxer.html#af25dadbbc5c22bae98a3700c2b985343", null ],
+    [ "get_parent_mirror", "class_f_e_a_t_1_1_global_1_1_muxer.html#a8ed46a4575ddfcc045f2572f53b2e5b3", null ],
+    [ "get_parent_rank", "class_f_e_a_t_1_1_global_1_1_muxer.html#ae2c4174347b66bd329dc6d57bb1bf574", null ],
     [ "get_sibling_comm", "class_f_e_a_t_1_1_global_1_1_muxer.html#a922e4f560704f30e0f2dc5e26dbd2f92", null ],
     [ "is_child", "class_f_e_a_t_1_1_global_1_1_muxer.html#a14c378e93171c8c5ffbbdc844a1737da", null ],
     [ "is_ghost", "class_f_e_a_t_1_1_global_1_1_muxer.html#a5a6b43de042740941dbdc6bd80fa736c", null ],

@@ -148,6 +148,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a98c728b49b2ba064f46fff286b9cc0f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a98c728b49b2ba064f46fff286b9cc0f0">Evaluator</a> (const <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional.html">LaplaceFunctional</a>&lt; Function_ &gt; &amp;functional)</td></tr>
 <tr class="memdesc:a98c728b49b2ba064f46fff286b9cc0f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor  <a href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a98c728b49b2ba064f46fff286b9cc0f0">More...</a><br /></td></tr>
 <tr class="separator:a98c728b49b2ba064f46fff286b9cc0f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9e8fc5db1216eb984f8a062c1031193"><td class="memTemplParams" colspan="2">template&lt;typename T_ , int m_, int n_, int sm_, int sn_&gt; </td></tr>
+<tr class="memitem:ab9e8fc5db1216eb984f8a062c1031193"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#ab9e8fc5db1216eb984f8a062c1031193">calc_trace</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; T_, m_, n_, sm_, sn_ &gt; &amp;<a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a90c62f60544de31ba2e69d2f2a51314f">hess</a>)</td></tr>
+<tr class="separator:ab9e8fc5db1216eb984f8a062c1031193"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af55271fc7204dd1e751a40a40125d417"><td class="memTemplParams" colspan="2">template&lt;typename T_ , int l_, int m_, int n_, int sl_, int sm_, int sn_&gt; </td></tr>
+<tr class="memitem:af55271fc7204dd1e751a40a40125d417"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#af55271fc7204dd1e751a40a40125d417">calc_trace</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html">Tiny::Tensor3</a>&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt; &amp;<a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a90c62f60544de31ba2e69d2f2a51314f">hess</a>)</td></tr>
+<tr class="separator:af55271fc7204dd1e751a40a40125d417"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9108b13d74d486b8cc3f72067b487712"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a060648fc999b87799e30256b1527fd9f">ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a9108b13d74d486b8cc3f72067b487712">eval</a> (const <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a04f5a84c67902a4856bd169c49e906ee">TestBasisData</a> &amp;psi) const</td></tr>
 <tr class="memdesc:a9108b13d74d486b8cc3f72067b487712"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluation operator.  <a href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a9108b13d74d486b8cc3f72067b487712">More...</a><br /></td></tr>
 <tr class="separator:a9108b13d74d486b8cc3f72067b487712"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -366,6 +372,74 @@ template&lt;typename AsmTraits_ &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab9e8fc5db1216eb984f8a062c1031193" name="ab9e8fc5db1216eb984f8a062c1031193"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e8fc5db1216eb984f8a062c1031193">&#9670;&#160;</a></span>calc_trace() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Function_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename AsmTraits_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename T_ , int m_, int n_, int sm_, int sn_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional.html">FEAT::Assembly::Common::LaplaceFunctional</a>&lt; Function_ &gt;<a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a98c728b49b2ba064f46fff286b9cc0f0">::Evaluator</a>&lt; AsmTraits_ &gt;::calc_trace </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; T_, m_, n_, sm_, sn_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>hess</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="common__functionals_8hpp_source.html#l00203">203</a> of file <a class="el" href="common__functionals_8hpp_source.html">common_functionals.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af55271fc7204dd1e751a40a40125d417" name="af55271fc7204dd1e751a40a40125d417"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af55271fc7204dd1e751a40a40125d417">&#9670;&#160;</a></span>calc_trace() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Function_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename AsmTraits_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename T_ , int l_, int m_, int n_, int sl_, int sm_, int sn_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional.html">FEAT::Assembly::Common::LaplaceFunctional</a>&lt; Function_ &gt;<a class="el" href="class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html#a98c728b49b2ba064f46fff286b9cc0f0">::Evaluator</a>&lt; AsmTraits_ &gt;::calc_trace </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html">Tiny::Tensor3</a>&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>hess</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="common__functionals_8hpp_source.html#l00209">209</a> of file <a class="el" href="common__functionals_8hpp_source.html">common_functionals.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a9108b13d74d486b8cc3f72067b487712" name="a9108b13d74d486b8cc3f72067b487712"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9108b13d74d486b8cc3f72067b487712">&#9670;&#160;</a></span>eval()</h2>
 
@@ -405,7 +479,7 @@ template&lt;typename AsmTraits_ &gt; </div>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_f_e_a_t_1_1_space_1_1_eval_data.html" title="Space evaluation data structure.">Space::EvalData</a></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The value of the linear functional. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="common__functionals_8hpp_source.html#l00214">214</a> of file <a class="el" href="common__functionals_8hpp_source.html">common_functionals.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__functionals_8hpp_source.html#l00230">230</a> of file <a class="el" href="common__functionals_8hpp_source.html">common_functionals.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="common__functionals_8hpp_source.html#l00184">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::_func_laplace</a>.</p>
 
@@ -520,7 +594,7 @@ template&lt;typename AsmTraits_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="common__functionals_8hpp_source.html#l00195">195</a> of file <a class="el" href="common__functionals_8hpp_source.html">common_functionals.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="common__functionals_8hpp_source.html#l00182">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::_func_eval</a>, and <a class="el" href="common__functionals_8hpp_source.html#l00184">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::_func_laplace</a>.</p>
+<p class="reference">References <a class="el" href="common__functionals_8hpp_source.html#l00182">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::_func_eval</a>.</p>
 
 </div>
 </div>
@@ -585,7 +659,7 @@ template&lt;typename AsmTraits_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="common__functionals_8hpp_source.html#l00184">184</a> of file <a class="el" href="common__functionals_8hpp_source.html">common_functionals.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="common__functionals_8hpp_source.html#l00214">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::eval()</a>, and <a class="el" href="common__functionals_8hpp_source.html#l00195">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::set_point()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="common__functionals_8hpp_source.html#l00230">FEAT::Assembly::Common::LaplaceFunctional&lt; Function_ &gt;::Evaluator&lt; AsmTraits_ &gt;::eval()</a>.</p>
 
 </div>
 </div>

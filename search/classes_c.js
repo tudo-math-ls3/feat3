@@ -99,8 +99,9 @@ var searchData=
   ['mutable_5fpriority_5fqueue_96',['mutable_priority_queue',['../class_f_e_a_t_1_1mutable__priority__queue.html',1,'FEAT']]],
   ['muxer_97',['Muxer',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
   ['muxer_3c_20localpresvector_2c_20presmirror_20_3e_98',['Muxer&lt; LocalPresVector, PresMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
-  ['muxer_3c_20localstressvector_2c_20stressmirror_20_3e_99',['Muxer&lt; LocalStressVector, StressMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
-  ['muxer_3c_20localsystemvector_2c_20systemmirror_20_3e_100',['Muxer&lt; LocalSystemVector, SystemMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
-  ['muxer_3c_20localsystemvectorr_2c_20systemmirror_20_3e_101',['Muxer&lt; LocalSystemVectorR, SystemMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
-  ['muxer_3c_20localvelovector_2c_20velomirror_20_3e_102',['Muxer&lt; LocalVeloVector, VeloMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]]
+  ['muxer_3c_20localscalarvector_2c_20scalarmirror_20_3e_99',['Muxer&lt; LocalScalarVector, ScalarMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
+  ['muxer_3c_20localstressvector_2c_20stressmirror_20_3e_100',['Muxer&lt; LocalStressVector, StressMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
+  ['muxer_3c_20localsystemvector_2c_20systemmirror_20_3e_101',['Muxer&lt; LocalSystemVector, SystemMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
+  ['muxer_3c_20localsystemvectorr_2c_20systemmirror_20_3e_102',['Muxer&lt; LocalSystemVectorR, SystemMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]],
+  ['muxer_3c_20localvelovector_2c_20velomirror_20_3e_103',['Muxer&lt; LocalVeloVector, VeloMirror &gt;',['../class_f_e_a_t_1_1_global_1_1_muxer.html',1,'FEAT::Global']]]
 ];
