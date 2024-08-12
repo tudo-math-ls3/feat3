@@ -89,6 +89,7 @@ namespace FEAT
         }
         else
         {
+          (void)eps;
           #pragma omp parallel
           {
             // #pragma master
