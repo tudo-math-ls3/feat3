@@ -325,13 +325,13 @@ namespace FEAT
       typedef Intern::CSRTupleMatrixWrapper<DataType, IndexType, Intern::AmaVankaMatrixHelper<VankaMatrixType>::num_blocks> VankaWrapper;
       /// coloring
       Adjacency::ColoringDataHandler _coloring_data;
-      /// gpu dof data
+      /// vector of graph arrays
       std::vector<Index*> _d_macro_dofs, _d_dof_macros;
-      // std::vector<Index*> _sorter, _d_sorter; //sorters are overkill? <- finding the local index should not be that expensive
+      /// size data
       std::vector<Index> _max_degree_dofs, _max_degree_macros;
-      /// gpu macro mask
+      /// array of macro mask
       int* _d_macro_mask;
-      /// flag whether we should allocate on device
+      /// flag whether we should allocate additional device pointer
       bool _allocate_device = false;
 
       /// \brief Calculate the max degree of our graphs
@@ -365,55 +365,49 @@ namespace FEAT
             malloc_size = this->_macro_dofs[i].get_num_nodes_domain() * _max_degree_dofs[i] * sizeof(Index);
           else
             malloc_size = this->_macro_dofs[i].get_num_nodes_domain() * (_max_degree_dofs[i]+1) * sizeof(Index);
-          _d_macro_dofs[i] = (Index*)Util::cuda_malloc(malloc_size);
+          _d_macro_dofs[i] = (Index*)Util::cuda_malloc_managed(malloc_size);
           // prepare tmp array
           {
-            Index* tmp_pinned = (Index*)Util::cuda_malloc_host(malloc_size);
+            Index* tmp_alias = _d_macro_dofs[i];
             const Index* dom_ptr = this->_macro_dofs[i].get_domain_ptr();
             const Index* img_ptr = this->_macro_dofs[i].get_image_idx();
             for(int k = 0; k < int(this->_macro_dofs[i].get_num_nodes_domain()); ++k)
             {
               if constexpr(macro_type_ == FEAT::Intern::VankaMacroPolicy::uniformMacros)
               {
-                std::memcpy(tmp_pinned + k*_max_degree_dofs[i], img_ptr + dom_ptr[k], _max_degree_dofs[i]*sizeof(Index));
+                std::memcpy(tmp_alias + k*_max_degree_dofs[i], img_ptr + dom_ptr[k], _max_degree_dofs[i]*sizeof(Index));
               }
               else
               {
                 const Index loc_size = dom_ptr[k+1] - dom_ptr[k];
-                tmp_pinned[k*(_max_degree_dofs[i]+1)] = loc_size;
-                std::memcpy(tmp_pinned + k*(_max_degree_dofs[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
-                std::memset(tmp_pinned + k*(_max_degree_dofs[i]+1) + loc_size + 1, ~int(0), (_max_degree_dofs[i] - loc_size)*sizeof(Index));
+                tmp_alias[k*(_max_degree_dofs[i]+1)] = loc_size;
+                std::memcpy(tmp_alias + k*(_max_degree_dofs[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
+                std::memset(tmp_alias + k*(_max_degree_dofs[i]+1) + loc_size + 1, ~int(0), (_max_degree_dofs[i] - loc_size)*sizeof(Index));
               }
             }
-            Util::cuda_copy_host_to_device((void*)(_d_macro_dofs[i]), (void*)tmp_pinned, malloc_size);
-            Util::cuda_free_host((void*)tmp_pinned);
           }
           malloc_size = this->_dof_macros[i].get_num_nodes_domain()*(_max_degree_macros[i]+1)*sizeof(Index);
-          _d_dof_macros[i] = (Index*)Util::cuda_malloc(malloc_size);
+          _d_dof_macros[i] = (Index*)Util::cuda_malloc_managed(malloc_size);
           {
-            Index* tmp_pinned = (Index*)Util::cuda_malloc_host(malloc_size);
+            Index* tmp_alias = _d_dof_macros[i];
             const Index* dom_ptr = this->_dof_macros[i].get_domain_ptr();
             const Index* img_ptr = this->_dof_macros[i].get_image_idx();
             for(int k = 0; k < int(this->_dof_macros[i].get_num_nodes_domain()); ++k)
             {
               const Index loc_size = dom_ptr[k+1] - dom_ptr[k];
-              tmp_pinned[k*(_max_degree_macros[i]+1)] = loc_size;
-              std::memcpy(tmp_pinned + k*(_max_degree_macros[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
-              std::memset(tmp_pinned + k*(_max_degree_macros[i]+1) + loc_size + 1, ~int(0), (_max_degree_macros[i] - loc_size)*sizeof(Index));
+              tmp_alias[k*(_max_degree_macros[i]+1)] = loc_size;
+              std::memcpy(tmp_alias + k*(_max_degree_macros[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
+              std::memset(tmp_alias + k*(_max_degree_macros[i]+1) + loc_size + 1, ~int(0), (_max_degree_macros[i] - loc_size)*sizeof(Index));
             }
-            Util::cuda_copy_host_to_device((void*)(_d_dof_macros[i]), (void*)tmp_pinned, malloc_size);
-            Util::cuda_free_host((void*)tmp_pinned);
           }
         }
         {
           if(this->_skip_singular)
           {
-            _d_macro_mask = (int*)Util::cuda_malloc(this->_macro_mask.size()*sizeof(int));
+            _d_macro_mask = (int*)Util::cuda_malloc_managed(this->_macro_mask.size()*sizeof(int));
             Util::cuda_set_memory(_d_macro_mask, 0, this->_macro_mask.size());
           }
         }
-        // initialize coloroing
-        _coloring_data.init_device();
       #endif
       }
 
@@ -421,11 +415,6 @@ namespace FEAT
       void _free_device()
       {
       #ifdef FEAT_HAVE_CUDA
-        // Util::cuda_free(_d_accum_row_ctr);
-        // _d_accum_row_ctr = nullptr;
-        // Util::cuda_free(_d_accum_row_index);
-        // _d_accum_row_index = nullptr;
-        _coloring_data.free_device();
         Util::cuda_free(_d_macro_mask);
         _d_macro_mask = nullptr;
         for(int i = 0; i < int(_d_macro_dofs.size()); ++i)
@@ -540,18 +529,18 @@ namespace FEAT
         #endif
       }
 
-      /**
-       * \brief Sets whether device ptr should be allocated.
-       *
-       * \param[in] allocate Should device ptr be allocated?
-       *
-       * \warning Setting this to false while having PreferedBackend set to cuda during the assembly
-       *          will lead to an error.
-       */
-      void set_allocate_device(bool allocate)
-      {
-        _allocate_device = allocate;
-      }
+      // /**
+      //  * \brief Sets whether device ptr should be allocated.
+      //  *
+      //  * \param[in] allocate Should device ptr be allocated?
+      //  *
+      //  * \warning Setting this to false while having PreferedBackend set to cuda during the assembly
+      //  *          will lead to an error.
+      //  */
+      // void set_allocate_device(bool allocate)
+      // {
+      //   _allocate_device = allocate;
+      // }
 
       /**
        * \brief Fills the coloring data.

@@ -69,17 +69,18 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              [[maybe_unused]] const std::vector<void*>& coloring_maps_device, DT_ alpha)
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
+              DT_ alpha)
       {
-        for(Index col = 0; col < Index(coloring_maps_host.size()); ++col)
+        for(Index col = 0; col < Index(coloring_maps.size()); ++col)
         {
           VoxelAssembly::Kernel::template poisson_assembler_matrix1_csr_host<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>(
             matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
             (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
             cubature.cub_wg, cubature.num_cubs, alpha, dof_mapping.cell_to_dof, dof_mapping.cell_num,
             (const typename Tiny::Vector<DT_, Space_::world_dim>*) dof_mapping.nodes, dof_mapping.node_size,
-            (const int*) coloring_maps_host[col].data(), coloring_maps_host[col].size(), dof_mapping.cell_to_dof_sorter
+            (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter
           );
         }
       }
@@ -94,21 +95,21 @@ using namespace FEAT::VoxelAssembly;
 
 /*--------------------Poisson Assembler Q2Quad-------------------------------------------------*/
 template void Arch::assemble_poisson_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, double);
+                                          const std::vector<int*>&, const std::vector<Index>&, double);
 template void Arch::assemble_poisson_csr_host(const Q2StandardQuad&, const CSRMatrixData<float, std::uint32_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, float);
+                                          const std::vector<int*>&, const std::vector<Index>&, float);
 template void Arch::assemble_poisson_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint64_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, double);
+                                          const std::vector<int*>&, const std::vector<Index>&, double);
 template void Arch::assemble_poisson_csr_host(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, float);
+                                          const std::vector<int*>&, const std::vector<Index>&, float);
 
 
 /*---------------------Poisson Assembler Q2Hexa------------------------------------------------------*/
 template void Arch::assemble_poisson_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, double);
+                                          const std::vector<int*>&, const std::vector<Index>&, double);
 template void Arch::assemble_poisson_csr_host(const Q2StandardHexa&, const CSRMatrixData<float, std::uint32_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, float);
+                                          const std::vector<int*>&, const std::vector<Index>&, float);
 template void Arch::assemble_poisson_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint64_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, double);
+                                          const std::vector<int*>&, const std::vector<Index>&, double);
 template void Arch::assemble_poisson_csr_host(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const std::vector<std::vector<int>>&, const std::vector<void*>&, float);
+                                          const std::vector<int*>&, const std::vector<Index>&, float);

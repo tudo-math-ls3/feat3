@@ -333,8 +333,6 @@ public:
     constexpr FEAT::Intern::VankaMacroPolicy macro_pol = uniform_ ? FEAT::Intern::VankaMacroPolicy::uniformMacros : FEAT::Intern::VankaMacroPolicy::anisotropicMacros;
     auto voxel_vanka = Solver::new_voxel_amavanka<MatrixType, FilterType, decltype(col), asm_pol_, macro_pol>(matrix, filter, col, omega, 10);
 
-    voxel_vanka->set_allocate_device(true);
-
     vanka->init();
     voxel_vanka->init();
     // // voxel_vanka->init_symbolic();

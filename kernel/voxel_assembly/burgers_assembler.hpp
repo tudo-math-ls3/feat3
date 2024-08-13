@@ -487,8 +487,8 @@ namespace FEAT
        * \param[in] conv_data The data array of the convection vector.
        * \param[in] cubature A wrapper around the cubature rule data. Datapointer have to be device pointer.
        * \param[in] dof_mapping A wrapper around the dof mapping for scattering gathering of local dofs. Datapointer have to be devicepointer.
-       * \param[in] coloring_maps_host A vector of the dof indices per color. Since on host side, actual data is ignored, but sizes have to be correct.
-       * \param[in] coloring_maps_device A vector of the dof indices per color. Inner pointers have to be device pointer.
+       * \param[in] coloring_maps A vector of arrays of the dof indices per color.
+       * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
        */
@@ -498,8 +498,8 @@ namespace FEAT
               const DT_* conv_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              const std::vector<void*>& coloring_maps_device,
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params);
 
       /**
@@ -517,8 +517,8 @@ namespace FEAT
        * \param[in] primal_data The data array of the primal vector the matrix is applied to.
        * \param[in] cubature A wrapper around the cubature rule data. Datapointer have to be device pointer.
        * \param[in] dof_mapping A wrapper around the dof mapping for scattering gathering of local dofs. Datapointer have to be devicepointer.
-       * \param[in] coloring_maps_host A vector of the dof indices per color. Since on host side, actual data is ignored, but sizes have to be correct.
-       * \param[in] coloring_maps_device A vector of the dof indices per color. Inner pointers have to be device pointer.
+       * \param[in] coloring_maps A vector of arrays of the dof indices per color.
+       * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
        */
@@ -529,8 +529,8 @@ namespace FEAT
               const DT_* primal_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              const std::vector<void*>& coloring_maps_device,
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params);
 
       /**
@@ -579,8 +579,8 @@ namespace FEAT
        * \param[in] conv_data The data array of the convection vector.
        * \param[in] cubature A wrapper around the cubature rule data. Data has to be allocated on host side.
        * \param[in] dof_mapping A wrapper around the dof mapping for scattering gathering of local dofs.
-       * \param[in] coloring_maps_host A vector of the dof indices per color.
-       * \param[in] coloring_maps_device A vector of the dof indices per color. Data is ignored.
+       * \param[in] coloring_maps A vector of arrays of the dof indices per color.
+       * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
        */
@@ -590,8 +590,8 @@ namespace FEAT
               const DT_* conv_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              [[maybe_unused]] const std::vector<void*>& coloring_maps_device,
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params);
 
       /**
@@ -609,8 +609,8 @@ namespace FEAT
        * \param[in] primal_data The data array of the primal vector the matrix is applied to.
        * \param[in] cubature A wrapper around the cubature rule data.
        * \param[in] dof_mapping A wrapper around the dof mapping for scattering gathering of local dofs.
-       * \param[in] coloring_maps_host A vector of the dof indices per color.
-       * \param[in] coloring_maps_device A vector of the dof indices per color. Data is ignored.
+       * \param[in] coloring_maps A vector of arrays of the dof indices per color.
+       * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
        */
@@ -621,8 +621,8 @@ namespace FEAT
               const DT_* primal_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              [[maybe_unused]] const std::vector<void*>& coloring_maps_device,
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params);
 
       /**
@@ -851,11 +851,11 @@ namespace FEAT
         const DataType* vec_data = convect.template elements<LAFEM::Perspective::pod>();
 
         VoxelAssembly::AssemblyCubatureData<DataType> cub_data = {(void*)cub_pt, cub_wg, num_cubs};
-        VoxelAssembly::AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_host_assembly_field();
+        VoxelAssembly::AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
 
-        VoxelAssembly::Arch::assemble_burgers_csr_host(space, mat_data, vec_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_coloring_maps_device(), alpha,
+        VoxelAssembly::Arch::assemble_burgers_csr_host(space, mat_data, vec_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha,
                                   burgers_params);
       }
 
@@ -867,11 +867,11 @@ namespace FEAT
         const DataType* primal_data = primal.template elements<LAFEM::Perspective::pod>();
 
         VoxelAssembly::AssemblyCubatureData<DataType> cub_data = {(void*)cub_pt, cub_wg, num_cubs};
-        VoxelAssembly::AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_host_assembly_field();
+        VoxelAssembly::AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
 
-        VoxelAssembly::Arch::assemble_burgers_defect_host(space, vec_data, conv_data, primal_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_coloring_maps_device(), alpha,
+        VoxelAssembly::Arch::assemble_burgers_defect_host(space, vec_data, conv_data, primal_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha,
                                   burgers_params);
         //free resources
       }
@@ -903,10 +903,10 @@ namespace FEAT
         Util::cuda_copy_host_to_device(cub_wg_device, (void*)cub_wg, Index(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
-        VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_device_assembly_field();
+        VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
-        VoxelAssembly::Arch::template assemble_burgers_csr(space, mat_data, vec_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_coloring_maps_device(), alpha, burgers_params);
+        VoxelAssembly::Arch::template assemble_burgers_csr(space, mat_data, vec_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, burgers_params);
         Util::cuda_free(cub_wg_device);
         Util::cuda_free(cub_pt_device);
       }
@@ -928,10 +928,10 @@ namespace FEAT
         Util::cuda_copy_host_to_device(cub_wg_device, (void*)cub_wg, Index(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
-        VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_device_assembly_field();
+        VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
-        VoxelAssembly::Arch::template assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_coloring_maps_device(), alpha, burgers_params);
+        VoxelAssembly::Arch::template assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, burgers_params);
         Util::cuda_free(cub_wg_device);
         Util::cuda_free(cub_pt_device);
       }
@@ -957,7 +957,7 @@ namespace FEAT
       void assemble_vector_cuda(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>&, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>&, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>&,
        const SpaceType&, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType*, const DataType*, int, DataType) const
       {
-        XABORTM("This call was logged and your local FBI agent was informed about your transgression");
+        XABORTM("This call was logged and your local FBI agent was informed about your transgressions");
       }
 
       void set_sd_v_norm_cuda(const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>&)

@@ -177,11 +177,11 @@ namespace FEAT
           if(skip_singular)
             Solver::Kernel::template assemble_unscaled_vanka_host<DT_, IT_, n_, true>
                                             (mat_wrap, vanka_wrap, graphs_macro_dofs,
-                                             _m_mask, coloring_map[k].data(), coloring_map[k].size(), stride, eps);
+                                             _m_mask, coloring_map[k], coloring_data.get_color_size(k), stride, eps);
           else
             Solver::Kernel::template assemble_unscaled_vanka_host<DT_, IT_, n_, false>
                                             (mat_wrap, vanka_wrap, graphs_macro_dofs,
-                                             _m_mask, coloring_map[k].data(), coloring_map[k].size(), stride, eps);
+                                             _m_mask, coloring_map[k], coloring_data.get_color_size(k), stride, eps);
         }
         if(skip_singular)
           Solver::Kernel::template scale_vanka_rows_host<DT_, IT_, n_, true>(vanka_wrap, omega, graphs_dof_macros,_m_mask);

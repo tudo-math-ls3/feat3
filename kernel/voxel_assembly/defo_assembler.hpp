@@ -89,8 +89,8 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              const std::vector<void*>& coloring_maps_device,
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
               DT_ alpha, DT_ nu
               );
       #endif
@@ -100,8 +100,8 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<std::vector<int>>& coloring_maps_host,
-              const std::vector<void*>& coloring_maps_device,
+              const std::vector<int*>& coloring_maps,
+              const std::vector<Index>& coloring_map_sizes,
               DT_ alpha, DT_ nu
               );
     }
@@ -177,10 +177,10 @@ namespace FEAT
         CSRMatrixData<DataType, IndexType> mat_data = {matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), matrix.rows(), matrix.columns()};
 
         AssemblyCubatureData<DataType> cub_data = {(void*)cub_pt, cub_wg, num_cubs};
-        AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_host_assembly_field();
+        AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_assembly_field();
 
 
-        VoxelAssembly::Arch::assemble_defo_csr_host(space, mat_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_coloring_maps_device(), alpha, nu);
+        VoxelAssembly::Arch::assemble_defo_csr_host(space, mat_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, nu);
       }
 
       #ifdef FEAT_HAVE_CUDA
@@ -197,10 +197,10 @@ namespace FEAT
         Util::cuda_copy_host_to_device(cub_wg_device, (void*)cub_wg, num_cubs * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
-        VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_device_assembly_field();
+        VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
 
 
-        VoxelAssembly::Arch::template assemble_defo_csr(space, mat_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_coloring_maps_device(), alpha, nu);
+        VoxelAssembly::Arch::template assemble_defo_csr(space, mat_data, d_cub_data, d_mapping_data,  mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, nu);
         //free resources
         Util::cuda_free(cub_wg_device);
         Util::cuda_free(cub_pt_device);

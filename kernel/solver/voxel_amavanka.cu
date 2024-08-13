@@ -324,7 +324,7 @@ namespace FEAT
             degree_dofs.max_degree_dofs[i] = max_degree_dofs.at(i);
             degree_macros.max_degree_macros[i] = max_degree_macros.at(i);
           }
-          auto& coloring_map = coloring_data.get_coloring_maps_device();
+          auto& coloring_map = coloring_data.get_coloring_maps();
           const Index max_color_size = coloring_data.get_max_size();
           // allocate arrays for local matrix
           DataType* local = (DataType*)Util::cuda_malloc(max_color_size*stride*stride*sizeof(DataType));
@@ -412,7 +412,7 @@ namespace FEAT
             degree_dofs.max_degree_dofs[i] = max_degree_dofs.at(i);
             degree_macros.max_degree_macros[i] = max_degree_macros.at(i);
           }
-          auto& coloring_map = coloring_data.get_coloring_maps_device();
+          auto& coloring_map = coloring_data.get_coloring_maps();
           // allocate arrays for local matrix
           DataType* local = (DataType*)Util::cuda_malloc(num_macros*stride*stride*sizeof(DataType));
           Util::cuda_set_memory(local, DataType(0), num_macros*stride*stride);
@@ -448,6 +448,7 @@ namespace FEAT
 
           //check for cuda error in our kernel
           Util::cuda_check_last_error();
+          Util::cuda_free((void*)info_array);
           Util::cuda_free((void*)pivot);
           Util::cuda_free((void*)local_t);
           Util::cuda_free((void*)local);

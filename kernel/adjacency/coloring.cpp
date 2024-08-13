@@ -261,7 +261,7 @@ namespace FEAT
     }
 
     // move ctor
-    Coloring::Coloring(Coloring&& other) :
+    Coloring::Coloring(Coloring&& other) noexcept:
       _num_colors(other._num_colors),
       _coloring(std::forward<IndexVector>(other._coloring))
     {
@@ -270,7 +270,7 @@ namespace FEAT
     }
 
     // move-assign operator
-    Coloring& Coloring::operator=(Coloring&& other)
+    Coloring& Coloring::operator=(Coloring&& other) noexcept
     {
       // avoid self-move
       if(this == &other)

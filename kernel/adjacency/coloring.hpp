@@ -10,6 +10,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/memory_pool.hpp>
 
 #ifdef FEAT_HAVE_CUDA
 #include <kernel/util/cuda_util.hpp>
@@ -139,10 +140,10 @@ namespace FEAT
       explicit Coloring(const Graph& graph, const Index* order);
 
       /// move ctor
-      Coloring(Coloring&& other);
+      Coloring(Coloring&& other) noexcept;
 
       /// move-assign operator
-      Coloring& operator=(Coloring&& other);
+      Coloring& operator=(Coloring&& other) noexcept;
 
       /// virtual destructor
       virtual ~Coloring();
@@ -253,8 +254,10 @@ namespace FEAT
     class ColoringDataHandler
     {
       public:
-        std::vector<std::vector<int>> _coloring_maps;
-        std::vector<void*> _d_coloring_maps;
+        /// vector of unified memory pointer
+        std::vector<int*> _coloring_maps;
+        /// vector of coloring sizes
+        std::vector<Index> _coloring_map_sizes;
 
       explicit ColoringDataHandler() = default;
 
@@ -278,88 +281,54 @@ namespace FEAT
         fill_color(coloring, hint);
       }
 
+      ~ColoringDataHandler()
+      {
+        release_color();
+      }
+
       /// Returns the number of colors
       Index get_num_colors() const
       {
-        return _coloring_maps.size();
+        return _coloring_map_sizes.size();
       }
 
       Index get_color_size(Index k) const
       {
-        return _coloring_maps.at(k).size();
+        return _coloring_map_sizes.at(k);
+      }
+
+      std::vector<Index>& get_color_sizes()
+      {
+        return _coloring_map_sizes;
+      }
+
+      const std::vector<Index>& get_color_sizes() const
+      {
+        return _coloring_map_sizes;
       }
 
       /// Get the k-th color map
-      std::vector<int>& get_color_map(Index k)
+      int* get_color_map(Index k)
       {
         return _coloring_maps.at(k);
       }
 
       /// \copydoc get_color_map
-      const std::vector<int>& get_color_map(Index k) const
+      const int* get_color_map(Index k) const
       {
         return _coloring_maps.at(k);
       }
 
-      /// Get the k-th device color map
-      void* get_color_map_device(Index k)
-      {
-        return _d_coloring_maps.at(k);
-      }
-
-      /// \copydoc get_color_map_device
-      const void* get_color_map_device(Index k) const
-      {
-        return _d_coloring_maps.at(k);
-      }
-
       /// Retrieve the color maps
-      std::vector<std::vector<int>>& get_coloring_maps()
+      std::vector<int*>& get_coloring_maps()
       {
         return _coloring_maps;
       }
 
       /// \copydoc get_coloring_maps
-      const std::vector<std::vector<int>>& get_coloring_maps() const
+      const std::vector<int*>& get_coloring_maps() const
       {
         return _coloring_maps;
-      }
-
-      /// Retrieve the device  color maps
-      std::vector<void*>& get_coloring_maps_device()
-      {
-        return _d_coloring_maps;
-      }
-
-      /// \copydoc get_coloring_maps_device
-      const std::vector<void*>& get_coloring_maps_device() const
-      {
-        return _d_coloring_maps;
-      }
-
-      /// Initialize the device coloring data. Beforehand, fill_color should have been called.
-      void init_device()
-      {
-        #ifdef FEAT_HAVE_CUDA
-          _d_coloring_maps.resize(_coloring_maps.size());
-          for(Index i = 0; i < _coloring_maps.size(); ++i)
-          {
-            _d_coloring_maps[i] = Util::cuda_malloc(_coloring_maps[i].size() * sizeof(int));
-            Util::cuda_copy_host_to_device(_d_coloring_maps[i], _coloring_maps[i].data(), _coloring_maps[i].size() * sizeof(int));
-          }
-        #endif
-      }
-
-      /// Free the device data.
-      void free_device()
-      {
-        #ifdef FEAT_HAVE_CUDA
-          for(Index i = 0; i < _d_coloring_maps.size(); ++i)
-          {
-            Util::cuda_free(_d_coloring_maps[i]);
-          }
-          _d_coloring_maps.clear();
-        #endif
       }
 
       /**
@@ -375,10 +344,20 @@ namespace FEAT
         {
           num_colors = *std::max_element(coloring.begin(), coloring.end());
         }
-        _coloring_maps.resize(std::size_t(num_colors));
+        // fill tmp vector with coloring
+        std::vector<std::vector<int>> tmp_vector;
+        tmp_vector.resize(Index(num_colors));
         for(std::size_t i = 0; i < coloring.size(); ++i)
         {
-          _coloring_maps.at(std::size_t(coloring.at(i))).push_back(int(i));
+          tmp_vector.at(std::size_t(coloring.at(i))).push_back(int(i));
+        }
+        _coloring_maps.resize(std::size_t(num_colors));
+        _coloring_map_sizes.resize(std::size_t(num_colors));
+        for(Index i = 0; i < Index(num_colors); ++i)
+        {
+          _coloring_maps.at(i) = MemoryPool::allocate_memory<int>(tmp_vector.at(i).size());
+          MemoryPool::copy(_coloring_maps.at(i), tmp_vector.at(i).data(), tmp_vector.at(i).size());
+          _coloring_map_sizes.at(i) = tmp_vector.at(i).size();
         }
 
       }
@@ -397,21 +376,42 @@ namespace FEAT
         {
           ASSERTM(num_colors == hint, "Hint and number of colors do not fit!");
         }
-        _coloring_maps.resize(std::size_t(num_colors));
-        for(int i = 0; i < int(coloring.get_num_nodes()); ++i)
+
+        // fill tmp vector with coloring
+        std::vector<std::vector<int>> tmp_vector;
+        tmp_vector.resize(Index(num_colors));
+        for(std::size_t i = 0; i < coloring.size(); ++i)
         {
-          _coloring_maps.at(coloring[Index(i)]).push_back(i);
+          tmp_vector.at(std::size_t(coloring[i])).push_back(int(i));
         }
+        _coloring_maps.resize(std::size_t(num_colors));
+        _coloring_map_sizes.resize(std::size_t(num_colors));
+        for(Index i = 0; i < Index(num_colors); ++i)
+        {
+          _coloring_maps.at(i) = MemoryPool::allocate_memory<int>(tmp_vector.at(i).size());
+          MemoryPool::copy(_coloring_maps.at(i), tmp_vector.at(i).data(), tmp_vector.at(i).size());
+          _coloring_map_sizes.at(i) = Index(tmp_vector.at(i).size());
+        }
+      }
+
+      void release_color()
+      {
+        for(Index i = 0; i < _coloring_maps.size(); ++i)
+        {
+          MemoryPool::release_memory(_coloring_maps.at(i));
+        }
+        _coloring_maps.clear();
+        _coloring_map_sizes.clear();
       }
 
       bool initialized() const
       {
-        return _d_coloring_maps.size() > 0u;
+        return _coloring_maps.size() > 0u;
       }
 
       Index get_max_size() const
       {
-        return std::accumulate(_coloring_maps.begin(), _coloring_maps.end(), Index(0), [](const auto& a, const auto& b){return std::max(a, Index(b.size()));});
+        return std::accumulate(_coloring_map_sizes.begin(), _coloring_map_sizes.end(), Index(0), [](const Index& a, const Index& b){return std::max(a, b);});
       }
     }; // class ColoringDataHandler
   } // namespace Adjacency
