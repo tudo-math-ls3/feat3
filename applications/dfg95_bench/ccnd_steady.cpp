@@ -659,7 +659,8 @@ namespace DFG95
     watch_nonlin_solver_init.stop();
 
     // accumulate vanka sizes
-    statistics.counts[Counts::vanka_data] = Index(ama_vankas.front()->data_size());
+    if(!ama_vankas.empty())
+      statistics.counts[Counts::vanka_data] = Index(ama_vankas.front()->data_size());
     statistics.bytes[Bytes::vanka] = 0ull;
     for(auto& v : ama_vankas)
       statistics.bytes[Bytes::vanka] += v->bytes();
