@@ -286,6 +286,31 @@ namespace FEAT
         release_color();
       }
 
+      ColoringDataHandler(const ColoringDataHandler&) = delete;
+
+      ColoringDataHandler& operator=(const ColoringDataHandler&) = delete;
+
+
+      ColoringDataHandler(ColoringDataHandler&& other) noexcept
+      {
+        _coloring_maps = std::move(other._coloring_maps);
+        _coloring_map_sizes = std::move(other._coloring_map_sizes);
+        other._coloring_maps.clear();
+        other._coloring_map_sizes.clear();
+      }
+
+      ColoringDataHandler& operator=(ColoringDataHandler&& other) noexcept
+      {
+        if(this == &other)
+          return *this;
+        release_color();
+        _coloring_maps = std::move(other._coloring_maps);
+        _coloring_map_sizes = std::move(other._coloring_map_sizes);
+        other._coloring_maps.clear();
+        other._coloring_map_sizes.clear();
+        return *this;
+      }
+
       /// Returns the number of colors
       Index get_num_colors() const
       {

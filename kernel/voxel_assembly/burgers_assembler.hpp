@@ -752,6 +752,17 @@ namespace FEAT
         #endif
       }
 
+      // rule of 5
+      VoxelBurgersAssembler(const VoxelBurgersAssembler&) = delete;
+
+      VoxelBurgersAssembler& operator=(const VoxelBurgersAssembler&) = delete;
+
+      VoxelBurgersAssembler(VoxelBurgersAssembler&&) = default;
+
+      VoxelBurgersAssembler& operator=(VoxelBurgersAssembler&&) = default;
+
+      ~VoxelBurgersAssembler(){}
+
       /**
        * \brief Wraps the set burgers parameter into convenient struct.
        *

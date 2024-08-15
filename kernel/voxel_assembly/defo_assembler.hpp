@@ -153,6 +153,18 @@ namespace FEAT
         #endif
       }
 
+      // rule of 5
+      VoxelDefoAssembler(const VoxelDefoAssembler&) = delete;
+
+      VoxelDefoAssembler& operator=(const VoxelDefoAssembler&) = delete;
+
+      VoxelDefoAssembler(VoxelDefoAssembler&&) = default;
+
+      VoxelDefoAssembler& operator=(VoxelDefoAssembler&&) = delete;
+
+      ~VoxelDefoAssembler(){}
+
+
       template<typename CubatureFactory_>
       void assemble_matrix1(LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim>& matrix, const SpaceType& space, const CubatureFactory_& cubature_factory, DataType alpha = DataType(1)) const
       {

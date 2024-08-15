@@ -235,6 +235,42 @@ namespace FEAT
 
       }
 
+      LagrangeDataHandler(const LagrangeDataHandler&) = delete;
+
+      LagrangeDataHandler& operator=(const LagrangeDataHandler&) = delete;
+
+      LagrangeDataHandler(LagrangeDataHandler&& other) noexcept :
+      _cell_to_dof(other._cell_to_dof),
+      _cell_to_dof_sorter(other._cell_to_dof_sorter),
+      _cell_to_dof_size(other._cell_to_dof_size),
+      _nodes(other._nodes),
+      _nodes_size(other._nodes_size),
+      coloring_data(std::move(other.coloring_data))
+      {
+        MemoryPool::increase_memory(_cell_to_dof);
+        MemoryPool::increase_memory(_cell_to_dof_sorter);
+        MemoryPool::increase_memory(_nodes);
+      }
+
+      LagrangeDataHandler& operator=(LagrangeDataHandler&& other) noexcept
+      {
+        if(this == &other)
+          return *this;
+        coloring_data = std::move(other.coloring_data);
+        MemoryPool::release_memory(_nodes);
+        MemoryPool::release_memory(_cell_to_dof_sorter);
+        MemoryPool::release_memory(_cell_to_dof);
+        _cell_to_dof = other._cell_to_dof;
+        _cell_to_dof_sorter = other._cell_to_dof_sorter;
+        _cell_to_dof_size = other._cell_to_dof_size;
+        _nodes = other._nodes;
+        _nodes_size = other._nodes_size;
+        MemoryPool::increase_memory(_cell_to_dof);
+        MemoryPool::increase_memory(_cell_to_dof_sorter);
+        MemoryPool::increase_memory(_nodes);
+        return *this;
+      }
+
       ~LagrangeDataHandler()
       {
         MemoryPool::release_memory(_nodes);

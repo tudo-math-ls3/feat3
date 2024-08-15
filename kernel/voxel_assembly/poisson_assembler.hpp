@@ -148,6 +148,17 @@ namespace FEAT
       {
       }
 
+      // rule of 5
+      VoxelPoissonAssembler(const VoxelPoissonAssembler&) = delete;
+
+      VoxelPoissonAssembler& operator=(const VoxelPoissonAssembler&) = delete;
+
+      VoxelPoissonAssembler(VoxelPoissonAssembler&&) = default;
+
+      VoxelPoissonAssembler& operator=(VoxelPoissonAssembler&&) = delete;
+
+      ~VoxelPoissonAssembler(){}
+
       template<typename CubatureFactory_>
       void assemble_matrix1(LAFEM::SparseMatrixCSR<DataType, IndexType>& matrix, const SpaceType& space, const CubatureFactory_& cubature_factory, DataType alpha = DataType(1)) const
       {
