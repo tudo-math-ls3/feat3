@@ -27,6 +27,10 @@ endif (FEAT_EICKT)
 
 add_library(kernel-geometry STATIC ${kernel-geometry-list})
 
+if (FEAT_VALGRIND)
+  target_compile_definitions(kernel-geometry PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK=ON)
+endif (FEAT_VALGRIND)
+
 target_link_libraries(kernel-geometry PRIVATE kernel-util)
 
 # list of geometry tests
