@@ -93,7 +93,7 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
         cxxflags += " -fsanitize=address" #" -fsanitize=memory" #-fsanitize=address-full  #Problem with clang LLVM on windows with VS22..
       #see https://github.com/llvm/llvm-project/issues/56300
 
-  elif "opt" in buildid or "fast" in buildid:
+  elif "opt" in buildid:
     if major >= 7:
       cxxflags += " -funroll-loops"
       if "lto" in buildid:
@@ -101,12 +101,6 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
 
     if "opt" in buildid:
       cxxflags += " -O3"
-    elif "fast" in buildid:
-      if major == 3 and minor < 7:
-        cxxflags += " -O3"
-      else:
-        # work around for https://llvm.org/bugs/show_bug.cgi?id=13745 - math.h/math-finite-h broken in gcc 4.6 (host compiler of ubuntu 12.04)
-        cxxflags += " -Ofast -D__extern_always_inline='extern __always_inline' -ffp-model=fast"
 
     if cpu == "unknown":
       cxxflags += " -march=native"

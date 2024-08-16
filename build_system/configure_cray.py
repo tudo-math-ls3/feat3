@@ -15,7 +15,4 @@ def configure_cray(cpu, buildid, compiler, restrict_errors):
   elif "opt" in buildid:
     cxxflags += " -O3"
 
-  elif "fast" in buildid:
-    cxxflags += " -fast -ffp=4"
-
   return cxxflags

@@ -37,14 +37,12 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
     cxxflags += "  -O0 -debug all"
     #TODO missing ftrapuv, not know by icpx: Initializes stack local variables to an unusual value to aid error detection.
 
-  elif "opt" in buildid or "fast" in buildid:
+  elif "opt" in buildid:
     if "lto" in buildid :
       cxxflags += " -ipo "
 
     if "opt" in buildid:
       cxxflags += " -O3"
-    elif "fast" in buildid:
-      cxxflags += " -Ofast"
 
     if cpu == "unknown":
       # generate code for every simd unit, existing so far

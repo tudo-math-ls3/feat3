@@ -63,7 +63,6 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("* Build mode (mutually exclusive):")
   print ("  - 'opt': compile in optimized mode (recommended)")
   print ("  - 'debug': compile in debug mode and disable all optimizations")
-  print ("  - 'fast': compile in optimized mode including non-standard optimizations")
   print ("  - 'nopt': compile in non-optimized mode")
   print ("")
   print ("* Parallelization backends:")
@@ -275,11 +274,8 @@ elif "nopt" in buildid:
 elif "opt" in buildid:
   remove_string(unused_tokens, "opt")
   cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
-elif "fast" in buildid:
-  remove_string(unused_tokens, "fast")
-  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
 else:
-  print ("Error: No supported build mode (opt/debug/fast/nopt) found in build id:")
+  print ("Error: No supported build mode (opt/debug/nopt) found in build id:")
   print (buildid_string)
   sys.exit(1)
 
@@ -731,8 +727,8 @@ for i in clean:
 os.environ["CXXFLAGS"] = cxxflags
 if "lto" in buildid:
   remove_string(unused_tokens, "lto")
-  if not "opt" in buildid and not "fast" in buildid:
-    print("Error: lto not usable in debug mode!")
+  if not "opt" in buildid:
+    print("Error: lto only usable in opt mode!")
     sys.exit()
   ldflags += cxxflags
 os.environ["LDFLAGS"] = ldflags

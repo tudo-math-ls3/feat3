@@ -96,7 +96,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       if major >= 9 and major < 12:
         cxxflags += " -lrt"
 
-  elif "opt" in buildid or "fast" in buildid:
+  elif "opt" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
     if "lto" in buildid:
       cxxflags += " -flto"
@@ -107,8 +107,6 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags +=" -malign-data=cacheline"
     if "opt" in buildid:
       cxxflags += " -O3"
-    elif "fast" in buildid:
-      cxxflags += " -Ofast"
 
     if cpu == "unknown":
       cxxflags += " -march=native"

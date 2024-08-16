@@ -32,7 +32,7 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
   if "debug" in buildid or "nopt" in buildid:
     cxxflags += "  -O0 -debug all -ftrapuv"
 
-  elif "opt" in buildid or "fast" in buildid:
+  elif "opt" in buildid:
     cxxflags += " -no-prec-div -diag-disable 11074,11076,25463,25464 -diag-disable openmp"
     if "lto" in buildid and major >= 18:
       cxxflags += " -ipo -diag-disable 11000,11001,11006"
@@ -42,8 +42,6 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
 
     if "opt" in buildid:
       cxxflags += " -O3"
-    elif "fast" in buildid:
-      cxxflags += " -Ofast"
 
     if cpu == "unknown":
       # generate code for every simd unit, existing so far
