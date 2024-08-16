@@ -297,7 +297,7 @@ public:
         a(i, tv1);
         Tiny::Vector<DT_, block_size_> tv2;
         for (Index j(0) ; j < block_size_ ; ++j)
-          tv2.v[j] = DT_(2) - DT_(i % (42 + j));
+          tv2.v[j] = DT_(2) + DT_(i % (42 + j));
         b(i, tv2);
         ref(i, s * a(i) + b(i));
 
@@ -308,14 +308,14 @@ public:
       c.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(c(i).v[j], ref(i).v[j], eps);
+          TEST_CHECK_RELATIVE(c(i).v[j], ref(i).v[j], eps);
 
       DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
       a_tmp.copy(a);
       a.axpy(a, b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(a(i).v[j], ref(i).v[j], eps);
+          TEST_CHECK_RELATIVE(a(i).v[j], ref(i).v[j], eps);
 
       a.copy(a_tmp);
       b.axpy(a, b, s);
@@ -649,6 +649,73 @@ DenseVectorBlockedComponentProductTest <float, std::uint32_t, 3> cuda_dv_blocked
 DenseVectorBlockedComponentProductTest <double, std::uint32_t, 3> cuda_dv_blocked_component_product_test_double_uint32(PreferredBackend::cuda);
 DenseVectorBlockedComponentProductTest <float, std::uint64_t, 2> cuda_dv_blocked_component_product_test_float_uint64(PreferredBackend::cuda);
 DenseVectorBlockedComponentProductTest <double, std::uint64_t, 2> cuda_dv_blocked_component_product_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedComponentCopyTest
+  : public UnitTest
+{
+public:
+  DenseVectorBlockedComponentCopyTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedComponentCopyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorBlockedComponentCopyTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    for(Index size(1); size < Index(1e3); size*=2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVector<DT_,IT_> v(size);
+
+      for(Index j(0); j < size; ++j)
+        v(j, DT_(j));
+
+      a.component_copy(v, 0);
+      for (Index i(0); i < a.template size<Perspective::native>(); ++i)
+      {
+        TEST_CHECK_RELATIVE(a.template elements<Perspective::native>()[i][0], DT_(i), eps);
+      }
+
+      DenseVector<DT_, IT_> v2(size);
+      a.component_copy_to(v2, 0);
+
+      for (Index i(0); i < size; ++i)
+      {
+        TEST_CHECK_RELATIVE(v2(i), DT_(i), eps);
+      }
+    }
+  }
+};
+DenseVectorBlockedComponentCopyTest <float, std::uint32_t, 3> dv_blocked_component_copy_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedComponentCopyTest <double, std::uint32_t, 3> dv_blocked_component_copy_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedComponentCopyTest <float, std::uint64_t, 2> dv_blocked_component_copy_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedComponentCopyTest <double, std::uint64_t, 2> dv_blocked_component_copy_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseVectorBlockedComponentCopyTest <float, std::uint64_t, 3> mkl_dv_blocked_component_copy_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedComponentCopyTest <double, std::uint64_t, 2> mkl_dv_blocked_component_copy_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedComponentCopyTest <__float128, std::uint32_t, 3> dv_blocked_component_copy_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedComponentCopyTest <__float128, std::uint64_t, 2> dv_blocked_component_copy_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorBlockedComponentCopyTest <Half, std::uint32_t, 3> dv_blocked_component_copy_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedComponentCopyTest <Half, std::uint64_t, 2> dv_blocked_component_copy_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedComponentCopyTest <float, std::uint32_t, 3> cuda_dv_blocked_component_copy_test_float_uint32(PreferredBackend::cuda);
+DenseVectorBlockedComponentCopyTest <double, std::uint32_t, 3> cuda_dv_blocked_component_copy_test_double_uint32(PreferredBackend::cuda);
+DenseVectorBlockedComponentCopyTest <float, std::uint64_t, 2> cuda_dv_blocked_component_copy_test_float_uint64(PreferredBackend::cuda);
+DenseVectorBlockedComponentCopyTest <double, std::uint64_t, 2> cuda_dv_blocked_component_copy_test_double_uint64(PreferredBackend::cuda);
 #endif
 
 template<

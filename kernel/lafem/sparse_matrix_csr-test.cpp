@@ -358,7 +358,7 @@ public:
   virtual void run() const override
   {
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
-    DT_ s(DT_(4711.1));
+    DT_ s(DT_(0.4711));
     for (IT_ size(1); size < IT_(1e3); size *= IT_(2))
     {
       SparseMatrixFactory<DT_, IT_> a_fac(size, size);
@@ -402,7 +402,7 @@ public:
       a.apply(r, x, y, DT_(0.0));
       ref.copy(y);
       for (Index i(0); i < size; ++i)
-        TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));

@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
+#include <kernel/lafem/arch/component_copy.hpp>
 #include <kernel/lafem/arch/component_invert.hpp>
 #include <kernel/lafem/arch/max_abs_index.hpp>
 #include <kernel/lafem/arch/min_abs_index.hpp>
@@ -872,6 +873,46 @@ namespace FEAT
         TimeStamp ts_start;
 
         Arch::ComponentProduct::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Statistics::add_flops(this->size<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Copies the elements of a dense vector into a specific block of this blocked vector.
+      *
+      * \param[in] x The vector to be copied.
+      * \param[in] block_ The index of the block in the target vector where the elements should be copied.
+      */
+      void component_copy(const DenseVector<DT_, IT_>& x, const int block_)
+      {
+        XASSERTM(block_ >= 0, "Block index has to be a positive integer!");
+        XASSERTM(Index(block_) < this->size(), "Block index is too big!");
+        XASSERTM(this->size() == x.size(), "Vector size does not match!");
+        TimeStamp ts_start;
+
+        Arch::ComponentCopy::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), BlockSize_, block_, this->size<Perspective::native>());
+        Statistics::add_flops(this->size<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Copies the elements of a specific block of this blocked vector into a dense vector.
+      *
+      * \param[in] x The vector which will contain the copies.
+      * \param[in] block_ The index of the block of this blocked vector from where the elements should be copied.
+      */
+      void component_copy_to(DenseVector<DT_, IT_>& x, const int block_) const
+      {
+        XASSERTM(block_ >= 0, "Block index has to be a positive integer!");
+        XASSERTM(Index(block_) < this->size(), "Block index is too big!");
+        XASSERTM(this->size() == x.size(), "Vector size does not match!");
+        TimeStamp ts_start;
+
+        Arch::ComponentCopy::value_to(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), BlockSize_, block_, this->size<Perspective::native>());
         Statistics::add_flops(this->size<Perspective::pod>());
 
         TimeStamp ts_stop;
