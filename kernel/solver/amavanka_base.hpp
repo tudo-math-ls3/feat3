@@ -2026,7 +2026,7 @@ namespace FEAT
               }
             }
           }
-          else // null row replace by unit row
+          else // null row replace by unit row, careful, this works only if hw == hb
           {
             for(IT_ j = row_ptr[cur_row]; j < row_ptr[cur_row+1]; ++j)
             {
@@ -2038,7 +2038,11 @@ namespace FEAT
                 {
                   loc_val[ii*hb+jj] = DT_(0);
                 }
-                loc_val[ii*hb +ii] = diag_val;
+              }
+              //handle the diagonal entries
+              for(int ii = 0; ii < Math::min(hw, hb); ++ii)
+              {
+                loc_val[ii*hb + ii] = diag_val;
               }
             }
           }
@@ -2091,7 +2095,11 @@ namespace FEAT
                 {
                   loc_val[ii*hb+jj] = DT_(0);
                 }
-                loc_val[ii*hb +ii] = diag_val;
+              }
+              //handle the diagonal entries
+              for(int ii = 0; ii < CudaMath::cuda_min(hw, hb); ++ii)
+              {
+                loc_val[ii*hb + ii] = diag_val;
               }
             }
           }
