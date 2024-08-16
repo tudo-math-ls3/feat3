@@ -428,7 +428,7 @@ namespace FEAT
         }
 
         // scale rows of Vanka matrix
-        Solver::Intern::AmaVankaCore::scale_rows(this->_vanka, this->_omega, this->_dof_macros, this->_macro_mask, Index(0));
+        Solver::Intern::AmaVankaCore::scale_rows(this->_vanka, this->_omega, this->_dof_macros, this->_macro_mask, Index(0), Index(0));
 
         watch_init_numeric.stop();
       }

@@ -279,8 +279,9 @@ namespace FEAT
         const IT_* row_ptr = vanka_wrap.row_arrays[rowc*n_+meta_col];
         const IT_* col_idx = vanka_wrap.col_arrays[rowc*n_+meta_col];
         const int hb = vanka_wrap.blocksizes[meta_col +1];
+        const bool meta_diag = (rowc == meta_col);
         // careful, num rows is counted against native elements, not raw elements
-        Intern::VoxelAmaVankaCore::scale_row<DT_, IT_, skip_singular_>(vals, omega, row_ptr, col_idx, row_img_idx+1, real_degree, hw, hb, xrow, m_mask);
+        Intern::VoxelAmaVankaCore::scale_row<DT_, IT_, skip_singular_>(vals, omega, row_ptr, col_idx, row_img_idx+1, real_degree, hw, hb, xrow, m_mask, meta_diag);
 
       }
     }

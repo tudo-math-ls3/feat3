@@ -1403,10 +1403,13 @@ namespace FEAT
          *
          * \param[in] row_block
          * The row-index of the current meta-matrix block.
+         *
+         * \param[in] col_block
+         * The col-index of the current meta-matrix block.
          */
         template<typename Matrix_>
         static void scale_rows(Matrix_& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const Index row_block, const Index col_block)
         {
         }
 #endif // DOXYGEN
@@ -1414,7 +1417,7 @@ namespace FEAT
         /// specialization for LAFEM::SparseMatrixCSR
         template<typename DT_, typename IT_>
         static void scale_rows(LAFEM::SparseMatrixCSR<DT_, IT_>& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
           // get matrix arrays
           DT_* vals = matrix.val();
@@ -1451,7 +1454,7 @@ namespace FEAT
               for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
                 vals[j] *= sc;
             }
-            else // null row: replace by unit row
+            else if(row_block == col_block) // null row: replace by unit row
             {
               for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
               {
@@ -1464,7 +1467,7 @@ namespace FEAT
         /// specialization for LAFEM::SparseMatrixBCSR
         template<typename DT_, typename IT_, int bh_, int bw_>
         static void scale_rows(LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
           // get matrix arrays
           Tiny::Matrix<DT_, bh_, bw_>* vals = matrix.val();
@@ -1501,7 +1504,7 @@ namespace FEAT
               for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
                 vals[j] *= sc;
             }
-            else // null row: replace by unit row
+            else if(row_block == col_block) // null row: replace by unit row
             {
               for(IT_ j(row_ptr[i]); j < row_ptr[i+1]; ++j)
               {
@@ -1515,35 +1518,35 @@ namespace FEAT
         /// specialization for LAFEM::TupleMatrixRow
         template<typename DT_, typename First_, typename Second_, typename... Rest_>
         static void scale_rows(LAFEM::TupleMatrixRow<First_, Second_, Rest_...>& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
-          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block);
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block, col_block);
+          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block, col_block + Index(1));
         }
 
         /// specialization for LAFEM::TupleMatrixRow (single column)
         template<typename DT_, typename First_>
         static void scale_rows(LAFEM::TupleMatrixRow<First_>& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block, col_block);
         }
 
         /// specialization for LAFEM::TupleMatrix
         template<typename DT_, typename FirstRow_, typename SecondRow_, typename... RestRows_>
         static void scale_rows(LAFEM::TupleMatrix<FirstRow_, SecondRow_, RestRows_...>& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
-          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block + Index(1));
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block, col_block);
+          AmaVankaCore::scale_rows(matrix.rest(), omega, dof_macros, macro_mask, row_block + Index(1), col_block);
         }
 
         /// specialization for LAFEM::TupleMatrix (single row)
         template<typename DT_, typename FirstRow_>
         static void scale_rows(LAFEM::TupleMatrix<FirstRow_>& matrix, const DT_ omega,
-          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block)
+          const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
-          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block);
+          AmaVankaCore::scale_rows(matrix.first(), omega, dof_macros, macro_mask, row_block, col_block);
         }
 
         /* ********************************************************************************************************* */
@@ -1994,7 +1997,7 @@ namespace FEAT
 
         template<typename DT_, typename IT_, bool skip_singular_>
         CUDA_HOST static void scale_row(DT_* vals, DT_ omega, const IT_* row_ptr, const IT_* col_idx, const Index* row_dom_ptr, const Index* row_img_idx,
-                                  int hw, int hb, Index cur_row, const int* m_mask)
+                                  int hw, int hb, Index cur_row, const int* m_mask, const bool meta_diag)
         {
           ASSERT(row_dom_ptr[cur_row] < row_dom_ptr[cur_row+1]);
           //get number of active macros for this DOF
@@ -2026,7 +2029,7 @@ namespace FEAT
               }
             }
           }
-          else // null row replace by unit row, careful, this works only if hw == hb
+          else if(meta_diag) // null row replace by unit row
           {
             for(IT_ j = row_ptr[cur_row]; j < row_ptr[cur_row+1]; ++j)
             {
@@ -2052,7 +2055,7 @@ namespace FEAT
         #ifdef __CUDACC__
         template<typename DT_, typename IT_, bool skip_singular_>
         CUDA_HOST_DEVICE static void scale_row(DT_* vals, DT_ omega, const IT_* row_ptr, const IT_* col_idx, const Index* row_dom_ptr, const Index row_number,
-                                  int hw, int hb, Index cur_row, const int* m_mask)
+                                  int hw, int hb, Index cur_row, const int* m_mask, bool meta_diag)
         {
           //get number of active macros for this DOF
           Index n(0);
@@ -2083,7 +2086,7 @@ namespace FEAT
               }
             }
           }
-          else // null row replace by unit row
+          else if(meta_diag) // null row replace by unit row
           {
             for(IT_ j = row_ptr[cur_row]; j < row_ptr[cur_row+1]; ++j)
             {

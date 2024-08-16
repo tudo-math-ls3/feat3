@@ -139,12 +139,13 @@ namespace FEAT
             const IT_* row_ptr = vanka_wrap.row_arrays[i*n_+j];
             const IT_* col_idx = vanka_wrap.col_arrays[i*n_+j];
             const int hb = vanka_wrap.blocksizes[j +1];
+            const bool meta_diag = (i == j);
             // now do the actual inner openmp loop over each column of the sub matrix
             #pragma omp parallel for
             for(int row = 0; row < num_rows; ++row)
             {
               // careful, num rows is counted against native elements, not raw elements
-              Intern::VoxelAmaVankaCore::scale_row<DT_, IT_, skip_singular_>(vals, omega, row_ptr, col_idx, row_dom_ptr, row_img_idx, hw, hb, Index(row), _m_mask);
+              Intern::VoxelAmaVankaCore::scale_row<DT_, IT_, skip_singular_>(vals, omega, row_ptr, col_idx, row_dom_ptr, row_img_idx, hw, hb, Index(row), _m_mask, meta_diag);
             }
           }
         }
