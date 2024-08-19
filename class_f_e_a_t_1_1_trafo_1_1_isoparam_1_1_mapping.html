@@ -160,9 +160,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac32a0181f5ef996cc77e8da21a2b0fa8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#ac32a0181f5ef996cc77e8da21a2b0fa8">add_meshpart_chart</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">Geometry::MeshPart</a>&lt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a746ce147ab2bbe9c9a6735f588fca4f3">MeshType</a> &gt; &amp;mesh_part, const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html">Geometry::Atlas::ChartBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a746ce147ab2bbe9c9a6735f588fca4f3">MeshType</a> &gt; &amp;chart)</td></tr>
 <tr class="memdesc:ac32a0181f5ef996cc77e8da21a2b0fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a mesh-part and its associated chart to the trafo.  <a href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#ac32a0181f5ef996cc77e8da21a2b0fa8">More...</a><br /></td></tr>
 <tr class="separator:ac32a0181f5ef996cc77e8da21a2b0fa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a093cae6da75925c1f40bb84f24e4fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a7a093cae6da75925c1f40bb84f24e4fe">clear</a> ()</td></tr>
-<tr class="memdesc:a7a093cae6da75925c1f40bb84f24e4fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears all added mesh-part/chart pairs.  <a href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a7a093cae6da75925c1f40bb84f24e4fe">More...</a><br /></td></tr>
-<tr class="separator:a7a093cae6da75925c1f40bb84f24e4fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa486dabba364bec21dd2e838a73dd0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#aaa486dabba364bec21dd2e838a73dd0a">clear_charts</a> ()</td></tr>
+<tr class="memdesc:aaa486dabba364bec21dd2e838a73dd0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears all added mesh-part/chart pairs.  <a href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#aaa486dabba364bec21dd2e838a73dd0a">More...</a><br /></td></tr>
+<tr class="separator:aaa486dabba364bec21dd2e838a73dd0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a718350f4be058e681d77c699611e2d9b"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; const <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#ad46451af14a1bcb0dd46e06bc4cb9f2d">ChartType</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a718350f4be058e681d77c699611e2d9b">get_charts_vector</a> (int dim) const</td></tr>
 <tr class="memdesc:a718350f4be058e681d77c699611e2d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the shape-charts vector.  <a href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a718350f4be058e681d77c699611e2d9b">More...</a><br /></td></tr>
 <tr class="separator:a718350f4be058e681d77c699611e2d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -429,8 +429,8 @@ template&lt;typename Mesh_ , int degree_&gt; </div>
 
 </div>
 </div>
-<a id="a7a093cae6da75925c1f40bb84f24e4fe" name="a7a093cae6da75925c1f40bb84f24e4fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a093cae6da75925c1f40bb84f24e4fe">&#9670;&#160;</a></span>clear()</h2>
+<a id="aaa486dabba364bec21dd2e838a73dd0a" name="aaa486dabba364bec21dd2e838a73dd0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa486dabba364bec21dd2e838a73dd0a">&#9670;&#160;</a></span>clear_charts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -441,7 +441,7 @@ template&lt;typename Mesh_ , int degree_&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html">FEAT::Trafo::Isoparam::Mapping</a>&lt; Mesh_, degree_ &gt;::clear </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html">FEAT::Trafo::Isoparam::Mapping</a>&lt; Mesh_, degree_ &gt;::clear_charts </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -529,7 +529,7 @@ template&lt;typename Mesh_ &gt; </div>
 
 <p class="reference">References <a class="el" href="mapping__base_8hpp_source.html#l00074">FEAT::Trafo::MappingBase&lt; Mesh_ &gt;::_mesh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="standard_2mapping_8hpp_source.html#l00111">FEAT::Trafo::Standard::Mapping&lt; Mesh_ &gt;::compute_vol()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="standard_2mapping_8hpp_source.html#l00113">FEAT::Trafo::Standard::Mapping&lt; Mesh_ &gt;::compute_vol()</a>.</p>
 
 </div>
 </div>
@@ -745,7 +745,7 @@ template&lt;typename Mesh_ , int degree_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="isoparam_2mapping_8hpp_source.html#l00107">107</a> of file <a class="el" href="isoparam_2mapping_8hpp_source.html">mapping.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="isoparam_2mapping_8hpp_source.html#l00136">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;::Mapping()</a>, <a class="el" href="isoparam_2mapping_8hpp_source.html#l00163">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;::clear()</a>, and <a class="el" href="isoparam_2mapping_8hpp_source.html#l00177">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;::get_charts_vector()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="isoparam_2mapping_8hpp_source.html#l00136">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;::Mapping()</a>, <a class="el" href="isoparam_2mapping_8hpp_source.html#l00163">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;::clear_charts()</a>, and <a class="el" href="isoparam_2mapping_8hpp_source.html#l00177">FEAT::Trafo::Isoparam::Mapping&lt; Mesh_, degree_ &gt;::get_charts_vector()</a>.</p>
 
 </div>
 </div>

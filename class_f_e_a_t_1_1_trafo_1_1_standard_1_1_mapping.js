@@ -7,6 +7,7 @@ var class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping =
     [ "MeshType", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#a045e3535fe6e1f9de7c82d504c5e3cb8", null ],
     [ "ShapeType", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#ab029a0459681a10c64549ca9a280ea64", null ],
     [ "Mapping", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#af8355927d016f951e12c921c42fd6594", null ],
+    [ "add_meshpart_chart", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#ac4b4974340f2a992f6755e41218e34a1", null ],
     [ "compute_vol", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#ac494c99dfdc48ffe3733ef64b56ce9c8", null ],
     [ "compute_vol", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#a018fc3467811ca7f0fdbb0611fd6ca4b", null ],
     [ "get_mesh", "class_f_e_a_t_1_1_trafo_1_1_standard_1_1_mapping.html#a08e99c74983c4fbbbd1d214be96ff1d1", null ],

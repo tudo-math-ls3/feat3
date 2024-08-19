@@ -24,7 +24,7 @@ var searchData=
   ['linearfunctionalassembler_21',['LinearFunctionalAssembler',['../class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembler.html',1,'FEAT::Assembly']]],
   ['linearfunctionalassemblyjob_22',['LinearFunctionalAssemblyJob',['../class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembly_job.html',1,'FEAT::Assembly']]],
   ['linesearch_23',['Linesearch',['../class_f_e_a_t_1_1_solver_1_1_linesearch.html',1,'FEAT::Solver']]],
-  ['localmassmatrixsingularexception_24',['LocalMassMatrixSingularException',['../class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::GridTransfer']]],
+  ['localmassmatrixsingularexception_24',['LocalMassMatrixSingularException',['../class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::GridTransfer::LocalMassMatrixSingularException'],['../class_f_e_a_t_1_1_assembly_1_1_space_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::SpaceTransfer::LocalMassMatrixSingularException']]],
   ['loopunroller_25',['LoopUnroller',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller.html',1,'FEAT::LAFEM::Arch::Intern']]],
   ['loopunroller_3c_20start_2c_20start_2c_20step_20_3e_26',['LoopUnroller&lt; Start, Start, Step &gt;',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller_3_01_start_00_01_start_00_01_step_01_4.html',1,'FEAT::LAFEM::Arch::Intern']]],
   ['lumping_27',['Lumping',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping.html',1,'FEAT::LAFEM::Arch']]]

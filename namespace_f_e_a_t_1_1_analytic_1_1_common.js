@@ -1,6 +1,5 @@
 var namespace_f_e_a_t_1_1_analytic_1_1_common =
 [
-    [ "BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d" ],
     [ "ConstantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function" ],
     [ "ConstantVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function" ],
     [ "CornerSingularity2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d" ],
@@ -27,6 +26,7 @@ var namespace_f_e_a_t_1_1_analytic_1_1_common =
     [ "SineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_tensor_static" ],
     [ "SinYT0", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0" ],
     [ "SinYT0StokesRhs", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0_stokes_rhs.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0_stokes_rhs" ],
+    [ "SphereCapFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function" ],
     [ "SphereSinBubbleFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_sin_bubble_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_sin_bubble_function" ],
     [ "StandingVortexFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d" ],
     [ "TaylorGreenVortexPres2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_taylor_green_vortex_pres2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_taylor_green_vortex_pres2_d" ],

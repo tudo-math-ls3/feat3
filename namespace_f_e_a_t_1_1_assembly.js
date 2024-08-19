@@ -62,6 +62,7 @@ var namespace_f_e_a_t_1_1_assembly =
     [ "ScalarErrorComputer", "class_f_e_a_t_1_1_assembly_1_1_scalar_error_computer.html", "class_f_e_a_t_1_1_assembly_1_1_scalar_error_computer" ],
     [ "ScalarErrorInfo", "struct_f_e_a_t_1_1_assembly_1_1_scalar_error_info.html", "struct_f_e_a_t_1_1_assembly_1_1_scalar_error_info" ],
     [ "SlipFilterAssembler", "class_f_e_a_t_1_1_assembly_1_1_slip_filter_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_slip_filter_assembler" ],
+    [ "SpaceTransfer", "class_f_e_a_t_1_1_assembly_1_1_space_transfer.html", "class_f_e_a_t_1_1_assembly_1_1_space_transfer" ],
     [ "StokesFBMAssembler", "class_f_e_a_t_1_1_assembly_1_1_stokes_f_b_m_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_stokes_f_b_m_assembler" ],
     [ "SymbolicAssembler", "class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler" ],
     [ "TraceAssembler", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler" ],

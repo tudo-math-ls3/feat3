@@ -1,10 +1,10 @@
 var namespace_f_e_a_t_1_1_voxel_assembly =
 [
     [ "Arch", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html", [
-      [ "assemble_burgers_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a808b692a464bb1252babcd9427db077a", null ],
-      [ "assemble_burgers_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1a9e8496b6a48892a2c8ea08cd845d98", null ],
-      [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a21c7659a8aeafcb97f412d725dc78393", null ],
-      [ "assemble_burgers_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1b164b2e538cf16bfb66e688ba40e30a", null ],
+      [ "assemble_burgers_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a9c9dabf44d9b61752740b6a587ca1b51", null ],
+      [ "assemble_burgers_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a6b2f1aefbd0865db566b4cf48f34c49a", null ],
+      [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aaed62a52a2917d948b7685b7d0c51d49", null ],
+      [ "assemble_burgers_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aa5bb883737c2cc04cc1ec321a2308fae", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aec510f211770223f5e804a3ede770ae7", null ],
       [ "get_sd_v_norm_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a55b4d5e867d4739199f9365a8cf5b00a", null ],

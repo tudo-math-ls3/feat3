@@ -99,6 +99,7 @@ var hierarchy =
       [ "FEAT::Analytic::Common::YZPlaneParabolic< DT_, dim_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_y_z_plane_parabolic_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Distance::DistanceFunction< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Distance::DistanceFunctionSD< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::Distance::InverseDistanceFunction< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_inverse_distance_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Distance::PlaneDistanceFunctionSD< component_, dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d_1_1_evaluator.html", null ]
     ] ],
     [ "FEAT::Space::CaiDouSanSheYe::Evaluator< FacetType, DataType_ >", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_evaluator.html", null ],
@@ -220,7 +221,6 @@ var hierarchy =
     [ "FEAT::Analytic::EvalTraitsBase< DataType_, domain_dim_, Image::Scalar >", "struct_f_e_a_t_1_1_analytic_1_1_eval_traits_base_3_01_data_type___00_01domain__dim___00_01_image_1_1_scalar_01_4.html", null ],
     [ "FEAT::Analytic::EvalTraitsBase< DataType_, domain_dim_, Image::Vector< image_dim_ > >", "struct_f_e_a_t_1_1_analytic_1_1_eval_traits_base_3_01_data_type___00_01domain__dim___00_01_image55653a181e5217b83cea43e69e5552e5.html", null ],
     [ "FEAT::Analytic::Function", "class_f_e_a_t_1_1_analytic_1_1_function.html", [
-      [ "FEAT::Analytic::Common::BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", null ],
       [ "FEAT::Analytic::Common::ConstantFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", null ],
       [ "FEAT::Analytic::Common::ConstantVectorFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", null ],
@@ -243,6 +243,7 @@ var hierarchy =
       [ "FEAT::Analytic::Common::SineRingVortexPres2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_ring_vortex_pres2_d.html", null ],
       [ "FEAT::Analytic::Common::SineRingVortexRHS2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_ring_vortex_r_h_s2_d.html", null ],
       [ "FEAT::Analytic::Common::SineRingVortexVelo2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_ring_vortex_velo2_d.html", null ],
+      [ "FEAT::Analytic::Common::SphereCapFunction< dim_, a_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function.html", null ],
       [ "FEAT::Analytic::Common::SphereSinBubbleFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_sin_bubble_function.html", null ],
       [ "FEAT::Analytic::Common::StandingVortexFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d.html", null ],
       [ "FEAT::Analytic::Common::TaylorGreenVortexPres2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_taylor_green_vortex_pres2_d.html", null ],
@@ -252,6 +253,7 @@ var hierarchy =
       [ "FEAT::Analytic::Curl< Function_ >", "class_f_e_a_t_1_1_analytic_1_1_curl.html", null ],
       [ "FEAT::Analytic::Distance::DistanceFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function.html", null ],
       [ "FEAT::Analytic::Distance::DistanceFunctionSD< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d.html", null ],
+      [ "FEAT::Analytic::Distance::InverseDistanceFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_inverse_distance_function.html", null ],
       [ "FEAT::Analytic::Distance::PlaneDistanceFunctionSD< component_, dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d.html", null ],
       [ "FEAT::Analytic::Divergence< Function_ >", "class_f_e_a_t_1_1_analytic_1_1_divergence.html", null ],
       [ "FEAT::Analytic::Gradient< Function_ >", "class_f_e_a_t_1_1_analytic_1_1_gradient.html", null ],
@@ -268,11 +270,11 @@ var hierarchy =
     ] ],
     [ "FEAT::Analytic::Function::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_function_1_1_evaluator.html", [
       [ "FEAT::Analytic::AutoDerive< Function_, DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_auto_derive_1_1_evaluator.html", null ],
-      [ "FEAT::Analytic::Common::BallCapFunction2D::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2D< DT_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2DRadial< DT_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ParProfileScalar< DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_scalar_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ParProfileVector< DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_vector_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::Common::SphereCapFunction< dim_, a_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::StandingVortexFunction2D::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Curl< Function_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_curl_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Divergence< Function_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_divergence_1_1_evaluator.html", null ],
@@ -408,6 +410,7 @@ var hierarchy =
     [ "FEAT::Assembly::ScalarErrorComputer< max_norm_, sub_dimensional_ >", "class_f_e_a_t_1_1_assembly_1_1_scalar_error_computer.html", null ],
     [ "FEAT::Assembly::ScalarErrorInfo< DataType_ >", "struct_f_e_a_t_1_1_assembly_1_1_scalar_error_info.html", null ],
     [ "FEAT::Assembly::SlipFilterAssembler< Trafo_ >", "class_f_e_a_t_1_1_assembly_1_1_slip_filter_assembler.html", null ],
+    [ "FEAT::Assembly::SpaceTransfer", "class_f_e_a_t_1_1_assembly_1_1_space_transfer.html", null ],
     [ "FEAT::Assembly::StokesFBMAssembler< MeshType_ >", "class_f_e_a_t_1_1_assembly_1_1_stokes_f_b_m_assembler.html", null ],
     [ "FEAT::Assembly::SymbolicAssembler", "class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html", null ],
     [ "FEAT::Assembly::TraceAssembler< Trafo_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html", null ],
@@ -1024,7 +1027,8 @@ var hierarchy =
       ] ],
       [ "FEAT::Space::ParametricEvaluator< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >, TrafoEvaluator_, SpaceEvalTraits_, ref_caps >", "class_f_e_a_t_1_1_space_1_1_parametric_evaluator.html", [
         [ "FEAT::Space::Bernstein2::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >", "class_f_e_a_t_1_1_space_1_1_bernstein2_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_82866b3cc738de4ae4935135fac5e732.html", null ],
-        [ "FEAT::Space::Lagrange1::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >", "class_f_e_a_t_1_1_space_1_1_lagrange1_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sfefdf9344ae32fc63142f60cb7a695a8.html", null ]
+        [ "FEAT::Space::Lagrange1::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >", "class_f_e_a_t_1_1_space_1_1_lagrange1_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sfefdf9344ae32fc63142f60cb7a695a8.html", null ],
+        [ "FEAT::Space::Lagrange3::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html", null ]
       ] ],
       [ "FEAT::Space::ParametricEvaluator< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >, TrafoEvaluator_, SpaceEvalTraits_, ref_caps >", "class_f_e_a_t_1_1_space_1_1_parametric_evaluator.html", [
         [ "FEAT::Space::CaiDouSanSheYe::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_evaluator_3_01_space___00_01_trafo_evaluator_cd584e2ae53d2b4306ff680d7265a0ec.html", null ]
@@ -1044,9 +1048,6 @@ var hierarchy =
         [ "FEAT::Space::Discontinuous::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Variant::StdPolyP< 1 >, Shape::Simplex< shape_dim_ > >", "class_f_e_a_t_1_1_space_1_1_discontinuous_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_b2c6b42d6f9b9e25d469d3575a373a61.html", null ]
       ] ],
       [ "FEAT::Space::ParametricEvaluator< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, typename Space_::ShapeType >, TrafoEvaluator_, SpaceEvalTraits_, ref_caps >", "class_f_e_a_t_1_1_space_1_1_parametric_evaluator.html", null ],
-      [ "FEAT::Space::ParametricEvaluator< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_3d >", "class_f_e_a_t_1_1_space_1_1_parametric_evaluator.html", [
-        [ "FEAT::Space::Lagrange3::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html", null ]
-      ] ],
       [ "FEAT::Space::ParametricEvaluator< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Simplex< 3 > >, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_3d >", "class_f_e_a_t_1_1_space_1_1_parametric_evaluator.html", [
         [ "FEAT::Space::Lagrange3::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Simplex< 3 > >", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sb3aa60112044c986d3e79f1b1403fdf7.html", null ]
       ] ],
@@ -1445,6 +1446,7 @@ var hierarchy =
       [ "FEAT::Exception", "class_f_e_a_t_1_1_exception.html", [
         [ "FEAT::Analytic::ParsedFunctionEvalError", "class_f_e_a_t_1_1_analytic_1_1_parsed_function_eval_error.html", null ],
         [ "FEAT::Assembly::GridTransfer::LocalMassMatrixSingularException", "class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html", null ],
+        [ "FEAT::Assembly::SpaceTransfer::LocalMassMatrixSingularException", "class_f_e_a_t_1_1_assembly_1_1_space_transfer_1_1_local_mass_matrix_singular_exception.html", null ],
         [ "FEAT::Cubature::UnknownRule", "class_f_e_a_t_1_1_cubature_1_1_unknown_rule.html", null ],
         [ "FEAT::FileError", "class_f_e_a_t_1_1_file_error.html", [
           [ "FEAT::FileNotCreated", "class_f_e_a_t_1_1_file_not_created.html", null ],
@@ -1494,6 +1496,7 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< CoordType, shape_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, 2 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, conv_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Tiny::Vector< DataType, dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, domain_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, max_local_dofs >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],

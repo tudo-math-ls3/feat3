@@ -9,7 +9,7 @@ var class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping =
     [ "ShapeType", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#af4cca54c6133ac4d86b287e9e4505cb4", null ],
     [ "Mapping", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a66e7960ec82e3379940ad72e29ef7dba", null ],
     [ "add_meshpart_chart", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#ac32a0181f5ef996cc77e8da21a2b0fa8", null ],
-    [ "clear", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a7a093cae6da75925c1f40bb84f24e4fe", null ],
+    [ "clear_charts", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#aaa486dabba364bec21dd2e838a73dd0a", null ],
     [ "get_charts_vector", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a718350f4be058e681d77c699611e2d9b", null ],
     [ "get_mesh", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#a08e99c74983c4fbbbd1d214be96ff1d1", null ],
     [ "get_mesh", "class_f_e_a_t_1_1_trafo_1_1_isoparam_1_1_mapping.html#ae9aa275b0ab1e749a5ccc0ad46887c60", null ],

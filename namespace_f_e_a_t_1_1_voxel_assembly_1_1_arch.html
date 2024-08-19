@@ -112,28 +112,28 @@ $(document).ready(function(){initNavTree('namespace_f_e_a_t_1_1_voxel_assembly_1
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a808b692a464bb1252babcd9427db077a"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
-<tr class="memitem:a808b692a464bb1252babcd9427db077a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a808b692a464bb1252babcd9427db077a">assemble_burgers_csr</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const DT_ *conv_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;coloring_maps_host, const std::vector&lt; void * &gt; &amp;coloring_maps_device, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
-<tr class="memdesc:a808b692a464bb1252babcd9427db077a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the full matrix burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a808b692a464bb1252babcd9427db077a">More...</a><br /></td></tr>
-<tr class="separator:a808b692a464bb1252babcd9427db077a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a9e8496b6a48892a2c8ea08cd845d98"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
-<tr class="memitem:a1a9e8496b6a48892a2c8ea08cd845d98"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1a9e8496b6a48892a2c8ea08cd845d98">assemble_burgers_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const DT_ *conv_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;coloring_maps_host, const std::vector&lt; void * &gt; &amp;coloring_maps_device, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
-<tr class="memdesc:a1a9e8496b6a48892a2c8ea08cd845d98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the full matrix burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1a9e8496b6a48892a2c8ea08cd845d98">More...</a><br /></td></tr>
-<tr class="separator:a1a9e8496b6a48892a2c8ea08cd845d98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21c7659a8aeafcb97f412d725dc78393"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
-<tr class="memitem:a21c7659a8aeafcb97f412d725dc78393"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a21c7659a8aeafcb97f412d725dc78393">assemble_burgers_defect</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;coloring_maps_host, const std::vector&lt; void * &gt; &amp;coloring_maps_device, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
-<tr class="memdesc:a21c7659a8aeafcb97f412d725dc78393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a21c7659a8aeafcb97f412d725dc78393">More...</a><br /></td></tr>
-<tr class="separator:a21c7659a8aeafcb97f412d725dc78393"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b164b2e538cf16bfb66e688ba40e30a"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
-<tr class="memitem:a1b164b2e538cf16bfb66e688ba40e30a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1b164b2e538cf16bfb66e688ba40e30a">assemble_burgers_defect_host</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;coloring_maps_host, const std::vector&lt; void * &gt; &amp;coloring_maps_device, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
-<tr class="memdesc:a1b164b2e538cf16bfb66e688ba40e30a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1b164b2e538cf16bfb66e688ba40e30a">More...</a><br /></td></tr>
-<tr class="separator:a1b164b2e538cf16bfb66e688ba40e30a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d3009475b5095e5d2b8cea131a0a4ee"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
-<tr class="memitem:a4d3009475b5095e5d2b8cea131a0a4ee"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a4d3009475b5095e5d2b8cea131a0a4ee">assemble_defo_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;coloring_maps_host, const std::vector&lt; void * &gt; &amp;coloring_maps_device, DT_ alpha, DT_ nu)</td></tr>
-<tr class="separator:a4d3009475b5095e5d2b8cea131a0a4ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63656fbbcdd15df61f6245031c2b043f"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
-<tr class="memitem:a63656fbbcdd15df61f6245031c2b043f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a63656fbbcdd15df61f6245031c2b043f">assemble_poisson_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;coloring_maps_host, const std::vector&lt; void * &gt; &amp;coloring_maps_device, DT_ alpha)</td></tr>
-<tr class="separator:a63656fbbcdd15df61f6245031c2b043f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c9dabf44d9b61752740b6a587ca1b51"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a9c9dabf44d9b61752740b6a587ca1b51"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a9c9dabf44d9b61752740b6a587ca1b51">assemble_burgers_csr</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const DT_ *conv_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
+<tr class="memdesc:a9c9dabf44d9b61752740b6a587ca1b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the full matrix burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a9c9dabf44d9b61752740b6a587ca1b51">More...</a><br /></td></tr>
+<tr class="separator:a9c9dabf44d9b61752740b6a587ca1b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b2f1aefbd0865db566b4cf48f34c49a"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a6b2f1aefbd0865db566b4cf48f34c49a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a6b2f1aefbd0865db566b4cf48f34c49a">assemble_burgers_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const DT_ *conv_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
+<tr class="memdesc:a6b2f1aefbd0865db566b4cf48f34c49a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the full matrix burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a6b2f1aefbd0865db566b4cf48f34c49a">More...</a><br /></td></tr>
+<tr class="separator:a6b2f1aefbd0865db566b4cf48f34c49a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaed62a52a2917d948b7685b7d0c51d49"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:aaed62a52a2917d948b7685b7d0c51d49"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aaed62a52a2917d948b7685b7d0c51d49">assemble_burgers_defect</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
+<tr class="memdesc:aaed62a52a2917d948b7685b7d0c51d49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aaed62a52a2917d948b7685b7d0c51d49">More...</a><br /></td></tr>
+<tr class="separator:aaed62a52a2917d948b7685b7d0c51d49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e6a55472d415879ff5a6899a016ae5c"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a3e6a55472d415879ff5a6899a016ae5c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c">assemble_burgers_defect_host</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
+<tr class="memdesc:a3e6a55472d415879ff5a6899a016ae5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c">More...</a><br /></td></tr>
+<tr class="separator:a3e6a55472d415879ff5a6899a016ae5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac166440142faa086bc36d8abc7ab1e2e"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:ac166440142faa086bc36d8abc7ab1e2e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#ac166440142faa086bc36d8abc7ab1e2e">assemble_defo_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, DT_ nu)</td></tr>
+<tr class="separator:ac166440142faa086bc36d8abc7ab1e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f4033a874f36eccc29418becb814530"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a0f4033a874f36eccc29418becb814530"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a0f4033a874f36eccc29418becb814530">assemble_poisson_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha)</td></tr>
+<tr class="separator:a0f4033a874f36eccc29418becb814530"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5bb883737c2cc04cc1ec321a2308fae"><td class="memTemplParams" colspan="2">template&lt;typename DT_ , typename IT_ , int dim_&gt; </td></tr>
 <tr class="memitem:aa5bb883737c2cc04cc1ec321a2308fae"><td class="memTemplItemLeft" align="right" valign="top">DT_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aa5bb883737c2cc04cc1ec321a2308fae">get_sd_v_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">Global::Vector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DT_, IT_, dim_ &gt;, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt; DT_, IT_ &gt; &gt; &amp;convect)</td></tr>
 <tr class="memdesc:aa5bb883737c2cc04cc1ec321a2308fae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the global sd_v_norm calculation.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aa5bb883737c2cc04cc1ec321a2308fae">More...</a><br /></td></tr>
@@ -154,8 +154,8 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Namespace for the kernel wrapper. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a808b692a464bb1252babcd9427db077a" name="a808b692a464bb1252babcd9427db077a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a808b692a464bb1252babcd9427db077a">&#9670;&#160;</a></span>assemble_burgers_csr()</h2>
+<a id="a9c9dabf44d9b61752740b6a587ca1b51" name="a9c9dabf44d9b61752740b6a587ca1b51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c9dabf44d9b61752740b6a587ca1b51">&#9670;&#160;</a></span>assemble_burgers_csr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -195,14 +195,14 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_host</em>, </td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; void * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_device</em>, </td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -241,8 +241,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">conv_data</td><td>The data array of the convection vector. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. Datapointer have to be device pointer. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. Datapointer have to be devicepointer. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_host</td><td>A vector of the dof indices per color. Since on host side, actual data is ignored, but sizes have to be correct. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_device</td><td>A vector of the dof indices per color. Inner pointers have to be device pointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
   </table>
@@ -251,8 +251,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 
 </div>
 </div>
-<a id="a1a9e8496b6a48892a2c8ea08cd845d98" name="a1a9e8496b6a48892a2c8ea08cd845d98"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a9e8496b6a48892a2c8ea08cd845d98">&#9670;&#160;</a></span>assemble_burgers_csr_host()</h2>
+<a id="a6b2f1aefbd0865db566b4cf48f34c49a" name="a6b2f1aefbd0865db566b4cf48f34c49a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b2f1aefbd0865db566b4cf48f34c49a">&#9670;&#160;</a></span>assemble_burgers_csr_host()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -292,14 +292,14 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_host</em>, </td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; void * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_device</em>, </td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -338,8 +338,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">conv_data</td><td>The data array of the convection vector. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. Data has to be allocated on host side. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_host</td><td>A vector of the dof indices per color. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_device</td><td>A vector of the dof indices per color. Data is ignored. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
   </table>
@@ -352,8 +352,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 
 </div>
 </div>
-<a id="a21c7659a8aeafcb97f412d725dc78393" name="a21c7659a8aeafcb97f412d725dc78393"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21c7659a8aeafcb97f412d725dc78393">&#9670;&#160;</a></span>assemble_burgers_defect()</h2>
+<a id="aaed62a52a2917d948b7685b7d0c51d49" name="aaed62a52a2917d948b7685b7d0c51d49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaed62a52a2917d948b7685b7d0c51d49">&#9670;&#160;</a></span>assemble_burgers_defect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -399,14 +399,14 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_host</em>, </td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; void * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_device</em>, </td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -446,8 +446,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">primal_data</td><td>The data array of the primal vector the matrix is applied to. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. Datapointer have to be device pointer. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. Datapointer have to be devicepointer. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_host</td><td>A vector of the dof indices per color. Since on host side, actual data is ignored, but sizes have to be correct. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_device</td><td>A vector of the dof indices per color. Inner pointers have to be device pointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
   </table>
@@ -456,8 +456,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 
 </div>
 </div>
-<a id="a1b164b2e538cf16bfb66e688ba40e30a" name="a1b164b2e538cf16bfb66e688ba40e30a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b164b2e538cf16bfb66e688ba40e30a">&#9670;&#160;</a></span>assemble_burgers_defect_host()</h2>
+<a id="a3e6a55472d415879ff5a6899a016ae5c" name="a3e6a55472d415879ff5a6899a016ae5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e6a55472d415879ff5a6899a016ae5c">&#9670;&#160;</a></span>assemble_burgers_defect_host()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -503,14 +503,14 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_host</em>, </td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; void * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_device</em>, </td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -550,8 +550,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">primal_data</td><td>The data array of the primal vector the matrix is applied to. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_host</td><td>A vector of the dof indices per color. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps_device</td><td>A vector of the dof indices per color. Data is ignored. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
   </table>
@@ -564,8 +564,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 
 </div>
 </div>
-<a id="a4d3009475b5095e5d2b8cea131a0a4ee" name="a4d3009475b5095e5d2b8cea131a0a4ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d3009475b5095e5d2b8cea131a0a4ee">&#9670;&#160;</a></span>assemble_defo_csr_host()</h2>
+<a id="ac166440142faa086bc36d8abc7ab1e2e" name="ac166440142faa086bc36d8abc7ab1e2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac166440142faa086bc36d8abc7ab1e2e">&#9670;&#160;</a></span>assemble_defo_csr_host()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -599,14 +599,14 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_host</em>, </td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; void * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_device</em>, </td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -632,8 +632,8 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 
 </div>
 </div>
-<a id="a63656fbbcdd15df61f6245031c2b043f" name="a63656fbbcdd15df61f6245031c2b043f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63656fbbcdd15df61f6245031c2b043f">&#9670;&#160;</a></span>assemble_poisson_csr_host()</h2>
+<a id="a0f4033a874f36eccc29418becb814530" name="a0f4033a874f36eccc29418becb814530"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f4033a874f36eccc29418becb814530">&#9670;&#160;</a></span>assemble_poisson_csr_host()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -667,14 +667,14 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_host</em>, </td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; void * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>coloring_maps_device</em>, </td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

@@ -743,68 +743,86 @@ $(document).ready(function(){initNavTree('domain__control_8hpp_source.html','');
 <div class="line"><a id="l00710" name="l00710"></a><span class="lineno">  710</span>          _comm.<a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a0d3bba422418ba86aedeb33bf88edc43">allreduce</a>(&amp;my_virt_size, &amp;_virt_size, std::size_t(1), <a class="code hl_variable" href="namespace_f_e_a_t_1_1_dist.html#aa3861018cc031cde76ced1fb73c9a979">Dist::op_max</a>);</div>
 <div class="line"><a id="l00711" name="l00711"></a><span class="lineno">  711</span>        }</div>
 <div class="line"><a id="l00712" name="l00712"></a><span class="lineno">  712</span> </div>
-<div class="line"><a id="l00713" name="l00713"></a><span class="lineno">  713</span>        String dump_layers()<span class="keyword"> const</span></div>
-<div class="line"><a id="l00714" name="l00714"></a><span class="lineno">  714</span><span class="keyword">        </span>{</div>
-<div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span>          String msg;</div>
-<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span>          msg += <span class="stringliteral">&quot;(&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(_layers.size()) + <span class="stringliteral">&quot;):&quot;</span>;</div>
-<div class="line"><a id="l00717" name="l00717"></a><span class="lineno">  717</span>          <span class="keywordflow">for</span>(std::size_t i(0); i &lt; _layers.size(); ++i)</div>
-<div class="line"><a id="l00718" name="l00718"></a><span class="lineno">  718</span>          {</div>
-<div class="line"><a id="l00719" name="l00719"></a><span class="lineno">  719</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; lyr = *_layers.at(i);</div>
-<div class="line"><a id="l00720" name="l00720"></a><span class="lineno">  720</span>            std::size_t np = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>(lyr.comm().size()));</div>
-<div class="line"><a id="l00721" name="l00721"></a><span class="lineno">  721</span>            <span class="keywordflow">if</span>(i &gt; std::size_t(0))</div>
-<div class="line"><a id="l00722" name="l00722"></a><span class="lineno">  722</span>              msg += <span class="stringliteral">&quot; |&quot;</span>;</div>
-<div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span>            msg += <span class="stringliteral">&quot; [&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(lyr.comm().rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np) + <span class="stringliteral">&quot;]&quot;</span>;</div>
-<div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span>            <span class="keywordflow">if</span>(lyr.is_child())</div>
-<div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span>            {</div>
-<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span>              std::size_t ns = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>(lyr.comm().size()));</div>
-<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span>              msg += <span class="stringliteral">&quot; &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(lyr.sibling_comm_ptr()-&gt;rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(ns);</div>
-<div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span>              msg += <span class="stringliteral">&quot; {&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(lyr.get_parent_rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np);</div>
-<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>              msg += lyr.is_parent() ? <span class="stringliteral">&quot;*}&quot;</span> : <span class="stringliteral">&quot; }&quot;</span>;</div>
-<div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span>            }</div>
-<div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span>          }</div>
-<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>          <span class="keywordflow">return</span> msg;</div>
-<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span>        }</div>
-<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span> </div>
-<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span>        String dump_layer_levels()<span class="keyword"> const</span></div>
-<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span><span class="keyword">        </span>{</div>
-<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span>          String msg;</div>
-<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span>          <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = _layer_levels.begin(); it != _layer_levels.end(); ++it)</div>
-<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span>          {</div>
-<div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span>            <span class="keywordflow">if</span>(it != _layer_levels.begin())</div>
-<div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span>              msg += <span class="stringliteral">&quot; |&quot;</span>;</div>
-<div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span> jt = it-&gt;begin(); jt != it-&gt;end(); ++jt)</div>
-<div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span>              msg += <span class="stringliteral">&quot; &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*jt)-&gt;get_level_index());</div>
-<div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span>          }</div>
-<div class="line"><a id="l00745" name="l00745"></a><span class="lineno">  745</span>          <span class="keywordflow">return</span> msg;</div>
-<div class="line"><a id="l00746" name="l00746"></a><span class="lineno">  746</span>        }</div>
-<div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span> </div>
-<div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span>        String dump_virt_levels()<span class="keyword"> const</span></div>
-<div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span><span class="keyword">        </span>{</div>
-<div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span>          String msg;</div>
-<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span>          <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = _virt_levels.begin(); it != _virt_levels.end(); ++it)</div>
-<div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span>          {</div>
-<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span>            std::size_t np = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>((*it).layer().comm().size()));</div>
-<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span>            <span class="keywordflow">if</span>((*it).is_child())</div>
-<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span>              np = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>((*it).layer_c().comm().size()));</div>
-<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span>            msg += <span class="stringliteral">&quot; &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it)-&gt;get_level_index());</div>
-<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span>            msg += <span class="stringliteral">&quot;[&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it).layer().comm().size()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np) + <span class="stringliteral">&quot;]&quot;</span>;</div>
-<div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span>            <span class="keywordflow">if</span>((*it).is_child())</div>
-<div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span>            {</div>
-<div class="line"><a id="l00760" name="l00760"></a><span class="lineno">  760</span>              msg += <span class="stringliteral">&quot; { &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it).layer_c().get_parent_rank());</div>
-<div class="line"><a id="l00761" name="l00761"></a><span class="lineno">  761</span>              <span class="keywordflow">if</span>((*it).is_parent())</div>
-<div class="line"><a id="l00762" name="l00762"></a><span class="lineno">  762</span>                msg += <span class="stringliteral">&quot;:&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it).layer_p().comm().rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np) + <span class="stringliteral">&quot;}&quot;</span>;</div>
-<div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span>              <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00764" name="l00764"></a><span class="lineno">  764</span>                msg += String(np+1, <span class="charliteral">&#39; &#39;</span>) + <span class="stringliteral">&quot;}&quot;</span>;</div>
-<div class="line"><a id="l00765" name="l00765"></a><span class="lineno">  765</span>            }</div>
-<div class="line"><a id="l00766" name="l00766"></a><span class="lineno">  766</span>          }</div>
-<div class="line"><a id="l00767" name="l00767"></a><span class="lineno">  767</span>          <span class="keywordflow">return</span> msg;</div>
-<div class="line"><a id="l00768" name="l00768"></a><span class="lineno">  768</span>        }</div>
-<div class="line"><a id="l00769" name="l00769"></a><span class="lineno">  769</span>      }; <span class="comment">// class DomainControl&lt;...&gt;</span></div>
-<div class="line"><a id="l00770" name="l00770"></a><span class="lineno">  770</span>    } <span class="comment">// namespace Domain</span></div>
-<div class="line"><a id="l00771" name="l00771"></a><span class="lineno">  771</span>  } <span class="comment">// namespace Control</span></div>
-<div class="line"><a id="l00772" name="l00772"></a><span class="lineno">  772</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00773" name="l00773"></a><span class="lineno">  773</span> </div>
-<div class="line"><a id="l00774" name="l00774"></a><span class="lineno">  774</span><span class="preprocessor">#endif </span><span class="comment">// CONTROL_DOMAIN_DOMAIN_CONTROL_HPP</span></div>
+<div class="line"><a id="l00713" name="l00713"></a><span class="lineno">  713</span>        <span class="keywordtype">void</span> add_trafo_mesh_part_charts()</div>
+<div class="line"><a id="l00714" name="l00714"></a><span class="lineno">  714</span>        {</div>
+<div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span>          <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; bl : _base_levels)</div>
+<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span>            bl-&gt;add_trafo_mesh_part_charts();</div>
+<div class="line"><a id="l00717" name="l00717"></a><span class="lineno">  717</span>          <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; ll : _layer_levels)</div>
+<div class="line"><a id="l00718" name="l00718"></a><span class="lineno">  718</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; l : ll)</div>
+<div class="line"><a id="l00719" name="l00719"></a><span class="lineno">  719</span>              l-&gt;add_trafo_mesh_part_charts();</div>
+<div class="line"><a id="l00720" name="l00720"></a><span class="lineno">  720</span>          <span class="comment">/*for(auto it = _virt_levels.begin(); it != _virt_levels.end(); ++it)</span></div>
+<div class="line"><a id="l00721" name="l00721"></a><span class="lineno">  721</span><span class="comment">          {</span></div>
+<div class="line"><a id="l00722" name="l00722"></a><span class="lineno">  722</span><span class="comment">            if(it-&gt;is_parent())</span></div>
+<div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span><span class="comment">              it-&gt;level_p().add_trafo_mesh_part_charts();</span></div>
+<div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span><span class="comment">            if(it-&gt;is_child())</span></div>
+<div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span><span class="comment">              it-&gt;level_c().add_trafo_mesh_part_charts();</span></div>
+<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span><span class="comment">            else</span></div>
+<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span><span class="comment">              it-&gt;level().add_trafo_mesh_part_charts();</span></div>
+<div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span><span class="comment">          }*/</span></div>
+<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>        }</div>
+<div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span> </div>
+<div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span>        String dump_layers()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span><span class="keyword">        </span>{</div>
+<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span>          String msg;</div>
+<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span>          msg += <span class="stringliteral">&quot;(&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(_layers.size()) + <span class="stringliteral">&quot;):&quot;</span>;</div>
+<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span>          <span class="keywordflow">for</span>(std::size_t i(0); i &lt; _layers.size(); ++i)</div>
+<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span>          {</div>
+<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; lyr = *_layers.at(i);</div>
+<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span>            std::size_t np = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>(lyr.comm().size()));</div>
+<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span>            <span class="keywordflow">if</span>(i &gt; std::size_t(0))</div>
+<div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span>              msg += <span class="stringliteral">&quot; |&quot;</span>;</div>
+<div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span>            msg += <span class="stringliteral">&quot; [&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(lyr.comm().rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np) + <span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span>            <span class="keywordflow">if</span>(lyr.is_child())</div>
+<div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span>            {</div>
+<div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span>              std::size_t ns = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>(lyr.comm().size()));</div>
+<div class="line"><a id="l00745" name="l00745"></a><span class="lineno">  745</span>              msg += <span class="stringliteral">&quot; &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(lyr.sibling_comm_ptr()-&gt;rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(ns);</div>
+<div class="line"><a id="l00746" name="l00746"></a><span class="lineno">  746</span>              msg += <span class="stringliteral">&quot; {&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>(lyr.get_parent_rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np);</div>
+<div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span>              msg += lyr.is_parent() ? <span class="stringliteral">&quot;*}&quot;</span> : <span class="stringliteral">&quot; }&quot;</span>;</div>
+<div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span>            }</div>
+<div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span>          }</div>
+<div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span>          <span class="keywordflow">return</span> msg;</div>
+<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span>        }</div>
+<div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span> </div>
+<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span>        String dump_layer_levels()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span><span class="keyword">        </span>{</div>
+<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span>          String msg;</div>
+<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span>          <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = _layer_levels.begin(); it != _layer_levels.end(); ++it)</div>
+<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span>          {</div>
+<div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span>            <span class="keywordflow">if</span>(it != _layer_levels.begin())</div>
+<div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span>              msg += <span class="stringliteral">&quot; |&quot;</span>;</div>
+<div class="line"><a id="l00760" name="l00760"></a><span class="lineno">  760</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span> jt = it-&gt;begin(); jt != it-&gt;end(); ++jt)</div>
+<div class="line"><a id="l00761" name="l00761"></a><span class="lineno">  761</span>              msg += <span class="stringliteral">&quot; &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*jt)-&gt;get_level_index());</div>
+<div class="line"><a id="l00762" name="l00762"></a><span class="lineno">  762</span>          }</div>
+<div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span>          <span class="keywordflow">return</span> msg;</div>
+<div class="line"><a id="l00764" name="l00764"></a><span class="lineno">  764</span>        }</div>
+<div class="line"><a id="l00765" name="l00765"></a><span class="lineno">  765</span> </div>
+<div class="line"><a id="l00766" name="l00766"></a><span class="lineno">  766</span>        String dump_virt_levels()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00767" name="l00767"></a><span class="lineno">  767</span><span class="keyword">        </span>{</div>
+<div class="line"><a id="l00768" name="l00768"></a><span class="lineno">  768</span>          String msg;</div>
+<div class="line"><a id="l00769" name="l00769"></a><span class="lineno">  769</span>          <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = _virt_levels.begin(); it != _virt_levels.end(); ++it)</div>
+<div class="line"><a id="l00770" name="l00770"></a><span class="lineno">  770</span>          {</div>
+<div class="line"><a id="l00771" name="l00771"></a><span class="lineno">  771</span>            std::size_t np = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>((*it).layer().comm().size()));</div>
+<div class="line"><a id="l00772" name="l00772"></a><span class="lineno">  772</span>            <span class="keywordflow">if</span>((*it).is_child())</div>
+<div class="line"><a id="l00773" name="l00773"></a><span class="lineno">  773</span>              np = std::size_t(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06">Math::ilog10</a>((*it).layer_c().comm().size()));</div>
+<div class="line"><a id="l00774" name="l00774"></a><span class="lineno">  774</span>            msg += <span class="stringliteral">&quot; &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it)-&gt;get_level_index());</div>
+<div class="line"><a id="l00775" name="l00775"></a><span class="lineno">  775</span>            msg += <span class="stringliteral">&quot;[&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it).layer().comm().size()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np) + <span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><a id="l00776" name="l00776"></a><span class="lineno">  776</span>            <span class="keywordflow">if</span>((*it).is_child())</div>
+<div class="line"><a id="l00777" name="l00777"></a><span class="lineno">  777</span>            {</div>
+<div class="line"><a id="l00778" name="l00778"></a><span class="lineno">  778</span>              msg += <span class="stringliteral">&quot; { &quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it).layer_c().get_parent_rank());</div>
+<div class="line"><a id="l00779" name="l00779"></a><span class="lineno">  779</span>              <span class="keywordflow">if</span>((*it).is_parent())</div>
+<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span>                msg += <span class="stringliteral">&quot;:&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">stringify</a>((*it).layer_p().comm().rank()).<a class="code hl_function" href="class_f_e_a_t_1_1_string.html#ac8f44f2b1d8f4c2952538e8639319585">pad_front</a>(np) + <span class="stringliteral">&quot;}&quot;</span>;</div>
+<div class="line"><a id="l00781" name="l00781"></a><span class="lineno">  781</span>              <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00782" name="l00782"></a><span class="lineno">  782</span>                msg += String(np+1, <span class="charliteral">&#39; &#39;</span>) + <span class="stringliteral">&quot;}&quot;</span>;</div>
+<div class="line"><a id="l00783" name="l00783"></a><span class="lineno">  783</span>            }</div>
+<div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span>          }</div>
+<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>          <span class="keywordflow">return</span> msg;</div>
+<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span>        }</div>
+<div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span>      }; <span class="comment">// class DomainControl&lt;...&gt;</span></div>
+<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>    } <span class="comment">// namespace Domain</span></div>
+<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span>  } <span class="comment">// namespace Control</span></div>
+<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span> </div>
+<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span><span class="preprocessor">#endif </span><span class="comment">// CONTROL_DOMAIN_DOMAIN_CONTROL_HPP</span></div>
 <div class="ttc" id="aassertion_8hpp_html_af5c647b0786db55f57452bfc26726bde"><div class="ttname"><a href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a></div><div class="ttdeci">#define XASSERT(expr)</div><div class="ttdoc">Assertion macro definition.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00264">assertion.hpp:264</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control_html"><div class="ttname"><a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html">FEAT::Control::Domain::DomainControl</a></div><div class="ttdoc">Domain control base-class template.</div><div class="ttdef"><b>Definition:</b> <a href="domain__control_8hpp_source.html#l00410">domain_control.hpp:411</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control_html_a426bf2533f64c2ebafc4112b72626347"><div class="ttname"><a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html#a426bf2533f64c2ebafc4112b72626347">FEAT::Control::Domain::DomainControl::has_ghost</a></div><div class="ttdeci">bool has_ghost() const</div><div class="ttdef"><b>Definition:</b> <a href="domain__control_8hpp_source.html#l00554">domain_control.hpp:554</a></div></div>

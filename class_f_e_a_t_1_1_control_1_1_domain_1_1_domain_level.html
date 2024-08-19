@@ -104,6 +104,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_control_1_1_domain_1
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Control::Domain::DomainLevel&lt; Mesh_ &gt; Class Template Reference</div></div>
@@ -123,6 +124,8 @@ Inheritance diagram for FEAT::Control::Domain::DomainLevel&lt; Mesh_ &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:aebce2abe7f0c7c9692db8adf4339ff76"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html">Geometry::Atlas::ChartBase</a>&lt; MeshType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html#aebce2abe7f0c7c9692db8adf4339ff76">ChartType</a></td></tr>
+<tr class="separator:aebce2abe7f0c7c9692db8adf4339ff76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7599c0f57c175d75e1633c49afd967e7"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">Geometry::RootMeshNode</a>&lt; MeshType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html#a7599c0f57c175d75e1633c49afd967e7">MeshNodeType</a></td></tr>
 <tr class="separator:a7599c0f57c175d75e1633c49afd967e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92f27e174e8eaae4286cedc7ae64afa1"><td class="memItemLeft" align="right" valign="top">typedef Mesh_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html#a92f27e174e8eaae4286cedc7ae64afa1">MeshType</a></td></tr>
@@ -155,6 +158,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a98742249658acef278f1c1154d294d34"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">MeshNodeType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html#a98742249658acef278f1c1154d294d34">get_mesh_node</a> () const</td></tr>
 <tr class="separator:a98742249658acef278f1c1154d294d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a842b79ee7040e76e74f177c0f12b90a3"><td class="memTemplParams" colspan="2">template&lt;typename Trafo_ &gt; </td></tr>
+<tr class="memitem:a842b79ee7040e76e74f177c0f12b90a3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html#a842b79ee7040e76e74f177c0f12b90a3">_add_trafo_mesh_part_charts</a> (Trafo_ &amp;trafo)</td></tr>
+<tr class="separator:a842b79ee7040e76e74f177c0f12b90a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a9547d0436b92644e4b5697ae27f489e8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html#a9547d0436b92644e4b5697ae27f489e8">_level_index</a></td></tr>
@@ -167,6 +176,24 @@ Protected Attributes</h2></td></tr>
 class FEAT::Control::Domain::DomainLevel&lt; Mesh_ &gt;</div>
 <p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00021">21</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="aebce2abe7f0c7c9692db8adf4339ff76" name="aebce2abe7f0c7c9692db8adf4339ff76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebce2abe7f0c7c9692db8adf4339ff76">&#9670;&#160;</a></span>ChartType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html">Geometry::Atlas::ChartBase</a>&lt;MeshType&gt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html">FEAT::Control::Domain::DomainLevel</a>&lt; Mesh_ &gt;::ChartType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00028">28</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a7599c0f57c175d75e1633c49afd967e7" name="a7599c0f57c175d75e1633c49afd967e7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7599c0f57c175d75e1633c49afd967e7">&#9670;&#160;</a></span>MeshNodeType</h2>
 
@@ -276,7 +303,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00034">34</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00035">35</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -306,7 +333,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00043">43</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00044">44</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -335,11 +362,43 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00049">49</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00050">50</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a842b79ee7040e76e74f177c0f12b90a3" name="a842b79ee7040e76e74f177c0f12b90a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a842b79ee7040e76e74f177c0f12b90a3">&#9670;&#160;</a></span>_add_trafo_mesh_part_charts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename Trafo_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html">FEAT::Control::Domain::DomainLevel</a>&lt; Mesh_ &gt;::_add_trafo_mesh_part_charts </td>
+          <td>(</td>
+          <td class="paramtype">Trafo_ &amp;&#160;</td>
+          <td class="paramname"><em>trafo</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00096">96</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a6c30ffa993ac63f9dd01b44fe2dfb8cc" name="a6c30ffa993ac63f9dd01b44fe2dfb8cc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6c30ffa993ac63f9dd01b44fe2dfb8cc">&#9670;&#160;</a></span>bytes()</h2>
 
@@ -365,7 +424,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00053">53</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00054">54</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -395,7 +454,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00083">83</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00084">84</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +484,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00088">88</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00089">89</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -454,7 +513,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00058">58</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00059">59</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -483,7 +542,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00073">73</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00074">74</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -512,7 +571,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00078">78</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00079">79</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +600,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00063">63</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00064">64</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -570,7 +629,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00068">68</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00069">69</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -597,7 +656,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00030">30</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00031">31</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>
@@ -623,7 +682,7 @@ template&lt;typename Mesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00031">31</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__level_8hpp_source.html#l00032">32</a> of file <a class="el" href="domain__level_8hpp_source.html">domain_level.hpp</a>.</p>
 
 </div>
 </div>

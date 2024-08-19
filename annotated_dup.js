@@ -14,7 +14,6 @@ var annotated_dup =
       ] ],
       [ "Analytic", "namespace_f_e_a_t_1_1_analytic.html", [
         [ "Common", "namespace_f_e_a_t_1_1_analytic_1_1_common.html", [
-          [ "BallCapFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_ball_cap_function2_d" ],
           [ "ConstantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_function" ],
           [ "ConstantVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function" ],
           [ "CornerSingularity2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d" ],
@@ -41,6 +40,7 @@ var annotated_dup =
           [ "SineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_tensor_static" ],
           [ "SinYT0", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0" ],
           [ "SinYT0StokesRhs", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0_stokes_rhs.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sin_y_t0_stokes_rhs" ],
+          [ "SphereCapFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function" ],
           [ "SphereSinBubbleFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_sin_bubble_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_sin_bubble_function" ],
           [ "StandingVortexFunction2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_standing_vortex_function2_d" ],
           [ "TaylorGreenVortexPres2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_taylor_green_vortex_pres2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_taylor_green_vortex_pres2_d" ],
@@ -52,6 +52,7 @@ var annotated_dup =
         [ "Distance", "namespace_f_e_a_t_1_1_analytic_1_1_distance.html", [
           [ "DistanceFunction", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function" ],
           [ "DistanceFunctionSD", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d" ],
+          [ "InverseDistanceFunction", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_inverse_distance_function.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_inverse_distance_function" ],
           [ "PlaneDistanceFunctionSD", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d.html", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d" ]
         ] ],
         [ "Image", "namespace_f_e_a_t_1_1_analytic_1_1_image.html", [
@@ -165,6 +166,7 @@ var annotated_dup =
         [ "ScalarErrorComputer", "class_f_e_a_t_1_1_assembly_1_1_scalar_error_computer.html", "class_f_e_a_t_1_1_assembly_1_1_scalar_error_computer" ],
         [ "ScalarErrorInfo", "struct_f_e_a_t_1_1_assembly_1_1_scalar_error_info.html", "struct_f_e_a_t_1_1_assembly_1_1_scalar_error_info" ],
         [ "SlipFilterAssembler", "class_f_e_a_t_1_1_assembly_1_1_slip_filter_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_slip_filter_assembler" ],
+        [ "SpaceTransfer", "class_f_e_a_t_1_1_assembly_1_1_space_transfer.html", "class_f_e_a_t_1_1_assembly_1_1_space_transfer" ],
         [ "StokesFBMAssembler", "class_f_e_a_t_1_1_assembly_1_1_stokes_f_b_m_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_stokes_f_b_m_assembler" ],
         [ "SymbolicAssembler", "class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler" ],
         [ "TraceAssembler", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler" ],

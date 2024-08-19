@@ -1,6 +1,6 @@
 var class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde =
 [
-    [ "BaseClass", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#adfaa6837ae3ddce4c2513251d1ee2cdf", null ],
+    [ "BaseClass", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a544303339c797c7145526ad4bd0ece72", null ],
     [ "DataType", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a6ab99a9c42d3cc7b6e958490d760f710", null ],
     [ "DomainPointType", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#aecea689c36cf32103086010295edff0d", null ],
     [ "EvalPolicy", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a2a06e99288a60a056017e0cb1f61c21f", null ],
@@ -13,6 +13,7 @@ var class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo
     [ "eval_gradients", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a928c1fc25e4c56643b88d1a7510cb40f", null ],
     [ "eval_hessians", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#abeda000eff0270b2a43789f0148fb536", null ],
     [ "eval_ref_gradients", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#aa6a5bba68c1f75949dc01bbd1612f7d5", null ],
+    [ "eval_ref_hessians", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a9500245b2837a02c4995b044e8ceb6a7", null ],
     [ "eval_ref_values", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a3ea8e506a43452d92b6c5d31afafe6d8", null ],
     [ "eval_values", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a15914083d87d19f34c58c4e6f9d5331e", null ],
     [ "finish", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_sf226d38d10549efcd3a6fff34f617cde.html#a2644f5cb97bfdc7ce8f437a8c9176b4b", null ],

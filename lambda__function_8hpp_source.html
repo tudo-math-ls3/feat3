@@ -586,8 +586,8 @@ $(document).ready(function(){initNavTree('lambda__function_8hpp_source.html','')
 <div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> LambdaFunction_&gt;</div>
 <div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>        <span class="keyword">explicit</span> LambdaFunctionEvaluator(<span class="keyword">const</span> LambdaFunction_&amp; function) :</div>
 <div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>          lambda_set(function.lambda_set),</div>
-<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>          grad_helper(lambda_set, function.initial_h_grad, function.max_steps_grad),</div>
-<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>          hess_helper(lambda_set, function.initial_h_hess, function.max_steps_hess)</div>
+<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>          grad_helper(lambda_set, DataType(function.initial_h_grad), function.max_steps_grad),</div>
+<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>          hess_helper(lambda_set, DataType(function.initial_h_hess), function.max_steps_hess)</div>
 <div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>        {</div>
 <div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>        }</div>
 <div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span> </div>

@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_analytic_1_1_common_
 </div><!--header-->
 <div class="contents">
 
-<p>Singularity function for a 2D reentry corner with homogenous boundary conditions.  
+<p>Singularity function for a 2D reentry corner with homogeneous boundary conditions.  
  <a href="class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="common_8hpp_source.html">common.hpp</a>&gt;</code></p>
@@ -167,9 +167,9 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_&gt;<br />
-class FEAT::Analytic::Common::CornerSingularity2D&lt; DT_ &gt;</div><p >Singularity function for a 2D reentry corner with homogenous boundary conditions. </p>
+class FEAT::Analytic::Common::CornerSingularity2D&lt; DT_ &gt;</div><p >Singularity function for a 2D reentry corner with homogeneous boundary conditions. </p>
 <p >This function represents the lowest order singular function that occurs for the poisson equation with a re-entry corner, which has zero boundary conditions in the corner itself.</p>
-<p >The natural space to describe this function is in radial basis and is given by \( f(r,\varphi) = r^{\frac{\pi}{\theta}}\sin(\frac{\pi}{\theta}\varphi) \) where \theta is the (right-handed) opening angle of the re-entry corner. This function is in \( H^1 \) but for degrees larger \( \frac{\pi}{2} \) not in \( H^2 \) despite the corresponding Poisson-Equation having homogenous right hand side and arbitrarily smooth boundary conditions.</p>
+<p >The natural space to describe this function is in radial basis and is given by \( f(r,\varphi) = r^{\frac{\pi}{\theta}}\sin(\frac{\pi}{\theta}\varphi) \) where \theta is the (right-handed) opening angle of the re-entry corner. This function is in \( H^1 \) but for degrees larger \( \frac{\pi}{2} \) not in \( H^2 \) despite the corresponding Poisson-Equation having homogeneous right hand side and arbitrarily smooth boundary conditions.</p>
 <p >The actual function space is provided in standard euclidean coordinates and requires a center point p as well as the two directional vectors v_1, v_2 of the re-entry corner provided in a right-hand oriented manner: </p><pre class="fragment">             \ v_2
               \
                \  theta
@@ -178,7 +178,7 @@ class FEAT::Analytic::Common::CornerSingularity2D&lt; DT_ &gt;</div><p >Singular
 </pre> <dl class="section note"><dt>Note</dt><dd>This version directly calculates the values, gradients and hessians in euclidean basis, allowing for a few simplifications. There is also a variant based on radial basis function, which has to be wrapped in the <a class="el" href="class_f_e_a_t_1_1_analytic_1_1_polar_coordinate.html" title="This class is a wrapper transforming a polar-basis function to a euclidean base one.">PolarCoordinate</a> wrapper. </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Maximilian Esser </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04047">4047</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04068">4068</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ae7c77840b69cf4893b13d58a4593c0f1" name="ae7c77840b69cf4893b13d58a4593c0f1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae7c77840b69cf4893b13d58a4593c0f1">&#9670;&#160;</a></span>DataType</h2>
@@ -194,7 +194,7 @@ template&lt;typename DT_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04051">4051</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04072">4072</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -212,7 +212,7 @@ template&lt;typename DT_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04053">4053</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04074">4074</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +265,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04064">4064</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04086">4086</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +292,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04060">4060</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04081">4081</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +318,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04059">4059</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04080">4080</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +344,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04055">4055</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04076">4076</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +370,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04056">4056</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04077">4077</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -396,7 +396,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04054">4054</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04075">4075</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -422,7 +422,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04052">4052</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04073">4073</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -448,7 +448,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04060">4060</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04081">4081</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +474,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04060">4060</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common_8hpp_source.html#l04081">4081</a> of file <a class="el" href="common_8hpp_source.html">common.hpp</a>.</p>
 
 </div>
 </div>
