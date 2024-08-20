@@ -9,6 +9,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#include <kernel/backend.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -28,6 +29,8 @@
 #include <kernel/global/filter.hpp>
 #include <kernel/global/mean_filter.hpp>
 #include <kernel/solver/base.hpp>
+#include <kernel/solver/cudss.hpp>
+#include <kernel/solver/mkl_dss.hpp>
 #include <kernel/solver/umfpack.hpp>
 
 // includes, system
@@ -193,6 +196,9 @@ namespace FEAT
       /// do we have to use the pressure mean filter?
       bool _have_mean_filter_p = false;
 
+      /// do we need a main diagonal in S?
+      bool _need_main_diagonal = false;
+
       /// unit filter masks for velocity and pressure
       std::vector<int> _unit_mask_v, _unit_mask_p;
 
@@ -236,6 +242,18 @@ namespace FEAT
       DirectStokesCore& operator=(const DirectStokesCore&) = delete;
 
       /**
+       * \brief Specifies whether the solver matrix needs to contain all main diagonal entries
+       *
+       * \param[in] need_main_diagonal
+       * Specifies whether the solver matrix structure should always contain all main diagonal entries.
+       * This is required by some solvers, e.g. by the MKL DSS solver.
+       */
+      void set_need_main_diagonal(bool need_it)
+      {
+        this->_need_main_diagonal = need_it;
+      }
+
+      /**
        * \brief Returns a const reference to the solver matrix.
        */
       const SolverMatrixType& get_solver_matrix() const
@@ -270,11 +288,11 @@ namespace FEAT
        */
       virtual void upload_vector(SolverVectorType& vector, const VectorTypeV& vector_v, const VectorTypeP& vector_p) const
       {
-        const IT_ nv = vector_v.template size<LAFEM::Perspective::pod>();
-        const IT_ np = vector_p.size();
-        const IT_ nx = vector.size();
+        const IT_ nv = IT_(vector_v.template size<LAFEM::Perspective::pod>());
+        const IT_ np = IT_(vector_p.size());
+        const IT_ nx = IT_(vector.size());
 
-        XASSERTM(nx == this->_solver_matrix.rows(), "invalid solver vector size");
+        XASSERTM(nx == IT_(this->_solver_matrix.rows()), "invalid solver vector size");
         XASSERTM(nv + np <= nx, "invalid velocity/pressure vector size");
 
         SolverDataType* vec = vector.elements();
@@ -303,11 +321,11 @@ namespace FEAT
        */
       virtual void download_vector(const SolverVectorType& vector, VectorTypeV& vector_v, VectorTypeP& vector_p) const
       {
-        const IT_ nv = vector_v.template size<LAFEM::Perspective::pod>();
-        const IT_ np = vector_p.size();
-        const IT_ nx = vector.size();
+        const IT_ nv = IT_(vector_v.template size<LAFEM::Perspective::pod>());
+        const IT_ np = IT_(vector_p.size());
+        const IT_ nx = IT_(vector.size());
 
-        XASSERTM(nx == this->_solver_matrix.rows(), "invalid solver vector size");
+        XASSERTM(nx == IT_(this->_solver_matrix.rows()), "invalid solver vector size");
         XASSERTM(nv + np <= nx, "invalid velocity/pressure vector size");
 
         const SolverDataType* vec = vector.elements();
@@ -367,8 +385,8 @@ namespace FEAT
       {
         // get the number of DOFs
         const IT_ idim = IT_(dim_);
-        const IT_ num_dofs_v = _matrix_a.rows();
-        const IT_ num_dofs_p = _matrix_d.rows();
+        const IT_ num_dofs_v = IT_(_matrix_a.rows());
+        const IT_ num_dofs_p = IT_(_matrix_d.rows());
 
         XASSERT(_matrix_a.columns() == num_dofs_v);
         XASSERT(_matrix_b.columns() == num_dofs_p);
@@ -396,9 +414,9 @@ namespace FEAT
         const IT_ num_total_dofs = idim*num_dofs_v + num_dofs_p + num_slip_dofs + IT_(_have_mean_filter_p ? 1 : 0);
 
         // get number of matrix NZEs
-        const IT_ num_nze_a = _matrix_a.used_elements();
-        const IT_ num_nze_b = _matrix_b.used_elements();
-        const IT_ num_nze_d = _matrix_d.used_elements();
+        const IT_ num_nze_a = IT_(_matrix_a.used_elements());
+        const IT_ num_nze_b = IT_(_matrix_b.used_elements());
+        const IT_ num_nze_d = IT_(_matrix_d.used_elements());
         const IT_ num_nze_s = IT_(_matrix_s != nullptr ? _matrix_s->used_elements() : 0u);
 
         // compute upper bound for non-zero entry count
@@ -410,6 +428,10 @@ namespace FEAT
         // Lagrange multiplier for pressure mean filter (when necessary)
         if(this->_have_mean_filter_p)
           max_nze += IT_(2)*num_dofs_p;
+
+        // need a main diagonal?
+        if(this->_need_main_diagonal)
+          max_nze += num_dofs_p + IT_(2)*num_slip_dofs*idim + IT_(1);
 
         // allocate row-pointer and column index arrays
         std::vector<IT_> row_ptr, col_idx;
@@ -493,8 +515,33 @@ namespace FEAT
               col_idx[op] = idim*col_idx_d[ip] + k;
           // copy row of S (if it exists)
           if(row_ptr_s != nullptr)
-            for(IT_ ip(row_ptr_s[i]); ip < row_ptr_s[i+1]; ++ip, ++op)
-              col_idx[op] = idim*num_dofs_v + col_idx_s[ip];
+          {
+            if(this->_need_main_diagonal)
+            {
+              // copy row i of S and insert a main diagonal entry if it is not present in S
+              bool have_diag = false;
+              for(IT_ ip(row_ptr_s[i]); ip < row_ptr_s[i+1]; ++ip, ++op)
+              {
+                if(!have_diag && (col_idx_s[ip] > i))
+                {
+                  col_idx[op++] = row;
+                  have_diag = true;
+                }
+                col_idx[op] = idim*num_dofs_v + col_idx_s[ip];
+                have_diag = have_diag || (col_idx_s[ip] == i);
+              }
+            }
+            else
+            {
+              for(IT_ ip(row_ptr_s[i]); ip < row_ptr_s[i+1]; ++ip, ++op)
+                col_idx[op] = idim*num_dofs_v + col_idx_s[ip];
+            }
+          }
+          else if(this->_need_main_diagonal)
+          {
+            // insert a main diagonal entry
+            col_idx[op++] = row;
+          }
           // copy row of P (if we have a pressure mean filter)
           if(this->_have_mean_filter_p)
             col_idx[op++] = idim*num_dofs_v + num_slip_dofs + num_dofs_p;
@@ -505,12 +552,14 @@ namespace FEAT
         // next, add all slip filter entries Q^T
         for(auto it(_slip_filters_v.begin()); it != _slip_filters_v.end(); ++it)
         {
-          const IT_ nsx = it->used_elements();
+          const IT_ nsx = IT_(it->used_elements());
           const IT_* idx = it->get_indices();
           for(IT_ j(0); j < nsx; ++j)
           {
             for(IT_ k(0); k < idim; ++k, ++op)
               col_idx[op] = idim*idx[j] + k;
+            if(this->_need_main_diagonal)
+              col_idx[op++] = row;
             // set row pointer
             row_ptr[++row] = op;
           }
@@ -521,6 +570,8 @@ namespace FEAT
         {
           for(IT_ j(0); j < num_dofs_p; ++j, ++op)
             col_idx[op] = idim*num_dofs_v + j;
+          if(this->_need_main_diagonal)
+            col_idx[op++] = row;
           row_ptr[++row] = op;
         }
 
@@ -552,8 +603,8 @@ namespace FEAT
       virtual void init_numeric()
       {
         // get the number of DOFs
-        const IT_ num_dofs_v = _matrix_a.rows();
-        const IT_ num_dofs_p = _matrix_d.rows();
+        const IT_ num_dofs_v = IT_(_matrix_a.rows());
+        const IT_ num_dofs_p = IT_(_matrix_d.rows());
 
         // the system has the following structure:
         //   | A   B   Q   0 |
@@ -574,6 +625,7 @@ namespace FEAT
         const IT_* row_ptr_d = _matrix_d.row_ptr();
         const auto* val_d    = _matrix_d.val();
         const IT_* row_ptr_s = (_matrix_s != nullptr ? _matrix_s->row_ptr() : nullptr);
+        const IT_* col_idx_s = (_matrix_s != nullptr ? _matrix_s->col_ind() : nullptr);
         const auto* val_s    = (_matrix_s != nullptr ? _matrix_s->val() : nullptr);
         SolverDataType* val_x = _solver_matrix.val();
 
@@ -606,7 +658,6 @@ namespace FEAT
             {
               // get the normal vector of this slip filter entry
               const auto& nu = this->_slip_filters_v.at(_slip_fil_dqu[ip]).get_values()[_slip_fil_idx[ip]];
-
               // set the normal vector component
               val_x[op] = SolverDataType(nu[j]);
             }
@@ -630,8 +681,33 @@ namespace FEAT
               val_x[op] = SolverDataType(val_d[ip][0][k]);
           // copy row of S (if it exists)
           if(row_ptr_s != nullptr)
-            for(IT_ ip(row_ptr_s[i]); ip < row_ptr_s[i+1]; ++ip, ++op)
-              val_x[op] = SolverDataType(val_s[ip]);
+          {
+            if(this->_need_main_diagonal)
+            {
+              bool have_diag = false;
+              for(IT_ ip(row_ptr_s[i]); ip < row_ptr_s[i+1]; ++ip, ++op)
+              {
+                if(!have_diag && (col_idx_s[ip] > i))
+                {
+                  val_x[op++] = SolverDataType(0);
+                  have_diag = true;
+                }
+                val_x[op] = SolverDataType(val_s[ip]);
+                have_diag = have_diag || (col_idx_s[ip] == i);
+              }
+            }
+            else
+            {
+              for(IT_ ip(row_ptr_s[i]); ip < row_ptr_s[i+1]; ++ip, ++op)
+                val_x[op] = SolverDataType(val_s[ip]);
+            }
+          }
+          else if(this->_need_main_diagonal)
+          {
+            // insert a main diagonal entry
+            val_x[op++] = SolverDataType(0);
+          }
+
           // copy row of P (if we have a pressure mean filter)
           if(this->_have_mean_filter_p)
           {
@@ -643,12 +719,14 @@ namespace FEAT
         // next, add all slip filter entries Q^T
         for(auto it(_slip_filters_v.begin()); it != _slip_filters_v.end(); ++it)
         {
-          const IT_ nsx = it->used_elements();
+          const IT_ nsx = IT_(it->used_elements());
           const auto* nu = it->get_values();
           for(IT_ j(0); j < nsx; ++j)
           {
             for(int k(0); k < dim_; ++k, ++op)
               val_x[op] = SolverDataType(nu[j][k]);
+            if(this->_need_main_diagonal)
+              val_x[op++] = SolverDataType(0);
           }
         }
 
@@ -658,7 +736,12 @@ namespace FEAT
           const auto* v = _mean_filter_p_dual.elements();
           for(IT_ j(0); j < num_dofs_p; ++j, ++op)
             val_x[op] = SolverDataType(v[j]);
+          if(this->_need_main_diagonal)
+            val_x[op++] = SolverDataType(0);
         }
+
+        // sanity check
+        XASSERT(op == _solver_matrix.used_elements());
       }
 
       /// \brief Releases all data allocated during numerical initialization
@@ -855,7 +938,7 @@ namespace FEAT
       /// computes the slip matrix layout Q^T and returns the total number of slip DOFs
       IT_ _compute_slip_matrix_layout()
       {
-        const IT_ nv = _matrix_a.rows();
+        const IT_ nv = IT_(_matrix_a.rows());
 
         _slip_row_ptr.clear();
         _slip_col_idx.clear();
@@ -927,7 +1010,7 @@ namespace FEAT
 
         for(const auto& it : this->_unit_filters_v)
         {
-          const IT_ n = it.used_elements();
+          const IT_ n = IT_(it.used_elements());
           const IT_* idx = it.get_indices();
           for(IT_ k(0); k < n; ++k)
             _unit_mask_v.at(idx[k]) = 1;
@@ -943,7 +1026,7 @@ namespace FEAT
 
         for(const auto& it : this->_unit_filters_p)
         {
-          const IT_ n = it.used_elements();
+          const IT_ n = IT_(it.used_elements());
           const IT_* idx = it.get_indices();
           for(IT_ k(0); k < n; ++k)
             _unit_mask_p.at(idx[k]) = 1;
@@ -1012,8 +1095,16 @@ namespace FEAT
       /// the actual direct solver; opaque SolverBase pointer
       std::shared_ptr<Solver::SolverBase<SolverVectorType>> _direct_solver;
 
-#ifdef FEAT_HAVE_UMFPACK
-      /// the actual UMFPACK solver object
+#if defined(FEAT_HAVE_CUDSS) || defined(DOXYGEN)
+      /// our CUDSS solver object; used if preferred backend is PreferredBackend::cuda
+      std::shared_ptr<Solver::CUDSS> _cudss_solver;
+#endif // FEAT_HAVE_CUDSS
+#if defined(FEAT_HAVE_MKL) || defined(DOXYGEN)
+      /// our MKLDSS solver object; used if preferred backend is PreferredBackend::mkl
+      std::shared_ptr<Solver::MKLDSS> _mkldss_solver;
+#endif // FEAT_HAVE_MKL
+#if defined(FEAT_HAVE_UMFPACK) || defined(DOXYGEN)
+      /// our UMFPACK solver object; used if no other direct solver was chosen
       std::shared_ptr<Solver::Umfpack> _umfpack_solver;
 #endif // FEAT_HAVE_UMFPACK
 
@@ -1033,19 +1124,58 @@ namespace FEAT
         _stokes_core(_matrix_sys.block_a(), _matrix_sys.block_b(), _matrix_sys.block_d()),
         _direct_solver()
       {
+#ifdef FEAT_HAVE_CUDSS
+        if(Backend::get_preferred_backend() == PreferredBackend::cuda)
+        {
+          // create a CUDSS solver
+          _cudss_solver = Solver::new_cudss(_stokes_core.get_solver_matrix());
+          _direct_solver = _cudss_solver;
+          // main diagonal is not absolutely necessary for CUDSS, but it seems to improve precision a bit
+          _stokes_core.set_need_main_diagonal(true);
+        }
+        else
+#endif // FEAT_HAVE_CUDSS
+#ifdef FEAT_HAVE_MKL
+        if(Backend::get_preferred_backend() == PreferredBackend::mkl)
+        {
+          // create a MKLDSS solver
+          _mkldss_solver = Solver::new_mkl_dss(_stokes_core.get_solver_matrix());
+          _direct_solver = _mkldss_solver;
+          // MKL emphasized that main diagonal is absolutely mandatory
+          _stokes_core.set_need_main_diagonal(true);
+        }
+        else
+#endif // FEAT_HAVE_MKL
 #ifdef FEAT_HAVE_UMFPACK
-        // create an UMFPACK solver
-        _umfpack_solver = Solver::new_umfpack(_stokes_core.get_solver_matrix());
-        _direct_solver = _umfpack_solver;
+        // fallback or generic: try to create UMFPACK solver
+        {
+          // create an UMFPACK solver
+          _umfpack_solver = Solver::new_umfpack(_stokes_core.get_solver_matrix());
+          _direct_solver = _umfpack_solver;
+        }
 #else
-        XABORTM("DirectStokesSolver can only be used if UMFPACK is available");
+        {
+          XABORTM("DirectStokesSolver can only be used if UMFPACK is available");
+        }
 #endif
       }
 
       /// Returns the name of the solver.
       virtual String name() const override
       {
-        return "DirectStokesSolver<SaddlePointMatrix>";
+#ifdef FEAT_HAVE_CUDSS
+        if(_cudss_solver)
+          return "DirectStokesSolver<SaddlePointMatrix>[CUDSS]";
+#endif
+#ifdef FEAT_HAVE_MKL
+        if(_mkldss_solver)
+          return "DirectStokesSolver<SaddlePointMatrix>[MKLDSS]";
+#endif
+#ifdef FEAT_HAVE_UMFPACK
+        if(_umfpack_solver)
+          return "DirectStokesSolver<SaddlePointMatrix>[UMFPACK]";
+#endif
+        return "DirectStokesSolver<SaddlePointMatrix>[???]";
       }
 
       /// Performs the symbolic initialization

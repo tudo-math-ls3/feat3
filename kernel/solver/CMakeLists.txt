@@ -60,6 +60,7 @@ set(test_list
   basic_solver-test
   cudss-test
   cusolver-test
+  direct_stokes_solver-test
   hypre-test
   mkl_dss-test
   optimizer-test

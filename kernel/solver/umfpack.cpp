@@ -465,5 +465,5 @@ namespace FEAT
 } // namespace FEAT
 #else
 // insert dummy function to suppress linker warnings
-void dummy_function() {}
+void dummy_function_umfpack() {}
 #endif // FEAT_HAVE_UMFPACK
