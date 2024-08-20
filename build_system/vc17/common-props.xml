@@ -18,6 +18,14 @@
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
+  <!-- CUDSS Backend Detection -->
+  <!-- ********************************************************************* -->
+  <PropertyGroup Condition="'$(EnableCUDA)'=='true' And '$(FeatHaveCUDSS)'=='' And '$(CUDSS_PATH)'!=''">
+    <FeatCUDSSPath>$(CUDSS_PATH)</FeatCUDSSPath>
+    <FeatHaveCUDSS>true</FeatHaveCUDSS>
+  </PropertyGroup>
+
+  <!-- ********************************************************************* -->
   <!-- MKL Backend Detection -->
   <!-- ********************************************************************* -->
   <PropertyGroup Condition="'$(EnableMKL)'=='true' And '$(FeatHaveMKL)'=='' And '($ONEAPI_ROOT)'!=''">
@@ -99,9 +107,11 @@
       Include="FEAT_HAVE_MPI" />
     <FeatDef Condition="'$(EnableOMP)'=='true'"
       Include="FEAT_HAVE_OMP" />
-    <FeatDef Condition="'$(EnableCuda)'=='true'"
+    <FeatDef Condition="'$(FeatHaveCuda)'=='true'"
       Include="FEAT_HAVE_CUDA;FEAT_HAVE_CUSOLVER;DISABLE_CUSPARSE_DEPRECATED" />
-    <FeatDef Condition="'$(EnableMKL)'=='true'"
+    <FeatDef Condition="'$(FeatHaveCUDSS)'=='true'"
+      Include="FEAT_HAVE_CUDSS" />
+    <FeatDef Condition="'$(FeatHaveMKL)'=='true'"
       Include="FEAT_HAVE_MKL;MKL_ILP64" />
   </ItemGroup>
 
@@ -109,9 +119,11 @@
   <ItemGroup Label="FEAT Include Paths">
     <FeatIncDir Condition="'$(EnableMPI)'=='true'"
       Include="$(MSMPI_INC)" />
-    <FeatIncDir Condition="'$(EnableCuda)'=='true'"
+    <FeatIncDir Condition="'$(FeatHaveCuda)'=='true'"
       Include="$(FeatCudaPath)\include" />
-    <FeatIncDir Condition="'$(EnableMKL)'=='true'"
+    <FeatIncDir Condition="'$(FeatHaveCUDSS)'=='true'"
+      Include="$(FeatCUDSSPath)\include" />
+    <FeatIncDir Condition="'$(FeatHaveMKL)'=='true'"
       Include="$(ONEAPI_ROOT)\mkl\latest\include" />
   </ItemGroup>
 
@@ -122,9 +134,11 @@
       Include="$(MSMPI_LIB32)" />
     <FeatLibDir Condition="'$(EnableMPI)'=='true' And '$(Platform)'=='x64'"
       Include="$(MSMPI_LIB64)" />
-    <FeatLibDir Condition="'$(EnableCuda)'=='true'"
+    <FeatLibDir Condition="'$(FeatHaveCuda)'=='true'"
       Include="$(CudaToolkitLibDir)" />
-    <FeatLibDir Condition="'$(EnableMKL)'=='true'"
+    <FeatLibDir Condition="'$(FeatHaveCUDSS)'=='true'"
+      Include="$(FeatCUDSSPath)\lib\12" />
+    <FeatLibDir Condition="'$(FeatHaveMKL)'=='true'"
       Include="$(ONEAPI_ROOT)\mkl\latest\lib\intel64" />
   </ItemGroup>
 
@@ -134,9 +148,11 @@
       Include="DbgHelp.lib" />
     <FeatLibDep Condition="'$(EnableMPI)'=='true'"
       Include="msmpi.lib" />
-    <FeatLibDep Condition="'$(EnableCuda)'=='true'"
+    <FeatLibDep Condition="'$(FeatHaveCuda)'=='true'"
       Include="cudart_static.lib;cublas.lib;cublasLt.lib;cusparse.lib;cusolver.lib;cusolverMg.lib" />
-    <FeatLibDep Condition="'$(EnableMKL)'=='true'"
+    <FeatLibDep Condition="'$(FeatHaveCUDSS)'=='true'"
+      Include="cudss.lib" />
+    <FeatLibDep Condition="'$(FeatHaveMKL)'=='true'"
       Include="mkl_core_dll.lib;mkl_sequential_dll.lib;mkl_intel_ilp64_dll.lib" />
   </ItemGroup>
 

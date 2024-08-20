@@ -3,6 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of lafem source files
 set(kernel-solver-list
+  cudss.cpp
   hypre.cpp
   mkl_dss.cpp
   superlu.cpp
@@ -57,6 +58,7 @@ endif (FEAT_HAVE_CUDA)
 set(test_list
   amavanka-test
   basic_solver-test
+  cudss-test
   cusolver-test
   hypre-test
   mkl_dss-test

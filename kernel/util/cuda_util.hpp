@@ -18,6 +18,9 @@
 #include <cublas_v2.h>
 #include <cublasLt.h>
 #endif
+#ifdef FEAT_HAVE_CUDSS
+#include <cudss.h>
+#endif
 
 namespace FEAT
 {
@@ -33,6 +36,9 @@ namespace FEAT
       extern bool * cublas_lt_algo_matmat_initialized;
       extern size_t cuda_workspace_size;
       extern void * cuda_workspace;
+#endif
+#ifdef FEAT_HAVE_CUDSS
+      extern cudssHandle_t cudss_handle;
 #endif
     }
     /// \endcond

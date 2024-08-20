@@ -29,6 +29,10 @@ bool * FEAT::Util::Intern::cublas_lt_algo_matmat_initialized;
 size_t FEAT::Util::Intern::cuda_workspace_size;
 void * FEAT::Util::Intern::cuda_workspace;
 
+#ifdef FEAT_HAVE_CUDSS
+cudssHandle_t FEAT::Util::Intern::cudss_handle = nullptr;
+#endif
+
 namespace FEAT
 {
   namespace Util
@@ -164,6 +168,11 @@ void FEAT::Util::cuda_initialize(int rank, int /*ranks_per_node*/, int /*ranks_p
   if (CUBLAS_STATUS_SUCCESS != cublasSetMathMode(Util::Intern::cublas_handle, CUBLAS_TF32_TENSOR_OP_MATH))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasSetMathMode failed!");
 
+#ifdef FEAT_HAVE_CUDSS
+  if(CUDSS_STATUS_SUCCESS != cudssCreate(&Util::Intern::cudss_handle))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudssCreate failed!");
+#endif
+
   Util::Intern::cublas_lt_algo_matmat = new cublasLtMatmulAlgo_t[6];
   Util::Intern::cublas_lt_algo_matmat_initialized = new bool[6];
   for (int i(0) ; i < 6 ; ++i)
@@ -183,6 +192,10 @@ void FEAT::Util::cuda_finalize()
   if (cudaSuccess != cudaDeviceSynchronize())
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
 
+#ifdef FEAT_HAVE_CUDSS
+  if(CUDSS_STATUS_SUCCESS != cudssDestroy(Util::Intern::cudss_handle))
+    throw InternalError(__func__, __FILE__, __LINE__, "cudssDestroy failed!");
+#endif
   if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasDestroy failed!");
   if (CUSPARSE_STATUS_SUCCESS != cusparseDestroy(Util::Intern::cusparse_handle))
