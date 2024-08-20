@@ -137,7 +137,7 @@
     <FeatLibDep Condition="'$(EnableCuda)'=='true'"
       Include="cudart_static.lib;cublas.lib;cublasLt.lib;cusparse.lib;cusolver.lib;cusolverMg.lib" />
     <FeatLibDep Condition="'$(EnableMKL)'=='true'"
-      Include="mkl_core.lib;mkl_sequential_dll.lib;mkl_intel_ilp64_dll.lib" />
+      Include="mkl_core_dll.lib;mkl_sequential_dll.lib;mkl_intel_ilp64_dll.lib" />
   </ItemGroup>
 
   <!-- include third-party libaries -->

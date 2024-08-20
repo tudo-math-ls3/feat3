@@ -4,6 +4,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # list of lafem source files
 set(kernel-solver-list
   hypre.cpp
+  mkl_dss.cpp
   superlu.cpp
   umfpack.cpp
   voxel_amavanka.cpp
@@ -58,6 +59,7 @@ set(test_list
   basic_solver-test
   cusolver-test
   hypre-test
+  mkl_dss-test
   optimizer-test
   superlu-test
   umfpack-test
