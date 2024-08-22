@@ -41,7 +41,7 @@ public:
     for(Index size(1); size < Index(1e3); size*=2)
     {
       DenseVector<DT_, IT_> vec_prim(size, DT_(1));
-      DenseVector<DT_, IT_> vec_dual(size, DT_(DT_(1)/size));
+      DenseVector<DT_, IT_> vec_dual(size, DT_(DT_(1)/DT_(size)));
 
       DT_ sol_mean = DT_(1.563);
 
