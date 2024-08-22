@@ -36,6 +36,8 @@ set(test_list
   dense_vector_blocked-test
   matrix_mirror_buffer-test
   matrix_mult-test
+  mean_filter-test
+  mean_filter_blocked-test
   meta_filter-test
   meta_matrix-apply-test
   meta_matrix-io-test
