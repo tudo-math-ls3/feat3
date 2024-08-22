@@ -20,7 +20,42 @@ namespace FEAT
     /**
      * \brief FGMRES(k) solver implementation
      *
-     * This class implements the Restarted Flexible Generalized Minimal Residual solver (FGMRES(k)).
+     * This class implements the Restarted Flexible Generalized Minimal Residual solver (FGMRES(k)), which is
+     * a variation of the "normal" preconditioned Restarted GMRES (GMRES(k)) solver that supports varying
+     * preconditioners, i.e. it allows the use of preconditioner \f$M^{-1}\f$ which does not necessarily have to
+     * fulfill the linearity condition \f$M^{-1}(\alpha x + y) = \alpha M^{-1}x + M^{-1}y\f$.
+     * If used with a preconditioner that does fulfill the linearity condition or if used without a preconditioner,
+     * the FGMRES(k) and GMRES(k) solvers are equivalent with the exception of rounding errors, of course.
+     *
+     * <u><b>Details about the inner resolution scaling factor:</b></u>\n
+     * In contrast to other popular iterative Krylov subspace methods like PCG or BiCGStab, the GMRES method and all
+     * of its variants -- including the FMGRES(k) solver implemented by this class -- do \b not compute or update the
+     * residual/defect vector after each iteration! This is not an oversight, but it is a fundamental property of the
+     * GMRES methods that both the solution vector as well as the residual/defect vectors are only computed after the
+     * GMRES method has terminated or, in the case of restarted [F]GMRES(k) variants, after each restart, which happens
+     * after at most k iterations. Saad describes this problem and proposes a solution in his book \cite Saad03 in
+     * Proposition 6.9, which also states that the euclidean norm of the residual \f$\|b-Ax_m\|_2\f$ is equal to
+     * a scalar quantity \f$|\gamma_{m+1}|\f$, which is easily computed from the other quantities that have to be
+     * updated in each GMRES iteration. Therefore, one might simply use this scalar to implement a absolute or relative
+     * defect tolerance stopping criterion without the need to explicitly compute the residual/defect vector itself.
+     *
+     * However, in the real world case of finite precision arithmetic, the identity is merely an approximation, i.e.
+     * we actually have \f$|\gamma_{m+1}|\approx\|b-Ax_m\|_2\f$ and therefore checking \f$|\gamma_{m+1}|\f$ against
+     * the stopping criterion may lead to false positives and therefore premature termination of the inner FGMRES(k)
+     * loop. At the end of each inner FGMRES(k) loop, the solution and residual/defect vectors are updated and now
+     * the real residual/defect norm is computed and checked against the tolerances and it may now happen that
+     * \f$|\gamma_{m+1}| < \textnormal{tol}_{\textnormal{abs}} < \|b-Ax_m\|_2\f\f$ (and analogously for the relative
+     * tolerance, of course), therefore leading to another restart of the inner FGMRES(k) loop. In the worst case,
+     * this restarted inner loop may again produce a false positive after 1 iteration, therefore triggering another
+     * restart, thus effectively leading to an extremely slowly converging FGMRES(1) iteration.
+     *
+     * To deal with this problem, this implementation includes an inner residual scaling factor \f$\delta\geq 0\f$,
+     * which is used to check \f$\delta|\gamma_{m+1}| < \textnormal{tol}_{\textnormal{abs}}\f$ for the absolute and
+     * \f$\delta|\gamma_{m+1}| < \textnormal{tol}_{\textnormal{rel}}\|r_0\|_2\f$ for the relative stopping criterion,
+     * respectively. By choosing a \f$0 < \delta < 1\f$, one can ensure that the inner GMRES loop has to fulfill a
+     * tighter tolerance than the outer loop, therefore reducing the risk of false positives. It is also possible to
+     * set \f$\delta = 0\f$, in which case the inner GMRES loop will only terminate prematurely if it detects that it
+     * has arrived at the exact solution and no more inner iterations must be performed to avoid division by zero.
      *
      * \see
      * Y. Saad: A flexible inner-outer preconditioned GMRES algorithm;
@@ -56,25 +91,7 @@ namespace FEAT
       const FilterType& _system_filter;
       /// krylov dimension
       Index _krylov_dim;
-      /** \brief inner pseudo-residual scaling factor
-       *
-       * The GMRES-algorithm can check for convergence at two positions during the iteration:
-       * One is to check the factor \f$q\f$ from the algorithm when building up a the Krylow-spaces (in the inner loop),
-       * the other one is to check the real residuum after the space is built up.
-       * This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor
-       * \f$q\f$ will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means:
-       * If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check
-       * (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.\n
-       * The solution to this problem is this factor: The preconditioned residuum needs to fulfill the usual convergence criterion,
-       * but they are scaled with this factor: Instead of the usual convergence criterion, it has to fulfill the scaled convergence criterion
-       * \f[
-       *   (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-       * \f]
-       * This means: If you do not know any estimate for the correlation between your preconditioned residuum and the real residuum,
-       * you can just set this factor to zero. This will deactivate this intermediate check and thus result in a few more iterations,
-       * but it is the save variant that will lead to convergence. You should only set it to something else than zero if you really
-       * know what you are doing!
-       */
+      /// inner pseudo-residual scaling factor, see the documentation of this class for details
       DataType _inner_res_scale;
       /// krylov basis vectors
       std::vector<VectorType> _vec_v, _vec_z;
@@ -97,8 +114,7 @@ namespace FEAT
        * The maximum Krylov subspace dimension. Must be > 0.
        *
        * \param[in] inner_res_scale
-       * The scaling factor for the inner GMRES loop residual.
-       * \copydetails _inner_res_scale
+       * The scaling factor for the inner GMRES loop residual. See the documentation of this class for details.
        *
        * \param[in] precond
        * A pointer to the preconditioner. May be \c nullptr.
@@ -201,7 +217,6 @@ namespace FEAT
        *
        * \param[in] inner_res_scale
        * Scaling parameter for convergence of the inner iteration
-       *
        */
       virtual void set_inner_res_scale(DataType inner_res_scale)
       {
@@ -397,7 +412,7 @@ namespace FEAT
      *
      * \param[in] inner_res_scale
      * The scaling factor for the inner GMRES loop residual.
-     * Set this to zero unless you know what you are doing.
+     * See the details of the FGMRES class documentation for details
      *
      * \param[in] precond
      * The preconditioner. May be \c nullptr.

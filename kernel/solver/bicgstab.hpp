@@ -127,7 +127,7 @@ namespace FEAT
      * The combined algorithm shown above was derived by applying the unpreconditioned BiCGStab algorithm
      * (see e.g. \cite Meister2015, page 208) onto the left-only-preconditioned system \f$(M^{-1}A)x = M^{-1}b\f$
      * and the right-only-preconditioned system \f$(AM^{-1})y = b,~x=M^{-1}y\f$, respectively. After further
-     * optimising the two resulting algorithms by some clever vector substitutions and some reordering, we
+     * optimizing the two resulting algorithms by some clever vector substitutions and some reordering, we
      * have obtained two versions of the BiCGStab algorithm, which only differed by the choice of the scalar
      * products, so that these two versions could be easily \e merged into the single algorithm as shown above.
      *
