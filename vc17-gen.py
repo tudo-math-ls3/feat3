@@ -115,7 +115,7 @@ if kernel_guid == None:
 ifs = open(build_modes_path, "rt")
 for l in ifs.readlines():
   l = l.strip()
-  r = re.search("'\$\(Configuration\)'=='(.+)'", l)
+  r = re.search(r"'\$\(Configuration\)'=='(.+)'", l)
   if r:
     build_ids = build_ids + [r.group(1)]
 ifs.close()
