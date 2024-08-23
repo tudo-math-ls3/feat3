@@ -33,9 +33,16 @@ build_tags = [
 ]
 
 # enabled build modes
-build_modes = ['dbg', 'opt', 'dbg-omp', 'opt-omp', 'dbg-mpi', 'opt-mpi', 'dbg-cuda', 'opt-cuda', 'dbg-mkl', 'opt-mkl']
+build_modes = [
+  'dbg', 'opt',
+  'dbg-omp', 'opt-omp',
+  'dbg-mpi', 'opt-mpi',
+  'dbg-mkl', 'opt-mkl',
+  'dbg-cuda', 'opt-cuda',
+  'dbg-cuda-mkl-omp', 'opt-cuda-mkl-omp',
+  'dbg-cuda-mkl-omp-mpi', 'opt-cuda-mkl-omp-mpi'
+]
 platforms = ['x64']
-
 
 # write build modes
 fo = open("build-modes.xml", "wt")

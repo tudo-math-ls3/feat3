@@ -226,6 +226,11 @@ void Runtime::initialize(int& argc, char**& argv)
 #else
         std::cout << "FEAT_HAVE_CUDA................: no\n";
 #endif
+#ifdef FEAT_HAVE_CUDSS
+        std::cout << "FEAT_HAVE_CUDSS...............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_CUDSS...............: no\n";
+#endif
 #ifdef FEAT_HAVE_DEATH_HANDLER
         std::cout << "FEAT_HAVE_DEATH_HANDLER.......: yes\n";
 #else

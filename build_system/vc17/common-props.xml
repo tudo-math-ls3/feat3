@@ -139,7 +139,7 @@
     <FeatLibDir Condition="'$(FeatHaveCUDSS)'=='true'"
       Include="$(FeatCUDSSPath)\lib\12" />
     <FeatLibDir Condition="'$(FeatHaveMKL)'=='true'"
-      Include="$(ONEAPI_ROOT)\mkl\latest\lib\intel64" />
+      Include="$(ONEAPI_ROOT)\mkl\latest\lib" />
   </ItemGroup>
 
   <!-- FEAT additional library dependencies list -->
@@ -154,6 +154,8 @@
       Include="cudss.lib" />
     <FeatLibDep Condition="'$(FeatHaveMKL)'=='true'"
       Include="mkl_core_dll.lib;mkl_sequential_dll.lib;mkl_intel_ilp64_dll.lib" />
+    <!--<FeatLibDep Condition="'$(FeatHaveMKL)'=='true' And '$(EnableOMP)'!='true'" Include="mkl_core_dll.lib;mkl_sequential_dll.lib;mkl_intel_ilp64_dll.lib" /> -->
+    <!--<FeatLibDep Condition="'$(FeatHaveMKL)'=='true' And '$(EnableOMP)'=='true'" Include="mkl_core_dll.lib;mkl_intel_thread_dll.lib;mkl_intel_ilp64_dll.lib" /> -->
   </ItemGroup>
 
   <!-- include third-party libaries -->

@@ -60,16 +60,22 @@ sc config MsMpiLaunchSvc start= auto
 Once you have installed MS-MPI and setup the launch service, there is nothing more to do, as the build-system will
 automatically detect that a MPI implementation is available.
 
-\subsection win_vs17_prereqs_cuda Nvidia CUDA v11.8
-Currently, the only supported version of Nvidia CUDA is version 11.8, which must be installed including its integration
+\subsection win_vs17_prereqs_cuda Nvidia CUDA
+The minimum supported version of Nvidia CUDA for FEAT is version 12.0, which must be installed including its integration
 into Visual Studio 2022, of course. There is nothing else that has to be done manually to enable CUDA in FEAT; simply
 select a build configuration that contains the <c>cuda</c> tag to enable CUDA in FEAT.
 
 \subsection win_vs17_prereqs_imkl Intel oneAPI MKL
-The Visual Studio build system supports the use of Intel oneAPI MKL, assuming that it is installed on the system, of
-course. There is nothing else that has to be done manually to enable MKL in FEAT; simply select a build configuration
-that contains the <c>mkl</c> tag to enable MKL in FEAT. The only version that has been tested to work is 2023.1.0,
-but we expect that any newer version will work as well.
+The minimum supported version Intel oneAPI MKL is version 2024.2. Unfortunately, Intel apparently does not provide any
+useful environment variables to the installation directory anymore, so one has to declare one by themselves. Assuming
+that you have installed MKL in its default installation directory, execute the following command in a console with
+administrator rights:
+\verbatim
+setx ONEAPI_ROOT "C:\Program Files (x86)\Intel\oneAPI"
+\endverbatim
+If you have installed Intel oneAPI in another directory, then you have to adjust the path accordingly, of course.
+There is nothing else that has to be done manually to enable MKL in FEAT; simply select a build configuration that
+contains the mkl tag to enable MKL in FEAT.
 
 \section win_vs17_thirdparty Additional Third-Party Libraries
 
@@ -214,8 +220,8 @@ The list of all supported (and currently disabled) features is:
 - <c>dbg</c>: generate a debug binary (mutually exclusive with <c>opt</c>)
 - <c>opt</c>: generate an optimized binary (mutually exclusive with <c>dbg</c>)
 - <c>mpi</c>: build with MPI support (requires MS-MPI to be installed)
-- <c>cuda</c> build with Nvidia CUDA support (requires Nvidia CUDA 11.8 to be installed)
-- <c>mkl</c>: build with Intel MKL support (requires Intel oneAPI MKL 2023 or newer to be installed)
+- <c>cuda</c> build with Nvidia CUDA support (requires Nvidia CUDA 12.0 or newer to be installed)
+- <c>mkl</c>: build with Intel MKL support (requires Intel oneAPI MKL 2024 or newer to be installed)
 - <c>omp</c>: build with OpenMP support
 
 So, for example the configuration <c>dbg</c> represents a simple debug build without any additional features such as
