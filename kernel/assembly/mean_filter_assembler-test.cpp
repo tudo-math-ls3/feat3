@@ -1,5 +1,5 @@
 // FEAT3: Finite Element Analysis Toolbox, Version 3
-// Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
+// Copyright (C) 2010 - 2024 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
@@ -17,7 +17,7 @@ using namespace FEAT;
 using namespace FEAT::TestSystem;
 
 template<typename DataType_, typename IndexType_>
-class MeanFilterTest :
+class MeanFilterAssemblerTest :
   public UnitTest
 {
   typedef LAFEM::MeanFilter<DataType_, IndexType_> FilterType;
@@ -30,12 +30,12 @@ class MeanFilterTest :
   typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
 
 public:
-  MeanFilterTest(PreferredBackend backend) :
-    UnitTest("MeanFilterTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
+  MeanFilterAssemblerTest(PreferredBackend backend) :
+    UnitTest("MeanFilterAssemblerTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
 
-  virtual ~MeanFilterTest()
+  virtual ~MeanFilterAssemblerTest()
   {
   }
 
@@ -106,25 +106,25 @@ public:
   }
 };
 
-MeanFilterTest <float, std::uint32_t> mean_filter_test_float_uint32(PreferredBackend::generic);
-MeanFilterTest <double, std::uint32_t> mean_filter_test_double_uint32(PreferredBackend::generic);
-MeanFilterTest <float, std::uint64_t> mean_filter_test_float_uint64(PreferredBackend::generic);
-MeanFilterTest <double, std::uint64_t> mean_filter_test_double_uint64(PreferredBackend::generic);
+MeanFilterAssemblerTest <float, std::uint32_t> mean_filter_asm_test_float_uint32(PreferredBackend::generic);
+MeanFilterAssemblerTest <double, std::uint32_t> mean_filter_asm_test_double_uint32(PreferredBackend::generic);
+MeanFilterAssemblerTest <float, std::uint64_t> mean_filter_asm_test_float_uint64(PreferredBackend::generic);
+MeanFilterAssemblerTest <double, std::uint64_t> mean_filter_asm_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MeanFilterTest <float, std::uint64_t> mkl_mean_filter_test_float_uint64(PreferredBackend::mkl);
-MeanFilterTest <double, std::uint64_t> mkl_mean_filter_test_double_uint64(PreferredBackend::mkl);
+MeanFilterAssemblerTest <float, std::uint64_t> mkl_mean_filter_asm_test_float_uint64(PreferredBackend::mkl);
+MeanFilterAssemblerTest <double, std::uint64_t> mkl_mean_filter_asm_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MeanFilterTest <__float128, std::uint32_t> mean_filter_test_float128_uint32(PreferredBackend::generic);
-MeanFilterTest <__float128, std::uint64_t> mean_filter_test_float128_uint64(PreferredBackend::generic);
+MeanFilterAssemblerTest <__float128, std::uint32_t> mean_filter_asm_test_float128_uint32(PreferredBackend::generic);
+MeanFilterAssemblerTest <__float128, std::uint64_t> mean_filter_asm_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MeanFilterTest <Half, std::uint32_t> mean_filter_test_half_uint32(PreferredBackend::generic);
-MeanFilterTest <Half, std::uint64_t> mean_filter_test_half_uint64(PreferredBackend::generic);
+MeanFilterAssemblerTest <Half, std::uint32_t> mean_filter_asm_test_half_uint32(PreferredBackend::generic);
+MeanFilterAssemblerTest <Half, std::uint64_t> mean_filter_asm_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MeanFilterTest <float, std::uint32_t> cuda_mean_filter_test_float_uint32(PreferredBackend::cuda);
-MeanFilterTest <double, std::uint32_t> cuda_mean_filter_test_double_uint32(PreferredBackend::cuda);
-MeanFilterTest <float, std::uint64_t> cuda_mean_filter_test_float_uint64(PreferredBackend::cuda);
-MeanFilterTest <double, std::uint64_t> cuda_mean_filter_test_double_uint64(PreferredBackend::cuda);
+MeanFilterAssemblerTest <float, std::uint32_t> cuda_mean_filter_asm_test_float_uint32(PreferredBackend::cuda);
+MeanFilterAssemblerTest <double, std::uint32_t> cuda_mean_filter_asm_test_double_uint32(PreferredBackend::cuda);
+MeanFilterAssemblerTest <float, std::uint64_t> cuda_mean_filter_asm_test_float_uint64(PreferredBackend::cuda);
+MeanFilterAssemblerTest <double, std::uint64_t> cuda_mean_filter_asm_test_double_uint64(PreferredBackend::cuda);
 #endif

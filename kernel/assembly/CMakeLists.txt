@@ -15,7 +15,7 @@ set(test_list
   interpolator-test
   jump_stabil-test
   linear_functional-test
-  mean_filter-test
+  mean_filter_assembler-test
   rew_projector-test
 )
 
