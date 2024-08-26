@@ -26,7 +26,7 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
 
-    const IT_ m = 10;
+    const IT_ m = 8;
     const IT_ num_cells = m*m;
     const IT_ num_edges = 2*m*(m+1);
     const IT_ off_edgev = m*(m+1);

@@ -69,12 +69,28 @@ namespace FEAT
         row_ptr_v.resize(neq+1u);
         col_idx_v.resize(nze);
         for(Index i(0); i <= Index(neq); ++i)
-          row_ptr_v[i] = MKL_INT(a_row_ptr[i]);
+          row_ptr_v[i] = static_cast<MKL_INT>(a_row_ptr[i]);
         for(Index i(0); i < Index(nze); ++i)
-          col_idx_v[i] = MKL_INT(a_col_idx[i]);
+          col_idx_v[i] = static_cast<MKL_INT>(a_col_idx[i]);
         row_ptr = row_ptr_v.data();
         col_idx = col_idx_v.data();
       }
+
+      // validate matrix structure
+#ifdef DEBUG
+      for(Index i(0); i < Index(neq); ++i)
+      {
+        bool have_diag = false;
+        for(Index j(row_ptr[i]); j < Index(row_ptr[i+1u]); ++j)
+        {
+          have_diag = have_diag || (col_idx[j] == i);
+          if((j+1u < Index(row_ptr[i+1u])) && (col_idx[j+1u] <= col_idx[j]))
+            throw InvalidMatrixStructureException("MKL DSS: non-ascending column indices detected");
+        }
+        if(!have_diag)
+          throw InvalidMatrixStructureException("MKL DSS: missing main diagonal entry");
+      }
+#endif
 
       // set matrix structure
       opt = MKL_DSS_NON_SYMMETRIC;
