@@ -18,6 +18,7 @@
 #include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/space/hermite3/element.hpp>
 #include <kernel/space/argyris/element.hpp>
+#include <kernel/space/q1tbnp/element.hpp>
 
 #include <vector>
 
@@ -105,7 +106,10 @@ int main(int, char**)
     dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("2d_quad_bogner_fox_schmit.vtk");
     // Hermite-3
     dump_basis< Space::Hermite3::Element<TrafoType> >("2d_quad_hermite-3.vtk");
+    // Q1~bubble non-parametric
+    dump_basis< Space::Q1TBNP::Element<TrafoType> >("2d_quad_q1tbnp.vtk");
   }
+
   // 3D Hexa Elements
   {
     typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
@@ -119,6 +123,8 @@ int main(int, char**)
     dump_basis< Space::Lagrange2::Element<TrafoType> >("3d_hexa_lagrange-2.vtk", 3);
     // Lagrange-3
     dump_basis< Space::Lagrange3::Element<TrafoType> >("3d_hexa_lagrange-3.vtk", 3);
+    // Q1~bubble non-parametric
+    dump_basis< Space::Q1TBNP::Element<TrafoType> >("3d_quad_q1tbnp.vtk");
   }
 }
 

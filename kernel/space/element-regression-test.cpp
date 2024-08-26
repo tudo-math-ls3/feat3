@@ -35,6 +35,7 @@
 #include <kernel/space/lagrange3/element.hpp>
 #include <kernel/space/p2bubble/element.hpp>
 #include <kernel/space/bernstein2/element.hpp>
+#include <kernel/space/q1tbnp/element.hpp>
 
 namespace ElementRegression
 {
@@ -687,6 +688,19 @@ namespace ElementRegression
   // **********************************************************************************************
   // **********************************************************************************************
   // **********************************************************************************************
+  // Q1T~bubble non-parametric element
+
+  // Interpolation Hypercube<2>
+  ElementRegressionInterpol<Shape::Hypercube<2>, Space::Q1TBNP::Element, true, true, false>
+    int_hy2_q1tbnp_lvl4(4, 1.910237680393e-03, 1.264949562432e-01);
+
+  // Interpolation Hypercube<3>
+  ElementRegressionInterpol<Shape::Hypercube<3>, Space::Q1TBNP::Element, true, true, false>
+    int_hy3_q1tbnp_lvl3(3, 5.767513119018e-03, 3.080389898912e-01);
+
+  // **********************************************************************************************
+  // **********************************************************************************************
+  // **********************************************************************************************
   // P2-Bubble element
 
   // Interpolation Simplex<2>
@@ -890,6 +904,19 @@ namespace ElementRegression
   // **********************************************************************************************
   // **********************************************************************************************
   // **********************************************************************************************
+  // Q1~bubble non-parametric element
+
+  // L2-Projection Hypercube<2>
+  ElementRegressionL2<Shape::Hypercube<2>, Space::Q1TBNP::Element, true, true, false>
+    l2_hy2_q1tbnp_lvl4(4, 1.030638532786e-03, 1.268734260472e-01);
+
+  // L2-Projection Hypercube<3>
+  ElementRegressionL2<Shape::Hypercube<3>, Space::Q1TBNP::Element, true, true, false>
+    l2_hy3_q1tbnp_lvl3(3, 3.637136139749e-03, 3.090493480241e-01);
+
+  // **********************************************************************************************
+  // **********************************************************************************************
+  // **********************************************************************************************
   // P2-Bubble element
 
   // L2-Projection Simplex<2>
@@ -1044,6 +1071,19 @@ namespace ElementRegression
   // H1-Projection Hypercube<2>
   ElementRegressionH1<Shape::Hypercube<2>, Space::CaiDouSanSheYe::Element, true, true, false>
     h1_hy2_cai_dou_san_she_ye_lvl4(4, 1.933685701573e-03, 1.784654397361e-01);
+
+  // **********************************************************************************************
+  // **********************************************************************************************
+  // **********************************************************************************************
+  // Q1~bubble non-parametric element
+
+  // H1-Projection Hypercube<2>
+  ElementRegressionH1<Shape::Hypercube<2>, Space::Q1TBNP::Element, true, true, false>
+    h1_hy2_q1tbnp_lvl4(4, 1.935826929624e-03, 1.784654204256e-01);
+
+  // H1-Projection Hypercube<3>
+  ElementRegressionH1<Shape::Hypercube<3>, Space::Q1TBNP::Element, true, true, false>
+    h1_hy3_q1tbnp_lvl3(3, 1.001650377646e-02, 3.794926149716e-01);
 
   // **********************************************************************************************
   // **********************************************************************************************
