@@ -21,6 +21,7 @@
 #include <kernel/space/lagrange2/element.hpp>
 #include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
+#include <kernel/space/q1tbnp/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/analytic/wrappers.hpp>
 #include <kernel/analytic/lambda_function.hpp>
@@ -120,12 +121,15 @@ namespace CCND
 #endif
 
   // define FE space types
-#ifdef FEAT_CCND_APP_Q1T_P0
+#if defined(FEAT_CCND_APP_Q1T_P0)
   typedef Space::CroRavRanTur::Element<TrafoType> SpaceVeloType;
-  typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<0>> SpacePresType;
+  typedef Space::Discontinuous::ElementP0<TrafoType> SpacePresType;
+#elif defined(FEAT_CCND_APP_Q1TBNP_P1DC)
+  typedef Space::Q1TBNP::Element<TrafoType> SpaceVeloType;
+  typedef Space::Discontinuous::ElementP1<TrafoType> SpacePresType;
 #else
   typedef Space::Lagrange2::Element<TrafoType> SpaceVeloType;
-  typedef Space::Discontinuous::Element<TrafoType, Space::Discontinuous::Variant::StdPolyP<1>> SpacePresType;
+  typedef Space::Discontinuous::ElementP1<TrafoType> SpacePresType;
 #endif
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

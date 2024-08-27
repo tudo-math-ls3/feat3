@@ -509,7 +509,11 @@ namespace CCND
       }
 
       // want to write VTK?
+#if defined(FEAT_CCND_APP_Q1T_P0) || defined(FEAT_CCND_APP_Q1TBNP_P1DC)
+      refine_vtk = false;
+#else
       refine_vtk = (args.check("refine-vtk") >= 0);
+#endif
       args.parse("vtk", vtk_filename);
       want_vtk = (args.check("vtk") >= 0) || refine_vtk;
 
@@ -1093,7 +1097,7 @@ namespace CCND
 
       // create our solver
       if(solve_gmres_dim > Index(0))
-        solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.0, multigrid);
+        solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.95, multigrid);
       else
         solver = solver_iterative = Solver::new_richardson(matrix_sys, filter_sys, 1.0, multigrid);
 
@@ -1704,8 +1708,16 @@ namespace CCND
       Geometry::ExportVTK<MeshType> exporter(*mesh);
 
       // write velocity
+#if defined(FEAT_CCND_APP_Q1T_P0) || defined(FEAT_CCND_APP_Q1TBNP_P1DC)
+      LAFEM::DenseVectorBlocked<DataType, Index, dim> vtx_v, vtx_f;
+      Assembly::DiscreteVertexProjector::project(vtx_v, vec_sol.local().template at<0>(), domain.front()->space_velo);
+      Assembly::DiscreteVertexProjector::project(vtx_f, vec_rhs.local().template at<0>(), domain.front()->space_velo);
+      exporter.add_vertex_vector("velocity", vtx_v);
+      exporter.add_vertex_vector("rhs_v", vtx_f);
+#else
       exporter.add_vertex_vector("velocity", vec_sol.local().template at<0>());
       exporter.add_vertex_vector("rhs_v", vec_rhs.local().template at<0>());
+#endif
 
       // project pressure
       LAFEM::DenseVector<DataType, Index> vtx_p, vtx_q;

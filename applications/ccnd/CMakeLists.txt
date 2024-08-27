@@ -6,7 +6,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # add all executables
 add_executable(ccnd-steady-dfg95-2d ccnd_steady_dfg95.cpp)
 add_executable(ccnd-steady-dfg95-2d-q1t ccnd_steady_dfg95.cpp)
+add_executable(ccnd-steady-dfg95-2d-q1tbnp ccnd_steady_dfg95.cpp)
 add_executable(ccnd-steady-dfg95-3d ccnd_steady_dfg95.cpp)
+add_executable(ccnd-steady-dfg95-3d-q1tbnp ccnd_steady_dfg95.cpp)
 add_executable(ccnd-steady-dricav-2d ccnd_steady_dricav.cpp)
 add_executable(ccnd-steady-taygre-2d ccnd_steady_taygre.cpp)
 add_executable(ccnd-steady-ypipe-2d ccnd_steady_ypipe.cpp)
@@ -17,6 +19,7 @@ add_executable(ccnd-unsteady-dfg95-3d ccnd_unsteady_dfg95.cpp)
 set(app_list_2d
   ccnd-steady-dfg95-2d
   ccnd-steady-dfg95-2d-q1t
+  ccnd-steady-dfg95-2d-q1tbnp
   ccnd-steady-dricav-2d
   ccnd-steady-taygre-2d
   ccnd-steady-ypipe-2d
@@ -26,6 +29,7 @@ set(app_list_2d
 # define 3D app list
 set(app_list_3d
   ccnd-steady-dfg95-3d
+  ccnd-steady-dfg95-3d-q1tbnp
   ccnd-unsteady-dfg95-3d
 )
 
@@ -39,9 +43,15 @@ set(app_list_iso
   ccnd-unsteady-dfg95-3d
 )
 
-#define Q1T/P0 app list
+# define Q1T app list
 set(app_list_q1t
   ccnd-steady-dfg95-2d-q1t
+)
+
+# define Q1TBNP app list
+set(app_list_q1tbnp
+  ccnd-steady-dfg95-2d-q1tbnp
+  ccnd-steady-dfg95-3d-q1tbnp
 )
 
 # list of all applications
@@ -63,6 +73,11 @@ endforeach (app)
 # set Q1T/P0 spaces
 foreach (app ${app_list_q1t})
   target_compile_definitions(${app} PUBLIC FEAT_CCND_APP_Q1T_P0)
+endforeach (app)
+
+# set Q1TBNP/P1DC spaces
+foreach (app ${app_list_q1t})
+  target_compile_definitions(${app} PUBLIC FEAT_CCND_APP_Q1TBNP_P1DC)
 endforeach (app)
 
 # set the other compile options for all applications
