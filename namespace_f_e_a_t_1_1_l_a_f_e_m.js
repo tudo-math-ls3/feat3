@@ -12,6 +12,7 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "MatrixMirror", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror" ],
     [ "MatrixMirrorBuffer", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror_buffer.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror_buffer" ],
     [ "MeanFilter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter" ],
+    [ "MeanFilterBlocked", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked" ],
     [ "MetaMatrixTestBase", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_meta_matrix_test_base.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_meta_matrix_test_base" ],
     [ "MetaVectorTestBase", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_meta_vector_test_base.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_meta_vector_test_base" ],
     [ "NoneFilter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter" ],

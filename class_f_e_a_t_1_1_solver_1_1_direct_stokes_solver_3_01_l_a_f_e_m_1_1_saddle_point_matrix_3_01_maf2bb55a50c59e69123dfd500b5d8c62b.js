@@ -19,9 +19,12 @@ var class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_
     [ "init_numeric", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a091327058de7ec33f92727441a05ed94", null ],
     [ "init_symbolic", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#ad841166ff0b7da0f5719bcc149bc6fc2", null ],
     [ "name", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#ad77c5eabdf0566a660cd0e762a1e2cde", null ],
+    [ "_cudss_solver", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a5f244471be0b76731fe57182171d14e9", null ],
     [ "_direct_solver", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#acfdb102426ceea10d874132964117826", null ],
     [ "_filter_sys", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a028123b6d1f5e235ff5a5b5816ae4623", null ],
     [ "_matrix_sys", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#aad9daf9ff3da05729f2bda741d0342f9", null ],
+    [ "_mkldss_solver", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a75208f86aefdde20ad2ad05adf864527", null ],
     [ "_stokes_core", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#ae5755448f04668ae8a8bb34595bbd99d", null ],
+    [ "_umfpack_solver", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a432160042e7363d8825e4a6f22c2edc2", null ],
     [ "_vec_sol", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a11ab45df003dfac0adf117ab3cdcd015", null ]
 ];

@@ -117,6 +117,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a42d89cc97c90f13fcec674b5f8e02f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcbb21f0aa89f17ac749559913a5ca65"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_scale.html#abcbb21f0aa89f17ac749559913a5ca65">value</a> (float *r, const float *const x, const float s, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
 <tr class="separator:abcbb21f0aa89f17ac749559913a5ca65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae768e7c9c73431ff7de49cbbd1bc4ba0"><td class="memTemplParams" colspan="2">template&lt;typename ValueType_ &gt; </td></tr>
+<tr class="memitem:ae768e7c9c73431ff7de49cbbd1bc4ba0"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_scale.html#ae768e7c9c73431ff7de49cbbd1bc4ba0">value_blocked</a> (ValueType_ *r, const ValueType_ *const x, const ValueType_ s, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
+<tr class="separator:ae768e7c9c73431ff7de49cbbd1bc4ba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a495911bbb9c5e9c5b92898378581edfe"><td class="memTemplParams" colspan="2">template&lt;typename ValueType_ &gt; </td></tr>
+<tr class="memitem:a495911bbb9c5e9c5b92898378581edfe"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_scale.html#a495911bbb9c5e9c5b92898378581edfe">value_blocked_generic</a> (ValueType_ *r, const ValueType_ *const x, const ValueType_ s, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
+<tr class="separator:a495911bbb9c5e9c5b92898378581edfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6554217c09a843056739f4706485f9bd"><td class="memTemplParams" colspan="2"><a id="a6554217c09a843056739f4706485f9bd" name="a6554217c09a843056739f4706485f9bd"></a>
 template&lt;typename DT_ &gt; </td></tr>
 <tr class="memitem:a6554217c09a843056739f4706485f9bd"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>value_cuda</b> (DT_ *r, const DT_ *const x, const DT_ s, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
@@ -179,7 +185,7 @@ template&lt;typename DT_ &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scale_8hpp_source.html#l00041">41</a> of file <a class="el" href="scale_8hpp_source.html">scale.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scale_8hpp_source.html#l00047">47</a> of file <a class="el" href="scale_8hpp_source.html">scale.hpp</a>.</p>
 
 </div>
 </div>
@@ -281,7 +287,111 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="scale_8hpp_source.html#l00036">36</a> of file <a class="el" href="scale_8hpp_source.html">scale.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scale_8hpp_source.html#l00042">42</a> of file <a class="el" href="scale_8hpp_source.html">scale.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae768e7c9c73431ff7de49cbbd1bc4ba0" name="ae768e7c9c73431ff7de49cbbd1bc4ba0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae768e7c9c73431ff7de49cbbd1bc4ba0">&#9670;&#160;</a></span>value_blocked()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FEAT::LAFEM::Arch::Scale::value_blocked </td>
+          <td>(</td>
+          <td class="paramtype">ValueType_ *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scale_8hpp_source.html#l00030">30</a> of file <a class="el" href="scale_8hpp_source.html">scale.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a495911bbb9c5e9c5b92898378581edfe" name="a495911bbb9c5e9c5b92898378581edfe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a495911bbb9c5e9c5b92898378581edfe">&#9670;&#160;</a></span>value_blocked_generic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::LAFEM::Arch::Scale::value_blocked_generic </td>
+          <td>(</td>
+          <td class="paramtype">ValueType_ *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="scale__generic_8hpp_source.html#l00041">41</a> of file <a class="el" href="scale__generic_8hpp_source.html">scale_generic.hpp</a>.</p>
 
 </div>
 </div>

@@ -110,7 +110,7 @@ $(document).ready(function(){initNavTree('feat_for_win_vs17.html',''); initResiz
 </li>
 <li class="level2"><a href="#win_vs17_prereqs_python">Python 3 Interpreter</a></li>
 <li class="level2"><a href="#win_vs17_prereqs_mpi">Microsoft MPI</a></li>
-<li class="level2"><a href="#win_vs17_prereqs_cuda">Nvidia CUDA v11.8</a></li>
+<li class="level2"><a href="#win_vs17_prereqs_cuda">Nvidia CUDA</a></li>
 <li class="level2"><a href="#win_vs17_prereqs_imkl">Intel oneAPI MKL</a></li>
 </ul>
 </li>
@@ -154,11 +154,12 @@ Microsoft MPI</h2>
 </pre></dd></dl>
 <p>Once you have installed MS-MPI and setup the launch service, there is nothing more to do, as the build-system will automatically detect that a MPI implementation is available.</p>
 <h2><a class="anchor" id="win_vs17_prereqs_cuda"></a>
-Nvidia CUDA v11.8</h2>
-<p >Currently, the only supported version of Nvidia CUDA is version 11.8, which must be installed including its integration into Visual Studio 2022, of course. There is nothing else that has to be done manually to enable CUDA in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>; simply select a build configuration that contains the <code>cuda</code> tag to enable CUDA in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>.</p>
+Nvidia CUDA</h2>
+<p >The minimum supported version of Nvidia CUDA for <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> is version 12.0, which must be installed including its integration into Visual Studio 2022, of course. There is nothing else that has to be done manually to enable CUDA in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>; simply select a build configuration that contains the <code>cuda</code> tag to enable CUDA in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>.</p>
 <h2><a class="anchor" id="win_vs17_prereqs_imkl"></a>
 Intel oneAPI MKL</h2>
-<p >The Visual Studio build system supports the use of Intel oneAPI MKL, assuming that it is installed on the system, of course. There is nothing else that has to be done manually to enable MKL in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>; simply select a build configuration that contains the <code>mkl</code> tag to enable MKL in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>. The only version that has been tested to work is 2023.1.0, but we expect that any newer version will work as well.</p>
+<p >The minimum supported version Intel oneAPI MKL is version 2024.2. Unfortunately, Intel apparently does not provide any useful environment variables to the installation directory anymore, so one has to declare one by themselves. Assuming that you have installed MKL in its default installation directory, execute the following command in a console with administrator rights: </p><pre class="fragment">setx ONEAPI_ROOT "C:\Program Files (x86)\Intel\oneAPI"
+</pre><p> If you have installed Intel oneAPI in another directory, then you have to adjust the path accordingly, of course. There is nothing else that has to be done manually to enable MKL in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>; simply select a build configuration that contains the mkl tag to enable MKL in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>.</p>
 <h1><a class="anchor" id="win_vs17_thirdparty"></a>
 Additional Third-Party Libraries</h1>
 <p ><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> supports a set of third-party libraries, which can be included to extend the functionality offered by <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>. Note that all third-party libraries are <em>opt-in</em>, i.e. you are not forced to use any of these libraries, but you may as well use <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> without any additional libraries (a.k.a. "naked build") &ndash; the drawback is that you will only have reduced functionality, of course.</p>
@@ -231,8 +232,8 @@ Build Configurations and Platforms</h1>
 <li><code>dbg</code>: generate a debug binary (mutually exclusive with <code>opt</code>)</li>
 <li><code>opt</code>: generate an optimized binary (mutually exclusive with <code>dbg</code>)</li>
 <li><code>mpi</code>: build with MPI support (requires MS-MPI to be installed)</li>
-<li><code>cuda</code> build with Nvidia CUDA support (requires Nvidia CUDA 11.8 to be installed)</li>
-<li><code>mkl</code>: build with Intel MKL support (requires Intel oneAPI MKL 2023 or newer to be installed)</li>
+<li><code>cuda</code> build with Nvidia CUDA support (requires Nvidia CUDA 12.0 or newer to be installed)</li>
+<li><code>mkl</code>: build with Intel MKL support (requires Intel oneAPI MKL 2024 or newer to be installed)</li>
 <li><code>omp</code>: build with OpenMP support</li>
 </ul>
 <p >So, for example the configuration <code>dbg</code> represents a simple debug build without any additional features such as MPI or CUDA, whereas <code>opt-mpi</code> represents an optimized build including MPI support.</p>

@@ -117,6 +117,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a4b6b5cec3be8ff4a47547258c05b2833"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af84bf6fc4bfe3d9c75933c4ad4bcd4e4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html#af84bf6fc4bfe3d9c75933c4ad4bcd4e4">value</a> (float *r, const float a, const float *const x, const float *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
 <tr class="separator:af84bf6fc4bfe3d9c75933c4ad4bcd4e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e2e3fcf525e3f126dfd6c938a254c09"><td class="memTemplParams" colspan="2">template&lt;typename ValueType_ &gt; </td></tr>
+<tr class="memitem:a2e2e3fcf525e3f126dfd6c938a254c09"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html#a2e2e3fcf525e3f126dfd6c938a254c09">value_blocked</a> (ValueType_ *r, const ValueType_ a, const ValueType_ *const x, const ValueType_ *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
+<tr class="separator:a2e2e3fcf525e3f126dfd6c938a254c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71aac13a6f2050a075ab9ada1e57d5fc"><td class="memTemplParams" colspan="2">template&lt;typename ValueType_ &gt; </td></tr>
+<tr class="memitem:a71aac13a6f2050a075ab9ada1e57d5fc"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html#a71aac13a6f2050a075ab9ada1e57d5fc">value_blocked_generic</a> (ValueType_ *r, const ValueType_ a, const ValueType_ *const x, const ValueType_ *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
+<tr class="separator:a71aac13a6f2050a075ab9ada1e57d5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abde593205ac8cdb2e62091ebcc973980"><td class="memTemplParams" colspan="2"><a id="abde593205ac8cdb2e62091ebcc973980" name="abde593205ac8cdb2e62091ebcc973980"></a>
 template&lt;typename DT_ &gt; </td></tr>
 <tr class="memitem:abde593205ac8cdb2e62091ebcc973980"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>value_cuda</b> (DT_ *r, const DT_ a, const DT_ *const x, const DT_ *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
@@ -185,7 +191,7 @@ template&lt;typename DT_ &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="axpy_8hpp_source.html#l00041">41</a> of file <a class="el" href="axpy_8hpp_source.html">axpy.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="axpy_8hpp_source.html#l00047">47</a> of file <a class="el" href="axpy_8hpp_source.html">axpy.hpp</a>.</p>
 
 </div>
 </div>
@@ -299,7 +305,123 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="axpy_8hpp_source.html#l00036">36</a> of file <a class="el" href="axpy_8hpp_source.html">axpy.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="axpy_8hpp_source.html#l00042">42</a> of file <a class="el" href="axpy_8hpp_source.html">axpy.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a2e2e3fcf525e3f126dfd6c938a254c09" name="a2e2e3fcf525e3f126dfd6c938a254c09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e2e3fcf525e3f126dfd6c938a254c09">&#9670;&#160;</a></span>value_blocked()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FEAT::LAFEM::Arch::Axpy::value_blocked </td>
+          <td>(</td>
+          <td class="paramtype">ValueType_ *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="axpy_8hpp_source.html#l00030">30</a> of file <a class="el" href="axpy_8hpp_source.html">axpy.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a71aac13a6f2050a075ab9ada1e57d5fc" name="a71aac13a6f2050a075ab9ada1e57d5fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71aac13a6f2050a075ab9ada1e57d5fc">&#9670;&#160;</a></span>value_blocked_generic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::LAFEM::Arch::Axpy::value_blocked_generic </td>
+          <td>(</td>
+          <td class="paramtype">ValueType_ *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="axpy__generic_8hpp_source.html#l00052">52</a> of file <a class="el" href="axpy__generic_8hpp_source.html">axpy_generic.hpp</a>.</p>
 
 </div>
 </div>

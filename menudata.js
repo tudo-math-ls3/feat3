@@ -83,6 +83,7 @@ var menudata={children:[
 {text:"g",url:"namespacemembers_type.html#index_g"},
 {text:"h",url:"namespacemembers_type.html#index_h"},
 {text:"i",url:"namespacemembers_type.html#index_i"},
+{text:"m",url:"namespacemembers_type.html#index_m"},
 {text:"p",url:"namespacemembers_type.html#index_p"},
 {text:"q",url:"namespacemembers_type.html#index_q"},
 {text:"r",url:"namespacemembers_type.html#index_r"},

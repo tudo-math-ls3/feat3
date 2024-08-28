@@ -117,6 +117,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a9b282b092a5b6b8aa7d1b356c2ae3f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada25b0d54ec15505e20a49f5bdf8e49b"><td class="memItemLeft" align="right" valign="top">static float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_dot_product.html#ada25b0d54ec15505e20a49f5bdf8e49b">value</a> (const float *const x, const float *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
 <tr class="separator:ada25b0d54ec15505e20a49f5bdf8e49b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a861e22f8f6afdf4f58295f628053dfe9"><td class="memTemplParams" colspan="2">template&lt;typename ValueType_ &gt; </td></tr>
+<tr class="memitem:a861e22f8f6afdf4f58295f628053dfe9"><td class="memTemplItemLeft" align="right" valign="top">static ValueType_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_dot_product.html#a861e22f8f6afdf4f58295f628053dfe9">value_blocked</a> (const ValueType_ *const x, const ValueType_ *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
+<tr class="separator:a861e22f8f6afdf4f58295f628053dfe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cebdd96808a672fb2e8fc25844c1b01"><td class="memTemplParams" colspan="2">template&lt;typename ValueType_ &gt; </td></tr>
+<tr class="memitem:a3cebdd96808a672fb2e8fc25844c1b01"><td class="memTemplItemLeft" align="right" valign="top">static ValueType_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_dot_product.html#a3cebdd96808a672fb2e8fc25844c1b01">value_blocked_generic</a> (const ValueType_ *const x, const ValueType_ *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
+<tr class="separator:a3cebdd96808a672fb2e8fc25844c1b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63e93fd81a7f9f7368989679f90f6e15"><td class="memTemplParams" colspan="2"><a id="a63e93fd81a7f9f7368989679f90f6e15" name="a63e93fd81a7f9f7368989679f90f6e15"></a>
 template&lt;typename DT_ &gt; </td></tr>
 <tr class="memitem:a63e93fd81a7f9f7368989679f90f6e15"><td class="memTemplItemLeft" align="right" valign="top">static DT_&#160;</td><td class="memTemplItemRight" valign="bottom"><b>value_cuda</b> (const DT_ *const x, const DT_ *const y, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</td></tr>
@@ -173,7 +179,7 @@ template&lt;typename DT_ &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dot__product_8hpp_source.html#l00041">41</a> of file <a class="el" href="dot__product_8hpp_source.html">dot_product.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dot__product_8hpp_source.html#l00047">47</a> of file <a class="el" href="dot__product_8hpp_source.html">dot_product.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +269,99 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dot__product_8hpp_source.html#l00036">36</a> of file <a class="el" href="dot__product_8hpp_source.html">dot_product.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dot__product_8hpp_source.html#l00042">42</a> of file <a class="el" href="dot__product_8hpp_source.html">dot_product.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a861e22f8f6afdf4f58295f628053dfe9" name="a861e22f8f6afdf4f58295f628053dfe9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a861e22f8f6afdf4f58295f628053dfe9">&#9670;&#160;</a></span>value_blocked()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static ValueType_ FEAT::LAFEM::Arch::DotProduct::value_blocked </td>
+          <td>(</td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="dot__product_8hpp_source.html#l00030">30</a> of file <a class="el" href="dot__product_8hpp_source.html">dot_product.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3cebdd96808a672fb2e8fc25844c1b01" name="a3cebdd96808a672fb2e8fc25844c1b01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cebdd96808a672fb2e8fc25844c1b01">&#9670;&#160;</a></span>value_blocked_generic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType_ FEAT::LAFEM::Arch::DotProduct::value_blocked_generic </td>
+          <td>(</td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType_ *const&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="dot__product__generic_8hpp_source.html#l00044">44</a> of file <a class="el" href="dot__product__generic_8hpp_source.html">dot_product_generic.hpp</a>.</p>
 
 </div>
 </div>

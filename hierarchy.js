@@ -111,13 +111,15 @@ var hierarchy =
     [ "FEAT::Space::Bernstein2::Evaluator< ShapeType, DataType_ >", "class_f_e_a_t_1_1_space_1_1_bernstein2_1_1_evaluator.html", null ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Shape::Hypercube< shape_dim_ >, DataType_, SpaceEvalTraits_, typename Space_::ShapeType >, DataType_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", null ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hexahedron >, TrafoEvaluator_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", [
-      [ "FEAT::Space::CroRavRanTur::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hexahedron >", "class_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur_1_1_evaluator_3_01_space___00_01_trafo_evaluator___0b6ac4939673a6cd90495f3edd5624cc3.html", null ]
+      [ "FEAT::Space::CroRavRanTur::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hexahedron >", "class_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur_1_1_evaluator_3_01_space___00_01_trafo_evaluator___0b6ac4939673a6cd90495f3edd5624cc3.html", null ],
+      [ "FEAT::Space::Q1TBNP::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hexahedron >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_2be5aeec58e5b7d19e38f7fb4e901a36.html", null ]
     ] ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 1 > >, TrafoEvaluator_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", null ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 2 > >, TrafoEvaluator_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", null ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube< 3 > >, TrafoEvaluator_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", null ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >, TrafoEvaluator_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", [
-      [ "FEAT::Space::CroRavRanTur::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >", "class_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur_1_1_evaluator_3_01_space___00_01_trafo_evaluator___001b011599bed78529504db50cb49456d.html", null ]
+      [ "FEAT::Space::CroRavRanTur::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >", "class_f_e_a_t_1_1_space_1_1_cro_rav_ran_tur_1_1_evaluator_3_01_space___00_01_trafo_evaluator___001b011599bed78529504db50cb49456d.html", null ],
+      [ "FEAT::Space::Q1TBNP::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_3da8886277cafb8343dcd8258f6373f1.html", null ]
     ] ],
     [ "FEAT::Space::EvaluatorBase< Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Simplex< 2 > >, TrafoEvaluator_, SpaceEvalTraits_ >", "class_f_e_a_t_1_1_space_1_1_evaluator_base.html", [
       [ "FEAT::Space::Argyris::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Simplex< 2 > >", "class_f_e_a_t_1_1_space_1_1_argyris_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01_spa96d47ea9782e73b0166b29cca748b7d3.html", null ]
@@ -673,6 +675,7 @@ var hierarchy =
     [ "FEAT::KahanAccumulation", "struct_f_e_a_t_1_1_kahan_accumulation.html", null ],
     [ "FEAT::LAFEM::Arch::Apply", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_apply.html", null ],
     [ "FEAT::LAFEM::Arch::Axpy", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html", null ],
+    [ "FEAT::LAFEM::Arch::ComponentCopy", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_component_copy.html", null ],
     [ "FEAT::LAFEM::Arch::ComponentInvert", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_component_invert.html", null ],
     [ "FEAT::LAFEM::Arch::ComponentProduct", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_component_product.html", null ],
     [ "FEAT::LAFEM::Arch::Diagonal", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_diagonal.html", null ],
@@ -690,6 +693,7 @@ var hierarchy =
     [ "FEAT::LAFEM::Arch::MinIndex", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_min_index.html", null ],
     [ "FEAT::LAFEM::Arch::Mirror", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_mirror.html", null ],
     [ "FEAT::LAFEM::Arch::Norm2", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_norm2.html", null ],
+    [ "FEAT::LAFEM::Arch::Norm2Sqr", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_norm2_sqr.html", null ],
     [ "FEAT::LAFEM::Arch::ProductMatMat", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_product_mat_mat.html", null ],
     [ "FEAT::LAFEM::Arch::RowNorm", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_row_norm.html", null ],
     [ "FEAT::LAFEM::Arch::Scale", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_scale.html", null ],
@@ -741,6 +745,7 @@ var hierarchy =
     [ "FEAT::LAFEM::MatrixGatherScatterHelper< Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_t615360d4651e74a259baaf0968479879.html", null ],
     [ "FEAT::LAFEM::MatrixMirror< DT_, IT_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_mirror.html", null ],
     [ "FEAT::LAFEM::MeanFilter< DT_, IT_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html", null ],
+    [ "FEAT::LAFEM::MeanFilterBlocked< DT_, IT_, BlockSize_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html", null ],
     [ "FEAT::LAFEM::NoneFilter< DataType_, IndexType_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter.html", null ],
     [ "FEAT::LAFEM::NoneFilterBlocked< DataType_, IndexType_, BlockSize_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html", null ],
     [ "FEAT::LAFEM::NullMatrix< DT_, IT_, BlockHeight_, BlockWidth_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html", null ],
@@ -1004,7 +1009,8 @@ var hierarchy =
       [ "FEAT::Space::Lagrange1::Element< Trafo_ >", "class_f_e_a_t_1_1_space_1_1_lagrange1_1_1_element.html", null ],
       [ "FEAT::Space::Lagrange2::Element< Trafo_ >", "class_f_e_a_t_1_1_space_1_1_lagrange2_1_1_element.html", null ],
       [ "FEAT::Space::Lagrange3::Element< Trafo_ >", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_element.html", null ],
-      [ "FEAT::Space::P2Bubble::Element< Trafo_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_element.html", null ]
+      [ "FEAT::Space::P2Bubble::Element< Trafo_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_element.html", null ],
+      [ "FEAT::Space::Q1TBNP::Element< Trafo_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_element.html", null ]
     ] ],
     [ "FEAT::Space::ElementBase< Trafo_ >::DofAssignment< shape_dim_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_element_base_1_1_dof_assignment.html", null ],
     [ "FEAT::Space::ElementBase< Trafo_ >::Evaluator< TrafoEvaluator_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_element_base_1_1_evaluator.html", null ],
@@ -1146,11 +1152,15 @@ var hierarchy =
         [ "FEAT::Space::Lagrange1::NodeFunctional< Space_, shape_dim_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_lagrange1_1_1_node_functional.html", null ],
         [ "FEAT::Space::Lagrange2::NodeFunctional< Space_, ShapeType_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_lagrange2_1_1_node_functional.html", null ],
         [ "FEAT::Space::Lagrange3::NodeFunctional< Space_, ShapeType_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_lagrange3_1_1_node_functional.html", null ],
-        [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, ShapeType_, FaceType_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional.html", null ]
+        [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, ShapeType_, FaceType_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional.html", null ],
+        [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape_, codim_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional.html", null ]
       ] ],
       [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, Shape::Simplex< dim_ >, Shape::Simplex< dim_ >, DataType_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional_3_01_space___00_01_shape_1_1_simplex_3828a164494b96eac4c588a6596fe739f.html", null ],
       [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, ShapeType_, Shape::Simplex< 1 >, DataType_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional_3_01_space___00_01_shape_type___00_01_9b0c87a1767f7d6681d046d9bfa2a7b6.html", null ],
-      [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, ShapeType_, Shape::Vertex, DataType_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional_3_01_space___00_01_shape_type___00_01_f5ad02ebcd81dbcdf2592296fe88707b.html", null ]
+      [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, ShapeType_, Shape::Vertex, DataType_ >", "class_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional_3_01_space___00_01_shape_type___00_01_f5ad02ebcd81dbcdf2592296fe88707b.html", null ],
+      [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape::Hypercube< 2 >, 0, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional_3_01_space___00_01_shape_1_1_hypercub9798db6ea14cc0d2104186ccce2f66d8.html", null ],
+      [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape::Hypercube< 3 >, 0, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional_3_01_space___00_01_shape_1_1_hypercuba38ba907df69d7a6699d9147bfadbbd8.html", null ],
+      [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape::Hypercube< shape_dim_ >, 1, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional_3_01_space___00_01_shape_1_1_hypercubfba02d77f303402360726189a0c1054b.html", null ]
     ] ],
     [ "FEAT::Space::P2Bubble::DofTraits< Shape_, dim_ >", "struct_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_dof_traits.html", null ],
     [ "FEAT::Space::P2Bubble::DofTraits< Shape::Simplex< 2 >, 2 >", "struct_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_dof_traits_3_01_shape_1_1_simplex_3_012_01_4_00_012_01_4.html", null ],
@@ -1166,6 +1176,19 @@ var hierarchy =
     [ "FEAT::Space::P2Bubble::NodeFunctional< Space_, ShapeType_, Shape::Vertex, DataType_ >::Value< Function_ >", "struct_f_e_a_t_1_1_space_1_1_p2_bubble_1_1_node_functional_3_01_space___00_01_shape_type___00_0196f09c74bf71ba3bcb4729c098016440.html", null ],
     [ "FEAT::Space::ParametricEvalHelper", "struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html", null ],
     [ "FEAT::Space::ParametricEvaluator< SpaceEvaluator_, TrafoEvaluator_, SpaceEvalTraits_, ref_caps_ >::ConfigTraits< cfg_ >", "struct_f_e_a_t_1_1_space_1_1_parametric_evaluator_1_1_config_traits.html", null ],
+    [ "FEAT::Space::Q1TBNP::DofTraits< Shape_, dim_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_dof_traits.html", null ],
+    [ "FEAT::Space::Q1TBNP::DofTraits< Shape::Hypercube< 2 >, 2 >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_dof_traits_3_01_shape_1_1_hypercube_3_012_01_4_00_012_01_4.html", null ],
+    [ "FEAT::Space::Q1TBNP::DofTraits< Shape::Hypercube< 3 >, 3 >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_dof_traits_3_01_shape_1_1_hypercube_3_013_01_4_00_013_01_4.html", null ],
+    [ "FEAT::Space::Q1TBNP::DofTraits< Shape::Hypercube< dim_+1 >, dim_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01dim___091_01_4_00_01dim___01_4.html", null ],
+    [ "FEAT::Space::Q1TBNP::Element< Trafo_ >::DofAssignment< shape_dim_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_element_1_1_dof_assignment.html", null ],
+    [ "FEAT::Space::Q1TBNP::Element< Trafo_ >::Evaluator< TrafoEvaluator_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_element_1_1_evaluator.html", null ],
+    [ "FEAT::Space::Q1TBNP::Element< Trafo_ >::NodeFunctional< shape_dim_, DataType_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_element_1_1_node_functional.html", null ],
+    [ "FEAT::Space::Q1TBNP::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape_ >", "class_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator.html", null ],
+    [ "FEAT::Space::Q1TBNP::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hexahedron >::ConfigTraits< cfg_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_0151719a61b7fd9347c54a261080665c24.html", null ],
+    [ "FEAT::Space::Q1TBNP::Evaluator< Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Quadrilateral >::ConfigTraits< cfg_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01644f37e7e95ab6c4e55eccb88d5d5c51.html", null ],
+    [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape::Hypercube< 2 >, 0, DataType_ >::Value< Function_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional_3_01_space___00_01_shape_1_1_hypercu9d0460edb370bf6e84db87a22347b453.html", null ],
+    [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape::Hypercube< 3 >, 0, DataType_ >::Value< Function_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional_3_01_space___00_01_shape_1_1_hypercu20b7eb172803d372336a0173fae7ea6a.html", null ],
+    [ "FEAT::Space::Q1TBNP::NodeFunctional< Space_, Shape::Hypercube< shape_dim_ >, 1, DataType_ >::Value< Function_ >", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_node_functional_3_01_space___00_01_shape_1_1_hypercu46861c7ddfce2b4bef65304cdf16ecfa.html", null ],
     [ "FEAT::Statistics", "class_f_e_a_t_1_1_statistics.html", null ],
     [ "FEAT::StopWatch", "class_f_e_a_t_1_1_stop_watch.html", null ],
     [ "FEAT::String::NoCaseLess", "class_f_e_a_t_1_1_string_1_1_no_case_less.html", null ],
@@ -1304,8 +1327,10 @@ var hierarchy =
     [ "FEAT::Tiny::Matrix< DataType, 21, 21 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 3, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 4, 4 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Tiny::Matrix< DataType, 5, 5 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 6, 6 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 6, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Tiny::Matrix< DataType, 9, 9 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 9, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, conv_dim, conv_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, max_local_dofs, max_local_dofs >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
@@ -1374,6 +1399,8 @@ var hierarchy =
       [ "FEAT::Solver::ConvertPrecond< Global::Vector< LocalVectorOuter_, MirrorOuter_ >, Global::Vector< LocalVectorInner_, MirrorInner_ > >", "class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html", null ]
     ] ],
     [ "FEAT::Solver::SolverBase< LAFEM::DenseVector< double, Index > >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", [
+      [ "FEAT::Solver::CUDSS", "class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html", null ],
+      [ "FEAT::Solver::MKLDSS", "class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html", null ],
       [ "FEAT::Solver::Umfpack", "class_f_e_a_t_1_1_solver_1_1_umfpack.html", null ],
       [ "FEAT::Solver::UmfpackMean", "class_f_e_a_t_1_1_solver_1_1_umfpack_mean.html", null ]
     ] ],

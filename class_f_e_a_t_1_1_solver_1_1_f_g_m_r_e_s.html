@@ -369,7 +369,7 @@ Protected Attributes</h2></td></tr>
 <tr class="memdesc:aa1d9ff7579d96221d5905230cd0727fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hessenberg matrix.  <a href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html#aa1d9ff7579d96221d5905230cd0727fb">More...</a><br /></td></tr>
 <tr class="separator:aa1d9ff7579d96221d5905230cd0727fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a29e25850729825faf35116ecd66b9f"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html#a3a29e25850729825faf35116ecd66b9f">_inner_res_scale</a></td></tr>
-<tr class="memdesc:a3a29e25850729825faf35116ecd66b9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">inner pseudo-residual scaling factor  <a href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html#a3a29e25850729825faf35116ecd66b9f">More...</a><br /></td></tr>
+<tr class="memdesc:a3a29e25850729825faf35116ecd66b9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">inner pseudo-residual scaling factor, see the documentation of this class for details  <a href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html#a3a29e25850729825faf35116ecd66b9f">More...</a><br /></td></tr>
 <tr class="separator:a3a29e25850729825faf35116ecd66b9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44a696c771d3d261646f8de9a353cf38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a44a696c771d3d261646f8de9a353cf38">_iter_digits</a></td></tr>
 <tr class="memdesc:a44a696c771d3d261646f8de9a353cf38"><td class="mdescLeft">&#160;</td><td class="mdescRight">iteration count digits for plotting  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a44a696c771d3d261646f8de9a353cf38">More...</a><br /></td></tr>
@@ -441,7 +441,11 @@ Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename Matrix_, typename Filter_&gt;<br />
 class FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;</div><p >FGMRES(k) solver implementation. </p>
-<p >This class implements the Restarted Flexible Generalized Minimal Residual solver (FGMRES(k)).</p>
+<p >This class implements the Restarted Flexible Generalized Minimal Residual solver (FGMRES(k)), which is a variation of the "normal" preconditioned Restarted GMRES (GMRES(k)) solver that supports varying preconditioners, i.e. it allows the use of preconditioner \(M^{-1}\) which does not necessarily have to fulfill the linearity condition \(M^{-1}(\alpha x + y) = \alpha M^{-1}x + M^{-1}y\). If used with a preconditioner that does fulfill the linearity condition or if used without a preconditioner, the FGMRES(k) and GMRES(k) solvers are equivalent with the exception of rounding errors, of course.</p>
+<p ><u><b>Details about the inner resolution scaling factor:</b></u><br  />
+In contrast to other popular iterative Krylov subspace methods like <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g.html" title="(Preconditioned) Conjugate-Gradient solver implementation">PCG</a> or <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a>, the GMRES method and all of its variants &ndash; including the FMGRES(k) solver implemented by this class &ndash; do <b>not</b> compute or update the residual/defect vector after each iteration! This is not an oversight, but it is a fundamental property of the GMRES methods that both the solution vector as well as the residual/defect vectors are only computed after the GMRES method has terminated or, in the case of restarted [F]GMRES(k) variants, after each restart, which happens after at most k iterations. Saad describes this problem and proposes a solution in his book <b>[Saad03]</b> in Proposition 6.9, which also states that the euclidean norm of the residual \(\|b-Ax_m\|_2\) is equal to a scalar quantity \(|\gamma_{m+1}|\), which is easily computed from the other quantities that have to be updated in each GMRES iteration. Therefore, one might simply use this scalar to implement a absolute or relative defect tolerance stopping criterion without the need to explicitly compute the residual/defect vector itself.</p>
+<p >However, in the real world case of finite precision arithmetic, the identity is merely an approximation, i.e. we actually have \(|\gamma_{m+1}|\approx\|b-Ax_m\|_2\) and therefore checking \(|\gamma_{m+1}|\) against the stopping criterion may lead to false positives and therefore premature termination of the inner FGMRES(k) loop. At the end of each inner FGMRES(k) loop, the solution and residual/defect vectors are updated and now the real residual/defect norm is computed and checked against the tolerances and it may now happen that \(|\gamma_{m+1}| &lt; \textnormal{tol}_{\textnormal{abs}} &lt; \|b-Ax_m\|_2\f\) (and analogously for the relative tolerance, of course), therefore leading to another restart of the inner FGMRES(k) loop. In the worst case, this restarted inner loop may again produce a false positive after 1 iteration, therefore triggering another restart, thus effectively leading to an extremely slowly converging FGMRES(1) iteration.</p>
+<p >To deal with this problem, this implementation includes an inner residual scaling factor \(\delta\geq 0\), which is used to check \(\delta|\gamma_{m+1}| &lt; \textnormal{tol}_{\textnormal{abs}}\) for the absolute and \(\delta|\gamma_{m+1}| &lt; \textnormal{tol}_{\textnormal{rel}}\|r_0\|_2\) for the relative stopping criterion, respectively. By choosing a \(0 &lt; \delta &lt; 1\), one can ensure that the inner GMRES loop has to fulfill a tighter tolerance than the outer loop, therefore reducing the risk of false positives. It is also possible to set \(\delta = 0\), in which case the inner GMRES loop will only terminate prematurely if it detects that it has arrived at the exact solution and no more inner iterations must be performed to avoid division by zero.</p>
 <dl class="section see"><dt>See also</dt><dd>Y. Saad: A flexible inner-outer preconditioned GMRES algorithm; SIAM Journal on Scientific Computing, Volume 14 Issue 2, pp. 461-469, March 1993</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -452,7 +456,7 @@ class FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;</div><p >FGMRES(k) solver i
 </dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00040">40</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00075">75</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a9f4334f2ef4a888c5d4b676712c5d08d" name="a9f4334f2ef4a888c5d4b676712c5d08d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9f4334f2ef4a888c5d4b676712c5d08d">&#9670;&#160;</a></span>BaseClass</h2>
@@ -468,7 +472,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00048">48</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00083">83</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -486,7 +490,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00047">47</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00082">82</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +508,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00045">45</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00080">80</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -522,7 +526,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00044">44</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00079">79</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -540,7 +544,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00050">50</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00085">85</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -558,7 +562,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00046">46</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00081">81</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -623,27 +627,15 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>A reference to the system matrix.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>A reference to the system filter.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">krylov_dim</td><td>The maximum Krylov subspace dimension. Must be &gt; 0.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">inner_res_scale</td><td>The scaling factor for the inner GMRES loop residual.  </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>The GMRES-algorithm can check for convergence at two positions during the iteration: One is to check the factor \(q\) from the algorithm when building up a the Krylow-spaces (in the inner loop), the other one is to check the real residuum after the space is built up. This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor \(q\) will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means: If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.<br  />
-The solution to this problem is this factor: The preconditioned residuum needs to fulfill the usual convergence criterion, but they are scaled with this factor: Instead of the usual convergence criterion, it has to fulfill the scaled convergence criterion  </p><p class="formulaDsp">
-\[
-  (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-\]
-</p>
-<p> This means: If you do not know any estimate for the correlation between your preconditioned residuum and the real residuum, you can just set this factor to zero. This will deactivate this intermediate check and thus result in a few more iterations, but it is the save variant that will lead to convergence. You should only set it to something else than zero if you really know what you are doing! </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">inner_res_scale</td><td>The scaling factor for the inner GMRES loop residual. See the documentation of this class for details.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">precond</td><td>A pointer to the preconditioner. May be <code>nullptr</code>. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00106">106</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00122">122</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00626">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_comm_by_matrix()</a>, and <a class="el" href="fgmres_8hpp_source.html#l00206">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::set_inner_res_scale()</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00626">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_comm_by_matrix()</a>, and <a class="el" href="fgmres_8hpp_source.html#l00221">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::set_inner_res_scale()</a>.</p>
 
 </div>
 </div>
@@ -701,7 +693,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00118">118</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00134">134</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -732,7 +724,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Empty virtual destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00147">147</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00163">163</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -842,7 +834,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00241">241</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00256">256</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -1244,7 +1236,7 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00626">626</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="bicgstab_8hpp_source.html#l00192">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::BiCGStab()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00156">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::BiCGStabL()</a>, <a class="el" href="fgmres_8hpp_source.html#l00106">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::FGMRES()</a>, <a class="el" href="gropppcg_8hpp_source.html#l00070">FEAT::Solver::GroppPCG&lt; Matrix_, Filter_ &gt;::GroppPCG()</a>, <a class="el" href="idrs_8hpp_source.html#l00093">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::IDRS()</a>, <a class="el" href="nloptls_8hpp_source.html#l00107">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::NLOptLS()</a>, <a class="el" href="pcg_8hpp_source.html#l00075">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::PCG()</a>, <a class="el" href="pcr_8hpp_source.html#l00068">FEAT::Solver::PCR&lt; Matrix_, Filter_ &gt;::PCR()</a>, <a class="el" href="pipepcg_8hpp_source.html#l00073">FEAT::Solver::PipePCG&lt; Matrix_, Filter_ &gt;::PipePCG()</a>, <a class="el" href="pmr_8hpp_source.html#l00073">FEAT::Solver::PMR&lt; Matrix_, Filter_ &gt;::PMR()</a>, <a class="el" href="psd_8hpp_source.html#l00068">FEAT::Solver::PSD&lt; Matrix_, Filter_ &gt;::PSD()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00072">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::RBiCGStab()</a>, <a class="el" href="rgcr_8hpp_source.html#l00072">FEAT::Solver::RGCR&lt; Matrix_, Filter_ &gt;::RGCR()</a>, and <a class="el" href="richardson_8hpp_source.html#l00072">FEAT::Solver::Richardson&lt; Matrix_, Filter_ &gt;::Richardson()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="bicgstab_8hpp_source.html#l00192">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::BiCGStab()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00156">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::BiCGStabL()</a>, <a class="el" href="fgmres_8hpp_source.html#l00122">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::FGMRES()</a>, <a class="el" href="gropppcg_8hpp_source.html#l00070">FEAT::Solver::GroppPCG&lt; Matrix_, Filter_ &gt;::GroppPCG()</a>, <a class="el" href="idrs_8hpp_source.html#l00093">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::IDRS()</a>, <a class="el" href="nloptls_8hpp_source.html#l00107">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::NLOptLS()</a>, <a class="el" href="pcg_8hpp_source.html#l00075">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::PCG()</a>, <a class="el" href="pcr_8hpp_source.html#l00068">FEAT::Solver::PCR&lt; Matrix_, Filter_ &gt;::PCR()</a>, <a class="el" href="pipepcg_8hpp_source.html#l00073">FEAT::Solver::PipePCG&lt; Matrix_, Filter_ &gt;::PipePCG()</a>, <a class="el" href="pmr_8hpp_source.html#l00073">FEAT::Solver::PMR&lt; Matrix_, Filter_ &gt;::PMR()</a>, <a class="el" href="psd_8hpp_source.html#l00068">FEAT::Solver::PSD&lt; Matrix_, Filter_ &gt;::PSD()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00072">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::RBiCGStab()</a>, <a class="el" href="rgcr_8hpp_source.html#l00072">FEAT::Solver::RGCR&lt; Matrix_, Filter_ &gt;::RGCR()</a>, and <a class="el" href="richardson_8hpp_source.html#l00072">FEAT::Solver::Richardson&lt; Matrix_, Filter_ &gt;::Richardson()</a>.</p>
 
 </div>
 </div>
@@ -1546,7 +1538,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <dl class="section attention"><dt>Attention</dt><dd>vec_cor and vec_def must <b>not</b> refer to the same vector object!</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A Status code that represents the status of the solution step.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00213">213</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00228">228</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00135">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_status</a>, and <a class="el" href="iterative_8hpp_source.html#l00573">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::plot_summary()</a>.</p>
 
@@ -1660,7 +1652,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00228">228</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00243">243</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00135">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_status</a>, and <a class="el" href="iterative_8hpp_source.html#l00573">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::plot_summary()</a>.</p>
 
@@ -1818,9 +1810,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html#af94a02cae8fe53aebff183f79b81833c">FEAT::Solver::PreconditionedIterativeSolver&lt; Matrix_::VectorTypeR &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00179">179</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00195">195</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00080">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_vec_v</a>, and <a class="el" href="iterative_8hpp_source.html#l01043">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_symbolic()</a>.</p>
+<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00097">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_vec_v</a>, and <a class="el" href="iterative_8hpp_source.html#l01043">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -2431,9 +2423,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html#a7dc2a10ac4838f02d5684a5a396b3afa">FEAT::Solver::PreconditionedIterativeSolver&lt; Matrix_::VectorTypeR &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00157">157</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00173">173</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00082">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_c</a>, <a class="el" href="fgmres_8hpp_source.html#l00084">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_h</a>, <a class="el" href="fgmres_8hpp_source.html#l00058">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_krylov_dim</a>, <a class="el" href="fgmres_8hpp_source.html#l00080">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_vec_v</a>, <a class="el" href="iterative_8hpp_source.html#l01019">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::init_symbolic()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>.</p>
+<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00099">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_c</a>, <a class="el" href="fgmres_8hpp_source.html#l00101">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_h</a>, <a class="el" href="fgmres_8hpp_source.html#l00093">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_krylov_dim</a>, <a class="el" href="fgmres_8hpp_source.html#l00097">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_vec_v</a>, <a class="el" href="iterative_8hpp_source.html#l01019">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::init_symbolic()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>.</p>
 
 </div>
 </div>
@@ -2637,7 +2629,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00152">152</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00168">168</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -2672,7 +2664,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00677">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_plot_summary()</a>, <a class="el" href="iterative_8hpp_source.html#l00698">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_print_line()</a>, and <a class="el" href="iterative_8hpp_source.html#l00556">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_summary()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alglib__wrapper_8hpp_source.html#l00306">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00842">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00294">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00278">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="nlcg_8hpp_source.html#l00310">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="nlsd_8hpp_source.html#l00208">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="pcg_8hpp_source.html#l00140">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00149">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="fgmres_8hpp_source.html#l00213">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="idrs_8hpp_source.html#l00196">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00329">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00861">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00277">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00261">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="fgmres_8hpp_source.html#l00228">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="idrs_8hpp_source.html#l00215">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="nlcg_8hpp_source.html#l00336">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="nlsd_8hpp_source.html#l00231">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="pcg_8hpp_source.html#l00159">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::correct()</a>, and <a class="el" href="rbicgstab_8hpp_source.html#l00168">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alglib__wrapper_8hpp_source.html#l00306">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00842">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00294">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00278">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="nlcg_8hpp_source.html#l00310">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="nlsd_8hpp_source.html#l00208">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="pcg_8hpp_source.html#l00140">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00149">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="fgmres_8hpp_source.html#l00228">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="idrs_8hpp_source.html#l00196">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00329">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00861">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00277">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00261">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="fgmres_8hpp_source.html#l00243">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="idrs_8hpp_source.html#l00215">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="nlcg_8hpp_source.html#l00336">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="nlsd_8hpp_source.html#l00231">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="pcg_8hpp_source.html#l00159">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::correct()</a>, and <a class="el" href="rbicgstab_8hpp_source.html#l00168">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>.</p>
 
 </div>
 </div>
@@ -2778,11 +2770,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00206">206</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00221">221</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00078">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_inner_res_scale</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00095">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_inner_res_scale</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00106">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::FGMRES()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00122">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::FGMRES()</a>.</p>
 
 </div>
 </div>
@@ -2820,9 +2812,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00193">193</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00209">209</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00058">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_krylov_dim</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="fgmres_8hpp_source.html#l00093">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::_krylov_dim</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -3251,9 +3243,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Givens rotation coefficients. </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00082">82</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00099">99</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00157">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00173">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -3461,9 +3453,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Hessenberg matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00084">84</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00101">101</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00157">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00173">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -3489,18 +3481,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>inner pseudo-residual scaling factor </p>
-<p >The GMRES-algorithm can check for convergence at two positions during the iteration: One is to check the factor \(q\) from the algorithm when building up a the Krylow-spaces (in the inner loop), the other one is to check the real residuum after the space is built up. This is perfectly fine if no preconditioner is applied. However, if a preconditioner is applied then the factor \(q\) will correlate to the preconditioned residuum which does not have to correlate to the residuum. This means: If you stop the loop there because the preconditioned residuum was small, it can happen that the final convergence check (in the outer loop) fails. As a result, GMRES will always build up a one-dimensional Krylow-space and then never converge.<br  />
-The solution to this problem is this factor: The preconditioned residuum needs to fulfill the usual convergence criterion, but they are scaled with this factor: Instead of the usual convergence criterion, it has to fulfill the scaled convergence criterion  </p><p class="formulaDsp">
-\[
-  (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_abs}) \land ((\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale}\cdot\text{tol\_rel}\vert \vert r_0\vert\vert) \lor (\vert \vert q_k\vert\vert \leq \text{\_inner\_res\_scale} \cdot \text{tol\_abs\_low}))
-\]
-</p>
-<p> This means: If you do not know any estimate for the correlation between your preconditioned residuum and the real residuum, you can just set this factor to zero. This will deactivate this intermediate check and thus result in a few more iterations, but it is the save variant that will lead to convergence. You should only set it to something else than zero if you really know what you are doing! </p>
+<p>inner pseudo-residual scaling factor, see the documentation of this class for details </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00078">78</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00095">95</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00206">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::set_inner_res_scale()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00221">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::set_inner_res_scale()</a>.</p>
 
 </div>
 </div>
@@ -3558,9 +3543,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>krylov dimension </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00058">58</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00093">93</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00157">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, and <a class="el" href="fgmres_8hpp_source.html#l00193">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::set_krylov_dim()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00173">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, and <a class="el" href="fgmres_8hpp_source.html#l00209">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::set_krylov_dim()</a>.</p>
 
 </div>
 </div>
@@ -3852,7 +3837,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00082">82</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00099">99</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -3878,7 +3863,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00082">82</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00099">99</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -3968,7 +3953,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00135">135</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alglib__wrapper_8hpp_source.html#l00306">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00842">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00294">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00278">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="nlcg_8hpp_source.html#l00310">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="nlsd_8hpp_source.html#l00208">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="pcg_8hpp_source.html#l00140">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00149">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="fgmres_8hpp_source.html#l00213">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="idrs_8hpp_source.html#l00196">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00329">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00861">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00277">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00261">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="fgmres_8hpp_source.html#l00228">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="idrs_8hpp_source.html#l00215">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="nlcg_8hpp_source.html#l00336">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="nlsd_8hpp_source.html#l00231">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="pcg_8hpp_source.html#l00159">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00168">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>, and <a class="el" href="iterative_8hpp_source.html#l00522">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_status()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alglib__wrapper_8hpp_source.html#l00306">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00842">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00294">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00278">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="nlcg_8hpp_source.html#l00310">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="nlsd_8hpp_source.html#l00208">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="pcg_8hpp_source.html#l00140">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00149">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="fgmres_8hpp_source.html#l00228">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="idrs_8hpp_source.html#l00196">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::apply()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00329">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00861">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00277">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00261">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="fgmres_8hpp_source.html#l00243">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="idrs_8hpp_source.html#l00215">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="nlcg_8hpp_source.html#l00336">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="nlsd_8hpp_source.html#l00231">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="pcg_8hpp_source.html#l00159">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;::correct()</a>, <a class="el" href="rbicgstab_8hpp_source.html#l00168">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;::correct()</a>, and <a class="el" href="iterative_8hpp_source.html#l00522">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_status()</a>.</p>
 
 </div>
 </div>
@@ -3996,7 +3981,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the filter for the solver </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00056">56</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00091">91</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -4024,7 +4009,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the matrix for the solver </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00054">54</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00089">89</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -4178,9 +4163,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>krylov basis vectors </p>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00080">80</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00097">97</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00179">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::done_symbolic()</a>, and <a class="el" href="fgmres_8hpp_source.html#l00157">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fgmres_8hpp_source.html#l00195">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::done_symbolic()</a>, and <a class="el" href="fgmres_8hpp_source.html#l00173">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -4206,7 +4191,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00080">80</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00097">97</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>

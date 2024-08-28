@@ -1,0 +1,6 @@
+var struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01644f37e7e95ab6c4e55eccb88d5d5c51 =
+[
+    [ "EvalDataType", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01644f37e7e95ab6c4e55eccb88d5d5c51.html#a0dbbc867d3bc506b6f52577ef3847c7b", null ],
+    [ "config", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01644f37e7e95ab6c4e55eccb88d5d5c51.html#ac9eab4bfaffc70b72b677a3fe1ad0e01", null ],
+    [ "trafo_config", "struct_f_e_a_t_1_1_space_1_1_q1_t_b_n_p_1_1_evaluator_3_01_space___00_01_trafo_evaluator___00_01644f37e7e95ab6c4e55eccb88d5d5c51.html#a1b223db7e139637b411d3f836b506542", null ]
+];

@@ -11,6 +11,7 @@ var namespace_f_e_a_t_1_1_space =
     [ "Lagrange2", "namespace_f_e_a_t_1_1_space_1_1_lagrange2.html", "namespace_f_e_a_t_1_1_space_1_1_lagrange2" ],
     [ "Lagrange3", "namespace_f_e_a_t_1_1_space_1_1_lagrange3.html", "namespace_f_e_a_t_1_1_space_1_1_lagrange3" ],
     [ "P2Bubble", "namespace_f_e_a_t_1_1_space_1_1_p2_bubble.html", "namespace_f_e_a_t_1_1_space_1_1_p2_bubble" ],
+    [ "Q1TBNP", "namespace_f_e_a_t_1_1_space_1_1_q1_t_b_n_p.html", "namespace_f_e_a_t_1_1_space_1_1_q1_t_b_n_p" ],
     [ "BasisData", "class_f_e_a_t_1_1_space_1_1_basis_data.html", "class_f_e_a_t_1_1_space_1_1_basis_data" ],
     [ "DofAssignmentBase", "class_f_e_a_t_1_1_space_1_1_dof_assignment_base.html", "class_f_e_a_t_1_1_space_1_1_dof_assignment_base" ],
     [ "DofAssignmentIdentity", "class_f_e_a_t_1_1_space_1_1_dof_assignment_identity.html", "class_f_e_a_t_1_1_space_1_1_dof_assignment_identity" ],

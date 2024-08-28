@@ -189,6 +189,9 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:a5f244471be0b76731fe57182171d14e9"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html">Solver::CUDSS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a5f244471be0b76731fe57182171d14e9">_cudss_solver</a></td></tr>
+<tr class="memdesc:a5f244471be0b76731fe57182171d14e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">our <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html" title="Nvidia CUDA Direct Sparse Solver wrapper.">CUDSS</a> solver object; used if preferred backend is <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">PreferredBackend::cuda</a>  <a href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a5f244471be0b76731fe57182171d14e9">More...</a><br /></td></tr>
+<tr class="separator:a5f244471be0b76731fe57182171d14e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfdb102426ceea10d874132964117826"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">Solver::SolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a36274c9084581271c0e9a90371afced3">SolverVectorType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#acfdb102426ceea10d874132964117826">_direct_solver</a></td></tr>
 <tr class="memdesc:acfdb102426ceea10d874132964117826"><td class="mdescLeft">&#160;</td><td class="mdescRight">the actual direct solver; opaque <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html" title="Polymorphic solver interface.">SolverBase</a> pointer  <a href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#acfdb102426ceea10d874132964117826">More...</a><br /></td></tr>
 <tr class="separator:acfdb102426ceea10d874132964117826"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -198,9 +201,15 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:aad9daf9ff3da05729f2bda741d0342f9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#af1b378f730f61d25f3d448f39652b75f">SystemMatrixType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#aad9daf9ff3da05729f2bda741d0342f9">_matrix_sys</a></td></tr>
 <tr class="memdesc:aad9daf9ff3da05729f2bda741d0342f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">the system matrix  <a href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#aad9daf9ff3da05729f2bda741d0342f9">More...</a><br /></td></tr>
 <tr class="separator:aad9daf9ff3da05729f2bda741d0342f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75208f86aefdde20ad2ad05adf864527"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html">Solver::MKLDSS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a75208f86aefdde20ad2ad05adf864527">_mkldss_solver</a></td></tr>
+<tr class="memdesc:a75208f86aefdde20ad2ad05adf864527"><td class="mdescLeft">&#160;</td><td class="mdescRight">our <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html" title="Intel MKL Direct Sparse Solver wrapper.">MKLDSS</a> solver object; used if preferred backend is <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">PreferredBackend::mkl</a>  <a href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a75208f86aefdde20ad2ad05adf864527">More...</a><br /></td></tr>
+<tr class="separator:a75208f86aefdde20ad2ad05adf864527"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5755448f04668ae8a8bb34595bbd99d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#acbedd70bf635b6569bc9f14b4ccc3d3b">StokesCoreType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#ae5755448f04668ae8a8bb34595bbd99d">_stokes_core</a></td></tr>
 <tr class="memdesc:ae5755448f04668ae8a8bb34595bbd99d"><td class="mdescLeft">&#160;</td><td class="mdescRight">the direct stokes core  <a href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#ae5755448f04668ae8a8bb34595bbd99d">More...</a><br /></td></tr>
 <tr class="separator:ae5755448f04668ae8a8bb34595bbd99d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a432160042e7363d8825e4a6f22c2edc2"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html">Solver::Umfpack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a432160042e7363d8825e4a6f22c2edc2">_umfpack_solver</a></td></tr>
+<tr class="memdesc:a432160042e7363d8825e4a6f22c2edc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">our UMFPACK solver object; used if no other direct solver was chosen  <a href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a432160042e7363d8825e4a6f22c2edc2">More...</a><br /></td></tr>
+<tr class="separator:a432160042e7363d8825e4a6f22c2edc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca1ee870596e22d5851d2713abb0a6de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a36274c9084581271c0e9a90371afced3">SolverVectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#aca1ee870596e22d5851d2713abb0a6de">_vec_rhs</a></td></tr>
 <tr class="separator:aca1ee870596e22d5851d2713abb0a6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11ab45df003dfac0adf117ab3cdcd015"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a36274c9084581271c0e9a90371afced3">SolverVectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a11ab45df003dfac0adf117ab3cdcd015">_vec_sol</a></td></tr>
@@ -214,7 +223,7 @@ class FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_
 <dl class="section attention"><dt>Attention</dt><dd>Currently, this solver class can only be used if <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> is compiled and linked with support for the UMFPACK library.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00976">976</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01059">1059</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a82e2c6e7dd5f2ff0d29713f76f507d31" name="a82e2c6e7dd5f2ff0d29713f76f507d31"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a82e2c6e7dd5f2ff0d29713f76f507d31">&#9670;&#160;</a></span>BaseClass</h2>
@@ -232,7 +241,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00988">988</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01071">1071</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -252,7 +261,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the solver filter type; this is always a NoneFilter </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00998">998</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01081">1081</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +281,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the solver matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00994">994</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01077">1077</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +301,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the solver vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00996">996</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01079">1079</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +321,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the direct Stokes core class type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00991">991</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01074">1074</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +341,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>our system filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00985">985</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01068">1068</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -352,7 +361,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>our system matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00981">981</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01064">1064</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -372,7 +381,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>our system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l00983">983</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01066">1066</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -448,9 +457,9 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01030">1030</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01121">1121</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00118">FEAT::Solver::new_umfpack()</a>, and <a class="el" href="assertion_8hpp_source.html#l00194">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>, <a class="el" href="backend_8cpp_source.html#l00027">FEAT::Backend::get_preferred_backend()</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">FEAT::mkl</a>, <a class="el" href="cudss_8hpp_source.html#l00107">FEAT::Solver::new_cudss()</a>, <a class="el" href="mkl__dss_8hpp_source.html#l00112">FEAT::Solver::new_mkl_dss()</a>, <a class="el" href="umfpack_8hpp_source.html#l00118">FEAT::Solver::new_umfpack()</a>, and <a class="el" href="assertion_8hpp_source.html#l00194">XABORTM</a>.</p>
 
 </div>
 </div>
@@ -551,7 +560,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 <dl class="section attention"><dt>Attention</dt><dd>vec_cor and vec_def must <b>not</b> refer to the same vector object!</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A Status code that represents the status of the solution step. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01118">1118</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01248">1248</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -615,7 +624,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#af2ea6e8c96de45c8408f3dcc59b8f186">FEAT::Solver::SolverBase&lt; LAFEM::TupleVector&lt; MatrixB_::VectorTypeL, MatrixD_::VectorTypeL &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01084">1084</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01214">1214</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -648,7 +657,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a70018a5e4ca2cd3dfc0cac9db3df051e">FEAT::Solver::SolverBase&lt; LAFEM::TupleVector&lt; MatrixB_::VectorTypeL, MatrixD_::VectorTypeL &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01093">1093</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01223">1223</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -712,7 +721,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a3d2a6e135e4af6af6be0c0aaf3330b3a">FEAT::Solver::SolverBase&lt; LAFEM::TupleVector&lt; MatrixB_::VectorTypeL, MatrixD_::VectorTypeL &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01070">1070</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01200">1200</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -745,7 +754,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a394e71e99c87e99a5eda16c302df725e">FEAT::Solver::SolverBase&lt; LAFEM::TupleVector&lt; MatrixB_::VectorTypeL, MatrixD_::VectorTypeL &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01052">1052</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01182">1182</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -778,11 +787,39 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; LAFEM::TupleVector&lt; MatrixB_::VectorTypeL, MatrixD_::VectorTypeL &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01046">1046</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01164">1164</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a5f244471be0b76731fe57182171d14e9" name="a5f244471be0b76731fe57182171d14e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f244471be0b76731fe57182171d14e9">&#9670;&#160;</a></span>_cudss_solver</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename FilterV_ , typename FilterP_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html">Solver::CUDSS</a>&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html">FEAT::Solver::DirectStokesSolver</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_filter.html">LAFEM::TupleFilter</a>&lt; FilterV_, FilterP_ &gt; &gt;::_cudss_solver</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>our <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html" title="Nvidia CUDA Direct Sparse Solver wrapper.">CUDSS</a> solver object; used if preferred backend is <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">PreferredBackend::cuda</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01100">1100</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+
+</div>
+</div>
 <a id="acfdb102426ceea10d874132964117826" name="acfdb102426ceea10d874132964117826"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acfdb102426ceea10d874132964117826">&#9670;&#160;</a></span>_direct_solver</h2>
 
@@ -807,7 +844,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the actual direct solver; opaque <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html" title="Polymorphic solver interface.">SolverBase</a> pointer </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01013">1013</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01096">1096</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -835,7 +872,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01004">1004</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01087">1087</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -863,7 +900,35 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01002">1002</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01085">1085</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a75208f86aefdde20ad2ad05adf864527" name="a75208f86aefdde20ad2ad05adf864527"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75208f86aefdde20ad2ad05adf864527">&#9670;&#160;</a></span>_mkldss_solver</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename FilterV_ , typename FilterP_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html">Solver::MKLDSS</a>&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html">FEAT::Solver::DirectStokesSolver</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_filter.html">LAFEM::TupleFilter</a>&lt; FilterV_, FilterP_ &gt; &gt;::_mkldss_solver</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>our <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html" title="Intel MKL Direct Sparse Solver wrapper.">MKLDSS</a> solver object; used if preferred backend is <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">PreferredBackend::mkl</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01104">1104</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -891,7 +956,35 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>the direct stokes core </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01007">1007</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01090">1090</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a432160042e7363d8825e4a6f22c2edc2" name="a432160042e7363d8825e4a6f22c2edc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a432160042e7363d8825e4a6f22c2edc2">&#9670;&#160;</a></span>_umfpack_solver</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename FilterV_ , typename FilterP_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html">Solver::Umfpack</a>&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html">FEAT::Solver::DirectStokesSolver</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_filter.html">LAFEM::TupleFilter</a>&lt; FilterV_, FilterP_ &gt; &gt;::_umfpack_solver</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>our UMFPACK solver object; used if no other direct solver was chosen </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01108">1108</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -917,7 +1010,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01010">1010</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01093">1093</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -945,7 +1038,7 @@ template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename
 
 <p>our RHS/SOL vectors </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01010">1010</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01093">1093</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>

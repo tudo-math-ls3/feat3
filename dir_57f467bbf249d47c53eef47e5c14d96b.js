@@ -15,6 +15,7 @@ var dir_57f467bbf249d47c53eef47e5c14d96b =
     [ "matrix_mirror.hpp", "matrix__mirror_8hpp_source.html", null ],
     [ "matrix_mirror_buffer.hpp", "matrix__mirror__buffer_8hpp_source.html", null ],
     [ "mean_filter.hpp", "lafem_2mean__filter_8hpp_source.html", null ],
+    [ "mean_filter_blocked.hpp", "mean__filter__blocked_8hpp_source.html", null ],
     [ "meta_element.hpp", "meta__element_8hpp_source.html", null ],
     [ "meta_matrix_test_base.hpp", "meta__matrix__test__base_8hpp_source.html", null ],
     [ "meta_vector_test_base.hpp", "meta__vector__test__base_8hpp_source.html", null ],
