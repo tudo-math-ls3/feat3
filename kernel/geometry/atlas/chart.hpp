@@ -45,8 +45,10 @@ namespace FEAT
         typedef typename VertexSetType::CoordType CoordType;
 
       public:
-        /// virtual DTOR
-        virtual ~ChartBase() {}
+        ChartBase() = default;
+        ChartBase(const ChartBase&) = default;
+        ChartBase& operator=(const ChartBase&) = default;
+        virtual ~ChartBase() = default;
 
         /// \returns The size of dynamically allocated memory in bytes.
         virtual std::size_t bytes() const

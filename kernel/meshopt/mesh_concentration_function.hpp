@@ -1767,6 +1767,9 @@ namespace FEAT
         //  {
         //  }
 
+        ConcentrationFunctionPowOfDist(const ConcentrationFunctionPowOfDist&) = default;
+        ConcentrationFunctionPowOfDist& operator=(const ConcentrationFunctionPowOfDist&) = default;
+
         /**
          * \brief Empty destructor
          *

@@ -59,17 +59,12 @@ namespace FEAT
       IdxSet _cells[shape_dim + 1];
 
     public:
-      /**
-       * \brief Constructor.
-       */
-      explicit UnitFilterAssembler()
-      {
-      }
-
-      /// virtual destructor
-      virtual ~UnitFilterAssembler()
-      {
-      }
+      UnitFilterAssembler() = default;
+      UnitFilterAssembler(UnitFilterAssembler&&) = default;
+      UnitFilterAssembler& operator=(UnitFilterAssembler&&) = default;
+      UnitFilterAssembler(const UnitFilterAssembler&) = delete;
+      UnitFilterAssembler& operator=(const UnitFilterAssembler&) = delete;
+      virtual ~UnitFilterAssembler() = default;
 
       /**
        * \brief Adds the dofs on a mesh-part to the dof-set.

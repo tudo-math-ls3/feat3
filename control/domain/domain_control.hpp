@@ -252,9 +252,11 @@ namespace FEAT
           }
         }
 
-        virtual ~VirtualLevel()
-        {
-        }
+        VirtualLevel(VirtualLevel&&) = default;
+        VirtualLevel& operator=(VirtualLevel&&) = default;
+        VirtualLevel(const VirtualLevel&) = delete;
+        VirtualLevel& operator=(const VirtualLevel&) = delete;
+        virtual ~VirtualLevel() = default;
 
         bool is_child() const
         {

@@ -549,10 +549,18 @@ namespace FEAT
         {
         }
 
+        /// default move constructor
+        Worker(Worker&&) = default;
+        /// default move assignment
+        Worker& operator=(Worker&&) = default;
+
+        /// no copy, no problems
+        Worker(const Worker&) = delete;
+        /// no copy, no problems
+        Worker& operator=(const Worker&) = delete;
+
         /// virtual destructor
-        virtual ~Worker()
-        {
-        }
+        virtual ~Worker() = default;
 
         /**
          * \brief Evaluation operator
