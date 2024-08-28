@@ -99,6 +99,7 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("- 'alglib': download and build ALGLIB library from source")
   print ("- 'boost': download and include BOOST header library")
   print ("- 'cgal': download and include CGAL header library (requires BOOST)")
+  print ("- 'cudss': use externally provided CUDSS cuda direct sparse solver")
   print ("- 'deathhandler': download and build deathhandler library")
   print ("- 'fparser': download and build fparser library")
   print ("- 'floatx': download and include floatx header library")
@@ -622,6 +623,10 @@ if "cuda" in buildid:
   if not cuda_host_compiler:
     cuda_host_compiler = find_exe("g++")
   cmake_flags += " -DFEAT_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
+
+  if "cudss" in buildid:
+    remove_string(unused_tokens, "cudss")
+    cmake_flags += " -DFEAT_HAVE_CUDSS:BOOL=ON"
 
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")

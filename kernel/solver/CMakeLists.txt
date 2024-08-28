@@ -3,7 +3,6 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of lafem source files
 set(kernel-solver-list
-  cudss.cpp
   hypre.cpp
   mkl_dss.cpp
   superlu.cpp
@@ -44,13 +43,17 @@ endif (FEAT_HAVE_SUPERLU_DIST)
 
 if (FEAT_HAVE_CUDA)
   add_library(kernel-solver-cuda STATIC
+    cudss.cu
     cusolver.cu
     ilu_precond.cu
     sor_precond.cu
     ssor_precond.cu
     voxel_amavanka.cu
   )
-  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} kernel-util-cuda)
+  if (FEAT_HAVE_CUDSS)
+    set(CUDA_cudss_LIBRARY "-lcudss")
+  endif (FEAT_HAVE_CUDSS)
+  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cudss_LIBRARY} kernel-util-cuda)
   target_link_libraries(kernel-solver PRIVATE kernel-solver-cuda)
 endif (FEAT_HAVE_CUDA)
 

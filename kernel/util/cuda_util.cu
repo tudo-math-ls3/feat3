@@ -12,6 +12,10 @@
 #include <kernel/util/assertion.hpp>
 #include "cuda_profiler_api.h"
 
+#ifdef FEAT_HAVE_CUDSS
+#include <kernel/solver/cudss.hpp>
+#endif
+
 using namespace FEAT;
 
 Index FEAT::Util::cuda_blocksize_misc = 256;

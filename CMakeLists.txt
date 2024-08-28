@@ -74,6 +74,7 @@ if (FEAT_HAVE_CUDA)
   if (FEAT_CUDA_HOST_COMPILER)
     set (INTERNAL_CUDA_FLAGS "${INTERNAL_CUDA_FLAGS} -ccbin ${FEAT_CUDA_HOST_COMPILER}")
   endif (FEAT_CUDA_HOST_COMPILER)
+
   #Important: Set cuda flag before enable language call
   set(CMAKE_CUDA_FLAGS "${INTERNAL_CUDA_FLAGS}" CACHE STRING "Cuda compile flag")
   enable_language(CUDA)

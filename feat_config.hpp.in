@@ -41,6 +41,9 @@
 /// Do we have CUDA support enabled?
 #cmakedefine FEAT_HAVE_CUDA
 
+/// Do we have CUDA CUDSS support enabled?
+#cmakedefine FEAT_HAVE_CUDSS
+
 /// Do we have DEATH_HANDLER support enabled?
 #cmakedefine FEAT_HAVE_DEATH_HANDLER
 

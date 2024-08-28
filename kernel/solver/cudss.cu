@@ -6,9 +6,9 @@
 #include <kernel/base_header.hpp>
 
 #ifdef FEAT_HAVE_CUDSS
-#include <kernel/solver/cudss.hpp>
 #include <kernel/util/memory_pool.hpp>
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/solver/cudss.hpp>
 
 namespace FEAT
 {
