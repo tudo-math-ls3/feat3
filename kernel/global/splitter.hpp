@@ -416,7 +416,7 @@ namespace FEAT
        * by calling the set_base_vector_template() before calling this function.
        */
       void join_write_out(const Global::Vector<LocalVector_, Mirror_>& vector, const String& filename,
-        LAFEM::FileMode mode = LAFEM::FileMode::fm_binary)
+        LAFEM::FileMode mode = LAFEM::FileMode::fm_binary) const
       {
         // actual join
         LocalVector_ vec_base(join(vector));
@@ -442,7 +442,7 @@ namespace FEAT
        * The LAFEM::FileMode of the input file, defaults to binary format.
        */
       void split_read_from(Global::Vector<LocalVector_, Mirror_>& vector, const String& filename,
-        LAFEM::FileMode mode = LAFEM::FileMode::fm_binary)
+        LAFEM::FileMode mode = LAFEM::FileMode::fm_binary) const
       {
         split_read_from(vector.local(), filename, mode);
       }
@@ -461,7 +461,7 @@ namespace FEAT
        * The LAFEM::FileMode of the input file, defaults to binary format.
        */
       void split_read_from(LocalVector_& vector, const String& filename,
-        LAFEM::FileMode mode = LAFEM::FileMode::fm_binary)
+        LAFEM::FileMode mode = LAFEM::FileMode::fm_binary) const
       {
         // create an empty base-mesh vector
         LocalVector_ vec_base;
