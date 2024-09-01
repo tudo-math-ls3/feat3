@@ -52,13 +52,15 @@ if (FEAT_HAVE_MKL)
 endif (FEAT_HAVE_MKL)
 
 
-add_library(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
+add_library(feat-kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
 if (FEAT_COTIRE)
-  cotire(kernel-lafem-arch)
+  cotire(feat-kernel-lafem-arch)
 endif (FEAT_COTIRE)
 
+target_link_libraries(feat-kernel-lafem-arch PUBLIC feat-dependency)
+
 if (FEAT_HAVE_CUDA)
-  add_library(kernel-lafem-arch-cuda STATIC
+  add_library(feat-kernel-lafem-arch-cuda STATIC
     axpy.cu
     apply.cu
     component_copy.cu
@@ -81,7 +83,16 @@ if (FEAT_HAVE_CUDA)
     unit_filter_blocked.cu
   )
 
-  target_link_libraries(kernel-lafem-arch-cuda PRIVATE kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
+  target_link_libraries(feat-kernel-lafem-arch-cuda
+  PUBLIC
+    feat-dependency
+  PRIVATE
+    feat-kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
 #TODO: Use Static variants?  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_static_LIBRARY} ${CUDA_cublas_static_LIBRARY})
-  target_link_libraries(kernel-lafem-arch PRIVATE kernel-lafem-arch-cuda)
+
+  if(FEAT_HAVE_CUDSS)
+    target_link_libraries(feat-kernel-lafem-arch-cuda PRIVATE cuDSS::cuDSS)
+  endif()
+
+  target_link_libraries(feat-kernel-lafem-arch PRIVATE feat-kernel-lafem-arch-cuda)
 endif (FEAT_HAVE_CUDA)

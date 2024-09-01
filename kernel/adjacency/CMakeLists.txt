@@ -2,14 +2,14 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of adjacency source files
-add_library(kernel-adjacency STATIC
+add_library(feat-kernel-adjacency STATIC
   coloring.cpp
   cuthill_mckee.cpp
   graph.cpp
   permutation.cpp
 )
 if (FEAT_COTIRE)
-  cotire(kernel-adjacency)
+  cotire(feat-kernel-adjacency)
 endif (FEAT_COTIRE)
 
 # list of adjacency tests
@@ -20,7 +20,7 @@ set(test_list
   permutation-test
 )
 
-target_link_libraries(kernel-adjacency PRIVATE kernel-util)
+target_link_libraries(feat-kernel-adjacency PRIVATE feat-kernel-util feat-dependency)
 
 # create all tests
 foreach (test ${test_list} )

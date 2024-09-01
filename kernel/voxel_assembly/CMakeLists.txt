@@ -8,15 +8,19 @@ set(kernel-voxel-assembly-list
   empty_voxel.cpp
   )
 
-add_library(kernel-voxel-assembly STATIC ${kernel-voxel-assembly-list})
+add_library(feat-kernel-voxel-assembly STATIC ${kernel-voxel-assembly-list})
 if (FEAT_COTIRE)
-  cotire(kernel-voxel-assembly)
+  cotire(feat-kernel-voxel-assembly)
 endif (FEAT_COTIRE)
 
-target_link_libraries(kernel-voxel-assembly PRIVATE kernel-voxel-assembly-arch kernel-util)
+target_link_libraries(feat-kernel-voxel-assembly
+PUBLIC
+  feat-dependency
+PRIVATE
+  feat-kernel-voxel-assembly-arch feat-kernel-util)
 
 if (FEAT_HAVE_CUDA)
-  target_link_libraries(kernel-voxel-assembly PRIVATE kernel-util-cuda)
+  target_link_libraries(feat-kernel-voxel-assembly PRIVATE feat-kernel-util-cuda)
 endif (FEAT_HAVE_CUDA)
 
 # list of lafem tests
@@ -27,7 +31,7 @@ set(test_list
 # create all tests
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

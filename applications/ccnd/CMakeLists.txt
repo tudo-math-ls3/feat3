@@ -83,12 +83,6 @@ endforeach (app)
 # set the other compile options for all applications
 foreach (app ${app_list})
   target_link_libraries(${app} feat)
-  if (MPI_C_COMPILE_FLAGS)
-    set_target_properties(${app} PROPERTIES COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-  endif ()
-  if (MPI_C_LINK_FLAGS)
-    set_target_properties(${app} PROPERTIES LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-  endif ()
 endforeach (app)
 
 #######################################################################################################################

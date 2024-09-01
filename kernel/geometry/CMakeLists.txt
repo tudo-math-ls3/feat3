@@ -6,7 +6,6 @@ add_subdirectory( test_aux )
 
 # list of geometry source files and depenencies
 set(kernel-geometry-list
-  cgal.cpp
   parti_parmetis.cpp
   parti_zoltan.cpp
   voxel_map.cpp
@@ -26,13 +25,47 @@ if (FEAT_EICKT)
   )
 endif (FEAT_EICKT)
 
-add_library(kernel-geometry STATIC ${kernel-geometry-list})
+
+add_library(feat-kernel-geometry STATIC ${kernel-geometry-list})
+
+if(FEAT_HAVE_PARMETIS)
+  target_link_libraries(feat-kernel-geometry PRIVATE ParMETIS::ParMETIS)
+endif(FEAT_HAVE_PARMETIS)
+
+if(FEAT_HAVE_ZOLTAN)
+  target_link_libraries(feat-kernel-geometry PRIVATE Zoltan::Zoltan)
+endif()
+
+if(FEAT_HAVE_FPARSER)
+  ## direct build dependy for feat-kernel-geometry
+  target_link_libraries(feat-kernel-geometry PRIVATE fparser::fparser)
+endif()
+
+# CGAL wrapper library to hide CGALs dependency on boost
+# We build the cgal-wrapper as a static library linking to the external cgal
+# dependency and parts of FEAT. This static library is then linked privately
+# into the geometry kernel. That way cgals dependencies on boost are hidden.
+if(FEAT_HAVE_CGAL)
+  add_library(feat-kernel-geometry-cgal STATIC cgal.cpp)
+
+  target_link_libraries(feat-kernel-geometry-cgal
+  PRIVATE
+    CGAL::CGAL
+  PUBLIC # TODO: necessary?
+    feat-dependency feat-kernel-util)
+
+  target_link_libraries(feat-kernel-geometry PRIVATE feat-kernel-geometry-cgal)
+endif()
 
 if (FEAT_VALGRIND)
-  target_compile_definitions(kernel-geometry PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK=ON)
+  target_compile_definitions(feat-kernel-geometry PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK=ON)
 endif (FEAT_VALGRIND)
 
-target_link_libraries(kernel-geometry PRIVATE kernel-util)
+target_link_libraries(feat-kernel-geometry
+PUBLIC
+  feat-dependency
+PRIVATE
+  feat-kernel-util)
 
 # list of geometry tests
 set(test_list
@@ -56,8 +89,9 @@ set(test_list
 # create all tests
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  add_dependencies(${test} kernel-geometry-test-aux)
-  target_link_libraries(${test} feat test_system kernel-geometry-test-aux)
+  add_dependencies(${test} feat-kernel-geometry-test-aux)
+  target_link_libraries(${test} PRIVATE feat test_system feat-kernel-geometry-test-aux)
+
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

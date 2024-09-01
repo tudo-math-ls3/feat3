@@ -6,14 +6,6 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # applications to build
 add_executable(navier_stokes_ppnd navier_stokes_ppnd.cpp)
 target_link_libraries(navier_stokes_ppnd feat)
-if (MPI_C_COMPILE_FLAGS)
-  set_target_properties(navier_stokes_ppnd PROPERTIES
-    COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-endif ()
-if (MPI_C_LINK_FLAGS)
-  set_target_properties(navier_stokes_ppnd PROPERTIES
-    LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-endif ()
 
 if (FEAT_HAVE_MPI)
   add_test(navier_stokes_ppnd_test_mpi_16 ${CMAKE_CTEST_COMMAND}

@@ -8,7 +8,7 @@ set(test_list checkpoint-test)
 
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

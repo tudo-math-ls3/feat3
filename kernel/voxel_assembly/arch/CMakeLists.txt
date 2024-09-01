@@ -18,21 +18,33 @@ if (NOT FEAT_HAVE_OMP)
   message(STATUS "OMP not found, missing CPU threading capability of voxel assembly.")
 endif ()
 
-add_library(kernel-voxel-assembly-arch STATIC ${kernel-voxel-assembly-arch-list})
+add_library(feat-kernel-voxel-assembly-arch STATIC ${kernel-voxel-assembly-arch-list})
+target_link_libraries(feat-kernel-voxel-assembly-arch PUBLIC feat-dependency feat-kernel-util)
+
 if (FEAT_COTIRE)
-  cotire(kernel-voxel-assembly-arch)
+  cotire(feat-kernel-voxel-assembly-arch)
 endif (FEAT_COTIRE)
-target_link_libraries(kernel-voxel-assembly-arch PRIVATE kernel-util)
+target_link_libraries(feat-kernel-voxel-assembly-arch PRIVATE feat-kernel-util)
 
 if (FEAT_HAVE_CUDA)
-  add_library(kernel-voxel-assembly-arch-cuda STATIC
+  add_library(feat-kernel-voxel-assembly-arch-cuda STATIC
     burgers_assembler.cu
     defo_assembler.cu
     poisson_assembler.cu
   )
-  target_link_libraries(kernel-voxel-assembly-arch-cuda PRIVATE kernel-util)
-
-  target_compile_options(kernel-voxel-assembly-arch-cuda PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:$<$<BOOL:FEAT_HAVE_OMP>:-Xcompiler=-fopenmp>>) #-dc for relocatable device code...
-  target_compile_options(kernel-voxel-assembly-arch-cuda PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-suppress-stack-size-warning>)
-  target_link_libraries(kernel-voxel-assembly-arch PRIVATE kernel-voxel-assembly-arch-cuda)
+  target_link_libraries(feat-kernel-voxel-assembly-arch-cuda
+  PUBLIC
+    feat-dependency
+  PRIVATE
+    feat-kernel-util-cuda)
+  ## get openmp flags and convert (potential list with ; to list with ,)
+  set(CUDA_TMP_FLAGS "")
+  if(OpenMP_CXX_FOUND)
+    string(REPLACE ";" "," CUDA_TMP_FLAGS "${OpenMP_CXX_FLAGS}")
+  endif(OpenMP_CXX_FOUND)
+  target_compile_options(feat-kernel-voxel-assembly-arch-cuda PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:$<$<BOOL:FEAT_HAVE_OMP>:-Xcompiler=${CUDA_TMP_FLAGS}>>) #-dc for relocatable device code...
+  target_compile_options(feat-kernel-voxel-assembly-arch-cuda PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-suppress-stack-size-warning>)
+  target_link_libraries(feat-kernel-voxel-assembly-arch
+  PRIVATE
+    feat-kernel-voxel-assembly-arch-cuda)
 endif (FEAT_HAVE_CUDA)

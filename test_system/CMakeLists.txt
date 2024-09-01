@@ -5,7 +5,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 add_library(test_system STATIC test_system.cpp)
 
-target_link_libraries(test_system INTERFACE feat)
+## why public here, but tests are linked explicitly against feat
+# target_link_libraries(test_system PUBLIC feat)
+target_link_libraries(test_system PRIVATE feat)
 
 #list of test_system tests
 set(test_list test_system-test)
@@ -13,7 +15,7 @@ set(test_list test_system-test)
 #create all tests
 foreach (test ${test_list})
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

@@ -16,12 +16,12 @@ if (WIN32)
 endif (WIN32)
 
 # list of util source files
-add_library(kernel-util STATIC ${KERNEL_LIBRARY_FILES})
+add_library(feat-kernel-util STATIC ${KERNEL_LIBRARY_FILES})
 
 if (WIN32)
-  target_link_libraries(kernel-util PRIVATE -limagehlp)
+  target_link_libraries(feat-kernel-util PRIVATE -limagehlp)
   if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    target_link_libraries(kernel-util PRIVATE -lmsvcr120)
+    target_link_libraries(feat-kernel-util PRIVATE -lmsvcr120)
   endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 endif (WIN32)
 
@@ -43,13 +43,27 @@ endif (WIN32)
 # endif(DEFINED ENV{OS})
 
 if (FEAT_COTIRE)
-  cotire(kernel-util)
+  cotire(feat-kernel-util)
 endif (FEAT_COTIRE)
 
 #link against mpi if available
-target_link_libraries(kernel-util PRIVATE ${MPI_C_LIBRARIES})
+# target_link_libraries(feat-kernel-util PRIVATE ${MPI_C_LIBRARIES})
+target_link_libraries(feat-kernel-util PUBLIC feat-dependency)
+
+if (FEAT_HAVE_ZLIB)
+  target_link_libraries(feat-kernel-util PUBLIC zlib::zlib)
+endif (FEAT_HAVE_ZLIB)
+
+if(FEAT_HAVE_FLOATX)
+  target_link_libraries(feat-kernel-util PUBLIC FloatX::FloatX)
+endif()
+
+if(FEAT_HAVE_ZFP)
+  target_link_libraries(feat-kernel-util PUBLIC zfp::zfp)
+endif()
 
 if (FEAT_USE_LIKWID)
+  # probably can be done better, but was necessary due to faulty config files from likwid
   if (FEAT_EXPLICIT_LIKWID_PATH)
     message (STATUS "Found likwid in ${FEAT_EXPLICIT_LIKWID_PATH}")
     set (likwid_FOUND ON)
@@ -59,34 +73,32 @@ if (FEAT_USE_LIKWID)
     find_package(likwid)
   endif (FEAT_EXPLICIT_LIKWID_PATH)
   if (likwid_FOUND)
-    # set(LIKWID_LIBRARIES -L/sfw/likwid/git230818/lib -llikwid)
-    target_link_libraries(kernel-util PUBLIC ${LIKWID_LIBRARIES})
-    target_include_directories(kernel-util PUBLIC ${LIKWID_INCLUDES})
-    # target_link_options(kernel-util PUBLIC LIKWID_PERFMON) # set by our config script
+    target_link_libraries(feat-kernel-util PRIVATE ${LIKWID_LIBRARIES})
+    target_include_directories(feat-kernel-util PRIVATE ${LIKWID_INCLUDES})
   else (likwid_FOUND)
     message(STATUS "Could not find likwid cmake path, consider specifing it with likwid_DIR")
   endif (likwid_FOUND)
 endif (FEAT_USE_LIKWID)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-  target_link_libraries(kernel-util PRIVATE -lexecinfo)
-endif ()
-
-if (MPI_C_COMPILE_FLAGS)
-  set_target_properties(kernel-util PROPERTIES
-    COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-endif ()
-if (MPI_C_LINK_FLAGS)
-  set_target_properties(kernel-util PROPERTIES
-    LINK_FLAGS "${MPI_C_LINK_FLAGS}")
+  target_link_libraries(feat-kernel-util PRIVATE -lexecinfo)
 endif ()
 
 if (FEAT_HAVE_CUDA)
-  add_library(kernel-util-cuda STATIC
+  add_library(feat-kernel-util-cuda STATIC
     cuda_util.cu
   )
-  target_link_libraries(kernel-util-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY})
-  target_link_libraries(kernel-util PRIVATE kernel-util-cuda)
+  target_link_libraries(feat-kernel-util-cuda
+  PUBLIC
+    feat-dependency
+  PRIVATE
+    ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY})
+
+  if(FEAT_HAVE_CUDSS)
+    target_link_libraries(feat-kernel-util-cuda PUBLIC cuDSS::cuDSS)
+  endif()
+
+  target_link_libraries(feat-kernel-util PRIVATE feat-kernel-util-cuda)
 endif (FEAT_HAVE_CUDA)
 
 # list of util tests
@@ -108,7 +120,7 @@ set(test_list
 # create all tests
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

@@ -16,9 +16,13 @@ if (FEAT_EICKT)
     )
 endif (FEAT_EICKT)
 
-add_library(kernel-meshopt STATIC ${kernel-meshopt-list})
+add_library(feat-kernel-meshopt STATIC ${kernel-meshopt-list})
 
-target_link_libraries(kernel-meshopt PRIVATE kernel-cubature kernel-geometry kernel-lafem kernel-util)
+target_link_libraries(feat-kernel-meshopt
+PUBLIC
+  feat-dependency
+PRIVATE
+  feat-kernel-cubature feat-kernel-geometry feat-kernel-lafem feat-kernel-util)
 
 # list of meshopt tests
 set(test_list
@@ -28,7 +32,7 @@ set(test_list
 # create all tests
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

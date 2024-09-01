@@ -18,15 +18,19 @@ if (FEAT_EICKT)
     )
 endif (FEAT_EICKT)
 
-add_library(kernel-lafem STATIC ${kernel-lafem-list})
+add_library(feat-kernel-lafem STATIC ${kernel-lafem-list})
 if (FEAT_COTIRE)
-  cotire(kernel-lafem)
+  cotire(feat-kernel-lafem)
 endif (FEAT_COTIRE)
 
-target_link_libraries(kernel-lafem PRIVATE kernel-lafem-arch kernel-util kernel-adjacency)
+target_link_libraries(feat-kernel-lafem
+PUBLIC
+  feat-dependency
+PRIVATE
+  feat-kernel-lafem-arch feat-kernel-util feat-kernel-adjacency)
 
 if (FEAT_HAVE_CUDA)
-  target_link_libraries(kernel-lafem PRIVATE kernel-util-cuda)
+  target_link_libraries(feat-kernel-lafem PRIVATE feat-kernel-util-cuda)
 endif (FEAT_HAVE_CUDA)
 
 # list of lafem tests
@@ -68,7 +72,7 @@ set(test_list
 # create all tests
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

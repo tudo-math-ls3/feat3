@@ -10,39 +10,35 @@ set(kernel-solver-list
   voxel_amavanka.cpp
   )
 
-add_library(kernel-solver STATIC ${kernel-solver-list})
+add_library(feat-kernel-solver STATIC ${kernel-solver-list})
 if (FEAT_COTIRE)
-  cotire(kernel-solver)
+  cotire(feat-kernel-solver)
 endif (FEAT_COTIRE)
-target_link_libraries(kernel-solver PRIVATE kernel-lafem kernel-util kernel-adjacency)
+target_link_libraries(feat-kernel-solver
+PUBLIC
+  feat-dependency
+PRIVATE
+  feat-kernel-lafem feat-kernel-util feat-kernel-adjacency)
 
 if (FEAT_HAVE_UMFPACK)
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUITESPARSE}/SuiteSparse_config/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUITESPARSE}/AMD/Include/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUITESPARSE}/UMFPACK/Include/")
+  target_link_libraries(feat-kernel-solver PRIVATE SuiteSparse::UMFPACK)
 endif (FEAT_HAVE_UMFPACK)
 
 if (FEAT_HAVE_HYPRE)
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/parcsr_ls/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/utilities/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/seq_mv/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/parcsr_mv/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/IJ_mv/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/multivector/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/krylov/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/distributed_matrix/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/parcsr_block_mv/")
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_HYPRE}/src/blas/")
+  target_link_libraries(feat-kernel-solver PRIVATE HYPRE::HYPRE)
 endif (FEAT_HAVE_HYPRE)
 
 if (FEAT_HAVE_SUPERLU_DIST)
-  target_include_directories(kernel-solver PRIVATE "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_SUPERLU}/SRC/")
+  target_link_libraries(feat-kernel-solver PRIVATE SuperLU::SuperLU)
 endif (FEAT_HAVE_SUPERLU_DIST)
+
+if(FEAT_HAVE_ALGLIB)
+  target_link_libraries(feat-kernel-solver PUBLIC Alglib::Alglib)
+endif()
 
 
 if (FEAT_HAVE_CUDA)
-  add_library(kernel-solver-cuda STATIC
+  add_library(feat-kernel-solver-cuda STATIC
     cudss.cu
     cusolver.cu
     ilu_precond.cu
@@ -51,10 +47,10 @@ if (FEAT_HAVE_CUDA)
     voxel_amavanka.cu
   )
   if (FEAT_HAVE_CUDSS)
-    set(CUDA_cudss_LIBRARY "-lcudss")
+    target_link_libraries(feat-kernel-solver-cuda PRIVATE cuDSS::cuDSS)
   endif (FEAT_HAVE_CUDSS)
-  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cudss_LIBRARY} kernel-util-cuda kernel-util)
-  target_link_libraries(kernel-solver PRIVATE kernel-solver-cuda)
+  target_link_libraries(feat-kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} feat-kernel-util-cuda)
+  target_link_libraries(feat-kernel-solver PRIVATE feat-kernel-solver-cuda)
 endif (FEAT_HAVE_CUDA)
 
 # list of solver tests
@@ -76,7 +72,7 @@ set(test_list
 # create all tests
 foreach (test ${test_list} )
   add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} feat test_system)
+  target_link_libraries(${test} PRIVATE feat test_system)
 
   add_test(${test}_all ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

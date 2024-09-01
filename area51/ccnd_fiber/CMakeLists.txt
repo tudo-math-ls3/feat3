@@ -4,10 +4,10 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 add_executable(ccnd-fiber-time-stepping-test ccnd_time_stepping_test.cpp)
-target_link_libraries(ccnd-fiber-time-stepping-test feat)
+target_link_libraries(ccnd-fiber-time-stepping-test PRIVATE feat)
 
 add_executable(ccnd-joined-fiber-time-stepping-test ccnd_joined_time_stepping_test.cpp)
-target_link_libraries(ccnd-joined-fiber-time-stepping-test feat)
+target_link_libraries(ccnd-joined-fiber-time-stepping-test PRIVATE feat)
 
 #disable advanced variable tracking for debug informations on big applications (it would be disabled afterwards anyways
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
@@ -15,7 +15,7 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
 add_executable(tensor_operations-test EXCLUDE_FROM_ALL tensor_operations-test.cpp)
-target_link_libraries(tensor_operations-test feat test_system)
+target_link_libraries(tensor_operations-test PRIVATE feat test_system)
 
 add_test(tensor_operations-test_all ${CMAKE_CTEST_COMMAND}
   --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"

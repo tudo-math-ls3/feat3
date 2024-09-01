@@ -35,14 +35,6 @@ set(app_list
 foreach (app ${app_list} )
   add_executable(${app} ${app}.cpp)
   target_link_libraries(${app} feat)
-  if (MPI_C_COMPILE_FLAGS)
-    set_target_properties(${app} PROPERTIES
-      COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-  endif ()
-  if (MPI_C_LINK_FLAGS)
-    set_target_properties(${app} PROPERTIES
-      LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-  endif ()
 endforeach (app)
 
 #disable advanced variable tracking for debug informations on big applications (it would be disabled afterwards anyways
@@ -82,12 +74,6 @@ endif (FEAT_HAVE_QUADMATH)
 
 foreach (app ${dfg95_bench1_list} )
   target_link_libraries(${app} feat)
-  if (MPI_C_COMPILE_FLAGS)
-    set_target_properties(${app} PROPERTIES COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}")
-  endif ()
-  if (MPI_C_LINK_FLAGS)
-    set_target_properties(${app} PROPERTIES LINK_FLAGS "${MPI_C_LINK_FLAGS}")
-  endif ()
 endforeach (app)
 
 ######################### hierarch_transfer_test-app

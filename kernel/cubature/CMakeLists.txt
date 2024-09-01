@@ -12,9 +12,9 @@ if (FEAT_EICKT)
   )
 endif (FEAT_EICKT)
 
-add_library(kernel-cubature STATIC ${kernel-cubature-list})
+add_library(feat-kernel-cubature STATIC ${kernel-cubature-list})
 
-target_link_libraries(kernel-cubature PRIVATE kernel-util)
+target_link_libraries(feat-kernel-cubature PRIVATE feat-kernel-util)
 
 # list of cubature tests
 set(test_list

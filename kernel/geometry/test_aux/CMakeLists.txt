@@ -2,7 +2,7 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of geometry-test-aux source files and dependencies
-add_library(kernel-geometry-test-aux STATIC
+add_library(feat-kernel-geometry-test-aux STATIC
   index_calculator_meshes.cpp
   standard_quad.cpp
   standard_hexa.cpp
@@ -13,4 +13,4 @@ add_library(kernel-geometry-test-aux STATIC
   validate_structured_meshes.cpp
 )
 
-target_link_libraries(kernel-geometry-test-aux PRIVATE kernel-util)
+target_link_libraries(feat-kernel-geometry-test-aux PUBLIC feat-kernel-util)
