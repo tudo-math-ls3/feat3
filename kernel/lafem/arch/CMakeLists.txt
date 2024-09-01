@@ -12,6 +12,7 @@ if (FEAT_EICKT)
     axpy_generic-eickt.cpp
     apply_generic-eickt.cpp
     apply_generic_banded-eickt.cpp
+    component_copy_generic-eickt.cpp
     component_invert_generic-eickt.cpp
     component_product_generic-eickt.cpp
     diagonal_generic-eickt.cpp
@@ -37,6 +38,7 @@ if (FEAT_HAVE_MKL)
   set(kernel-lafem-arch-list ${kernel-lafem-arch-list}
     axpy_mkl.cpp
     apply_mkl.cpp
+    component_copy_mkl.cpp
     component_product_mkl.cpp
     dot_product_mkl.cpp
     max_abs_index_mkl.cpp
@@ -59,6 +61,7 @@ if (FEAT_HAVE_CUDA)
   add_library(kernel-lafem-arch-cuda STATIC
     axpy.cu
     apply.cu
+    component_copy.cu
     component_invert.cu
     component_product.cu
     diagonal.cu
