@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
+#include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/util/binary_stream.hpp>
 
 #include <kernel/util/random.hpp>
@@ -61,6 +62,9 @@ public:
     DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
     DenseVector<DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
+    DenseVector<DT_, IT_> vec_val2(num_of_offsets * rows);
+    vec_val2.format(random, DT_(-49), DT_(187));
+
     // create random vector of offsets
     FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
@@ -86,6 +90,28 @@ public:
     TEST_CHECK_EQUAL(a.rows(), rows);
     TEST_CHECK_EQUAL(a.columns(), columns);
 
+    SparseMatrixBanded<DT_, IT_> a2(rows, columns, vec_val2, vec_offsets);
+    DenseMatrix<DT_, IT_> refmat(rows, columns);
+    refmat.format();
+    //fill refmat
+    for (Index off_idx(0); off_idx < num_of_offsets; ++off_idx)
+    {
+      Index offset = Index(vec_offsets(off_idx));
+      Index start_col = offset >= rows ? offset + 1 - rows : 0;
+      Index end_col = offset < columns ? offset + 1 : columns;
+      for (Index col(start_col); col  < end_col; ++col)
+      {
+        Index row = col + rows - offset  - 1;
+        DT_ val = vec_val2(off_idx * rows + row);
+        refmat(row, col, val);
+      }
+    }
+
+    ////check indexing / ctor
+    for (Index row(0); row < rows; ++row)
+      for (Index col(0); col  < columns; ++col)
+        TEST_CHECK_EQUAL(refmat(row, col), a2(row, col));
+
     auto b = a.clone();
     SparseMatrixBanded<DT_, IT_> bl(b.layout());
     TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
@@ -107,12 +133,14 @@ public:
     TEST_CHECK_EQUAL((void*)x.offsets(), (void*)b.offsets());
     TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
 
+    SparseMatrixBanded<DT_, IT_> c;
+    c.clone(a, LAFEM::CloneMode::Weak);
+
     SparseMatrixBanded<DT_, IT_> z;
     z.convert(a);
     TEST_CHECK_EQUAL(a, z);
 
-    SparseMatrixBanded<DT_, IT_> c;
-    c.clone(a);
+
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)a.val());
     TEST_CHECK_EQUAL((void*)c.offsets(), (void*)a.offsets());
     c = z.clone(CloneMode::Deep);
@@ -278,7 +306,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.7)));
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
 
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
@@ -299,6 +327,7 @@ public:
 
     DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
     DenseVector<DT_, IT_> vec_val(num_of_offsets * rows);
+
 
     // create random vector of offsets
     FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
@@ -324,7 +353,7 @@ public:
 
     for (Index i(0); i < x.size(); ++i)
     {
-      x(i, random(DT_(-1), DT_(1)));
+      x(i, random(DT_(0.1), DT_(2.1)));
     }
 
     for (Index i(0); i < ref1.size(); ++i)
@@ -345,22 +374,20 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
     {
-      if (Math::abs(ref1(i)) > eps)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref1(i), eps);
+      TEST_CHECK_RELATIVE(r(i), ref1(i), eps);
     }
 
     for (Index i(0); i < r.size(); ++i)
     {
-      ref2(i, ref1(i) + Math::cos(DT_(i)));
+      ref2(i, ref1(i) + Math::cos(DT_(i)) + DT_(1));
     }
 
-    sys.apply(r, x, ref2, DT_(-1.0));
+    sys.apply(r, x, ref2);
 
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
     {
-      if (Math::abs(ref1(i)) > eps)
-        TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)), r(i), eps);
+      TEST_CHECK_RELATIVE( DT_(2.0) * ref1(i) + Math::cos(DT_(i)) + DT_(1), r(i), eps);
     }
 
     for (Index i(0); i < r.size(); ++i)
@@ -368,13 +395,12 @@ public:
       ref2(i, ref2(i) * s);
     }
 
-    sys.apply(r, x, ref2, -s);
+    sys.apply(r, x, ref2, s);
 
     // check, if the result is correct
     for (Index i(0) ; i < r.size() ; ++i)
     {
-      if (Math::abs(ref1(i)) > eps)
-        TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos(DT_(i)) * s, r(i), eps);
+      TEST_CHECK_RELATIVE(ref1(i) * s + ref2(i), r(i), eps);
     }
   }
 };
