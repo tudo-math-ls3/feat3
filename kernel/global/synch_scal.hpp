@@ -146,16 +146,20 @@ namespace FEAT
         _mpi_wait(other._mpi_wait),
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
 #ifdef FEAT_MPI_THREAD_MULTIPLE
-        _mutex(std::forward<std::mutex>(other._mutex)),
-        _cv_allreduce_called(other._cv_allreduce_called),
+        _mutex(),
+        _cv_allreduce_called(),
         _flag_allreduce_called(other._flag_allreduce_called),
-        _thread(std::forward<std::thread>(other._thread)),
+        _thread(std::move(other._thread)),
 #else // no MPI_THREAD_MULTIPLE
-        _req(std::forward<Dist::Request>(other._req)),
+        _req(std::move(other._req)),
 #endif // MPI_THREAD_MULTIPLE
 #endif //(defined(FEAT_HAVE_MPI) && defined(FEAT_MPI_THREAD_MULTIPLE)) || defined(DOXYGEN)
         _finished(other._finished)
       {
+        #ifdef FEAT_MPI_THREAD_MULTIPLE
+        XASSERTM(other._mutex.try_lock(), "Other is still locked by other thread!");
+        XASSERTM(other._flag_allreduce_called, "Allreduce not called!");
+        #endif // FEAT_MPI_THREAD_MULTIPLE
         other._finished = true;
       }
 
@@ -172,12 +176,12 @@ namespace FEAT
         _mpi_wait = other._mpi_wait;
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
 #ifdef FEAT_MPI_THREAD_MULTIPLE
-        _mutex = std::forward<std::mutex>(other._mutex);
-        _cv_allreduce_called = other._cv_allreduce_called;
+        XASSERTM(other._mutex.try_lock(), "Other is still locked by other thread!");
+        XASSERTM(other._flag_allreduce_called, "Allreduce not called!");
         _flag_allreduce_called = other._flag_allreduce_called;
-        _thread = std::forward<std::thread>(other._thread);
+        _thread = std::move(other._thread);
 #else // no MPI_THREAD_MULTIPLE
-        _req = std::forward<Dist::Request>(other._req);
+        _req = std::move(other._req);
 #endif // MPI_THREAD_MULTIPLE
 #endif //(defined(FEAT_HAVE_MPI) && defined(FEAT_MPI_THREAD_MULTIPLE)) || defined(DOXYGEN)
         _finished = other._finished;
