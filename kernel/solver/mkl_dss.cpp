@@ -83,7 +83,7 @@ namespace FEAT
         bool have_diag = false;
         for(Index j(row_ptr[i]); j < Index(row_ptr[i+1u]); ++j)
         {
-          have_diag = have_diag || (col_idx[j] == i);
+          have_diag = have_diag || (Index(col_idx[j]) == i);
           if((j+1u < Index(row_ptr[i+1u])) && (col_idx[j+1u] <= col_idx[j]))
             throw InvalidMatrixStructureException("MKL DSS: non-ascending column indices detected");
         }
