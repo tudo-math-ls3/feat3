@@ -568,7 +568,7 @@ namespace CCNDSimple
       }
 
       // update solution
-      vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+      vec_sol.axpy(vec_cor);
 
       // next non-linear iteration
     }

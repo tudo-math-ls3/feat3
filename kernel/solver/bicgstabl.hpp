@@ -373,7 +373,8 @@ namespace FEAT
               rho_0 = rho_1;
               for ( int i(0) ; i <= j ; i++)
               {
-                _vec_uj_hat.at( Index(i) ).axpy(_vec_uj_hat.at( Index(i) ), _vec_rj_hat.at( Index(i) ), -beta );
+                _vec_uj_hat.at(Index(i)).scale(_vec_uj_hat.at(Index(i)), -beta);
+                _vec_uj_hat.at( Index(i)).axpy(_vec_rj_hat.at( Index(i)));/// \todo use axpby here
               }
 
 
@@ -406,7 +407,7 @@ namespace FEAT
 
               for ( int i(0) ; i <= j ; i++)
               {
-                _vec_rj_hat.at(Index(i)).axpy( _vec_uj_hat.at( Index(i+1) ) , _vec_rj_hat.at( Index(i) ), -alpha );
+                _vec_rj_hat.at(Index(i)).axpy(_vec_uj_hat.at( Index(i+1)), -alpha);
               }
 
               if (_precon_variant ==  BiCGStabLPreconVariant::left)
@@ -433,7 +434,7 @@ namespace FEAT
                 fil_sys.filter_def( _vec_rj_hat.at(Index(j+1)) );
               }
 
-              vec_sol.axpy(_vec_uj_hat.at(0), vec_sol, alpha);
+              vec_sol.axpy(_vec_uj_hat.at(0), alpha);
             }
             for ( int j(0) ; j < l ; j++)       //changed counter in comparison to pseudo code
             {
@@ -441,7 +442,7 @@ namespace FEAT
               for ( int i(0); i<j ; i++)        //changed counter
               {
                 tau.at( Index(j*(l-1) + i) ) = ( _vec_rj_hat.at( Index(i+1) ).dot( _vec_rj_hat.at( Index(j+1) ) ) ) / sigma.at(Index(i));
-                _vec_rj_hat.at(Index(j+1)).axpy(_vec_rj_hat.at(Index(i+1)), _vec_rj_hat.at(Index(j+1)), -tau.at( Index(j*(l-1) + i) ) );
+                _vec_rj_hat.at(Index(j+1)).axpy(_vec_rj_hat.at(Index(i+1)), -tau.at( Index(j*(l-1) + i)));
               }
               sigma.at(Index(j)) = _vec_rj_hat.at( Index(j+1) ).dot( _vec_rj_hat.at(Index(j+1)) );
               gamma_prime.at(Index(j)) = ( _vec_rj_hat.at(0).dot( _vec_rj_hat.at(Index(j+1)) ) ) / sigma.at(Index(j));
@@ -466,22 +467,22 @@ namespace FEAT
                 gamma_prime_prime.at(Index(j)) += tau.at(Index(i*(l-1) + j)) * gamma_j.at(Index(i+1));
               }
             }
-                      vec_sol.axpy(_vec_rj_hat.at(0),           vec_sol,      gamma_j.at(0));
-            _vec_rj_hat.at(0).axpy(_vec_rj_hat.at(Index(l)), _vec_rj_hat.at(0), -gamma_prime.at(Index(l-1)));
-            _vec_uj_hat.at(0).axpy(_vec_uj_hat.at(Index(l)), _vec_uj_hat.at(0),     -gamma_j.at(Index(l-1)));
+                      vec_sol.axpy(_vec_rj_hat.at(0),         gamma_j.at(0));
+            _vec_rj_hat.at(0).axpy(_vec_rj_hat.at(Index(l)), -gamma_prime.at(Index(l-1)));
+            _vec_uj_hat.at(0).axpy(_vec_uj_hat.at(Index(l)), -gamma_j.at(Index(l-1)));
 
             for ( int j(1) ; j<l; j++)
             {
-              _vec_uj_hat.at(0).axpy(_vec_uj_hat.at(Index(j)), _vec_uj_hat.at(0),           -gamma_j.at(Index(j-1)));
-                        vec_sol.axpy(_vec_rj_hat.at(Index(j)),           vec_sol,  gamma_prime_prime.at(Index(j-1)));
-              _vec_rj_hat.at(0).axpy(_vec_rj_hat.at(Index(j)), _vec_rj_hat.at(0),       -gamma_prime.at(Index(j-1)));
+              _vec_uj_hat.at(0).axpy(_vec_uj_hat.at(Index(j)), -gamma_j.at(Index(j-1)));
+                        vec_sol.axpy(_vec_rj_hat.at(Index(j)), gamma_prime_prime.at(Index(j-1)));
+              _vec_rj_hat.at(0).axpy(_vec_rj_hat.at(Index(j)), -gamma_prime.at(Index(j-1)));
             }
             // Compute defect norm
             if (_precon_variant ==  BiCGStabLPreconVariant::left)
             {
               mat_sys.apply(_vec_pc, vec_sol);
               fil_sys.filter_def(_vec_pc);
-              _vec_pc.axpy( vec_rhs, _vec_pc , -1);
+              _vec_pc.axpy( vec_rhs, -1);
               fil_sys.filter_def(_vec_pc);
               status = this->_set_new_defect(_vec_pc, vec_sol);
             }

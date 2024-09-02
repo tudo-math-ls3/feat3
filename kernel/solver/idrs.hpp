@@ -268,7 +268,7 @@ namespace FEAT
         {
           for (Index i(0); i<j; ++i)
           {
-            _vec_P.at(j).axpy(_vec_P.at(i), _vec_P.at(j), -_vec_P.at(j).dot(_vec_P.at(i)));
+            _vec_P.at(j).axpy(_vec_P.at(i), -_vec_P.at(j).dot(_vec_P.at(i)));
           }
           _vec_P.at(j).scale(_vec_P.at(j), DataType(1)/_vec_P.at(j).norm2());
         }
@@ -318,9 +318,9 @@ namespace FEAT
           om = _vec_v.dot(_vec_r) / _vec_v.dot(_vec_v);
           _vec_dX.at(k).scale(_vec_r,  om);
           _vec_dR.at(k).scale(_vec_v, -om);
-          vec_sol.axpy(vec_sol, _vec_dX.at(k));
-          _vec_r.axpy(_vec_r, _vec_dR.at(k));
-          _vec_res.axpy(_vec_t, _vec_res, -om);
+          vec_sol.axpy(_vec_dX.at(k));
+          _vec_r.axpy(_vec_dR.at(k));
+          _vec_res.axpy(_vec_t, -om);
 
           // push our new defect
           status = this->_set_new_defect(_vec_res, vec_sol);
@@ -357,9 +357,10 @@ namespace FEAT
 
             _vec_q.scale(_vec_dR.at(0), -_dvec_c(0) );
             for (Index l(1); l < _krylov_dim; ++l)
-              _vec_q.axpy(_vec_dR.at(l), _vec_q, -_dvec_c(l));
+              _vec_q.axpy(_vec_dR.at(l), -_dvec_c(l));
 
-            _vec_v.axpy(_vec_r, _vec_q);
+            _vec_v.copy(_vec_q);
+            _vec_v.axpy(_vec_r);
 
             if (k == 0)
             {
@@ -372,15 +373,16 @@ namespace FEAT
                 return Status::aborted;
               }
               om = _vec_v.dot(_vec_t) / _vec_t.dot(_vec_t);
-              _vec_dR.at(oldest).axpy(_vec_t, _vec_q, -om);
+              _vec_dR.at(oldest).copy(_vec_q);
+              _vec_dR.at(oldest).axpy(_vec_t, -om);
 
               //dX(oldest)=-dX*c+om*v
               _vec_dX.at(oldest).scale(_vec_dX.at(oldest), -_dvec_c(oldest));
               for (Index l(0); l < oldest; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), _vec_dX.at(oldest), -_dvec_c(l));
+                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
               for (Index l(oldest+1); l < _krylov_dim; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), _vec_dX.at(oldest), -_dvec_c(l));
-              _vec_dX.at(oldest).axpy(_vec_v, _vec_dX.at(oldest), om);
+                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
+              _vec_dX.at(oldest).axpy(_vec_v, om);
 
               matrix.apply(_vec_t, _vec_dX.at(oldest));
               filter.filter_def(_vec_t);
@@ -390,10 +392,10 @@ namespace FEAT
               //dX(oldest)=-dX*c+om*v
               _vec_dX.at(oldest).scale(_vec_dX.at(oldest), -_dvec_c(oldest));
               for (Index l(0); l < oldest; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), _vec_dX.at(oldest), -_dvec_c(l));
+                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
               for (Index l(oldest+1); l < _krylov_dim; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), _vec_dX.at(oldest), -_dvec_c(l));
-              _vec_dX.at(oldest).axpy(_vec_v, _vec_dX.at(oldest), om);
+                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
+              _vec_dX.at(oldest).axpy(_vec_v, om);
 
               matrix.apply( _vec_dR.at(oldest), _vec_dX.at(oldest));
               filter.filter_def(_vec_dR.at(oldest));
@@ -408,9 +410,9 @@ namespace FEAT
             }
 
 
-            _vec_r.axpy( _vec_dR.at(oldest), _vec_r );
-            vec_sol.axpy(_vec_dX.at(oldest), vec_sol);
-            _vec_res.axpy(_vec_t, _vec_res, -1);
+            _vec_r.axpy(_vec_dR.at(oldest));
+            vec_sol.axpy(_vec_dX.at(oldest));
+            _vec_res.axpy(_vec_t, -1);
 
             status = this->_set_new_defect(_vec_res, vec_sol);
             if (status != Status::progress)
@@ -421,7 +423,7 @@ namespace FEAT
               _dvec_dm(l, _vec_P.at(l).dot(_vec_dR.at(oldest)) );
               _dmat_M( l, oldest, _dvec_dm(l));
             }
-            _dvec_m.axpy(_dvec_dm, _dvec_m);
+            _dvec_m.axpy(_dvec_dm);
             oldest = (oldest+1) % _krylov_dim;
           } //end inner loop
 

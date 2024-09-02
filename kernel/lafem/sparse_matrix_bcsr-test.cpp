@@ -929,20 +929,23 @@ public:
       ref.template val<Perspective::pod>()[i] = scal * dv1(i) + dv4(i);
     }
 
-    c.axpy(a, b, scal);
+    c.copy(b);
+    c.axpy(a, scal);
     TEST_CHECK_EQUAL(c, ref);
 
     c.copy(b);
-    c.axpy(a, c, scal);
+    c.axpy(a, scal);
     TEST_CHECK_EQUAL(c, ref);
 
     c.copy(a);
-    c.axpy(c, b, scal);
+    c.scale(c, scal);
+    c.axpy(b); /// \todo use axpby here
     TEST_CHECK_EQUAL(c, ref);
 
     scal = DT_(0);
     ref.clone(b);
-    c.axpy(a, b, scal);
+    c.copy(b);
+    c.axpy(a, scal);
     TEST_CHECK_EQUAL(c, ref);
 
     scal = DT_(1);
@@ -950,7 +953,8 @@ public:
     {
       ref.template val<Perspective::pod>()[i] = dv1(i) + dv4(i);
     }
-    c.axpy(a, b, scal);
+    c.copy(b);
+    c.axpy(a, scal);
     TEST_CHECK_EQUAL(c, ref);
 
     scal = DT_(-1);
@@ -958,7 +962,8 @@ public:
     {
       ref.template val<Perspective::pod>()[i] = dv4(i) - dv1(i);
     }
-    c.axpy(a, b, scal);
+    c.copy(b);
+    c.axpy(a, scal);
     TEST_CHECK_EQUAL(c, ref);
   }
 };

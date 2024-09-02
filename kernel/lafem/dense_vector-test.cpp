@@ -309,11 +309,13 @@ public:
       }
 
       DenseVector<DT_, IT_> c(size);
-      c.axpy(a, b, s); //a != b != r
+      c.copy(b);
+      c.axpy(a, s);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_RELATIVE(c(i), ref(i), eps);
 
-      a.axpy(a, b, s); //r == a
+      a.scale(a, s);
+      a.axpy(b); /// \todo use axpby here
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_RELATIVE(a(i), ref(i), eps);
 
@@ -323,7 +325,7 @@ public:
         ref(i, s * a(i) + b(i));
       }
 
-      b.axpy(a, b, s); //r == b
+      b.axpy(a, s);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_RELATIVE(b(i), ref(i), eps);
     }

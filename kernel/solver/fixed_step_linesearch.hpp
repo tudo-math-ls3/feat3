@@ -144,7 +144,7 @@ namespace FEAT
           this->_norm_dir = vec_dir.norm2();
           // clear solution vector
           vec_cor.format();
-          vec_cor.axpy(vec_dir, vec_cor, _step_length);
+          vec_cor.axpy(vec_dir, _step_length);
 
           this->_functional.prepare(vec_cor, this->_filter);
 
@@ -165,7 +165,7 @@ namespace FEAT
         virtual Status correct(VectorType& vec_sol, const VectorType& vec_dir) override
         {
           this->_norm_dir = vec_dir.norm2();
-          vec_sol.axpy(vec_dir, vec_sol, _step_length);
+          vec_sol.axpy(vec_dir, _step_length);
 
           this->_functional.prepare(vec_sol, this->_filter);
           this->_functional.eval_fval_grad(this->_fval_min, this->_vec_grad);

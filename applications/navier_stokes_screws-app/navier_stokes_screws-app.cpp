@@ -1535,7 +1535,8 @@ struct NavierStokesScrewsApp
 
         // Compute mesh velocity
         {
-          mesh_velocity.axpy(old_coords, new_coords, DataType(-1));
+          mesh_velocity.copy(new_coords);
+          mesh_velocity.axpy(old_coords, DataType(-1));
           mesh_velocity.scale(mesh_velocity, DataType(1)/time_disc.delta_t());
 
           // Compute maximum of the mesh velocity
@@ -1612,7 +1613,7 @@ struct NavierStokesScrewsApp
         for(Index step(0); step < time_disc.get_p_extrapolation_steps(); ++step)
         {
           vec_extrapolated_p.axpy(
-            vec_sol_p.at(step+Index(1)), vec_extrapolated_p, time_disc.coeff_extrapolation_p.at(step));
+            vec_sol_p.at(step+Index(1)), time_disc.coeff_extrapolation_p.at(step));
         }
 
         // Assemble filters on all levels
@@ -1693,7 +1694,7 @@ struct NavierStokesScrewsApp
           {
             // linear extrapolation of solution in time
             vec_conv.scale(vec_sol_v.at(1), DataType(2));
-            vec_conv.axpy(vec_sol_v.at(2), vec_conv, -DataType(1));
+            vec_conv.axpy(vec_sol_v.at(2), -DataType(1));
           }
           else
           {
@@ -1705,7 +1706,7 @@ struct NavierStokesScrewsApp
         // Use ALE velocity if necessary
         if(time_disc.ale_handling == Control::Time::TermHandling::expl)
         {
-          vec_conv.axpy(mesh_velocity_q2, vec_conv, -DataType(1));
+          vec_conv.axpy(mesh_velocity_q2, -DataType(1));
         }
 
         // Assemble rhs for NVS
@@ -1775,7 +1776,7 @@ struct NavierStokesScrewsApp
           {
             // linear extrapolation of solution in time
             vec_conv.scale(vec_sol_v.at(1), DataType(2));
-            vec_conv.axpy(vec_sol_v.at(2), vec_conv, -DataType(1));
+            vec_conv.axpy(vec_sol_v.at(2), -DataType(1));
           }
           else
           {
@@ -1787,7 +1788,7 @@ struct NavierStokesScrewsApp
         // Use ALE velocity if necessary
         if(time_disc.ale_handling == Control::Time::TermHandling::impl)
         {
-          vec_conv.axpy(mesh_velocity_q2, vec_conv, -DataType(1));
+          vec_conv.axpy(mesh_velocity_q2, -DataType(1));
         }
 
         // Phase 2: loop over all levels and assemble the burgers matrices
@@ -1842,7 +1843,7 @@ struct NavierStokesScrewsApp
 
         // Assemble rhs for the auxillary pressure poisson problem
         vec_rhs_phi.format();
-        vec_rhs_phi.axpy(vec_D_v, vec_rhs_phi, time_disc.coeff_rhs_phi);
+        vec_rhs_phi.axpy(vec_D_v, time_disc.coeff_rhs_phi);
         filter_p.filter_rhs(vec_rhs_phi);
         watch_asm_rhs.stop();
 
@@ -1884,7 +1885,7 @@ struct NavierStokesScrewsApp
         // Add rotational part (or not)
         if(time_disc.is_rotational())
         {
-          vec_rhs_p.axpy(vec_D_v, vec_rhs_p, time_disc.coeff_rhs_proj_D_v);
+          vec_rhs_p.axpy(vec_D_v, time_disc.coeff_rhs_proj_D_v);
         }
         watch_asm_rhs.stop();
 

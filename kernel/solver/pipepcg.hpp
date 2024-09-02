@@ -265,13 +265,17 @@ namespace FEAT
           {
             beta = gamma / gamma_old;
             alpha = gamma / (delta - beta / alpha * gamma);
-            vec_z.axpy(vec_z, vec_n, beta);
-            vec_q.axpy(vec_q, vec_m, beta);
-            vec_p.axpy(vec_p, vec_u, beta);
-            vec_s.axpy(vec_s, vec_w, beta);
+            vec_z.scale(vec_z, beta);
+            vec_z.axpy(vec_n); /// \todo use axpby here
+            vec_q.scale(vec_q, beta);
+            vec_q.axpy(vec_m); /// \todo use axpby here
+            vec_p.scale(vec_p, beta);
+            vec_p.axpy(vec_u); /// \todo use axpby here
+            vec_s.scale(vec_s, beta);
+            vec_s.axpy(vec_w); /// \todo use axpby here
           }
 
-          vec_sol.axpy(vec_p, vec_sol, alpha);
+          vec_sol.axpy(vec_p, alpha);
 
           /* Stabilization, recalculate real values
           if(this->_num_iter > 40 && this->_num_iter % 50 == 0)
@@ -285,9 +289,9 @@ namespace FEAT
           }
           else */
           {
-            vec_u.axpy(vec_q, vec_u, -alpha);
-            vec_w.axpy(vec_z, vec_w, -alpha);
-            vec_r.axpy(vec_s, vec_r, -alpha);
+            vec_u.axpy(vec_q, -alpha);
+            vec_w.axpy(vec_z, -alpha);
+            vec_r.axpy(vec_s, -alpha);
           }
 
           gamma_old = gamma;

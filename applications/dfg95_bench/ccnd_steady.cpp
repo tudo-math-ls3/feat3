@@ -984,7 +984,7 @@ namespace DFG95
         }
 
         // update solution
-        vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+        vec_sol.axpy(vec_cor);
 
         FEAT::Statistics::compress_solver_expressions();
         // next non-linear iteration

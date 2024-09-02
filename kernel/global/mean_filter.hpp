@@ -230,7 +230,7 @@ namespace FEAT
           _comm->allreduce(&integ, &integ, std::size_t(1), Dist::op_sum);
         }
         // subtract mean
-        vector.axpy(_vec_dual, vector, -integ / _volume);
+        vector.axpy(_vec_dual, -integ / _volume);
       }
 
       /**
@@ -253,7 +253,7 @@ namespace FEAT
           _comm->allreduce(&integ, &integ, std::size_t(1), Dist::op_sum);
         }
         // subtract mean
-        vector.axpy(_vec_prim, vector, -integ / _volume);
+        vector.axpy(_vec_prim, -integ / _volume);
       }
 
       /**

@@ -578,7 +578,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Calculate \f$this \leftarrow \alpha~ x + y\f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x + this\f$
        *
        * \param[in] x The first summand vector to be scaled.
        * \param[in] y The second summand vector.
@@ -586,23 +586,14 @@ namespace FEAT
        */
       void axpy(
         const DenseMatrix & x,
-        const DenseMatrix & y,
         const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.size() == y.size(), "Vector size does not match!");
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
-
-        if (Math::abs(alpha) < Math::eps<DT_>())
-        {
-          this->copy(y);
-          //y.scale(beta);
-          return;
-        }
 
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 2);
-        Arch::Axpy::value(this->elements(), alpha, x.elements(), y.elements(), this->size());
+        Arch::Axpy::value(this->elements(), alpha, x.elements(), this->elements(), this->size());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));

@@ -1034,7 +1034,7 @@ namespace FEAT
       ///@name Linear algebra operations
       ///@{
       /**
-       * \brief Calculate \f$this \leftarrow y + \alpha~ x\f$
+       * \brief Calculate \f$this \leftarrow this + \alpha~ x\f$
        *
        * \param[in] x The first summand matrix to be scaled.
        * \param[in] y The second summand matrix
@@ -1044,22 +1044,11 @@ namespace FEAT
        */
       void axpy(
                 const SparseMatrixBCSR & x,
-                const SparseMatrixBCSR & y,
                 const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.rows() == y.rows(), "Matrix rows do not match!");
         XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == y.columns(), "Matrix columns do not match!");
         XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.used_elements() == y.used_elements(), "Matrix used_elements do not match!");
         XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
-
-        if (Math::abs(alpha) < Math::eps<DT_>())
-        {
-          this->copy(y);
-          //y.scale(beta);
-          return;
-        }
 
         TimeStamp ts_start;
 
@@ -1067,7 +1056,7 @@ namespace FEAT
         Arch::Axpy::value(this->template val<Perspective::pod>(),
             alpha,
             x.template val<Perspective::pod>(),
-            y.template val<Perspective::pod>(),
+            this->template val<Perspective::pod>(),
             this->used_elements<Perspective::pod>());
 
         TimeStamp ts_stop;

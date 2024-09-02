@@ -257,7 +257,8 @@ namespace CCND_FIBER
         neumann_boundary_asm.assemble_functional_vector(_vec_sol.local().template at<0>(), neumann_functional, velo_space, cubature);
 
         //and now add this vector onto cor
-        vec_temp.axpy(_vec_sol, _vec_rhs, DataType(1.));
+        vec_temp.copy(_vec_rhs);
+        vec_temp.axpy(_vec_sol, DataType(1.));
         //multiply with rho, save this into rhs
         _vec_rhs.scale(vec_temp, _inner_solver.rho);
         //set help vectors to zero
@@ -328,7 +329,7 @@ namespace CCND_FIBER
         neumann_boundary_asm.assemble_functional_vector(vec_temp.local().template at<0>(), neumann_functional, velo_space, cubature);
 
         //and now add this vector onto cor
-        vec_temp.axpy(vec_temp, _vec_rhs, DataType(1.));
+        vec_temp.axpy(_vec_rhs, DataType(1.));
         //multiply with rho, save this into rhs
         _vec_rhs.scale(vec_temp, _inner_solver.rho);
 
@@ -467,15 +468,16 @@ namespace CCND_FIBER
             {
               // perform quadratic extrapolation of solution to current timestep
               // u_{k} := 3*u_{k-1} - 3*u_{k-2}) + u_{k-3}
-              _vec_sol.axpy(_prev_sol1, _prev_sol3, DataType(3));
-              _vec_sol.axpy(_prev_sol2, _vec_sol, -DataType(3));
+              _vec_sol.copy(_prev_sol3);
+              _vec_sol.axpy(_prev_sol1, DataType(3));
+              _vec_sol.axpy(_prev_sol2, -DataType(3));
             }
             else if((t_expo >= Index(1)) && (time_step > Index(1)))
             {
               // perform linear extrapolation of solution to current timestep
               // u_{k} := 2*u_{k-1} - u_{k-2}
               _vec_sol.scale(_prev_sol1, DataType(2));
-              _vec_sol.axpy(_prev_sol2, _vec_sol, -DataType(1));
+              _vec_sol.axpy(_prev_sol2, -DataType(1));
             }
             // else-case is constant extrapolation, which is done already by copy
           }
@@ -496,7 +498,8 @@ namespace CCND_FIBER
             the_system_level.local_velo_mass_matrix.apply(
               vec_rhs_time_stepping.local().template at<0>(),
                                                           _prev_sol1.local().template at<0>());
-            vec_rhs_time_stepping.axpy(vec_rhs_time_stepping, _vec_rhs, DataType(1) / delta_t);
+            vec_rhs_time_stepping.scale(vec_rhs_time_stepping, DataType(1) / delta_t);
+            vec_rhs_time_stepping.axpy(_vec_rhs); /// \todo use axpby here
           }
           else
           {
@@ -507,11 +510,13 @@ namespace CCND_FIBER
             auto& vec_temp = _inner_solver.vec_def;
             // f_k := 3/(2*dt) * (4/3 * M * u_{k-1} - 1/3 M * u_{k-2}
             //      = -1/(2*dt) * M * (u_{k-2} - 4*u_{k-1})
-            vec_temp.axpy(_prev_sol1, _prev_sol2, -DataType(4));
+            vec_temp.copy(_prev_sol2);
+            vec_temp.axpy(_prev_sol1, -DataType(4));
             the_system_level.local_velo_mass_matrix.apply(
               vec_rhs_time_stepping.local().template at<0>(),
                                                           vec_temp.local().template at<0>());
-            vec_rhs_time_stepping.axpy(vec_rhs_time_stepping, _vec_rhs, -DataType(0.5) / delta_t);
+            vec_rhs_time_stepping.scale(vec_rhs_time_stepping, -DataType(0.5) / delta_t);
+            vec_rhs_time_stepping.axpy(_vec_rhs); /// \todo use axpby here
           }
 
           //before solving, project the given second moment vectors into the right space
@@ -812,15 +817,16 @@ namespace CCND_FIBER
             {
               // perform quadratic extrapolation of solution to current timestep
               // u_{k} := 3*u_{k-1} - 3*u_{k-2}) + u_{k-3}
-              _vec_sol.axpy(_prev_sol1, _prev_sol3, DataType(3));
-              _vec_sol.axpy(_prev_sol2, _vec_sol, -DataType(3));
+              _vec_sol.copy(_prev_sol3);
+              _vec_sol.axpy(_prev_sol1, DataType(3));
+              _vec_sol.axpy(_prev_sol2, -DataType(3));
             }
             else if((t_expo >= Index(1)) && (time_step > Index(1)))
             {
               // perform linear extrapolation of solution to current timestep
               // u_{k} := 2*u_{k-1} - u_{k-2}
               _vec_sol.scale(_prev_sol1, DataType(2));
-              _vec_sol.axpy(_prev_sol2, _vec_sol, -DataType(1));
+              _vec_sol.axpy(_prev_sol2, -DataType(1));
             }
             // else-case is constant extrapolation, which is done already by copy
           }
@@ -841,7 +847,8 @@ namespace CCND_FIBER
             the_system_level.local_velo_mass_matrix.apply(
               vec_rhs_time_stepping.local().template at<0>(),
                                                           _prev_sol1.local().template at<0>());
-            vec_rhs_time_stepping.axpy(vec_rhs_time_stepping, _vec_rhs, DataType(1) / delta_t);
+            vec_rhs_time_stepping.scale(vec_rhs_time_stepping, DataType(1) / delta_t);
+            vec_rhs_time_stepping.axpy(_vec_rhs);/// \todo use axpby here
           }
           else
           {
@@ -852,11 +859,13 @@ namespace CCND_FIBER
             auto& vec_temp = _inner_solver.vec_def;
             // f_k := 3/(2*dt) * (4/3 * M * u_{k-1} - 1/3 M * u_{k-2}
             //      = -1/(2*dt) * M * (u_{k-2} - 4*u_{k-1})
-            vec_temp.axpy(_prev_sol1, _prev_sol2, -DataType(4));
+            vec_temp.copy(_prev_sol2);
+            vec_temp.axpy(_prev_sol1, -DataType(4));
             the_system_level.local_velo_mass_matrix.apply(
               vec_rhs_time_stepping.local().template at<0>(),
                                                           vec_temp.local().template at<0>());
-            vec_rhs_time_stepping.axpy(vec_rhs_time_stepping, _vec_rhs, -DataType(0.5) / delta_t);
+            vec_rhs_time_stepping.scale(vec_rhs_time_stepping, -DataType(0.5) / delta_t);
+            vec_rhs_time_stepping.axpy(_vec_rhs); /// \todo use axpby here
           }
           _comm.print("Starting moment joining");
           //before calling the inner solver we have to distribute the second and fourth moment vectors
@@ -1110,7 +1119,8 @@ namespace CCND_FIBER
       neumann_boundary_asm.assemble_functional_vector(_vec_sol.local().template at<0>(), neumann_functional, velo_space, cubature);
 
       //and now add this vector onto cor
-      vec_temp.axpy(_vec_sol, _vec_rhs, DataType(1.));
+      vec_temp.copy(_vec_rhs);
+      vec_temp.axpy(_vec_sol, DataType(1.));
       //multiply with rho, save this into rhs
       _vec_rhs.scale(vec_temp, _inner_solver.rho);
       //set help vectors to zero
@@ -2018,7 +2028,7 @@ namespace CCND_FIBER
     }
 
     // update solution
-    vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+    vec_sol.axpy(vec_cor, DataType(1));
 
     FEAT::Statistics::compress_solver_expressions();
     // next non-linear iteration
@@ -2441,7 +2451,7 @@ Solver::Status solve_navier(GlobalSystemVector& vec_sol, const GlobalSystemVecto
     }
 
     // update solution
-    vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+    vec_sol.axpy(vec_cor, DataType(1));
 
     FEAT::Statistics::compress_solver_expressions();
     // next non-linear iteration

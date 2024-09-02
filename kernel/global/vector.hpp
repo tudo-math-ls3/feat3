@@ -340,7 +340,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs an AXPY operation: this <- y + alpha*x
+       * \brief Performs an AXPY operation: this <- this + alpha*x
        *
        * \param[in] x, y
        * The \transient references to the two input vectors
@@ -348,9 +348,9 @@ namespace FEAT
        * \param[in] alpha
        * The scaling factor for the input vector \p x
        */
-      void axpy(const Vector& x, const Vector& y, const DataType alpha = DataType(1))
+      void axpy(const Vector& x, const DataType alpha = DataType(1))
       {
-        _vector.axpy(x.local(), y.local(), alpha);
+        _vector.axpy(x.local(), alpha);
       }
 
       /**

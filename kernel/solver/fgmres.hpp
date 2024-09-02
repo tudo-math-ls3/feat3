@@ -299,7 +299,7 @@ namespace FEAT
             for(Index k(0); k <= i; ++k)
             {
               this->_h.at(i).at(k) = this->_vec_v.at(i+1).dot(this->_vec_v.at(k));
-              this->_vec_v.at(i+1).axpy(this->_vec_v.at(k), this->_vec_v.at(i+1), -this->_h.at(i).at(k));
+              this->_vec_v.at(i+1).axpy(this->_vec_v.at(k), -this->_h.at(i).at(k));
             }
 
             // normalize v[i+1]
@@ -382,7 +382,7 @@ namespace FEAT
 
           // update solution
           for(Index k(0); k < n; ++k)
-            vec_sol.axpy(this->_vec_z.at(k), vec_sol, this->_q.at(k));
+            vec_sol.axpy(this->_vec_z.at(k), this->_q.at(k));
 
           // compute "real" residual
           matrix.apply(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));

@@ -144,7 +144,7 @@ namespace DbgBaseSplitter
       the_system_level.base_splitter_sys.split_read_from(vector2, filename, file_mode);
 
       // compute errors
-      vector2.axpy(vector, vector2, -1.0);
+      vector2.axpy(vector, -1.0);
       double ad = vector2.max_abs_element();
       comm.print("Max absolute difference: " + stringify_fp_sci(ad));
     }

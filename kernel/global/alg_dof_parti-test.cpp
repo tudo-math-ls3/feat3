@@ -188,8 +188,8 @@ public:
     adp_vec_y.download(glob_vec_y2);
 
     // compute errors to original vectors
-    glob_vec_x2.axpy(glob_vec_x, glob_vec_x2, -DataType(1));
-    glob_vec_y2.axpy(glob_vec_y, glob_vec_y2, -DataType(1));
+    glob_vec_x2.axpy(glob_vec_x, -DataType(1));
+    glob_vec_y2.axpy(glob_vec_y, -DataType(1));
 
     // compute error
     const DataType download_error = Math::sqrt(glob_vec_x2.norm2sqr() + glob_vec_y2.norm2sqr());
@@ -243,7 +243,7 @@ public:
     adp_vec_b.download(glob_vec_b2);
 
     // compute error vector
-    glob_vec_b2.axpy(glob_vec_b, glob_vec_b2, -DataType(1));
+    glob_vec_b2.axpy(glob_vec_b, -DataType(1));
     const DataType error_norm = glob_vec_b2.norm2();
     TEST_CHECK(error_norm < tol);
   }

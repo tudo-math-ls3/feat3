@@ -55,7 +55,7 @@ public:
         // compute w = A*ev - lambda_min*ev
         VectorType w(ev.size());
         a.apply(w, ev);
-        w.axpy(ev, w, -lambda_min);
+        w.axpy(ev, -lambda_min);
 
         // check norm of w
         TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DT_(0), tol);
@@ -79,7 +79,7 @@ public:
       // compute w = A*ev - lambda_min*ev
       VectorType w(ev.size());
       a.apply(w, ev);
-      w.axpy(ev, w, -lambda_min);
+      w.axpy(ev, -lambda_min);
 
       // check norm of w
       TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DT_(0), tol);
@@ -160,7 +160,7 @@ public:
     // compute w = A*ev - lambda_min*ev
     VectorType w(ev.size());
     a.apply(w, ev);
-    w.axpy(ev, w, -lambda_min);
+    w.axpy(ev, -lambda_min);
 
     // check norm of w
     TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DT_(0), tol);

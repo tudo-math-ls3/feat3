@@ -454,7 +454,7 @@ namespace FEAT
           // filter correct
           this->_filter.filter_cor(this->_vec_c);
           // update solution
-          vec_x.axpy(this->_vec_c, vec_x);
+          vec_x.axpy(this->_vec_c);
         }
 
         watch_apply.stop();

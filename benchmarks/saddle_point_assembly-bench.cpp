@@ -228,7 +228,7 @@ namespace SaddlePointAssemblyBench
       solver_apply_watch.start();
       vec_sol.format();
       fgmres->apply(vec_sol, vec_rhs);
-      vec_def.axpy(vec_sol, vec_def, DataType(1));
+      vec_def.axpy(vec_sol, DataType(1));
       solver_apply_watch.stop();
       Backend::set_preferred_backend(backend_asm);
       asm_num_vanka_watch.start();
@@ -375,7 +375,7 @@ namespace SaddlePointAssemblyBench
       solver_apply_watch.start();
       vec_sol.format();
       fgmres->apply(vec_sol, vec_rhs);
-      vec_def.axpy(vec_sol, vec_def, DataType(1));
+      vec_def.axpy(vec_sol, DataType(1));
       solver_apply_watch.stop();
       Backend::set_preferred_backend(backend_asm);
       asm_num_vanka_watch.start();

@@ -68,7 +68,7 @@ public:
 
     // test t <- A*x; t <- t - b
     mat_sys.apply(vec_tmp, vec_sol);
-    vec_tmp.axpy(vec_rhs, vec_tmp, -DataType_(1));
+    vec_tmp.axpy(vec_rhs, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // generate densevectors
@@ -84,7 +84,7 @@ public:
 
     // test t <- A*x; t <- t - b with densevectors
     mat_sys.apply(vec_tmp_dense, vec_sol_dense);
-    vec_tmp_dense.axpy(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
+    vec_tmp_dense.axpy(vec_rhs_dense, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
   }
 
@@ -104,7 +104,7 @@ public:
 
     // test t <- A*x; t <- t - b
     mat_sys.apply(vec_tmp, vec_sol);
-    vec_tmp.axpy(vec_rhs, vec_tmp, -DataType_(1));
+    vec_tmp.axpy(vec_rhs, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.norm2(), DataType_(0), tol);
 
     // generate densevectors
@@ -119,7 +119,7 @@ public:
 
     // test t <- A*x; t <- t - b with densevectors
     mat_sys.apply(vec_tmp_dense, vec_sol_dense);
-    vec_tmp_dense.axpy(vec_rhs_dense, vec_tmp_dense, -DataType_(1));
+    vec_tmp_dense.axpy(vec_rhs_dense, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp_dense.norm2(), DataType_(0), tol);
   }
 };

@@ -609,11 +609,13 @@ namespace FETI{
         XASSERTM(this->gate_signs[i] != 0, "Gate signs are not correctly initialized!");
         if(this->gate_signs[i]*sign > 0)
         {
-          output[i].axpy(dom_buffer_2[i], dom_buffer_1[i], -1.);
+          output[i].copy(dom_buffer_1[i]);
+          output[i].axpy(dom_buffer_2[i], -1.);
         }
         else
         {
-          output[i].axpy(dom_buffer_1[i], dom_buffer_2[i], -1.);
+          output[i].copy(dom_buffer_2[i]);
+          output[i].axpy(dom_buffer_1[i], -1.);
         }
       }
     }
@@ -731,18 +733,20 @@ namespace FETI{
       //setup right_side
       this->extract_residuum(this->vec_rhs_buffer, this->lambda_0);
       LocalVectorType new_rhs(vec_rhs_local.size(), 0.);
-      new_rhs.axpy(this->vec_rhs_buffer, this->vec_rhs_local);
+      new_rhs.copy(this->vec_rhs_local);
+      new_rhs.axpy(this->vec_rhs_buffer);
       //calculate solution without kernel
       this->solve(this->vec_sol_buffer, new_rhs);
       //add kernel
       if(this->floating)
       {
-        this->vec_sol_local.axpy(this->R_vector, this->vec_sol_buffer, - this->alpha);
+        this->vec_sol_local.copy(this->vec_sol_buffer);
+        this->vec_sol_local.axpy(this->R_vector, - this->alpha);
       }
       else // or not
       {
         //I think i have to do this this way to keep the values of the filter
-        vec_sol_local.axpy(vec_sol_local, vec_sol_buffer);
+        vec_sol_local.axpy(vec_sol_buffer);
       }
     }
 
@@ -965,7 +969,8 @@ namespace FETI{
        //subtract from the original residuum with axpy
        for(IndexType i(0); i < (*it)->gate_ranks_size; ++i)
        {
-         (*it)->residuum_opt[i].axpy((*it)->extract_egde_values(tmp, i), (*it)->residuum[i], -1.);
+         (*it)->residuum_opt[i].copy((*it)->residuum[i]);
+         (*it)->residuum_opt[i].axpy((*it)->extract_egde_values(tmp, i), -1.);
          //(*it)->residuum_opt[i].copy((*it)->residuum[i]);
        }
      }
@@ -1015,7 +1020,8 @@ namespace FETI{
        //this should be a move operation...
        for(IndexType i(0); i < (*it)->gate_ranks_size; ++i)
        {
-         (*it)->w_opt[i].axpy((*it)->extract_egde_values(tmp, i), (*it)->w[i], -1.);
+         (*it)->w_opt[i].copy((*it)->w[i]);
+         (*it)->w_opt[i].axpy((*it)->extract_egde_values(tmp, i), -1.);
          //(*it)->w_opt[i].copy((*it)->w[i]);
        }
      }

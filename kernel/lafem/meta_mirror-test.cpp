@@ -111,8 +111,8 @@ public:
     mirror_y.scatter_axpy(vec_y, buf_x);
 
     // compute difference to reference
-    vec_x.axpy(sync_x, vec_x, -DataType(1));
-    vec_y.axpy(sync_y, vec_y, -DataType(1));
+    vec_x.axpy(sync_x, -DataType(1));
+    vec_y.axpy(sync_y, -DataType(1));
 
     // check difference norm
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_x.norm2(), DataType_(0), tol);

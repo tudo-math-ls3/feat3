@@ -486,7 +486,8 @@ struct MeshoptRAdaptApp
 
       // Compute mesh velocity
       {
-        mesh_velocity.axpy(old_coords, meshopt_ctrl->get_coords(), DataType(-1));
+        mesh_velocity.copy(meshopt_ctrl->get_coords());
+        mesh_velocity.axpy(old_coords, DataType(-1));
         mesh_velocity.scale(mesh_velocity, DataType(1)/delta_t);
 
         // Compute maximum of the mesh velocity

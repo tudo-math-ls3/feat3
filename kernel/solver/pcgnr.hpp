@@ -331,11 +331,11 @@ namespace FEAT
 
           // update solution vector
           // x[k+1] := x[k] + alpha[k] * q[k]
-          vec_sol.axpy(vec_q, vec_sol, alpha);
+          vec_sol.axpy(vec_q, alpha);
 
           // update defect vector
           // r[k+1] := r[k] - alpha[k] * y[k]
-          vec_r.axpy(vec_y, vec_r, -alpha);
+          vec_r.axpy(vec_y, -alpha);
 
           // compute defect norm and check for convergence
           status = this->_set_new_defect(vec_r, vec_sol);
@@ -346,7 +346,7 @@ namespace FEAT
           }
 
           // p[k+1] := p[k] - alpha[k] * z[k]
-          vec_p.axpy(vec_z, vec_p, -alpha);
+          vec_p.axpy(vec_z, -alpha);
 
           // s[k+1] := A^T * p[k+1]
           transp.apply(vec_s, vec_p);
@@ -370,7 +370,8 @@ namespace FEAT
 
           // update direction vector
           // q[k+1] := t[k+1] + beta * q[k]
-          vec_q.axpy(vec_q, vec_t, beta);
+          vec_q.scale(vec_q, beta);
+          vec_q.axpy(vec_t); /// \todo use axpby here
         }
 
         // we should never reach this point...

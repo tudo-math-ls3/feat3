@@ -408,7 +408,7 @@ public:
       a.apply(r, x, y, DT_(-1.0));
       a.apply(ref, x);
       ref.scale(ref, DT_(-1.0));
-      ref.axpy(ref, y);
+      ref.axpy(y);
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
@@ -424,7 +424,7 @@ public:
       //ref.product_matvec(a, x);
       a.apply(ref, x);
       ref.scale(ref, s);
-      ref.axpy(ref, y);
+      ref.axpy(y);
       for (Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
@@ -444,7 +444,7 @@ public:
       SparseMatrixCSR<DT_, IT_> at = a.transpose();
       at.apply(ref, x);
       ref.scale(ref,  DT_(-1.0));
-      ref.axpy(ref, y);
+      ref.axpy(y);
 
       for(Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
@@ -1087,27 +1087,32 @@ public:
       SparseMatrixCSR<DT_, IT_> c;
 
       c.clone(a);
-      c.axpy(c, b, s);
+      c.scale(c, s);
+      c.axpy(b); /// \todo use axpby here
       TEST_CHECK_EQUAL(c, ref);
 
       c.clone(b);
-      c.axpy(a, c, s);
+      c.axpy(a, s);
       TEST_CHECK_EQUAL(c, ref);
 
-      c.axpy(a, b, s);
+      c.copy(b);
+      c.axpy(a, s);
       TEST_CHECK_EQUAL(c, ref);
 
       s = DT_(0);
       ref.clone(b);
-      c.axpy(a, b, s);
+      c.copy(b);
+      c.axpy(a, s);
       TEST_CHECK_EQUAL(c, ref);
 
       s = DT_(1);
-      c.axpy(a, b, s);
+      c.copy(b);
+      c.axpy(a, s);
       TEST_CHECK_EQUAL(c, ref_plus);
 
       s = DT_(-1);
-      c.axpy(a, b, s);
+      c.copy(b);
+      c.axpy(a, s);
       TEST_CHECK_EQUAL(c, ref_minus);
     }
   }

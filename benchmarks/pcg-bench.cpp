@@ -66,7 +66,7 @@ void run(PreferredBackend backend)
   Backend::set_preferred_backend(PreferredBackend::generic);
 
   // compute error to reference solution
-  vec_ref.axpy(vec_sol, vec_ref, -DT_(1));
+  vec_ref.axpy(vec_sol, -DT_(1));
   DT_ err = vec_ref.norm2();
 
   const unsigned long long n   = matrix.rows();

@@ -38,7 +38,7 @@ void run(PreferredBackend backend)
   bytes *= 3;
   bytes *= sizeof(DT_);
 
-  auto func = [&] () { y.axpy(x,y,s); };
+  auto func = [&] () { y.axpy(x, s); };
   run_bench(func, flops, bytes);
 }
 

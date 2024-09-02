@@ -215,7 +215,7 @@ namespace FEAT
       {
         // subtract to dual integral mean zero
         if(!_vec_prim.empty())
-          vector.axpy(_vec_dual, vector, -vector.dot(_vec_prim) / _volume);
+          vector.axpy(_vec_dual, -vector.dot(_vec_prim) / _volume);
       }
 
       /**
@@ -235,7 +235,7 @@ namespace FEAT
         // <==>                 alpha*v*w = sol_mean*v*w - x*w
         // <==>                     alpha = sol_mean - (x*w/v*w)
         if(!_vec_prim.empty())
-          vector.axpy(_vec_prim, vector, _sol_mean - vector.dot(_vec_dual) / _volume);
+          vector.axpy(_vec_prim, _sol_mean - vector.dot(_vec_dual) / _volume);
       }
 
       /**
@@ -260,7 +260,7 @@ namespace FEAT
       {
         // subtract to primal integral mean zero
         if(!_vec_prim.empty())
-          vector.axpy(_vec_prim, vector, -vector.dot(_vec_dual) / _volume);
+          vector.axpy(_vec_prim, -vector.dot(_vec_dual) / _volume);
       }
 
       /**

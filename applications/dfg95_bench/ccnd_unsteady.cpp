@@ -1118,14 +1118,14 @@ namespace DFG95
         // transform v[k-1] :=       L_0(-q)*u[k] + L_1(-q)*u[k-1] +   L_2(-q)*u[k-2]
         //                   = (q-1)*(q-2)/2*u[k] + q*(2-q)*u[k-1] + q*(q-1)/2*u[k-2]
         vec_sol_1.scale(vec_sol, (q - DataType(1))*(q - DataType(2)) / DataType(2));
-        vec_sol_1.axpy(old_sol_1, vec_sol_1, q * (DataType(2) - q));
-        vec_sol_1.axpy(old_sol_2, vec_sol_1, q * (q - DataType(1)) / DataType(2));
+        vec_sol_1.axpy(old_sol_1, q * (DataType(2) - q));
+        vec_sol_1.axpy(old_sol_2, q * (q - DataType(1)) / DataType(2));
 
         // transform v[k-2] :=      L_0(-2q)*u[k] +  L_1(-2q)*u[k-1] +  L_2(-2q)*u[k-2]
         //                   = (q-1)*(2*q-1)*u[k] + 4*q*(1-q)*u[k-1] + q*(2*q-1)*u[k-2]
         vec_sol_2.scale(vec_sol, (q - DataType(1))*(DataType(2)*q - DataType(1)));
-        vec_sol_2.axpy(old_sol_1, vec_sol_2, DataType(4) * q * (DataType(1) - q));
-        vec_sol_2.axpy(old_sol_2, vec_sol_2, q * (DataType(2)*q - DataType(1)));
+        vec_sol_2.axpy(old_sol_1, DataType(4) * q * (DataType(1) - q));
+        vec_sol_2.axpy(old_sol_2, q * (DataType(2)*q - DataType(1)));
       }
       else if(!same_dt && (t_expo >= Index(1)))
       {
@@ -1138,7 +1138,7 @@ namespace DFG95
 
         // transform v[k-1] = (1-q)*u[k] + q*v[k-1]
         vec_sol_1.scale(vec_sol_1, q);
-        vec_sol_1.axpy(vec_sol, vec_sol_1, DataType(1) - q);
+        vec_sol_1.axpy(vec_sol, DataType(1) - q);
       }
       // If t_expo is < 1, i.e. constant extrapolation, then no transformation is
       // required even if the timestep size has changed.
@@ -1191,15 +1191,16 @@ namespace DFG95
         {
           // perform quadratic extrapolation of solution to current time-step
           // u_{k} := 3*u_{k-1} - 3*u_{k-2}) + u_{k-3}
-          vec_sol.axpy(vec_sol_1, vec_sol_3, DataType(3));
-          vec_sol.axpy(vec_sol_2, vec_sol, -DataType(3));
+          vec_sol.copy(vec_sol_3);
+          vec_sol.axpy(vec_sol_1, DataType(3));
+          vec_sol.axpy(vec_sol_2, -DataType(3));
         }
         else if((t_expo >= Index(1)) && (time_step > Index(1)))
         {
           // perform linear extrapolation of solution to current time-step
           // u_{k} := 2*u_{k-1} - u_{k-2}
           vec_sol.scale(vec_sol_1, DataType(2));
-          vec_sol.axpy(vec_sol_2, vec_sol, -DataType(1));
+          vec_sol.axpy(vec_sol_2, -DataType(1));
         }
         // else-case is constant extrapolation, which is done already by copy
       }
@@ -1257,7 +1258,8 @@ namespace DFG95
         // we're beyond the first time step ==> BDF(2)
         // f_k := 3/(2*dt) * (4/3 * M * u_{k-1} - 1/3 M * u_{k-2}
         //      = -1/(2*dt) * M * (u_{k-2} - 4*u_{k-1})
-        vec_def.axpy(vec_sol_1, vec_sol_2, -DataType(4));
+        vec_def.copy(vec_sol_2);
+        vec_def.axpy(vec_sol_1, -DataType(4));
         the_system_level.local_velo_mass_matrix.apply(
           vec_rhs.local().template at<0>(),
           vec_def.local().template at<0>());
@@ -1510,7 +1512,7 @@ namespace DFG95
         }
 
         // update solution
-        vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+        vec_sol.axpy(vec_cor);
 
         FEAT::Statistics::compress_solver_expressions();
         // next non-linear iteration
@@ -1660,7 +1662,8 @@ namespace DFG95
       comm.print(summary.format_compact(t_line + " > "));
 
       // compute time derivative vector
-      vec_def.axpy(vec_sol_1, vec_sol, -DataType(1));
+      vec_def.copy(vec_sol);
+      vec_def.axpy(vec_sol_1, -DataType(1));
       vec_def.scale(vec_def, DataType(1) / delta_t);
 
       // compute L2-norm of velocity time-derivative by utilizing the velocity mass matrix

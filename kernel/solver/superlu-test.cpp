@@ -257,7 +257,7 @@ public:
     solver->done();
 
     // check solution
-    vec_sol.axpy(vec_ref, vec_sol, -DT_(1));
+    vec_sol.axpy(vec_ref, -DT_(1));
     const DT_ norm = vec_sol.norm2();
     TEST_CHECK_EQUAL_WITHIN_EPS(norm, DT_(0), tol);
   }

@@ -80,10 +80,10 @@ public:
     filter.filter_sol(b2);
 
     // subtract reference results
-    a1.axpy(ar, a1, -DT_(1));
-    a2.axpy(ar, a2, -DT_(1));
-    b1.axpy(br, b1, -DT_(1));
-    b2.axpy(br, b2, -DT_(1));
+    a1.axpy(ar, -DT_(1));
+    a2.axpy(ar, -DT_(1));
+    b1.axpy(br, -DT_(1));
+    b2.axpy(br, -DT_(1));
 
     // check results
     TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
@@ -218,14 +218,14 @@ public:
     filter.filter_mat(matrix_a1);
 
     // subtract reference
-    matrix_a1.axpy(matrix_b, matrix_a1, -DT_(1));
+    matrix_a1.axpy(matrix_b, -DT_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a1.norm_frobenius(), DT_(0), tol);
 
     // apply weak filter onto a2
     filter.filter_weak_matrix_rows(matrix_a2, matrix_a2);
 
     // subtract reference
-    matrix_a2.axpy(matrix_c, matrix_a2, -DT_(1));
+    matrix_a2.axpy(matrix_c, -DT_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(matrix_a2.norm_frobenius(), DT_(0), tol);
   }
 };

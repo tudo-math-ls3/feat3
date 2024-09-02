@@ -86,7 +86,7 @@ public:
     matrix_q1_to_q2.apply(vec_q2t, vec_q1);
 
     // compare vectors
-    vec_q2t.axpy(vec_q2, vec_q2t, -DataType_(1));
+    vec_q2t.axpy(vec_q2, -DataType_(1));
     TEST_CHECK(vec_q2t.norm2() < eps);
 
     // project Q2 vector into Q1 space
@@ -94,7 +94,7 @@ public:
     matrix_q2_to_q1.apply(vec_q1t, vec_q2);
 
     // compare vectors
-    vec_q1t.axpy(vec_q1, vec_q1t, -DataType_(1));
+    vec_q1t.axpy(vec_q1, -DataType_(1));
     TEST_CHECK(vec_q1t.norm2() < eps);
   }
 };

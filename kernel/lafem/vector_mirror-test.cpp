@@ -138,9 +138,9 @@ public:
       mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
       // subtract reference results
-      a1.axpy(a2, a1, -DT_(1));
-      b1.axpy(b2, b1, -DT_(1));
-      c1.axpy(c2, c1, -DT_(1));
+      a1.axpy(a2, -DT_(1));
+      b1.axpy(b2, -DT_(1));
+      c1.axpy(c2, -DT_(1));
 
       // check norms
       TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);
@@ -344,9 +344,9 @@ public:
       mirror2.scatter_axpy(c1, vec_buf_ac_a);
 
       // Subtract reference results
-      a1.axpy(a2, a1, -DT_(1));
-      b1.axpy(b2, b1, -DT_(1));
-      c1.axpy(c2, c1, -DT_(1));
+      a1.axpy(a2, -DT_(1));
+      b1.axpy(b2, -DT_(1));
+      c1.axpy(c2, -DT_(1));
 
       // Check norms
       TEST_CHECK_EQUAL_WITHIN_EPS(a1.norm2(), DT_(0), tol);

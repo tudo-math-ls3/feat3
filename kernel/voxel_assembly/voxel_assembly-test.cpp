@@ -94,7 +94,8 @@ public:
   void compare_matrices(const MatrixType_& mat_a, const MatrixType_& mat_b) const
   {
     auto matrix_comp = mat_a.clone(LAFEM::CloneMode::Deep);
-    matrix_comp.axpy(mat_a, mat_b, DataType(-1));
+    matrix_comp.copy(mat_b);
+    matrix_comp.axpy(mat_a, DataType(-1));
     // std::cout << matrix_comp << std::endl;
     TEST_CHECK_EQUAL_WITHIN_EPS(matrix_comp.norm_frobenius(), DataType(0), tol);
   }
@@ -103,7 +104,8 @@ public:
   void compare_defects(const VectorType_& vec_a, const VectorType_& vec_b) const
   {
     auto vec_comp = vec_a.clone(LAFEM::CloneMode::Deep);
-    vec_comp.axpy(vec_a, vec_b, DataType(-1));
+    vec_comp.copy(vec_b);
+    vec_comp.axpy(vec_a, DataType(-1));
     // std::cout << matrix_comp << std::endl;
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_comp.norm2(), DataType(0), tol);
   }

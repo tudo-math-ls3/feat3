@@ -366,7 +366,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Performs \f$ this \leftarrow \alpha\cdot x + y \f$
+       * \brief Performs \f$ this \leftarrow \alpha\cdot x + this \f$
        *
        * \param[in] x
        * The first summand vector.
@@ -377,10 +377,10 @@ namespace FEAT
        * \param[in] alpha
        * The scaling factor for \p x.
        */
-      void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))
+      void axpy(const PowerVector& x, DataType alpha = DataType(1))
       {
-        first().axpy(x.first(), y.first(), alpha);
-        rest().axpy(x.rest(), y.rest(), alpha);
+        first().axpy(x.first(), alpha);
+        rest().axpy(x.rest(), alpha);
       }
 
       /**
@@ -892,9 +892,9 @@ namespace FEAT
         first().copy(x.first(), full);
       }
 
-      void axpy(const PowerVector& x, const PowerVector& y, DataType alpha = DataType(1))
+      void axpy(const PowerVector& x, DataType alpha = DataType(1))
       {
-        first().axpy(x.first(), y.first(), alpha);
+        first().axpy(x.first(), alpha);
       }
 
       void component_product(const PowerVector & x, const PowerVector & y)

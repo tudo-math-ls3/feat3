@@ -851,7 +851,8 @@ namespace PoissonMultigridBench
 
     // compute and save final relative error
     {
-      vec_rhs.axpy(vec_sol, vec_ref, -DataType(1));
+      vec_rhs.copy(vec_ref);
+      vec_rhs.axpy(vec_sol, -DataType(1));
       stats.final_error = vec_rhs.norm2() / Math::sqrt(DataType(stats.counts.front()[Counts::num_dofs_g]));
     }
 

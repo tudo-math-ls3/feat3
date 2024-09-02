@@ -716,7 +716,8 @@ namespace DFG95
     const auto* vchr = vec_char.elements();
     for(Index i(0); i < n; ++i)
     {
-      frc.axpy(vchr[i], vdef[i]);
+      frc.copy(vdef[i]);
+      frc.axpy(vchr[i]);
     }
   }
 

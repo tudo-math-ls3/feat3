@@ -213,7 +213,7 @@ namespace FEAT
           //filter.filter_cor(vec_cor);
 
           // update solution vector
-          vec_sol.axpy(vec_cor, vec_sol, this->_omega);
+          vec_sol.axpy(vec_cor, this->_omega);
 
           // compute new defect vector
           matrix.apply(vec_def, vec_sol, vec_rhs, -DataType(1));

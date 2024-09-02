@@ -294,15 +294,16 @@ namespace CCNDSimple
     {
       // perform quadratic extrapolation of solution to current time-step
       // u_{k} := 3*u_{k-1} - 3*u_{k-2}) + u_{k-3}
-      vec_sol.axpy(vec_sol_1, vec_sol_3, DataType(3));
-      vec_sol.axpy(vec_sol_2, vec_sol, -DataType(3));
+      vec_sol.copy(vec_sol_3);
+      vec_sol.axpy(vec_sol_1, DataType(3));
+      vec_sol.axpy(vec_sol_2, -DataType(3));
     }
     else if((time_step > Index(1)) && (sol_expo >= Index(1)))
     {
       // perform linear extrapolation of solution to current time-step
       // u_{k} := 2*u_{k-1} - u_{k-2}
       vec_sol.scale(vec_sol_1, DataType(2));
-      vec_sol.axpy(vec_sol_2, vec_sol, -DataType(1));
+      vec_sol.axpy(vec_sol_2, -DataType(1));
     }
     // else: leave vec_sol untouched, which results in constant extrapolation
 
@@ -333,7 +334,8 @@ namespace CCNDSimple
       // we're beyond the first time step ==> BDF(2)
       // f_k := 3/(2*dt) * (4/3 * M * u_{k-1} - 1/3 M * u_{k-2}
       //      = -1/(2*dt) * M * (u_{k-2} - 4*u_{k-1})
-      vec_tmp.axpy(vec_sol_1, vec_sol_2, -DataType(4));
+      vec_tmp.copy(vec_sol_2);
+      vec_tmp.axpy(vec_sol_1, -DataType(4));
       the_system_level.local_velo_mass_matrix.apply(
         vec_rhs.local().template at<0>(),
         vec_tmp.local().template at<0>(),

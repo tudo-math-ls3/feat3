@@ -110,7 +110,8 @@ public:
     Assembly::BilinearOperatorAssembler::apply1(res, x, my_operator, my_space, cubature_factory);
 
     // Compute || ref - res ||_l2
-    res.axpy(res, ref, DataType_(-1));
+    res.scale(res, DataType_(-1));
+    res.axpy(ref); /// \todo use axpby here
     const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
     TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DataType_(0), eps);
 
@@ -168,7 +169,8 @@ public:
       (res, x, my_operator, my_test_space, my_trial_space, cubature_factory);
 
     // Compute || ref - res ||_l2
-    res.axpy(res, ref, DataType_(-1));
+    res.scale(res, DataType_(-1));
+    res.axpy(ref); /// \todo use axpby here
 
     const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
     TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DataType_(0), eps);

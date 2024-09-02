@@ -231,12 +231,12 @@ namespace FEAT
 
           alpha = gamma / t;
 
-          vec_r.axpy(vec_s, vec_r, -alpha);
+          vec_r.axpy(vec_s, -alpha);
           auto norm_def_cur = vec_r.norm2_async();
 
-          vec_sol.axpy(vec_p, vec_sol, alpha);
+          vec_sol.axpy(vec_p, alpha);
 
-          vec_z.axpy(vec_S, vec_z, -alpha);
+          vec_z.axpy(vec_S, -alpha);
 
           auto dot_gamma_new = vec_r.dot_async(vec_z);
           matrix.apply(vec_Z, vec_z);
@@ -246,8 +246,10 @@ namespace FEAT
           beta = gamma_new / gamma;
           gamma = gamma_new;
 
-          vec_p.axpy(vec_p, vec_z, beta);
-          vec_s.axpy(vec_s, vec_Z, beta);
+          vec_p.scale(vec_p, beta);
+          vec_p.axpy(vec_z); /// \todo use axpby here
+          vec_s.scale(vec_s, beta);
+          vec_s.axpy(vec_Z); /// \todo use axpby here
 
           status = this->_update_defect(norm_def_cur.wait());
           if(status != Status::progress)

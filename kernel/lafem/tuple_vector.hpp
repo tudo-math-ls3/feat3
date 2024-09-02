@@ -321,10 +321,10 @@ namespace FEAT
         rest().copy(x.rest(), full);
       }
 
-      void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
+      void axpy(const TupleVector& x, DataType alpha = DataType(1))
       {
-        first().axpy(x.first(), y.first(), alpha);
-        rest().axpy(x.rest(), y.rest(), alpha);
+        first().axpy(x.first(), alpha);
+        rest().axpy(x.rest(), alpha);
       }
 
       void component_product(const TupleVector & x, const TupleVector & y)
@@ -724,9 +724,9 @@ namespace FEAT
         first().copy(x.first(), full);
       }
 
-      void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
+      void axpy(const TupleVector& x, DataType alpha = DataType(1))
       {
-        first().axpy(x.first(), y.first(), alpha);
+        first().axpy(x.first(), alpha);
       }
 
       void component_product(const TupleVector & x, const TupleVector & y)

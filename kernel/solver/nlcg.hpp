@@ -520,7 +520,8 @@ namespace FEAT
             this->_ls_its = _linesearch->get_num_iter();
             this->_steplength = _linesearch->get_rel_update();
             _linesearch->get_defect_from_grad(this->_vec_r);
-            this->_vec_y.axpy(this->_vec_y, this->_vec_r, -DataType(1));
+            this->_vec_y.scale(this->_vec_y, -DataType(1));
+            this->_vec_y.axpy(this->_vec_r); /// \todo use axpby here
 
             // Log iterates if necessary
             if(iterates != nullptr)
@@ -593,7 +594,8 @@ namespace FEAT
             }
             else
             {
-              this->_vec_p.axpy(this->_vec_p, this->_vec_z, beta);
+              this->_vec_p.scale(this->_vec_p, beta);
+              this->_vec_p.axpy(this->_vec_z); /// \todo use axpby here
             }
 
 

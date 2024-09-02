@@ -418,18 +418,21 @@ namespace PoissonMixed
         //Assembly::DiscreteCellProjector::project(cell_def_1, vdef_1.local(), the_domain_level.space_pres);
         //Assembly::DiscreteCellProjector::project(cell_def_2, vdef_2.local(), the_domain_level.space_pres);
 
-        vdef_1.axpy(vdef_1, vec_rhs, -1.0);
-        vdef_2.axpy(vdef_2, vec_rhs, -1.0);
+        vdef_1.scale(vdef_1, -1.0);
+        vdef_1.axpy(vec_rhs); /// \todo use axpby here
+        vdef_2.scale(vdef_2, -1.0);
+        vdef_2.axpy(vec_rhs); /// \todo use axpby here
 
         // compute defect norm
         DataType norm_1 = vdef_1.norm2();
         DataType norm_2 = vdef_2.norm2();
 
-        vsol_1.axpy(vdef_1, vsol_1, omega);
-        vsol_2.axpy(vdef_2, vsol_2, omega);
+        vsol_1.axpy(vdef_1, omega);
+        vsol_2.axpy(vdef_2, omega);
 
         // compute difference of solutions
-        verr.axpy(vsol_1, vsol_2, -1.0);
+        verr.copy(vsol_2);
+        verr.axpy(vsol_1, -1.0);
         DataType norm_e = verr.norm2();
 
         comm.print("ADP-Richardson: " + stringify(iter).pad_front(3) + ": " + stringify_fp_sci(norm_1)

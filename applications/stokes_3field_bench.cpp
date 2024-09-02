@@ -445,7 +445,7 @@ namespace Stokes3Field
         //filter.filter_cor(vec_cor);
 
         // update solution vector
-        vec_sol.axpy(vec_cor, vec_sol);
+        vec_sol.axpy(vec_cor);
 
         // compute new defect vector
         //matrix.apply(vec_def, vec_sol, vec_rhs, -DataType(1));

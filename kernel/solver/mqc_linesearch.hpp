@@ -289,7 +289,8 @@ namespace FEAT
             //std::cout << "Set alpha_smin " << _alpha_soft_min << " alpha_smax " << _alpha_soft_max << std::endl;
 
             // Update solution: sol <- initial_sol + _alpha*dir
-            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
+            vec_sol.copy(this->_vec_initial_sol);
+            vec_sol.axpy(this->_vec_pn, alpha);
             //std::cout << "Linesearch alpha " << alpha << std::endl;
             //std::cout << "initial_sol " << *(this->_vec_initial_sol) << std::endl;
             //std::cout << "dir " << *this->_vec_pn << std::endl;
@@ -310,7 +311,8 @@ namespace FEAT
             // If success is reported, check if it is a real success or if something fishy is going on
             if(status == Status::success)
             {
-              this->_vec_tmp.axpy(vec_sol, this->_vec_initial_sol, -DataType(1));
+              this->_vec_tmp.copy(this->_vec_initial_sol);
+              this->_vec_tmp.axpy(vec_sol, -DataType(1));
               if(fval >= this->_fval_0 || this->_vec_tmp.norm2() == DataType(0))
               {
                 status = Status::stagnated;
@@ -407,7 +409,8 @@ namespace FEAT
             this->_alpha_min = alpha_lo;
             this->_fval_min = fval_lo;
             //std::cout << "Unusual termination alpha_lo " << alpha_lo << "fval_lo " << fval_lo << std::endl;
-            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha_lo);
+            vec_sol.copy(this->_vec_initial_sol);
+            vec_sol.axpy(this->_vec_pn, alpha_lo);
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);

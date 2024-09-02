@@ -270,13 +270,14 @@ namespace FEAT
           delta = dot_delta.wait();
           alpha = rho / delta;
 
-          vec_th.axpy(vec_s, vec_z, -alpha);
+          vec_th.copy(vec_z);
+          vec_th.axpy(vec_s, -alpha);
 
           matrix.apply(vec_t, vec_th);
           filter.filter_def(vec_t);
 
-          vec_sol.axpy(vec_vh, vec_sol, alpha);
-          vec_r.axpy(vec_v, vec_r, -alpha);
+          vec_sol.axpy(vec_vh, alpha);
+          vec_r.axpy(vec_v, -alpha);
           auto norm_def_half = vec_r.norm2_async();
 
           auto dot_theta = vec_t.dot_async(vec_r);
@@ -339,17 +340,19 @@ namespace FEAT
 
           omega = theta / phi;
 
-          vec_sol.axpy(vec_th, vec_sol, omega);
-          vec_r.axpy(vec_t, vec_r, -omega);
+          vec_sol.axpy(vec_th, omega);
+          vec_r.axpy(vec_t, -omega);
 
           auto norm_def_cur = vec_r.norm2_async();
 
           rho = -omega * psi;
-          vec_z.axpy(vec_z, vec_th, -omega);
+          vec_z.scale(vec_z, -omega);
+          vec_z.axpy(vec_th); /// \todo use axpby here
           beta = (rho / rho_old) * (alpha / omega);
           rho_old = rho;
-          vec_vh.axpy(vec_s, vec_vh, -omega);
-          vec_vh.axpy(vec_vh, vec_z, beta);
+          vec_vh.axpy(vec_s, -omega);
+          vec_vh.scale(vec_vh, beta);
+          vec_vh.axpy(vec_z); /// \todo use axpby here
 
           status = this->_update_defect(norm_def_cur.wait());
           if(status != Status::progress)

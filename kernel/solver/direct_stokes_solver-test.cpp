@@ -168,7 +168,7 @@ public:
 
     // compute defect and error
     matrix.apply(vec_def, vec_sol, vec_rhs, -1.0);
-    vec_ref.axpy(vec_sol, vec_ref, -1.0);
+    vec_ref.axpy(vec_sol, -1.0);
 
     std::cout << "|rhs| = " << stringify_fp_sci(vec_rhs.max_abs_element()) << std::endl;
     std::cout << "|sol| = " << stringify_fp_sci(vec_sol.max_abs_element()) << std::endl;

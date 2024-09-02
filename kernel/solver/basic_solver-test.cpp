@@ -86,7 +86,7 @@ public:
     solver.done();
 
     // check against reference solution
-    vec_sol.axpy(vec_ref, vec_sol, -DataType(1));
+    vec_sol.axpy(vec_ref, -DataType(1));
     const DataType d = vec_sol.norm2sqr();
     TEST_CHECK_MSG(d <= tol, name + ": failed to reach tolerance\n"
       + "result: " + stringify_fp_sci(d) + "; expected result <= " + stringify(tol));

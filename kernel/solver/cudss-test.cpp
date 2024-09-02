@@ -66,7 +66,7 @@ public:
     }
 
     // subtract reference solution
-    vec_sol.axpy(vec_ref, vec_sol, -1.0);
+    vec_sol.axpy(vec_ref, -1.0);
 
     // compute the norm
     double nrm2 = vec_sol.norm2();

@@ -170,10 +170,10 @@ namespace FEAT
 
         // compute rhs vector (by exploiting the eigenvector property)
         mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
-        vec_rhs1.axpy(vec_eigen1, vec_rhs1, ps_fd.lambda_min()); // B1*p
+        vec_rhs1.axpy(vec_eigen1, ps_fd.lambda_min()); // B1*p
         vec_rhs2.scale(vec_eigen1, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
         mat_fd.apply(vec_rhs3, vec_bubble); // D1*u1
-        vec_rhs3.axpy(vec_eigen1, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+        vec_rhs3.axpy(vec_eigen1, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<0>().template at<0>().convert(vec_rhs1);
@@ -220,10 +220,10 @@ namespace FEAT
         // compute rhs vector (by exploiting the eigenvector property)
         mat_fe.apply(vec_rhs1, vec_bubble); // A11*u1
         mat_fd.apply(vec_rhs2, vec_bubble); // A21*u1
-        vec_rhs1.axpy(vec_eigen1, vec_rhs1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
-        vec_rhs2.axpy(vec_eigen1, vec_rhs2, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
+        vec_rhs1.axpy(vec_eigen1, ps_fd.lambda_min() + ps_fd.lambda_min()); // A12*u2 + B1*p
+        vec_rhs2.axpy(vec_eigen1, ps_fe.lambda_min() + ps_fd.lambda_min()); // A22*u2 + B2*p
         mat_fd.apply(vec_rhs3, vec_bubble); // D1*u1
-        vec_rhs3.axpy(vec_eigen1, vec_rhs3, ps_fd.lambda_min()); // D2*u2
+        vec_rhs3.axpy(vec_eigen1, ps_fd.lambda_min()); // D2*u2
 
         // set rhs vector
         vec_rhs.template at<0>().template at<0>().convert(vec_rhs1);

@@ -615,12 +615,12 @@ namespace Tutorial06
       alpha_l = gamma_l / alpha_l;
 
       // update solution
-      vec_sol.axpy(vec_dir, vec_sol, alpha_g);
-      adp_vector_x.owned().axpy(adp_vector_y.owned(), adp_vector_x.owned(), alpha_l);
+      vec_sol.axpy(vec_dir, alpha_g);
+      adp_vector_x.owned().axpy(adp_vector_y.owned(), alpha_l);
 
       // update residual
-      vec_def.axpy(vec_tmp, vec_def, -alpha_g);
-      adp_vector_d.owned().axpy(adp_vector_q.owned(), adp_vector_d.owned(), -alpha_l);
+      vec_def.axpy(vec_tmp, -alpha_g);
+      adp_vector_d.owned().axpy(adp_vector_q.owned(), -alpha_l);
 
       // update gamma
       DataType gamma_g2 = gamma_g;
@@ -643,8 +643,10 @@ namespace Tutorial06
         break;
 
       // compute update direction
-      vec_dir.axpy(vec_dir, vec_def, gamma_g / gamma_g2);
-      adp_vector_y.owned().axpy(adp_vector_y.owned(), adp_vector_d.owned(), gamma_l / gamma_l2);
+      vec_dir.scale(vec_dir, gamma_g / gamma_g2);
+      vec_dir.axpy(vec_def); /// \todo use axpby here
+      adp_vector_y.owned().scale(adp_vector_y.owned(), gamma_l / gamma_l2);
+      adp_vector_y.owned().axpy(adp_vector_d.owned()); /// \todo use axpby here
     }
 
     // ############################################################################################

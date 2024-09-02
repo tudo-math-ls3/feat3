@@ -118,7 +118,8 @@ namespace HierarchTransferTestApp
 
       // compute difference norm
       GlobalVectorType vec_err = vec_crs.clone();
-      vec_err.axpy(vec_rst, vec_crs, -DataType(1));
+      vec_err.copy(vec_crs);
+      vec_err.axpy(vec_rst, -DataType(1));
       DataType de = vec_err.norm2();
       derr += de;
       msg += " | " + stringify_fp_sci(de, 3);
@@ -209,7 +210,8 @@ namespace HierarchTransferTestApp
 
       // compute difference norm
       GlobalVectorType vec_err = vec_fine.clone();
-      vec_err.axpy(vec_prol, vec_fine, -DataType(1));
+      vec_err.copy(vec_fine);
+      vec_err.axpy(vec_prol, -DataType(1));
       DataType de = vec_err.norm2();
       derr += de;
       msg += " | " + stringify_fp_sci(de, 3);
@@ -304,7 +306,8 @@ namespace HierarchTransferTestApp
 
       // compute difference norm
       GlobalVectorType vec_err = vec_crs.clone();
-      vec_err.axpy(vec_trc, vec_crs, -DataType(1));
+      vec_err.copy(vec_crs);
+      vec_err.axpy(vec_trc, -DataType(1));
       DataType de = vec_err.norm2();
       derr += de;
       msg += " | " + stringify_fp_sci(de, 3);

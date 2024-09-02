@@ -1609,7 +1609,7 @@ namespace FEAT
         system_filter.filter_cor(lvl.vec_cor);
 
         // update solution vector
-        lvl.vec_sol.axpy(lvl.vec_cor, lvl.vec_sol);
+        lvl.vec_sol.axpy(lvl.vec_cor);
 
         // re-compute defect
         TimeStamp stamp_defect;
@@ -1927,7 +1927,7 @@ namespace FEAT
           }
 
           // update our solution vector
-          lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol, omega_cgc);
+          lvl_f.vec_sol.axpy(lvl_f.vec_cor, omega_cgc);
 
           // get our post-smoother
           std::shared_ptr<SolverType> smoother = lvl_f.level->get_smoother_post();
@@ -1952,7 +1952,7 @@ namespace FEAT
               //           = rhs - A * (sol_old + omega * cor)
               //           = rhs - A *  sol_old - omega * A * cor
               //           = def_old            - omega * tmp
-              lvl_f.vec_def.axpy(lvl_f.vec_tmp, lvl_f.vec_def, -omega_cgc);
+              lvl_f.vec_def.axpy(lvl_f.vec_tmp, -omega_cgc);
             }
             else
             {
@@ -1974,7 +1974,7 @@ namespace FEAT
             lvl_f.time_smooth += stamp_smooth.elapsed_now();
 
             // update solution vector
-            lvl_f.vec_sol.axpy(lvl_f.vec_cor, lvl_f.vec_sol);
+            lvl_f.vec_sol.axpy(lvl_f.vec_cor);
           }
 
           _toes.at((size_t)i) += at.elapsed_now();

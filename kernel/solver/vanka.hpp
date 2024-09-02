@@ -1682,7 +1682,7 @@ namespace FEAT
             this->_vec_tmp2.component_product(this->_vec_tmp2, this->_vec_scale);
 
             // update correction vector
-            vec_cor.axpy(vec_cor, this->_vec_tmp2);
+            vec_cor.axpy(this->_vec_tmp2);
           }
 
           // apply filter
@@ -1961,7 +1961,7 @@ namespace FEAT
             this->_vec_tmp2.component_product(this->_vec_tmp2, this->_vec_scale);
 
             // update correction vector
-            vec_cor.axpy(vec_cor, this->_vec_tmp2);
+            vec_cor.axpy(this->_vec_tmp2);
           }
 
           // apply filter

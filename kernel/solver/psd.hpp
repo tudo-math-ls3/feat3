@@ -202,11 +202,11 @@ namespace FEAT
 
           // update solution vector:
           // x[k+1] := x[k] + alpha[k] * z[k]
-          vec_sol.axpy(vec_z, vec_sol, alpha);
+          vec_sol.axpy(vec_z, alpha);
 
           // update defect vector:
           // r[k+1] := r[k] - alpha[k] * q[k]
-          vec_r.axpy(vec_q, vec_r, -alpha);
+          vec_r.axpy(vec_q, -alpha);
 
           // compute defect norm
           status = this->_set_new_defect(vec_r, vec_sol);

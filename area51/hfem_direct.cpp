@@ -125,7 +125,7 @@ namespace HFEM_direct
       v.multiply(Btd, f, v, DT_(-1.), DT_(-1.));
 
       //axpy(T(1.0), g, v);                            // v = g + v
-      v.axpy(g, v);
+      v.axpy(g);
 
       //vtmp.copy_from(v);                             // vtmp = v
       vtmp.copy(v);

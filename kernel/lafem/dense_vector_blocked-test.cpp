@@ -305,26 +305,28 @@ public:
       }
 
       DenseVectorBlocked<DT_, IT_, block_size_> c(size);
-      c.axpy(a, b, s);
+      c.copy(b);
+      c.axpy(a, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_RELATIVE(c(i).v[j], ref(i).v[j], eps);
 
       DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
       a_tmp.copy(a);
-      a.axpy(a, b, s);
+      a.scale(a, s);
+      a.axpy(b); /// \todo use axpby here
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_RELATIVE(a(i).v[j], ref(i).v[j], eps);
 
       a.copy(a_tmp);
-      b.axpy(a, b, s);
+      b.axpy(a, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_RELATIVE(b(i).v[j], ref(i).v[j], eps);
 
       a.copy(a_tmp);
-      b.axpy_blocked(a, b, bs);
+      b.axpy_blocked(a, bs);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_RELATIVE(b(i).v[j], ref_bs(i).v[j], eps);

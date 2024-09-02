@@ -373,7 +373,7 @@ namespace FEAT
         filter.filter_cor(vec_cor);
 
         // update solution
-        vec_sol.axpy(vec_sol, vec_cor);
+        vec_sol.axpy(vec_cor);
       }
 
       // return status

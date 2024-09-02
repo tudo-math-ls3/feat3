@@ -214,8 +214,8 @@ namespace FEAT
             for (Index j(0) ; j < this->_num_iter ; ++j)
             {
               auto beta = vec_q_hat.dot(q_list.at(j));
-              vec_q_hat.axpy(q_list.at(j), vec_q_hat, -beta);
-              vec_p_hat.axpy(p_list.at(j), vec_p_hat, -beta);
+              vec_q_hat.axpy(q_list.at(j), -beta);
+              vec_p_hat.axpy(p_list.at(j), -beta);
             }
             const auto gamma = DataType(1) / vec_q_hat.norm2();
             vec_q_hat.scale(vec_q_hat, gamma);
@@ -225,8 +225,8 @@ namespace FEAT
           }
 
           auto alpha = vec_r.dot(q_list.at(this->_num_iter));
-          vec_sol.axpy(p_list.at(this->_num_iter), vec_sol, alpha);
-          vec_r.axpy(q_list.at(this->_num_iter), vec_r, -alpha);
+          vec_sol.axpy(p_list.at(this->_num_iter), alpha);
+          vec_r.axpy(q_list.at(this->_num_iter), -alpha);
           // compute defect norm
           status = this->_set_new_defect(vec_r, vec_sol);
           if(status != Status::progress)

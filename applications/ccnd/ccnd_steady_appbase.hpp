@@ -1264,7 +1264,7 @@ namespace CCND
       if(enable_fbm)
       {
         system.front()->apply_fbm_filter_to_def(vec_def_unsynced, vec_sol, -DataType(1));
-        vec_def.axpy(vec_def, vec_def_unsynced);
+        vec_def.axpy(vec_def_unsynced);
       }
 
       // compute remainder of defect vector
@@ -1633,7 +1633,7 @@ namespace CCND
         }
 
         // update solution
-        vec_sol.axpy(vec_cor, vec_sol, DataType(1));
+        vec_sol.axpy(vec_cor);
 
         // next non-linear iteration
       }

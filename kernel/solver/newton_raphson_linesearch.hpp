@@ -213,7 +213,8 @@ namespace FEAT
             alpha -= this->_vec_grad.dot(this->_vec_pn)/this->_vec_pn.dot(this->_vec_tmp);
 
             // Update solution
-            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
+            vec_sol.copy(this->_vec_initial_sol);
+            vec_sol.axpy(this->_vec_pn, alpha);
 
           }
 
@@ -221,7 +222,8 @@ namespace FEAT
           // step
           if(st != Status::success)
           {
-            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, this->_alpha_min);
+            vec_sol.copy(this->_vec_initial_sol);
+            vec_sol.axpy(this->_vec_pn, this->_alpha_min);
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);

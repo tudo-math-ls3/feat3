@@ -370,7 +370,7 @@ public:
       a.apply(r, x, y, DT_(-1.0));
       a.apply(ref, x);
       ref.scale(ref, DT_(-1.0));
-      ref.axpy(ref, y);
+      ref.axpy(y);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
@@ -386,7 +386,7 @@ public:
       //ref.product_matvec(a, x);
       a.apply(ref, x);
       ref.scale(ref, s);
-      ref.axpy(ref, y);
+      ref.axpy(y);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 

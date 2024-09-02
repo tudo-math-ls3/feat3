@@ -224,7 +224,7 @@ namespace FEAT
           {
             tmp(i) /= -_volume(i);
           }
-          vector.axpy_blocked(_vec_dual, vector, tmp);
+          vector.axpy_blocked(_vec_dual, tmp);
         }
       }
 
@@ -251,7 +251,7 @@ namespace FEAT
           {
             tmp(i)= _sol_mean(i) - tmp(i) * DT_(DT_(1)/_volume(i));
           }
-          vector.axpy_blocked(_vec_prim, vector, tmp);
+          vector.axpy_blocked(_vec_prim, tmp);
         }
       }
 
@@ -283,7 +283,7 @@ namespace FEAT
           {
             tmp(i) /= -_volume(i);
           }
-          vector.axpy_blocked(_vec_prim, vector, tmp);
+          vector.axpy_blocked(_vec_prim, tmp);
         }
       }
 

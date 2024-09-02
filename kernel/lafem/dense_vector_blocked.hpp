@@ -800,7 +800,7 @@ namespace FEAT
       ///@name Linear algebra operations
       ///@{
       /**
-       * \brief Calculate \f$this \leftarrow \alpha~ x + y\f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x + this\f$
        *
        * \param[in] x The first summand vector to be scaled.
        * \param[in] y The second summand vector
@@ -808,32 +808,23 @@ namespace FEAT
        */
       void axpy(
         const DenseVectorBlocked & x,
-        const DenseVectorBlocked & y,
         const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.size() == y.size(), "Vector size does not match!");
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
         FEAT_KERNEL_MARKER_START("DV_axpy");
 
-        if (Math::abs(alpha) < Math::eps<DT_>())
-        {
-          this->copy(y);
-          //y.scale(beta);
-          return;
-        }
-
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
       /**
-       * \brief Calculate \f$this \leftarrow \alpha~ x + y\f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x + this\f$
        *
        * \param[in] x The first summand vector to be scaled.
        * \param[in] y The second summand vector
@@ -841,10 +832,8 @@ namespace FEAT
        */
       void axpy_blocked(
         const DenseVectorBlocked & x,
-        const DenseVectorBlocked & y,
         const ValueType alpha)
       {
-        XASSERTM(x.size() == y.size(), "Vector size does not match!");
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
         FEAT_KERNEL_MARKER_START("DV_axpy");
@@ -852,7 +841,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy::value_blocked(elements<Perspective::native>(), alpha, x.template elements<Perspective::native>(), y.template elements<Perspective::native>(), this->size<Perspective::native>());
+        Arch::Axpy::value_blocked(elements<Perspective::native>(), alpha, x.template elements<Perspective::native>(), elements<Perspective::native>(), this->size<Perspective::native>());
 
         FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;

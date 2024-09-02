@@ -217,7 +217,8 @@ namespace FEAT
 
           // The second secant point in the first iteration is x + _secant_step * vec_dir
           // The first "other" point for the secant
-          vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
+          vec_sol.copy(this->_vec_initial_sol);
+          vec_sol.axpy(this->_vec_pn, alpha);
 
           // start iterating
           while(st == Status::progress)
@@ -262,7 +263,8 @@ namespace FEAT
             alpha += alpha_update;
 
             // Update the solution
-            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, alpha);
+            vec_sol.copy(this->_vec_initial_sol);
+            vec_sol.axpy(this->_vec_pn, alpha);
           }
 
           // If we are successful, we could save the last step length as the new initial step length. This is
@@ -275,7 +277,8 @@ namespace FEAT
           // step
           if(st != Status::success)
           {
-            vec_sol.axpy(this->_vec_pn, this->_vec_initial_sol, this->_alpha_min);
+            vec_sol.copy(this->_vec_initial_sol);
+            vec_sol.axpy(this->_vec_pn, this->_alpha_min);
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);

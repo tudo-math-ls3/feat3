@@ -234,11 +234,11 @@ namespace FEAT
 
           // update solution vector
           // x[k+1] := x[k] + alpha[k] * p[k]
-          vec_sol.axpy(vec_p, vec_sol, alpha);
+          vec_sol.axpy(vec_p, alpha);
 
           // update real residual vector
           // r[k+1] := r[k] - alpha[k] * q[k]
-          vec_r.axpy(vec_q, vec_r, -alpha);
+          vec_r.axpy(vec_q, -alpha);
 
           // compute defect norm and check for convergence
           status = this->_set_new_defect(vec_r, vec_sol);
@@ -250,7 +250,7 @@ namespace FEAT
 
           // update preconditioned residual vector
           // s[k+1] := s[k] - alpha[k] * z[k]
-          vec_s.axpy(vec_z, vec_s, -alpha);
+          vec_s.axpy(vec_z, -alpha);
 
           // y[k+1] := A*s[k+1]
           matrix.apply(vec_y, vec_s);
@@ -267,10 +267,12 @@ namespace FEAT
 
           // update direction vectors:
           // p[k+1] := s[k+1] + beta[k] * p[k]
-          vec_p.axpy(vec_p, vec_s, beta);
+          vec_p.scale(vec_p, beta);
+          vec_p.axpy(vec_s); /// \todo use axpy here
 
           // q[k+1] := y[k+1] + beta[k] * q[k]
-          vec_q.axpy(vec_q, vec_y, beta);
+          vec_q.scale(vec_q, beta);
+          vec_q.axpy(vec_y); /// \todo use axpy here
         }
 
         // we should never reach this point...

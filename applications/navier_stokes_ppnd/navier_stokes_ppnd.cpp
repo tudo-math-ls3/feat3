@@ -1914,7 +1914,7 @@ namespace NavierStokesPP
           vec_rhs.sync_0();
 
           // add support for the given righthandside vec_f (aka F^(n+1))
-          vec_rhs.axpy(vec_f, vec_rhs,theta3);
+          vec_rhs.axpy(vec_f,theta3);
         }
         else
         {
@@ -1939,8 +1939,8 @@ namespace NavierStokesPP
           vec_rhs.sync_0();
 
           // add support for the given righthandside vec_f and vec_f_old (aka F^(n+1) and F^n)
-          vec_rhs.axpy(vec_f, vec_rhs, cfg.theta*delta_t);
-          vec_rhs.axpy(vec_f_old, vec_rhs, (DataType(1.0) - cfg.theta)*delta_t);
+          vec_rhs.axpy(vec_f, cfg.theta*delta_t);
+          vec_rhs.axpy(vec_f_old, (DataType(1.0) - cfg.theta)*delta_t);
         }
         watch_asm_rhs.stop();
         // apply RHS filter
@@ -1950,7 +1950,7 @@ namespace NavierStokesPP
         if((time_step > Index(2)) && (cfg.no_nonlinear))
         {
           vec_conv.scale(vec_sol_v_1, DataType(2));
-          vec_conv.axpy(vec_sol_v_2, vec_conv, -DataType(1));
+          vec_conv.axpy(vec_sol_v_2, -DataType(1));
         }
         else
         {
@@ -2017,7 +2017,8 @@ namespace NavierStokesPP
           watch_calc_def.start();
           vec_def_v.format();
           matrix_a.apply(vec_def_v, vec_conv);
-          vec_def_v.axpy(vec_def_v,vec_rhs,-DataType(1));
+          vec_def_v.scale(vec_def_v, -DataType(1));
+          vec_def_v.axpy(vec_rhs); /// \todo use axpby here
           filter_v.filter_def(vec_def_v);
           if (nonlin_step == 0)
             vec_def_v_old_1.copy(vec_def_v);
@@ -2074,7 +2075,7 @@ namespace NavierStokesPP
             multigrid_hierarchy_velo->done_numeric();
           iter_a = solver_a->get_num_iter();
 
-          vec_conv.axpy(vec_cor_v, vec_conv);
+          vec_conv.axpy(vec_cor_v);
           // apply filter onto solution vector
           filter_v.filter_sol(vec_conv);
 
@@ -2141,14 +2142,14 @@ namespace NavierStokesPP
         if (cfg.chorin)
           vec_sol_p.scale(vec_q,cfg.alpha_r);
         else
-          vec_sol_p.axpy(vec_q,vec_sol_p,cfg.alpha_r);
+          vec_sol_p.axpy(vec_q, cfg.alpha_r);
 
         // update the pressure part II
         // p = p_old + alpha_d f      (= p_old + alpha_d M_p^(-1) f_p)
         if (cfg.alpha_d > 0)
         {
           vec_def_p.component_product(the_system_level.inverse_lumped_mass_pres, vec_def_p);
-          vec_sol_p.axpy(vec_def_p,vec_sol_p,cfg.alpha_d);
+          vec_sol_p.axpy(vec_def_p, cfg.alpha_d);
         }
         filter_p.filter_sol(vec_sol_p);
 
@@ -2163,7 +2164,8 @@ namespace NavierStokesPP
         // tmp = M_l^(-1) B q
         vec_tmp.component_product(the_system_level.inverse_lumped_mass_velo, vec_tmp);
         // u^l = -k tmp + tilde_u^l = -k M_l^(-1) B q + tilde_u^l
-        vec_sol_v.axpy(vec_tmp,vec_conv,-delta_t);
+        vec_sol_v.copy(vec_conv);
+        vec_sol_v.axpy(vec_tmp, -delta_t);
         // apply filter onto solution vector
         filter_v.filter_sol(vec_sol_v);
 
@@ -2181,8 +2183,10 @@ namespace NavierStokesPP
           //  vec_sol_p_mid.axpy(vec_sol_p, vec_sol_p_1);
           //  vec_sol_p_mid.scale(vec_sol_p_mid, DataType(0.5));
           // extrapolation
-          vec_sol_p_mid.axpy(vec_sol_p_1, vec_sol_p, -DataType(1));
-          vec_sol_p_mid.axpy(vec_sol_p_mid, vec_sol_p, DataType(0.5));
+          vec_sol_p_mid.copy(vec_sol_p);
+          vec_sol_p_mid.axpy(vec_sol_p_1, -DataType(1));
+          vec_sol_p_mid.scale(vec_sol_p_mid, DataType(0.5));
+          vec_sol_p_mid.axpy(vec_sol_p); /// \todo use axpby here
 
           {
           // assemble drag and lift forces
@@ -2229,7 +2233,8 @@ namespace NavierStokesPP
           Cubature::DynamicFactory cub("gauss-legendre:2");
           LAFEM::DenseVector<double, Index> vtx_p, vtx_der_p;
           GlobalPresVector vec_sol_p_post = vec_sol_p.clone();
-          vec_sol_p_post.axpy(vec_sol_p,vec_sol_p_1);
+          vec_sol_p_post.copy(vec_sol_p_1);
+          vec_sol_p_post.axpy(vec_sol_p);
           vec_sol_p_post.scale(vec_sol_p_post,DataType(0.5));
           Assembly::DiscreteCellProjector::project(vtx_p, vec_sol_p.local(), the_domain_level.space_pres, cub);
 
@@ -2239,8 +2244,8 @@ namespace NavierStokesPP
           // compute and write time-derivatives
           GlobalVeloVector vec_der_v = vec_sol_v.clone();
           GlobalPresVector vec_der_p = vec_sol_p.clone();
-          vec_der_v.axpy(vec_sol_v_1, vec_der_v, -DataType(1));
-          vec_der_p.axpy(vec_sol_p_1, vec_der_p, -DataType(1));
+          vec_der_v.axpy(vec_sol_v_1, -DataType(1));
+          vec_der_p.axpy(vec_sol_p_1, -DataType(1));
           vec_der_v.scale(vec_der_v, DataType(1) / delta_t);
           vec_der_p.scale(vec_der_p, DataType(1) / delta_t);
           Assembly::DiscreteCellProjector::project(vtx_der_p, vec_der_p.local(), the_domain_level.space_pres, cub);

@@ -829,7 +829,8 @@ namespace StokesMultigridBench
 
     // compute and save final relative errors
     {
-      vec_rhs.axpy(vec_sol, vec_ref, -DataType(1));
+      vec_rhs.copy(vec_ref);
+      vec_rhs.axpy(vec_sol, -DataType(1));
       stats.final_errors[0u] = vec_rhs.local().template at<0>().norm2sqr();
       stats.final_errors[1u] = vec_rhs.local().template at<1>().norm2sqr();
       comm.allreduce(stats.final_errors.data(), stats.final_errors.data(), 2u, Dist::op_sum);

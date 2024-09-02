@@ -282,16 +282,17 @@ namespace FETI{
 
     void end_result(LocalVectorType& vec_sol_buffer, LocalVectorType& vec_rhs_buffer, const DataType alpha)
     {
-      vec_rhs_buffer.axpy(vec_rhs_buffer, _vec_rhs);
+      vec_rhs_buffer.axpy(_vec_rhs);
       //calculate solution without kernel
       apply_inverse(vec_sol_buffer, vec_rhs_buffer);
       if(_floating)
       {
-        _vec_sol.axpy(_R_vector, vec_sol_buffer, - alpha);
+        _vec_sol.copy(vec_sol_buffer);
+        _vec_sol.axpy(_R_vector, - alpha);
       }
       else
       {
-        _vec_sol.axpy(_vec_sol, vec_sol_buffer);
+        _vec_sol.axpy(vec_sol_buffer);
       }
     }
 
@@ -372,7 +373,8 @@ namespace FETI{
       XASSERTM(input.size() == _mirror_dofs.back(), "Sizes do not match!");
       for(IndexType i(0); i < _gate_ranks_size; ++i)
       {
-        output[i].axpy(extract_edge_values(input, i), prev[i], -1.);
+        output[i].copy(prev[i]);
+        output[i].axpy(extract_edge_values(input, i), -1.);
       }
     }
 
@@ -528,11 +530,13 @@ namespace FETI{
         //process recv_bufs depending on gate_signs
         if(_gate_signs[idx]*sign > 0)
         {
-          output[idx].axpy(recv_bufs.at(idx), send_bufs.at(idx), -1.);
+          output[idx].copy(send_bufs.at(idx));
+          output[idx].axpy(recv_bufs.at(idx), -1.);
         }
         else
         {
-          output[idx].axpy(send_bufs.at(idx), recv_bufs.at(idx), -1.);
+          output[idx].copy(recv_bufs.at(idx));
+          output[idx].axpy(send_bufs.at(idx), -1.);
         }
 
       }
@@ -997,7 +1001,7 @@ namespace FETI{
     {
       for(IndexType i(0); i < vec_size; ++i)
       {
-        target[i].axpy(other[i], target[i], scalar);
+        target[i].axpy(other[i], scalar);
       }
     }
 
@@ -1005,7 +1009,8 @@ namespace FETI{
     {
       for(IndexType i(0); i < vec_size; ++i)
       {
-        target[i].axpy(target[i], other[i], scalar);
+        target[i].scale(target[i], scalar);
+        target[i].axpy(other[i]); /// \todo use axpby here
       }
     }
 
@@ -1728,7 +1733,8 @@ namespace FETI{
     matrix.apply(vec_rhs_buff, vec_sol);
     //apply filter on buffer
     filter.filter_rhs(vec_rhs_buff);
-    vec_rhs_buff.axpy(vec_rhs_buff, vec_rhs, -1.);
+    vec_rhs_buff.scale(vec_rhs_buff, -1.);
+    vec_rhs_buff.axpy(vec_rhs); /// \todo use axpby here
     DataType global_res_dot = vec_rhs_buff.norm2();
     comm.print("The 2 Norm of the residual is: " + stringify(global_res_dot));
 

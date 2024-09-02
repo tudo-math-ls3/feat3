@@ -348,7 +348,8 @@ public:
 
       Backend::set_preferred_backend(PreferredBackend::generic);
       a.apply(ref, x);
-      ref.axpy(ref, y, s);
+      ref.scale(ref, s);
+      ref.axpy(y); /// \todo use axpby here
 
       for (Index i(0); i < result.size(); ++i)
         TEST_CHECK_RELATIVE(result(i), ref(i), eps);
@@ -428,7 +429,8 @@ public:
         }
       }
 
-      result.axpy(x, y, alpha);
+      result.copy(y);
+      result.axpy(x, alpha);
 
       for (Index i(0); i < result.rows(); ++i)
       {

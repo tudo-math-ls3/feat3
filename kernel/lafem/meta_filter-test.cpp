@@ -154,8 +154,8 @@ public:
     const MetaVector ref_def(gen_vector_def(m));
 
     // subtract reference
-    vec_sol.axpy(ref_sol, vec_sol, -DataType(1));
-    vec_def.axpy(ref_def, vec_def, -DataType(1));
+    vec_sol.axpy(ref_sol, -DataType(1));
+    vec_def.axpy(ref_def, -DataType(1));
 
     // check norm
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_sol.norm2(), DataType(0), tol);

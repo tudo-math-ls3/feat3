@@ -416,10 +416,10 @@ namespace FEAT
 
             // First "half" update
             // x[k+1/2] = x[k] + alpha[k] p~[k]
-            vec_sol.axpy(vec_p_tilde, vec_sol, alpha);
+            vec_sol.axpy(vec_p_tilde, alpha);
 
             // r[k+1/2] = r[k] - alpha[k] q[k]
-            vec_r.axpy(vec_q, vec_r, -alpha);
+            vec_r.axpy(vec_q, -alpha);
 
             // Check if we are already converged or failed after the "half" update
             {
@@ -465,7 +465,7 @@ namespace FEAT
             }
 
             // Update preconditioned defect: r~[k+1/2] = r~[k] - alpha q[k]
-            vec_r_tilde.axpy(vec_q_tilde, vec_r_tilde, -alpha);
+            vec_r_tilde.axpy(vec_q_tilde, -alpha);
 
             // t = A r~[k+1/2]
             mat_sys.apply(vec_t, vec_r_tilde);
@@ -505,11 +505,11 @@ namespace FEAT
 
             // Second "half" update
             // x[k+1] = x[k+1/2] + omega r~[k+1/2]
-            vec_sol.axpy(vec_r_tilde, vec_sol, omega);
+            vec_sol.axpy(vec_r_tilde, omega);
 
             // Upate defect
             // r[k+1] = r[k] - omega t[k]
-            vec_r.axpy(vec_t, vec_r, -omega);
+            vec_r.axpy(vec_t, -omega);
 
             // Compute defect norm
             status = this->_set_new_defect(vec_r, vec_sol);
@@ -524,7 +524,7 @@ namespace FEAT
 
             // Update preconditioned defect
             // r~[k+1] = r~[k] - omega t~[k]
-            vec_r_tilde.axpy(vec_t_tilde, vec_r_tilde, -omega);
+            vec_r_tilde.axpy(vec_t_tilde, -omega);
 
             // Save old rho
             DataType rho2(rho);
@@ -552,8 +552,9 @@ namespace FEAT
             }
 
             // p~[k+1] = r~[k+1] + beta(p~[k] - omega[k] q~[k])
-            vec_p_tilde.axpy(vec_q_tilde, vec_p_tilde, -omega);
-            vec_p_tilde.axpy(vec_p_tilde, vec_r_tilde, beta);
+            vec_p_tilde.axpy(vec_q_tilde, -omega);
+            vec_p_tilde.scale(vec_p_tilde, beta);
+            vec_p_tilde.axpy(vec_r_tilde); /// \todo use axpby here
 
           }
 

@@ -210,8 +210,8 @@ namespace FEAT
           _matrix.apply(_aux1, vec_cor);
           _filter.filter_def(_aux1);
           _aux2.component_product(_inv_diag, _aux1);
-          vec_cor.axpy(vec_cor, _aux3);
-          vec_cor.axpy(_aux2, vec_cor, DataType(-1.0));
+          vec_cor.axpy(_aux3);
+          vec_cor.axpy(_aux2, DataType(-1.0));
         }
 
         this->_filter.filter_cor(vec_cor);
