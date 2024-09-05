@@ -1056,7 +1056,6 @@ namespace FEAT
         Arch::Axpy::value(this->template val<Perspective::pod>(),
             alpha,
             x.template val<Perspective::pod>(),
-            this->template val<Perspective::pod>(),
             this->used_elements<Perspective::pod>());
 
         TimeStamp ts_stop;

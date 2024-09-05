@@ -22,51 +22,35 @@ namespace FEAT
     namespace Arch
     {
       template <typename DT_>
-      void Axpy::value_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
+      void Axpy::value_generic(DT_ * r, const DT_ a, const DT_ * const x, const Index size)
       {
-        if (r == y)
+        if (r == x)
         {
           for (Index i(0) ; i < size ; ++i)
           {
-            r[i] += a * x[i];
-          }
-        }
-        else if (r == x)
-        {
-          for (Index i(0) ; i < size ; ++i)
-          {
-            r[i] *= a;
-            r[i]+= y[i];
+            r[i] *= DT_(2) * a;
           }
         }
         else
         {
           for (Index i(0) ; i < size ; ++i)
           {
-            r[i] = (a * x[i]) + y[i];
+            r[i] = (a * x[i]) + r[i];
           }
         }
       }
 
       template <typename ValueType_>
-      void Axpy::value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const ValueType_ * const y, const Index size)
+      void Axpy::value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const Index size)
       {
-        if (r == y)
-        {
-          for (Index i(0) ; i < size ; ++i)
-          {
-            for(int j(0); j < ValueType_::n; ++j)
-              r[i][j] += a[j] * x[i][j];
-          }
-        }
-        else if (r == x)
+        if (r == x)
         {
           for (Index i(0) ; i < size ; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j)
             {
               r[i][j] *= a[j];
-              r[i][j] += y[i][j];
+              r[i][j] += r[i][j];
             }
           }
         }
@@ -75,7 +59,7 @@ namespace FEAT
           for (Index i(0) ; i < size ; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j)
-              r[i][j] = (a[j] * x[i][j]) + y[i][j];
+              r[i][j] = (a[j] * x[i][j]) + r[i][j];
           }
         }
       }

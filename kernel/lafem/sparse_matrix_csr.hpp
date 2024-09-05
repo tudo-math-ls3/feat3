@@ -1408,7 +1408,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy::value(this->val(), alpha, x.val(), this->val(), this->used_elements());
+        Arch::Axpy::value(this->val(), alpha, x.val(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));

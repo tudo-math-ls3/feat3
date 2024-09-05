@@ -13,5 +13,5 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-template void Axpy::value_generic(float *, const float, const float * const, const float * const, const Index);
-template void Axpy::value_generic(double *, const double, const double * const, const double * const, const Index);
+template void Axpy::value_generic(float *, const float, const float * const, const Index);
+template void Axpy::value_generic(double *, const double, const double * const, const Index);

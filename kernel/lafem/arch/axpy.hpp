@@ -21,50 +21,50 @@ namespace FEAT
       struct Axpy
       {
         template <typename DT_>
-        static void value(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
+        static void value(DT_ * r, const DT_ a, const DT_ * const x, const Index size)
         {
-          value_generic(r, a, x, y, size);
+          value_generic(r, a, x, size);
         }
 
         template <typename ValueType_>
-        static void value_blocked(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const ValueType_ * const y, const Index size)
+        static void value_blocked(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const Index size)
         {
-          value_blocked_generic(r, a, x, y, size);
+          value_blocked_generic(r, a, x, size);
         }
 
 #ifdef FEAT_HAVE_HALFMATH
-        static void value(Half * r, const Half a, const Half * const x, const Half * const y, const Index size)
+        static void value(Half * r, const Half a, const Half * const x, const Index size)
         {
-          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, a, x, y, size)
+          BACKEND_SKELETON_VOID(value_cuda, value_generic, value_generic, r, a, x, size)
         }
 #endif
 
-        static void value(float * r, const float a, const float * const x, const float * const y, const Index size)
+        static void value(float * r, const float a, const float * const x, const Index size)
         {
-          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, a, x, y, size)
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, a, x, size)
         }
 
-        static void value(double * r, const double a, const double * const x, const double * const y, const Index size)
+        static void value(double * r, const double a, const double * const x, const Index size)
         {
-          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, a, x, y, size)
+          BACKEND_SKELETON_VOID(value_cuda, value_mkl, value_generic, r, a, x, size)
         }
 
         template <typename DT_>
-        static void value_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
+        static void value_generic(DT_ * r, const DT_ a, const DT_ * const x, const Index size);
 
-        static void value_mkl(float * r, const float a, const float * const x, const float * const y, const Index size);
-        static void value_mkl(double * r, const double a, const double * const x, const double * const y, const Index size);
+        static void value_mkl(float * r, const float a, const float * const x, const Index size);
+        static void value_mkl(double * r, const double a, const double * const x, const Index size);
 
         template <typename DT_>
-        static void value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
+        static void value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const Index size);
 
         template <typename ValueType_>
-        static void value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const ValueType_ * const y, const Index size);
+        static void value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const Index size);
       };
 
 #ifdef FEAT_EICKT
-      extern template void Axpy::value_generic(float *, const float, const float * const, const float * const, const Index);
-      extern template void Axpy::value_generic(double *, const double, const double * const, const double * const, const Index);
+      extern template void Axpy::value_generic(float *, const float, const float * const, const Index);
+      extern template void Axpy::value_generic(double *, const double, const double * const, const Index);
 #endif
 
     } // namespace Arch

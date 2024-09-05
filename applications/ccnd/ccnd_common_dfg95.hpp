@@ -659,8 +659,7 @@ namespace CCND
         const auto* vchr = vec_char_obstacle.elements();
         for(Index i(0); i < n; ++i)
         {
-          frc.copy(vdef[i]);
-          frc.axpy(vchr[i]);
+          frc.axpy(vchr[i], vdef[i]);
         }
 
         // sum up over all processes

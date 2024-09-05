@@ -16,7 +16,7 @@ using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
 template <typename DT_>
-void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)
+void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const Index size)
 {
   cudaDataType dt;
   cudaDataType et;
@@ -53,12 +53,6 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * con
     temp_x = (void*)x;
   }
 
-  if (r != y)
-  {
-    ///\todo cuse cublasCopyEx when available
-    Util::cuda_copy(r, y, size * sizeof(DT_));
-  }
-
   status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, temp_x, dt, 1, r, dt, 1, et);
   if (r == x)
     Util::cuda_free(temp_x);
@@ -74,7 +68,7 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * con
 #endif
 }
 #ifdef FEAT_HAVE_HALFMATH
-template void Axpy::value_cuda(Half *, const Half, const Half * const, const Half * const, const Index);
+template void Axpy::value_cuda(Half *, const Half, const Half * const, const Index);
 #endif
-template void Axpy::value_cuda(float *, const float, const float * const, const float * const, const Index);
-template void Axpy::value_cuda(double *, const double, const double * const, const double * const, const Index);
+template void Axpy::value_cuda(float *, const float, const float * const, const Index);
+template void Axpy::value_cuda(double *, const double, const double * const, const Index);

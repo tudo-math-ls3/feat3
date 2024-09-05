@@ -1373,7 +1373,7 @@ namespace NavierStokesCP2D
         {
           // linear extrapolation of solution in time
           vec_conv.scale(vec_sol_v_1, DataType(2));
-          vec_conv.axpy(vec_sol_v_2, vec_conv, -DataType(1));
+          vec_conv.axpy(vec_sol_v_2,-DataType(1));
         }
         else
         {
@@ -1483,7 +1483,7 @@ namespace NavierStokesCP2D
           iter_v += solver_a->get_num_iter();
 
           // update velocity solution
-          vec_sol_v.axpy(vec_cor_v, vec_sol_v);
+          vec_sol_v.axpy(vec_cor_v);
 
           // are we done yet?
           if(dpm_step >= cfg.dpm_steps)
@@ -1509,7 +1509,7 @@ namespace NavierStokesCP2D
           iter_p += solver_s->get_num_iter();
 
           // update pressure solution
-          vec_sol_p.axpy(vec_cor_p, vec_sol_p, -DataType(1) / delta_t);
+          vec_sol_p.axpy(vec_cor_p, -DataType(1) / delta_t);
 
           // compute new defect
           watch_calc_def.start();
@@ -1667,8 +1667,8 @@ namespace NavierStokesCP2D
         // compute and write time-derivatives
         GlobalVeloVector vec_der_v = vec_sol_v.clone();
         GlobalPresVector vec_der_p = vec_sol_p.clone();
-        vec_der_v.axpy(vec_sol_v_1, vec_der_v, -DataType(1));
-        vec_der_p.axpy(vec_sol_p_1, vec_der_p, -DataType(1));
+        vec_der_v.axpy(vec_sol_v_1, -DataType(1));
+        vec_der_p.axpy(vec_sol_p_1, -DataType(1));
         vec_der_v.scale(vec_der_v, DataType(1) / delta_t);
         vec_der_p.scale(vec_der_p, DataType(1) / delta_t);
         Assembly::DiscreteCellProjector::project(vtx_der_p, vec_der_p.local(), the_domain_level.space_pres, cub);

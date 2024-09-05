@@ -817,7 +817,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
 
         FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;
@@ -841,7 +841,7 @@ namespace FEAT
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy::value_blocked(elements<Perspective::native>(), alpha, x.template elements<Perspective::native>(), elements<Perspective::native>(), this->size<Perspective::native>());
+        Arch::Axpy::value_blocked(elements<Perspective::native>(), alpha, x.template elements<Perspective::native>(), this->size<Perspective::native>());
 
         FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;

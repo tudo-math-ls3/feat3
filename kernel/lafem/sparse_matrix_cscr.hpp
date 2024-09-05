@@ -900,27 +900,16 @@ namespace FEAT
        */
       void axpy(
                 const SparseMatrixCSCR & x,
-                const SparseMatrixCSCR & y,
                 const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.rows() == y.rows(), "Matrix rows do not match!");
         XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == y.columns(), "Matrix columns do not match!");
         XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.used_elements() == y.used_elements(), "Matrix used_elements do not match!");
         XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
-
-        if (Math::abs(alpha) < Math::eps<DT_>())
-        {
-          this->copy(y);
-          //y.scale(beta);
-          return;
-        }
 
         TimeStamp ts_start;
 
         Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy::value(this->val(), alpha, x.val(), y.val(), this->used_elements());
+        Arch::Axpy::value(this->val(), alpha, x.val(), this->used_elements());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
