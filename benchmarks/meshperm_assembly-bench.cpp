@@ -186,7 +186,7 @@ namespace MeshPermAssemblyBench
 
 
   template<typename Shape_, int nc_, typename CT_>
-  void bench_poisson_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index lvl, PreferredBackend backend)
+  void bench_poisson_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index /*lvl*/, PreferredBackend backend)
   {
     Backend::set_preferred_backend(backend);
     // #ifdef FEAT_HAVE_CUDA
@@ -205,11 +205,18 @@ namespace MeshPermAssemblyBench
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
 
     Cubature::DynamicFactory cubature("gauss-legendre:3");
-    std::vector<int> coloring = VoxelAssembly::UnitCubeColoring<Shape_>::create_coloring(int(lvl));
+    //create coloring from our mesh
+    const auto& verts_at_elem = mesh.template get_index_set<Shape_::dimension, 0>();
+    Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+    Adjacency::Graph elems_at_elem(Adjacency::RenderType::injectify, verts_at_elem, elems_at_vert);
+
+    // create coloring
+    Adjacency::Coloring coloring(elems_at_elem);
+
     // std::cout << "Coloring size " << coloring.size() << " mesh size " << mesh.get_num_elements() << std::endl;
     TimeStamp stamp_1, stamp_2;
-    VoxelAssembly::test_coloring(mesh, coloring);
-    VoxelAssembly::VoxelPoissonAssembler<SpaceType, DataType, IndexType> poisson_assembler(space, coloring, SpaceType::world_dim == 3 ? 8 : 4);
+    // VoxelAssembly::test_coloring(mesh, coloring);
+    VoxelAssembly::VoxelPoissonAssembler<SpaceType, DataType, IndexType> poisson_assembler(space, coloring);
 
     stamp_2.stamp();
     bres.thread_time_assemble = stamp_2.elapsed(stamp_1);
@@ -341,7 +348,7 @@ namespace MeshPermAssemblyBench
   }
 
   template<typename Shape_, int nc_, typename CT_>
-  void bench_burgers_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index lvl, PreferredBackend backend)
+  void bench_burgers_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index /*lvl*/, PreferredBackend backend)
   {
     // #ifdef FEAT_HAVE_CUDA
     // Util::cuda_start_profiling();
@@ -360,6 +367,8 @@ namespace MeshPermAssemblyBench
     LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
 
+    std::cout << "Meshsize " << matrix.bytes() << "\n";
+
     // interpolate convection vector
     LAFEM::DenseVectorBlocked<DataType, IndexType, dim> vector;
     Analytic::Common::CosineWaveFunction<dim> cosine_wave;
@@ -370,10 +379,15 @@ namespace MeshPermAssemblyBench
 
     //setup burgers
     //dummy coloring vector
-    std::vector<int> coloring = VoxelAssembly::UnitCubeColoring<Shape_>::create_coloring(int(lvl));
-    VoxelAssembly::test_coloring(mesh, coloring);
+    //create coloring from our mesh
+    const auto& verts_at_elem = mesh.template get_index_set<Shape_::dimension, 0>();
+    Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+    Adjacency::Graph elems_at_elem(Adjacency::RenderType::injectify, verts_at_elem, elems_at_vert);
+
+    // create coloring
+    Adjacency::Coloring coloring(elems_at_elem);
     TimeStamp stamp_1, stamp_2;
-    VoxelAssembly::VoxelBurgersAssembler<SpaceType, DataType, IndexType> burgers(space, coloring, SpaceType::world_dim == 3 ? 8 : 4);
+    VoxelAssembly::VoxelBurgersAssembler<SpaceType, DataType, IndexType> burgers(space, coloring);
     burgers.nu = burgers.beta = burgers.frechet_beta = burgers.theta = 1.0;
     stamp_2.stamp();
     bres.thread_time_assemble = stamp_2.elapsed(stamp_1);
@@ -387,6 +401,74 @@ namespace MeshPermAssemblyBench
     {
       matrix.format();
       burgers.assemble_matrix1(matrix, vector, space, cubature, DataType(1));
+      stamp_2.stamp();
+      bres.num_asm_time = stamp_2.elapsed(stamp_1);
+      bres.num_asm_count += 1;
+    } while((bres.num_asm_count < min_num_asm_count) || (bres.num_asm_time < min_num_asm_time));
+    Backend::set_preferred_backend(standard_backend);
+    // #ifdef FEAT_HAVE_CUDA
+    // Util::cuda_stop_profiling();
+    // #endif
+  }
+
+  template<typename Shape_, int nc_, typename CT_>
+  void bench_burgers_def_voxel(Geometry::ConformalMesh<Shape_, nc_, CT_>& mesh, BenchResults& bres, Index /*lvl*/, PreferredBackend backend)
+  {
+    // #ifdef FEAT_HAVE_CUDA
+    // Util::cuda_start_profiling();
+    // #endif
+    Backend::set_preferred_backend(backend);
+    typedef Geometry::ConformalMesh<Shape_, nc_, CT_> MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceType;
+
+    TrafoType trafo(mesh);
+    SpaceType space(trafo);
+
+    static constexpr int dim = Shape_::dimension;
+
+    // assemble matrix structure
+    // LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim> matrix;
+    // Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+
+    // interpolate convection vector
+    LAFEM::DenseVectorBlocked<DataType, IndexType, dim> vector;
+    Analytic::Common::CosineWaveFunction<dim> cosine_wave;
+    Analytic::Gradient<decltype(cosine_wave)> conv_func(cosine_wave);
+    Assembly::Interpolator::project(vector, conv_func, space);
+
+    LAFEM::DenseVectorBlocked<DataType, IndexType, dim> primal = vector.clone(LAFEM::CloneMode::Weak);
+
+    Cubature::DynamicFactory cubature("gauss-legendre:3");
+
+    //setup burgers
+    //dummy coloring vector
+    //create coloring from our mesh
+    const auto& verts_at_elem = mesh.template get_index_set<Shape_::dimension, 0>();
+    Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+    Adjacency::Graph elems_at_elem(Adjacency::RenderType::injectify, verts_at_elem, elems_at_vert);
+
+    // create coloring
+    Adjacency::Coloring coloring(elems_at_elem);
+    TimeStamp stamp_1, stamp_2;
+    VoxelAssembly::VoxelBurgersAssembler<SpaceType, DataType, IndexType> burgers(space, coloring);
+    burgers.nu = burgers.beta = burgers.frechet_beta = burgers.theta = 1.0;
+    burgers.print_occupancy = true;
+    burgers.shared_mem = 4450;
+    // burgers.blocksize = 64;
+    // burgers.gridsize = 64;
+    stamp_2.stamp();
+    bres.thread_time_assemble = stamp_2.elapsed(stamp_1);
+
+
+    bres.num_asm_count = 0;
+    bres.num_asm_time = 0.0;
+    stamp_1.stamp();
+    // numeric assembly loop
+    do
+    {
+      primal.format();
+      burgers.assemble_vector(primal, vector, vector, space, cubature, DataType(1));
       stamp_2.stamp();
       bres.num_asm_time = stamp_2.elapsed(stamp_1);
       bres.num_asm_count += 1;
@@ -784,18 +866,13 @@ namespace MeshPermAssemblyBench
 
   }
 
-
-  template<int dim>
-  void run_structured(SimpleArgParser& args)
+  template<typename Mesh_>
+  void run_structured(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader)
   {
     #ifndef FEAT_HAVE_OMP
       std::cout << "Warning: Running meshperm bench without OMP, leading to wrong results for CPU voxel assembly!\n";
     #endif
-    typedef Shape::Hypercube<dim> ShapeType;
-    // parse levels
-    Index lvl_min(0);
-    Index lvl_max(1);
-    args.parse("level", lvl_max, lvl_min);
+    // typedef Shape::Hypercube<Mesh_::dimension> ShapeType;
     const bool only_gpu = args.check("only-gpu") >= 0;
     Index blocksize = 256;
     args.parse("set-blocksize", blocksize);
@@ -805,7 +882,11 @@ namespace MeshPermAssemblyBench
     Util::cuda_set_blocksize(256, 256, 256, 256, blocksize, blocksize);
     #endif
 
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    // parse levels
+    Index lvl_min(0);
+    Index lvl_max(1);
+    args.parse("level", lvl_max, lvl_min);
+
     // parse threads
     std::vector<std::size_t> num_threads;
     num_threads.push_back(0u);
@@ -826,18 +907,32 @@ namespace MeshPermAssemblyBench
       }
     }
 
-    Random rng;
-
     // create an empty atlas and a root mesh node
-    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(0);
-    MeshType mesh(mesh_factory);
-    std::deque<std::unique_ptr<Geometry::RootMeshNode<MeshType>>> nodes;
-    // nodes.push_back(std::make_unique<typename Geometry::RootMeshNode<MeshType>>(std::make_unique<MeshType>(mesh.clone())));
-    #ifdef __clang__
-    nodes.push_back(std::unique_ptr<Geometry::RootMeshNode<MeshType>>(new Geometry::RootMeshNode<MeshType>(std::unique_ptr<MeshType>(new MeshType(mesh.clone())))));
-    #else
-    nodes.push_back(Geometry::RootMeshNode<MeshType>::make_unique(std::make_unique<MeshType>(mesh.clone())));
-    #endif
+    Geometry::MeshAtlas<Mesh_> atlas;
+    std::deque<std::unique_ptr<Geometry::RootMeshNode<Mesh_>>> nodes;
+    nodes.push_back(Geometry::RootMeshNode<Mesh_>::make_unique(nullptr, &atlas));
+
+    // try to parse the mesh file
+#ifndef DEBUG
+    try
+#endif
+    {
+      std::cout << "Parsing mesh files..." << std::endl;
+      // Now parse the mesh file
+      mesh_reader.parse(*nodes.back(), atlas, nullptr);
+    }
+#ifndef DEBUG
+    catch(std::exception& exc)
+    {
+      std::cerr << "ERROR: " << exc.what() << std::endl;
+      return;
+    }
+    catch(...)
+    {
+      std::cerr << "ERROR: unknown exception" << std::endl;
+      return;
+    }
+#endif
 
     // refine
     std::cout << "Refining up to level " << lvl_max << "..." << std::endl;
@@ -1263,6 +1358,518 @@ namespace MeshPermAssemblyBench
 
   }
 
+
+  template<int dim>
+  void run_structured(SimpleArgParser& args)
+  {
+    #ifndef FEAT_HAVE_OMP
+      std::cout << "Warning: Running meshperm bench without OMP, leading to wrong results for CPU voxel assembly!\n";
+    #endif
+    typedef Shape::Hypercube<dim> ShapeType;
+    // parse levels
+    Index lvl_min(0);
+    Index lvl_max(1);
+    args.parse("level", lvl_max, lvl_min);
+    const bool only_gpu = args.check("only-gpu") >= 0;
+    Index blocksize = 256;
+    args.parse("set-blocksize", blocksize);
+
+    std::cout << "Chosen blocksize for assembly: " << blocksize << std::endl;
+    #ifdef FEAT_HAVE_CUDA
+    Util::cuda_set_blocksize(256, 256, 256, 256, blocksize, blocksize);
+    #endif
+
+    typedef Geometry::ConformalMesh<ShapeType> MeshType;
+    // parse threads
+    std::vector<std::size_t> num_threads;
+    num_threads.push_back(0u);
+    {
+      auto* p = args.query("threads");
+      if(p != nullptr)
+      {
+        for(std::size_t i(0); i < p->second.size(); ++i)
+        {
+          std::size_t t(0u);
+          if(!p->second.at(i).parse(t))
+          {
+            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << std::endl;
+            return;
+          }
+          num_threads.push_back(t);
+        }
+      }
+    }
+
+    Random rng;
+
+    // create an empty atlas and a root mesh node
+    Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(0);
+    MeshType mesh(mesh_factory);
+    std::deque<std::unique_ptr<Geometry::RootMeshNode<MeshType>>> nodes;
+    // nodes.push_back(std::make_unique<typename Geometry::RootMeshNode<MeshType>>(std::make_unique<MeshType>(mesh.clone())));
+    #ifdef __clang__
+    nodes.push_back(std::unique_ptr<Geometry::RootMeshNode<MeshType>>(new Geometry::RootMeshNode<MeshType>(std::unique_ptr<MeshType>(new MeshType(mesh.clone())))));
+    #else
+    nodes.push_back(Geometry::RootMeshNode<MeshType>::make_unique(std::make_unique<MeshType>(mesh.clone())));
+    #endif
+
+    // refine
+    std::cout << "Refining up to level " << lvl_max << "..." << std::endl;
+    for(Index lvl(1); lvl <= lvl_max; ++lvl)
+    {
+      nodes.push_back(nodes.back()->refine_unique());
+    }
+
+    static constexpr std::size_t nperms(5u);
+
+    std::deque<std::array<BenchResults, nperms>> res_poisson(nodes.size());
+    std::deque<std::array<BenchResults, nperms>> res_burgers(nodes.size());
+
+    std::deque<std::deque<std::array<BenchResults, nperms>>> res_poisson_smp(nodes.size());
+    std::deque<std::deque<std::array<BenchResults, nperms>>> res_burgers_smp(nodes.size());
+
+    std::deque<BenchResults> res_poisson_gpu(nodes.size());
+    std::deque<BenchResults> res_burgers_gpu(nodes.size());
+    std::deque<std::deque<BenchResults>> res_poisson_host(nodes.size());
+    std::deque<std::deque<BenchResults>> res_burgers_host(nodes.size());
+    std::deque<BenchResults> res_burgers_def_gpu(nodes.size());
+    std::deque<std::deque<BenchResults>> res_burgers_def_host(nodes.size());
+
+    const bool b_poisson = (args.check("no-poisson") < 0);
+    const bool b_burgers = (args.check("no-burgers") < 0);
+
+    std::cout << std::endl << "Performing benchmark..." << std::endl;
+    for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+    {
+      std::cout << "Level " << stringify(lvl).pad_front(2) << ": ";
+
+      // allocate smp deques
+      res_poisson_smp.at(lvl).resize(num_threads.size());
+      res_burgers_smp.at(lvl).resize(num_threads.size());
+
+      for(std::size_t perm(0); perm < nperms; ++perm)
+      {
+        if(only_gpu)
+          break;
+        std::cout << '.';
+        std::cout.flush();
+
+        // clone node
+        auto node = nodes.at(lvl)->clone_unique();
+
+        // permute
+        TimeStamp stamp_1;
+        switch(perm)
+        {
+        case 0:
+          break;
+
+        case 1:
+          node->create_permutation(Geometry::PermutationStrategy::random);
+          break;
+
+        case 2:
+          node->create_permutation(Geometry::PermutationStrategy::lexicographic);
+          break;
+
+        case 3:
+          node->create_permutation(Geometry::PermutationStrategy::colored);
+          break;
+
+        case 4:
+          /*continue; // skip this one
+          node->create_permutation(Geometry::PermutationStrategy::cuthill_mckee);
+          break;
+
+        case 5:
+          continue; // skip this one
+          node->create_permutation(Geometry::PermutationStrategy::cuthill_mckee_reversed);
+          break;
+
+        case 6:*/
+          node->create_permutation(Geometry::PermutationStrategy::geometric_cuthill_mckee);
+          break;
+
+        /*case 7:
+          continue; // skip this one
+          node->create_permutation(Geometry::PermutationStrategy::geometric_cuthill_mckee_reversed);
+          break;*/
+        }
+        TimeStamp stamp_2;
+        res_poisson.at(lvl).at(perm).permute_time =
+        res_burgers.at(lvl).at(perm).permute_time = stamp_2.elapsed(stamp_1);
+
+        if(b_poisson)
+        {
+          bench_poisson(*node->get_mesh(), res_poisson.at(lvl).at(perm));
+          for(std::size_t i(0); i < num_threads.size(); ++i)
+            bench_poisson_new(*node->get_mesh(), res_poisson_smp.at(lvl).at(i).at(perm), num_threads.at(i));
+        }
+        if(b_burgers)
+        {
+          bench_burgers(*node->get_mesh(), res_burgers.at(lvl).at(perm));
+          for(std::size_t i(0); i < num_threads.size(); ++i)
+            bench_burgers_new(*node->get_mesh(), res_burgers_smp.at(lvl).at(i).at(perm), num_threads.at(i));
+        }
+      }
+      if(b_poisson)
+      {
+        bench_poisson_voxel(*nodes.at(lvl)->get_mesh(), res_poisson_gpu.at(lvl), lvl, PreferredBackend::cuda);
+        res_poisson_host.at(lvl).resize(num_threads.size());
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          if(only_gpu)
+            break;
+          omp_set_num_threads(int(num_threads.at(i)));
+          bench_poisson_voxel(*nodes.at(lvl)->get_mesh(), res_poisson_host.at(lvl).at(i), lvl, PreferredBackend::generic);
+          res_poisson_host.at(lvl).at(i).num_worker_threads = int(num_threads.at(i));
+        }
+      }
+      if(b_burgers)
+      {
+        bench_burgers_voxel(*nodes.at(lvl)->get_mesh(), res_burgers_gpu.at(lvl), lvl, PreferredBackend::cuda);
+        bench_burgers_def_voxel(*nodes.at(lvl)->get_mesh(), res_burgers_def_gpu.at(lvl), lvl, PreferredBackend::cuda);
+        res_burgers_host.at(lvl).resize(num_threads.size());
+        res_burgers_def_host.at(lvl).resize(num_threads.size());
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          if(only_gpu)
+            break;
+          omp_set_num_threads(int(num_threads.at(i)));
+          bench_burgers_voxel(*nodes.at(lvl)->get_mesh(), res_burgers_host.at(lvl).at(i), lvl, PreferredBackend::generic);
+          bench_burgers_def_voxel(*nodes.at(lvl)->get_mesh(), res_burgers_def_host.at(lvl).at(i), lvl, PreferredBackend::generic);
+          res_burgers_host.at(lvl).at(i).num_worker_threads = int(num_threads.at(i));
+          res_burgers_def_host.at(lvl).at(i).num_worker_threads = int(num_threads.at(i));
+        }
+      }
+
+      std::cout << " done!"<< std::endl;
+    }
+    if(!only_gpu)
+    {
+      for(std::size_t i(0); i < num_threads.size(); ++i)
+      {
+        std::cout << std::endl << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            std::cout << stringify(res_poisson_smp.at(lvl).at(i).at(perm).num_worker_threads).pad_front(12);
+          }
+          std::cout << std::endl;
+        }
+      }
+
+      std::cout << std::endl << "Permutation Timings:" << std::endl;
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        for(std::size_t perm(0); perm < nperms; ++perm)
+        {
+          std::cout << stringify_fp_fix(res_poisson.at(lvl).at(perm).permute_time, 6, 12);
+        }
+        std::cout << std::endl;
+      }
+    }
+
+    if(b_poisson)
+    {
+      if(!only_gpu)
+      {
+        std::cout << std::endl << "Poisson Assembly Timings:" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_poisson.at(lvl).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t, 6, 12);
+          }
+          std::cout << std::endl;
+        }
+
+        /*std::cout << std::endl << "Poisson Assembly Timing Relative to 2-Level:" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          const double t2 = res_poisson.at(lvl).front().num_asm_time / double(res_poisson.at(lvl).front().num_asm_count);
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_poisson.at(lvl).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t/t2, 6, 12);
+          }
+          std::cout << std::endl;
+        }*/
+
+
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+          for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+          {
+            std::cout << stringify(lvl).pad_front(2) << ": ";
+
+            for(std::size_t perm(0); perm < nperms; ++perm)
+            {
+              const auto& b = res_poisson_smp.at(lvl).at(i).at(perm);
+              double t = b.num_asm_time / double(b.num_asm_count);
+              std::cout << stringify_fp_fix(t, 6, 12);
+            }
+            std::cout << std::endl;
+          }
+        }
+
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+          {
+            std::cout << stringify(lvl).pad_front(2) << ": ";
+            for(std::size_t perm(0); perm < nperms; ++perm)
+              std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
+            std::cout << std::endl;
+          }
+        }
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+          {
+            std::cout << stringify(lvl).pad_front(2) << ": ";
+            for(std::size_t perm(0); perm < nperms; ++perm)
+              std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
+            std::cout << std::endl;
+          }
+        }
+
+        /*std::cout << std::endl << "New Poisson Assembly Timing Relative to 2-Level:" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          const double t2 = res_poisson2.at(lvl).front().num_asm_time / double(res_poisson2.at(lvl).front().num_asm_count);
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_poisson2.at(lvl).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t/t2, 6, 12);
+          }
+          std::cout << std::endl;
+        }*/
+      }
+      std::cout << std::endl << "GPU Poisson Assembly Timing" << std::endl;
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        std::cout << stringify_fp_fix(res_poisson_gpu.at(lvl).thread_time_assemble, 6, 20);
+        std::cout << stringify_fp_fix(res_poisson_gpu.at(lvl).num_asm_time/double(res_poisson_gpu.at(lvl).num_asm_count), 6, 20);
+        std::cout << std::endl;
+      }
+
+      for(Index i(0); i < num_threads.size(); ++i)
+      {
+        if(only_gpu)
+          break;
+        std::cout << std::endl << "OMP Host Poisson Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          std::cout << stringify_fp_fix(res_poisson_host.at(lvl).at(i).thread_time_assemble, 6, 20);
+          std::cout << stringify_fp_fix(res_poisson_host.at(lvl).at(i).num_asm_time/double(res_poisson_host.at(lvl).at(i).num_asm_count), 6, 20);
+          std::cout << std::endl;
+        }
+      }
+    }
+
+    if(b_burgers)
+    {
+      if(!only_gpu)
+      {
+        std::cout << std::endl << "Burgers Assembly Timings:" << std::endl;
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_burgers.at(lvl).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t, 6, 12);
+          }
+          std::cout << std::endl;
+        }
+
+        /*std::cout << std::endl << "Burgers Assembly Timing Relative to 2-Level:" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          const double t2 = res_burgers.at(lvl).front().num_asm_time / double(res_burgers.at(lvl).front().num_asm_count);
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_burgers.at(lvl).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t/t2, 6, 12);
+          }
+          std::cout << std::endl;
+        }*/
+
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+
+          for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+          {
+            std::cout << stringify(lvl).pad_front(2) << ": ";
+
+            for(std::size_t perm(0); perm < nperms; ++perm)
+            {
+              const auto& b = res_burgers_smp.at(lvl).at(i).at(perm);
+              double t = b.num_asm_time / double(b.num_asm_count);
+              std::cout << stringify_fp_fix(t, 6, 12);
+            }
+            std::cout << std::endl;
+          }
+        }
+
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+          {
+            std::cout << stringify(lvl).pad_front(2) << ": ";
+            for(std::size_t perm(0); perm < nperms; ++perm)
+              std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
+            std::cout << std::endl;
+          }
+        }
+        for(std::size_t i(0); i < num_threads.size(); ++i)
+        {
+          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+          {
+            std::cout << stringify(lvl).pad_front(2) << ": ";
+            for(std::size_t perm(0); perm < nperms; ++perm)
+              std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
+            std::cout << std::endl;
+          }
+        }
+
+        /*std::cout << std::endl << "New Burgers Assembly Timing Relative to 2-Level:" << std::endl;
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          const double t2 = res_burgers2.at(lvl).front().num_asm_time / double(res_burgers2.at(lvl).front().num_asm_count);
+
+          for(std::size_t perm(0); perm < nperms; ++perm)
+          {
+            const auto& b = res_burgers2.at(lvl).at(perm);
+            double t = b.num_asm_time / double(b.num_asm_count);
+            std::cout << stringify_fp_fix(t/t2, 6, 12);
+          }
+          std::cout << std::endl;
+        }*/
+      }
+      std::cout << std::endl << "GPU Burgers Assembly Timing" << std::endl;
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        std::cout << stringify_fp_fix(res_burgers_gpu.at(lvl).thread_time_assemble, 6, 20);
+        std::cout << stringify_fp_fix(res_burgers_gpu.at(lvl).num_asm_time/double(res_burgers_gpu.at(lvl).num_asm_count), 6, 20);
+        std::cout << std::endl;
+      }
+
+      std::cout << std::endl << "GPU Burgers Defect Assembly Timing" << std::endl;
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ": ";
+        std::cout << stringify_fp_fix(res_burgers_def_gpu.at(lvl).thread_time_assemble, 6, 20);
+        std::cout << stringify_fp_fix(res_burgers_def_gpu.at(lvl).num_asm_time/double(res_burgers_def_gpu.at(lvl).num_asm_count), 6, 20);
+        std::cout << std::endl;
+      }
+
+      for(Index i(0); i < num_threads.size(); ++i)
+      {
+        if(only_gpu)
+          break;
+        std::cout << std::endl << "OMP Host Burgers Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          std::cout << stringify_fp_fix(res_burgers_host.at(lvl).at(i).thread_time_assemble, 6, 20);
+          std::cout << stringify_fp_fix(res_burgers_host.at(lvl).at(i).num_asm_time/double(res_burgers_host.at(lvl).at(i).num_asm_count), 6, 20);
+          std::cout << std::endl;
+        }
+      }
+
+      for(Index i(0); i < num_threads.size(); ++i)
+      {
+        if(only_gpu)
+          break;
+        std::cout << std::endl << "OMP Host Burgers Defect Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ": ";
+          std::cout << stringify_fp_fix(res_burgers_def_host.at(lvl).at(i).thread_time_assemble, 6, 20);
+          std::cout << stringify_fp_fix(res_burgers_def_host.at(lvl).at(i).num_asm_time/double(res_burgers_def_host.at(lvl).at(i).num_asm_count), 6, 20);
+          std::cout << std::endl;
+        }
+      }
+    }
+
+  }
+
   void main(int argc, char** argv)
   {
     // This is the list of all supported meshes that could appear in the mesh file
@@ -1281,6 +1888,7 @@ namespace MeshPermAssemblyBench
     args.support("refined-unit-square-q2");
     args.support("refined-unit-cube-q2");
     args.support("only-gpu");
+    args.support("voxel");
     args.support("set-blocksize");
 
     // check for unsupported options
@@ -1309,6 +1917,8 @@ namespace MeshPermAssemblyBench
       return;
     }
 
+    bool voxel_run = args.check("voxel")>= 0;
+
     // get our filename deque
     auto mpars = args.query("mesh");
     XASSERT(mpars != nullptr);
@@ -1325,12 +1935,19 @@ namespace MeshPermAssemblyBench
     const String mtype = mesh_reader.get_meshtype_string();
 
     std::cout << "Mesh Type: " << mtype << std::endl;
-
+    if(voxel_run)
+    {
+    if(mtype == "conformal:hypercube:2:2") run_structured<H2M2D>(args, mesh_reader); else
+    if(mtype == "conformal:hypercube:3:3") run_structured<H3M3D>(args, mesh_reader); else
+    std::cout << "ERROR: unsupported mesh type!" << std::endl;
+    }
+    else{
     if(mtype == "conformal:hypercube:2:2") run<H2M2D>(args, mesh_reader); else
     if(mtype == "conformal:hypercube:3:3") run<H3M3D>(args, mesh_reader); else
     if(mtype == "conformal:simplex:2:2") run<S2M2D>(args, mesh_reader); else
     if(mtype == "conformal:simplex:3:3") run<S3M3D>(args, mesh_reader); else
     std::cout << "ERROR: unsupported mesh type!" << std::endl;
+    }
   }
 } // namespace MeshPermAssemblyBench
 

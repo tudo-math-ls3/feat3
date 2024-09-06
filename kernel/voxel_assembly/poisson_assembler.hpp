@@ -146,6 +146,14 @@ namespace FEAT
       explicit VoxelPoissonAssembler(const SpaceType& space, const ColoringType_& coloring, int hint = -1) :
       mesh_data(space, coloring, hint)
       {
+        #ifdef FEAT_HAVE_CUDA
+        #ifdef DEBUG
+        const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
+        const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
+        if(stack_limit < stack_limit_target)
+          Util::cuda_set_max_cache_thread(stack_limit_target);
+        #endif
+        #endif
       }
 
       // rule of 5

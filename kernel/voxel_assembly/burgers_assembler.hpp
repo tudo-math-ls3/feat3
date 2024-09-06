@@ -21,6 +21,12 @@
 #include <kernel/util/cuda_util.hpp>
 #endif
 
+#ifdef __CUDACC__
+#include <cooperative_groups.h>
+#include <cooperative_groups/reduce.h>
+namespace cg = cooperative_groups;
+#endif
+
 namespace FEAT
 {
   namespace VoxelAssembly
@@ -36,6 +42,36 @@ namespace FEAT
      */
     template<typename Space_, typename DT_, typename IT_>
     class VoxelBurgersAssembler DOXY({});
+
+    #if defined(FEAT_HAVE_CUDA) || defined(DOXYGEN)
+    /// Helper struct wrapping the data required as shared data
+    template<typename SpaceHelp_>
+    struct BurgersSharedDataKernelWrapper
+    {
+      typedef SpaceHelp_ SpaceHelp;
+      static constexpr int dim = SpaceHelp::dim;
+      typedef typename SpaceHelp::SpaceType SpaceType;
+      typedef typename SpaceHelp::DataType DataType;
+      //define local sizes
+      static constexpr int num_loc_dofs = SpaceType::DofMappingType::dof_count;
+      // local vector and matrix defines
+      typedef Tiny::Vector<DataType, dim> VecValueType;
+      typedef Tiny::Matrix<DataType, dim, dim> MatValueType;
+
+      typename SpaceHelp::EvalData basis_data;
+      typename SpaceHelp::JacobianMatrixType loc_jac;
+      typename SpaceHelp::JacobianMatrixType loc_jac_inv;
+      MatValueType loc_grad_v;
+      VecValueType loc_v;
+      VecValueType mean_v;
+      typename SpaceHelp::DomainPointType dom_point;
+      Tiny::Vector<DataType, num_loc_dofs> streamdiff_coeffs;
+      DataType local_delta;
+      DataType det;
+      DataType weight;
+      bool need_frechet;
+    };
+    #endif
 
     namespace Kernel
     {
@@ -133,10 +169,6 @@ namespace FEAT
 
           if(local_norm_v > tol_eps)
           {
-            //we need this trafo data
-            SpaceHelp::calc_jac_mat(loc_jac, barycenter, local_coeffs);
-            loc_jac_inv.set_inverse(loc_jac);
-
             const DataType local_h = SpaceHelp::width_directed(mean_v, local_coeffs) * local_norm_v;
             const DataType local_re = (local_norm_v * local_h) / sd_nu;
             local_delta = sd_delta * (local_h / sd_v_norm) * (DataType(2) * local_re) / (DataType(1) + local_re);
@@ -298,6 +330,548 @@ namespace FEAT
         // next cubature point
         }
       }
+
+      #if defined(__CUDACC__) || defined(DOXYGEN)
+
+
+      template<typename ThreadGroup_, typename SpaceHelp_>
+      CUDA_DEVICE __forceinline__ void grouped_burgers_mat_alt_prepare_assembly_kernel(const ThreadGroup_& tg, BurgersSharedDataKernelWrapper<SpaceHelp_>* shared_wrapper,
+                                          int loc_assemble_size, int assemble_offset, typename SpaceHelp_::DataType* loc_mat, const typename SpaceHelp_::DataType* local_conv_dofs,
+                                          const Tiny::Matrix<typename SpaceHelp_::DataType, SpaceHelp_::dim, SpaceHelp_::num_verts>& local_coeffs,
+                                          const typename SpaceHelp_::DomainPointType* cub_pt, const typename SpaceHelp_::DataType* cub_wg, const int cub_ind,
+                                          const VoxelAssembly::AssemblyBurgersData<typename SpaceHelp_::DataType>& burgers_params,
+                                          const bool need_streamline, const bool need_convection, const typename SpaceHelp_::DataType tol_eps)
+      {
+        typedef SpaceHelp_ SpaceHelp;
+        constexpr int dim = SpaceHelp::dim;
+        typedef typename SpaceHelp::SpaceType SpaceType;
+        typedef typename SpaceHelp::DataType DataType;
+        // constexpr int num_loc_verts = SpaceHelp::num_verts;
+        const int t_idx = tg.thread_rank();
+        const int g_size = tg.num_threads();
+
+        const DataType& nu{burgers_params.nu};
+        const DataType& theta{burgers_params.theta};
+        const DataType& beta{burgers_params.beta};
+        const DataType& frechet_beta{burgers_params.frechet_beta};
+        const DataType& sd_delta{burgers_params.sd_delta};
+        const DataType& sd_nu{burgers_params.sd_nu};
+        const DataType& sd_v_norm{burgers_params.sd_v_norm};
+        const bool& deformation{burgers_params.deformation};
+
+        // #ifdef __CUDACC__
+        // const DataType tol_eps = CudaMath::cuda_get_sqrt_eps<DataType>();
+        // #else
+        // const DataType tol_eps = Math::sqrt(Math::eps<DataType>());
+        // #endif
+
+        // #ifdef __CUDACC__
+        // const bool need_streamline = (CudaMath::cuda_abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = CudaMath::cuda_abs(beta) > DataType(0);
+        // #else
+        // const bool need_streamline = (Math::abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = Math::abs(beta) > DataType(0);
+        // #endif
+
+
+        //define local sizes
+        constexpr int num_loc_dofs = SpaceType::DofMappingType::dof_count;
+        // local vector and matrix defines
+        typedef Tiny::Vector<DataType, dim> VecValueType;
+        typedef Tiny::Matrix<DataType, dim, dim> MatValueType;
+        //get number of nodes per element
+        // constexpr int num_loc_verts = SpaceType::MeshType::template IndexSet<dim, 0>::Type::num_indices;
+        // define local arrays
+        // use extern shared for this?!
+        // TODO: get initiliziaztion into outside loop...
+        typedef BurgersSharedDataKernelWrapper<SpaceHelp> BSDKWrapper;
+        typename SpaceHelp::JacobianMatrixType& loc_jac = shared_wrapper->loc_jac;
+        typename SpaceHelp::JacobianMatrixType& loc_jac_inv = shared_wrapper->loc_jac_inv;
+        MatValueType& loc_grad_v = shared_wrapper->loc_grad_v;
+        VecValueType& loc_v = shared_wrapper->loc_v;
+        VecValueType& mean_v = shared_wrapper->mean_v;
+        typename SpaceHelp::DomainPointType& dom_point = shared_wrapper->dom_point;
+        Tiny::Vector<DataType, num_loc_dofs>& streamdiff_coeffs = shared_wrapper->streamdiff_coeffs;
+        DataType& local_delta = shared_wrapper->local_delta;
+        DataType& det = shared_wrapper->det;
+        DataType& weight = shared_wrapper->weight;
+        typename SpaceHelp::EvalData& basis_data = shared_wrapper->basis_data;
+        bool& need_frechet = shared_wrapper->need_frechet;
+
+        VoxelAssembly::coalesced_format(tg, (unsigned int*) shared_wrapper, sizeof(BSDKWrapper)/(sizeof(unsigned int)));
+        tg.sync();
+
+        cg::invoke_one(tg, [&](){need_frechet = CudaMath::cuda_abs(frechet_beta) > DataType(0);});
+        tg.sync();
+
+
+        if(need_streamline) //need streamdiff?
+        {
+          cg::invoke_one(tg, [&]() {mean_v = DataType(0);});
+          //set domain point to barycenter, which is zero for Hypercubes
+          // NewSpaceHelp::_map_point(img_point, barycenter, local_coeffs);
+          //only reserve memory for reference values
+          cg::invoke_one(tg, [&](){ const VecValueType bc(0);
+                                    SpaceHelp::eval_ref_values(basis_data, bc);
+                                    SpaceHelp::trans_values(basis_data);});
+
+          tg.sync();
+
+          for(int idx = t_idx; idx < num_loc_dofs; idx += g_size)
+          {
+            VoxelAssembly::template grouped_axpy<DataType, cg::thread_group, dim>(tg, &mean_v[0], basis_data.phi[idx].value, &local_conv_dofs[idx*dim]);
+          }
+
+          tg.sync();
+
+          DataType local_norm_v = mean_v.norm_euclid();
+
+          if(local_norm_v > tol_eps)
+          {
+            cg::invoke_one(tg, [&](){
+              const DataType local_h = SpaceHelp::width_directed(mean_v, local_coeffs) * local_norm_v;
+              const DataType local_re = (local_norm_v * local_h) / sd_nu;
+              local_delta = sd_delta * (local_h / sd_v_norm) * (DataType(2) * local_re) / (DataType(1) + local_re);
+            });
+          }
+        }
+
+        tg.sync();
+        {
+          cg::invoke_one(tg, [&](){dom_point = cub_pt[cub_ind];
+                                  SpaceHelp::eval_ref_values(basis_data, dom_point);
+                                  SpaceHelp::trans_values(basis_data);});
+          // NewSpaceHelp::_map_point(img_point, dom_point, local_coeffs);//not needed?
+          tg.sync();
+          SpaceHelp::grouped_calc_jac_mat(tg, loc_jac, dom_point, &local_coeffs[0][0]);
+          tg.sync();
+          cg::invoke_one(tg, [&](){det = loc_jac.det();
+                                  weight = det * cub_wg[cub_ind];});
+          tg.sync();
+          loc_jac_inv.grouped_set_inverse(tg, loc_jac, det);
+          tg.sync();
+          cg::invoke_one(tg, [&](){
+                                  SpaceHelp::eval_ref_gradients(basis_data, dom_point);
+                                  SpaceHelp::trans_gradients(basis_data, loc_jac_inv);});
+
+          tg.sync();
+          if(need_convection || need_streamline) // need streamdiff or convection?
+          {
+            VoxelAssembly::coalesced_format(tg, &loc_v[0], dim);
+            tg.sync();
+
+            for(int idx = t_idx; idx < num_loc_dofs; idx += g_size)
+            {
+              VoxelAssembly::template grouped_axpy<DataType, cg::thread_group, dim>(tg, &loc_v[0], basis_data.phi[idx].value, &local_conv_dofs[idx*dim]);
+            }
+            // tg.sync();
+          }
+
+          if(need_frechet)
+          {
+            VoxelAssembly::coalesced_format(tg, &loc_grad_v[0][0], dim*dim);
+            tg.sync();
+            for(int i = t_idx; i < num_loc_dofs; i += g_size)
+            {
+              VoxelAssembly::grouped_add_outer_product(tg, &loc_grad_v[0][0], &local_conv_dofs[i*dim], basis_data.phi[i].grad);
+            }
+            // tg.sync();
+          }
+
+          if(need_streamline) // need streamdiff?
+          {
+            tg.sync();
+            for(int i = t_idx; i < num_loc_dofs; i += g_size)
+            {
+              streamdiff_coeffs[i] = Tiny::dot(loc_v, basis_data.phi[i].grad);
+            }
+            // tg.sync();
+          }
+
+          tg.sync();
+        }
+      }
+
+      /// appears to not work *better*... compiler optimizes this sufficiently?
+      template<typename ThreadGroup_, typename SpaceHelp_>
+      CUDA_DEVICE __forceinline__ void grouped_burgers_mat_alt_assembly_kernel(const ThreadGroup_& tg, BurgersSharedDataKernelWrapper<SpaceHelp_>* shared_wrapper,
+                                          int loc_assemble_size, int assemble_offset, typename SpaceHelp_::DataType* loc_mat,
+                                          const VoxelAssembly::AssemblyBurgersData<typename SpaceHelp_::DataType>& burgers_params,
+                                          const bool need_streamline, const bool need_convection, const typename SpaceHelp_::DataType tol_eps)
+      {
+        typedef SpaceHelp_ SpaceHelp;
+        constexpr int dim = SpaceHelp::dim;
+        typedef typename SpaceHelp::SpaceType SpaceType;
+        typedef typename SpaceHelp::DataType DataType;
+        // constexpr int num_loc_verts = SpaceHelp::num_verts;
+        const int t_idx = tg.thread_rank();
+        const int g_size = tg.num_threads();
+
+        const DataType& nu{burgers_params.nu};
+        const DataType& theta{burgers_params.theta};
+        const DataType& beta{burgers_params.beta};
+        const DataType& frechet_beta{burgers_params.frechet_beta};
+        const DataType& sd_delta{burgers_params.sd_delta};
+        const DataType& sd_nu{burgers_params.sd_nu};
+        const DataType& sd_v_norm{burgers_params.sd_v_norm};
+        const bool& deformation{burgers_params.deformation};
+
+        // #ifdef __CUDACC__
+        // const DataType tol_eps = CudaMath::cuda_get_sqrt_eps<DataType>();
+        // #else
+        // const DataType tol_eps = Math::sqrt(Math::eps<DataType>());
+        // #endif
+
+        // #ifdef __CUDACC__
+        // const bool need_streamline = (CudaMath::cuda_abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = CudaMath::cuda_abs(beta) > DataType(0);
+        // #else
+        // const bool need_streamline = (Math::abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = Math::abs(beta) > DataType(0);
+        // #endif
+
+
+        //define local sizes
+        constexpr int num_loc_dofs = SpaceType::DofMappingType::dof_count;
+        // local vector and matrix defines
+        typedef Tiny::Vector<DataType, dim> VecValueType;
+        typedef Tiny::Matrix<DataType, dim, dim> MatValueType;
+        //get number of nodes per element
+        // constexpr int num_loc_verts = SpaceType::MeshType::template IndexSet<dim, 0>::Type::num_indices;
+        // define local arrays
+        // use extern shared for this?!
+        // TODO: get initiliziaztion into outside loop...
+        typedef BurgersSharedDataKernelWrapper<SpaceHelp> BSDKWrapper;
+        typename SpaceHelp::JacobianMatrixType& loc_jac = shared_wrapper->loc_jac;
+        typename SpaceHelp::JacobianMatrixType& loc_jac_inv = shared_wrapper->loc_jac_inv;
+        MatValueType& loc_grad_v = shared_wrapper->loc_grad_v;
+        VecValueType& loc_v = shared_wrapper->loc_v;
+        VecValueType& mean_v = shared_wrapper->mean_v;
+        typename SpaceHelp::DomainPointType& dom_point = shared_wrapper->dom_point;
+        Tiny::Vector<DataType, num_loc_dofs>& streamdiff_coeffs = shared_wrapper->streamdiff_coeffs;
+        DataType& local_delta = shared_wrapper->local_delta;
+        DataType& det = shared_wrapper->det;
+        DataType& weight = shared_wrapper->weight;
+        typename SpaceHelp::EvalData& basis_data = shared_wrapper->basis_data;
+        bool& need_frechet = shared_wrapper->need_frechet;
+
+
+        for(int idx = t_idx; idx < loc_assemble_size; idx += g_size)
+        {
+          const int i = (idx+assemble_offset) / num_loc_dofs;
+          const int j = (idx+assemble_offset) % num_loc_dofs;
+          if(deformation)
+          {
+            // compute scalar value
+            const DataType value = nu * weight * Tiny::dot(basis_data.phi[i].grad, basis_data.phi[j].grad);
+
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_outer_product(basis_data.phi[j].grad, basis_data.phi[i].grad, nu * weight);
+          }
+          else
+          {
+            // compute scalar value
+            const DataType value = nu * weight * Tiny::dot(basis_data.phi[i].grad, basis_data.phi[j].grad);
+
+            // update local matrix
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+          }
+
+          if(need_convection) // assemble convection?
+          {
+            // compute scalar value
+            const DataType value = beta * weight * basis_data.phi[i].value * VoxelAssembly::dot(basis_data.phi[j].grad, &loc_v[0]);
+
+            // update local matrix
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+          }
+
+          // assemble convection Frechet?
+          if(need_frechet)
+          {
+            // compute scalar value
+            const DataType value = frechet_beta * weight * basis_data.phi[i].value * basis_data.phi[j].value;
+
+            // update local matrix
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->axpy(value, loc_grad_v);
+          }
+
+          // assemble reaction?
+          #ifdef __CUDACC__
+          if(CudaMath::cuda_abs(theta) > DataType(0))
+          #else
+          if(Math::abs(theta) > DataType(0))
+          #endif
+          {
+            // compute scalar value
+            const DataType value = theta * weight *  basis_data.phi[i].value * basis_data.phi[j].value;
+
+            // update local matrix
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+          }
+
+          // assemble streamline diffusion?
+          if((need_streamline) && (local_delta > tol_eps))
+          {
+            // compute scalar value
+            const DataType value = local_delta * weight * streamdiff_coeffs[i] * streamdiff_coeffs[j];
+
+            // update local matrix
+            ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+          }
+        // next cubature point
+        }
+      }
+
+      /**
+       * \brief Burgers Matrix assembly kernel
+       *
+       * Outsources the the most inner execution of the assembly of the full burgers term for a cell previously gathered.
+       * Local always refers to the local dofs of the current cell.
+       *
+       * \tparam SpaceHelp_ The psacehelper to be used. Holds most information about the underlying space.
+       * \tparam LocMatType_ The Matrixtype of the local matrix dofs.
+       * \tparam LocVecType_ The Vectortype of the local convection dofs.
+       * \tparam dim_ Dimension of our space. For ease of access.
+       * \tparam num_verts_ The number of vertices of one cell.
+       *
+       * \param[out] loc_mat A reference to the local matrix to be assembled.
+       * \param[in] local_conv_dofs A reference to the local convection dofs. If convection is not needed values are ignored.
+       * \param[in] local_coeffs The local trafo coefficients.
+       * \param[in] cub_pt A pointer to the cubature point coordinate vector.
+       * \param[in] cub_wg A pointer to the cubature weights. Same order as cub_pt array.
+       * \param[in] burgers_params A struct holding the burgers parameter configuration.
+       * \param[in] need_streamline Do we need streamline?
+       * \param[in] need_convection Do we need convection?
+       * \param[in] tol_eps Tolerance for local stream norm to be regarded as zero.
+       */
+      template<typename ThreadGroup_, typename SpaceHelp_>
+      CUDA_DEVICE __forceinline__ void grouped_burgers_mat_assembly_kernel(const ThreadGroup_& tg, BurgersSharedDataKernelWrapper<SpaceHelp_>* shared_wrapper, int loc_assemble_size, int assemble_offset, typename SpaceHelp_::DataType* loc_mat, const typename SpaceHelp_::DataType* local_conv_dofs,
+                                          const Tiny::Matrix<typename SpaceHelp_::DataType, SpaceHelp_::dim, SpaceHelp_::num_verts>& local_coeffs,
+                                          const typename SpaceHelp_::DomainPointType* cub_pt, const typename SpaceHelp_::DataType* cub_wg, const int num_cubs,
+                                          const VoxelAssembly::AssemblyBurgersData<typename SpaceHelp_::DataType>& burgers_params,
+                                          const bool need_streamline, const bool need_convection, const typename SpaceHelp_::DataType tol_eps)
+      {
+        typedef SpaceHelp_ SpaceHelp;
+        constexpr int dim = SpaceHelp::dim;
+        typedef typename SpaceHelp::SpaceType SpaceType;
+        typedef typename SpaceHelp::DataType DataType;
+        // constexpr int num_loc_verts = SpaceHelp::num_verts;
+        const int t_idx = tg.thread_rank();
+        const int g_size = tg.num_threads();
+
+        const DataType& nu{burgers_params.nu};
+        const DataType& theta{burgers_params.theta};
+        const DataType& beta{burgers_params.beta};
+        const DataType& frechet_beta{burgers_params.frechet_beta};
+        const DataType& sd_delta{burgers_params.sd_delta};
+        const DataType& sd_nu{burgers_params.sd_nu};
+        const DataType& sd_v_norm{burgers_params.sd_v_norm};
+        const bool& deformation{burgers_params.deformation};
+
+        // #ifdef __CUDACC__
+        // const DataType tol_eps = CudaMath::cuda_get_sqrt_eps<DataType>();
+        // #else
+        // const DataType tol_eps = Math::sqrt(Math::eps<DataType>());
+        // #endif
+
+        // #ifdef __CUDACC__
+        // const bool need_streamline = (CudaMath::cuda_abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = CudaMath::cuda_abs(beta) > DataType(0);
+        // #else
+        // const bool need_streamline = (Math::abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = Math::abs(beta) > DataType(0);
+        // #endif
+
+
+        //define local sizes
+        constexpr int num_loc_dofs = SpaceType::DofMappingType::dof_count;
+        // local vector and matrix defines
+        typedef Tiny::Vector<DataType, dim> VecValueType;
+        typedef Tiny::Matrix<DataType, dim, dim> MatValueType;
+        //get number of nodes per element
+        // constexpr int num_loc_verts = SpaceType::MeshType::template IndexSet<dim, 0>::Type::num_indices;
+        // define local arrays
+        // use extern shared for this?!
+        typedef BurgersSharedDataKernelWrapper<SpaceHelp> BSDKWrapper;
+        typename SpaceHelp::JacobianMatrixType& loc_jac = shared_wrapper->loc_jac;
+        typename SpaceHelp::JacobianMatrixType& loc_jac_inv = shared_wrapper->loc_jac_inv;
+        MatValueType& loc_grad_v = shared_wrapper->loc_grad_v;
+        VecValueType& loc_v = shared_wrapper->loc_v;
+        VecValueType& mean_v = shared_wrapper->mean_v;
+        typename SpaceHelp::DomainPointType& dom_point = shared_wrapper->dom_point;
+        Tiny::Vector<DataType, num_loc_dofs>& streamdiff_coeffs = shared_wrapper->streamdiff_coeffs;
+        DataType& local_delta = shared_wrapper->local_delta;
+        DataType& det = shared_wrapper->det;
+        DataType& weight = shared_wrapper->weight;
+        typename SpaceHelp::EvalData& basis_data = shared_wrapper->basis_data;
+        bool& need_frechet = shared_wrapper->need_frechet;
+
+        VoxelAssembly::coalesced_format(tg, (unsigned int*) shared_wrapper, sizeof(BSDKWrapper)/(sizeof(unsigned int)));
+        tg.sync();
+
+        cg::invoke_one(tg, [&](){need_frechet = CudaMath::cuda_abs(frechet_beta) > DataType(0);});
+        tg.sync();
+
+
+        if(need_streamline) //need streamdiff?
+        {
+          cg::invoke_one(tg, [&]() {mean_v = DataType(0);});
+          //set domain point to barycenter, which is zero for Hypercubes
+          // NewSpaceHelp::_map_point(img_point, barycenter, local_coeffs);
+          //only reserve memory for reference values
+          cg::invoke_one(tg, [&](){ const VecValueType bc(0);
+                                    SpaceHelp::eval_ref_values(basis_data, bc);
+                                    SpaceHelp::trans_values(basis_data);});
+
+          tg.sync();
+
+          for(int idx = t_idx; idx < num_loc_dofs; idx += g_size)
+          {
+            VoxelAssembly::template grouped_axpy<DataType, cg::thread_group, dim>(tg, &mean_v[0], basis_data.phi[idx].value, &local_conv_dofs[idx*dim]);
+          }
+
+          tg.sync();
+
+          DataType local_norm_v = mean_v.norm_euclid();
+
+          if(local_norm_v > tol_eps)
+          {
+            cg::invoke_one(tg, [&](){
+              const DataType local_h = SpaceHelp::width_directed(mean_v, local_coeffs) * local_norm_v;
+              const DataType local_re = (local_norm_v * local_h) / sd_nu;
+              local_delta = sd_delta * (local_h / sd_v_norm) * (DataType(2) * local_re) / (DataType(1) + local_re);
+            });
+          }
+        }
+
+        tg.sync();
+
+
+        for(int cub_ind = 0; cub_ind < num_cubs; ++cub_ind)
+        {
+          cg::invoke_one(tg, [&](){dom_point = cub_pt[cub_ind];
+                                  SpaceHelp::eval_ref_values(basis_data, dom_point);
+                                  SpaceHelp::trans_values(basis_data);});
+          // NewSpaceHelp::_map_point(img_point, dom_point, local_coeffs);//not needed?
+          tg.sync();
+          SpaceHelp::grouped_calc_jac_mat(tg, loc_jac, dom_point, &local_coeffs[0][0]);
+          tg.sync();
+          cg::invoke_one(tg, [&](){det = loc_jac.det();
+          weight = det * cub_wg[cub_ind];});
+          tg.sync();
+          loc_jac_inv.grouped_set_inverse(tg, loc_jac, det);
+          tg.sync();
+          cg::invoke_one(tg, [&](){
+                                  SpaceHelp::eval_ref_gradients(basis_data, dom_point);
+                                  SpaceHelp::trans_gradients(basis_data, loc_jac_inv);});
+
+          tg.sync();
+          if(need_convection || need_streamline) // need streamdiff or convection?
+          {
+            VoxelAssembly::coalesced_format(tg, &loc_v[0], dim);
+            tg.sync();
+
+            for(int idx = t_idx; idx < num_loc_dofs; idx += g_size)
+            {
+              VoxelAssembly::template grouped_axpy<DataType, cg::thread_group, dim>(tg, &loc_v[0], basis_data.phi[idx].value, &local_conv_dofs[idx*dim]);
+            }
+            // tg.sync();
+          }
+
+          if(need_frechet)
+          {
+            VoxelAssembly::coalesced_format(tg, &loc_grad_v[0][0], dim*dim);
+            tg.sync();
+            for(int i = t_idx; i < num_loc_dofs; i += g_size)
+            {
+              VoxelAssembly::grouped_add_outer_product(tg, &loc_grad_v[0][0], &local_conv_dofs[i*dim], basis_data.phi[i].grad);
+            }
+            // tg.sync();
+          }
+
+          if(need_streamline) // need streamdiff?
+          {
+            tg.sync();
+            for(int i = t_idx; i < num_loc_dofs; i += g_size)
+            {
+              streamdiff_coeffs[i] = Tiny::dot(loc_v, basis_data.phi[i].grad);
+            }
+            // tg.sync();
+          }
+
+          tg.sync();
+
+          for(int idx = t_idx; idx < loc_assemble_size; idx += g_size)
+          {
+            // the thread local test and trial function indices
+            const int i = (idx+assemble_offset) / num_loc_dofs;
+            const int j = (idx+assemble_offset) % num_loc_dofs;
+
+            if(deformation)
+            {
+              // compute scalar value
+              const DataType value = nu * weight * Tiny::dot(basis_data.phi[i].grad, basis_data.phi[j].grad);
+
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_outer_product(basis_data.phi[j].grad, basis_data.phi[i].grad, nu * weight);
+            }
+            else
+            {
+              // compute scalar value
+              const DataType value = nu * weight * Tiny::dot(basis_data.phi[i].grad, basis_data.phi[j].grad);
+
+              // update local matrix
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+            }
+
+            if(need_convection) // assemble convection?
+            {
+              // compute scalar value
+              const DataType value = beta * weight * basis_data.phi[i].value * VoxelAssembly::dot(basis_data.phi[j].grad, &loc_v[0]);
+
+              // update local matrix
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+            }
+
+            // assemble convection Frechet?
+            if(need_frechet)
+            {
+              // compute scalar value
+              const DataType value = frechet_beta * weight * basis_data.phi[i].value * basis_data.phi[j].value;
+
+              // update local matrix
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->axpy(value, loc_grad_v);
+            }
+
+            // assemble reaction?
+            #ifdef __CUDACC__
+            if(CudaMath::cuda_abs(theta) > DataType(0))
+            #else
+            if(Math::abs(theta) > DataType(0))
+            #endif
+            {
+              // compute scalar value
+              const DataType value = theta * weight *  basis_data.phi[i].value * basis_data.phi[j].value;
+
+              // update local matrix
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+            }
+
+            // assemble streamline diffusion?
+            if((need_streamline) && (local_delta > tol_eps))
+            {
+              // compute scalar value
+              const DataType value = local_delta * weight * streamdiff_coeffs[i] * streamdiff_coeffs[j];
+
+              // update local matrix
+              ((Tiny::Matrix<DataType, dim, dim>*)(loc_mat + dim*dim*idx))->add_scalar_main_diag(value);
+            }
+          }
+        // next cubature point
+        }
+      }
+      #endif
 
       /**
        * \brief Burgers Vector assembly kernel
@@ -468,6 +1042,161 @@ namespace FEAT
         // next cubature point
         }
       }
+
+      #ifdef __CUDACC__
+      template<typename ThreadGroup_, typename SpaceHelp_>
+      CUDA_DEVICE void grouped_burgers_defect_assembly_kernel(const ThreadGroup_& tg, BurgersSharedDataKernelWrapper<SpaceHelp_>* shared_wrapper, int loc_assemble_size, int assemble_offset,
+                                          typename SpaceHelp_::DataType* loc_vec, const typename SpaceHelp_::DataType* local_prim_dofs, const typename SpaceHelp_::DataType* local_conv_dofs,
+                                          const Tiny::Matrix<typename SpaceHelp_::DataType, SpaceHelp_::dim, SpaceHelp_::num_verts>& local_coeffs,
+                                          const typename SpaceHelp_::DomainPointType* cub_pt, const typename SpaceHelp_::DataType* cub_wg, const int num_cubs,
+                                          const VoxelAssembly::AssemblyBurgersData<typename SpaceHelp_::DataType>& burgers_params,
+                                          const bool need_convection)
+      {
+        typedef SpaceHelp_ SpaceHelp;
+        constexpr int dim = SpaceHelp::dim;
+        typedef typename SpaceHelp::SpaceType SpaceType;
+        typedef typename SpaceHelp::DataType DataType;
+        const int t_idx = tg.thread_rank();
+        const int g_size = tg.num_threads();
+
+        const DataType& nu{burgers_params.nu};
+        const DataType& theta{burgers_params.theta};
+        const DataType& beta{burgers_params.beta};
+        // const DataType& frechet_beta{burgers_params.frechet_beta};
+        // const DataType& sd_delta{burgers_params.sd_delta};
+        // const DataType& sd_nu{burgers_params.sd_nu};
+        // const DataType& sd_v_norm{burgers_params.sd_v_norm};
+        const bool& deformation{burgers_params.deformation};
+
+        // #ifdef __CUDACC__
+        // const DataType tol_eps = CudaMath::cuda_get_sqrt_eps<DataType>();
+        // #else
+        // const DataType tol_eps = Math::sqrt(Math::eps<DataType>());
+        // #endif
+
+        // #ifdef __CUDACC__
+        // const bool need_streamline = (CudaMath::cuda_abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = CudaMath::cuda_abs(beta) > DataType(0);
+        // #else
+        // const bool need_streamline = (Math::abs(sd_delta) > DataType(0)) && (sd_v_norm > tol_eps);
+        // const bool need_convection = Math::abs(beta) > DataType(0);
+        // #endif
+
+
+        //define local sizes
+        constexpr int num_loc_dofs = SpaceType::DofMappingType::dof_count;
+        //get number of nodes per element
+        // constexpr int num_loc_verts = SpaceType::MeshType::template IndexSet<dim, 0>::Type::num_indices;
+        // define local arrays
+        typedef BurgersSharedDataKernelWrapper<SpaceHelp> BSDKWrapper;
+        typename SpaceHelp::JacobianMatrixType& loc_jac = shared_wrapper->loc_jac;
+        typename SpaceHelp::JacobianMatrixType& loc_jac_inv = shared_wrapper->loc_jac_inv;
+
+        DataType& det = shared_wrapper->det;
+        DataType& weight = shared_wrapper->weight;
+        typename SpaceHelp::EvalData& basis_data = shared_wrapper->basis_data;
+        // local vector and matrix defines
+        typedef Tiny::Vector<DataType, dim> VecValueType;
+        // typedef Tiny::Matrix<DataType, dim, dim> MatValueType;
+
+        VecValueType& loc_v = shared_wrapper->loc_v;
+
+        typename SpaceHelp::DomainPointType& dom_point = shared_wrapper->dom_point;
+
+        VoxelAssembly::coalesced_format(tg, (unsigned int*) shared_wrapper, sizeof(BSDKWrapper)/(sizeof(unsigned int)));
+        tg.sync();
+        // 4 threads should work on one entry, requires block size to be mutliple of 4
+        cg::thread_block_tile<1> tile4 = cg::tiled_partition<1>(tg);
+
+        for(int cub_ind = 0; cub_ind < num_cubs; ++cub_ind)
+        {
+          tg.sync();
+          cg::invoke_one(tg, [&](){dom_point = cub_pt[cub_ind];
+                                  SpaceHelp::eval_ref_values(basis_data, dom_point);
+                                  SpaceHelp::trans_values(basis_data);});
+          // NewSpaceHelp::_map_point(img_point, dom_point, local_coeffs);//not needed?
+          tg.sync();
+          SpaceHelp::grouped_calc_jac_mat(tg, loc_jac, dom_point, &local_coeffs[0][0]);
+          tg.sync();
+          cg::invoke_one(tg, [&](){det = loc_jac.det();
+          weight = det * cub_wg[cub_ind];});
+          tg.sync();
+          loc_jac_inv.grouped_set_inverse(tg, loc_jac, det);
+          tg.sync();
+          cg::invoke_one(tg, [&](){
+                                  SpaceHelp::eval_ref_gradients(basis_data, dom_point);
+                                  SpaceHelp::trans_gradients(basis_data, loc_jac_inv);});
+
+          tg.sync();
+          if(need_convection) // need streamdiff or convection?
+          {
+            VoxelAssembly::coalesced_format(tg, &loc_v[0], dim);
+            tg.sync();
+
+            for(int idx = t_idx; idx < num_loc_dofs; idx += g_size)
+            {
+              VoxelAssembly::template grouped_axpy<DataType, cg::thread_group, dim>(tg, &loc_v[0], basis_data.phi[idx].value, &local_conv_dofs[idx*dim]);
+            }
+          }
+          tg.sync();
+
+
+          for(int idx = tile4.meta_group_rank(); idx < loc_assemble_size*dim; idx += tile4.meta_group_size())
+          {
+            // compute scalar value
+            DataType val = DataType(0);
+            // the thread local test function index
+            const int i = (idx/dim+assemble_offset);
+            const int ii = idx%dim;
+            if(deformation)
+            {
+              for(int j = tile4.thread_rank(); j < num_loc_dofs; j += tile4.size())
+              {
+                // compute scalar values
+                val += nu * weight * (Tiny::dot(basis_data.phi[i].grad, basis_data.phi[j].grad) * local_prim_dofs[j*dim + ii]
+                      + Tiny::dot(((Tiny::Vector<DataType, dim>*)local_prim_dofs)[j], basis_data.phi[i].grad) * basis_data.phi[j].grad[ii]);
+              }
+            }
+            else
+            {
+              for(int j = tile4.thread_rank(); j < num_loc_dofs; j += tile4.size())
+              {
+                // compute scalar values
+                val += nu * weight * Tiny::dot(basis_data.phi[i].grad, basis_data.phi[j].grad) * local_prim_dofs[j*dim + ii];
+              }
+            }
+
+            if(need_convection) // assemble convection?
+            {
+              for(int j = tile4.thread_rank(); j < num_loc_dofs; j += tile4.size())
+              {
+                // compute scalar values
+                val += beta * weight * basis_data.phi[i].value * Tiny::dot(loc_v, basis_data.phi[j].grad) * local_prim_dofs[j*dim + ii];
+              }
+            }
+
+            // assemble reaction?
+            #ifdef __CUDACC__
+            if(CudaMath::cuda_abs(theta) > DataType(0))
+            #else
+            if(Math::abs(theta) > DataType(0))
+            #endif
+            {
+              for(int j = tile4.thread_rank(); j < num_loc_dofs; j += tile4.size())
+              {
+                // compute scalar values
+                val += theta * weight *  basis_data.phi[i].value * basis_data.phi[j].value * local_prim_dofs[j*dim + ii];
+              }
+            }
+            // reduce result and store value with async call
+            // tile4.sync();
+            cuda::atomic_ref<DataType, cuda::thread_scope_block> a_ref(*(loc_vec+idx));
+            cg::reduce_update_async(tile4, a_ref, val, cg::plus<DataType>());
+          }
+        // next cubature point
+        }
+      }
+      #endif
     } // namespace Kernel
 
     namespace Arch
@@ -491,6 +1220,10 @@ namespace FEAT
        * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
+       * \param[in] shared_mem Shared memory to be used.
+       * \param[in] blocksize The thread blocksize working on one element at the same time.
+       * \param[in] gridsize The gridsize to be used. Has to be sufficiently large to support enough parallelity.
+       * \param[in] print_occupancy Print occupancy to std::cout. For debbugging purposes.
        */
       template<typename Space_, typename DT_, typename IT_>
       void assemble_burgers_csr(const Space_& space,
@@ -500,7 +1233,8 @@ namespace FEAT
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
               const std::vector<int*>& coloring_maps,
               const std::vector<Index>& coloring_map_sizes,
-              DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params);
+              DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
+              int shared_mem, int blocksize, int gridsize, bool print_occupancy);
 
       /**
        * \brief Device kernel wrapper for the defect burgers assembler.
@@ -521,6 +1255,10 @@ namespace FEAT
        * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
+       * \param[in] shared_mem Shared memory to be used.
+       * \param[in] blocksize The thread blocksize working on one element at the same time.
+       * \param[in] gridsize The gridsize to be used. Has to be sufficiently large to support enough parallelity.
+       * \param[in] print_occupancy Print occupancy to std::cout. For debbugging purposes.
        */
       template<typename Space_, typename DT_, typename IT_>
       void assemble_burgers_defect(const Space_& space,
@@ -531,7 +1269,8 @@ namespace FEAT
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
               const std::vector<int*>& coloring_maps,
               const std::vector<Index>& coloring_map_sizes,
-              DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params);
+              DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
+              int shared_mem, int blocksize, int gridsize, bool print_occupancy);
 
       /**
        * \brief Device kernel wrapper for the local sd_v_norm calculation.
@@ -714,8 +1453,21 @@ namespace FEAT
       /// Streamline diffosuion viscosity. Generally equal to nu.
       DataType sd_nu;
 
-      /// The currecnt maximum velocity norm.
+      /// The current maximum velocity norm.
       DataType sd_v_norm;
+
+      // variables controlling cuda kernel launch
+      /// how much shared memory should the kernel use
+      int shared_mem;
+
+      /// the grid size to be used
+      int gridsize;
+
+      /// the block size to be used
+      int blocksize;
+
+      /// print out occupancy
+      bool print_occupancy;
 
       /// Should we use full deformation formulation?
       bool deformation;
@@ -739,16 +1491,18 @@ namespace FEAT
       explicit VoxelBurgersAssembler(const SpaceType& space, const ColoringType_& coloring, int hint = -1) :
       mesh_data(space, coloring, hint),
       nu(DataType(0)), theta(DataType(0)), beta(DataType(0)), frechet_beta(DataType(0)), sd_delta(DataType(0)),
-      sd_nu(DataType(0)), sd_v_norm(DataType(0)), deformation(true)
+      sd_nu(DataType(0)), sd_v_norm(DataType(0)), shared_mem(0), gridsize(1), blocksize(32), print_occupancy(false),  deformation(true)
       {
         #ifdef FEAT_HAVE_CUDA
         #ifdef DEBUG
-        std::cout << "Setting cache per thread up to meet debug demands!" << std::endl;
-        if constexpr(dim == 3)
-          Util::cuda_set_max_cache_thread(8096u * sizeof(DataType));
-        else
-          Util::cuda_set_max_cache_thread(1012u * sizeof(DataType));
+        const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
+        const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
+        if(stack_limit < stack_limit_target)
+          Util::cuda_set_max_cache_thread(stack_limit_target);
         #endif
+        // set kernel launch parameters
+        int target_elements = SpaceType::DofMappingType::dof_count * (dim == 3 ? (SpaceType::DofMappingType::dof_count/2+1) : SpaceType::DofMappingType::dof_count);
+        set_kernel_launch_params(target_elements, blocksize);
         #endif
       }
 
@@ -917,7 +1671,10 @@ namespace FEAT
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
-        VoxelAssembly::Arch::template assemble_burgers_csr(space, mat_data, vec_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, burgers_params);
+        VoxelAssembly::Arch::template assemble_burgers_csr(space, mat_data, vec_data, d_cub_data,
+                                                        d_mapping_data, mesh_data.get_coloring_maps(),
+                                                        mesh_data.get_color_map_sizes(), alpha, burgers_params,
+                                                        shared_mem, blocksize, gridsize, print_occupancy);
         Util::cuda_free(cub_wg_device);
         Util::cuda_free(cub_pt_device);
       }
@@ -942,7 +1699,9 @@ namespace FEAT
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
-        VoxelAssembly::Arch::template assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, burgers_params);
+        VoxelAssembly::Arch::template assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
+                                                              mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, burgers_params,
+                                                              shared_mem, 32, gridsize, print_occupancy);
         Util::cuda_free(cub_wg_device);
         Util::cuda_free(cub_pt_device);
       }
@@ -956,6 +1715,33 @@ namespace FEAT
       void set_sd_v_norm_cuda(const Global::Vector<LAFEM::DenseVectorBlocked<DataType, IndexType, dim>, LAFEM::VectorMirror<DataType, IndexType>>& convect)
       {
         this->sd_v_norm = VoxelAssembly::Arch::get_sd_v_norm(convect);
+      }
+
+      /// Sets kernel launch parameters based on local block dofs to be assembled by one threadblock in parallel
+      void set_kernel_launch_params(int target_elements, int blocksize_)
+      {
+        const int max_shared_mem = int(Util::cuda_get_shared_mem_per_sm());
+        const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());
+        const int max_sm_per_device = int(Util::cuda_get_sm_count());
+
+        // const int max_shared_mem_per_block = max_shared_mem/max_blocks_per_sm;
+
+        // get the size of all necessary shared memory
+        // constexpr int dim = SpaceType::ShapeType::dimension;
+        // constexpr int num_loc_dofs = SpaceType::DofMappingType::dof_count;
+        constexpr int element_size = dim*dim*int(sizeof(DataType));
+        constexpr int shared_size_nec = sizeof(VoxelAssembly::BurgersSharedDataGlobalWrapper<VoxelAssembly::SpaceHelper<SpaceType, DataType, IndexType>>) + sizeof(VoxelAssembly::BurgersSharedDataKernelWrapper<VoxelAssembly::SpaceHelper<SpaceType, DataType, IndexType>>);
+
+        // our kernel gets the maximal number of local blocks itself, so we just provide the best feasible memory
+        shared_mem = Math::max(shared_mem, shared_size_nec + target_elements * element_size);
+        // XASSERTM(shared_mem < 48000, "Shared mem per block to large without special opt in. To be implemented yet.");
+        XASSERTM(shared_mem < max_shared_mem, "Targeted shared memory is " + stringify(shared_mem) + "B but Hardware only supports " + stringify(max_shared_mem) + " shared memory.");
+        blocksize = blocksize_;
+        const int max_color_sizes = int(mesh_data.get_max_color_size());
+        // spawn enough thread blocks to either handle all elements of a color simultaneously or to have enough
+        // thread blocks to have all sms working
+        // this should be minimal, due to overhead of thread spawning...
+        gridsize = std::min(int(max_color_sizes), 2*max_sm_per_device*(max_blocks_per_sm/(int(blocksize)/32)));
       }
 
 

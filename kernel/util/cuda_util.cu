@@ -8,7 +8,6 @@
 #include <kernel/util/cuda_util.hpp>
 #include <kernel/util/half.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include "cuda_profiler_api.h"
 
@@ -25,6 +24,8 @@ Index FEAT::Util::cuda_blocksize_axpy = 256;
 Index FEAT::Util::cuda_blocksize_scalar_assembly = 256;
 Index FEAT::Util::cuda_blocksize_blocked_assembly = 128;
 Index FEAT::Util::cuda_blocksize_vanka_assembly = 64;
+
+int FEAT::Util::cuda_device_number = 0;
 
 cusparseHandle_t FEAT::Util::Intern::cusparse_handle;
 cublasHandle_t FEAT::Util::Intern::cublas_handle;
@@ -151,12 +152,12 @@ void FEAT::Util::cuda_free_host(void * address)
 void FEAT::Util::cuda_initialize(int rank, int /*ranks_per_node*/, int /*ranks_per_uma*/, int gpus_per_node)
 {
   /// \todo enable non cuda ranks and ensure balance of ranks per numa section
-  int device = rank % gpus_per_node;
-  if (cudaSuccess != cudaSetDevice(device))
+  FEAT::Util::cuda_device_number = rank % gpus_per_node;
+  if (cudaSuccess != cudaSetDevice(cuda_device_number))
     throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDevice failed!");
 
   int mm_support = 0;
-  if (cudaSuccess != cudaDeviceGetAttribute(&mm_support, cudaDevAttrManagedMemory, device))
+  if (cudaSuccess != cudaDeviceGetAttribute(&mm_support, cudaDevAttrManagedMemory, cuda_device_number))
     throw InternalError(__func__, __FILE__, __LINE__, "cudaGetAttribute failed!");
   XASSERTM(mm_support == 1, "selected cuda device does not support managed memory!");
 
@@ -385,6 +386,15 @@ String FEAT::Util::cuda_get_visible_devices()
   return result;
 }
 
+std::size_t Util::cuda_get_max_cache_thread()
+{
+  std::size_t value = 0;
+  auto status = cudaDeviceGetLimit(&value, cudaLimit::cudaLimitStackSize);
+  if(cudaSuccess != status)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSetLimit failed!");
+  return value;
+}
+
 void FEAT::Util::cuda_set_max_cache_thread(const std::size_t bytes)
 {
   std::size_t value = bytes;
@@ -406,4 +416,37 @@ void FEAT::Util::cuda_start_profiling()
 void FEAT::Util::cuda_stop_profiling()
 {
   cudaProfilerStop();
+}
+
+std::size_t FEAT::Util::cuda_get_shared_mem_per_sm()
+{
+  int max_shared_mem_sm = 0;
+  if(cudaDeviceGetAttribute(&max_shared_mem_sm, cudaDevAttrMaxSharedMemoryPerMultiprocessor, Util::cuda_device_number) != cudaSuccess)
+  {
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetAttribute failed!");
+  }
+  return std::size_t(max_shared_mem_sm);
+
+}
+
+std::size_t FEAT::Util::cuda_get_max_blocks_per_sm()
+{
+  int max_blocks_per_sm = 0;
+  if(cudaDeviceGetAttribute(&max_blocks_per_sm, cudaDevAttrMaxBlocksPerMultiprocessor, Util::cuda_device_number) != cudaSuccess)
+  {
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetAttribute failed!");
+  }
+  return std::size_t(max_blocks_per_sm);
+
+}
+
+std::size_t FEAT::Util::cuda_get_sm_count()
+{
+  int max_sm_per_device = 0;
+  if(cudaDeviceGetAttribute(&max_sm_per_device, cudaDevAttrMultiProcessorCount, Util::cuda_device_number) != cudaSuccess)
+  {
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetAttribute failed!");
+  }
+  return std::size_t(max_sm_per_device);
+
 }

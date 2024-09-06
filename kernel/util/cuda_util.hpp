@@ -12,6 +12,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
+#include <kernel/util/exception.hpp>
 
 #ifdef __CUDACC__
 #include <cusparse_v2.h>
@@ -42,6 +43,9 @@ namespace FEAT
 #endif
     }
     /// \endcond
+
+    /// The device number this process uses
+    extern int cuda_device_number;
 
     /// cuda threading grid blocksize for miscellaneous ops
     extern Index cuda_blocksize_misc;
@@ -89,9 +93,29 @@ namespace FEAT
     int cuda_get_device_count();
     int cuda_get_device_id();
     String cuda_get_visible_devices();
+    std::size_t cuda_get_max_cache_thread();
     void cuda_set_max_cache_thread(const std::size_t bytes);
     void cuda_start_profiling();
     void cuda_stop_profiling();
+    std::size_t cuda_get_shared_mem_per_sm();
+    std::size_t cuda_get_max_blocks_per_sm();
+    std::size_t cuda_get_sm_count();
+
+    #ifdef __CUDACC__
+    /// returns the number of active blocks of size blocksize for a given cuda kernel T
+    /// for this to work, you have to be in teh compile unit of the targeted kernel, i.e.
+    /// in the .cu file itself
+    template<typename T>
+    inline int cuda_get_occupancy(T kernel_func, int blocksize, int shared_memory = 0)
+    {
+      int num_blocks = 0;
+      if(cudaOccupancyMaxActiveBlocksPerMultiprocessor(&num_blocks, kernel_func, blocksize, shared_memory) != cudaSuccess)
+      {
+        throw InternalError(__func__, __FILE__, __LINE__, "cudaOccupancyMaxActiveBlockPerMultiprocessor failed!");
+      }
+      return num_blocks;
+    }
+    #endif
   }
 }
 #endif // FEAT_HAVE_CUDA

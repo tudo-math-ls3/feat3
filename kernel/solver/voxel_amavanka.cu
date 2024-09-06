@@ -193,7 +193,7 @@ namespace FEAT
               local_t[i*stride+j] = local[i*stride+j];
 
           // invert matrix
-          CudaMath::invert_matrix(nrc.first, stride, local, pivot);
+          CudaMath::cuda_invert_matrix(nrc.first, stride, local, pivot);
 
           // compute (squared) Frobenius norm of (I - A*A^{-1})
           DataType norm = DataType(0);
@@ -238,7 +238,7 @@ namespace FEAT
                                                                                                   max_degree_wrapper.max_degree_dofs, Index(0), Index(0),
                                                                                                  Index(0), Index(0));
           // invert matrix
-          CudaMath::invert_matrix(nrc.first, stride, local, pivot);
+          CudaMath::cuda_invert_matrix(nrc.first, stride, local, pivot);
 
           Intern::VoxelAmaVankaCore::template scatter_add<DT_, IT_, n_, uniform_macros_>(vanka_wrap, local, stride, imacro, macro_dofs_wrapper.macro_dofs,
                                                  max_degree_wrapper.max_degree_dofs, Index(0), Index(0),

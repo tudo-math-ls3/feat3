@@ -105,6 +105,11 @@ namespace FEAT
         return coloring_data.get_color_sizes();
       }
 
+      Index get_max_color_size() const
+      {
+        return coloring_data.get_max_color_size();
+      }
+
     protected:
       //Container has to be sortable and a and b have to be sorted beforhand....
       template<typename ITX_>

@@ -10,10 +10,13 @@ static_assert(false, "Tyring to include a cuh header in a non nvcc compile unit!
 
 // for numerical limits
 #include <float.h>
-
+#include <cooperative_groups.h>
+#include <cooperative_groups/reduce.h>
 #ifdef FEAT_HAVE_HALFMATH
 #include "cuda_fp16.h"
 #endif
+
+namespace cg = cooperative_groups;
 
 namespace FEAT
 {
@@ -144,122 +147,6 @@ namespace FEAT
       return __habs(val);
     }
     #endif
-
-    /** \brief Calculates the absolute value.
-     *
-     * \tparam DT_ The used dataytpe.
-     *
-     * \param[in] val The value in.
-     *
-     * \return The value of |val|.
-     */
-    template<typename DT_, typename IT_>
-    __host__ __device__ DT_ cuda_invert_matrix(const IT_ n, const IT_ stride, DT_* __restrict__ a, IT_* __restrict__ p)
-    {
-      // make sure that the parameters are valid
-      if((n <= IT_(0)) || (stride < n) || (a == nullptr) || (p == nullptr))
-        return DT_(0);
-
-      // invert 1x1 explicitly
-      if(n == IT_(1))
-      {
-        DT_ det = a[0];
-        a[0] = DT_(1) / det;
-        return det;
-      }
-
-      // initialize identity permutation
-      for(IT_ i(0); i < n; ++i)
-      {
-        p[i] = i;
-      }
-
-      // initialize determinant to 1
-      DT_ det = DT_(1);
-
-      // primary column elimination loop
-      for(IT_ k(0); k < n; ++k)
-      {
-        // step 1: find a pivot for the elimination of column k
-        {
-          // for this, we only check the rows p[j] with j >= k, as all
-          // rows p[j] with j < k have already been eliminated and are
-          // therefore not candidates for pivoting
-          DT_ pivot = abs(a[p[k]*stride + p[k]]);
-          IT_ i = k;
-
-          // loop over all unprocessed rows
-          for(IT_ j(k+1); j < n; ++j)
-          {
-            // get our matrix value and check whether it can be a pivot
-            DT_ abs_val = abs(a[p[j]*stride + p[j]]);
-            if(abs_val > pivot)
-            {
-              pivot = abs_val;
-              i = j;
-            }
-          }
-
-          // do we have to swap rows i and k?
-          if(i > k)
-          {
-            // swap rows "virtually" by exchanging their permutation positions
-            IT_ t = p[k];
-            p[k] = p[i];
-            p[i] = t;
-          }
-        }
-
-        // compute pivot row offset
-        const IT_ pk_off = p[k]*stride;
-
-        // step 2: process pivot row
-        {
-          // update determinant by multiplying with the pivot element
-          det *= a[pk_off + p[k]];
-
-          // get our inverted pivot element
-          const DT_ pivot = DT_(1) / a[pk_off + p[k]];
-
-          // replace column entry by unit column entry
-          a[pk_off + p[k]] = DT_(1);
-
-          // divide the whole row by the inverted pivot
-          for(IT_ j(0); j < n; ++j)
-          {
-            a[pk_off+j] *= pivot;
-          }
-        }
-
-        // step 3: eliminate pivot column
-
-        // loop over all rows of the matrix
-        for(IT_ i(0); i < n; ++i)
-        {
-          // skip the pivot row
-          if(i == p[k])
-            continue;
-
-          // compute row and pivot offsets
-          const IT_ row_off = i*stride;
-
-          // fetch elimination factor
-          const DT_ factor =  a[row_off + p[k]];
-
-          // replace by unit column entry
-          a[row_off + p[k]] = DT_(0);
-
-          // process the row
-          for(IT_ j(0); j < n; ++j)
-          {
-            a[row_off + j] -= a[pk_off + j] * factor;
-          }
-        }
-      }
-
-      // return determinant
-      return det;
-    }
 
     /**
      * \brief Checks if a value is normal.
@@ -712,7 +599,7 @@ namespace FEAT
     #endif
 
     template<typename DT_, typename IT_>
-    __host__ __device__ inline DT_ invert_matrix(const IT_ n, const IT_ stride, DT_* __restrict__ a, IT_* __restrict__ p)
+    __host__ __device__ inline DT_ cuda_invert_matrix(const IT_ n, const IT_ stride, DT_* __restrict__ a, IT_* __restrict__ p)
     {
       #ifndef __CUDA_ARCH__
       // make sure that the parameters are valid
@@ -822,6 +709,166 @@ namespace FEAT
       // return determinant
       return det;
     }
+
+
+    // only callable by a coalesced, i.e. a sub warp group...
+    template<typename DT_, typename IT_>
+    __device__ __forceinline__ DT_ cuda_grouped_invert_matrix(const cg::coalesced_group& tg, const int n, const int stride, DT_* __restrict__ a, IT_* __restrict__ p)
+    {
+      const int idx = tg.thread_rank();
+      const int g_size = tg.num_threads();
+
+      // initialize identity permutation
+      for(int i = idx; i < n; i += g_size)
+      {
+        p[i] = i;
+      }
+
+      // initialize determinant to 1
+      DT_ det = DT_(1);
+
+      // all threads work on one column, the could be more leeways to optimize by red-balck strategies
+      // we have to see...
+      for(int k = 0; k < n; ++k)
+      {
+        // step 1: use a sub-group to find the maximum diag pivot
+        {
+          for(int i = idx; (i < n); i += g_size)
+          {
+            auto active_g = cg::coalesced_threads();
+            int k_prob = CudaMath::cuda_max(i,k);
+            k_prob = reduce(active_g, k_prob,
+              [&](const int& v1, const int& v2) -> int
+              {return cuda_abs(a[p[v1]*stride + p[v1]]) >= cuda_abs(a[p[v2]*stride + p[v2]]) ?
+                                      v1 : v2;});
+            cg::invoke_one(active_g, [&](){
+              if((k_prob > k) && (cuda_abs(a[p[k_prob]*stride + p[k_prob]]) > cuda_abs(a[p[k]*stride + p[k]])))
+                cuda::std::swap(p[k], p[k_prob]);});
+            active_g.sync();
+          }
+        }
+        // wait for all threads to arrive
+        tg.sync();
+        // compute pivot row offset
+        const int pk_off = p[k]*stride;
+
+        // step 2: process pivot
+        {
+          // update determinant by multiplying with the pivot element
+          det *= a[pk_off + p[k]];
+
+          // get our inverted pivot element
+          const DT_ pivot = DT_(1) / a[pk_off + p[k]];
+
+          // replace column entry by unit column entry
+          cg::invoke_one(tg, [&](){
+                              a[pk_off + p[k]] = DT_(1);});
+          tg.sync();
+          // divide the whole row by the inverted pivot
+          for(int i = idx; i < n; i += g_size)
+          {
+            a[pk_off+i] *= pivot;
+          }
+        }
+
+        // step 3: eliminate pivot column
+
+        // loop over all rows of the matrix
+        for(int i = idx; i < n*n; i += g_size)
+        {
+          const int row = i/n;
+          const int col = i%n;
+          // skip the pivot row
+          if(row == p[k])
+            continue;
+
+          // compute row and pivot offsets
+          const int row_off = row*stride;
+
+          // fetch elimination factor
+          const DT_ factor =  a[row_off + p[k]];
+
+          // combine update and replace of unit column entry in one step
+          a[row_off + col] = (col == p[k] ? DT_(0) : a[row_off + col]) - a[pk_off + col] * factor;
+        }
+
+      }
+
+      // return determinant
+      return det;
+
+
+
+    }
+
+    template<typename DT_>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align();
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<double>()
+    {
+      return std::size_t(8u);
+    }
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<float>()
+    {
+      return std::size_t(4u);
+    }
+
+    #ifdef FEAT_HAVE_HALFMATH
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<Half>()
+    {
+      return std::size_t(2u);
+    }
+    #endif
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<std::int64_t>()
+    {
+      return std::size_t(8u);
+    }
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<std::uint64_t>()
+    {
+      return std::size_t(8u);
+    }
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<std::int32_t>()
+    {
+      return std::size_t(4u);
+    }
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<std::uint32_t>()
+    {
+      return std::size_t(4u);
+    }
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<std::int16_t>()
+    {
+      return std::size_t(2u);
+    }
+
+    template<>
+    __host__ __device__ constexpr inline std::size_t cuda_get_align<std::uint16_t>()
+    {
+      return std::size_t(2u);
+    }
+
+    /// this function returns the maximum alignment of the datatypes to allow for reinterpret casts
+    template<typename DT_, typename IT_>
+    __host__ __device__ constexpr inline std::size_t cuda_get_min_align()
+    {
+      return (cuda_get_align<DT_>() < cuda_get_align<IT_>()) ? cuda_get_align<DT_>() : cuda_get_align<IT_>();
+    }
+
+
+
   }
 }
 #endif // KERNEL_UTIL_CUDA_MATH_CUH

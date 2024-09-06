@@ -816,7 +816,78 @@ namespace FEAT
             coeffs[i][3] = DataType(0.25) * DataType( v0[i] - v1[i] - v2[i] + v3[i]);
           }
 
+          // #ifndef __CUDACC__
+          // for(int i(0); i < image_dim; ++i)
+          // {
+          //   for(int k(0); k < 4; ++k)
+          //   {
+          //     std::cout << "coeff i, k " << i << ", " << k << "  " << coeffs[i][k] << "\n";
+          //   }
+          // }
+          // #endif
+
         }
+
+        #ifdef __CUDACC__
+        template<typename ThreadGroup_, typename VertexSetType_, typename IndexSetType_>
+        CUDA_DEVICE static void __forceinline__ _group_gather_vertex_set(const ThreadGroup_& tg, typename VertexSetType_::VertexType* __restrict__ vn, const VertexSetType_& vertex_set, const IndexSetType_& index_set, const Index cell_index)
+        {
+          // use block strided access pattern
+          for(int i = tg.thread_rank(); i < num_verts; i += tg.num_threads())
+            vn[i] = vertex_set[index_set(cell_index, i)];
+        }
+
+        template<typename ThreadGroup_, typename VertexType_>
+        CUDA_DEVICE static void __forceinline__ _group_set_coeffs(const ThreadGroup_& tg, DataType* __restrict__ coeffs, const VertexType_* __restrict__ vn)
+        {
+          // calculate transformation coefficients
+          // j = _coeff[i][j] for all j = 0....7
+          // v = 0 + 1*x + 2*y + 3*z + x*y*4 + x*z*5 + y*z*6 + x*y*z*7
+          // there is simply no nice way to do this... still, it seems directly transmitting the coeffs could be more efficient...
+          for(int i = tg.thread_rank(); i < image_dim; i += tg.num_threads())
+          {
+            coeffs[4*i+0] = DataType(0.25) * DataType( vn[0][i] + vn[1][i] + vn[2][i] + vn[3][i]);
+            coeffs[4*i+1] = DataType(0.25) * DataType(-vn[0][i] + vn[1][i] - vn[2][i] + vn[3][i]);
+            coeffs[4*i+2] = DataType(0.25) * DataType(-vn[0][i] - vn[1][i] + vn[2][i] + vn[3][i]);
+            coeffs[4*i+3] = DataType(0.25) * DataType( vn[0][i] - vn[1][i] - vn[2][i] + vn[3][i]);
+          }
+        }
+        /**
+         * \brief Sets the coefficient vector based on the underlying standard transformation.
+         * This gather the respective data into shared memory for the whole group
+         *
+         * \tparam ThreadGroup_ The group type that gathers the coefficients
+         * \tparam VertexType_ The type of the vertex array.
+         * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
+         *
+         * \param[in] tg
+         * A reference to the thread group that shares the resulting array.
+         *
+         * \param[out] coeffs
+         * A two dimensional array holding the local coefficients of the trafo after the call.
+         *
+         * \param[in] index_tuple
+         * A mapping from local indices to global.
+         *
+         * \param[in] vertex_set
+         * A pointer to the beginnnig of the vertex set.
+         */
+        template<typename ThreadGroup_, typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_DEVICE static void inline grouped_set_coefficients(const ThreadGroup_& tg, DataType* coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, const IT_ cell_index)
+        {
+          typedef typename VertexSetType_::VertexType VertexType;
+          // get shared vertex set array
+          __shared__ VertexType vn[8];
+
+          _group_gather_vertex_set(tg, vn, vertex_set, index_set, cell_index);
+
+          tg.sync();
+
+          _group_set_coeffs(tg, coeffs, vn);
+
+          tg.sync();
+        }
+        #endif
 
         /**
          * \brief Maps a point from the reference cell to the selected cell.
@@ -859,6 +930,42 @@ namespace FEAT
             jac_mat(i,1) = coeffs[i][2] + dom_point[0] * coeffs[i][3];
           }
         }
+
+        #ifdef __CUDACC__
+        /**
+         * \brief Calculates the jacobian matrix for a given point for a whole cooperative group.
+         *
+         * \tparam ThreadGroup_ The cooperative group, that performs this together.
+         *
+         * \param[in] tg
+         * A reference to the thread group object.
+         *
+         * \param[out] jac_mat
+         * A reference to the jacobian matrix that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell where the jacobian matrix is to be computed.
+         *
+         * \param[in] coeffs
+         * A two dimensional array holding the local coefficients of the trafo.
+         *
+         * \warning Does not synchronize itself!
+         */
+        template<typename ThreadGroup_>
+        CUDA_DEVICE static inline void grouped_calc_jac_mat(const ThreadGroup_& tg, JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType* coeffs)
+        {
+          for(int idx = tg.thread_rank(); idx < 2*image_dim; idx += tg.num_threads())
+          {
+            __builtin_assume(idx >= 0);
+            const int i = idx/image_dim;
+            const int curr = idx%image_dim;
+            // a bit of branch free magic, TODO: we could even start with
+            jac_mat(i,curr) = coeffs[i*num_verts + curr+1] + dom_point[1-curr] * coeffs[i*num_verts + 3];
+            // printf("jac mat i %i, curr %i, coeff ent %i, dom ent %i, coeff ent %i\n", i, curr, int(i*num_verts+curr+1), int(1-curr), int(i*num_verts+3));
+            // printf("domp i %i, dp %f, coeff 1 %f, coeff 2 %f\n", idx, dom_point[1-curr], coeffs[i*num_verts +curr+1], coeffs[i*num_verts+3]);
+          }
+        }
+        #endif
 
         /**
          * \brief Computes the hessian tensor for a given domain point.
@@ -1024,6 +1131,71 @@ namespace FEAT
 
         }
 
+        #ifdef __CUDACC__
+        template<typename ThreadGroup_, typename VertexSetType_, typename IndexSetType_>
+        CUDA_DEVICE static void __forceinline__ _group_gather_vertex_set(const ThreadGroup_& tg, typename VertexSetType_::VertexType* __restrict__ vn, const VertexSetType_& vertex_set, const IndexSetType_& index_set, const Index cell_index)
+        {
+          // use block strided access pattern
+          for(int i = tg.thread_rank(); i < num_verts; i += tg.num_threads())
+            vn[i] = vertex_set[index_set(cell_index, i)];
+        }
+
+        template<typename ThreadGroup_, typename VertexType_>
+        CUDA_DEVICE static void __forceinline__ _group_set_coeffs(const ThreadGroup_& tg, DataType* __restrict__ coeffs, const VertexType_* __restrict__ vn)
+        {
+          // calculate transformation coefficients
+          // j = _coeff[i][j] for all j = 0....7
+          // v = 0 + 1*x + 2*y + 3*z + x*y*4 + x*z*5 + y*z*6 + x*y*z*7
+          // there is simply no nice way to do this... still, it seems directly transmitting the coeffs could be more efficient...
+          for(int i = tg.thread_rank(); i < image_dim; i += tg.num_threads())
+          {
+            coeffs[8*i+0] = DataType(0.125) * DataType( + vn[0][i] + vn[1][i] + vn[2][i] + vn[3][i] + vn[4][i] + vn[5][i] + vn[6][i] + vn[7][i]);
+            coeffs[8*i+1] = DataType(0.125) * DataType( - vn[0][i] + vn[1][i] - vn[2][i] + vn[3][i] - vn[4][i] + vn[5][i] - vn[6][i] + vn[7][i]);
+            coeffs[8*i+2] = DataType(0.125) * DataType( - vn[0][i] - vn[1][i] + vn[2][i] + vn[3][i] - vn[4][i] - vn[5][i] + vn[6][i] + vn[7][i]);
+            coeffs[8*i+3] = DataType(0.125) * DataType( - vn[0][i] - vn[1][i] - vn[2][i] - vn[3][i] + vn[4][i] + vn[5][i] + vn[6][i] + vn[7][i]);
+            coeffs[8*i+4] = DataType(0.125) * DataType( + vn[0][i] - vn[1][i] - vn[2][i] + vn[3][i] + vn[4][i] - vn[5][i] - vn[6][i] + vn[7][i]);
+            coeffs[8*i+5] = DataType(0.125) * DataType( + vn[0][i] - vn[1][i] + vn[2][i] - vn[3][i] - vn[4][i] + vn[5][i] - vn[6][i] + vn[7][i]);
+            coeffs[8*i+6] = DataType(0.125) * DataType( + vn[0][i] + vn[1][i] - vn[2][i] - vn[3][i] - vn[4][i] - vn[5][i] + vn[6][i] + vn[7][i]);
+            coeffs[8*i+7] = DataType(0.125) * DataType( - vn[0][i] + vn[1][i] + vn[2][i] - vn[3][i] + vn[4][i] - vn[5][i] - vn[6][i] + vn[7][i]);
+          }
+        }
+        /**
+         * \brief Sets the coefficient vector based on the underlying standard transformation.
+         * This gather the respective data into shared memory for the whole group
+         *
+         * \tparam ThreadGroup_ The group type that gathers the coefficients
+         * \tparam VertexType_ The type of the vertex array.
+         * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
+         *
+         * \param[in] tg
+         * A reference to the thread group that shares the resulting array.
+         *
+         * \param[out] coeffs
+         * A two dimensional array holding the local coefficients of the trafo after the call.
+         *
+         * \param[in] index_tuple
+         * A mapping from local indices to global.
+         *
+         * \param[in] vertex_set
+         * A pointer to the beginnnig of the vertex set.
+         */
+        template<typename ThreadGroup_, typename VertexSetType_, typename IndexSetType_, typename IT_>
+        CUDA_DEVICE static void inline grouped_set_coefficients(const ThreadGroup_& tg, DataType* coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, const IT_ cell_index)
+        {
+          typedef typename VertexSetType_::VertexType VertexType;
+          // get shared vertex set array
+          __shared__ VertexType vn[8];
+
+          _group_gather_vertex_set(tg, vn, vertex_set, index_set, cell_index);
+
+          tg.sync();
+
+          _group_set_coeffs(tg, coeffs, vn);
+
+          tg.sync();
+        }
+        #endif
+
         /**
          * \brief Maps a point from the reference cell to the selected cell.
          *
@@ -1069,6 +1241,40 @@ namespace FEAT
             jac_mat(i,2) = coeffs[i][3] + dom_point[0] * coeffs[i][5] + dom_point[1] * (coeffs[i][6] + dom_point[0] * coeffs[i][7]);
           }
         }
+
+        #ifdef __CUDACC__
+        /**
+         * \brief Calculates the jacobian matrix for a given point for a whole cooperative group.
+         *
+         * \tparam ThreadGroup_ The cooperative group, that performs this together.
+         *
+         * \param[in] tg
+         * A reference to the thread group object.
+         *
+         * \param[out] jac_mat
+         * A reference to the jacobian matrix that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell where the jacobian matrix is to be computed.
+         *
+         * \param[in] coeffs
+         * A two dimensional array holding the local coefficients of the trafo.
+         *
+         * \warning Does not synchronize itself!
+         */
+        template<typename ThreadGroup_>
+        CUDA_DEVICE static inline void grouped_calc_jac_mat(const ThreadGroup_& tg, JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType* coeffs)
+        {
+          for(int idx = tg.thread_rank(); idx < 3*image_dim; idx += tg.num_threads())
+          {
+            __builtin_assume(idx >= 0);
+            const int i = idx/image_dim;
+            const int curr = idx%image_dim;
+            // a bit of branch free magic, TODO: we could even start with
+            jac_mat(i,curr) = coeffs[i*num_verts + curr+1] + dom_point[1-(curr+1)/2] * coeffs[i* num_verts + 4+curr/2] + dom_point[2-curr/2] * (coeffs[i*num_verts + 5+(curr+1)/2] + dom_point[1-(curr+1)/2] * coeffs[i*num_verts + 7]);
+          }
+        }
+        #endif
 
         /**
          * \brief Computes the hessian tensor for a given domain point.

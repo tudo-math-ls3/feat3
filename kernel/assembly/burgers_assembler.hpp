@@ -333,7 +333,6 @@ namespace FEAT
             else if(need_diff && deformation)
             {
               // assemble deformation-tensor diffusion
-
               // test function loop
               for(int i(0); i < num_loc_dofs; ++i)
               {
@@ -343,6 +342,8 @@ namespace FEAT
                   // compute inner product of grad(phi) and grad(psi)
                   const DataType value = nu * weight * Tiny::dot(space_data.phi[j].grad, space_data.phi[i].grad);
 
+                  // if(point == 1)
+                  //   printf("i %i j %i val %f\n", i, j, float(value));
                   // update local matrix
                   local_matrix[i][j].add_scalar_main_diag(value);
 
@@ -382,6 +383,7 @@ namespace FEAT
                   // compute scalar value
                   const DataType value = frechet_beta * weight * space_data.phi[i].value * space_data.phi[j].value;
 
+                  // printf("i %i, j %i, val %f\n", i, j, float(value));
                   // update local matrix
                   local_matrix[i][j].axpy(value, loc_grad_v);
                 }
@@ -423,7 +425,6 @@ namespace FEAT
                 }
               }
             }
-
             // continue with next cubature point
           }
 

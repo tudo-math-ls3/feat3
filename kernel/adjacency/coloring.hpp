@@ -356,6 +356,13 @@ namespace FEAT
         return _coloring_maps;
       }
 
+      /// Get max size of all colors
+      Index get_max_color_size() const
+      {
+        return Index(std::accumulate(_coloring_map_sizes.begin(), _coloring_map_sizes.end(), Index(0), [](Index a, Index b){return std::max(a,b);}));
+      }
+
+
       /**
        * \brief Fill in the coloring array
        *
@@ -367,7 +374,7 @@ namespace FEAT
         int num_colors = hint;
         if(hint < 0)
         {
-          num_colors = *std::max_element(coloring.begin(), coloring.end());
+          num_colors = *std::max_element(coloring.begin(), coloring.end()) + 1;
         }
         // fill tmp vector with coloring
         std::vector<std::vector<int>> tmp_vector;

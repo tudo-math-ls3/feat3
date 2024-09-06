@@ -1258,6 +1258,32 @@ namespace FEAT
         return *this;
       }
 
+      #ifdef __CUDACC__
+      /**
+       * \brief Sets this matrix to the inverse of another matrix.
+       *
+       * \warning This function only works for \p m_ = \p n_ and will intentionally fail to compile in any other case.
+       * \tparam ThreadGroup_ The active threadgroup.
+       *
+       * \param[in] tg
+       * A reference to the threadgroups.
+       * \param[in] a
+       * The matrix whose inverse is to be stored in this matrix.
+       * \param[in] det
+       * The determinant of the matrix.
+       *
+       * \returns \p *this
+       */
+      template<typename ThreadGroup_, int sma_, int sna_>
+      CUDA_HOST_DEVICE __forceinline__ Matrix& grouped_set_inverse(const ThreadGroup_& tg, const Matrix<T_, m_, n_, sma_, sna_>& a, const T_& det)
+      {
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
+        Intern::InverseHelper<m_, n_, sn_, sna_>::grouped_compute(tg, &this->v[0].v[0], &a.v[0].v[0], det);
+        return *this;
+      }
+      #endif
+
       /**
        * \brief Sets this matrix to the cofactor matrix of another matrix.
        *
@@ -2925,6 +2951,27 @@ namespace FEAT
           b[1*snb_+1] =  d*a[0*sna_+0];
           return det;
         }
+
+        #ifdef __CUDACC__
+        template<typename T_, typename ThreadGroup_>
+        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_& det)
+        {
+          //i think an if else cascade could do better than heavy modulo operations...
+          T_ d = T_(1) / det;
+
+          for(int idx = tg.thread_rank(); idx < 4; idx += tg.num_threads())
+          {
+            const int i = idx /2;
+            const int j = idx %2;
+            b[i*snb_+0] = ((i+j)==1 ? (-1) : (1)) * d * a[(1-j)*sna_+(1-i)];
+
+          }
+          b[0*snb_+0] =  d*a[1*sna_+1];
+          b[0*snb_+1] = -d*a[0*sna_+1];
+          b[1*snb_+0] = -d*a[1*sna_+0];
+          b[1*snb_+1] =  d*a[0*sna_+0];
+        }
+        #endif
       };
 
       template<int sna_, int snb_>
@@ -2949,6 +2996,51 @@ namespace FEAT
           b[2*snb_+2] = d*(a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0]);
           return det;
         }
+
+        #ifdef __CUDACC__
+        template<typename T_, typename ThreadGroup_>
+        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_& det)
+        {
+          // for(int i = tg.thread_rank(); i < 3; i += tg.num_threads())
+          // {
+          //   b[i*snb_+0] = a[1*sna_+1+i-3*(i/2)]*a[2*sna_+(2*(1-i+i/2))] - a[1*sna_+(2*(1-i+i/2))]*a[2*sna_+1+i-3*(i/2)];
+          // }
+          // tg.sync();
+          // T_ det = a[0*sna_+0]*b[0*snb_+0] + a[0*sna_+1]*b[1*snb_+0] + a[0*sna_+2]*b[2*snb_+0];
+          // T_ d = T_(1) / det;
+          // for(int idx = tg.thread_rank(); idx < 3; idx += tg.num_threads())
+          // {
+          //   const int i = idx/3;
+          //   const int j = idx%3;
+          //   b[i*snb_+j] = d*(a[()*sna_+1]*a[2*sna_+2] - a[1*sna_+2]*a[2*sna_+1])
+
+          // }
+          //i think an if else cascade could do better than heavy modulo operations...
+          T_ d = T_(1) / det;
+
+          for(int idx = tg.thread_rank(); idx < 9; idx += tg.num_threads())
+          {
+            if(idx == 0)
+              b[0*snb_+0] = d*(a[1*sna_+1]*a[2*sna_+2] - a[1*sna_+2]*a[2*sna_+1]);
+            else if(idx == 3)
+              b[1*snb_+0] = d*(a[1*sna_+2]*a[2*sna_+0] - a[1*sna_+0]*a[2*sna_+2]);
+            else if(idx == 6)
+              b[2*snb_+0] = d*(a[1*sna_+0]*a[2*sna_+1] - a[1*sna_+1]*a[2*sna_+0]);
+            else if(idx == 1)
+              b[0*snb_+1] = d*(a[0*sna_+2]*a[2*sna_+1] - a[0*sna_+1]*a[2*sna_+2]);
+            else if(idx == 4)
+              b[1*snb_+1] = d*(a[0*sna_+0]*a[2*sna_+2] - a[0*sna_+2]*a[2*sna_+0]);
+            else if(idx == 7)
+              b[2*snb_+1] = d*(a[0*sna_+1]*a[2*sna_+0] - a[0*sna_+0]*a[2*sna_+1]);
+            else if(idx == 2)
+              b[0*snb_+2] = d*(a[0*sna_+1]*a[1*sna_+2] - a[0*sna_+2]*a[1*sna_+1]);
+            else if(idx == 5)
+              b[1*snb_+2] = d*(a[0*sna_+2]*a[1*sna_+0] - a[0*sna_+0]*a[1*sna_+2]);
+            else if(idx == 8)
+              b[2*snb_+2] = d*(a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0]);
+          }
+        }
+        #endif
       };
 
       template<int sna_, int snb_>
@@ -2994,6 +3086,38 @@ namespace FEAT
           b[3*snb_+3] = d*( a[2*sna_+0]*w[3]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0]);
           return det;
         }
+
+        #ifdef __CUDACC__
+        template<typename T_, typename ThreadGroup_>
+        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
+        {
+          constexpr int n_ = 4;
+          // copy matrix a to b
+          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
+          {
+            const int row = i/n_;
+            const int col = i%n_;
+            b[row*snb_+col] = a[row*sna_+col];
+          }
+
+          // create shared pivot array
+          __shared__ int p[n_];
+          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
+          {
+            p[i] = 0;
+          }
+          tg.sync();
+          // call grouped invert from first warp subgroup
+          if(tg.thread_rank() < 32)
+          {
+            auto a_g = cg::coalesced_threads();
+
+            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
+          }
+          tg.sync();
+
+        }
+        #endif
       };
 
       template<int sna_, int snb_>
@@ -3087,6 +3211,38 @@ namespace FEAT
           b[4*snb_+4] = d*(-a[3*sna_+0]*w[16]+a[3*sna_+1]*w[13]-a[3*sna_+2]*w[11]+a[3*sna_+3]*w[10]);
           return det;
         }
+
+        #ifdef __CUDACC__
+        template<typename T_, typename ThreadGroup_>
+        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
+        {
+          constexpr int n_ = 5;
+          // copy matrix a to b
+          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
+          {
+            const int row = i/n_;
+            const int col = i%n_;
+            b[row*snb_+col] = a[row*sna_+col];
+          }
+
+          // create shared pivot array
+          __shared__ int p[n_];
+          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
+          {
+            p[i] = 0;
+          }
+          tg.sync();
+          // call grouped invert from first warp subgroup
+          if(tg.thread_rank() < 32)
+          {
+            auto a_g = cg::coalesced_threads();
+
+            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
+          }
+          tg.sync();
+
+        }
+        #endif
       };
 
       template<int sna_, int snb_>
@@ -3293,6 +3449,38 @@ namespace FEAT
           b[5*snb_+5] = d*( a[4*sna_+0]*w[10]-a[4*sna_+1]*w[6]+a[4*sna_+2]*w[3]-a[4*sna_+3]*w[1]+a[4*sna_+4]*w[0]);
           return det;
         }
+
+        #ifdef __CUDACC__
+        template<typename T_, typename ThreadGroup_>
+        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
+        {
+          constexpr int n_ = 6;
+          // copy matrix a to b
+          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
+          {
+            const int row = i/n_;
+            const int col = i%n_;
+            b[row*snb_+col] = a[row*sna_+col];
+          }
+
+          // create shared pivot array
+          __shared__ int p[n_];
+          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
+          {
+            p[i] = 0;
+          }
+          tg.sync();
+          // call grouped invert from first warp subgroup
+          if(tg.thread_rank() < 32)
+          {
+            auto a_g = cg::coalesced_threads();
+
+            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
+          }
+          tg.sync();
+
+        }
+        #endif
       };
 
       // generic square matrix inversion:
@@ -3321,6 +3509,37 @@ namespace FEAT
           return CudaMath::cuda_invert_matrix(n_, snb_, b, p);
           #endif
         }
+
+        #ifdef __CUDACC__
+        template<typename T_, typename ThreadGroup_>
+        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
+        {
+          // copy matrix a to b
+          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
+          {
+            const int row = i/n_;
+            const int col = i%n_;
+            b[row*snb_+col] = a[row*sna_+col];
+          }
+
+          // create shared pivot array
+          __shared__ int p[n_];
+          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
+          {
+            p[i] = 0;
+          }
+          tg.sync();
+          // call grouped invert from first warp subgroup
+          if(tg.thread_rank() < 32)
+          {
+            auto a_g = cg::coalesced_threads();
+
+            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
+          }
+          tg.sync();
+
+        }
+        #endif
       };
 
       template<int m_, int n_, int sna_, int snb_>

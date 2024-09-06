@@ -144,11 +144,10 @@ namespace FEAT
       {
         #ifdef FEAT_HAVE_CUDA
         #ifdef DEBUG
-        std::cout << "Setting cache per thread up to meet debug demands!" << std::endl;
-        if constexpr(dim == 3)
-          Util::cuda_set_max_cache_thread(8096u * sizeof(DataType));
-        else
-          Util::cuda_set_max_cache_thread(1012u * sizeof(DataType));
+        const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
+        const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
+        if(stack_limit < stack_limit_target)
+          Util::cuda_set_max_cache_thread(stack_limit_target);
         #endif
         #endif
       }
