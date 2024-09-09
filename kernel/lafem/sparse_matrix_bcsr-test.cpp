@@ -919,52 +919,25 @@ public:
       dv4(i, DT_(i-1));
     }
     SparseMatrixBCSR<DT_, IT_, 2, 3> b(2, 2, dv2, dv4, dv3);
-    SparseMatrixBCSR<DT_, IT_, 2, 3> c(a.layout());
     SparseMatrixBCSR<DT_, IT_, 2, 3> ref(a.layout());
+    SparseMatrixBCSR<DT_, IT_, 2, 3> ref2(a.layout());
 
     DT_ scal = DT_(1.234);
 
     for(Index i(0) ; i < ref.template used_elements<Perspective::pod>() ; ++i)
     {
       ref.template val<Perspective::pod>()[i] = scal * dv1(i) + dv4(i);
+      ref2.template val<Perspective::pod>()[i] = scal * dv4(i) + dv4(i);
     }
 
-    c.copy(b);
-    c.axpy(a, scal);
-    TEST_CHECK_EQUAL(c, ref);
+    // r != x
+    a.scale(a, scal);
+    a.axpy(b); /// \todo use axpby here
+    TEST_CHECK_EQUAL(a, ref);
 
-    c.copy(b);
-    c.axpy(a, scal);
-    TEST_CHECK_EQUAL(c, ref);
-
-    c.copy(a);
-    c.scale(c, scal);
-    c.axpy(b); /// \todo use axpby here
-    TEST_CHECK_EQUAL(c, ref);
-
-    scal = DT_(0);
-    ref.clone(b);
-    c.copy(b);
-    c.axpy(a, scal);
-    TEST_CHECK_EQUAL(c, ref);
-
-    scal = DT_(1);
-    for(Index i(0) ; i < ref.template used_elements<Perspective::pod>() ; ++i)
-    {
-      ref.template val<Perspective::pod>()[i] = dv1(i) + dv4(i);
-    }
-    c.copy(b);
-    c.axpy(a, scal);
-    TEST_CHECK_EQUAL(c, ref);
-
-    scal = DT_(-1);
-    for(Index i(0) ; i < ref.template used_elements<Perspective::pod>() ; ++i)
-    {
-      ref.template val<Perspective::pod>()[i] = dv4(i) - dv1(i);
-    }
-    c.copy(b);
-    c.axpy(a, scal);
-    TEST_CHECK_EQUAL(c, ref);
+    // r == x
+    b.axpy(b, scal);
+    TEST_CHECK_EQUAL(b, ref2);
   }
 };
 SparseMatrixBCSRAxpyTest <float, std::uint64_t> cpu_sm_bcsr_axpy_test_float_uint64(PreferredBackend::generic);

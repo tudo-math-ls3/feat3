@@ -267,8 +267,7 @@ namespace FEAT
         static bool compare(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_a, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_b)
         {
           auto tmp = matrix_a.clone(LAFEM::CloneMode::Weak);
-          tmp.copy(matrix_b);
-          tmp.axpy(matrix_a, DT_(-1));
+          tmp.axpy(matrix_b, DT_(-1));
           const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
           return (tmp.norm_frobenius()/(Math::sqrt(DT_(tmp.size()))) <= tol);
         }
@@ -320,8 +319,7 @@ namespace FEAT
         static bool compare(const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_b)
         {
           auto tmp = matrix_a.clone(LAFEM::CloneMode::Weak);
-          tmp.copy(matrix_b);
-          tmp.axpy(matrix_a, DT_(-1));
+          tmp.axpy(matrix_b, DT_(-1));
           const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
           return (tmp.norm_frobenius()/(Math::sqrt(DT_(tmp.size()))) <= tol);
         }

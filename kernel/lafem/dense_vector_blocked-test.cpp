@@ -288,7 +288,10 @@ public:
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
       DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref2(size);
       DenseVectorBlocked<DT_, IT_, block_size_> ref_bs(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_bs2(size);
+
       for (Index i(0) ; i < size ; ++i)
       {
         Tiny::Vector<DT_, block_size_> tv1;
@@ -300,36 +303,44 @@ public:
           tv2.v[j] = DT_(2) + DT_(i % (42 + j));
         b(i, tv2);
         ref(i, s * a(i) + b(i));
+        ref2(i, s * b(i) + b(i));
 
-        ref_bs(i, Tiny::component_product(bs, a(i)) + ref(i));
+        ref_bs(i, Tiny::component_product(bs, b(i)) + ref(i));
+        ref_bs2(i, Tiny::component_product(bs, ref2(i)) + ref2(i));
       }
 
       DenseVectorBlocked<DT_, IT_, block_size_> c(size);
-      c.copy(b);
-      c.axpy(a, s);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(c(i).v[j], ref(i).v[j], eps);
+      DenseVectorBlocked<DT_, IT_, block_size_> d(size);
+      c.copy(a);
+      d.copy(b);
 
-      DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
-      a_tmp.copy(a);
+      // r != x
       a.scale(a, s);
       a.axpy(b); /// \todo use axpby here
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
           TEST_CHECK_RELATIVE(a(i).v[j], ref(i).v[j], eps);
 
-      a.copy(a_tmp);
-      b.axpy(a, s);
+      // r == x
+      b.axpy(b, s);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(b(i).v[j], ref(i).v[j], eps);
+          TEST_CHECK_RELATIVE(b(i).v[j], ref2(i).v[j], eps);
 
-      a.copy(a_tmp);
-      b.axpy_blocked(a, bs);
+      // r != x
+      c.scale(c, s);
+      c.axpy(d);
+      c.axpy_blocked(d, bs);
       for (Index i(0) ; i < size ; ++i)
         for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(b(i).v[j], ref_bs(i).v[j], eps);
+          TEST_CHECK_RELATIVE(c(i).v[j], ref_bs(i).v[j], eps);
+
+      // r == x
+      d.axpy(d, s);
+      d.axpy_blocked(d, bs);
+      for (Index i(0) ; i < size ; ++i)
+        for (Index j(0) ; j < block_size_ ; ++j)
+          TEST_CHECK_RELATIVE(d(i).v[j], ref_bs2(i).v[j], eps);
     }
   }
 };

@@ -41,21 +41,7 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const Index siz
     throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
 
   cublasStatus_t status;
-  void* temp_x;
-
-  if (r == x)
-  {
-    temp_x = Util::cuda_malloc(sizeof(DT_) * size);
-    Util::cuda_copy(temp_x, x, size * sizeof(DT_));
-  }
-  else
-  {
-    temp_x = (void*)x;
-  }
-
-  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, temp_x, dt, 1, r, dt, 1, et);
-  if (r == x)
-    Util::cuda_free(temp_x);
+  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, x, dt, 1, r, dt, 1, et);
 
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));

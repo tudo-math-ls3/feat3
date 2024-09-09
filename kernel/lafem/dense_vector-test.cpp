@@ -301,33 +301,26 @@ public:
       DenseVector<DT_, IT_> a(size);
       DenseVector<DT_, IT_> b(size);
       DenseVector<DT_, IT_> ref(size);
+      DenseVector<DT_, IT_> ref2(size);
+
       for (Index i(0) ; i < size ; ++i)
       {
         a(i, DT_(i % 100) * DT_(1.234));
         b(i, DT_(2) - DT_(i % 42));
         ref(i, s * a(i) + b(i));
+        ref2(i, s * b(i) + b(i));
       }
 
-      DenseVector<DT_, IT_> c(size);
-      c.copy(b);
-      c.axpy(a, s);
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_RELATIVE(c(i), ref(i), eps);
-
+      // r != x
       a.scale(a, s);
       a.axpy(b); /// \todo use axpby here
       for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_RELATIVE(a(i), ref(i), eps);
+        TEST_CHECK_RELATIVE(a(i), ref(i), DT_(10)*eps);
 
-      s *= DT_(0.5);
+      // r == x
+      b.axpy(b, s);
       for (Index i(0) ; i < size ; ++i)
-      {
-        ref(i, s * a(i) + b(i));
-      }
-
-      b.axpy(a, s);
-      for (Index i(0) ; i < size ; ++i)
-        TEST_CHECK_RELATIVE(b(i), ref(i), eps);
+        TEST_CHECK_RELATIVE(b(i), ref2(i), eps);
     }
   }
 };

@@ -20,34 +20,10 @@ using namespace FEAT::LAFEM::Arch;
 
 void Axpy::value_mkl(float * r, const float a, const float * const x, const Index size)
 {
-  if (r == x)
-  {
-    float * t = new float[size];
-    memcpy(t, x, sizeof(float) * size);
-    memcpy(r, r, sizeof(float) * size);
-    cblas_saxpy((MKL_INT)size, a, t, 1, r, 1);
-    delete[] t;
-  }
-  else
-  {
-    memcpy(r, r, sizeof(float) * size);
-    cblas_saxpy((MKL_INT)size, a, x, 1, r, 1);
-  }
+  cblas_saxpy((MKL_INT)size, a, x, 1, r, 1);
 }
 
 void Axpy::value_mkl(double * r, const double a, const double * const x, const Index size)
 {
-  if (r == x)
-  {
-    double * t = new double[size];
-    memcpy(t, x, sizeof(double) * size);
-    memcpy(r, r, sizeof(double) * size);
-    cblas_daxpy((MKL_INT)size, a, t, 1, r, 1);
-    delete[] t;
-  }
-  else
-  {
-    memcpy(r, r, sizeof(double) * size);
-    cblas_daxpy((MKL_INT)size, a, x, 1, r, 1);
-  }
+  cblas_daxpy((MKL_INT)size, a, x, 1, r, 1);
 }

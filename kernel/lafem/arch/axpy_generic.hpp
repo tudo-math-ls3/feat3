@@ -28,14 +28,14 @@ namespace FEAT
         {
           for (Index i(0) ; i < size ; ++i)
           {
-            r[i] *= DT_(2) * a;
+            r[i] *= DT_(1) + a;
           }
         }
         else
         {
           for (Index i(0) ; i < size ; ++i)
           {
-            r[i] = (a * x[i]) + r[i];
+            r[i] += a * x[i];
           }
         }
       }
@@ -43,24 +43,10 @@ namespace FEAT
       template <typename ValueType_>
       void Axpy::value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const Index size)
       {
-        if (r == x)
+        for (Index i(0) ; i < size ; ++i)
         {
-          for (Index i(0) ; i < size ; ++i)
-          {
-            for(int j(0); j < ValueType_::n; ++j)
-            {
-              r[i][j] *= a[j];
-              r[i][j] += r[i][j];
-            }
-          }
-        }
-        else
-        {
-          for (Index i(0) ; i < size ; ++i)
-          {
-            for(int j(0); j < ValueType_::n; ++j)
-              r[i][j] = (a[j] * x[i][j]) + r[i][j];
-          }
+          for(int j(0); j < ValueType_::n; ++j)
+            r[i][j] += a[j] * x[i][j];
         }
       }
     } // namespace Arch

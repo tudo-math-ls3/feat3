@@ -1053,8 +1053,8 @@ public:
       SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
       SparseMatrixFactory<DT_, IT_> b_fac(IT_(size), IT_(size + 2));
       SparseMatrixFactory<DT_, IT_> ref_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> ref_fac_plus(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> ref_fac_minus(IT_(size), IT_(size + 2));
+      SparseMatrixFactory<DT_, IT_> ref_fac2(IT_(size), IT_(size + 2));
+
       for (IT_ row(0); row < a_fac.rows(); ++row)
       {
         for (IT_ col(0); col < a_fac.columns(); ++col)
@@ -1064,56 +1064,32 @@ public:
             a_fac.add(row, col, DT_(2));
             b_fac.add(row, col, DT_((row + col) % 15));
             ref_fac.add(row, col, DT_(2) * s + DT_((row + col) % 15));
-            ref_fac_plus.add(row, col, DT_(2) + DT_((row + col) % 15));
-            ref_fac_minus.add(row, col, DT_((row + col) % 15) - DT_(2));
+            ref_fac2.add(row, col, DT_((row + col) % 15) * s + DT_((row + col) % 15));
           }
 
           else if ((row == col + 1) || (row + 1 == col))
           {
             a_fac.add(row, col, DT_(-1));
-            b_fac.add(row, col, DT_((row + col) % 15));
-            ref_fac.add(row, col, DT_(-1) * s + DT_((row + col) % 15));
-            ref_fac_plus.add(row, col, DT_(-1) + DT_((row + col) % 15));
-            ref_fac_minus.add(row, col, DT_((row + col) % 15) - DT_(-1));
+            b_fac.add(row, col, DT_((row + col + 1) % 15));
+            ref_fac.add(row, col, DT_(-1) * s + DT_((row + col + 1) % 15));
+            ref_fac2.add(row, col, DT_((row + col + 1) % 15) * s + DT_((row + col + 1) % 15));
           }
         }
       }
 
       SparseMatrixCSR<DT_, IT_> ref(ref_fac.make_csr());
-      SparseMatrixCSR<DT_, IT_> ref_plus(ref_fac_plus.make_csr());
-      SparseMatrixCSR<DT_, IT_> ref_minus(ref_fac_minus.make_csr());
+      SparseMatrixCSR<DT_, IT_> ref2(ref_fac2.make_csr());
       SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
       SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
-      SparseMatrixCSR<DT_, IT_> c;
 
-      c.clone(a);
-      c.scale(c, s);
-      c.axpy(b); /// \todo use axpby here
-      TEST_CHECK_EQUAL(c, ref);
+      // r != x
+      a.scale(a, s);
+      a.axpy(b); /// \todo use axpby here
+      TEST_CHECK_EQUAL(a, ref);
 
-      c.clone(b);
-      c.axpy(a, s);
-      TEST_CHECK_EQUAL(c, ref);
-
-      c.copy(b);
-      c.axpy(a, s);
-      TEST_CHECK_EQUAL(c, ref);
-
-      s = DT_(0);
-      ref.clone(b);
-      c.copy(b);
-      c.axpy(a, s);
-      TEST_CHECK_EQUAL(c, ref);
-
-      s = DT_(1);
-      c.copy(b);
-      c.axpy(a, s);
-      TEST_CHECK_EQUAL(c, ref_plus);
-
-      s = DT_(-1);
-      c.copy(b);
-      c.axpy(a, s);
-      TEST_CHECK_EQUAL(c, ref_minus);
+      // r == x
+      b.axpy(b, s);
+      TEST_CHECK_EQUAL(b, ref2);
     }
   }
 };

@@ -521,3 +521,112 @@ SparseMatrixBandedScaleTest <double, std::uint64_t> cuda_sparse_matrix_banded_sc
 SparseMatrixBandedScaleTest <float, std::uint32_t> cuda_sparse_matrix_banded_scale_test_float_uint32(PreferredBackend::cuda);
 SparseMatrixBandedScaleTest <double, std::uint32_t> cuda_sparse_matrix_banded_scale_test_double_uint32(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixBandedAxpyTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBandedAxpyTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBandedAxpyTest()
+  {
+  }
+
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
+
+  virtual void run() const override
+  {
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
+
+    DT_ s(DT_(4.321));
+
+    // create random matrix
+    const Index tsize(100);
+    const Index rows(tsize + random(Index(0), Index(20)));
+    const Index columns(tsize + random(Index(0), Index(20)));
+
+    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<DT_, IT_> vec_val_a(num_of_offsets * rows);
+    DenseVector<DT_, IT_> vec_val_b(num_of_offsets * rows);
+    DenseVector<DT_, IT_> vec_val_ref(num_of_offsets * rows, DT_(1));
+    DenseVector<DT_, IT_> vec_val_ref2(num_of_offsets * rows, DT_(1));
+
+
+    // create random vector of offsets
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    for (Index i(0); i < num_of_offsets; ++i)
+    {
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+    }
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+
+    // fill data-array
+    for (Index i(0); i < vec_val_a.size(); ++i)
+    {
+      vec_val_a(i, random(DT_(0), DT_(10)));
+      vec_val_b(i, random(DT_(0), DT_(10)));
+      vec_val_ref(i, vec_val_a(i) + vec_val_b(i) * s);
+      vec_val_ref2(i, vec_val_b(i) + vec_val_b(i) * s);
+    }
+
+    // create test-matrix
+    SparseMatrixBanded<DT_, IT_> ref(rows, columns, vec_val_ref, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> ref2(rows, columns, vec_val_ref2, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> a(rows, columns, vec_val_a, vec_offsets);
+    SparseMatrixBanded<DT_, IT_> b(rows, columns, vec_val_b, vec_offsets);
+
+    // r != x
+    a.axpy(b, s);
+    for(Index i(0); i < a.rows(); ++i)
+    {
+      for(Index j(0); j < a.columns(); ++j)
+      {
+        TEST_CHECK_RELATIVE(a(i, j), ref(i, j), eps);
+      }
+    }
+
+    // r == x
+    b.axpy(b, s);
+    for(Index i(0); i < b.rows(); ++i)
+    {
+      for(Index j(0); j < b.columns(); ++j)
+      {
+        TEST_CHECK_RELATIVE(b(i, j), ref2(i, j), eps);
+      }
+    }
+  }
+};
+
+SparseMatrixBandedAxpyTest <float, std::uint64_t> cpu_sparse_matrix_banded_axpy_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedAxpyTest <double, std::uint64_t> cpu_sparse_matrix_banded_axpy_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedAxpyTest <float, std::uint32_t> cpu_sparse_matrix_banded_axpy_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedAxpyTest <double, std::uint32_t> cpu_sparse_matrix_banded_axpy_test_double_uint32(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedAxpyTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_axpy_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedAxpyTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_axpy_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedAxpyTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_axpy_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedAxpyTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_axpy_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedAxpyTest <Half, std::uint32_t> cpu_sparse_matrix_banded_axpy_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedAxpyTest <Half, std::uint64_t> cpu_sparse_matrix_banded_axpy_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBandedAxpyTest <float, std::uint64_t> cuda_sparse_matrix_banded_axpy_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedAxpyTest <double, std::uint64_t> cuda_sparse_matrix_banded_axpy_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedAxpyTest <float, std::uint32_t> cuda_sparse_matrix_banded_axpy_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedAxpyTest <double, std::uint32_t> cuda_sparse_matrix_banded_axpy_test_double_uint32(PreferredBackend::cuda);
+#endif
