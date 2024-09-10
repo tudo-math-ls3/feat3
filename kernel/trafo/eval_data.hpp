@@ -61,7 +61,7 @@ namespace FEAT
       /// our trafo configuration
       static constexpr TrafoTags config = cfg_tags_;
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(__CUDA_ARCH__)
       EvalData()
       {
         // format all values to NaN

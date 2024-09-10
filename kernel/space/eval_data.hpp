@@ -55,7 +55,7 @@ namespace FEAT
       // our space config
       static constexpr SpaceTags config = cfg_tags_;
 
-#if defined(DEBUG) || !defined(__CUDA_ARCH__)
+#if defined(DEBUG) && !defined(__CUDA_ARCH__)
       BasisData()
       {
         // format all values to NaN
