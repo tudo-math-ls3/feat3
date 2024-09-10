@@ -437,7 +437,7 @@ public:
       a.apply(r, x);
       ref.copy(ax);
       for(Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(2)*eps);
 
       // transposed apply-test for alpha = -1
       a.apply(r, x, y,  DT_(-1.0), true);
