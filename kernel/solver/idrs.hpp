@@ -450,22 +450,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new IDRS object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<IDRS<Matrix_, Filter_>> new_idrs(
-      const Matrix_& matrix, const Filter_& filter, Index krylov_dim)
-    {
-      return std::make_shared<IDRS<Matrix_, Filter_>>(matrix, filter, krylov_dim);
-    }
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<IDRS<Matrix_, Filter_>> new_idrs(
-      const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
-      std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<IDRS<Matrix_, Filter_>>(matrix, filter, krylov_dim, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<IDRS<Matrix_, Filter_>> new_idrs(
       const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
@@ -473,7 +457,6 @@ namespace FEAT
     {
       return std::make_shared<IDRS<Matrix_, Filter_>>(matrix, filter, krylov_dim, precond);
     }
-#endif
 
     /**
      * \brief Creates a new IDR(s) solver object using a PropertyMap
@@ -496,24 +479,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new IDRS object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<IDRS<Matrix_, Filter_>> new_idrs(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<IDRS<Matrix_, Filter_>>(section_name, section, matrix, filter);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<IDRS<Matrix_, Filter_>> new_idrs(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<IDRS<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<IDRS<Matrix_, Filter_>> new_idrs(
       const String& section_name, PropertyMap* section,
@@ -522,7 +487,6 @@ namespace FEAT
     {
       return std::make_shared<IDRS<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 

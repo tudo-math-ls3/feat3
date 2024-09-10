@@ -533,7 +533,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new ALGLIBMinLBFGS object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinLBFGS<Functional_, Filter_>> new_alglib_minlbfgs(
       Functional_& functional_, Filter_& filter_,
@@ -560,7 +559,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new ALGLIBMinLBFGS object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinLBFGS<Functional_, Filter_>> new_alglib_minlbfgs(
       const String& section_name, PropertyMap* section,
@@ -1060,7 +1058,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new ALGLIBMinCG object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Functional_, Filter_>> new_alglib_mincg(
       Functional_& functional_, Filter_& filter_,
@@ -1088,7 +1085,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new ALGLIBMinCG object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Functional_, Filter_>> new_alglib_mincg(
       const String& section_name, PropertyMap* section,

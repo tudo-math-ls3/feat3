@@ -393,24 +393,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new NLSD object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Functional_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
-      Functional_& functional, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false)
-      {
-        return std::make_shared<NLSD<Functional_, Filter_>>(functional, filter, linesearch,
-        keep_iterates, nullptr);
-      }
-    template<typename Functional_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
-      Functional_& functional, Filter_& filter, Linesearch_& linesearch, bool keep_iterates,
-      std::shared_ptr<Precond_> precond)
-      {
-        return std::make_shared<NLSD<Functional_, Filter_>>(functional, filter, linesearch,
-        keep_iterates, precond);
-      }
-#else
     template<typename Functional_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
       Functional_& functional, Filter_& filter, Linesearch_& linesearch, bool keep_iterates = false,
@@ -419,7 +401,6 @@ namespace FEAT
         return std::make_shared<NLSD<Functional_, Filter_>>(functional, filter, linesearch,
         keep_iterates, precond);
       }
-#endif
 
     /**
      * \brief Creates a new NLSD solver object using a PropertyMap
@@ -445,27 +426,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new NLSD object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Functional_, typename Filter_, typename Linesearch_>
-    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
-      const String& section_name, PropertyMap* section,
-      Functional_& functional, Filter_& filter, Linesearch_& linesearch)
-      {
-        return std::make_shared<NLSD<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
-        nullptr);
-      }
-
-    template<typename Functional_, typename Filter_, typename Linesearch_, typename Precond_>
-    inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
-      const String& section_name, PropertyMap* section,
-      Functional_& functional, Filter_& filter, Linesearch_& linesearch,
-      std::shared_ptr<Precond_> precond)
-      {
-        return std::make_shared<NLSD<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
-        precond);
-      }
-#else
     template<typename Functional_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
       const String& section_name, PropertyMap* section,
@@ -475,7 +435,6 @@ namespace FEAT
         return std::make_shared<NLSD<Functional_, Filter_>>(section_name, section, functional, filter, linesearch,
         precond);
       }
-#endif
   } //namespace Solver
 } // namespace FEAT
 

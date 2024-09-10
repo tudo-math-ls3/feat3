@@ -247,25 +247,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new Richardson object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
-      const Matrix_& matrix, const Filter_& filter,
-      typename Matrix_::DataType omega = typename Matrix_::DataType(1))
-    {
-      return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, nullptr);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
-      const Matrix_& matrix, const Filter_& filter,
-      typename Matrix_::DataType omega,
-      std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
       const Matrix_& matrix, const Filter_& filter,
@@ -274,7 +255,6 @@ namespace FEAT
     {
       return std::make_shared<Richardson<Matrix_, Filter_>>(matrix, filter, omega, precond);
     }
-#endif
 
     /**
      * \brief Creates a new Richardson solver object using a PropertyMap
@@ -297,24 +277,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new Richardson object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<Richardson<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<Richardson<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<Richardson<Matrix_, Filter_>> new_richardson(
       const String& section_name, PropertyMap* section,
@@ -323,7 +285,6 @@ namespace FEAT
     {
       return std::make_shared<Richardson<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 

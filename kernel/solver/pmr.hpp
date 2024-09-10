@@ -265,23 +265,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new PMR object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<PMR<Matrix_, Filter_>>(matrix, filter, nullptr);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
-      const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<PMR<Matrix_, Filter_>>(matrix, filter, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
       const Matrix_& matrix, const Filter_& filter,
@@ -289,7 +272,6 @@ namespace FEAT
     {
       return std::make_shared<PMR<Matrix_, Filter_>>(matrix, filter, precond);
     }
-#endif
 
     /**
      * \brief Creates a new PMR solver object using a PropertyMap
@@ -312,25 +294,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new PMR object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<PMR<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<PMR<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
       const String& section_name, PropertyMap* section,
@@ -339,7 +302,6 @@ namespace FEAT
     {
       return std::make_shared<PMR<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 

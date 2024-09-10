@@ -397,24 +397,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new PCGNR object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter);
-    }
-
-    template<typename Matrix_, typename Filter_, typename PrecondL_, typename PrecondR_>
-    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
-      const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<PrecondL_> precond_l,
-      std::shared_ptr<PrecondR_> precond_r)
-    {
-      return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const Matrix_& matrix, const Filter_& filter,
@@ -423,7 +405,6 @@ namespace FEAT
     {
       return std::make_shared<PCGNR<Matrix_, Filter_>>(matrix, filter, precond_l, precond_r);
     }
-#endif
 
     /**
      * \brief Creates a new PCGNR solver object using a PropertyMap
@@ -449,26 +430,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new PCGNR object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<PCGNR<Matrix_, Filter_>>(section_name, section, matrix, filter);
-    }
-
-    template<typename Matrix_, typename Filter_, typename PrecondL_, typename PrecondR_>
-    inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<PrecondL_> precond_l,
-      std::shared_ptr<PrecondR_> precond_r)
-    {
-      return std::make_shared<PCGNR<Matrix_, Filter_>>(section_name, section, matrix, filter, precond_l, precond_r);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCGNR<Matrix_, Filter_>> new_pcgnr(
       const String& section_name, PropertyMap* section,
@@ -478,7 +439,6 @@ namespace FEAT
     {
       return std::make_shared<PCGNR<Matrix_, Filter_>>(section_name, section, matrix, filter, precond_l, precond_r);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 

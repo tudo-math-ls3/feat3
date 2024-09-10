@@ -684,21 +684,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new UzawaPrecond object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_, typename SolverA_, typename SolverS_>
-    inline std::shared_ptr<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_uzawa_precond(
-      const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
-      const FilterV_& filter_v, const FilterP_& filter_p,
-      std::shared_ptr<SolverA_> solver_a,
-      std::shared_ptr<SolverS_> solver_s,
-      UzawaType type = UzawaType::diagonal,
-      bool auto_init_s = true)
-    {
-      return std::make_shared<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
-        (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type, auto_init_s);
-    }
-#else
     template<typename MatrixA_, typename MatrixB_, typename MatrixD_, typename FilterV_, typename FilterP_>
     inline std::shared_ptr<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>> new_uzawa_precond(
       const MatrixA_& matrix_a, const MatrixB_& matrix_b, const MatrixD_& matrix_d,
@@ -711,7 +696,6 @@ namespace FEAT
       return std::make_shared<UzawaPrecond<MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_>>
         (matrix_a, matrix_b, matrix_d, filter_v, filter_p, solver_a, solver_s, type, auto_init_s);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 

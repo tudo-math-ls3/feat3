@@ -420,24 +420,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new FGMRES object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
-      const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
-      typename Matrix_::DataType inner_res_scale = typename Matrix_::DataType(0))
-    {
-      return std::make_shared<FGMRES<Matrix_, Filter_>>(matrix, filter, krylov_dim, inner_res_scale);
-    }
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
-      const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
-      typename Matrix_::DataType inner_res_scale,
-      std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<FGMRES<Matrix_, Filter_>>(matrix, filter, krylov_dim, inner_res_scale, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
       const Matrix_& matrix, const Filter_& filter, Index krylov_dim,
@@ -446,7 +428,6 @@ namespace FEAT
     {
       return std::make_shared<FGMRES<Matrix_, Filter_>>(matrix, filter, krylov_dim, inner_res_scale, precond);
     }
-#endif
 
     /**
      * \brief Creates a new FGMRES solver object using a PropertyMap
@@ -469,24 +450,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new FGMRES object.
      */
-     /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<FGMRES<Matrix_, Filter_>>(section_name, section, matrix, filter);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter, std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<FGMRES<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<FGMRES<Matrix_, Filter_>> new_fgmres(
       const String& section_name, PropertyMap* section,
@@ -495,7 +458,6 @@ namespace FEAT
     {
       return std::make_shared<FGMRES<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 

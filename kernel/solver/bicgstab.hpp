@@ -582,22 +582,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new BiCGStab object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, nullptr);
-    }
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
-      const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<Precond_> precond, BiCGStabPreconVariant precon_variant = BiCGStabPreconVariant::left)
-    {
-      return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const Matrix_& matrix, const Filter_& filter,
@@ -606,7 +590,6 @@ namespace FEAT
     {
       return std::make_shared<BiCGStab<Matrix_, Filter_>>(matrix, filter, precond, precon_variant);
     }
-#endif
 
     /**
      * \brief Creates a new BiCGStab solver object using a PropertyMap
@@ -629,25 +612,6 @@ namespace FEAT
      * \returns
      * A shared pointer to a new BiCGStab object.
      */
-    /// \compilerhack GCC < 4.9 fails to deduct shared_ptr
-#if defined(FEAT_COMPILER_GNU) && (FEAT_COMPILER_GNU < 40900)
-    template<typename Matrix_, typename Filter_>
-    inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter)
-    {
-      return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, nullptr);
-    }
-
-    template<typename Matrix_, typename Filter_, typename Precond_>
-    inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
-      const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter,
-      std::shared_ptr<Precond_> precond)
-    {
-      return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
-    }
-#else
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
       const String& section_name, PropertyMap* section,
@@ -656,7 +620,6 @@ namespace FEAT
     {
       return std::make_shared<BiCGStab<Matrix_, Filter_>>(section_name, section, matrix, filter, precond);
     }
-#endif
   } // namespace Solver
 } // namespace FEAT
 
