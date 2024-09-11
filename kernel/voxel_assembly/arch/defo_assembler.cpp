@@ -43,7 +43,7 @@ namespace FEAT
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
-          DataType local_coeffs[dim][num_loc_verts];
+          Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
           // and local matrix
           LocalMatrixType loc_mat;
           // now do work for this cell

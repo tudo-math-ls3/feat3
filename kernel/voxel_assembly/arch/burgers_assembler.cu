@@ -69,7 +69,7 @@ namespace FEAT
 
 
         // define local coefficients
-        DataType local_coeffs[dim][num_loc_verts];
+        Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
         // and local matrix
         LocalMatrixType loc_mat;
         LocalVectorType local_conv_dofs(DataType(0));
@@ -138,7 +138,7 @@ namespace FEAT
         LocalVectorType local_conv_dofs(DataType(0));
         LocalVectorType local_prim_dofs(DataType(0));
         // typename NewSpaceHelp::ImagePointType img_point;
-        DataType local_coeffs[dim][num_loc_verts];
+        Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
 
         //now do work for this cell
         Index cell = Index(coloring_map[idx]);
@@ -266,7 +266,7 @@ namespace FEAT
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
-          DataType local_coeffs[dim][num_loc_verts];
+          Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
           // and local matrix
           LocalMatrixType loc_mat;
           LocalVectorType local_conv_dofs(DataType(0));
@@ -336,7 +336,7 @@ namespace FEAT
           LocalVectorType local_conv_dofs(DataType(0));
           LocalVectorType local_prim_dofs(DataType(0));
           // typename NewSpaceHelp::ImagePointType img_point;
-          DataType local_coeffs[dim][num_loc_verts];
+          Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
 
           //now do work for this cell
           int cell = coloring_map[idx];

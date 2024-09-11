@@ -79,7 +79,7 @@ namespace FEAT
 
       protected:
         /// the coefficients of the trafo
-        DataType _coeff[image_dim][num_verts];
+        Tiny::Matrix<DataType, image_dim, num_verts> _coeff;
 
       public:
         /**
@@ -241,7 +241,7 @@ namespace FEAT
 
       protected:
         /// the coefficients of the trafo
-        DataType _coeff[image_dim];
+        Tiny::Vector<DataType, image_dim> _coeff;
 
       public:
         /**

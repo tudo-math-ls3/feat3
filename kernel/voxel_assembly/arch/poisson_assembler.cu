@@ -70,7 +70,7 @@ namespace FEAT
         typedef Tiny::Matrix<DataType, num_loc_dofs, num_loc_dofs> LocMatType;
 
         // define local coeffs
-        DataType local_coeffs[dim][num_loc_verts];
+        Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
 
         // define local arrays
         Tiny::Matrix<DataType, num_loc_dofs, num_loc_dofs> loc_mat;
@@ -135,7 +135,7 @@ namespace FEAT
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
-          DataType local_coeffs[dim][num_loc_verts];
+          Tiny::Matrix<DataType, dim, num_loc_verts> local_coeffs;
           // and local matrix
           Tiny::Matrix<DataType, num_loc_dofs, num_loc_dofs> loc_mat;
           // now do work for this cell

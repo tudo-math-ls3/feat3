@@ -159,32 +159,32 @@ namespace FEAT
         SpaceEvalHelp::eval_ref_hessians(data, point);
       }
 
-      CUDA_HOST_DEVICE static inline void set_coefficients(DataType (&coeffs)[dim][num_verts], const IndexSetWrapper<IndexType>& local_dofs, const VertexPointType* vertex_set, IndexType cell_index)
+      CUDA_HOST_DEVICE static inline void set_coefficients(Tiny::Matrix<DataType, dim, num_verts>& coeffs, const IndexSetWrapper<IndexType>& local_dofs, const VertexPointType* vertex_set, IndexType cell_index)
       {
         TrafoEvalHelp::set_coefficients(coeffs, VertexSetWrapper(vertex_set), local_dofs, cell_index);
       }
 
-      CUDA_HOST_DEVICE static inline void map_point(typename TrafoEvalHelp::ImagePointType& img_point, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline void map_point(typename TrafoEvalHelp::ImagePointType& img_point, const typename TrafoEvalHelp::DomainPointType& dom_point, const Tiny::Matrix<DataType, dim, num_verts>& coeffs)
       {
         TrafoEvalHelp::map_point(img_point, dom_point, coeffs);
       }
 
-      CUDA_HOST_DEVICE static inline void calc_jac_mat(typename TrafoEvalHelp::JacobianMatrixType& jac_mat, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline void calc_jac_mat(typename TrafoEvalHelp::JacobianMatrixType& jac_mat, const typename TrafoEvalHelp::DomainPointType& dom_point, const Tiny::Matrix<DataType, dim, num_verts>& coeffs)
       {
         TrafoEvalHelp::calc_jac_mat(jac_mat, dom_point, coeffs);
       }
 
-      CUDA_HOST_DEVICE static inline void calc_hess_ten(typename TrafoEvalHelp::HessianTensorType& hess_ten, const typename TrafoEvalHelp::DomainPointType& dom_point, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline void calc_hess_ten(typename TrafoEvalHelp::HessianTensorType& hess_ten, const typename TrafoEvalHelp::DomainPointType& dom_point, const Tiny::Matrix<DataType, dim, num_verts>& coeffs)
       {
         TrafoEvalHelp::calc_jac_mat(hess_ten, dom_point, coeffs);
       }
 
-      CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, dim, num_verts>& coeffs)
       {
         return TrafoEvalHelp::volume(coeffs);
       }
 
-      CUDA_HOST_DEVICE static inline DataType width_directed(const typename TrafoEvalHelp::ImagePointType& ray, const DataType (&coeffs)[dim][num_verts])
+      CUDA_HOST_DEVICE static inline DataType width_directed(const typename TrafoEvalHelp::ImagePointType& ray, const Tiny::Matrix<DataType, dim, num_verts>& coeffs)
       {
         return TrafoEvalHelp::width_directed(ray, coeffs);
       }

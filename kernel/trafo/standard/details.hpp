@@ -8,6 +8,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/shape.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 #ifndef __CUDA_ARCH__
 #include <kernel/util/math.hpp>
 #else
@@ -77,7 +78,7 @@ namespace FEAT
          * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
          *
          * \param[out] coeffs
-         * A two dimensional array holding the local coefficients of the trafo after the call.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \param[in] index_tuple
          * A mapping from local indices to global.
@@ -86,7 +87,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
+        CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           typedef typename VertexSetType_::VertexType VertexType;
 
@@ -112,9 +113,9 @@ namespace FEAT
          * A reference to the point on the reference cell that is to be mapped.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -132,9 +133,9 @@ namespace FEAT
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < img_dim; ++i)
           {
@@ -152,9 +153,9 @@ namespace FEAT
          * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
         {
           hess_ten.format();
         }
@@ -163,12 +164,12 @@ namespace FEAT
          * \brief Computes and returns the volume of the current cell.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The volume of the current cell.
          */
-        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           DataType v = DataType(0);
           #ifndef __CUDA_ARCH__
@@ -191,12 +192,12 @@ namespace FEAT
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           // in 1D, the width is always equal to the volume
           return volume(coeffs);
@@ -236,7 +237,7 @@ namespace FEAT
          * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
          *
          * \param[out] coeffs
-         * A two dimensional array holding the local coefficients of the trafo after the call.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \param[in] index_tuple
          * A mapping from local indices to global.
@@ -246,7 +247,7 @@ namespace FEAT
          *
          */
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
+        CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           typedef typename VertexSetType_::VertexType VertexType;
 
@@ -274,9 +275,9 @@ namespace FEAT
          * A reference to the point on the reference cell that is to be mapped.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -294,9 +295,9 @@ namespace FEAT
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -315,9 +316,9 @@ namespace FEAT
          * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
         {
           hess_ten.format();
         }
@@ -326,12 +327,12 @@ namespace FEAT
          * \brief Computes and returns the volume of the current cell.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The volume of the current cell.
          */
-        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           JacobianMatrixType jac_mat;
           for(int i(0); i < image_dim; ++i)
@@ -351,12 +352,12 @@ namespace FEAT
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           // This one is a little tricky:
           // We follow a similar approach as on quadrilaterals here, i.e. we first map the ray
@@ -431,7 +432,7 @@ namespace FEAT
          * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
          *
          * \param[out] coeffs
-         * A two dimensional array holding the local coefficients of the trafo after the call.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \param[in] index_tuple
          * A mapping from local indices to global.
@@ -440,7 +441,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
+        CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           // fetch the vertices of the edge
           typedef typename VertexSetType_::VertexType VertexType;
@@ -470,9 +471,9 @@ namespace FEAT
          * A reference to the point on the reference cell that is to be mapped.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -492,9 +493,9 @@ namespace FEAT
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -514,9 +515,9 @@ namespace FEAT
          * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
         {
           hess_ten.format();
         }
@@ -525,12 +526,12 @@ namespace FEAT
          * \brief Computes and returns the volume of the current cell.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The volume of the current cell.
          */
-        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           JacobianMatrixType jac_mat;
           for(int i(0); i < image_dim; ++i)
@@ -551,12 +552,12 @@ namespace FEAT
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           // We follow the same approach as for triangles here:
           // First, map the ray onto the reference element and then
@@ -629,7 +630,7 @@ namespace FEAT
          * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
          *
          * \param[out] coeffs
-         * A two dimensional array holding the local coefficients of the trafo after the call.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \param[in] index_tuple
          * A mapping from local indices to global.
@@ -638,7 +639,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
+        CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           typedef typename VertexSetType_::VertexType VertexType;
 
@@ -664,9 +665,9 @@ namespace FEAT
          * A reference to the point on the reference cell that is to be mapped.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -684,9 +685,9 @@ namespace FEAT
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < img_dim; ++i)
           {
@@ -704,9 +705,9 @@ namespace FEAT
          * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
         {
           hess_ten.format();
         }
@@ -715,12 +716,12 @@ namespace FEAT
          * \brief Computes and returns the volume of the current cell.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The volume of the current cell.
          */
-        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           DataType v = DataType(0);
           #ifndef __CUDA_ARCH__
@@ -743,12 +744,12 @@ namespace FEAT
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           // in 1D, the width is always equal to the volume
           return volume(coeffs);
@@ -788,7 +789,7 @@ namespace FEAT
          * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
          *
          * \param[out] coeffs
-         * A two dimensional array holding the local coefficients of the trafo after the call.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \param[in] index_tuple
          * A mapping from local indices to global.
@@ -797,7 +798,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
+        CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           typedef typename VertexSetType_::VertexType VertexType;
 
@@ -827,9 +828,9 @@ namespace FEAT
          * A reference to the point on the reference cell that is to be mapped.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -848,9 +849,9 @@ namespace FEAT
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -869,9 +870,9 @@ namespace FEAT
          * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -884,12 +885,12 @@ namespace FEAT
          * \brief Computes and returns the volume of the current cell.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The volume of the current cell.
          */
-        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           // According to Varignon's theorem, the area/volume of a quadrilateral is
           // equal to twice the area of the dual parallelogram of the quadrilateral,
@@ -924,12 +925,12 @@ namespace FEAT
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           JacobianMatrixType jac_mat;
           JacobianInverseType jac_inv;
@@ -984,7 +985,7 @@ namespace FEAT
          * \tparam IndexTupleType_ A type mapping the local index to the dofs. Has to support operator[](Index i).
          *
          * \param[out] coeffs
-         * A two dimensional array holding the local coefficients of the trafo after the call.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \param[in] index_tuple
          * A mapping from local indices to global.
@@ -993,7 +994,7 @@ namespace FEAT
          * A pointer to the beginnnig of the vertex set.
          */
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
-        CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[img_dim][num_verts], const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
+        CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, img_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           typedef typename VertexSetType_::VertexType VertexType;
 
@@ -1033,9 +1034,9 @@ namespace FEAT
          * A reference to the point on the reference cell that is to be mapped.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -1057,9 +1058,9 @@ namespace FEAT
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -1079,9 +1080,9 @@ namespace FEAT
          * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A tiny matrix holding the local coefficients of the trafo.
          */
-        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           for(int i(0); i < image_dim; ++i)
           {
@@ -1096,12 +1097,12 @@ namespace FEAT
          * \brief Computes and returns the volume of the current cell.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The volume of the current cell.
          */
-        CUDA_HOST_DEVICE static inline DataType volume(const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           // In contrast to 2D, it is not sufficient to evaluate the Jacobian determinant
           // in the barycentre of the cell to compute the cell's volume, as this will give
@@ -1140,12 +1141,12 @@ namespace FEAT
          * A (normalized) direction vector. Must not be a null vector.
          *
          * \param[in] coeffs
-         * A two dimensional array holding the local coefficients of the trafo.
+         * A reference to the tiny matrix holding the local coefficients of the trafo.
          *
          * \returns
          * The mesh width in direction of the input ray vector.
          */
-        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const DataType (&coeffs)[image_dim][num_verts])
+        CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& ray, const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
         {
           JacobianMatrixType jac_mat;
           JacobianInverseType jac_inv;
@@ -1195,7 +1196,7 @@ namespace FEAT
       //   static constexpr int image_dim = img_dim;
 
       //   template<typename VertexSetType_, typename IndexTupleType_>
-      //   CUDA_HOST_DEVICE static void inline set_coefficients(DataType (&coeffs)[image_dim][num_verts], const IndexTupleType_& DOXY(index_tuple), const VertexSetType_& vertex_set)
+      //   CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const IndexTupleType_& DOXY(index_tuple), const VertexSetType_& vertex_set)
       //   {
       //     const auto& vtx = vertex_set;
 
@@ -1206,7 +1207,7 @@ namespace FEAT
 
       //   }
 
-      //   CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& DOXY(dom_point), const DataType (&coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline void map_point(ImagePointType& img_point, const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& coeffs)
       //   {
       //     for(int i(0); i < image_dim; ++i)
       //     {
@@ -1214,19 +1215,19 @@ namespace FEAT
       //     }
       //   }
 
-      //   CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& DOXY(jac_mat), const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline void calc_jac_mat(JacobianMatrixType& DOXY(jac_mat), const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
       //   {
       //   }
 
-      //   CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& DOXY(hess_ten), const DomainPointType& DOXY(dom_point), const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline void calc_hess_ten(HessianTensorType& DOXY(hess_ten), const DomainPointType& DOXY(dom_point), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
       //   {
       //   }
 
-      //   CUDA_HOST_DEVICE static inline DataType volume(const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline DataType volume(const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
       //   {
       //   }
 
-      //   CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const DataType DOXY(coeffs)[image_dim][num_verts])
+      //   CUDA_HOST_DEVICE static inline DataType width_directed(const ImagePointType& DOXY(ray), const Tiny::Matrix<DataType, image_dim, num_verts>& DOXY(coeffs))
       //   {
       //   }
       // };
