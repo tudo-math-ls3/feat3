@@ -33,8 +33,8 @@ namespace FEAT
 
       MKL_INT ret = 0;
       MKL_INT opt = 0;
-      MKL_INT neq = _system_matrix.rows();
-      MKL_INT nze = _system_matrix.used_elements();
+      MKL_INT neq = static_cast<MKL_INT>(_system_matrix.rows());
+      MKL_INT nze = static_cast<MKL_INT>(_system_matrix.used_elements());
 
       // create DSS handle
       opt = MKL_DSS_TERM_LVL_ERROR + MKL_DSS_ZERO_BASED_INDEXING;
@@ -66,8 +66,8 @@ namespace FEAT
       }
       else
       {
-        row_ptr_v.resize(neq+1u);
-        col_idx_v.resize(nze);
+        row_ptr_v.resize(std::size_t(neq+1u));
+        col_idx_v.resize(std::size_t(nze));
         for(Index i(0); i <= Index(neq); ++i)
           row_ptr_v[i] = static_cast<MKL_INT>(a_row_ptr[i]);
         for(Index i(0); i < Index(nze); ++i)
@@ -81,7 +81,7 @@ namespace FEAT
       for(Index i(0); i < Index(neq); ++i)
       {
         bool have_diag = false;
-        for(Index j(row_ptr[i]); j < Index(row_ptr[i+1u]); ++j)
+        for(Index j = Index(row_ptr[i]); j < Index(row_ptr[i+1u]); ++j)
         {
           have_diag = have_diag || (Index(col_idx[j]) == i);
           if((j+1u < Index(row_ptr[i+1u])) && (col_idx[j+1u] <= col_idx[j]))

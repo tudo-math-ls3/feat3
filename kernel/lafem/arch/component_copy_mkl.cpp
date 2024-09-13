@@ -17,20 +17,20 @@ using namespace FEAT::LAFEM::Arch;
 
 void ComponentCopy::value_mkl(float * r, const float * const x, const int stride, const int block, const Index size)
 {
-  cblas_scopy(size, x, 1, &r[block], stride);
+  cblas_scopy(static_cast<MKL_INT>(size), x, 1, &r[block], static_cast<MKL_INT>(stride));
 }
 
 void ComponentCopy::value_mkl(double * r, const double * const x, const int stride, const int block, const Index size)
 {
-  cblas_dcopy(size, x, 1, &r[block], stride);
+  cblas_dcopy(static_cast<MKL_INT>(size), x, 1, &r[block], static_cast<MKL_INT>(stride));
 }
 
 void ComponentCopy::value_to_mkl(const float * const r, float * x, const int stride, const int block, const Index size)
 {
-  cblas_scopy(size, &r[block], stride, x, 1);
+  cblas_scopy(static_cast<MKL_INT>(size), &r[block], static_cast<MKL_INT>(stride), x, 1);
 }
 
 void ComponentCopy::value_to_mkl(const double * const r, double * x, const int stride, const int block, const Index size)
 {
-  cblas_dcopy(size, &r[block], stride, x, 1);
+  cblas_dcopy(static_cast<MKL_INT>(size), &r[block], static_cast<MKL_INT>(stride), x, 1);
 }

@@ -101,7 +101,7 @@ public:
       // now do a omp based loop
       std::vector<int> inside_test2(num_points);
       #pragma omp parallel for
-      for(int i = 0; i < int(num_points); ++i)
+      for(std::size_t i = 0; i < num_points; ++i)
       {
         // #ifdef FEAT_HAVE_OMP
         // if(i == 0)
@@ -110,7 +110,7 @@ public:
         inside_test2[i] = int(cw.point_inside(points[i][0], points[i][1], points[i][2]));
       }
 
-      for(int i = 0; i < int(num_points); ++i)
+      for(std::size_t i = 0; i < num_points; ++i)
       {
         TEST_CHECK_EQUAL(inside_tests[i], inside_test2[i]);
       }
