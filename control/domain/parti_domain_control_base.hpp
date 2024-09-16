@@ -1351,7 +1351,7 @@ namespace FEAT
           const auto& faces_at_elem = base_mesh_node.get_mesh()->template get_index_set<shape_dim, 0>();
 
           // call the partitioner
-          if(!partitioner.execute(faces_at_elem, ancestor.num_parts, weights))
+          if(!partitioner.execute(faces_at_elem, Index(ancestor.num_parts), weights))
             return false;
 
           // create partition graph

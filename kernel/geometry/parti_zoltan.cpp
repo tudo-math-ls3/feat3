@@ -286,22 +286,22 @@ namespace FEAT
     bool PartiZoltan::_gather_coloring(const int num_export, const int* export_parts)
     {
       // get my rank and size
-      const int z_rank = _zoltan_comm.rank();
-      const int z_size = _zoltan_comm.size();
+      const Index z_rank = Index(_zoltan_comm.rank());
+      const Index z_size = Index(_zoltan_comm.size());
 
       // determine maximum export size
-      int max_export(0);
-      _zoltan_comm.allreduce(&num_export, &max_export, 1u, Dist::op_max);
+      Index max_export = Index(num_export);
+      _zoltan_comm.allreduce(&max_export, &max_export, 1u, Dist::op_max);
       max_export += 1; // for actual size
 
       // allocate send buffer
       std::vector<int> send_buf(max_export);
       send_buf[0] = num_export;
-      for(int i(0); i < num_export; ++i)
+      for(Index i(0); i < Index(num_export); ++i)
         send_buf[i+1] = export_parts[i];
 
       // allocate receive buffer and gather coloring at rank 0
-      std::vector<int> recv_buf(z_rank == 0 ? max_export * z_size : std::size_t(0));
+      std::vector<int> recv_buf(z_rank == 0 ? max_export * z_size : Index(0));
       _zoltan_comm.gather(send_buf.data(), max_export, recv_buf.data(), max_export, 0);
 
       // all ranks > 0 are done here
@@ -309,21 +309,21 @@ namespace FEAT
         return true;
 
       // compute total element count
-      int num_elems(0);
-      for(int i(0); i < z_size; ++i)
-        num_elems += recv_buf[i*max_export];
+      Index num_elems(0);
+      for(Index i(0); i < z_size; ++i)
+        num_elems += Index(recv_buf[i*max_export]);
 
       // allocate ranks vector
       this->_coloring = Adjacency::Coloring(num_elems, this->_num_parts);
       Index* col = this->_coloring.get_coloring();
 
       // build ranks vector
-      for(int i(0), k(0); i < z_size; ++i)
+      for(Index i(0), k(0); i < z_size; ++i)
       {
-        int off = i*max_export;
-        int n = recv_buf[off];
-        for(int j(1); j <= n; ++j, ++k)
-          col[k] = recv_buf[off+j];
+        Index off = i*max_export;
+        Index n = Index(recv_buf[off]);
+        for(Index j(1); j <= n; ++j, ++k)
+          col[k] = Index(recv_buf[off+j]);
       }
 
       // build color counts

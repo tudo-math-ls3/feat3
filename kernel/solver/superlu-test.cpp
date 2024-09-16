@@ -152,8 +152,8 @@ public:
     const Dist::Comm& comm = *vec_sol.get_comm();
 
     const IT_ np = IT_(Math::sqrt(double(comm.size())));
-    const IT_ ii = IT_(comm.rank() / np);
-    const IT_ jj = IT_(comm.rank() % np);
+    const IT_ ii = IT_(comm.rank()) / np;
+    const IT_ jj = IT_(comm.rank()) % np;
 
     const IT_ n = IT_(Math::sqrt(double(vec_sol.local().size())));
     DataType* v = vec_sol.local().elements();
