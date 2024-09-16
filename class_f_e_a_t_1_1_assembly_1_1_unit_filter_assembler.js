@@ -2,8 +2,6 @@ var class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler =
 [
     [ "IdxSet", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a23f41efdd9fbd4e81b868a1e9a602e0f", null ],
     [ "MeshType", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a16f033f8dd60c443d573eb593227506a", null ],
-    [ "UnitFilterAssembler", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#ae2376c2d720d759c6be53eb1965239c4", null ],
-    [ "~UnitFilterAssembler", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a5b0759bfb25bfe995e32843d73724af6", null ],
     [ "add_mesh_part", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1b39e2621975a7d93d401e76e0d68163", null ],
     [ "assemble", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1b76079f66011dc5ef3e50dbdefce2f1", null ],
     [ "assemble", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a39c56fb5d2145d0ea39f9eb4d2a46459", null ],

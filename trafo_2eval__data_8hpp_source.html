@@ -143,7 +143,7 @@ $(document).ready(function(){initNavTree('trafo_2eval__data_8hpp_source.html',''
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_trafo_1_1_eval_data.html#ac10fcbc7d33a594422ed13a5804995ed">   62</a></span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="code hl_enumeration" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428">TrafoTags</a> <a class="code hl_variable" href="class_f_e_a_t_1_1_trafo_1_1_eval_data.html#ac10fcbc7d33a594422ed13a5804995ed">config</a> = cfg_tags_;</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#if defined(DEBUG) &amp;&amp; !defined(__CUDA_ARCH__)</span></div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>      <a class="code hl_class" href="class_f_e_a_t_1_1_trafo_1_1_eval_data.html">EvalData</a>()</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>      {</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        <span class="comment">// format all values to NaN</span></div>

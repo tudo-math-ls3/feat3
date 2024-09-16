@@ -5,7 +5,6 @@ var class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base =
     [ "PartType", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a762b81932c07f3126c88aa2422841ef2", null ],
     [ "VertexSetType", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a6c4000cbdf50d9ec19a431c40aacec10", null ],
     [ "WorldPoint", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#ae7e6057b9df59f90269596bee9af3f60", null ],
-    [ "~ChartBase", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a7e511deffbf1b1e24282a2c0d7e99f5c", null ],
     [ "adapt", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a0407171ddd019c4ae197fc6245115349", null ],
     [ "adapt", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a1652b93fc28b0806049b78945ca4640c", null ],
     [ "bytes", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html#a7619901767a0842436e3b8c616b6df81", null ],

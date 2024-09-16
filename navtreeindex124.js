@@ -1,5 +1,7 @@
 var NAVTREEINDEX124 =
 {
+"row__norm__generic_8hpp_source.html":[28,0,1,6,0,71],
+"rule_8hpp_source.html":[28,0,1,3,14],
 "rumpf__functional-eickt_8cpp_source.html":[28,0,1,7,9],
 "rumpf__functional_8hpp_source.html":[28,0,1,7,10],
 "rumpf__trafo-eickt_8cpp_source.html":[28,0,1,7,11],
@@ -247,7 +249,5 @@ var NAVTREEINDEX124 =
 "struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a452ea17479f6fc4fbe240b64a65af153":[27,0,0,2,70,6],
 "struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a57940ba55310c78a4b2ce9d07f98ccb3":[27,0,0,2,70,19],
 "struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a57940ba55310c78a4b2ce9d07f98ccb3":[26,0,0,2,69,19],
-"struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a7258cd7a7e2e67eefd55115862b942fe":[26,0,0,2,69,0],
-"struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a7258cd7a7e2e67eefd55115862b942fe":[27,0,0,2,70,0],
-"struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a8e78f41a6f18578d8ec5b75f65d82e9a":[26,0,0,2,69,4]
+"struct_f_e_a_t_1_1_assembly_1_1_vector_error_info.html#a7258cd7a7e2e67eefd55115862b942fe":[26,0,0,2,69,0]
 };
