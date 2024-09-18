@@ -23,6 +23,7 @@ namespace FEAT
         for (Index row(0); row < rows; row++)
         {
           const Index end = row_ptr[row + 1];
+          diag[row] = row_ptr[rows];
           for (Index col = row_ptr[row]; col < end; col++)
           {
             if (row == col_ind[col])
@@ -30,7 +31,6 @@ namespace FEAT
               diag[row] = IT_(col);
               break;
             }
-            diag[row] = row_ptr[rows];
           }
         }
       }

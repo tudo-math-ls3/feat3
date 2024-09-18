@@ -1002,6 +1002,23 @@ public:
       auto diag = a.extract_diag();
       TEST_CHECK_EQUAL(diag, ref);
     }
+
+    SparseMatrixFactory<DT_, IT_> b_fac(16, 16);
+    b_fac.add(0, 0, DT_(1.0));
+    b_fac.add(2, 2, DT_(2.0));
+    b_fac.add(3, 3, DT_(3.0));
+    b_fac.add(7, 7, DT_(7.0));
+
+    SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
+
+    auto ref = b.create_vector_l();
+    ref.format(DT_(0.0));
+    ref(0, DT_(1.0));
+    ref(2, DT_(2.0));
+    ref(3, DT_(3.0));
+    ref(7, DT_(7.0));
+    auto diag = b.extract_diag();
+    TEST_CHECK_EQUAL(diag, ref);
   }
 };
 
