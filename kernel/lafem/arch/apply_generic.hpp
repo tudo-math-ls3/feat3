@@ -153,6 +153,13 @@ namespace FEAT
         }
       }
 
+      template <int BlockHeight_, int BlockWidth_, typename DT_, typename IT_>
+      void Apply::bcsr_transposed_generic(DT_ * DOXY(r), const DT_ DOXY(a), const DT_ * const DOXY(x), const DT_ DOXY(b), const DT_ * const DOXY(y), const DT_ * const DOXY(val),
+        const IT_ * const DOXY(col_ind), const IT_ * const DOXY(row_ptr), const Index DOXY(rows), const Index, const Index)
+      {
+        XABORTM("not implemented");
+      }
+
       template <int BlockSize_, typename DT_, typename IT_>
       void Apply::csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index)
       {
@@ -394,6 +401,14 @@ namespace FEAT
 #endif //FEAT_UNROLL_BANDED
       }
 
+      template <typename DT_, typename IT_>
+      void Apply::banded_transposed_generic(DT_ * DOXY(r), const DT_ DOXY(alpha), const DT_ * const DOXY(x), const DT_ DOXY(beta), const DT_ * const DOXY(y),
+        const DT_ * const DOXY(val), const IT_ * const DOXY(offsets),
+        const Index DOXY(num_of_offsets), const Index DOXY(rows), const Index DOXY(columns))
+      {
+        XABORTM("not implemented");
+      }
+
       template <typename DT_>
       void Apply::dense_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
       {
@@ -415,6 +430,12 @@ namespace FEAT
           }
           r[row] = beta * r[row] + alpha * sum;
         }
+      }
+      template <typename DT_>
+      void Apply::dense_transposed_generic(DT_ * DOXY(r), const DT_ DOXY(alpha), const DT_ DOXY(beta), const DT_ * const DOXY(y),
+        const DT_ * const DOXY(val), const DT_ * const DOXY(x), const Index DOXY(rows), const Index DOXY(columns))
+      {
+        XABORTM("not implemented");
       }
 
     } // namespace Arch

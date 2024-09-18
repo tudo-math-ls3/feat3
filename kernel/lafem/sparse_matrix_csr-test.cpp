@@ -440,7 +440,7 @@ public:
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(2)*eps);
 
       // transposed apply-test for alpha = -1
-      a.apply(r, x, y,  DT_(-1.0), true);
+      a.apply_transposed(r, x, y,  DT_(-1.0));
       SparseMatrixCSR<DT_, IT_> at = a.transpose();
       at.apply(ref, x);
       ref.scale(ref,  DT_(-1.0));

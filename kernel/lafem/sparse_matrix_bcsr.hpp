@@ -1408,6 +1408,40 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector< DT_, IT_> & x) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+
+        TimeStamp ts_start;
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \attention r and x must \b not refer to the same vector object!
@@ -1436,6 +1470,42 @@ namespace FEAT
         Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+
+      /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVector< DT_, IT_> & x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
+          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
@@ -1478,6 +1548,41 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.elements(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \attention r and x must \b not refer to the same vector object!
@@ -1506,6 +1611,41 @@ namespace FEAT
         Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
+
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+          this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
@@ -1557,6 +1697,50 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      * \note r and y are allowed to refer to the same vector object.
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVector<DT_, IT_> & r,
+        const DenseVector< DT_, IT_> & x,
+        const DenseVector< DT_, IT_> & y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.copy(y);
+          //r.scale(beta);
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
+
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \attention r and x must \b not refer to the same vector object!
@@ -1593,6 +1777,49 @@ namespace FEAT
         Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
             this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      * \note r and y are allowed to refer to the same vector object.
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        const DenseVector< DT_, IT_> & x,
+        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if(this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.copy(y);
+          //r.scale(beta);
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops((this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2);
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
+          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;
@@ -1643,6 +1870,49 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      * \note r and y are allowed to refer to the same vector object.
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVector<DT_, IT_> & r,
+        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVector< DT_, IT_> & y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.copy(y);
+          //r.scale(beta);
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.elements(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
+          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \attention r and x must \b not refer to the same vector object!
@@ -1686,6 +1956,49 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      * \note r and y are allowed to refer to the same vector object.
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.copy(y);
+          //r.scale(beta);
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+          this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \attention r and x must \b not refer to the same vector object!
@@ -1722,6 +2035,49 @@ namespace FEAT
         Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
             r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
             this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      * \note r and y are allowed to refer to the same vector object.
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVector< DT_, IT_> & y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.convert(y);
+          //r.scale(beta);
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
+        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
+          r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
+          this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
 
         FEAT_KERNEL_MARKER_STOP("BCSR-apply");
         TimeStamp ts_stop;

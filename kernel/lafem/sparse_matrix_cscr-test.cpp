@@ -320,7 +320,7 @@ public:
   virtual void run() const override
   {
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
-    DT_ s(DT_(4711.1));
+    DT_ s(DT_(4.7111));
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       SparseMatrixFactory<DT_, IT_> a_fac(size, size);
@@ -366,6 +366,11 @@ public:
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
+      // apply-transposed-test for alpha = 0.0
+      a.apply_transposed(r, x, y, DT_(0.0));
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
+
       // apply-test for alpha = -1.0
       a.apply(r, x, y, DT_(-1.0));
       a.apply(ref, x);
@@ -374,13 +379,27 @@ public:
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
+      // apply-transposed-test for alpha = -1.0
+      a.apply_transposed(r, x, y, DT_(-1.0));
+      a.apply_transposed(ref, x);
+      ref.scale(ref, DT_(-1.0));
+      ref.axpy(y);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
       // apply-test for alpha = -1.0 and &r==&y
       r.copy(y);
       a.apply(r, x, r, DT_(-1.0));
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
-      // apply-test for alpha = 4711.1
+      // apply-transposed-test for alpha = -1.0 and &r==&y
+      r.copy(y);
+      a.apply_transposed(r, x, r, DT_(-1.0));
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+      // apply-test for alpha = 4.7111
       //r.axpy(s, a, x, y);
       a.apply(r, x, y, s);
       //ref.product_matvec(a, x);
@@ -390,7 +409,15 @@ public:
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
-      // apply-test for alpha = 4711.1 and &r==&y
+      // apply-transposed-test for alpha = 4.7111
+      a.apply_transposed(r, x, y, s);
+      a.apply_transposed(ref, x);
+      ref.scale(ref, s);
+      ref.axpy(y);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+      // apply-test for alpha = 4.7111 and &r==&y
       r.copy(y);
       a.apply(r, x, r, s);
       for (Index i(0) ; i < size ; ++i)

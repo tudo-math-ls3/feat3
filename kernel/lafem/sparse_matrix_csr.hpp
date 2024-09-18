@@ -1734,20 +1734,11 @@ namespace FEAT
        *
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
-       * \param[in] transposed Should the product use the transposed matrix?
        */
-      void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x, bool transposed = false) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        if (transposed)
-        {
-          XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-          XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        }
-        else
-        {
-          XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-          XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        }
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
 
         TimeStamp ts_start;
 
@@ -1761,7 +1752,38 @@ namespace FEAT
 
         Statistics::add_flops(this->used_elements() * 2);
         Arch::Apply::csr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
-            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
+            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), false);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0)
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops(this->used_elements() * 2);
+        Arch::Apply::csr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
+          this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), true);
 
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
@@ -1813,27 +1835,16 @@ namespace FEAT
        * \param[in] x The vector to be multiplied by this matrix.
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
-       * \param[in] transposed Should the product use the transposed matrix?
        */
       void apply(
                  DenseVector<DT_, IT_> & r,
                  const DenseVector<DT_, IT_> & x,
                  const DenseVector<DT_, IT_> & y,
-                 const DT_ alpha = DT_(1),
-                 const bool transposed = false) const
+                 const DT_ alpha = DT_(1)) const
       {
-        if (transposed)
-        {
-          XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-          XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-          XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
-        }
-        else
-        {
-          XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-          XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-          XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
-        }
+        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
 
         TimeStamp ts_start;
 
@@ -1848,7 +1859,47 @@ namespace FEAT
 
         Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
         Arch::Apply::csr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
-            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), transposed);
+            this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), false);
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \attention r and x must \b not refer to the same vector object!
+      * \note r and y are allowed to refer to the same vector object.
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVector<DT_, IT_> & r,
+        const DenseVector<DT_, IT_> & x,
+        const DenseVector<DT_, IT_> & y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        TimeStamp ts_start;
+
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.copy(y);
+          //r.scale(beta);
+          return;
+        }
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
+        Arch::Apply::csr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
+          this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements(), true);
 
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));

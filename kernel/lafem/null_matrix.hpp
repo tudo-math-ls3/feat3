@@ -430,6 +430,20 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+
+        r.format();
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -439,6 +453,20 @@ namespace FEAT
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
+
+        r.format();
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVector<DT_, IT_> & x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -458,6 +486,20 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        r.format();
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -467,6 +509,20 @@ namespace FEAT
       {
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+
+        r.format();
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -493,6 +549,27 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVector<DT_, IT_> & r,
+        const DenseVector<DT_, IT_> & x,
+        const DenseVector<DT_, IT_> & y,
+        const DT_ DOXY(alpha) = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+
+        r.copy(y);
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -512,6 +589,27 @@ namespace FEAT
 
         r.copy(y);
       }
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        const DenseVector<DT_, IT_> & x,
+        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        const DT_ DOXY(alpha) = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        r.copy(y);
+      }
+
 
       /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
@@ -535,6 +633,27 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVector<DT_, IT_> & r,
+        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVector<DT_, IT_> & y,
+        const DT_ DOXY(alpha) = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+
+        r.copy(y);
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -556,6 +675,27 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        const DT_ DOXY(alpha) = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        r.copy(y);
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -572,6 +712,27 @@ namespace FEAT
         XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
         XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
         XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
+
+        r.copy(y);
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(
+        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVector<DT_, IT_> & y,
+        const DT_ DOXY(alpha) = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
 
         r.copy(y);
       }

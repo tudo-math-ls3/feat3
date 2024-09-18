@@ -422,6 +422,39 @@ namespace FEAT
       }
 
       /**
+      * \brief Applies this matrix onto a vector.
+      *
+      * This function performs
+      *  \f[r \leftarrow this^\top \cdot x \f]
+      *
+      * \param[out] r
+      * The vector the receives the result.
+      *
+      * \param[in] x
+      * The multiplicant vector.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        first().apply_transposed(r.first(), x.first());
+        rest().apply_transposed(r.rest(), x.rest());
+      }
+
+      void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        DenseVector<DataType, IndexType> r_first(r, first().columns(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().columns(), first().columns());
+
+        DenseVector<DataType, IndexType> x_first(x, first().rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().rows(), first().rows());
+
+        first().apply_transposed(r_first, x_first);
+        rest().apply_transposed(r_rest, x_rest);
+      }
+
+      /**
        * \brief Applies this matrix onto a vector.
        *
        * This function performs
@@ -461,6 +494,48 @@ namespace FEAT
 
         first().apply(r_first, x_first, y_first, alpha);
         rest().apply(r_rest, x_rest, y_rest, alpha);
+      }
+
+      /**
+      * \brief Applies this matrix onto a vector.
+      *
+      * This function performs
+      *  \f[r \leftarrow y + \alpha\cdot this^\top \cdot x \f]
+      *
+      * \param[out] r
+      * The vector the receives the result.
+      *
+      * \param[in] x
+      * The multiplicant vector.
+      *
+      * \param[in] y
+      * The summand vector
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        first().apply_transposed(r.first(), x.first(), y.first(), alpha);
+        rest().apply_transposed(r.rest(), x.rest(), y.rest(), alpha);
+      }
+
+      void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+        const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        DenseVector<DataType, IndexType> r_first(r, first().columns(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().columns(), first().columns());
+
+        DenseVector<DataType, IndexType> x_first(x, first().rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().rows(), first().rows());
+
+        DenseVector<DataType, IndexType> y_first(y, first().columns(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, rest().columns(), first().columns());
+
+        first().apply_transposed(r_first, x_first, y_first, alpha);
+        rest().apply_transposed(r_rest, x_rest, y_rest, alpha);
       }
 
       /// Returns a new compatible L-Vector.
@@ -837,6 +912,16 @@ namespace FEAT
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         first().apply(r.first(), x.first(), y.first(), alpha);
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        first().apply_transposed(r.first(), x.first());
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        first().apply_transposed(r.first(), x.first(), y.first(), alpha);
       }
 
       /// Returns a new compatible L-Vector.

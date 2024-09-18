@@ -376,6 +376,27 @@ namespace FEAT
         _container.apply(r, x, y, alpha);
       }
 
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        _container.apply_transposed(r, x);
+      }
+
+      void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
+      {
+        _container.apply_transposed(r, x);
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        _container.apply_transposed(r, x, y, alpha);
+      }
+
+      void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+        const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      {
+        _container.apply_transposed(r, x, y, alpha);
+      }
+
       template <typename SubType2_>
       void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
       {

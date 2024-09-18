@@ -94,6 +94,14 @@ namespace FEAT
           bcsr_generic<BlockHeight_, BlockWidth_, DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
 
+        template <int BlockHeight_, int BlockWidth_, typename DT_, typename IT_>
+        static void bcsr_transposed(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns,
+          const Index used_elements)
+        {
+          bcsr_transposed_generic<BlockHeight_, BlockWidth_, DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+
         template <int BlockHeight_, int BlockWidth_>
         static void bcsr(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val,
                          const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns,
@@ -144,6 +152,12 @@ namespace FEAT
           banded_generic(r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns);
         }
 
+        template <typename DT_, typename IT_>
+        static void banded_transposed(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
+        {
+          banded_transposed_generic(r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns);
+        }
+
         static void banded(float * r, const float alpha, const float * const x, const float beta, const float * const y, const float * const val, const std::uint64_t * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
           BACKEND_SKELETON_VOID(banded_cuda, banded_generic, banded_generic, r, alpha, x, beta, y, val, offsets, num_of_offsets, rows, columns)
@@ -168,6 +182,12 @@ namespace FEAT
         static void dense(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
         {
           dense_generic(r, alpha, beta, y, val, x, rows, columns);
+        }
+
+        template <typename DT_>
+        static void dense_transposed(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
+        {
+          dense_transposed_generic(r, alpha, beta, y, val, x, rows, columns);
         }
 
 #ifdef FEAT_HAVE_HALFMATH
@@ -211,14 +231,24 @@ namespace FEAT
         static void bcsr_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
                          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
+        template <int BlockHeight_, int BlockWidth_, typename DT_, typename IT_>
+        static void bcsr_transposed_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+          const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
+
         template <int BlockSize_, typename DT_, typename IT_>
         static void csrsb_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
         static void banded_generic(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns);
 
+        template <typename DT_, typename IT_>
+        static void banded_transposed_generic(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns);
+
         template <typename DT_>
         static void dense_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
+
+        template <typename DT_>
+        static void dense_transposed_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const rhs, const DT_ * const val, const DT_ * const x, const Index rows, const Index columns);
 
         static void csr_mkl(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);
         static void csr_mkl(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index columns, const Index, const bool);

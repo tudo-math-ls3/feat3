@@ -975,6 +975,37 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(DenseVector<DT_, IT_>& r, const DenseVector<DT_, IT_>& x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        TimeStamp ts_start;
+        Statistics::add_flops( 2 * this->used_elements() );
+
+        Arch::Apply::banded_transposed(r.elements(),
+          DT_(1),
+          x.elements(),
+          DT_(0),
+          r.elements(),
+          this->val(),
+          this->offsets(),
+          this->num_of_offsets(),
+          this->rows(),
+          this->columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -1013,6 +1044,50 @@ namespace FEAT
             this->num_of_offsets(),
             this->rows(),
             this->columns());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top\cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(DenseVector<DT_, IT_>& r,
+        const DenseVector<DT_, IT_>& x,
+        const DenseVector<DT_, IT_>& y,
+        const DT_ alpha = DT_(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+
+        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        {
+          r.copy(y);
+          //r.scale(beta);
+          return;
+        }
+
+        TimeStamp ts_start;
+        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
+
+        Arch::Apply::banded_transposed(r.elements(),
+          alpha,
+          x.elements(),
+          DT_(1),
+          y.elements(),
+          this->val(),
+          this->offsets(),
+          this->num_of_offsets(),
+          this->rows(),
+          this->columns());
 
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));

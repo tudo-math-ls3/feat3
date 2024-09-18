@@ -317,6 +317,27 @@ namespace FEAT
       }
 
       /**
+      * \brief Performs a matrix-vector multiplication: r <- A^T*x
+      *
+      * \param[inout] r
+      * A \transient reference to the vector that should receive the result of the matrix-vector product.
+      * Must be allocated to the correct sizes and must have a valid gate assigned, but its numerical
+      * contents upon entry are ignored. Must not be the same object as \p x.
+      *
+      * \param[in] x
+      * A \transient reference to the vector that is to be multiplied by this matrix.
+      * Must not be the same object as \p r.
+      *
+      * \attention This function must be called by all processes participating in the gate's
+      * communicator, otherwise the application will deadlock.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        _matrix.apply_transposed(r.local(), x.local());
+        r.sync_0();
+      }
+
+      /**
        * \brief Performs a matrix-vector multiplication: r <- A*x
        *
        * \param[inout] r
@@ -336,6 +357,29 @@ namespace FEAT
       auto apply_async(VectorTypeL& r, const VectorTypeR& x) const -> decltype(r.sync_0_async())
       {
         _matrix.apply(r.local(), x.local());
+        return r.sync_0_async();
+      }
+
+      /**
+      * \brief Performs a matrix-vector multiplication: r <- A^T*x
+      *
+      * \param[inout] r
+      * A \transient reference to the vector that should receive the result of the matrix-vector product.
+      * Must be allocated to the correct sizes and must have a valid gate assigned, but its numerical
+      * contents upon entry are ignored. Must not be the same object as \p x.
+      *
+      * \param[in] x
+      * A \transient reference to the vector that is to be multiplied by this matrix.
+      * Must not be the same object as \p r.
+      *
+      * \returns A SynchVectorTicket object that waits for the operation to complete.
+      *
+      * \attention This function must be called by all processes participating in the gate's
+      * communicator, otherwise the application will deadlock.
+      */
+      auto apply_transposed_async(VectorTypeR& r, const VectorTypeL& x) const -> decltype(r.sync_0_async())
+      {
+        _matrix.apply_transposed(r.local(), x.local());
         return r.sync_0_async();
       }
 
@@ -378,6 +422,44 @@ namespace FEAT
       }
 
       /**
+      * \brief Performs a matrix-vector multiplication: r <- y + alpha*A^T*x
+      *
+      * \param[inout] r
+      * A \transient reference to the vector that should receive the result of the matrix-vector product.
+      * Must be allocated to the correct sizes and must have a valid gate assigned, but its numerical
+      * contents upon entry are ignored. Must not be the same object as \p x, but it may be
+      * the same object as \p y.
+      *
+      * \param[in] x
+      * A \transient reference to the vector that is to be multiplied by this matrix.
+      * Must not be the same object as \p r.
+      *
+      * \param[in] y
+      * A \transient reference to the vector that is to be added onto the result of the product.
+      * May be the same object as \p r.
+      *
+      * \param[in] alpha
+      * A scaling factor for the matrix-vector product A*x.
+      *
+      * \attention This function must be called by all processes participating in the gate's
+      * communicator, otherwise the application will deadlock.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, const DataType alpha = DataType(1)) const
+      {
+        // copy y to r
+        r.copy(y);
+
+        // convert from type-1 to type-0
+        r.from_1_to_0();
+
+        // r <- r + alpha*A^T*x
+        _matrix.apply_transposed(r.local(), x.local(), r.local(), alpha);
+
+        // synchronize r
+        r.sync_0();
+      }
+
+      /**
        * \brief Performs a matrix-vector multiplication: r <- y + alpha*A*x
        *
        * \param[inout] r
@@ -412,6 +494,46 @@ namespace FEAT
 
         // r <- r + alpha*A*x
         _matrix.apply(r.local(), x.local(), r.local(), alpha);
+
+        // synchronize r
+        return r.sync_0_async();
+      }
+
+      /**
+      * \brief Performs a matrix-vector multiplication: r <- y + alpha*A^T*x
+      *
+      * \param[inout] r
+      * A \transient reference to the vector that should receive the result of the matrix-vector product.
+      * Must be allocated to the correct sizes and must have a valid gate assigned, but its numerical
+      * contents upon entry are ignored. Must not be the same object as \p x, but it may be
+      * the same object as \p y.
+      *
+      * \param[in] x
+      * A \transient reference to the vector that is to be multiplied by this matrix.
+      * Must not be the same object as \p r.
+      *
+      * \param[in] y
+      * A \transient reference to the vector that is to be added onto the result of the product.
+      * May be the same object as \p r.
+      *
+      * \param[in] alpha
+      * A scaling factor for the matrix-vector product A*x.
+      *
+      * \returns A SynchVectorTicket object that waits for the operation to complete.
+      *
+      * \attention This function must be called by all processes participating in the gate's
+      * communicator, otherwise the application will deadlock.
+      */
+      auto apply_transposed_async(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, const DataType alpha = DataType(1)) const -> decltype(r.sync_0_async())
+      {
+        // copy y to r
+        r.copy(y);
+
+        // convert from type-1 to type-0
+        r.from_1_to_0();
+
+        // r <- r + alpha*A^T*x
+        _matrix.apply_transposed(r.local(), x.local(), r.local(), alpha);
 
         // synchronize r
         return r.sync_0_async();

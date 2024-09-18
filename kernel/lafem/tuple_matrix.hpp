@@ -308,10 +308,22 @@ namespace FEAT
         rest().apply(r, x.rest(), r, DataType(1));
       }
 
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        first().apply_transposed(r.first(), x);
+        rest().apply_transposed(r.rest(), x);
+      }
+
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         first().apply(r, x.first(), y, alpha);
         rest().apply(r, x.rest(), r, alpha);
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        first().apply_transposed(r.first(), x, y.first(), alpha);
+        rest().apply_transposed(r.rest(), x, y.rest(), alpha);
       }
 
       Index get_length_of_line(const Index row) const
@@ -560,6 +572,16 @@ namespace FEAT
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         first().apply(r, x.first(), y, alpha);
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        first().apply_transposed(r.first(), x);
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        first().apply_transposed(r.first(), x, y.first(), alpha);
       }
 
       Index get_length_of_line(const Index row) const
@@ -996,6 +1018,18 @@ namespace FEAT
       }
 
       /**
+      * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        first().apply_transposed(r, x.first());
+        rest().apply_transposed(r, x.rest(), r, DataType(1));
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow y + \alpha~ this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -1007,6 +1041,20 @@ namespace FEAT
       {
         first().apply(r.first(), x, y.first(), alpha);
         rest().apply(r.rest(), x, y.rest(), alpha);
+      }
+
+      /**
+      * \brief Calculate \f$ r \leftarrow y + \alpha~ this^\top \cdot x \f$
+      *
+      * \param[out] r The vector that receives the result.
+      * \param[in] x The vector to be multiplied by this matrix.
+      * \param[in] y The summand vector.
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        first().apply_transposed(r, x.first(), y, alpha);
+        rest().apply_transposed(r, x.rest(), r, alpha);
       }
 
       Index get_length_of_line(const Index row) const
@@ -1270,6 +1318,16 @@ namespace FEAT
       void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1)) const
       {
         first().apply(r.first(), x, y.first(), alpha);
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        first().apply_transposed(r, x.first());
+      }
+
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        first().apply(r, x.first(), y, alpha);
       }
 
       Index get_length_of_line(const Index row) const

@@ -467,6 +467,41 @@ namespace FEAT
       }
 
       /**
+      * \brief Applies this matrix onto a vector.
+      *
+      * This function performs
+      *  \f[r \leftarrow this^\top \cdot x \f]
+      *
+      * \param[out] r
+      * The vector the receives the result.
+      *
+      * \param[in] x
+      * The multiplicant vector.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x) const
+      {
+        block_a().apply_transposed(r.template at<0>(), x.template at<0>());
+        block_d().apply_transposed(r.template at<0>(), x.template at<1>(), r.template at<0>(), DataType(1));
+        block_b().apply_transposed(r.template at<1>(), x.template at<0>());
+      }
+
+      void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+
+        DenseVector<DataType, IndexType> r_first(r, block_a().columns(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_b().columns(), block_a().columns());
+
+        DenseVector<DataType, IndexType> x_first(x, block_a().rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_d().rows(), block_a().rows());
+
+        block_a().apply_transposed(r_first, x_first);
+        block_d().apply_transposed(r_first, x_rest, r_first, DataType(1));
+        block_b().applytransposed(r_rest, x_first);
+      }
+
+      /**
        * \brief Applies this matrix onto a vector.
        *
        * This function performs
@@ -509,6 +544,51 @@ namespace FEAT
         block_a().apply(r_first, x_first, y_first, alpha);
         block_b().apply(r_first, x_rest, r_first, alpha);
         block_d().apply(r_rest, x_first, y_rest, alpha);
+      }
+
+      /**
+      * \brief Applies this matrix onto a vector.
+      *
+      * This function performs
+      *  \f[r \leftarrow y + \alpha\cdot this^\top \cdot x \f]
+      *
+      * \param[out] r
+      * The vector the receives the result.
+      *
+      * \param[in] x
+      * The multiplicant vector.
+      *
+      * \param[in] y
+      * The summand vector
+      *
+      * \param[in] alpha A scalar to scale the product with.
+      */
+      void apply_transposed(VectorTypeR& r, const VectorTypeL& x, const VectorTypeR& y, DataType alpha = DataType(1)) const
+      {
+        block_a().apply_transposed(r.template at<0>(), x.template at<0>(), y.template at<0>(), alpha);
+        block_d().apply_transposed(r.template at<0>(), x.template at<1>(), r.template at<0>(), alpha);
+        block_b().apply_transposed(r.template at<1>(), x.template at<0>(), y.template at<1>(), alpha);
+      }
+
+      void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
+        const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
+      {
+        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+
+        DenseVector<DataType, IndexType> r_first(r, block_a().columns(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_b().columns(), block_a().columns());
+
+        DenseVector<DataType, IndexType> x_first(x, block_a().rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_d().rows(), block_a().rows());
+
+        DenseVector<DataType, IndexType> y_first(y, block_a().columns(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, block_b().columns(), block_a().columns());
+
+        block_a().apply_transposed(r_first, x_first, y_first, alpha);
+        block_d().apply_transposed(r_first, x_rest, r_first, alpha);
+        block_b().apply_transposed(r_rest, x_first, y_rest, alpha);
       }
 
       /// Returns a new compatible L-Vector.
