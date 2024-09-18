@@ -4,22 +4,21 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_INTEL_HPP
-#define KERNEL_UTIL_COMPILER_INTEL_HPP 1
+#ifndef KERNEL_UTIL_COMPILER_INTEL_ONEAPI_HPP
+#define KERNEL_UTIL_COMPILER_INTEL_ONEAPI_HPP 1
 
 /**
  * \file compiler_intel.hpp
  *
- * \brief Compiler detection header for Intel C++ compiler.
+ * \brief Compiler detection header for Intel OneAPI C++ compiler.
  *
- * \author Dominik Goeddeke
+ * \author Dirk Ribbrock, Peter Zajac
  */
 
 #if !defined(FEAT_COMPILER) && defined(__INTEL_LLVM_COMPILER)
 
-// define FEAT_COMPILER_INTEL macro
-// Note that __ICC is already linear sortable
-#  define FEAT_COMPILER_INTEL __INTEL_LLVM_COMPILER
+// define FEAT_COMPILER_INTEL_ONEAPI macro
+#  define FEAT_COMPILER_INTEL_ONEAPI __INTEL_LLVM_COMPILER
 
 // map version to human-readable string
 #  if(__INTEL_LLVM_COMPILER >= 20250000)
@@ -35,27 +34,22 @@
 #  elif(__INTEL_LLVM_COMPILER >= 20200000)
 #    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2020."
 #  else
-// too old to have a chance to support FEAT anyway
 #    define FEAT_COMPILER "Intel OneAPI C/C++ compiler"
 #  endif
 
-#  define FEAT_DISABLE_WARNINGS _Pragma("warning(push,0)") \
-    _Pragma("warning(disable:177)") \
-    _Pragma("warning(disable:2259)") \
-    _Pragma("warning(disable:1478)") \
-    _Pragma("warning(disable:1599)") \
-    _Pragma("warning(disable:1944)") \
-    _Pragma("warning(disable:3280)") \
-    _Pragma("warning(disable:858)")
+// oneAPI compilers are based on clang, so use clang-style diagnostics
 
-#  define FEAT_RESTORE_WARNINGS _Pragma("warning(pop)")
+#define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Wall\"") \
+  _Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"") \
+  _Pragma("clang diagnostic ignored \"-Wshadow\"") \
+  _Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-builtins\"") \
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-copy-with-user-provided-dtor\"")
 
-#  define FEAT_PRAGMA_IVDEP _Pragma("ivdep")
+#define FEAT_RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 
-
-// disable warning #2196 (routine is both "inline" and "noinline") unconditionally
-/// \todo evaluate, if the icc finally inlines or not the corresponding routines, marked by NOINLINE
-_Pragma("warning(disable:2196)")
+#define FEAT_PRAGMA_IVDEP _Pragma("ivdep")
 
 // define the noinline specifier
 #define NOINLINE __attribute__((noinline))
@@ -64,4 +58,4 @@ _Pragma("warning(disable:2196)")
 
 #endif // !defined(FEAT_COMPILER) && defined(__INTEL_LLVM_COMPILER)
 
-#endif // KERNEL_UTIL_COMPILER_INTEL_HPP
+#endif // KERNEL_UTIL_COMPILER_INTEL_ONEAPI_HPP
