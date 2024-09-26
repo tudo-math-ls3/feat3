@@ -387,6 +387,127 @@ DenseMatrixApplyTest <double, std::uint64_t> cuda_dense_matrix_apply_test_double
 template<
   typename DT_,
   typename IT_>
+class DenseMatrixApplyTransposedTest
+  : public UnitTest
+{
+public:
+  double _eps;
+
+  explicit DenseMatrixApplyTransposedTest(PreferredBackend backend, double eps)
+    : UnitTest("DenseMatrixApplyTransposedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
+    _eps(eps)
+  {
+  }
+
+  virtual ~DenseMatrixApplyTransposedTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ s(DT_(0.123));
+    for (Index size(16); size < 100; size *= 2)
+    {
+      DenseMatrix<DT_, IT_> a(size + 1, size, DT_(0));
+      DenseVector<DT_, IT_> x(size + 1);
+
+      DenseVector<DT_, IT_> y(size);
+      DenseVector<DT_, IT_> ref(size);
+      DenseVector<DT_, IT_> result(size, DT_(4711));
+
+      for (Index i(0); i < x.size(); ++i)
+      {
+        x(i, DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234))));
+      }
+      for (Index i(0); i < y.size(); ++i)
+      {
+        y(i, DT_(DT_(2) - DT_(i % 42)));
+      }
+
+      for (Index i(0); i < a.size(); ++i)
+      {
+        a.elements()[i] = DT_(DT_(i % 100) * DT_(1.234));
+      }
+
+      // apply-test for alpha = 0.0
+      a.apply_transposed(result, x, y, DT_(0.0));
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_RELATIVE(y(i), result(i), eps);
+
+      //apply-test for reduced apply call
+      a.apply_transposed(result, x);
+      for (Index i(0); i < a.columns(); ++i)
+      {
+        DT_ sum(0);
+        for (Index j(0); j < a.rows(); ++j)
+        {
+          sum += a(j, i) * x(j);
+        }
+        ref(i, sum);
+      }
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+
+      //apply-test for alpha = -1.0
+      a.apply_transposed(result, x, y, DT_(-1.0));
+      for (Index i(0); i < a.columns(); ++i)
+      {
+        DT_ sum(0);
+        for (Index j(0); j < a.rows(); ++j)
+        {
+          sum += a(j, i) * x(j);
+        }
+        ref(i, y(i) - sum);
+      }
+
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+
+      // apply-test for s = 0.123
+      a.apply_transposed(result, x, y, s);
+
+      Backend::set_preferred_backend(PreferredBackend::generic);
+      a.apply_transposed(ref, x);
+      ref.scale(ref, s);
+      ref.axpy(y); /// \todo use axpby here
+
+      for (Index i(0); i < result.size(); ++i)
+        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+    }
+  }
+};
+
+DenseMatrixApplyTransposedTest <float, std::uint32_t> dense_matrix_apply_transposed_test_float_uint32(PreferredBackend::generic, 1e-3);
+DenseMatrixApplyTransposedTest <double, std::uint32_t> dense_matrix_apply_transposed_test_double_uint32(PreferredBackend::generic, 1e-5);
+DenseMatrixApplyTransposedTest <float, std::uint64_t> dense_matrix_apply_transposed_test_float_uint64(PreferredBackend::generic, 1e-3);
+DenseMatrixApplyTransposedTest <double, std::uint64_t> dense_matrix_apply_transposed_test_double_uint64(PreferredBackend::generic, 1e-5);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixApplyTransposedTest <float, std::uint64_t> mkl_dense_matrix_apply_transposed_test_float_uint64(PreferredBackend::mkl, 1e-3);
+DenseMatrixApplyTransposedTest <double, std::uint64_t> mkl_dense_matrix_apply_transposed_test_double_uint64(PreferredBackend::mkl, 1e-5);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixApplyTransposedTest <__float128, std::uint32_t> dense_matrix_apply_transposed_test_float128_uint32(PreferredBackend::generic, 1e-6);
+DenseMatrixApplyTransposedTest <__float128, std::uint64_t> dense_matrix_apply_transposed_test_float128_uint64(PreferredBackend::generic, 1e-6);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixApplyTransposedTest <Half, std::uint32_t> dense_matrix_apply_transposed_test_half_uint32(PreferredBackend::generic, 5e-2);
+DenseMatrixApplyTransposedTest <Half, std::uint64_t> dense_matrix_apply_transposed_test_half_uint64(PreferredBackend::generic, 5e-2);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixApplyTransposedTest <Half, std::uint32_t> cuda_dense_matrix_apply_transposed_test_half_uint32(PreferredBackend::cuda, 5e-1);
+DenseMatrixApplyTransposedTest <Half, std::uint64_t> cuda_dense_matrix_apply_transposed_test_half_uint64(PreferredBackend::cuda, 5e-1);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixApplyTransposedTest <float, std::uint32_t> cuda_dense_matrix_apply_transposed_test_float_uint32(PreferredBackend::cuda, 1e-2);
+DenseMatrixApplyTransposedTest <double, std::uint32_t> cuda_dense_matrix_apply_transposed_test_double_uint32(PreferredBackend::cuda, 1e-4);
+DenseMatrixApplyTransposedTest <float, std::uint64_t> cuda_dense_matrix_apply_transposed_test_float_uint64(PreferredBackend::cuda, 1e-2);
+DenseMatrixApplyTransposedTest <double, std::uint64_t> cuda_dense_matrix_apply_transposed_test_double_uint64(PreferredBackend::cuda, 1e-4);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
   class DenseMatrixAxpyTest
   : public UnitTest
 {

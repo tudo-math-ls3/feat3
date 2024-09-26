@@ -141,23 +141,45 @@ namespace FEAT
           const IT_ end(row_ptr[row + 1]);
           for (IT_ i(row_ptr[row]) ; i < end ; ++i)
           {
-            for (int h(0) ; h < BlockHeight_ ; ++h)
-            {
-              for (int w(0) ; w < BlockWidth_ ; ++w)
-              {
-                bsum[h] += bval[i][h][w] * bx[col_ind[i]][w];
-              }
-            }
+            bsum.add_mat_vec_mult(bval[i], bx[col_ind[i]]);
           }
           br[row] = (bsum * a) + (b * br[row]);
         }
       }
 
       template <int BlockHeight_, int BlockWidth_, typename DT_, typename IT_>
-      void Apply::bcsr_transposed_generic(DT_ * DOXY(r), const DT_ DOXY(a), const DT_ * const DOXY(x), const DT_ DOXY(b), const DT_ * const DOXY(y), const DT_ * const DOXY(val),
-        const IT_ * const DOXY(col_ind), const IT_ * const DOXY(row_ptr), const Index DOXY(rows), const Index, const Index)
+      void Apply::bcsr_transposed_generic(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, const DT_ * const y, const DT_ * const val,
+        const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index columns, const Index)
       {
-        XABORTM("not implemented");
+        Tiny::Vector<DT_, BlockWidth_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockWidth_> *>(r));
+        const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *>(val));
+        const Tiny::Vector<DT_, BlockHeight_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> *>(x));
+
+        if (Math::abs(b) < Math::eps<DT_>())
+        {
+          MemoryPool::set_memory(r, DT_(0), columns * BlockWidth_);
+        }
+        else if (r != y)
+        {
+          MemoryPool::copy(r, y, columns * BlockWidth_);
+        }
+
+        DT_ ba = b/a;
+        for (Index col(0) ; col < columns ; ++col)
+        {
+          br[col] = ba * br[col];
+        }
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
+          {
+            br[col_ind[i]].add_vec_mat_mult(bx[row], bval[i]);
+          }
+        }
+        for (Index col(0) ; col < columns ; ++col)
+        {
+          br[col] = a * br[col];
+        }
       }
 
       template <int BlockSize_, typename DT_, typename IT_>
@@ -431,11 +453,29 @@ namespace FEAT
           r[row] = beta * r[row] + alpha * sum;
         }
       }
+
       template <typename DT_>
-      void Apply::dense_transposed_generic(DT_ * DOXY(r), const DT_ DOXY(alpha), const DT_ DOXY(beta), const DT_ * const DOXY(y),
-        const DT_ * const DOXY(val), const DT_ * const DOXY(x), const Index DOXY(rows), const Index DOXY(columns))
+      void Apply::dense_transposed_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const y,
+        const DT_ * const val, const DT_ * const x, const Index rows, const Index columns)
       {
-        XABORTM("not implemented");
+        if (Math::abs(beta) < Math::eps<DT_>())
+        {
+          MemoryPool::set_memory(r, DT_(0), columns);
+        }
+        else if (r != y)
+        {
+          MemoryPool::copy(r, y, columns);
+        }
+
+        for (Index col(0) ; col < columns ; ++col)
+        {
+          DT_ sum(0);
+          for (Index row(0); row < rows; ++row)
+          {
+            sum += val[row * columns + col] * x[row];
+          }
+          r[col] = beta * r[col] + alpha * sum;
+        }
       }
 
     } // namespace Arch

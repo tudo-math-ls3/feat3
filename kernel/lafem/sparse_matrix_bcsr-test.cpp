@@ -380,6 +380,158 @@ SparseMatrixBCSRApplyTest <double, std::uint32_t> cuda_sm_bcsr_apply_test_double
 #endif
 
 /**
+* \brief Test class for the sparse matrix csr blocked apply transposed method.
+*
+* \test test description missing
+*
+* \author Pia Ritter
+*/
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRApplyTransposedTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRApplyTransposedTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRApplyTransposedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRApplyTransposedTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+    DenseVector<DT_, IT_> dv1(12);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+      dv1(i, DT_(i+1));
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 3, 2> c(2, 2, dv2, dv1, dv3);
+
+    DenseVector<DT_, IT_> x(c.template rows<Perspective::pod>());
+    DenseVector<DT_, IT_> y(c.template columns<Perspective::pod>());
+    DenseVector<DT_, IT_> r(c.template columns<Perspective::pod>());
+    DenseVector<DT_, IT_> ref(c.template columns<Perspective::pod>());
+    for (Index i(0) ; i < x.size() ; ++i)
+    {
+      x(i, DT_(i));
+    }
+    for (Index i(0) ; i < r.size() ; ++i)
+    {
+      r(i, DT_(4711));
+      ref(i, DT_(4711));
+      y(i, DT_(i % 100));
+    }
+    DenseVectorBlocked<DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<DT_, IT_, 2> yb(y);
+    DenseVectorBlocked<DT_, IT_, 2> rb(r);
+
+    SparseMatrixCSR<DT_, IT_> csr;
+    csr.convert(c);
+    csr.apply_transposed(ref, x);
+
+    c.apply_transposed(r, x);
+
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(rb, x);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(r, xb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(rb, xb);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    //defect
+    DT_ alpha(-1);
+    csr.apply_transposed(ref, x, y, alpha);
+    c.apply_transposed(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(rb, x, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(r, xb, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(rb, xb, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.apply_transposed(rb, xb, y, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    //axpy
+    alpha = DT_(1.234);
+    csr.apply_transposed(ref, x, y, alpha);
+    c.apply_transposed(r, x, y, alpha);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+    // &r == &y
+    r.copy(y);
+    c.apply_transposed(r, x, r, alpha);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+    c.apply_transposed(rb, x, yb, alpha);
+    r.convert(rb);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+    c.apply_transposed(r, xb, y, alpha);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+    c.apply_transposed(rb, xb, yb, alpha);
+    r.convert(rb);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+
+    c.apply_transposed(rb, xb, y, alpha);
+    r.convert(rb);
+    for (Index i(0) ; i < r.size() ; ++i)
+      TEST_CHECK_RELATIVE(r(i), ref(i), eps);
+  }
+};
+SparseMatrixBCSRApplyTransposedTest <float, std::uint64_t> cpu_sm_bcsr_apply_transposed_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplyTransposedTest <double, std::uint64_t> cpu_sm_bcsr_apply_transposed_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplyTransposedTest <float, std::uint32_t> cpu_sm_bcsr_apply_transposed_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRApplyTransposedTest <double, std::uint32_t> cpu_sm_bcsr_apply_transposed_test_double_uint32(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRApplyTransposedTest <float, std::uint64_t> mkl_cpu_sm_bcsr_apply_transposed_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRApplyTransposedTest <double, std::uint64_t> mkl_cpu_sm_bcsr_apply_transposed_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRApplyTransposedTest <__float128, std::uint64_t> cpu_sm_bcsr_apply_transposed_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBCSRApplyTransposedTest <__float128, std::uint32_t> cpu_sm_bcsr_apply_transposed_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRApplyTransposedTest <Half, std::uint32_t> cpu_sm_bcsr_apply_transposed_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRApplyTransposedTest <Half, std::uint64_t> cpu_sm_bcsr_apply_transposed_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRApplyTransposedTest <float, std::uint64_t> cuda_sm_bcsr_apply_transposed_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTransposedTest <double, std::uint64_t> cuda_sm_bcsr_apply_transposed_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTransposedTest <float, std::uint32_t> cuda_sm_bcsr_apply_transposed_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBCSRApplyTransposedTest <double, std::uint32_t> cuda_sm_bcsr_apply_transposed_test_double_uint32(PreferredBackend::cuda);
+#endif
+
+/**
  * \brief Test class for the sparse matrix csr blocked apply method.
  *
  * \test test description missing
