@@ -48,7 +48,7 @@ namespace FEAT
 
     public:
       /// the coarse-level multiplexer
-      MuxerType* _coarse_muxer;
+      const MuxerType* _coarse_muxer;
       /// the local transfer operator
       LocalTransfer_ _transfer;
       /// a temporary local vector
@@ -79,7 +79,7 @@ namespace FEAT
        * The arguments that are passed to the local transfer operator constructor.
        */
       template<typename... Args_>
-      explicit Transfer(MuxerType* coarse_muxer, Args_&&... args) :
+      explicit Transfer(const MuxerType* coarse_muxer, Args_&&... args) :
         _coarse_muxer(coarse_muxer),
         _transfer(std::forward<Args_>(args)...),
         _vec_tmp(_transfer.get_mat_rest().create_vector_l())
