@@ -195,17 +195,13 @@ namespace FEAT
         if((void*)this == (void*)&other)
           return;
 
-        this->_ranks.clear();
-        this->_mirrors.clear();
-
         this->_comm = other._comm;
         this->_ranks = other._ranks;
 
-        for(auto& other_mirrors_i : other._mirrors)
+        this->_mirrors.resize(other._mirrors.size());
+        for(std::size_t i(0); i < other._mirrors.size(); ++i)
         {
-          MirrorType mirrors_i;
-          mirrors_i.convert(other_mirrors_i);
-          this->_mirrors.push_back(std::move(mirrors_i));
+          this->_mirrors.at(i).convert(other._mirrors.at(i));
         }
 
         this->_freqs.convert(other._freqs);

@@ -164,6 +164,7 @@ namespace FEAT
         this->_buffer_size = other._buffer_size;
         this->_parent_mirror.convert(other._parent_mirror);
 
+        this->_child_mirrors.resize(other._child_mirrors.size());
         for(std::size_t i(0); i < other._child_mirrors.size(); ++i)
         {
           this->_child_mirrors.at(i).convert(other._child_mirrors.at(i));
