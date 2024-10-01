@@ -59,6 +59,7 @@ set(test_list
   sparse_matrix_factory-test
   sparse_vector-test
   sparse_vector_blocked-test
+  test_matrix_factory-test
   unit_filter-test
   unit_filter_blocked-test
   vector_mirror-test
