@@ -45,13 +45,19 @@ namespace FEAT
     /// bit-wise AND operator for TestMatrixFlags
     inline TestMatrixFlags operator&(TestMatrixFlags a, TestMatrixFlags b)
     {
-      return (TestMatrixFlags)(((int)a) & ((int)b));
+      return static_cast<TestMatrixFlags>(static_cast<int>(a) & static_cast<int>(b));
     }
 
     /// bit-wise OR operator for TestMatrixFlags
     inline TestMatrixFlags operator|(TestMatrixFlags a, TestMatrixFlags b)
     {
-      return (TestMatrixFlags)(((int)a) | ((int)b));
+      return static_cast<TestMatrixFlags>(static_cast<int>(a) | static_cast<int>(b));
+    }
+
+    /// checks whether a & b != 0
+    inline bool operator*(TestMatrixFlags a, TestMatrixFlags b)
+    {
+      return static_cast<int>(a & b) != 0;
     }
 
     class TestMatrixFactory
