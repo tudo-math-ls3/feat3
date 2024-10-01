@@ -91,7 +91,7 @@
       <GPUDebugInfo>$(DebugMode)</GPUDebugInfo>
       <HostDebugInfo>$(DebugMode)</HostDebugInfo>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_60,sm_60</CodeGeneration>
+      <CodeGeneration>compute_75,sm_75</CodeGeneration>
       <CompileOut>$(IntDir)\%(Filename)%(Extension).obj</CompileOut>
       <AdditionalOptions>--std=c++17 --ptxas-options -suppress-stack-size-warning %(AdditionalOptions)</AdditionalOptions>
     </CudaCompile>
