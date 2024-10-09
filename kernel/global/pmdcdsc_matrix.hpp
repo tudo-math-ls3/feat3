@@ -59,7 +59,7 @@ namespace FEAT
     template<typename DT_, typename IT_, int dim_, typename MirrorV_, typename MirrorP_>
     class PMDCDSCMatrix<
       Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, 1>, MirrorV_, MirrorP_>,
-      Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim_>, MirrorV_, MirrorP_>>
+      Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, 1, dim_>, MirrorP_, MirrorV_>>
     {
     public:
       typedef DT_ DataType;

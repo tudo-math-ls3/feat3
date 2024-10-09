@@ -93,6 +93,8 @@ namespace FEAT
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
+      /// Value type, meaning the type of each 'block'
+      typedef DT_ ValueType;
       /// Compatible L-vector type
       typedef DenseVector<DT_, IT_> VectorTypeL;
       /// Compatible R-vector type
