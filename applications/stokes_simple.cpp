@@ -447,12 +447,13 @@ int main(int argc, char* argv [])
     // compile local type-1 system matrix for our AmaVanka smoother
     lvl.compile_local_matrix_sys_type1();
 
-    // create a damped AmaVanka smoother
+    // create a damped AmaVanka smoother; skip singular elements; this may happen on the coarse level
     auto amavanka = Solver::new_amavanka(lvl.local_matrix_sys_type1, lvl.filter_sys.local());
-
-    // skip singular elements; this may happen on the coarse level
     amavanka->set_skip_singular(true);
+
+    // create a Schwarz around the AmaVanka and ignore local AmaVanka status codes
     auto schwarz  = Solver::new_schwarz_precond(amavanka, lvl.filter_sys);
+    schwarz->set_ignore_status(true);
 
     // stuff the AmaVanka-smoother into a FGMRES(4) solver
     auto smoother = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 4, 0.0, schwarz);

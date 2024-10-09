@@ -366,8 +366,10 @@ namespace CCNDSimple
       if((i+1) < domain.size_virtual())
       {
         auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
+        vanka->set_skip_singular(true);
         amavankas.push_back(vanka);
         auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+        schwarz->set_ignore_status(true);
         auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
         smoother->set_min_iter(smooth_steps);
         smoother->set_max_iter(smooth_steps);
@@ -385,8 +387,10 @@ namespace CCNDSimple
       {
         // create BiCGStab-AmaVanka coarse grid solver
         auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
+        vanka->set_skip_singular(true);
         amavankas.push_back(vanka);
         auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+        schwarz->set_ignore_status(true);
         auto cgsolver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
         cgsolver->set_max_iter(500);
         cgsolver->set_tol_rel(1e-3);

@@ -1055,6 +1055,7 @@ namespace CCND
           vanka->set_skip_singular(true);
           ama_vankas.push_back(vanka);
           auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+          schwarz->set_ignore_status(true);
 
           // create smoother: either GMRES or Richardson
           std::shared_ptr<Solver::IterativeSolver<GlobalSystemVector>> smoother;
@@ -1082,6 +1083,7 @@ namespace CCND
           vanka->set_skip_singular(true);
           ama_vankas.push_back(vanka);
           auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+          schwarz->set_ignore_status(true);
           //auto coarse_solver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
           auto coarse_solver = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, schwarz);
           coarse_solver->set_max_iter(500);
