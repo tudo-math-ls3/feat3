@@ -110,6 +110,9 @@ $(document).ready(function(){initNavTree('struct_f_e_a_t_1_1_space_1_1_parametri
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a4b954dbdfe14f87714553b9914e9c510"><td class="memTemplParams" colspan="2">template&lt;typename SpaceData_ , typename JacInvType_ &gt; </td></tr>
+<tr class="memitem:a4b954dbdfe14f87714553b9914e9c510"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html#a4b954dbdfe14f87714553b9914e9c510">inplace_trans_gradients</a> (SpaceData_ &amp;space_data, const JacInvType_ &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>)</td></tr>
+<tr class="separator:a4b954dbdfe14f87714553b9914e9c510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f53602e75f7a9b87c5250ca419ad2eb"><td class="memTemplParams" colspan="2">template&lt;typename SpaceData_ , typename JacInvType_ &gt; </td></tr>
 <tr class="memitem:a8f53602e75f7a9b87c5250ca419ad2eb"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html#a8f53602e75f7a9b87c5250ca419ad2eb">trans_gradients</a> (SpaceData_ &amp;space_data, const JacInvType_ &amp;<a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>)</td></tr>
 <tr class="separator:a8f53602e75f7a9b87c5250ca419ad2eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,6 +127,46 @@ Static Public Member Functions</h2></td></tr>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="space_2details_8hpp_source.html#l00012">12</a> of file <a class="el" href="space_2details_8hpp_source.html">details.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a4b954dbdfe14f87714553b9914e9c510" name="a4b954dbdfe14f87714553b9914e9c510"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b954dbdfe14f87714553b9914e9c510">&#9670;&#160;</a></span>inplace_trans_gradients()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SpaceData_ , typename JacInvType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static CUDA_HOST_DEVICE void FEAT::Space::ParametricEvalHelper::inplace_trans_gradients </td>
+          <td>(</td>
+          <td class="paramtype">SpaceData_ &amp;&#160;</td>
+          <td class="paramname"><em>space_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const JacInvType_ &amp;&#160;</td>
+          <td class="paramname"><em>jac_inv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="space_2details_8hpp_source.html#l00037">37</a> of file <a class="el" href="space_2details_8hpp_source.html">details.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a8f53602e75f7a9b87c5250ca419ad2eb" name="a8f53602e75f7a9b87c5250ca419ad2eb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8f53602e75f7a9b87c5250ca419ad2eb">&#9670;&#160;</a></span>trans_gradients()</h2>
 
@@ -206,7 +249,7 @@ template&lt;typename SpaceData_ , typename JacInvType_ , typename HessInvType_ &
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="space_2details_8hpp_source.html#l00037">37</a> of file <a class="el" href="space_2details_8hpp_source.html">details.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="space_2details_8hpp_source.html#l00050">50</a> of file <a class="el" href="space_2details_8hpp_source.html">details.hpp</a>.</p>
 
 </div>
 </div>

@@ -4,6 +4,7 @@ var class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u =
     [ "PCGNRILU", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a9366fe54d9b341eb2b0c1e3bce44923b", null ],
     [ "~PCGNRILU", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#ae59126dede82b482847465fce7701211", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
+    [ "_apply_intern", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#aae30cb768050251fad6afcdc411b7d60", null ],
     [ "_calc_def_norm", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a9920812266b8f49921c9b133dd1451b4", null ],
     [ "_plot_iter", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#aa7281f8e3498245d411c5829b9d0cec0", null ],
     [ "_plot_iter_line", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a76a7e3315fcb44c2a3ac466ae1ee1337", null ],

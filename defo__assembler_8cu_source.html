@@ -153,7 +153,7 @@ $(document).ready(function(){initNavTree('defo__assembler_8cu_source.html',''); 
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        typedef Tiny::Matrix&lt;MatValueType, num_loc_dofs, num_loc_dofs&gt; LocalMatrixType;</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        // define local coefficients</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        DataType local_coeffs[dim][num_loc_verts];</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        Tiny::Matrix&lt;DataType, dim, num_loc_verts&gt; local_coeffs;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        //define local array</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        LocalMatrixType loc_mat;</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
@@ -213,7 +213,7 @@ $(document).ready(function(){initNavTree('defo__assembler_8cu_source.html',''); 
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        for(Index idx = 0; idx &lt; coloring_size; ++idx)</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        {</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>          // define local coefficients</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>          DataType local_coeffs[dim][num_loc_verts];</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>          Tiny::Matrix&lt;DataType, dim, num_loc_verts&gt; local_coeffs;</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>          // and local matrix</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>          LocalMatrixType loc_mat;</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>          // now do work for this cell</div>

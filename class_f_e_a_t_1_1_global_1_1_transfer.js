@@ -8,7 +8,7 @@ var class_f_e_a_t_1_1_global_1_1_transfer =
     [ "VectorType", "class_f_e_a_t_1_1_global_1_1_transfer.html#a4bfa266d61f0aff5e469682903ccf860", null ],
     [ "Transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html#acd9d9745f15c07c2916c2721cd7abd8d", null ],
     [ "Transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html#acbdc85d41e3a37a466f36e2a44a9b0c1", null ],
-    [ "Transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html#a0ced0acd6f985a63be294be5243b8382", null ],
+    [ "Transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html#ac03fbd81b55646e92d93cc08fbc6ce08", null ],
     [ "~Transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html#a7038d633d8d07eb9712806c6c030d09a", null ],
     [ "bytes", "class_f_e_a_t_1_1_global_1_1_transfer.html#a70d14c5d346cf5d53801f68797d0a35e", null ],
     [ "clone", "class_f_e_a_t_1_1_global_1_1_transfer.html#a69875261b47a86778d77d05eac7e1920", null ],
@@ -24,7 +24,7 @@ var class_f_e_a_t_1_1_global_1_1_transfer =
     [ "rest_send", "class_f_e_a_t_1_1_global_1_1_transfer.html#a1bfe2cad22d05618ccef25c6241c53d0", null ],
     [ "trunc", "class_f_e_a_t_1_1_global_1_1_transfer.html#a626cba351f5d1cb98393e967746256e2", null ],
     [ "trunc_send", "class_f_e_a_t_1_1_global_1_1_transfer.html#a6c7af5fe39e8bfeb19903e1a8c3c596f", null ],
-    [ "_coarse_muxer", "class_f_e_a_t_1_1_global_1_1_transfer.html#a58fcc08250f74d413c8bf51c1e0fb909", null ],
+    [ "_coarse_muxer", "class_f_e_a_t_1_1_global_1_1_transfer.html#a84e211d7fcbba32f4bc5ecda76554de2", null ],
     [ "_transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html#aeb5a6561121739d4ca57846286fb5225", null ],
     [ "_vec_tmp", "class_f_e_a_t_1_1_global_1_1_transfer.html#abf1fe2e56620b31fc684f143480c63b6", null ]
 ];

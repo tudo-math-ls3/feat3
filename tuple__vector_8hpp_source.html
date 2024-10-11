@@ -342,10 +342,10 @@ $(document).ready(function(){initNavTree('tuple__vector_8hpp_source.html',''); i
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>        rest().copy(x.rest(), full);</div>
 <div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>      }</div>
 <div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span> </div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>      <span class="keywordtype">void</span> axpy(<span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a>&amp; x, <span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a>&amp; y, <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a> alpha = <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a>(1))</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>      <span class="keywordtype">void</span> axpy(<span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a>&amp; x, <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a> alpha = <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a>(1))</div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>      {</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>        first().axpy(x.first(), y.first(), alpha);</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>        rest().axpy(x.rest(), y.rest(), alpha);</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>        first().axpy(x.first(), alpha);</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>        rest().axpy(x.rest(), alpha);</div>
 <div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>      }</div>
 <div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span> </div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>      <span class="keywordtype">void</span> component_product(<span class="keyword">const</span> TupleVector &amp; x, <span class="keyword">const</span> TupleVector &amp; y)</div>
@@ -653,9 +653,9 @@ $(document).ready(function(){initNavTree('tuple__vector_8hpp_source.html',''); i
 <div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span>        first().copy(x.first(), full);</div>
 <div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span>      }</div>
 <div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span> </div>
-<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span>      <span class="keywordtype">void</span> axpy(<span class="keyword">const</span> TupleVector&amp; x, <span class="keyword">const</span> TupleVector&amp; y, <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a> alpha = <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a>(1))</div>
+<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span>      <span class="keywordtype">void</span> axpy(<span class="keyword">const</span> TupleVector&amp; x, <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a> alpha = <a class="code hl_typedef" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a55dacd0e257ace5674d30cce0c57cefe">DataType</a>(1))</div>
 <div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span>      {</div>
-<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>        first().axpy(x.first(), y.first(), alpha);</div>
+<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>        first().axpy(x.first(), alpha);</div>
 <div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span>      }</div>
 <div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span> </div>
 <div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>      <span class="keywordtype">void</span> component_product(<span class="keyword">const</span> TupleVector &amp; x, <span class="keyword">const</span> TupleVector &amp; y)</div>

@@ -7,6 +7,7 @@ var searchData=
   ['parti_5fgraph_4',['parti_graph',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#ad78b93c4b69d419cdc616f971228ea09',1,'FEAT::Control::Domain::PartiDomainControlBase::Ancestor']]],
   ['parti_5finfo_5',['parti_info',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#aa24b4e49f6ae86f2c80f3b2353c83044',1,'FEAT::Control::Domain::PartiDomainControlBase::Ancestor']]],
   ['parti_5flevel_6',['parti_level',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html#a75d01110bb582e8943a89d6cf8dd1a81',1,'FEAT::Control::Domain::PartiDomainControlBase::Ancestor']]],
-  ['phi_7',['phi',['../class_f_e_a_t_1_1_space_1_1_eval_data.html#a7a92784b1f541ea099a35b8e2c32d60d',1,'FEAT::Space::EvalData']]],
-  ['precond_8',['precond',['../class_f_e_a_t_1_1_control_1_1_meshopt_1_1_hyperelasticity_functional_control.html#ad32c2b4c33dee1398e919cac9771591d',1,'FEAT::Control::Meshopt::HyperelasticityFunctionalControl']]]
+  ['phi_7',['phi',['../class_f_e_a_t_1_1_space_1_1_eval_data.html#a7a92784b1f541ea099a35b8e2c32d60d',1,'FEAT::Space::EvalData::phi()'],['../class_f_e_a_t_1_1_space_1_1_eval_data_reduced.html#a394d63a90ff721b7b41b93c9cfb65343',1,'FEAT::Space::EvalDataReduced::phi()']]],
+  ['precond_8',['precond',['../class_f_e_a_t_1_1_control_1_1_meshopt_1_1_hyperelasticity_functional_control.html#ad32c2b4c33dee1398e919cac9771591d',1,'FEAT::Control::Meshopt::HyperelasticityFunctionalControl']]],
+  ['print_5foccupancy_9',['print_occupancy',['../class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html#a664d7da214324bf2f0a552c3d2e3e2e5',1,'FEAT::VoxelAssembly::VoxelBurgersAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;']]]
 ];

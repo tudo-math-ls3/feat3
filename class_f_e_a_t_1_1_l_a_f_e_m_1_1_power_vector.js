@@ -17,7 +17,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector =
     [ "_write_out_binary", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a10f3975cd5725a297fa16ad0c294b8fa", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#ad836f024c878fb55080709a6a06bc9fd", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a6e0b9c14e5a3adf461aa81dbf46e35ae", null ],
-    [ "axpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a100c2101c805f214ed60bca20198c536", null ],
+    [ "axpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a5a858c84abe0b998f52d4221767190a4", null ],
     [ "blocks", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a8453f7c23592069eeba7c39039ca5c48", null ],
     [ "bytes", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#ab58de54418c5531c150ec3005e2726b5", null ],
     [ "clear", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a81fcd2c9332bc144797c88f0ccedda26", null ],

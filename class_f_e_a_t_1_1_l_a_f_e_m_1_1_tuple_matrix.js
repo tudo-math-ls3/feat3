@@ -13,6 +13,8 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix =
     [ "TupleMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#ae7d6bc79eab7d1c60397d0532965eeee", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a68f8bbd6837fa4d027c597981b0b5723", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#af4d16c2cb6a4b9d46be600a62db15d95", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a9c1e5bdc14040e09550dc2ff781f2ce0", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#ab58dc2321facd4869b946a7b829512d8", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a1e5a1800d55a6929bbeb82f36d504b8f", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#aea21e06edfb63ed19364b654570d4db3", null ],
     [ "bytes", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a3dda29e80e3d2791466c63b1861a497a", null ],

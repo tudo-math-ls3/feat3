@@ -299,7 +299,7 @@ $(document).ready(function(){initNavTree('voxel__amavanka_8cu_source.html',''); 
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>              local_t[i*stride+j] = local[i*stride+j];</div>
 <div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>          // invert matrix</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>          CudaMath::invert_matrix(nrc.first, stride, local, pivot);</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>          CudaMath::cuda_invert_matrix(nrc.first, stride, local, pivot);</div>
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>          // compute (squared) Frobenius norm of (I - A*A^{-1})</div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>          DataType norm = DataType(0);</div>
@@ -344,7 +344,7 @@ $(document).ready(function(){initNavTree('voxel__amavanka_8cu_source.html',''); 
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>                                                                                                  max_degree_wrapper.max_degree_dofs, Index(0), Index(0),</div>
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                                                                                                 Index(0), Index(0));</div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>          // invert matrix</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>          CudaMath::invert_matrix(nrc.first, stride, local, pivot);</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>          CudaMath::cuda_invert_matrix(nrc.first, stride, local, pivot);</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span> </div>
 <div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>          Intern::VoxelAmaVankaCore::template scatter_add&lt;DT_, IT_, n_, uniform_macros_&gt;(vanka_wrap, local, stride, imacro, macro_dofs_wrapper.macro_dofs,</div>
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>                                                 max_degree_wrapper.max_degree_dofs, Index(0), Index(0),</div>

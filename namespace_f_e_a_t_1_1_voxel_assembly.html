@@ -133,6 +133,13 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A data field for all necessary values that define the dof mapping for assembly.  <a href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_defect_shared_data_global_wrapper.html">BurgersDefectSharedDataGlobalWrapper</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_global_wrapper.html">BurgersSharedDataGlobalWrapper</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html">BurgersSharedDataKernelWrapper</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper struct wrapping the data required as shared data.  <a href="struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">CSR Matrix data.  <a href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,6 +147,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler.html">LagrangeDataHandler</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data handler for Lagrange based FE spaces.  <a href="class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_voxel_assembly_1_1_shared_index_set_wrapper.html">SharedIndexSetWrapper</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper.html">SpaceHelper</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -217,7 +226,7 @@ template&lt;typename Shape_ &gt; </div>
 
 <p>we only use standard mappings for voxel assembly </p>
 
-<p class="definition">Definition at line <a class="el" href="space__helper_8hpp_source.html#l00068">68</a> of file <a class="el" href="space__helper_8hpp_source.html">space_helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="space__helper_8hpp_source.html#l00088">88</a> of file <a class="el" href="space__helper_8hpp_source.html">space_helper.hpp</a>.</p>
 
 </div>
 </div>
@@ -235,7 +244,7 @@ template&lt;typename Shape_ &gt; </div>
 
 <p>Q2 hexadron space. </p>
 
-<p class="definition">Definition at line <a class="el" href="voxel__assembly__common_8hpp_source.html#l00033">33</a> of file <a class="el" href="voxel__assembly__common_8hpp_source.html">voxel_assembly_common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="voxel__assembly__common_8hpp_source.html#l00041">41</a> of file <a class="el" href="voxel__assembly__common_8hpp_source.html">voxel_assembly_common.hpp</a>.</p>
 
 </div>
 </div>
@@ -255,7 +264,7 @@ template&lt;int dim_&gt; </div>
 
 <p>Templated hypercube definition for standard mapping. </p>
 
-<p class="definition">Definition at line <a class="el" href="voxel__assembly__common_8hpp_source.html#l00037">37</a> of file <a class="el" href="voxel__assembly__common_8hpp_source.html">voxel_assembly_common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="voxel__assembly__common_8hpp_source.html#l00045">45</a> of file <a class="el" href="voxel__assembly__common_8hpp_source.html">voxel_assembly_common.hpp</a>.</p>
 
 </div>
 </div>
@@ -273,7 +282,7 @@ template&lt;int dim_&gt; </div>
 
 <p>Q2 quadliteral space. </p>
 
-<p class="definition">Definition at line <a class="el" href="voxel__assembly__common_8hpp_source.html#l00031">31</a> of file <a class="el" href="voxel__assembly__common_8hpp_source.html">voxel_assembly_common.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="voxel__assembly__common_8hpp_source.html#l00039">39</a> of file <a class="el" href="voxel__assembly__common_8hpp_source.html">voxel_assembly_common.hpp</a>.</p>
 
 </div>
 </div>

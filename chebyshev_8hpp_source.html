@@ -302,10 +302,10 @@ $(document).ready(function(){initNavTree('chebyshev_8hpp_source.html',''); initR
 <div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>          beta = (alpha * d) - <a class="code hl_typedef" href="class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a2a6f2a50fb6f33dba0a4a281801579e3">DataType</a>(1);</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>          vec_cor.scale(vec_cor, beta);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>          vec_cor.axpy(vec_def, vec_cor, alpha);</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>          vec_cor.axpy(vec_def, alpha);</div>
 <div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
 <div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>          <span class="comment">// update solution vector</span></div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>          vec_sol.axpy(vec_cor, vec_sol);</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>          vec_sol.axpy(vec_cor);</div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>          <span class="comment">// compute new defect vector</span></div>
 <div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>          matrix.apply(vec_def, vec_sol, vec_rhs, -<a class="code hl_typedef" href="class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a2a6f2a50fb6f33dba0a4a281801579e3">DataType</a>(1));</div>

@@ -1,9 +1,9 @@
 var namespace_f_e_a_t_1_1_voxel_assembly =
 [
     [ "Arch", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html", [
-      [ "assemble_burgers_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a9c9dabf44d9b61752740b6a587ca1b51", null ],
+      [ "assemble_burgers_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#af0d0e9b96f87568ed5a25d6d549ddab4", null ],
       [ "assemble_burgers_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a6b2f1aefbd0865db566b4cf48f34c49a", null ],
-      [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aaed62a52a2917d948b7685b7d0c51d49", null ],
+      [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#acb6ece7251040c8d11ad7c55c05f51ae", null ],
       [ "assemble_burgers_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aa5bb883737c2cc04cc1ec321a2308fae", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aec510f211770223f5e804a3ede770ae7", null ],
@@ -11,16 +11,22 @@ var namespace_f_e_a_t_1_1_voxel_assembly =
       [ "get_sd_v_norm_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a7a2184ba815ef28b7ea915533933146f", null ]
     ] ],
     [ "Kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html", [
-      [ "burgers_defect_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a1bb4c5e9481f0cba4229b019e96349fa", null ],
-      [ "burgers_mat_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a03446a9f5afc1a78e7436ca086beff04", null ],
+      [ "burgers_defect_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a5a38710550ec3ee871835a808bf55026", null ],
+      [ "burgers_mat_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#acd63fb3587dd8f322e5795e1f8b91b66", null ],
+      [ "grouped_burgers_mat_alt_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a832e2b7b166523256572343cb63df592", null ],
+      [ "grouped_burgers_mat_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a5596683b75c77d18b3361e4008dfafd9", null ],
       [ "set_sd_v_norm_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a4c35914dcc1c3078f382207b96884e5c", null ]
     ] ],
     [ "AssemblyBurgersData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html", null ],
     [ "AssemblyCubatureData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data" ],
     [ "AssemblyMappingData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data" ],
+    [ "BurgersDefectSharedDataGlobalWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_defect_shared_data_global_wrapper.html", null ],
+    [ "BurgersSharedDataGlobalWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_global_wrapper.html", null ],
+    [ "BurgersSharedDataKernelWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html", null ],
     [ "CSRMatrixData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html", null ],
     [ "IndexSetWrapper", "class_f_e_a_t_1_1_voxel_assembly_1_1_index_set_wrapper.html", null ],
     [ "LagrangeDataHandler", "class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler.html", "class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler" ],
+    [ "SharedIndexSetWrapper", "class_f_e_a_t_1_1_voxel_assembly_1_1_shared_index_set_wrapper.html", null ],
     [ "SpaceHelper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper.html", null ],
     [ "SpaceHelper< Q2StandardFE< Shape_ >, DT_, IT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper_3_01_q2_standard_f_e_3_01_shape___01_4_00_01_d_t___00_01_i_t___01_4.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper_3_01_q2_standard_f_e_3_01_shape___01_4_00_01_d_t___00_01_i_t___01_4" ],
     [ "UnitCubeColoring", "struct_f_e_a_t_1_1_voxel_assembly_1_1_unit_cube_coloring.html", null ],

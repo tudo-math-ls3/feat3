@@ -301,7 +301,7 @@ $(document).ready(function(){initNavTree('amavanka__base_8hpp_source.html',''); 
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>        <span class="keyword">static</span> <span class="keywordtype">bool</span> compare(<span class="keyword">const</span> LAFEM::SparseMatrixCSR&lt;DT_, IT_&gt;&amp; matrix_a, <span class="keyword">const</span> LAFEM::SparseMatrixCSR&lt;DT_, IT_&gt;&amp; matrix_b)</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>        {</div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>          <span class="keyword">auto</span> tmp = matrix_a.clone(LAFEM::CloneMode::Weak);</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>          tmp.axpy(matrix_a, matrix_b, DT_(-1));</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>          tmp.axpy(matrix_b, DT_(-1));</div>
 <div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>          <span class="keyword">const</span> DT_ tol = Math::pow(Math::eps&lt;DT_&gt;(), DT_(0.7));</div>
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>          <span class="keywordflow">return</span> (tmp.norm_frobenius()/(Math::sqrt(DT_(tmp.size()))) &lt;= tol);</div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        }</div>
@@ -353,7 +353,7 @@ $(document).ready(function(){initNavTree('amavanka__base_8hpp_source.html',''); 
 <div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>        <span class="keyword">static</span> <span class="keywordtype">bool</span> compare(<span class="keyword">const</span> LAFEM::SparseMatrixBCSR&lt;DT_, IT_, bh_, bw_&gt;&amp; matrix_a, <span class="keyword">const</span> LAFEM::SparseMatrixBCSR&lt;DT_, IT_, bh_, bw_&gt;&amp; matrix_b)</div>
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>        {</div>
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>          <span class="keyword">auto</span> tmp = matrix_a.clone(LAFEM::CloneMode::Weak);</div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>          tmp.axpy(matrix_a, matrix_b, DT_(-1));</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>          tmp.axpy(matrix_b, DT_(-1));</div>
 <div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>          <span class="keyword">const</span> DT_ tol = Math::pow(Math::eps&lt;DT_&gt;(), DT_(0.7));</div>
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>          <span class="keywordflow">return</span> (tmp.norm_frobenius()/(Math::sqrt(DT_(tmp.size()))) &lt;= tol);</div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>        }</div>

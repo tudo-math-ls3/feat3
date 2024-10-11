@@ -11,7 +11,7 @@ var namespace_f_e_a_t_1_1_global =
     [ "Muxer", "class_f_e_a_t_1_1_global_1_1_muxer.html", "class_f_e_a_t_1_1_global_1_1_muxer" ],
     [ "NonlinearFunctional", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional" ],
     [ "PMDCDSCMatrix", "class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html", null ],
-    [ "PMDCDSCMatrix< Global::Matrix< LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, 1 >, MirrorV_, MirrorP_ >, Global::Matrix< LAFEM::SparseMatrixBCSR< DT_, IT_, 1, dim_ >, MirrorV_, MirrorP_ > >", "class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0.html", "class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar4d3a70ff49e16f0d9ba9d236f0dafdc0" ],
+    [ "PMDCDSCMatrix< Global::Matrix< LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, 1 >, MirrorV_, MirrorP_ >, Global::Matrix< LAFEM::SparseMatrixBCSR< DT_, IT_, 1, dim_ >, MirrorP_, MirrorV_ > >", "class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar5e6f49c15ccb43840cb894a3375f33c3.html", "class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix_3_01_global_1_1_matrix_3_01_l_a_f_e_m_1_1_spar5e6f49c15ccb43840cb894a3375f33c3" ],
     [ "Splitter", "class_f_e_a_t_1_1_global_1_1_splitter.html", "class_f_e_a_t_1_1_global_1_1_splitter" ],
     [ "SymmetricLumpedSchurMatrix", "class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix.html", "class_f_e_a_t_1_1_global_1_1_symmetric_lumped_schur_matrix" ],
     [ "SynchMatrix", "class_f_e_a_t_1_1_global_1_1_synch_matrix.html", "class_f_e_a_t_1_1_global_1_1_synch_matrix" ],

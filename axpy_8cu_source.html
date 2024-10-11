@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('axpy_8cu_source.html',''); initResizab
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>using namespace FEAT::LAFEM::Arch;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>template &lt;typename DT_&gt;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const Index size)</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>{</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  cudaDataType dt;</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  cudaDataType et;</div>
@@ -147,43 +147,23 @@ $(document).ready(function(){initNavTree('axpy_8cu_source.html',''); initResizab
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;unsupported data type!&quot;);</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  cublasStatus_t status;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  void* temp_x;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &amp;a, et, x, dt, 1, r, dt, 1, et);</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  if (r == x)</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  {</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    temp_x = Util::cuda_malloc(sizeof(DT_) * size);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    Util::cuda_copy(temp_x, x, size * sizeof(DT_));</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  }</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  else</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  {</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    temp_x = (void*)x;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>  }</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  if (r != y)</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  {</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    ///\todo cuse cublasCopyEx when available</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    Util::cuda_copy(r, y, size * sizeof(DT_));</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  }</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &amp;a, et, temp_x, dt, 1, r, dt, 1, et);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  if (r == x)</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    Util::cuda_free(temp_x);</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>  if (status != CUBLAS_STATUS_SUCCESS)</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;cuda error: &quot; + stringify(cublasGetStatusString(status)));</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>  cudaDeviceSynchronize();</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>#ifdef FEAT_DEBUG_MODE</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  cudaError_t last_error(cudaGetLastError());</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  if (cudaSuccess != last_error)</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>#endif</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>}</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>#ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>template void Axpy::value_cuda(Half *, const Half, const Half * const, const Half * const, const Index);</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>#endif</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>template void Axpy::value_cuda(float *, const float, const float * const, const float * const, const Index);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>template void Axpy::value_cuda(double *, const double, const double * const, const double * const, const Index);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  if (status != CUBLAS_STATUS_SUCCESS)</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;cuda error: &quot; + stringify(cublasGetStatusString(status)));</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  cudaDeviceSynchronize();</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>#ifdef FEAT_DEBUG_MODE</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  cudaError_t last_error(cudaGetLastError());</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  if (cudaSuccess != last_error)</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>#endif</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>}</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>#ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>template void Axpy::value_cuda(Half *, const Half, const Half * const, const Index);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>#endif</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>template void Axpy::value_cuda(float *, const float, const float * const, const Index);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>template void Axpy::value_cuda(double *, const double, const double * const, const Index);</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

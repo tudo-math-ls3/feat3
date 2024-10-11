@@ -127,6 +127,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a29752770a8d0213d9a7ceeb0d2129f49"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a29752770a8d0213d9a7ceeb0d2129f49">gather_matrix_csr</a> (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; InnerType_, numr_, numc_ &gt; &amp;loc_mat, const InnerType_ *matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *row_map, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *col_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_rows, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_cols, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_row_ptr, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_col_idx, <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> alpha=<a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>(1), const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *dummy_ptr=nullptr)</td></tr>
 <tr class="memdesc:a29752770a8d0213d9a7ceeb0d2129f49"><td class="mdescLeft">&#160;</td><td class="mdescRight">CSR gather axpy function.  <a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a29752770a8d0213d9a7ceeb0d2129f49">More...</a><br /></td></tr>
 <tr class="separator:a29752770a8d0213d9a7ceeb0d2129f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a114e253a4c0ed432ff6b4c4b748a30b9"><td class="memTemplParams" colspan="2">template&lt;typename ThreadGroup_ , int numr_, int numc_ = numr_&gt; </td></tr>
+<tr class="memitem:a114e253a4c0ed432ff6b4c4b748a30b9"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a114e253a4c0ed432ff6b4c4b748a30b9">grouped_gather_matrix_csr</a> (const ThreadGroup_ &amp;tg, const int scatter_size, const int scatter_offset, <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *loc_mat, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *row_map, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *col_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_rows, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_cols, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_row_ptr, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_col_idx, int num_data_row, int num_data_col, <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> alpha=<a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>(1), <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *dummy_ptr=nullptr)</td></tr>
+<tr class="memdesc:a114e253a4c0ed432ff6b4c4b748a30b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">CSR grouped gather axpy function.  <a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a114e253a4c0ed432ff6b4c4b748a30b9">More...</a><br /></td></tr>
+<tr class="separator:a114e253a4c0ed432ff6b4c4b748a30b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0448a5ecebadab0066750ec6e90a8da6"><td class="memTemplParams" colspan="2">template&lt;typename ThreadGroup_ , int numr_, int numc_ = numr_&gt; </td></tr>
+<tr class="memitem:a0448a5ecebadab0066750ec6e90a8da6"><td class="memTemplItemLeft" align="right" valign="top">CUDA_DEVICE static __forceinline__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a0448a5ecebadab0066750ec6e90a8da6">grouped_scatter_matrix_csr</a> (const ThreadGroup_ &amp;tg, const int scatter_size, const int scatter_offset, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *loc_mat, <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *row_map, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *col_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_rows, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_cols, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_row_ptr, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_col_idx, int num_data_row, int num_data_col, <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> alpha=<a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>(1), <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *dummy_ptr=nullptr)</td></tr>
+<tr class="memdesc:a0448a5ecebadab0066750ec6e90a8da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">CSR grouped scatter axpy function.  <a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a0448a5ecebadab0066750ec6e90a8da6">More...</a><br /></td></tr>
+<tr class="separator:a0448a5ecebadab0066750ec6e90a8da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7e733481f0fe8c1d24574a4fa9967c2"><td class="memTemplParams" colspan="2">template&lt;typename InnerType_ , int numr_, int numc_ = numr_&gt; </td></tr>
 <tr class="memitem:af7e733481f0fe8c1d24574a4fa9967c2"><td class="memTemplItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#af7e733481f0fe8c1d24574a4fa9967c2">scatter_matrix_csr</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; InnerType_, numr_, numc_ &gt; &amp;loc_mat, InnerType_ *matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *row_map, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *col_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_rows, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_cols, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_row_ptr, const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *matrix_col_idx, <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> alpha=<a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>(1), <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *dummy_ptr=nullptr)</td></tr>
 <tr class="memdesc:af7e733481f0fe8c1d24574a4fa9967c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">CSR scatter axpy function.  <a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#af7e733481f0fe8c1d24574a4fa9967c2">More...</a><br /></td></tr>
@@ -309,9 +317,309 @@ template&lt;typename InnerType_ , int numr_, int numc_ = numr_&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This method also works for blocked variants. The interface is always used from the <em>native</em> variant, i.e. InnerType_ refers to <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a> . </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00142">142</a> of file <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html">matrix_gather_scatter_helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00194">194</a> of file <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html">matrix_gather_scatter_helper.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02498">FEAT::Tiny::axpy()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02524">FEAT::Tiny::axpy()</a>.</p>
+
+</div>
+</div>
+<a id="a114e253a4c0ed432ff6b4c4b748a30b9" name="a114e253a4c0ed432ff6b4c4b748a30b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a114e253a4c0ed432ff6b4c4b748a30b9">&#9670;&#160;</a></span>grouped_gather_matrix_csr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename ThreadGroup_ , int numr_, int numc_ = numr_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static CUDA_HOST_DEVICE void <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper.html">FEAT::LAFEM::MatrixGatherScatterHelper</a>&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps &gt;::grouped_gather_matrix_csr </td>
+          <td>(</td>
+          <td class="paramtype">const ThreadGroup_ &amp;&#160;</td>
+          <td class="paramname"><em>tg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>scatter_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>scatter_offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *&#160;</td>
+          <td class="paramname"><em>loc_mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *&#160;</td>
+          <td class="paramname"><em>matrix_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>row_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>col_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>matrix_num_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>matrix_num_cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>matrix_row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>matrix_col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_data_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_data_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>&#160;</td>
+          <td class="paramname"><em>alpha</em> = <code><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>(1)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>dummy_ptr</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CSR grouped gather axpy function. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ThreadGroup_</td><td>The thread group type, that work together. </td></tr>
+    <tr><td class="paramname">numr_,numc_</td><td>The row and column size of the internal data, i.e. each object map is mapping to consists of numr_*numc_ entries.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">tg</td><td>A reference to the thread group object on which to cooperate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scatter_size</td><td>The number of blocked size elements to be scattered </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scatter_offset</td><td>The offset into the global matrix in which to scatter </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">loc_mat</td><td>The local matrix which values are to be gathered in, has to be correctly initilized. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_data</td><td>A pointer to the csr data array to be gathered from. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_map</td><td>A pointer to the dof row mapping array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">col_map</td><td>A pointer to the dof col mapping array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_num_rows</td><td>Number of rows of the csr matrix. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_num_cols</td><td>Number of columns of the csr matrix. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_row_ptr</td><td>CSR row pointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_col_idx</td><td>CSR column index ptr. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_data_row</td><td>Number of InnerTypes to be scattered per local row. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_data_col</td><td>Number of InnerTypes to be scattered per local col. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Optional scaling parameter. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dummy_ptr</td><td>Dummy ptr used for other policies.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This method also works for blocked variants. The interface is always used from the <em>native</em> variant, i.e. InnerType_ refers to <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a> . </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00259">259</a> of file <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html">matrix_gather_scatter_helper.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0448a5ecebadab0066750ec6e90a8da6" name="a0448a5ecebadab0066750ec6e90a8da6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0448a5ecebadab0066750ec6e90a8da6">&#9670;&#160;</a></span>grouped_scatter_matrix_csr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename ThreadGroup_ , int numr_, int numc_ = numr_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">CUDA_DEVICE static __forceinline__ void <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper.html">FEAT::LAFEM::MatrixGatherScatterHelper</a>&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps &gt;::grouped_scatter_matrix_csr </td>
+          <td>(</td>
+          <td class="paramtype">const ThreadGroup_ &amp;&#160;</td>
+          <td class="paramname"><em>tg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>scatter_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>scatter_offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *&#160;</td>
+          <td class="paramname"><em>loc_mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a> *&#160;</td>
+          <td class="paramname"><em>matrix_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>row_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>col_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>matrix_num_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>matrix_num_cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>matrix_row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>matrix_col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_data_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_data_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>&#160;</td>
+          <td class="paramname"><em>alpha</em> = <code><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a3e382bb1c99805b03a282c0adcd6bb5b">DataType</a>(1)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7">IndexType</a> *&#160;</td>
+          <td class="paramname"><em>dummy_ptr</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CSR grouped scatter axpy function. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ThreadGroup_</td><td>The thread group type, that work together. </td></tr>
+    <tr><td class="paramname">numr_,numc_</td><td>The row and column size of the internal data, i.e. each object map is mapping to consists of numr_*numc_ entries.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">tg</td><td>A reference to the thread group object on which to cooperate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scatter_size</td><td>The number of blocked size elements to be scattered </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scatter_offset</td><td>The offset into the global matrix in which to scatter </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">loc_mat</td><td>The local matrix which values are to be scattered. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">matrix_data</td><td>A pointer to the csr data array to be scattered in. Has to be initialized to the correct size beforehand. Previous values are added on. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_map</td><td>A pointer to the dof row mapping array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">col_map</td><td>A pointer to the dof col mapping array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_num_rows</td><td>Number of rows of the csr matrix. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_num_cols</td><td>Number of columns of the csr matrix. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_row_ptr</td><td>CSR row pointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_col_idx</td><td>CSR column index ptr. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_data_row</td><td>Number of InnerTypes to be scattered per local row. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_data_col</td><td>Number of InnerTypes to be scattered per local col. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Optional scaling parameter. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dummy_ptr</td><td>Dummy ptr used for other policies.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This method also works for blocked variants. The interface is always used from the <em>native</em> variant, i.e. InnerType_ refers to <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a> . </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00148">148</a> of file <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html">matrix_gather_scatter_helper.hpp</a>.</p>
 
 </div>
 </div>
@@ -428,7 +736,7 @@ template&lt;typename InnerType_ , int numr_, int numc_ = numr_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00088">88</a> of file <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html">matrix_gather_scatter_helper.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02498">FEAT::Tiny::axpy()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02524">FEAT::Tiny::axpy()</a>.</p>
 
 </div>
 </div>

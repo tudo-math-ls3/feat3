@@ -16,6 +16,8 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix =
     [ "~SaddlePointMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#afa61babb64e329cebec8e1ae7b982ee9", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a756fc59881d80e138a5eb9fac86d8a66", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a060d973760bd538e9b063a880557bf76", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a49c6dbe7955766c877f8f2428808afb2", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#af963983650448367020fe9b921111708", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#af6ec9ea3c845f4d166d7a672b647505b", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a0bfc7d866e1de15d94bdfb3fa7d19271", null ],
     [ "block_a", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a5d5ad7e9babe05719eb2d8d3aa09e103", null ],

@@ -4,5 +4,7 @@ var struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___0
     [ "IndexType", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a1881e25df8f9a53f898a43d62efd63d7", null ],
     [ "SpaceType", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a03b10f738d54598870dc18e228bf4f05", null ],
     [ "gather_matrix_csr", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a29752770a8d0213d9a7ceeb0d2129f49", null ],
+    [ "grouped_gather_matrix_csr", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a114e253a4c0ed432ff6b4c4b748a30b9", null ],
+    [ "grouped_scatter_matrix_csr", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#a0448a5ecebadab0066750ec6e90a8da6", null ],
     [ "scatter_matrix_csr", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html#af7e733481f0fe8c1d24574a4fa9967c2", null ]
 ];

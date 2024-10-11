@@ -25,7 +25,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector =
     [ "_serialize", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ade7d7a8fe820d08f0c855a8e81f5fb53", null ],
     [ "_serialized_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a83fec5dca47080be3ee7d4e0fd9129bc", null ],
     [ "assign", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a9060d0e4e26b6ca72132ec9504a8ec90", null ],
-    [ "axpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ae8a8f9b7c245d83aa3e288737ce8df91", null ],
+    [ "axpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#aacecf2cbb2f5ef200e8be9f7fa764ec3", null ],
     [ "bytes", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a23a25e3270a4a0570987d74db1a14817", null ],
     [ "clear", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ada2b8bd276f75ab9df2a22cb52f48e7c", null ],
     [ "clone", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#ada94517bb090cc46e4a82ad3ede45b60", null ],

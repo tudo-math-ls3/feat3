@@ -17,6 +17,8 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix =
     [ "~PowerColMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a60307bb8fb60325d6913d4f4996dfee4", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#abc1ac5480cfc0bee641cdb1f57046488", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a32af77ef05cae9da79fcc6f285d99c9d", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a8339dbf2d8c358d3d086c4106622321c", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#aa4dd0321cb0934f6ee149de3d32a4005", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#ae8cb31ae7cb4019e937648ec01c00a2e", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#ae00dc7021f0d34405b7ff58ec6b5d6b3", null ],
     [ "bytes", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#ad4020b90621593cdf78144e9734bb957", null ],

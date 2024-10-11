@@ -18,6 +18,8 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix =
     [ "~PowerDiagMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#aedb9f646ead288e74d5ebc453487d627", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a8a97b939e56603cea13925c365a13175", null ],
     [ "apply", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#ac59f52f0bd32c79566ca13f0b94a996b", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#af86b675054ffd5ec153601694ab9b1c3", null ],
+    [ "apply_transposed", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#ad501deaacf3ac0b784c3d9437f11dcad", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a048c4fcaff85f9d6803b3bcfa5ccf157", null ],
     [ "at", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a2e97934e09dac572df3830dfb33686ce", null ],
     [ "bytes", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a94fbd5be33c08e1030ef9552f7178eb7", null ],
