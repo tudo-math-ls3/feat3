@@ -354,7 +354,7 @@ namespace CCNDSimple
   {
     burgers_def_job.deformation = deform_tensor;
     burgers_def_job.nu = -nu;
-    burgers_def_job.beta = -DataType(1);
+    burgers_def_job.beta = DataType(navier_stokes ? -1 : 0);
     if((time_step == Index(1)) || (bdf_type < Index(2)))
       burgers_def_job.theta = -DataType(1) / delta_t; // implicit Euler in first time step
     else
@@ -365,8 +365,8 @@ namespace CCNDSimple
   {
     burgers_mat_job.deformation = deform_tensor;
     burgers_mat_job.nu = nu;
-    burgers_mat_job.beta = DataType(1);
-    burgers_mat_job.frechet_beta = DataType(newton_solver ? 1 : 0);
+    burgers_mat_job.beta = DataType(navier_stokes ? 1 : 0);
+    burgers_mat_job.frechet_beta = DataType(navier_stokes && newton_solver ? 1 : 0);
     burgers_mat_job.sd_delta = upsam;
     burgers_mat_job.sd_nu = nu;
     if((time_step == Index(1)) || (bdf_type < Index(2)))
