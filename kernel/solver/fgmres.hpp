@@ -44,7 +44,7 @@ namespace FEAT
      * the stopping criterion may lead to false positives and therefore premature termination of the inner FGMRES(k)
      * loop. At the end of each inner FGMRES(k) loop, the solution and residual/defect vectors are updated and now
      * the real residual/defect norm is computed and checked against the tolerances and it may now happen that
-     * \f$|\gamma_{m+1}| < \textnormal{tol}_{\textnormal{abs}} < \|b-Ax_m\|_2\f\f$ (and analogously for the relative
+     * \f$|\gamma_{m+1}| < \textnormal{tol}_{\textnormal{abs}} < \|b-Ax_m\|_2\f$ (and analogously for the relative
      * tolerance, of course), therefore leading to another restart of the inner FGMRES(k) loop. In the worst case,
      * this restarted inner loop may again produce a false positive after 1 iteration, therefore triggering another
      * restart, thus effectively leading to an extremely slowly converging FGMRES(1) iteration.
