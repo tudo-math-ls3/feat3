@@ -2,7 +2,7 @@
 
 \tableofcontents{html,latex}
 
-This page describes the general syntax of Analytic::ParsedScalarFunction and Analytic::ParsedVectorFunction. You can also find a list of arithmetic operations and supported functions.
+This page describes the general syntax of FEAT::Analytic::ParsedScalarFunction and FEAT::Analytic::ParsedVectorFunction. You can also find a list of arithmetic operations and supported functions.
 
 The Original Website: http://warp.povusers.org/FunctionParser/fparser.html#literals
 
@@ -35,75 +35,66 @@ All functions, variables, constants and units must use unique names. It's not po
 
 The function string understood by the class is very similar (but not completely identical in all aspects) to mathematical expressions in the C/C++ languages. Arithmetic float expressions can be created from float literals, variables or functions using the following operators in this order of precedence:
 
+Arithmetic Expression|Description
+---------------------|:----------
+<b>()</b>|expressions in parentheses first
+<b>A unit</b>|a unit multiplier (if one has been added)
+<b>A^B</b>| exponentiation (A raised to the power B)
+<b>-A</b>|unary minus
+<b>!A</b>|unary logical not (result is 1 if int(A) is 0, else 0)
+<b>A*B<br>A/B<br>A\%B</b>|multiplication, division and modulo
+<b>A+B<br>A-B</b>|addition and subtraction
+<b>A=B<br>A!=B<br>A\<B<br>A\>B<br>A\<=B<br>A\>=B</b>|comparison between A and B (result is either 0 or 1)
+<b>A\&B</b>|result is 1 if <b>int(A)</b> and <b>int(B)</b> differ from 0, else 0.<br> Note: Regardless of the values, both operands are always evaluated. However, if the expression is optimized, it may be changed such that only one of the operands is evaluated, according to standard shortcut logical operation semantics.
+<b>A\|B</b>|result is 1 if <b>int(A)</b> or <b>int(B)</b> differ from 0, else 0.<br> Note: Regardless of the values, both operands are always evaluated. However, if the expression is optimized, it may be changed such that only one of the operands is evaluated, according to standard shortcut logical operation semantics.
 
-<table>
-<caption id="multi_row">Overview arithmetic expressions </caption>
-<tr><th>Arithmetic expressions                      <th>Description
-<tr><td ><B>() </B><td>expressions in parentheses first
-<tr> <td>      <B>A unit </B>              <td>a unit multiplier (if one has been added)
-<tr> <td>      <B>  A^B </B>           <td> 	exponentiation (A raised to the power B)
-<tr> <td>   <B>  -A   </B>            <td>unary minus
-<tr> <td>   <B>  !A  </B>             <td>unary logical not (result is 1 if int(A) is 0, else 0)
-<tr> <td>    <B>    A*B &nbsp;&nbsp; A/B &nbsp;&nbsp;   A%B  </B>  <td>multiplication, division and modulo
-<tr> <td>    <B>   A+B   &nbsp;&nbsp;  A-B  </B>           <td>addition and subtraction
-<tr> <td>    <B>   A=B &nbsp;&nbsp; A<B &nbsp;&nbsp; A<=B   \n   A!=B  &nbsp;&nbsp;  A>B &nbsp;&nbsp;    A>=B   </B>        <td> comparison between A and B (result is either 0 or 1)
-<tr> <td >   <B>     A&B  </B>          <td >result is 1 if <B> int(A)</B> and <B>int(B)</B> differ from 0, else 0.\n Note: Regardless of the values, both operands are always evaluated. However, if the expression is optimized, it may be changed such that only one of the \n operands is evaluated, according to standard shortcut logical operation semantics. </td> </tr>
-<tr> <td>  <B> A|B </B>  <td>result is 1 if <B>int(A)</B> or <B>int(B)</B> differ from 0, else 0.\n Note: Regardless of the values, both operands are always evaluated. However, if the expression is optimized, it may be changed such that only one of the \n operands is evaluated, according to standard shortcut logical operation semantics. </td> </tr>
-</table>
+Since the unary minus has higher precedence than any other operator, for example the following expression is valid: <B>x*-y</B>
 
-(Note that currently the exponentiation operator is not supported for <B>FunctionParser_li </B> nor <B>FunctionParser_gmpint </B>. With the former the result would very easily overflow, making its usefulness questionable. With the latter it could be easily abused to make the program run out of memory; think of a function like <B>"10^10^10^100000"</B>.)
-
-Since the unary minus has higher precedence than any other operator, for example the following expression is valid: <B>x*-y </B>
-
-The comparison operators use an epsilon value, so expressions which may differ in very least-significant digits should work correctly.\n For example, <B> "0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1 = 1" </B> should always return 1, and the same comparison done with <B> ">" </B> or <B>"<"</B> should always return 0. (The epsilon value can be configured in the <B>fpconfig.hh </B>file.) \n Without epsilon this comparison probably returns the wrong value.
+The comparison operators use an epsilon value, so expressions which may differ in very least-significant digits should work correctly. For example, <B> "0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1+0.1 = 1" </B> should always return 1, and the same comparison done with <B> ">" </B> or <B>"<"</B> should always return 0. Without epsilon this comparison probably returns the wrong value.
 
 The class supports these functions:
 
-<table>
-<caption id="multi_row">Overview embedded functions </caption>
-<tr><th>Function handle                     <th>Description
-<tr><td > <B>abs(A) </B> <td>Absolute value (magnitude) of A. With real numbers, if A is negative, returns -A otherwise returns A. With complex numbers, equivalent to <B> hypot(real(x),imag(x))</B>.
-<tr> <td> <B> acos(A) </B>  <td>Arc-cosine of A. Returns the angle, measured in radians, whose cosine is A.
-<tr> <td> <B>acosh(A)  </B>  <td>Same as acos() but for hyperbolic cosine.
-<tr> <td> <B> arg(A) </B>  <td> Phase angle of complex number A. Equivalent to <B>atan2(imag(x),real(x))</B>.
-<tr> <td> <B> asin(A) </B>  <td>Arc-sine of A. Returns the angle, measured in radians, whose sine is A.
-<tr> <td> <B>asinh(A)  </B>  <td>Same as asin() but for hyperbolic sine.
-<tr> <td> <B> atan(A)</B>  <td> Arc-tangent of (A). Returns the angle, measured in radians, whose tangent is A.
-<tr> <td> <B> atan2(A,B) </B>  <td> Principal arc-tangent of A/B, using the signs of the two arguments to determine the quadrant of the result.\n Returns the solution to the two expressions hypot(A,B)*sin(x)=A, hypot(A,B)*cos(x)=B. The return value is in range -pi to pi, inclusive.
-<tr> <td> <B> atanh(A) </B>  <td>Same as atan() but for hyperbolic tangent.
-<tr> <td> <B>cbrt(A)  </B>  <td>Cube root of A. Returns a solution to expression pow(x,3)=A.
-<tr> <td> <B> conj(A) </B>  <td> Complex conjugate of A. Equivalent to <B>real(x) - 1i*imag(x)</B> or <B>polar(abs(x),-arg(x))</B>.
-<tr> <td> <B> ceil(A) </B>  <td>Ceiling of A. Returns the smallest integer not smaller than A. Rounds up to the next higher integer.\n E.g. -2.9, -2.5 and -2.1 are rounded to -2.0, and 2.9, 2.5 and 2.1 are rounded to 3.0.
-<tr> <td> <B> cos(A) </B>  <td>Cosine of A. Returns the cosine of the angle A, where A is measured in radians.
-<tr> <td> <B> cosh(A) </B>  <td>Same as cos() but for hyperbolic cosine.
-<tr> <td> <B> cot(A) </B>  <td>Cotangent of A. Equivalent to <B>1/tan(A)</B>.
-<tr> <td> <B> csc(A) </B>  <td>Cosecant of A. Equivalent to <B> 1/sin(A)</B>.
-<tr> <td> <B> eval(...) </B>  <td> This a recursive call to the function to be evaluated. The number of parameters must be the same as the number of parameters taken by the function. \n Must be called inside <B>if()</B> to avoid infinite recursion.
-<tr> <td> <B>  exp(A)</B>  <td>Exponential of A. Returns the value of e raised to the power A where e is the base of the natural logarithm,\n i.e. the non-repeating value approximately equal to 2.71828182846.
-<tr> <td> <B> exp2(A) </B>  <td> Base 2 exponential of A. Equivalent to <B>pow(2,A)</B>.
-<tr> <td> <B> floor(A) </B>  <td>Floor of A. Returns the largest integer not greater than A. Rounds down to the next lower integer.\n E.g. -2.9, -2.5 and -2.1 are rounded to -3.0, and 2.9, 2.5 and 2.1 are rounded to 2.0.
-<tr> <td> <B> hypot(A,B) </B>  <td>Euclidean distance function. Equivalent to <B>sqrt(A^2+B^2)</B>.
-<tr> <td> <B> if(A,B,C) </B>  <td> If int(A) differs from 0, the return value of this function is B, else C. Only the parameter which needs to be evaluated is evaluated,\n the other parameter is skipped; this makes it safe to use <B>eval()</B> in them.
-<tr> <td> <B>imag(A)  </B>  <td> Return the imaginary part of complex number A. Equivalent to <B> abs(A)*sin(arg(A))</B>.
-<tr> <td> <B> int(A) </B>  <td>Rounds A to the closest integer. Equidistant values are rounded away from zero.\n E.g. -2.9 and -2.5 are rounded to -3.0; -2.1 is rounded to -2.0, and 2.9 and 2.5 are rounded to 3.0; 2.1 is rounded to 2.0.
-<tr> <td> <B> log(A) </B>  <td>Natural (base e) logarithm of A. Returns the solution to expression exp(x)=A.
-<tr> <td> <B> log2(A) </B>  <td>Base 2 logarithm of A. Equivalent to <B>log(A)/log(2)</B>.
-<tr> <td> <B>  log10(A)</B>  <td>Base 10 logarithm of A.
-<tr> <td> <B> max(A,B) </B>  <td>If A>B, the result is A, else B.
-<tr> <td> <B>  min(A,B)</B>  <td>If A<B, the result is A, else B.
-<tr> <td> <B> polar(A,B) </B>  <td>Returns a complex number from magnitude A, phase angle B (in radians). Equivalent to<B> real(A)*(cos(real(B))+1i*sin(real(B)))</B>.
-<tr> <td> <B> pow(A,B) </B>  <td>Exponentiation (A raised to the power B).
-<tr> <td> <B> real(A) </B>  <td>Return the real part of complex number A. Equivalent to <B>abs(A)*cos(arg(A))</B>.
-<tr> <td> <B> sec(A) </B>  <td>Secant of A. Equivalent to <B>1/cos(A)</B>.
-<tr> <td> <B> sin(A) </B>  <td>Sine of A. Returns the sine of the angle A, where A is measured in radians.
-<tr> <td> <B> sinh(A) </B>  <td>Same as sin() but for hyperbolic sine.
-<tr> <td> <B> sqrt(A) </B>  <td> 	Square root of A. Returns a solution to expression pow(x,2)=A.
-<tr> <td> <B> tan(A)  </B>  <td>Tangent of A. Returns the tangent of the angle A, where A is measured in radians.
-<tr> <td> <B> tanh(A) </B>  <td>Same as tan() but for hyperbolic tangent.
-<tr> <td> <B> trunc(A) </B>  <td>Truncated value of A. Returns an integer corresponding to the value of A without its fractional part.\n E.g. -2.9, -2.5 and -2.1 are rounded to -2.0, and 2.9, 2.5 and 2.1 are rounded to 2.0.
-</table>
-
-(Note that for <B>FunctionParser_li</B> and <B>FunctionParser_gmpint</B> only the functions <B>abs()</B>, <B>eval()</B>, <B>if()</B>, <B>min()</B> and <B>max()</B> are supported.)
+Function Name|Description
+-------------|:----------
+<b>abs(A)</b>|Absolute value (magnitude) of A. With real numbers, if A is negative, returns -A otherwise returns A. With complex numbers, equivalent to <b>hypot(real(x),imag(x))</b>.
+<b>acos(A)</b>|Arc-cosine of A. Returns the angle, measured in radians, whose cosine is A.
+<b>acosh(A)</b>|Same as acos() but for hyperbolic cosine.
+<b>arg(A)</b>| Phase angle of complex number A. Equivalent to <b>atan2(imag(x),real(x))</b>.
+<b>asin(A)</b>|Arc-sine of A. Returns the angle, measured in radians, whose sine is A.
+<b>asinh(A)</b>|Same as asin() but for hyperbolic sine.
+<b>atan(A)</b>| Arc-tangent of (A). Returns the angle, measured in radians, whose tangent is A.
+<b>atan2(A,B)</b>| Principal arc-tangent of A/B, using the signs of the two arguments to determine the quadrant of the result.<br> Returns the solution to the two expressions <b>hypot(A,B)*sin(x)=A, hypot(A,B)*cos(x)=B</b>. The return value is in range -pi to pi, inclusive.
+<b>atanh(A)</b>|Same as atan() but for hyperbolic tangent.
+<b>cbrt(A)</b>|Cube root of A. Returns a solution to expression pow(x,3)=A.
+<b>conj(A)</b>| Complex conjugate of A. Equivalent to <b>real(x) - 1i*imag(x)</b> or <b>polar(abs(x),-arg(x))</b>.
+<b>ceil(A)</b>|Ceiling of A. Returns the smallest integer not smaller than A. Rounds up to the next higher integer,<br> e.g. -2.9, -2.5 and -2.1 are rounded to -2.0, and 2.9, 2.5 and 2.1 are rounded to 3.0.
+<b>cos(A)</b>|Cosine of A. Returns the cosine of the angle A, where A is measured in radians.
+<b>cosh(A)</b>|Same as cos() but for hyperbolic cosine.
+<b>cot(A)</b>|Cotangent of A. Equivalent to <b>1/tan(A)</b>.
+<b>csc(A)</b>|Cosecant of A. Equivalent to <b>1/sin(A)</b>.
+<b>eval(...)</b>| This a recursive call to the function to be evaluated. The number of parameters must be the same as the number of parameters taken by the function. Must be called inside <b>if()</b> to avoid infinite recursion.<br> A simple valid example of a recursive function is the factorial function: <b>"if(n>1, n*eval(n-1), 1)"</b>
+<b>exp(A)</b>|Exponential of A. Returns the value of e raised to the power A where e is the base of the natural logarithm,<br> i.e. the non-repeating value approximately equal to 2.71828182846.
+<b>exp2(A)</b>| Base 2 exponential of A. Equivalent to <b>pow(2,A)</b>.
+<b>floor(A)</b>|Floor of A. Returns the largest integer not greater than A. Rounds down to the next lower integer,<br> e.g. -2.9, -2.5 and -2.1 are rounded to -3.0, and 2.9, 2.5 and 2.1 are rounded to 2.0.
+<b>hypot(A,B)</b>|Euclidean distance function. Equivalent to <b>sqrt(A^2+B^2)</b>.
+<b>if(A,B,C)</b>| If int(A) differs from 0, the return value of this function is B, else C. Only the parameter which needs to be evaluated is evaluated,<br> the other parameter is skipped; this makes it safe to use <b>eval()</b> in them.
+<b>imag(A)</b>| Return the imaginary part of complex number A. Equivalent to <b>abs(A)*sin(arg(A))</b>.
+<b>int(A)</b>|Rounds A to the closest integer. Equidistant values are rounded away from zero,<br> e.g. -2.9 and -2.5 are rounded to -3.0; -2.1 is rounded to -2.0, and 2.9 and 2.5 are rounded to 3.0; 2.1 is rounded to 2.0.
+<b>log(A)</b>|Natural (base e) logarithm of A. Returns the solution to expression exp(x)=A.
+<b>log2(A)</b>|Base 2 logarithm of A. Equivalent to <b>log(A)/log(2)</b>.
+<b>log10(A)</b>|Base 10 logarithm of A.
+<b>max(A,B)</b>|If A>B, the result is A, else B.
+<b>min(A,B)</b>|If A<B, the result is A, else B.
+<b>polar(A,B)</b>|Returns a complex number from magnitude A, phase angle B (in radians). Equivalent to <b>real(A)*(cos(real(B))+1i*sin(real(B)))</b>.
+<b>pow(A,B)</b>|Exponentiation (A raised to the power B).
+<b>real(A)</b>|Return the real part of complex number A. Equivalent to <b>abs(A)*cos(arg(A))</b>.
+<b>sec(A)</b>|Secant of A. Equivalent to <b>1/cos(A)</b>.
+<b>sin(A)</b>|Sine of A. Returns the sine of the angle A, where A is measured in radians.
+<b>sinh(A)</b>|Same as sin() but for hyperbolic sine.
+<b>sqrt(A)</b>| 	Square root of A. Returns a solution to expression pow(x,2)=A.
+<b>tan(A)</b>|Tangent of A. Returns the tangent of the angle A, where A is measured in radians.
+<b>tanh(A)</b>|Same as tan() but for hyperbolic tangent.
+<b>trunc(A)</b>|Truncated value of A. Returns an integer corresponding to the value of A without its fractional part,<br> e.g. -2.9, -2.5 and -2.1 are rounded to -2.0, and 2.9, 2.5 and 2.1 are rounded to 2.0.
 
 Examples of function string understood by the class:
 
@@ -112,17 +103,15 @@ Examples of function string understood by the class:
 "-sin(sqrt(x^2+y^2))"\n
 "sqrt(XCoord*XCoord + YCoord*YCoord)"</B>
 
-An example of a recursive function is the factorial function:<B> "if(n>1, n*eval(n-1), 1)"</B>
-
 Note that a recursive call has some overhead, which makes it a bit slower than any other operation. It may be a good idea to avoid recursive functions in very time-critical applications. \n Recursion also takes some memory, so extremely deep recursions should be avoided (eg. millions of nested recursive calls).
 
-Also note that even though the maximum recursion level of <B>eval() </B> is limited, it is possible to write functions which never reach that level but still take enormous amounts of time to evaluate.\n This can sometimes be undesirable because it is prone to exploitation, which is why <B>eval() </B> is disabled by default. It can be enabled in the<B> fpconfig.hh </B>file.
+Also note that even though the maximum recursion level of <B>eval()</B> is limited, it is possible to write functions which never reach that level but still take enormous amounts of time to evaluate.\n This can sometimes be undesirable because it is prone to exploitation, which is why <B>eval()</B> is disabled by default.
 
 \section parsed_function_inline_variables Inline variables
 
 The function syntax supports defining new variables inside the function string itself. This can be done with the following syntax:
 
-<B>"<variable name> := <expression>; <function>" </B>
+<B>"<variable name> := <expression>; <function>"</B>
 
 For example:
 
@@ -134,7 +123,7 @@ The obvious benefit of this is that if a long expression needs to be used in the
 
 The variable name must be an unused identifier (in other words, not an existing function, variable or unit name).
 
-The <B><function> </B> part can have further inline variable definitions, and thus it's possible to have any amount of them, for example:
+The <B>\<function\></B> part can have further inline variable definitions, and thus it's possible to have any amount of them, for example:
 
 <B>"A := x^2; B := y^2; C := z^2; sqrt(A+B+C)" </B>
 

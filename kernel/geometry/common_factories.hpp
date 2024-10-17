@@ -1424,6 +1424,7 @@ namespace FEAT
         }
       }
     }; // class UnitSphereFactory<ConformalMesh<Shape::Hypercube<2>, ...>>
+    /// \endcond
 
     template<typename MeshType_>
     using RefinedUnitSphereFactory = RefineFactory<MeshType_, Geometry::UnitSphereFactory>;

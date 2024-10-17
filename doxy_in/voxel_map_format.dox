@@ -67,7 +67,7 @@ of the i-th voxel is given by the formula
 
 where DT_ represents the floating point format, e.g. double. The Y- and Z-coordinates are computed analogously.
 
-\section voxel_map_file_format Voxel Map File Format
+\section voxel_map_file_overview Voxel Map File Overview
 
 A voxel map file consist of three sections:
 

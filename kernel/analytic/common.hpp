@@ -4370,7 +4370,7 @@ namespace FEAT
        *
        * \tparam dim_ The space dimension
        *
-       * For Franke's function f(x,y), this function represents \f$ g(x,y,z) = \exp(-(10*z-2)^2/25) \cdot f(x,y) $\f
+       * For Franke's function f(x,y), this function represents \f$ g(x,y,z) = \exp(-(10*z-2)^2/25) \cdot f(x,y) \f$
        *
        * \author Maximilian Esser
        */
