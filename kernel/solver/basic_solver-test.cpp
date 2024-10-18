@@ -16,6 +16,7 @@
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/bicgstabl.hpp>
 #include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/rgcr.hpp>
 #include <kernel/solver/pcr.hpp>
@@ -243,6 +244,13 @@ public:
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       auto solver = Solver::new_fgmres(matrix, filter, 16, DataType(0), precon);
       test_solver("FGMRES(16)-JAC", *solver, vec_sol, vec_ref, vec_rhs, 48);
+    }
+
+    // test GMRES-JAC
+    {
+      auto precon = Solver::new_jacobi_precond(matrix, filter);
+      auto solver = Solver::new_gmres(matrix, filter, 16, DataType(0), precon);
+      test_solver("GMRES(16)-JAC", *solver, vec_sol, vec_ref, vec_rhs, 48);
     }
 
     // test PCG-jac-matrix
