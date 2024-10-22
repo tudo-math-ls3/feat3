@@ -227,7 +227,7 @@ endif (FEAT_HAVE_HYPRE)
 if (FEAT_HAVE_DEATH_HANDLER)
   add_library(thirdparty-deathhandler STATIC "${FEAT_SOURCE_DIR}/thirdparty/${FEAT_DIRNAME_DEATHHANDLER}/DeathHandler-master/death_handler.cc")
   add_dependencies(thirdparty thirdparty-deathhandler)
-  target_compile_options(thirdparty-deathandler PRIVATE -w)
+  target_compile_options(thirdparty-deathhandler PRIVATE -w)
 #  target_link_options(thirdparty-deathhandler PRIVATE "LINKER:-w")
 endif (FEAT_HAVE_DEATH_HANDLER)
 
