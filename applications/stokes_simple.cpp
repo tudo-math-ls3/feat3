@@ -91,7 +91,7 @@
 #include <kernel/solver/pcg.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/amavanka.hpp>
-#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/multigrid.hpp>
 
@@ -455,8 +455,8 @@ int main(int argc, char* argv [])
     auto schwarz  = Solver::new_schwarz_precond(amavanka, lvl.filter_sys);
     schwarz->set_ignore_status(true);
 
-    // stuff the AmaVanka-smoother into a FGMRES(4) solver
-    auto smoother = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 4, 0.0, schwarz);
+    // stuff the AmaVanka-smoother into a GMRES(4) solver
+    auto smoother = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 4, 0.0, schwarz);
     smoother->set_min_iter(4);
     smoother->set_max_iter(4);
 

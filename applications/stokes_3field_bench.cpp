@@ -35,7 +35,7 @@
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
-#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/umfpack.hpp>
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/util/dist.hpp>
@@ -1063,7 +1063,7 @@ namespace Stokes3Field
       else
       {
         // create coarse grid solver
-        auto cgsolver = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, gmres_k, 0.0, schwarz);
+        auto cgsolver = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, gmres_k, 0.0, schwarz);
         cgsolver->set_max_iter(1000);
         cgsolver->set_tol_rel(1e-3);
         //cgsolver->set_plot_mode(Solver::PlotMode::summary);

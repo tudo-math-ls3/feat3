@@ -27,6 +27,11 @@ namespace FEAT
      * If used with a preconditioner that does fulfill the linearity condition or if used without a preconditioner,
      * the FGMRES(k) and GMRES(k) solvers are equivalent with the exception of rounding errors, of course.
      *
+     * \note
+     * If you intend to use a preconditioner that fulfills the abovementioned linearity condititon, then it is
+     * recommended that you use the GMRES(k) solver instead of this FMGRES(k) solver, because the FGMRES(k) requires
+     * almost \b twice the temporary memory as GMRES(k).
+     *
      * <u><b>Details about the inner resolution scaling factor:</b></u>\n
      * In contrast to other popular iterative Krylov subspace methods like PCG or BiCGStab, the GMRES method and all
      * of its variants -- including the FMGRES(k) solver implemented by this class -- do \b not compute or update the

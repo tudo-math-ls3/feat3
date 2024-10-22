@@ -90,7 +90,7 @@
 
 // FEAT-Solver includes
 #include <kernel/solver/vanka.hpp>                         // NEW: for Vanka preconditioner
-#include <kernel/solver/fgmres.hpp>                        // NEW: for FMGRES solver
+#include <kernel/solver/gmres.hpp>                         // NEW: for GMRES solver
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -437,9 +437,9 @@ namespace Tutorial07
       0.8                                 // the relaxation parameter
     );
 
-    // Next, we can create a FGMRES(64) solver and use the Vanka as a preconditioner.
-    // In contrast to PCG and BiCGStab, the FGMRES solver requires a few additional parameters:
-    auto solver = Solver::new_fgmres(
+    // Next, we can create a GMRES(64) solver and use the Vanka as a preconditioner.
+    // In contrast to PCG and BiCGStab, the GMRES solver requires a few additional parameters:
+    auto solver = Solver::new_gmres(
       matrix, // the system matrix
       filter, // the system filter
       64,     // the Krylov subspace dimension

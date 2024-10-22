@@ -1017,18 +1017,18 @@ namespace CCND
         else
 #endif //  FEAT_HAVE_UMFPACK
         {
-          comm.print("\nINFO: only 1 level chosen; creating single grid solver: FGMRES-AmaVanka");
+          comm.print("\nINFO: only 1 level chosen; creating single grid solver: GMRES-AmaVanka");
           auto vanka = Solver::new_amavanka(system.front()->local_matrix_sys, filter_sys.local());
           vanka->set_skip_singular(true);
           ama_vankas.push_back(vanka);
           auto schwarz = Solver::new_schwarz_precond(vanka, filter_sys);
           if(solve_gmres_dim > Index(0))
-            solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.0, schwarz);
+            solver = solver_iterative = Solver::new_gmres(matrix_sys, filter_sys, solve_gmres_dim, 0.0, schwarz);
           else
-            solver = solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, 16, 0.0, schwarz);
+            solver = solver_iterative = Solver::new_gmres(matrix_sys, filter_sys, 16, 0.0, schwarz);
 
           // configure solver
-          solver_iterative->set_plot_name("FGMRES-AmaVanka");
+          solver_iterative->set_plot_name("GMRES-AmaVanka");
           solver_iterative->set_min_iter(min_mg_iter);
           solver_iterative->set_max_iter(max_mg_iter);
           solver_iterative->set_tol_rel(mg_tol_rel);
@@ -1060,7 +1060,7 @@ namespace CCND
           // create smoother: either GMRES or Richardson
           std::shared_ptr<Solver::IterativeSolver<GlobalSystemVector>> smoother;
           if(smooth_gmres_dim > Index(0))
-            smoother = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, smooth_gmres_dim, 0.0, schwarz);
+            smoother = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, smooth_gmres_dim, 0.0, schwarz);
           else
             smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
           smoother->set_min_iter(smooth_steps);
@@ -1078,14 +1078,14 @@ namespace CCND
 #endif //  FEAT_HAVE_UMFPACK
         else
         {
-          // create FGMRES-AmaVanka coarse grid solver
+          // create GMRES-AmaVanka coarse grid solver
           auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
           vanka->set_skip_singular(true);
           ama_vankas.push_back(vanka);
           auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
           schwarz->set_ignore_status(true);
           //auto coarse_solver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          auto coarse_solver = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, schwarz);
+          auto coarse_solver = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, schwarz);
           coarse_solver->set_max_iter(500);
           coarse_solver->set_tol_rel(1e-3);
           //coarse_solver->set_plot_mode(Solver::PlotMode::summary);

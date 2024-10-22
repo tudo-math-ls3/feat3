@@ -31,7 +31,7 @@
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/jacobi_precond.hpp>
-#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/umfpack.hpp>
 #include <kernel/solver/superlu.hpp>
@@ -423,7 +423,7 @@ namespace PoissonVoxelMG
       {
         auto jacobi = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys);
         //auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, 0.7, jacobi);
-        auto smoother = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, steps, 0.0, jacobi);
+        auto smoother = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, steps, 0.0, jacobi);
         smoother->set_min_iter(steps);
         smoother->set_max_iter(steps);
         multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);

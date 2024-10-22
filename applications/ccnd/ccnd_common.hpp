@@ -40,6 +40,7 @@
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/bicgstab.hpp>
 #include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/direct_stokes_solver.hpp>
 
 #include <control/domain/parti_domain_control.hpp>

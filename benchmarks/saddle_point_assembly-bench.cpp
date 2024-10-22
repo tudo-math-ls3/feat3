@@ -14,7 +14,7 @@
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/analytic/common.hpp>
-#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/voxel_amavanka.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -203,7 +203,7 @@ namespace SaddlePointAssemblyBench
 
     asm_sym_vanka_watch.start();
     auto vanka = Solver::new_amavanka(matrix, filter, omega);
-    auto fgmres = Solver::new_fgmres(matrix, filter, Index(std::min(num_solver_iterations,16)), DataType(0), vanka);
+    auto fgmres = Solver::new_gmres(matrix, filter, Index(std::min(num_solver_iterations,16)), DataType(0), vanka);
     fgmres->set_min_iter(num_solver_iterations);
     fgmres->set_max_iter(num_solver_iterations);
     fgmres->skip_defect_calc(true);
@@ -350,7 +350,7 @@ namespace SaddlePointAssemblyBench
 
     asm_sym_vanka_watch.start();
     auto vanka = Solver::new_voxel_amavanka<MatrixType, FilterType, Adjacency::Coloring, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, FEAT::Intern::VankaMacroPolicy::uniformMacros>(matrix, filter, col, omega);
-    auto fgmres = Solver::new_fgmres(matrix, filter, Index(std::min(num_solver_iterations, 16)), DataType(0), vanka);
+    auto fgmres = Solver::new_gmres(matrix, filter, Index(std::min(num_solver_iterations, 16)), DataType(0), vanka);
     fgmres->set_min_iter(num_solver_iterations);
     fgmres->set_max_iter(num_solver_iterations);
     fgmres->skip_defect_calc(true);
