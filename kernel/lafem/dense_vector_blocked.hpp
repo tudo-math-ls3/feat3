@@ -528,7 +528,7 @@ namespace FEAT
       template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        if (perspective_ == Perspective::pod)
+        if constexpr(perspective_ == Perspective::pod)
           return static_cast<const Container<DT_, IT_> *>(this)->size() * Index(BlockSize_);
         else
           return static_cast<const Container<DT_, IT_> *>(this)->size();
