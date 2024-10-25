@@ -2532,7 +2532,7 @@ Solver::Status solve_navier(GlobalSystemVector& vec_sol, const GlobalSystemVecto
 
   //update all non Neumann boundary
   template<typename DirichletFunctionType, typename NoSlipFunctionType>
-  void update_filters(DirichletFunctionType& diri_func, NoSlipFunctionType& noslip_func, const String& InflowFacetName, const String& OutflowFacetName)
+  void update_filters(DirichletFunctionType& /*diri_func*/, NoSlipFunctionType& noslip_func, const String& InflowFacetName, const String& OutflowFacetName)
   {
     //get reference to domain
     Control::Domain::PartiDomainControl<DomainLevel_>& domain = *_domain_ptr;
