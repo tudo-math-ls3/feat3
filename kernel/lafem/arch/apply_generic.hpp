@@ -37,29 +37,33 @@ namespace FEAT
         if (transposed)
         {
           DT_ ba = b/a;
-          for (Index col(0) ; col < columns ; ++col)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index col = 0 ; col < columns ; ++col)
           {
             r[col] = ba * r[col];
           }
-          for (Index row(0) ; row < rows ; ++row)
+
+          for (Index row = 0 ; row < rows ; ++row)
           {
-            for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
+            for (Index i = row_ptr[row] ; i < row_ptr[row+1] ; ++i)
             {
               r[col_ind[i]] += val[i] * x[row];
             }
           }
-          for (Index col(0) ; col < columns ; ++col)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index col = 0 ; col < columns ; ++col)
           {
             r[col] = a * r[col];
           }
         }
         else
         {
-          for (Index row(0) ; row < rows ; ++row)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index row = 0 ; row < rows ; ++row)
           {
             DT_ sum(0);
             const IT_ end(row_ptr[row + 1]);
-            for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+            for (IT_ i = row_ptr[row] ; i < end ; ++i)
             {
               sum += val[i] * x[col_ind[i]];
             }
@@ -85,10 +89,12 @@ namespace FEAT
         if (transposed)
         {
           DT_ ba = b/a;
-          for (Index col(0) ; col < columns ; ++col)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index col = 0 ; col < columns ; ++col)
           {
             r[col] = ba * r[col];
           }
+
           for (Index nzrow(0) ; nzrow < used_rows ; ++nzrow)
           {
             const Index row(row_numbers[nzrow]);
@@ -97,19 +103,21 @@ namespace FEAT
               r[col_ind[i]] += val[i] * x[row];
             }
           }
-          for (Index col(0) ; col < columns ; ++col)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index col = 0 ; col < columns ; ++col)
           {
             r[col] = a * r[col];
           }
         }
         else
         {
-          for (Index nzrow(0) ; nzrow < used_rows ; ++nzrow)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index nzrow = 0 ; nzrow < used_rows ; ++nzrow)
           {
             const Index row(row_numbers[nzrow]);
             DT_ sum(0);
             const IT_ end(row_ptr[nzrow + 1]);
-            for (IT_ i(row_ptr[nzrow]) ; i < end ; ++i)
+            for (IT_ i = row_ptr[nzrow] ; i < end ; ++i)
             {
               sum += val[i] * x[col_ind[i]];
             }
@@ -135,11 +143,12 @@ namespace FEAT
           MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockHeight_);
         }
 
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           Tiny::Vector<DT_, BlockHeight_> bsum(0);
           const IT_ end(row_ptr[row + 1]);
-          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          for (IT_ i = row_ptr[row] ; i < end ; ++i)
           {
             bsum.add_mat_vec_mult(bval[i], bx[col_ind[i]]);
           }
@@ -165,18 +174,21 @@ namespace FEAT
         }
 
         DT_ ba = b/a;
-        for (Index col(0) ; col < columns ; ++col)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index col = 0 ; col < columns ; ++col)
         {
           br[col] = ba * br[col];
         }
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
           {
             br[col_ind[i]].add_vec_mat_mult(bx[row], bval[i]);
           }
         }
-        for (Index col(0) ; col < columns ; ++col)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index col = 0 ; col < columns ; ++col)
         {
           br[col] = a * br[col];
         }
@@ -197,7 +209,8 @@ namespace FEAT
           MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockSize_);
         }
 
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           Tiny::Vector<DT_, BlockSize_> bsum(0);
           const IT_ end(row_ptr[row + 1]);
@@ -443,7 +456,8 @@ namespace FEAT
           MemoryPool::copy(r, y, rows);
         }
 
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           DT_ sum(0);
           for (Index col(0); col < columns; ++col)
@@ -467,7 +481,8 @@ namespace FEAT
           MemoryPool::copy(r, y, columns);
         }
 
-        for (Index col(0) ; col < columns ; ++col)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index col = 0 ; col < columns ; ++col)
         {
           DT_ sum(0);
           for (Index row(0); row < rows; ++row)

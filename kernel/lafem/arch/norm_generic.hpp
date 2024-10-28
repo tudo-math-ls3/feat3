@@ -24,7 +24,8 @@ namespace FEAT
       DT_ Norm2::value_generic(const DT_ * const x, const Index size)
       {
         DT_ r(0);
-        for (Index i(0) ; i < size ; ++i)
+        FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+        for (Index i = 0 ; i < size ; ++i)
         {
           r += x[i] * x[i];
         }
@@ -36,7 +37,8 @@ namespace FEAT
       ValueType_ Norm2::value_blocked_generic(const ValueType_ * const x, const Index size)
       {
         ValueType_ r(0);
-        for(int j(0); j<ValueType_::n; ++j)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(int j = 0; j<ValueType_::n; ++j)
         {
           for (Index i(0) ; i < size ; ++i)
           {
@@ -51,7 +53,8 @@ namespace FEAT
       ValueType_ Norm2Sqr::value_blocked_generic(const ValueType_ * const x, const Index size)
       {
         ValueType_ r(0);
-        for(int j(0); j<ValueType_::n; ++j)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(int j = 0; j<ValueType_::n; ++j)
         {
           for (Index i(0) ; i < size ; ++i)
           {

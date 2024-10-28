@@ -23,7 +23,8 @@ namespace FEAT
       void RowNorm::csr_generic_norm2(DT_* row_norms, const DT_* const val, const IT_* const /*col_ind*/,
         const IT_* const row_ptr, const Index rows)
       {
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
           DT_ norm(0);
@@ -43,7 +44,8 @@ namespace FEAT
       void RowNorm::csr_generic_norm2sqr(DT_* row_norms, const DT_* const val,
       const IT_* const /*col_ind*/, const IT_* const row_ptr, const Index rows)
       {
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
           DT_ norm(0);
@@ -62,7 +64,8 @@ namespace FEAT
       void RowNorm::csr_generic_scaled_norm2sqr(DT_* row_norms, const DT_* const scal,
       const DT_* const val, const IT_* const /*col_ind*/, const IT_* const row_ptr, const Index rows)
       {
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
           DT_ norm(0);
@@ -84,11 +87,12 @@ namespace FEAT
         Index block_height = Index(BlockHeight);
         Index block_width = Index(BlockWidth);
 
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
 
-          for(Index i(0); i < block_height; ++i)
+          for(Index i = 0; i < block_height; ++i)
           {
              row_norms[block_height*row + i] = DT_(0);
           }
@@ -96,9 +100,9 @@ namespace FEAT
           for (Index col = row_ptr[row]; col < end; col++)
           {
             // Manually compute norm2 of row
-            for(Index i(0); i < block_height; ++i)
+            for(Index i = 0; i < block_height; ++i)
             {
-              for(Index j(0); j < block_width; ++j)
+              for(Index j = 0; j < block_width; ++j)
               {
                 row_norms[block_height*row + i] += Math::sqr(val[block_height*block_width*col + i*block_width + j]);
               }
@@ -117,11 +121,12 @@ namespace FEAT
         Index block_height = Index(BlockHeight);
         Index block_width = Index(BlockWidth);
 
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
 
-          for(Index i(0); i < block_height; ++i)
+          for(Index i = 0; i < block_height; ++i)
           {
              row_norms[block_height*row + i] = DT_(0);
           }
@@ -129,9 +134,9 @@ namespace FEAT
           for (Index col = row_ptr[row]; col < end; col++)
           {
             // Manually compute norm2 of row
-            for(Index i(0); i < block_height; ++i)
+            for(Index i = 0; i < block_height; ++i)
             {
-              for(Index j(0); j < block_width; ++j)
+              for(Index j = 0; j < block_width; ++j)
               {
                 row_norms[block_height*row + i] += Math::sqr(val[block_height*block_width*col + i*block_width + j]);
               }
@@ -149,11 +154,12 @@ namespace FEAT
         Index block_height = Index(BlockHeight);
         Index block_width = Index(BlockWidth);
 
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
 
-          for(Index i(0); i < block_height; ++i)
+          for(Index i = 0; i < block_height; ++i)
           {
              row_norms[block_height*row + i] = DT_(0);
           }
@@ -161,9 +167,9 @@ namespace FEAT
           for (Index col = row_ptr[row]; col < end; col++)
           {
             // Manually compute norm2 of row
-            for(Index i(0); i < block_height; ++i)
+            for(Index i = 0; i < block_height; ++i)
             {
-              for(Index j(0); j < block_width; ++j)
+              for(Index j = 0; j < block_width; ++j)
               {
                 row_norms[block_height*row + i] += scal[block_width*col_ind[col] + j]
                   *Math::sqr(val[block_height*block_width*col + i*block_width + j]);

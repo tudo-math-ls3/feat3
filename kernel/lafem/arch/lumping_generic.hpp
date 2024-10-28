@@ -21,7 +21,8 @@ namespace FEAT
       void Lumping::csr_generic(DT_ * lump, const DT_ * const val, const IT_ * const /*col_ind*/,
         const IT_ * const row_ptr, const Index rows)
       {
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
           DT_ sum(0);
@@ -40,7 +41,8 @@ namespace FEAT
         Index block_height = Index(BlockHeight);
         Index block_width = Index(BlockWidth);
 
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           Index end = row_ptr[row + 1];
 

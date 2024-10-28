@@ -21,7 +21,8 @@ namespace FEAT
       template <typename DT_, typename IT_>
       void UnitFilter::filter_rhs_generic(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
       {
-        for(Index i(0); i < ue ; ++i)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i < ue ; ++i)
         {
           v[sv_indices[i]] = sv_elements[i];
         }
@@ -30,7 +31,8 @@ namespace FEAT
       template <typename DT_, typename IT_>
       void UnitFilter::filter_def_generic(DT_ * v, const IT_ * const sv_indices, const Index ue)
       {
-        for(Index i(0); i < ue ; ++i)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i < ue ; ++i)
         {
           v[sv_indices[i]] = DT_(0);
         }

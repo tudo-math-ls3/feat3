@@ -780,6 +780,7 @@ public:
 
       a.scale_blocked(a, bs);
       TEST_CHECK_EQUAL(a, ref_bs);
+
     }
   }
 };

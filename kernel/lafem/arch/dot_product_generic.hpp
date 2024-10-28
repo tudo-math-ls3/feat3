@@ -24,14 +24,16 @@ namespace FEAT
 
         if(x == y)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+          for (Index i = 0 ; i < size ; ++i)
           {
             r += x[i] * x[i];
           }
         }
         else
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+          for (Index i = 0 ; i < size ; ++i)
           {
             r += x[i] * y[i];
           }
@@ -47,6 +49,7 @@ namespace FEAT
 
         if(x == y)
         {
+
           for (Index i(0) ; i < size ; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j) {
@@ -56,6 +59,7 @@ namespace FEAT
         }
         else
         {
+
           for (Index i(0) ; i < size ; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j) {
@@ -74,22 +78,26 @@ namespace FEAT
 
         if (x == y)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+          for (Index i = 0 ; i < size ; ++i)
             r += x[i] * x[i] * z[i];
         }
         else if (x == z)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+          for (Index i = 0 ; i < size ; ++i)
             r += x[i] * x[i] * y[i];
         }
         else if (y == z)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+          for (Index i = 0 ; i < size ; ++i)
             r += x[i] * y[i] * y[i];
         }
         else
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for reduction(+:r))
+          for (Index i = 0 ; i < size ; ++i)
             r += x[i] * y[i] * z[i];
         }
 
@@ -103,6 +111,7 @@ namespace FEAT
 
         if (x == y)
         {
+
           for(Index i(0); i < size; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j)
@@ -113,6 +122,7 @@ namespace FEAT
         }
         else if (x == z)
         {
+
           for (Index i(0) ; i < size ; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j)
@@ -123,6 +133,7 @@ namespace FEAT
         }
         else if (y == z)
         {
+
           for (Index i(0) ; i < size ; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j)
@@ -133,6 +144,7 @@ namespace FEAT
         }
         else
         {
+
           for(Index i(0); i < size; ++i)
           {
             for(int j(0); j < ValueType_::n; ++j)

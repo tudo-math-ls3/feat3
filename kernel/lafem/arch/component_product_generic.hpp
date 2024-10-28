@@ -23,28 +23,32 @@ namespace FEAT
       {
         if (r == x)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] *= y[i];
           }
         }
         else if (r == y)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] *= x[i];
           }
         }
         else if (r == x && r == y)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] *= r[i];
           }
         }
         else
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] = x[i] * y[i];
           }

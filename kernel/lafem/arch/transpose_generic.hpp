@@ -28,9 +28,10 @@ namespace FEAT
           /// \todo use inplace transform, i.e. lower triangular swap algorithm
           DT_* t= new DT_[rows_x * columns_x];
           std::memcpy(t, x, rows_x * columns_x * sizeof(DT_));
-          for (Index i(0) ; i < rows_x ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < rows_x ; ++i)
           {
-            for (Index j(0) ; j < columns_x ; ++j)
+            for (Index j = 0 ; j < columns_x ; ++j)
             {
               r[j * rows_x + i] = t[i * columns_x + j];
             }
@@ -39,9 +40,10 @@ namespace FEAT
         }
         else
         {
-          for (Index i(0) ; i < rows_x ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < rows_x ; ++i)
           {
-            for (Index j(0) ; j < columns_x ; ++j)
+            for (Index j = 0 ; j < columns_x ; ++j)
             {
               r[j * rows_x + i] = x[i * columns_x + j];
             }

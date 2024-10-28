@@ -20,7 +20,8 @@ namespace FEAT
       template <typename IT_>
       void Diagonal::csr_generic(IT_ * diag, const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows)
       {
-        for (Index row(0); row < rows; row++)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0; row < rows; row++)
         {
           const Index end = row_ptr[row + 1];
           diag[row] = row_ptr[rows];

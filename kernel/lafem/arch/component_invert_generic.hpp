@@ -22,14 +22,16 @@ namespace FEAT
       {
         if (r == x)
         {
-          for(Index i(0); i < size; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < size; ++i)
           {
             r[i] = s / r[i];
           }
         }
         else
         {
-          for(Index i(0); i < size; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < size; ++i)
           {
             r[i] = s / x[i];
           }

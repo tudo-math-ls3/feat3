@@ -25,10 +25,11 @@ namespace FEAT
                                                     const IT_ * const row_ptr, const DT_ * const x,
                                                     const Index rows, const Index, const Index)
       {
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           const IT_ end(row_ptr[row + 1]);
-          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          for (IT_ i = row_ptr[row] ; i < end ; ++i)
           {
             r[i] = a[i] * x[row];
           }
@@ -44,10 +45,11 @@ namespace FEAT
         Tiny::Matrix<DT_, bh_, bw_> * const br(reinterpret_cast<Tiny::Matrix<DT_, bh_, bw_> *>(r));
         const Tiny::Matrix<DT_, bh_, bw_> * const ba(reinterpret_cast<const Tiny::Matrix<DT_, bh_, bw_> *>(a));
         const Tiny::Vector<DT_, bh_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, bh_> *>(x));
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           const IT_ end(row_ptr[row + 1]);
-          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          for (IT_ i = row_ptr[row] ; i < end ; ++i)
           {
             for (int irow(0); irow < bh_; ++ irow )
             {
@@ -67,10 +69,11 @@ namespace FEAT
                                                     const IT_ * const row_ptr, const DT_ * const x,
                                                     const Index rows, const Index, const Index)
       {
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           const IT_ end(row_ptr[row + 1]);
-          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          for (IT_ i = row_ptr[row] ; i < end ; ++i)
           {
             r[i] = a[i] * x[col_ind[i]];
           }
@@ -86,14 +89,15 @@ namespace FEAT
         Tiny::Matrix<DT_, bh_, bw_> * const br(reinterpret_cast<Tiny::Matrix<DT_, bh_, bw_> *>(r));
         const Tiny::Matrix<DT_, bh_, bw_> * const ba(reinterpret_cast<const Tiny::Matrix<DT_, bh_, bw_> *>(a));
         const Tiny::Vector<DT_, bw_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, bw_> *>(x));
-        for (Index row(0) ; row < rows ; ++row)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index row = 0 ; row < rows ; ++row)
         {
           const IT_ end(row_ptr[row + 1]);
-          for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+          for (IT_ i = row_ptr[row] ; i < end ; ++i)
           {
-            for (int irow(0); irow < bh_; ++irow)
+            for (int irow = 0; irow < bh_; ++irow)
             {
-              for (int icol(0); icol < bw_; ++icol)
+              for (int icol = 0; icol < bw_; ++icol)
               {
                 br[i][irow][icol] = ba[i][irow][icol] * bx[col_ind[i]][icol];
               }

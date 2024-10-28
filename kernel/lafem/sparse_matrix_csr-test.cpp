@@ -409,7 +409,7 @@ public:
       a.apply(ref, x);
       ref.scale(ref, DT_(-1.0));
       ref.axpy(y);
-      for (Index i(0); i < size; ++i)
+      for(Index i(0); i < size; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
 
       // apply-test for alpha = -1.0 and &r==&y

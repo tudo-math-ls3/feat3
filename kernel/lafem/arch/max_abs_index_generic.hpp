@@ -33,7 +33,6 @@ namespace FEAT
             max_i = i;
           }
         }
-
         return max_i;
       }
 
@@ -42,6 +41,7 @@ namespace FEAT
       {
         ValueType_ max(0);
         Index max_i(0);
+
         for(int j(0); j < ValueType_::n; ++j)
         {
           max[j] = Math::abs(x[0][j]);

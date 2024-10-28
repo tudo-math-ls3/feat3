@@ -26,9 +26,10 @@ namespace FEAT
         Index block_size = Index(BlockSize_);
         if(ign_nans)
         {
-          for(Index i(0); i < ue; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < ue; ++i)
           {
-            for(Index j(0) ; j < block_size ; ++j)
+            for(Index j = 0 ; j < block_size ; ++j)
             {
               if(!Math::isnan(sv_elements[block_size * i + Index(j)]))
                 v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
@@ -37,9 +38,10 @@ namespace FEAT
         }
         else
         {
-          for(Index i(0); i < ue; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < ue; ++i)
           {
-            for(Index j(0) ; j < block_size ; ++j)
+            for(Index j = 0 ; j < block_size ; ++j)
             {
               v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
             }
@@ -53,9 +55,10 @@ namespace FEAT
         Index block_size = Index(BlockSize_);
         if(ign_nans)
         {
-          for(Index i(0); i < ue; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < ue; ++i)
           {
-            for(Index j(0) ; j < block_size ; ++j)
+            for(Index j = 0 ; j < block_size ; ++j)
             {
               if(!Math::isnan(sv_elements[block_size * i + Index(j)]))
                 v[block_size * sv_indices[i] + j] = DT_(0);
@@ -64,9 +67,10 @@ namespace FEAT
         }
         else
         {
-          for(Index i(0); i < ue; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < ue; ++i)
           {
-            for(Index j(0) ; j < BlockSize_ ; ++j)
+            for(Index j = 0 ; j < BlockSize_ ; ++j)
               v[block_size * sv_indices[i] + j] = DT_(0);
           }
         }

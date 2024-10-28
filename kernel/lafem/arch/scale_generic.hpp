@@ -23,14 +23,16 @@ namespace FEAT
       {
         if (x == r)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] *= s;
           }
         }
         else
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] = x[i] * s;
           }
@@ -42,9 +44,10 @@ namespace FEAT
       {
         if (x == r)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
-            for(int j(0); j < ValueType_::n; ++j)
+            for(int j = 0; j < ValueType_::n; ++j)
             {
               r[i][j] *= s[j];
             }
@@ -52,9 +55,10 @@ namespace FEAT
         }
         else
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
-            for(int j(0); j < ValueType_::n; ++j)
+            for(int j = 0; j < ValueType_::n; ++j)
             {
               r[i][j] = x[i][j] * s[j];
             }

@@ -26,14 +26,16 @@ namespace FEAT
       {
         if (r == x)
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] *= DT_(1) + a;
           }
         }
         else
         {
-          for (Index i(0) ; i < size ; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < size ; ++i)
           {
             r[i] += a * x[i];
           }
@@ -43,7 +45,8 @@ namespace FEAT
       template <typename ValueType_>
       void Axpy::value_blocked_generic(ValueType_ * r, const ValueType_ a, const ValueType_ * const x, const Index size)
       {
-        for (Index i(0) ; i < size ; ++i)
+        FEAT_PRAGMA_OMP(parallel for)
+        for (Index i = 0 ; i < size ; ++i)
         {
           for(int j(0); j < ValueType_::n; ++j)
             r[i][j] += a[j] * x[i][j];

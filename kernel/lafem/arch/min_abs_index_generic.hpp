@@ -42,6 +42,7 @@ namespace FEAT
       {
         ValueType_ min(0);
         Index min_i(0);
+
         for(int j(0); j < ValueType_::n; ++j)
         {
           min[j] = Math::abs(x[0][j]);
