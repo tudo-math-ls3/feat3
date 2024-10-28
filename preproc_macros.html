@@ -108,7 +108,9 @@ $(document).ready(function(){initNavTree('preproc_macros.html',''); initResizabl
 <ul><li class="level1"><a href="#preproc_sec_comp_detect">Compiler-Detection Macros</a><ul><li class="level2"><a href="#ppm_feat_compiler">FEAT_COMPILER</a></li>
 <li class="level2"><a href="#ppm_feat_compiler_gnu">FEAT_COMPILER_GNU</a></li>
 <li class="level2"><a href="#ppm_feat_compiler_clang">FEAT_COMPILER_CLANG</a></li>
+<li class="level2"><a href="#ppm_feat_compiler_cray">FEAT_COMPILER_CRAY</a></li>
 <li class="level2"><a href="#ppm_feat_compiler_intel">FEAT_COMPILER_INTEL</a></li>
+<li class="level2"><a href="#ppm_feat_compiler_intel_oneapi">FEAT_COMPILER_INTEL_ONEAPI</a></li>
 <li class="level2"><a href="#ppm_feat_compiler_microsoft">FEAT_COMPILER_MICROSOFT</a></li>
 </ul>
 </li>
@@ -117,6 +119,7 @@ $(document).ready(function(){initNavTree('preproc_macros.html',''); initResizabl
 <li class="level2"><a href="#ppm_feat_have_boost">FEAT_HAVE_BOOST</a></li>
 <li class="level2"><a href="#ppm_feat_have_deathhandler">FEAT_HAVE_DEATH_HANDLER</a></li>
 <li class="level2"><a href="#ppm_feat_have_cuda">FEAT_HAVE_CUDA</a></li>
+<li class="level2"><a href="#ppm_feat_have_cudss">FEAT_HAVE_CUDSS</a></li>
 <li class="level2"><a href="#ppm_feat_have_fparser">FEAT_HAVE_FPARSER</a></li>
 <li class="level2"><a href="#ppm_feat_have_floatx">FEAT_HAVE_FLOATX</a></li>
 <li class="level2"><a href="#ppm_feat_have_halfmath">FEAT_HAVE_HALFMATH</a></li>
@@ -210,9 +213,18 @@ FEAT_COMPILER_CLANG</h2>
 <p >This macro is defined if the Clang/LLVM C++ compiler is detected. Its value is defined as </p><pre class="fragment">(__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 </pre><p> which is a constant integral expression identifying the compiler version, e.g. the value <code>40702</code> identifies the clang 4.7.2 compiler. See the compiler's documentation for details.</p>
 <hr  />
+ <h2><a class="anchor" id="ppm_feat_compiler_cray"></a>
+FEAT_COMPILER_CRAY</h2>
+<p >This macro is defined if the Cray C++ compiler is detected. Its value is defined as </p><pre class="fragment">(_RELEASE_MAJOR * 10000 + _RELEASE_MINOR)
+</pre><p> which is a constant integral expression identifying the compiler version. See the compiler's documentation for details.</p>
+<hr  />
  <h2><a class="anchor" id="ppm_feat_compiler_intel"></a>
 FEAT_COMPILER_INTEL</h2>
 <p >This macro is defined if the Intel C++ compiler is detected. Its value coindices with the compiler's internal macro <code>__INTEL_COMPILER</code>, which is a constant integral expression identifying the compiler version, e.g. the value <code>1210</code> identifies the Intel C++ 12.1 compiler. See the compiler's documentation for details.</p>
+<hr  />
+ <h2><a class="anchor" id="ppm_feat_compiler_intel_oneapi"></a>
+FEAT_COMPILER_INTEL_ONEAPI</h2>
+<p >This macro is defined if the Intel OneAPI C++ compiler is detected. Its value coindices with the compiler's internal macro <code>__INTEL_LLVM_COMPILER</code>, which is a constant integral expression identifying the compiler version, e.g. the value <code>20250000</code> identifies the Intel OneAPI C++ 2025.0 compiler. See the compiler's documentation for details.</p>
 <hr  />
  <h2><a class="anchor" id="ppm_feat_compiler_microsoft"></a>
 FEAT_COMPILER_MICROSOFT</h2>
@@ -243,6 +255,10 @@ FEAT_HAVE_DEATH_HANDLER</h2>
 FEAT_HAVE_CUDA</h2>
 <p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the CUDA library.</p>
 <p >If defined, the LAFEM subsystem of the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel will offer corresponding specializations for the containters and operations using CUDA as a work-horse.</p>
+<hr  />
+ <h2><a class="anchor" id="ppm_feat_have_cudss"></a>
+FEAT_HAVE_CUDSS</h2>
+<p >This macro is defined by the build system if the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel is linked against the cuDSS library.</p>
 <hr  />
  <h2><a class="anchor" id="ppm_feat_have_fparser"></a>
 FEAT_HAVE_FPARSER</h2>

@@ -6,7 +6,7 @@ var searchData=
   ['redundantindexsetbuilder_3',['RedundantIndexSetBuilder',['../class_f_e_a_t_1_1_geometry_1_1_redundant_index_set_builder.html',1,'FEAT::Geometry']]],
   ['referencecell_4',['ReferenceCell',['../struct_f_e_a_t_1_1_shape_1_1_reference_cell.html',1,'FEAT::Shape']]],
   ['referencecellfactory_5',['ReferenceCellFactory',['../class_f_e_a_t_1_1_geometry_1_1_reference_cell_factory.html',1,'FEAT::Geometry']]],
-  ['refinefactory_6',['RefineFactory',['../class_f_e_a_t_1_1_cubature_1_1_refine_factory.html',1,'FEAT::Cubature']]],
+  ['refinefactory_6',['RefineFactory',['../class_f_e_a_t_1_1_cubature_1_1_refine_factory.html',1,'FEAT::Cubature::RefineFactory&lt; Factory_, variadic_ &gt;'],['../class_f_e_a_t_1_1_geometry_1_1_refine_factory.html',1,'FEAT::Geometry::RefineFactory&lt; Mesh_, Factory_ &gt;']]],
   ['refinefactory_3c_20factory_5f_2c_20false_20_3e_7',['RefineFactory&lt; Factory_, false &gt;',['../class_f_e_a_t_1_1_cubature_1_1_refine_factory_3_01_factory___00_01false_01_4.html',1,'FEAT::Cubature']]],
   ['refinefactory_3c_20factory_5f_2c_20true_20_3e_8',['RefineFactory&lt; Factory_, true &gt;',['../class_f_e_a_t_1_1_cubature_1_1_refine_factory_3_01_factory___00_01true_01_4.html',1,'FEAT::Cubature']]],
   ['refinefactorybase_9',['RefineFactoryBase',['../class_f_e_a_t_1_1_cubature_1_1_refine_factory_base.html',1,'FEAT::Cubature']]],

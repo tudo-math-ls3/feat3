@@ -226,6 +226,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html">GenericUmfpack</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic UMFPACK solver class.  <a href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html">GMRES</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">GMRES(k) solver implementation.  <a href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html">GroppPCG</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Preconditioned) pipelined Conjugate-Gradient solver implementation from Bill Gropp  <a href="class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -656,6 +659,14 @@ Functions</h2></td></tr>
 <tr class="memitem:aac261a767b52c9326b2ed02d10fe4aec"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html">GenericUmfpack</a>&lt; Matrix_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#aac261a767b52c9326b2ed02d10fe4aec">new_generic_umfpack</a> (const Matrix_ &amp;matrix)</td></tr>
 <tr class="memdesc:aac261a767b52c9326b2ed02d10fe4aec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html" title="Generic UMFPACK solver class.">GenericUmfpack</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#aac261a767b52c9326b2ed02d10fe4aec">More...</a><br /></td></tr>
 <tr class="separator:aac261a767b52c9326b2ed02d10fe4aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa51747b35fb7fc259d73ca20fb7d3153"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
+<tr class="memitem:aa51747b35fb7fc259d73ca20fb7d3153"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html">GMRES</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#aa51747b35fb7fc259d73ca20fb7d3153">new_gmres</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> krylov_dim, typename Matrix_::DataType inner_res_scale=typename Matrix_::DataType(0), std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
+<tr class="memdesc:aa51747b35fb7fc259d73ca20fb7d3153"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#aa51747b35fb7fc259d73ca20fb7d3153">More...</a><br /></td></tr>
+<tr class="separator:aa51747b35fb7fc259d73ca20fb7d3153"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94b1736d242903ea3371e36eb279d1c0"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
+<tr class="memitem:a94b1736d242903ea3371e36eb279d1c0"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html">GMRES</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a94b1736d242903ea3371e36eb279d1c0">new_gmres</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const Matrix_ &amp;matrix, const Filter_ &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
+<tr class="memdesc:a94b1736d242903ea3371e36eb279d1c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solver object using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="namespace_f_e_a_t_1_1_solver.html#a94b1736d242903ea3371e36eb279d1c0">More...</a><br /></td></tr>
+<tr class="separator:a94b1736d242903ea3371e36eb279d1c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0af5b9e827d08f7d923528cc679609c"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
 <tr class="memitem:ae0af5b9e827d08f7d923528cc679609c"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html">GroppPCG</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ae0af5b9e827d08f7d923528cc679609c">new_gropppcg</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
 <tr class="memdesc:ae0af5b9e827d08f7d923528cc679609c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html" title="(Preconditioned) pipelined Conjugate-Gradient solver implementation from Bill Gropp">GroppPCG</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#ae0af5b9e827d08f7d923528cc679609c">More...</a><br /></td></tr>
@@ -2645,14 +2656,14 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The system matrix.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>The system filter.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">krylov_dim</td><td>The maximum Krylov subspace dimension. Must be &gt; 0.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">inner_res_scale</td><td>The scaling factor for the inner GMRES loop residual. See the details of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html" title="FGMRES(k) solver implementation.">FGMRES</a> class documentation for details</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">inner_res_scale</td><td>The scaling factor for the inner <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> loop residual. See the details of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html" title="FGMRES(k) solver implementation.">FGMRES</a> class documentation for details</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">precond</td><td>The preconditioner. May be <code>nullptr</code>.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html" title="FGMRES(k) solver implementation.">FGMRES</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00424">424</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00429">429</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -2723,7 +2734,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html" title="FGMRES(k) solver implementation.">FGMRES</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00454">454</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fgmres_8hpp_source.html#l00459">459</a> of file <a class="el" href="fgmres_8hpp_source.html">fgmres.hpp</a>.</p>
 
 </div>
 </div>
@@ -2891,6 +2902,148 @@ template&lt;typename Matrix_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html" title="Generic UMFPACK solver class.">GenericUmfpack</a> object. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00781">781</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa51747b35fb7fc259d73ca20fb7d3153" name="aa51747b35fb7fc259d73ca20fb7d3153"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa51747b35fb7fc259d73ca20fb7d3153">&#9670;&#160;</a></span>new_gmres() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html">GMRES</a>&lt; Matrix_, Filter_ &gt; &gt; FEAT::Solver::new_gmres </td>
+          <td>(</td>
+          <td class="paramtype">const Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Filter_ &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>krylov_dim</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename Matrix_::DataType&#160;</td>
+          <td class="paramname"><em>inner_res_scale</em> = <code>typename&#160;Matrix_::DataType(0)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt;&#160;</td>
+          <td class="paramname"><em>precond</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solver object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The system matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>The system filter.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">krylov_dim</td><td>The maximum Krylov subspace dimension. Must be &gt; 0.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">inner_res_scale</td><td>The scaling factor for the inner <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> loop residual. See the details of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> class documentation for details</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">precond</td><td>The preconditioner. May be <code>nullptr</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="gmres_8hpp_source.html#l00437">437</a> of file <a class="el" href="gmres_8hpp_source.html">gmres.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a94b1736d242903ea3371e36eb279d1c0" name="a94b1736d242903ea3371e36eb279d1c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94b1736d242903ea3371e36eb279d1c0">&#9670;&#160;</a></span>new_gmres() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html">GMRES</a>&lt; Matrix_, Filter_ &gt; &gt; FEAT::Solver::new_gmres </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>section_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramname"><em>section</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Filter_ &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt;&#160;</td>
+          <td class="paramname"><em>precond</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solver object using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">section_name</td><td>The name of the config section, which it does not know by itself</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">section</td><td>A pointer to the <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a> section configuring this solver</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The system matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>The system filter.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">precond</td><td>The preconditioner. May be <code>nullptr</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="gmres_8hpp_source.html#l00467">467</a> of file <a class="el" href="gmres_8hpp_source.html">gmres.hpp</a>.</p>
 
 </div>
 </div>

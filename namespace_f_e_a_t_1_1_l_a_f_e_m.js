@@ -46,6 +46,7 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "SparseMatrixFactory", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_factory.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_factory" ],
     [ "SparseVector", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector" ],
     [ "SparseVectorBlocked", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked" ],
+    [ "TestMatrixFactory", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_test_matrix_factory.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_test_matrix_factory" ],
     [ "Transfer", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_transfer.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_transfer" ],
     [ "TupleDiagMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix" ],
     [ "TupleElement", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_element.html", null ],
@@ -104,7 +105,21 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
       [ "lt_ell", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638aefe46f20954dc552a912749b2e16b484", null ],
       [ "lt_banded", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a72009b0b5bf8c72b50704b44e42a37b1", null ]
     ] ],
+    [ "TestMatrixFlags", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278", [
+      [ "generic", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a3d517f8924ac7fd03699a29d97dc52d9", null ],
+      [ "symmetric_struct", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ade3aaf9039f90d1f38d202b821d27776", null ],
+      [ "symmetric", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278afeca3c730601be7fd57f1f0b668b4637", null ],
+      [ "non_negative", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ad0c0015a651861f606ba724bf9763435", null ],
+      [ "non_empty_rows", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ae6c82e67b5da47ff7b10f3290c72b201", null ],
+      [ "non_empty_cols", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a83d6c087af5e7774e1a12ba42d8bd726", null ],
+      [ "non_empty_diag", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a23c7c19d18f4f5158b0c126c97376e39", null ],
+      [ "non_zero_diag", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a232e0d8aadcf8b1f2f34dcc1744c0331", null ],
+      [ "diagonal_dominant", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a39be3c0940ff6f93390195ffa7967de0", null ]
+    ] ],
     [ "operator&", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aca01e69d025c391d78f9da6e2ab8e7b2", null ],
+    [ "operator&", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#a618de3d565248aa6421bab5ad70725e3", null ],
+    [ "operator*", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#abc05c5351009d872162225b99ff13618", null ],
     [ "operator|", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aeac797174e76e1c3df79dea5d70d1b4b", null ],
+    [ "operator|", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab89839954f6e5f969ad6d5975da8b18b", null ],
     [ "FileOutStreamBufferSize", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#a8c4c378c7a34eb8ccca4252d9bada38b", null ]
 ];

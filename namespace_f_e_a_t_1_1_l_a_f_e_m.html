@@ -251,6 +251,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sparse vector class template.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_test_matrix_factory.html">TestMatrixFactory</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_transfer.html">Transfer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grid-Transfer operator class template.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_transfer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -353,15 +355,40 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:aabefea13a94890ded77e859eecd6a638"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab53d180cbfe294f59fa52996cf37c278"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> : int { <br />
+&#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a3d517f8924ac7fd03699a29d97dc52d9">generic</a> = 0x00
+, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ade3aaf9039f90d1f38d202b821d27776">symmetric_struct</a> = 0x01
+, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278afeca3c730601be7fd57f1f0b668b4637">symmetric</a> = 0x02
+, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ad0c0015a651861f606ba724bf9763435">non_negative</a> = 0x04
+, <br />
+&#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ae6c82e67b5da47ff7b10f3290c72b201">non_empty_rows</a> = 0x08
+, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a83d6c087af5e7774e1a12ba42d8bd726">non_empty_cols</a> = 0x10
+, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a23c7c19d18f4f5158b0c126c97376e39">non_empty_diag</a> = 0x20
+, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a232e0d8aadcf8b1f2f34dcc1744c0331">non_zero_diag</a> = 0x20
+, <br />
+&#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a39be3c0940ff6f93390195ffa7967de0">diagonal_dominant</a> = 0x40
+<br />
+ }</td></tr>
+<tr class="memdesc:ab53d180cbfe294f59fa52996cf37c278"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags for desired test matrix.  <a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">More...</a><br /></td></tr>
+<tr class="separator:ab53d180cbfe294f59fa52996cf37c278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aca01e69d025c391d78f9da6e2ab8e7b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711">CompressionModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aca01e69d025c391d78f9da6e2ab8e7b2">operator&amp;</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711">CompressionModes</a> a, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711">CompressionModes</a> b)</td></tr>
 <tr class="memdesc:aca01e69d025c391d78f9da6e2ab8e7b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">bit-wise AND operator for CompressionModes  <a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aca01e69d025c391d78f9da6e2ab8e7b2">More...</a><br /></td></tr>
 <tr class="separator:aca01e69d025c391d78f9da6e2ab8e7b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a618de3d565248aa6421bab5ad70725e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a618de3d565248aa6421bab5ad70725e3">operator&amp;</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> a, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> b)</td></tr>
+<tr class="memdesc:a618de3d565248aa6421bab5ad70725e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">bit-wise AND operator for TestMatrixFlags  <a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a618de3d565248aa6421bab5ad70725e3">More...</a><br /></td></tr>
+<tr class="separator:a618de3d565248aa6421bab5ad70725e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc05c5351009d872162225b99ff13618"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#abc05c5351009d872162225b99ff13618">operator*</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> a, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> b)</td></tr>
+<tr class="memdesc:abc05c5351009d872162225b99ff13618"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks whether a &amp; b != 0  <a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#abc05c5351009d872162225b99ff13618">More...</a><br /></td></tr>
+<tr class="separator:abc05c5351009d872162225b99ff13618"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeac797174e76e1c3df79dea5d70d1b4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711">CompressionModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aeac797174e76e1c3df79dea5d70d1b4b">operator|</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711">CompressionModes</a> a, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711">CompressionModes</a> b)</td></tr>
 <tr class="memdesc:aeac797174e76e1c3df79dea5d70d1b4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">bit-wise OR operator for <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d" title="bitmask for zfp header">Pack::Type</a>  <a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aeac797174e76e1c3df79dea5d70d1b4b">More...</a><br /></td></tr>
 <tr class="separator:aeac797174e76e1c3df79dea5d70d1b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab89839954f6e5f969ad6d5975da8b18b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab89839954f6e5f969ad6d5975da8b18b">operator|</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> a, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> b)</td></tr>
+<tr class="memdesc:ab89839954f6e5f969ad6d5975da8b18b"><td class="mdescLeft">&#160;</td><td class="mdescRight">bit-wise OR operator for TestMatrixFlags  <a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab89839954f6e5f969ad6d5975da8b18b">More...</a><br /></td></tr>
+<tr class="separator:ab89839954f6e5f969ad6d5975da8b18b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -581,9 +608,55 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="ab53d180cbfe294f59fa52996cf37c278" name="ab53d180cbfe294f59fa52996cf37c278"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab53d180cbfe294f59fa52996cf37c278">&#9670;&#160;</a></span>TestMatrixFlags</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">FEAT::LAFEM::TestMatrixFlags</a> : int</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flags for desired test matrix. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278a3d517f8924ac7fd03699a29d97dc52d9" name="ab53d180cbfe294f59fa52996cf37c278a3d517f8924ac7fd03699a29d97dc52d9"></a>generic&#160;</td><td class="fielddoc"><p >generic matrix without special properties, values in range [-1,+1] </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278ade3aaf9039f90d1f38d202b821d27776" name="ab53d180cbfe294f59fa52996cf37c278ade3aaf9039f90d1f38d202b821d27776"></a>symmetric_struct&#160;</td><td class="fielddoc"><p >matrix with symmetric structure </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278afeca3c730601be7fd57f1f0b668b4637" name="ab53d180cbfe294f59fa52996cf37c278afeca3c730601be7fd57f1f0b668b4637"></a>symmetric&#160;</td><td class="fielddoc"><p >matrix with symmetric structure and values </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278ad0c0015a651861f606ba724bf9763435" name="ab53d180cbfe294f59fa52996cf37c278ad0c0015a651861f606ba724bf9763435"></a>non_negative&#160;</td><td class="fielddoc"><p >all values non-negative, i.e. values in range [0,1] </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278ae6c82e67b5da47ff7b10f3290c72b201" name="ab53d180cbfe294f59fa52996cf37c278ae6c82e67b5da47ff7b10f3290c72b201"></a>non_empty_rows&#160;</td><td class="fielddoc"><p >all rows non-empty </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278a83d6c087af5e7774e1a12ba42d8bd726" name="ab53d180cbfe294f59fa52996cf37c278a83d6c087af5e7774e1a12ba42d8bd726"></a>non_empty_cols&#160;</td><td class="fielddoc"><p >all columns non-empty </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278a23c7c19d18f4f5158b0c126c97376e39" name="ab53d180cbfe294f59fa52996cf37c278a23c7c19d18f4f5158b0c126c97376e39"></a>non_empty_diag&#160;</td><td class="fielddoc"><p >all main diagonal entries non-empty </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278a232e0d8aadcf8b1f2f34dcc1744c0331" name="ab53d180cbfe294f59fa52996cf37c278a232e0d8aadcf8b1f2f34dcc1744c0331"></a>non_zero_diag&#160;</td><td class="fielddoc"><p >all main diagonal entries non-zero </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ab53d180cbfe294f59fa52996cf37c278a39be3c0940ff6f93390195ffa7967de0" name="ab53d180cbfe294f59fa52996cf37c278a39be3c0940ff6f93390195ffa7967de0"></a>diagonal_dominant&#160;</td><td class="fielddoc"><p >diagonal dominant matrix </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="test__matrix__factory_8hpp_source.html#l00024">24</a> of file <a class="el" href="test__matrix__factory_8hpp_source.html">test_matrix_factory.hpp</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="aca01e69d025c391d78f9da6e2ab8e7b2" name="aca01e69d025c391d78f9da6e2ab8e7b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca01e69d025c391d78f9da6e2ab8e7b2">&#9670;&#160;</a></span>operator&amp;()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aca01e69d025c391d78f9da6e2ab8e7b2">&#9670;&#160;</a></span>operator&amp;() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -622,8 +695,88 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a618de3d565248aa6421bab5ad70725e3" name="a618de3d565248aa6421bab5ad70725e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a618de3d565248aa6421bab5ad70725e3">&#9670;&#160;</a></span>operator&amp;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> FEAT::LAFEM::operator&amp; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>bit-wise AND operator for TestMatrixFlags </p>
+
+<p class="definition">Definition at line <a class="el" href="test__matrix__factory_8hpp_source.html#l00047">47</a> of file <a class="el" href="test__matrix__factory_8hpp_source.html">test_matrix_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abc05c5351009d872162225b99ff13618" name="abc05c5351009d872162225b99ff13618"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc05c5351009d872162225b99ff13618">&#9670;&#160;</a></span>operator*()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FEAT::LAFEM::operator* </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>checks whether a &amp; b != 0 </p>
+
+<p class="definition">Definition at line <a class="el" href="test__matrix__factory_8hpp_source.html#l00059">59</a> of file <a class="el" href="test__matrix__factory_8hpp_source.html">test_matrix_factory.hpp</a>.</p>
+
+</div>
+</div>
 <a id="aeac797174e76e1c3df79dea5d70d1b4b" name="aeac797174e76e1c3df79dea5d70d1b4b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeac797174e76e1c3df79dea5d70d1b4b">&#9670;&#160;</a></span>operator|()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aeac797174e76e1c3df79dea5d70d1b4b">&#9670;&#160;</a></span>operator|() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -659,6 +812,46 @@ Variables</h2></td></tr>
 <p>bit-wise OR operator for <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d" title="bitmask for zfp header">Pack::Type</a> </p>
 
 <p class="definition">Definition at line <a class="el" href="kernel_2lafem_2base_8hpp_source.html#l00119">119</a> of file <a class="el" href="kernel_2lafem_2base_8hpp_source.html">base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab89839954f6e5f969ad6d5975da8b18b" name="ab89839954f6e5f969ad6d5975da8b18b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab89839954f6e5f969ad6d5975da8b18b">&#9670;&#160;</a></span>operator|() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a> FEAT::LAFEM::operator| </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278">TestMatrixFlags</a>&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>bit-wise OR operator for TestMatrixFlags </p>
+
+<p class="definition">Definition at line <a class="el" href="test__matrix__factory_8hpp_source.html#l00053">53</a> of file <a class="el" href="test__matrix__factory_8hpp_source.html">test_matrix_factory.hpp</a>.</p>
 
 </div>
 </div>

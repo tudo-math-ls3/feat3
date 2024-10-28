@@ -19,6 +19,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "expression.hpp", "expression_8hpp_source.html", null ],
     [ "fgmres.hpp", "fgmres_8hpp_source.html", null ],
     [ "fixed_step_linesearch.hpp", "fixed__step__linesearch_8hpp_source.html", null ],
+    [ "gmres.hpp", "gmres_8hpp_source.html", null ],
     [ "gropppcg.hpp", "gropppcg_8hpp_source.html", null ],
     [ "hessian_precond.hpp", "hessian__precond_8hpp_source.html", null ],
     [ "hypre.cpp", "hypre_8cpp_source.html", null ],

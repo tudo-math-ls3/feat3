@@ -44,6 +44,7 @@ var dir_57f467bbf249d47c53eef47e5c14d96b =
     [ "sparse_vector-eickt.cpp", "sparse__vector-eickt_8cpp_source.html", null ],
     [ "sparse_vector.hpp", "sparse__vector_8hpp_source.html", null ],
     [ "sparse_vector_blocked.hpp", "sparse__vector__blocked_8hpp_source.html", null ],
+    [ "test_matrix_factory.hpp", "test__matrix__factory_8hpp_source.html", null ],
     [ "transfer.hpp", "lafem_2transfer_8hpp_source.html", null ],
     [ "tuple_diag_matrix.hpp", "tuple__diag__matrix_8hpp_source.html", null ],
     [ "tuple_filter.hpp", "tuple__filter_8hpp_source.html", null ],
