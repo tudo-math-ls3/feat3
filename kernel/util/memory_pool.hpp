@@ -12,6 +12,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/util/random.hpp>
 #include <kernel/backend.hpp>
 
 #include <map>
@@ -196,6 +197,33 @@ namespace FEAT
                 address[i] = val;
               }
               return;
+          }
+        }
+
+        /// set memory to specific value
+        template <typename DT_>
+        static void set_memory(Random& rng, DT_ min, DT_ max, DT_ * address, const Index count = 1)
+        {
+          switch(Backend::get_preferred_backend())
+          {
+#ifdef FEAT_HAVE_CUDA
+            case PreferredBackend::cuda:
+            {
+              std::vector<DT_> tmp(count);
+              std::generate(tmp.begin(), tmp.end(), [&](){return rng(min,max);});
+              FEAT::Util::cuda_copy(address, tmp.data(), count*sizeof(DT_));
+              return;
+            }
+#endif
+            case PreferredBackend::generic:
+            default:
+            {
+              for (Index i(0) ; i < count ; ++i)
+              {
+                address[i] = rng(min, max);
+              }
+              return;
+            }
           }
         }
 

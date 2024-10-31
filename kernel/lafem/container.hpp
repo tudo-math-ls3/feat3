@@ -867,10 +867,7 @@ namespace FEAT
       {
         for (Index e(0) ; e < _elements.size() ; ++e)
         {
-          for (Index i(0) ; i < _elements_size.at(e); ++i)
-          {
-            MemoryPool::set_memory(this->_elements.at(e) + i, rng(min, max));
-          }
+          MemoryPool::set_memory(rng, min, max, this->_elements.at(e), this->_elements_size.at(e));
         }
       }
 
