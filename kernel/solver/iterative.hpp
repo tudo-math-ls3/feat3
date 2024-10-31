@@ -1055,6 +1055,8 @@ namespace FEAT
        * If no preconditioner is present, this function will simply copy the input vector's
        * contents into the output vector, therefore emulating an "identity preconditioner".
        *
+       * \attention vec_cor and vec_def must \b not refer to the same vector object!
+       *
        * \param[in,out] vec_cor
        * A reference to the vector that shall receive the preconditioned defect.
        *
@@ -1070,6 +1072,7 @@ namespace FEAT
       template<typename Filter_>
       bool _apply_precond(VectorType& vec_cor, const VectorType& vec_def, const Filter_& filter)
       {
+        XASSERTM(&vec_cor != &vec_def, "vec_cor and vec_def must not refer to the same object");
         if(this->_precond)
         {
           Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), this->_precond->name()));

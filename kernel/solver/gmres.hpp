@@ -70,7 +70,7 @@ namespace FEAT
      * \tparam Filter_
      * The filter class to be used by the solver.
      *
-     * \author Peter Zajac
+     * \author Pia Ritter, Peter Zajac
      */
     template<
       typename Matrix_,
@@ -385,17 +385,18 @@ namespace FEAT
           }
 
           // update solution
-          _vec_w.format();
+          this->_vec_w.format();
           for(Index k(0); k < n; ++k)
-            _vec_w.axpy(this->_vec_v.at(k), this->_q.at(k));
+            this->_vec_w.axpy(this->_vec_v.at(k), this->_q.at(k));
 
-          if(!this->_apply_precond(_vec_w, _vec_w, filter))
+          // re-use v[0] for preconditioned correction
+          if(!this->_apply_precond(this->_vec_v.front(), this->_vec_w, filter))
           {
             stat.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
           }
-          vec_sol.axpy(_vec_w);
+          vec_sol.axpy(this->_vec_v.front());
 
           // compute "real" residual
           matrix.apply(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
