@@ -52,9 +52,9 @@ namespace Tutorial01
 
   void run(Index level, int cores, MeshType& mesh)
   {
-    std::cout << "Level: " << level << std::endl;
-    std::cout << "Cores: " << cores << std::endl;
-    std::cout << "Elements: " << mesh.get_num_elements() << std::endl;
+    std::cout << "Level: " << level << "\n";
+    std::cout << "Cores: " << cores << "\n";
+    std::cout << "Elements: " << mesh.get_num_elements() << "\n";
 
     // Let's create a trafo object now. Its only parameter is the mesh that it is defined on.
     TrafoType trafo(mesh);
@@ -78,7 +78,7 @@ namespace Tutorial01
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_op, space, cubature_factory, -6.0);
     watch_1.stop();
 
-    std::cout << "Time 1: " << watch_1.elapsed_string().pad_front(10) << std::endl;
+    std::cout << "Time 1: " << watch_1.elapsed_string().pad_front(10) << "\n";
 
     String dump_1, dump_2;
 
@@ -97,17 +97,17 @@ namespace Tutorial01
       watch_2.start();
       integrator.assemble_master(laplace_job);
       watch_2.stop();
-      std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << "\n";
 
       watch_3.start();
       integrator.assemble_master2(laplace_job);
       watch_3.stop();
-      std::cout << "Time 3: " << watch_3.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 3: " << watch_3.elapsed_string().pad_front(10) << "\n";
 
       watch_4.start();
       integrator.assemble(laplace_job);
       watch_4.stop();
-      std::cout << "Time 4: " << watch_4.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 4: " << watch_4.elapsed_string().pad_front(10) << "\n";
     }
 
 
@@ -126,17 +126,17 @@ namespace Tutorial01
       watch_5.start();
       integrator.assemble_master(laplace_job);
       watch_5.stop();
-      std::cout << "Time 5: " << watch_5.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 5: " << watch_5.elapsed_string().pad_front(10) << "\n";
 
       watch_6.start();
       integrator.assemble_master2(laplace_job);
       watch_6.stop();
-      std::cout << "Time 6: " << watch_6.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 6: " << watch_6.elapsed_string().pad_front(10) << "\n";
 
       watch_7.start();
       integrator.assemble(laplace_job);
       watch_7.stop();
-      std::cout << "Time 7: " << watch_7.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 7: " << watch_7.elapsed_string().pad_front(10) << "\n";
     }
 
     DataType vmax = 0.0;
@@ -144,10 +144,10 @@ namespace Tutorial01
     for(Index i(0); i < matrix.used_elements(); ++i)
       vmax = Math::max(vmax, Math::abs(val[i]));
 
-    std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << std::endl;
+    std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << "\n";
 
-    //std::cout << dump_1 << std::endl << std::endl;;
-    //std::cout << dump_2 << std::endl;
+    //std::cout << dump_1 << "\n" << "\n";;
+    //std::cout << dump_2 << "\n";
     std::cout << "Times:"
       << watch_1.elapsed_string().pad_front(10)
       << watch_2.elapsed_string().pad_front(10)
@@ -156,7 +156,7 @@ namespace Tutorial01
       << watch_5.elapsed_string().pad_front(10)
       << watch_6.elapsed_string().pad_front(10)
       << watch_7.elapsed_string().pad_front(10)
-      << std::endl;
+      << "\n";
   } // void main(...)
 
 

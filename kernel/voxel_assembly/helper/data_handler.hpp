@@ -233,7 +233,7 @@ namespace FEAT
         //   {
         //     std::cout << ctd[i] << "  ";
         //   }
-        //   std::cout << std::endl;
+        //   std::cout << "\n";
         // }
 
         _fill_color(coloring, hint);

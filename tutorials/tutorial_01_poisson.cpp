@@ -228,7 +228,7 @@ namespace Tutorial01
     // Okay, we have already defined the mesh, trafo and space types, so we can start our
     // actual tutorial code by creating those.
 
-    std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
+    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
 
     // In a "real-life" application, we would either read the mesh from an input file or call
     // some sort of mesh generator library/tool to create a mesh for us, but in this tutorial,
@@ -263,7 +263,7 @@ namespace Tutorial01
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Trafo and Finite Element Space initialization
 
-    std::cout << "Creating Trafo and Space..." << std::endl;
+    std::cout << "Creating Trafo and Space..." << "\n";
 
     // We have already defined the types of the transformation and finite element space,
     // so we just need to create the objects.
@@ -284,7 +284,7 @@ namespace Tutorial01
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Allocating matrix and vectors..." << std::endl;
+    std::cout << "Allocating matrix and vectors..." << "\n";
 
     // Now we need to perform the symbolic matrix assembly, i.e., the computation of the non-zero
     // sparsity pattern and the allocation of the internal matrix arrays. For this, we first create
@@ -353,7 +353,7 @@ namespace Tutorial01
     //"trapezoidal";            // trapezoidal rule (works for all shape types)
     //"barycentre";             // barycentre rule (not recommended due to insufficient order)
 
-    std::cout << "Assembling system matrix..." << std::endl;
+    std::cout << "Assembling system matrix..." << "\n";
 
     // We want to assemble the 2D "-Laplace" operator (-u_xx -u_yy).
     // In this tutorial, we use a pre-defined class for the implementation of this operator.
@@ -372,7 +372,7 @@ namespace Tutorial01
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: RHS (linear forms)
 
-    std::cout << "Assembling right-hand-side vector..." << std::endl;
+    std::cout << "Assembling right-hand-side vector..." << "\n";
 
     // The assembly of right-hand-side vector follows pretty much the same generic structure.
     // We use the opportunity to explain how to prescribe systems with analytically-known solutions.
@@ -403,7 +403,7 @@ namespace Tutorial01
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Assembling boundary conditions..." << std::endl;
+    std::cout << "Assembling boundary conditions..." << "\n";
 
     // The next step is the assembly of the homogeneous Dirichlet boundary conditions.
     // For this task, we require a Unit-Filter assembler:
@@ -422,7 +422,7 @@ namespace Tutorial01
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition
 
-    std::cout << "Imposing boundary conditions..." << std::endl;
+    std::cout << "Imposing boundary conditions..." << "\n";
 
     // We have assembled the boundary conditions, but the linear system does not know about that
     // yet. So we need to apply the filter onto the system matrix and both vectors now.
@@ -444,7 +444,7 @@ namespace Tutorial01
 
     // For this tutorial, we stick to a simple PCG-SSOR solver.
 
-    std::cout << "Solving linear system..." << std::endl;
+    std::cout << "Solving linear system..." << "\n";
 
     // First, we need to create a SSOR preconditioner. Most of the solver implementations
     // have corresponding 'Solver::new_***' functions, which take care of the nasty type deduction
@@ -486,8 +486,8 @@ namespace Tutorial01
     // Since this is a simple benchmark problem, we know the analytical solution of our PDE, so
     // we may compute the H0- and H1-errors of our discrete solution against it.
 
-    std::cout << std::endl;
-    std::cout << "Computing errors against reference solution..." << std::endl;
+    std::cout << "\n";
+    std::cout << "Computing errors against reference solution..." << "\n";
 
     // We have to use the domain assembler for the actual error computation and we are going to
     // use another helper function here to do the job for us. This helper function returns a
@@ -512,8 +512,8 @@ namespace Tutorial01
     // norms and integrals as member functions, which we could access here individually. However,
     // we simply want to use the 'print_norms' function, which returns a formatted multi-line
     // string containing all the error norm values and
-    std::cout << "Error Analysis:" << std::endl;
-    std::cout << error_info.print_norms() << std::endl;
+    std::cout << "Error Analysis:" << "\n";
+    std::cout << error_info.print_norms() << "\n";
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
@@ -523,8 +523,8 @@ namespace Tutorial01
     // First of all, build the filename string
     String vtk_name(String("./tutorial-01-poisson-lvl") + stringify(level));
 
-    std::cout << std::endl;
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+    std::cout << "\n";
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
     // Next, project our solution into the vertices. This is not necessary for Q1, but in case that someone
     // chose to use the Rannacher-Turek or Crouzeix-Raviart element instead of Q1, this *will* be necessary.
@@ -554,7 +554,7 @@ namespace Tutorial01
     exporter.write(vtk_name);
 
     // That's all, folks.
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   } // void main(...)
 } // namespace Tutorial01
 
@@ -566,7 +566,7 @@ int main(int argc, char* argv[])
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #01: Poisson" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #01: Poisson" << "\n";
 
   // Specify the desired mesh refinement level, defaulted to 3.
   // Note that FEAT uses its own "Index" type rather than a wild mixture of int, uint, long
@@ -583,19 +583,19 @@ int main(int argc, char* argv[])
     if(!String(argv[argc-1]).parse(ilevel) || (ilevel < 1))
     {
       // Failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << std::endl;
-      std::cerr << "Note: The last argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << "\n";
+      std::cerr << "Note: The last argument must be a positive integer." << "\n";
       // Abort our runtime environment
       Runtime::abort();
     }
     // If parsing was successful, use the given information and notify the user
     level = Index(ilevel);
-    std::cout << "Refinement level: " << level << std::endl;
+    std::cout << "Refinement level: " << level << "\n";
   }
   else
   {
     // No command line parameter given, so inform the user that defaults are used
-    std::cout << "Refinement level (default): " << level << std::endl;
+    std::cout << "Refinement level (default): " << level << "\n";
   }
 
   // call the tutorial's main function

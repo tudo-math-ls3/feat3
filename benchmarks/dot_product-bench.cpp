@@ -23,8 +23,8 @@ void run(PreferredBackend backend)
   typedef typename VT_::IndexType IT_;
 
   Index size(500000000ul);
-  std::cout<<backend<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
-  std::cout<<"vector size: "<<size<<std::endl;
+  std::cout<<backend<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<"\n";
+  std::cout<<"vector size: "<<size<<"\n";
   VT_ x(size, DT_(1.234));
   VT_ y(size, DT_(4711));
 

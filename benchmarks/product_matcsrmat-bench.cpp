@@ -64,7 +64,7 @@ void run(PreferredBackend backend)
 
   Backend::set_preferred_backend(backend);
 
-  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols: " << size << std::endl;
+  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols: " << size << "\n";
 
   //roughly 5 csr entries per row
   double flops = 2. * double(5 * x.rows() * r.columns());
@@ -94,7 +94,7 @@ void run(PreferredBackend backend)
   }
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm_frobenius()<<std::endl;
+  std::cout<<"control norm: "<<r.norm_frobenius()<<"\n";
 }
 
 int main(int argc, char ** argv)

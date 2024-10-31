@@ -213,7 +213,7 @@ namespace MeshPermAssemblyBench
     // create coloring
     Adjacency::Coloring coloring(elems_at_elem);
 
-    // std::cout << "Coloring size " << coloring.size() << " mesh size " << mesh.get_num_elements() << std::endl;
+    // std::cout << "Coloring size " << coloring.size() << " mesh size " << mesh.get_num_elements() << "\n";
     TimeStamp stamp_1, stamp_2;
     // VoxelAssembly::test_coloring(mesh, coloring);
     VoxelAssembly::VoxelPoissonAssembler<SpaceType, DataType, IndexType> poisson_assembler(space, coloring);
@@ -499,7 +499,7 @@ namespace MeshPermAssemblyBench
           std::size_t t(0u);
           if(!p->second.at(i).parse(t))
           {
-            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << std::endl;
+            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << "\n";
             return;
           }
           num_threads.push_back(t);
@@ -519,25 +519,25 @@ namespace MeshPermAssemblyBench
     try
 #endif
     {
-      std::cout << "Parsing mesh files..." << std::endl;
+      std::cout << "Parsing mesh files..." << "\n";
       // Now parse the mesh file
       mesh_reader.parse(*nodes.back(), atlas, nullptr);
     }
 #ifndef DEBUG
     catch(std::exception& exc)
     {
-      std::cerr << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "ERROR: " << exc.what() << "\n";
       return;
     }
     catch(...)
     {
-      std::cerr << "ERROR: unknown exception" << std::endl;
+      std::cerr << "ERROR: unknown exception" << "\n";
       return;
     }
 #endif
 
     // refine
-    std::cout << "Refining up to level " << lvl_max << "..." << std::endl;
+    std::cout << "Refining up to level " << lvl_max << "..." << "\n";
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
       nodes.push_back(nodes.back()->refine_unique());
@@ -554,7 +554,7 @@ namespace MeshPermAssemblyBench
     const bool b_poisson = (args.check("no-poisson") < 0);
     const bool b_burgers = (args.check("no-burgers") < 0);
 
-    std::cout << std::endl << "Performing benchmark..." << std::endl;
+    std::cout << "\n" << "Performing benchmark..." << "\n";
     for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Level " << stringify(lvl).pad_front(2) << ": ";
@@ -626,14 +626,14 @@ namespace MeshPermAssemblyBench
             bench_burgers_new(*node->get_mesh(), res_burgers_smp.at(lvl).at(i).at(perm), num_threads.at(i));
         }
       }
-      std::cout << " done!"<< std::endl;
+      std::cout << " done!"<< "\n";
     }
 
     for(std::size_t i(0); i < num_threads.size(); ++i)
     {
-      std::cout << std::endl << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+      std::cout << "\n" << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -643,13 +643,13 @@ namespace MeshPermAssemblyBench
         {
           std::cout << stringify(res_poisson_smp.at(lvl).at(i).at(perm).num_worker_threads).pad_front(12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
     }
 
-    std::cout << std::endl << "Permutation Timings:" << std::endl;
-    //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+    std::cout << "\n" << "Permutation Timings:" << "\n";
+    //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+    std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
     for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
     {
@@ -658,14 +658,14 @@ namespace MeshPermAssemblyBench
       {
         std::cout << stringify_fp_fix(res_poisson.at(lvl).at(perm).permute_time, 6, 12);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
 
     if(b_poisson)
     {
-      std::cout << std::endl << "Poisson Assembly Timings:" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+      std::cout << "\n" << "Poisson Assembly Timings:" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -677,11 +677,11 @@ namespace MeshPermAssemblyBench
           double t = b.num_asm_time / double(b.num_asm_count);
           std::cout << stringify_fp_fix(t, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
-      /*std::cout << std::endl << "Poisson Assembly Timing Relative to 2-Level:" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      /*std::cout << "\n" << "Poisson Assembly Timing Relative to 2-Level:" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -694,15 +694,15 @@ namespace MeshPermAssemblyBench
           double t = b.num_asm_time / double(b.num_asm_count);
           std::cout << stringify_fp_fix(t/t2, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }*/
 
 
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -714,39 +714,39 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           for(std::size_t perm(0); perm < nperms; ++perm)
             std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           for(std::size_t perm(0); perm < nperms; ++perm)
             std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
-      /*std::cout << std::endl << "New Poisson Assembly Timing Relative to 2-Level:" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      /*std::cout << "\n" << "New Poisson Assembly Timing Relative to 2-Level:" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -759,15 +759,15 @@ namespace MeshPermAssemblyBench
           double t = b.num_asm_time / double(b.num_asm_count);
           std::cout << stringify_fp_fix(t/t2, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }*/
     }
 
     if(b_burgers)
     {
-      std::cout << std::endl << "Burgers Assembly Timings:" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+      std::cout << "\n" << "Burgers Assembly Timings:" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -779,11 +779,11 @@ namespace MeshPermAssemblyBench
           double t = b.num_asm_time / double(b.num_asm_count);
           std::cout << stringify_fp_fix(t, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
-      /*std::cout << std::endl << "Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      /*std::cout << "\n" << "Burgers Assembly Timing Relative to 2-Level:" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -796,14 +796,14 @@ namespace MeshPermAssemblyBench
           double t = b.num_asm_time / double(b.num_asm_count);
           std::cout << stringify_fp_fix(t/t2, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }*/
 
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -815,39 +815,39 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           for(std::size_t perm(0); perm < nperms; ++perm)
             std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           for(std::size_t perm(0); perm < nperms; ++perm)
             std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
-      /*std::cout << std::endl << "New Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+      /*std::cout << "\n" << "New Burgers Assembly Timing Relative to 2-Level:" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -860,7 +860,7 @@ namespace MeshPermAssemblyBench
           double t = b.num_asm_time / double(b.num_asm_count);
           std::cout << stringify_fp_fix(t/t2, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }*/
     }
 
@@ -877,7 +877,7 @@ namespace MeshPermAssemblyBench
     Index blocksize = 256;
     args.parse("set-blocksize", blocksize);
 
-    std::cout << "Chosen blocksize for assembly: " << blocksize << std::endl;
+    std::cout << "Chosen blocksize for assembly: " << blocksize << "\n";
     #ifdef FEAT_HAVE_CUDA
     Util::cuda_set_blocksize(256, 256, 256, 256, blocksize, blocksize);
     #endif
@@ -899,7 +899,7 @@ namespace MeshPermAssemblyBench
           std::size_t t(0u);
           if(!p->second.at(i).parse(t))
           {
-            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << std::endl;
+            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << "\n";
             return;
           }
           num_threads.push_back(t);
@@ -917,25 +917,25 @@ namespace MeshPermAssemblyBench
     try
 #endif
     {
-      std::cout << "Parsing mesh files..." << std::endl;
+      std::cout << "Parsing mesh files..." << "\n";
       // Now parse the mesh file
       mesh_reader.parse(*nodes.back(), atlas, nullptr);
     }
 #ifndef DEBUG
     catch(std::exception& exc)
     {
-      std::cerr << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "ERROR: " << exc.what() << "\n";
       return;
     }
     catch(...)
     {
-      std::cerr << "ERROR: unknown exception" << std::endl;
+      std::cerr << "ERROR: unknown exception" << "\n";
       return;
     }
 #endif
 
     // refine
-    std::cout << "Refining up to level " << lvl_max << "..." << std::endl;
+    std::cout << "Refining up to level " << lvl_max << "..." << "\n";
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
       nodes.push_back(nodes.back()->refine_unique());
@@ -957,7 +957,7 @@ namespace MeshPermAssemblyBench
     const bool b_poisson = (args.check("no-poisson") < 0);
     const bool b_burgers = (args.check("no-burgers") < 0);
 
-    std::cout << std::endl << "Performing benchmark..." << std::endl;
+    std::cout << "\n" << "Performing benchmark..." << "\n";
     for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Level " << stringify(lvl).pad_front(2) << ": ";
@@ -1058,15 +1058,15 @@ namespace MeshPermAssemblyBench
         }
       }
 
-      std::cout << " done!"<< std::endl;
+      std::cout << " done!"<< "\n";
     }
     if(!only_gpu)
     {
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1076,13 +1076,13 @@ namespace MeshPermAssemblyBench
           {
             std::cout << stringify(res_poisson_smp.at(lvl).at(i).at(perm).num_worker_threads).pad_front(12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
-      std::cout << std::endl << "Permutation Timings:" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+      std::cout << "\n" << "Permutation Timings:" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -1091,7 +1091,7 @@ namespace MeshPermAssemblyBench
         {
           std::cout << stringify_fp_fix(res_poisson.at(lvl).at(perm).permute_time, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
     }
 
@@ -1099,9 +1099,9 @@ namespace MeshPermAssemblyBench
     {
       if(!only_gpu)
       {
-        std::cout << std::endl << "Poisson Assembly Timings:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "Poisson Assembly Timings:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1113,11 +1113,11 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
 
-        /*std::cout << std::endl << "Poisson Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "Poisson Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1130,15 +1130,15 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
 
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
@@ -1150,39 +1150,39 @@ namespace MeshPermAssemblyBench
               double t = b.num_asm_time / double(b.num_asm_count);
               std::cout << stringify_fp_fix(t, 6, 12);
             }
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
-        /*std::cout << std::endl << "New Poisson Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "New Poisson Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1195,33 +1195,33 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
       }
-      std::cout << std::endl << "GPU Poisson Assembly Timing" << std::endl;
-      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+      std::cout << "\n" << "GPU Poisson Assembly Timing" << "\n";
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
         std::cout << stringify(lvl).pad_front(2) << ": ";
         std::cout << stringify_fp_fix(res_poisson_gpu.at(lvl).thread_time_assemble, 6, 20);
         std::cout << stringify_fp_fix(res_poisson_gpu.at(lvl).num_asm_time/double(res_poisson_gpu.at(lvl).num_asm_count), 6, 20);
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
       for(Index i(0); i < num_threads.size(); ++i)
       {
         if(only_gpu)
           break;
-        std::cout << std::endl << "OMP Host Poisson Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
-        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+        std::cout << "\n" << "OMP Host Poisson Assembly Timing with " << num_threads[i] << " maxthreads" << "\n";
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           std::cout << stringify_fp_fix(res_poisson_host.at(lvl).at(i).thread_time_assemble, 6, 20);
           std::cout << stringify_fp_fix(res_poisson_host.at(lvl).at(i).num_asm_time/double(res_poisson_host.at(lvl).at(i).num_asm_count), 6, 20);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
     }
@@ -1230,9 +1230,9 @@ namespace MeshPermAssemblyBench
     {
       if(!only_gpu)
       {
-        std::cout << std::endl << "Burgers Assembly Timings:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "Burgers Assembly Timings:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1244,11 +1244,11 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
 
-        /*std::cout << std::endl << "Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "Burgers Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1261,14 +1261,14 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
@@ -1280,39 +1280,39 @@ namespace MeshPermAssemblyBench
               double t = b.num_asm_time / double(b.num_asm_count);
               std::cout << stringify_fp_fix(t, 6, 12);
             }
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
-        /*std::cout << std::endl << "New Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "New Burgers Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1325,33 +1325,33 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
       }
-      std::cout << std::endl << "GPU Burgers Assembly Timing" << std::endl;
-      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+      std::cout << "\n" << "GPU Burgers Assembly Timing" << "\n";
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
         std::cout << stringify(lvl).pad_front(2) << ": ";
         std::cout << stringify_fp_fix(res_burgers_gpu.at(lvl).thread_time_assemble, 6, 20);
         std::cout << stringify_fp_fix(res_burgers_gpu.at(lvl).num_asm_time/double(res_burgers_gpu.at(lvl).num_asm_count), 6, 20);
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
       for(Index i(0); i < num_threads.size(); ++i)
       {
         if(only_gpu)
           break;
-        std::cout << std::endl << "OMP Host Burgers Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
-        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+        std::cout << "\n" << "OMP Host Burgers Assembly Timing with " << num_threads[i] << " maxthreads" << "\n";
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           std::cout << stringify_fp_fix(res_burgers_host.at(lvl).at(i).thread_time_assemble, 6, 20);
           std::cout << stringify_fp_fix(res_burgers_host.at(lvl).at(i).num_asm_time/double(res_burgers_host.at(lvl).at(i).num_asm_count), 6, 20);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
     }
@@ -1374,7 +1374,7 @@ namespace MeshPermAssemblyBench
     Index blocksize = 256;
     args.parse("set-blocksize", blocksize);
 
-    std::cout << "Chosen blocksize for assembly: " << blocksize << std::endl;
+    std::cout << "Chosen blocksize for assembly: " << blocksize << "\n";
     #ifdef FEAT_HAVE_CUDA
     Util::cuda_set_blocksize(256, 256, 256, 256, blocksize, blocksize);
     #endif
@@ -1392,7 +1392,7 @@ namespace MeshPermAssemblyBench
           std::size_t t(0u);
           if(!p->second.at(i).parse(t))
           {
-            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << std::endl;
+            std::cout << "ERROR: Failed to parse '" << p->second.at(i) << "' as thread count" << "\n";
             return;
           }
           num_threads.push_back(t);
@@ -1414,7 +1414,7 @@ namespace MeshPermAssemblyBench
     #endif
 
     // refine
-    std::cout << "Refining up to level " << lvl_max << "..." << std::endl;
+    std::cout << "Refining up to level " << lvl_max << "..." << "\n";
     for(Index lvl(1); lvl <= lvl_max; ++lvl)
     {
       nodes.push_back(nodes.back()->refine_unique());
@@ -1438,7 +1438,7 @@ namespace MeshPermAssemblyBench
     const bool b_poisson = (args.check("no-poisson") < 0);
     const bool b_burgers = (args.check("no-burgers") < 0);
 
-    std::cout << std::endl << "Performing benchmark..." << std::endl;
+    std::cout << "\n" << "Performing benchmark..." << "\n";
     for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
     {
       std::cout << "Level " << stringify(lvl).pad_front(2) << ": ";
@@ -1543,15 +1543,15 @@ namespace MeshPermAssemblyBench
         }
       }
 
-      std::cout << " done!"<< std::endl;
+      std::cout << " done!"<< "\n";
     }
     if(!only_gpu)
     {
       for(std::size_t i(0); i < num_threads.size(); ++i)
       {
-        std::cout << std::endl << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "New Assembly chosen thread counts with " << num_threads[i] << " worker threads:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1561,13 +1561,13 @@ namespace MeshPermAssemblyBench
           {
             std::cout << stringify(res_poisson_smp.at(lvl).at(i).at(perm).num_worker_threads).pad_front(12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
-      std::cout << std::endl << "Permutation Timings:" << std::endl;
-      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+      std::cout << "\n" << "Permutation Timings:" << "\n";
+      //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+      std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
@@ -1576,7 +1576,7 @@ namespace MeshPermAssemblyBench
         {
           std::cout << stringify_fp_fix(res_poisson.at(lvl).at(perm).permute_time, 6, 12);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
     }
 
@@ -1584,9 +1584,9 @@ namespace MeshPermAssemblyBench
     {
       if(!only_gpu)
       {
-        std::cout << std::endl << "Poisson Assembly Timings:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "Poisson Assembly Timings:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1598,11 +1598,11 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
 
-        /*std::cout << std::endl << "Poisson Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "Poisson Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1615,15 +1615,15 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
 
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads:" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
@@ -1635,39 +1635,39 @@ namespace MeshPermAssemblyBench
               double t = b.num_asm_time / double(b.num_asm_count);
               std::cout << stringify_fp_fix(t, 6, 12);
             }
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Poisson Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_poisson_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
-        /*std::cout << std::endl << "New Poisson Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "New Poisson Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1680,33 +1680,33 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
       }
-      std::cout << std::endl << "GPU Poisson Assembly Timing" << std::endl;
-      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+      std::cout << "\n" << "GPU Poisson Assembly Timing" << "\n";
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
         std::cout << stringify(lvl).pad_front(2) << ": ";
         std::cout << stringify_fp_fix(res_poisson_gpu.at(lvl).thread_time_assemble, 6, 20);
         std::cout << stringify_fp_fix(res_poisson_gpu.at(lvl).num_asm_time/double(res_poisson_gpu.at(lvl).num_asm_count), 6, 20);
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
       for(Index i(0); i < num_threads.size(); ++i)
       {
         if(only_gpu)
           break;
-        std::cout << std::endl << "OMP Host Poisson Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
-        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+        std::cout << "\n" << "OMP Host Poisson Assembly Timing with " << num_threads[i] << " maxthreads" << "\n";
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           std::cout << stringify_fp_fix(res_poisson_host.at(lvl).at(i).thread_time_assemble, 6, 20);
           std::cout << stringify_fp_fix(res_poisson_host.at(lvl).at(i).num_asm_time/double(res_poisson_host.at(lvl).at(i).num_asm_count), 6, 20);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
     }
@@ -1715,9 +1715,9 @@ namespace MeshPermAssemblyBench
     {
       if(!only_gpu)
       {
-        std::cout << std::endl << "Burgers Assembly Timings:" << std::endl;
-        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+        std::cout << "\n" << "Burgers Assembly Timings:" << "\n";
+        //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1729,11 +1729,11 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }
 
-        /*std::cout << std::endl << "Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "Burgers Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1746,14 +1746,14 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads:" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
 
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
@@ -1765,39 +1765,39 @@ namespace MeshPermAssemblyBench
               double t = b.num_asm_time / double(b.num_asm_count);
               std::cout << stringify_fp_fix(t, 6, 12);
             }
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit assembly() Time" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_assemble, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
         for(std::size_t i(0); i < num_threads.size(); ++i)
         {
-          std::cout << std::endl << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << std::endl;
-          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
-          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << std::endl;
+          std::cout << "\n" << "New Burgers Assembly Timings with " << num_threads[i] << " worker threads: explicit wait() Time" << "\n";
+          //std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
+          std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     GCMK" << "\n";
           for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
           {
             std::cout << stringify(lvl).pad_front(2) << ": ";
             for(std::size_t perm(0); perm < nperms; ++perm)
               std::cout << stringify_fp_fix(res_burgers_smp.at(lvl).at(i).at(perm).thread_time_wait, 6, 12);
-            std::cout << std::endl;
+            std::cout << "\n";
           }
         }
 
-        /*std::cout << std::endl << "New Burgers Assembly Timing Relative to 2-Level:" << std::endl;
-        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << std::endl;
+        /*std::cout << "\n" << "New Burgers Assembly Timing Relative to 2-Level:" << "\n";
+        std::cout << "LVL     2LEVEL      RANDOM      LEXICO      COLORED     ACMK        ACMKR       GCMK        GCMKR" << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
@@ -1810,44 +1810,44 @@ namespace MeshPermAssemblyBench
             double t = b.num_asm_time / double(b.num_asm_count);
             std::cout << stringify_fp_fix(t/t2, 6, 12);
           }
-          std::cout << std::endl;
+          std::cout << "\n";
         }*/
       }
-      std::cout << std::endl << "GPU Burgers Assembly Timing" << std::endl;
-      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+      std::cout << "\n" << "GPU Burgers Assembly Timing" << "\n";
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
         std::cout << stringify(lvl).pad_front(2) << ": ";
         std::cout << stringify_fp_fix(res_burgers_gpu.at(lvl).thread_time_assemble, 6, 20);
         std::cout << stringify_fp_fix(res_burgers_gpu.at(lvl).num_asm_time/double(res_burgers_gpu.at(lvl).num_asm_count), 6, 20);
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
-      std::cout << std::endl << "GPU Burgers Defect Assembly Timing" << std::endl;
-      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+      std::cout << "\n" << "GPU Burgers Defect Assembly Timing" << "\n";
+      std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
       for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
       {
         std::cout << stringify(lvl).pad_front(2) << ": ";
         std::cout << stringify_fp_fix(res_burgers_def_gpu.at(lvl).thread_time_assemble, 6, 20);
         std::cout << stringify_fp_fix(res_burgers_def_gpu.at(lvl).num_asm_time/double(res_burgers_def_gpu.at(lvl).num_asm_count), 6, 20);
-        std::cout << std::endl;
+        std::cout << "\n";
       }
 
       for(Index i(0); i < num_threads.size(); ++i)
       {
         if(only_gpu)
           break;
-        std::cout << std::endl << "OMP Host Burgers Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
-        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+        std::cout << "\n" << "OMP Host Burgers Assembly Timing with " << num_threads[i] << " maxthreads" << "\n";
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           std::cout << stringify_fp_fix(res_burgers_host.at(lvl).at(i).thread_time_assemble, 6, 20);
           std::cout << stringify_fp_fix(res_burgers_host.at(lvl).at(i).num_asm_time/double(res_burgers_host.at(lvl).at(i).num_asm_count), 6, 20);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
 
@@ -1855,15 +1855,15 @@ namespace MeshPermAssemblyBench
       {
         if(only_gpu)
           break;
-        std::cout << std::endl << "OMP Host Burgers Defect Assembly Timing with " << num_threads[i] << " maxthreads" << std::endl;
-        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << std::endl;
+        std::cout << "\n" << "OMP Host Burgers Defect Assembly Timing with " << num_threads[i] << " maxthreads" << "\n";
+        std::cout << "LVL          Load to GPU          Assembly Struct Colored " << "\n";
 
         for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
         {
           std::cout << stringify(lvl).pad_front(2) << ": ";
           std::cout << stringify_fp_fix(res_burgers_def_host.at(lvl).at(i).thread_time_assemble, 6, 20);
           std::cout << stringify_fp_fix(res_burgers_def_host.at(lvl).at(i).num_asm_time/double(res_burgers_def_host.at(lvl).at(i).num_asm_count), 6, 20);
-          std::cout << std::endl;
+          std::cout << "\n";
         }
       }
     }
@@ -1897,7 +1897,7 @@ namespace MeshPermAssemblyBench
     {
       // print all unsupported options to cerr
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
       return;
     }
     if(args.check("refined-unit-square-q2")>=0)
@@ -1913,7 +1913,7 @@ namespace MeshPermAssemblyBench
     int num_mesh_files = args.check("mesh");
     if(num_mesh_files < 1)
     {
-      std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << std::endl;
+      std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
       return;
     }
 
@@ -1934,19 +1934,19 @@ namespace MeshPermAssemblyBench
     // get mesh type
     const String mtype = mesh_reader.get_meshtype_string();
 
-    std::cout << "Mesh Type: " << mtype << std::endl;
+    std::cout << "Mesh Type: " << mtype << "\n";
     if(voxel_run)
     {
     if(mtype == "conformal:hypercube:2:2") run_structured<H2M2D>(args, mesh_reader); else
     if(mtype == "conformal:hypercube:3:3") run_structured<H3M3D>(args, mesh_reader); else
-    std::cout << "ERROR: unsupported mesh type!" << std::endl;
+    std::cout << "ERROR: unsupported mesh type!" << "\n";
     }
     else{
     if(mtype == "conformal:hypercube:2:2") run<H2M2D>(args, mesh_reader); else
     if(mtype == "conformal:hypercube:3:3") run<H3M3D>(args, mesh_reader); else
     if(mtype == "conformal:simplex:2:2") run<S2M2D>(args, mesh_reader); else
     if(mtype == "conformal:simplex:3:3") run<S3M3D>(args, mesh_reader); else
-    std::cout << "ERROR: unsupported mesh type!" << std::endl;
+    std::cout << "ERROR: unsupported mesh type!" << "\n";
     }
   }
 } // namespace MeshPermAssemblyBench

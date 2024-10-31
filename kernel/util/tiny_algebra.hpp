@@ -1820,7 +1820,7 @@ namespace FEAT
       {
         for (int i(0) ; i < m-1 ; ++i)
         {
-          lhs << A[i] << std::endl;
+          lhs << A[i] << "\n";
         }
         lhs << A[m-1];
 

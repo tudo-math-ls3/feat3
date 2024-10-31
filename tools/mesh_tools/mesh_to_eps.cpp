@@ -17,41 +17,41 @@ using namespace FEAT::Geometry;
 
 static void display_help()
 {
-  std::cout << std::endl;
-  std::cout << "mesh2eps: Converts a mesh from FEAT format to EPS format" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Mandatory arguments:" << std::endl;
-  std::cout << "--------------------" << std::endl;
-  std::cout << " --mesh <path to mesh file(s)>" << std::endl;
-  std::cout << "Specifies the sequence of input mesh files paths." << std::endl;
-  std::cout << std::endl;
-  std::cout << "Optional arguments:" << std::endl;
-  std::cout << "-------------------" << std::endl;
-  std::cout << " --eps <path to eps file>"  << std::endl;
-  std::cout << "Specifies the path of the output EPS file." << std::endl;
-  std::cout << "If not given, the name of the first input mesh file is used." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --level [lvl_max [lvl_min]]" << std::endl;
-  std::cout << "Specifies the minimum and maximum refinement levels." << std::endl;
-  std::cout << "If not given, only level 0 is processed." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --box [width height]" << std::endl;
-  std::cout << "Specifies the bounding box of the figure in millimeters." << std::endl;
-  std::cout << "If not given, a bounding box of 100 x 100 millimeters is used." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --stroke [width]" << std::endl;
-  std::cout << "Specifies the stroke width of the edges in millimeters." << std::endl;
-  std::cout << "If not given, a stroke width of 0.1 millimeters is used." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --extra [offset]" << std::endl;
-  std::cout << "Specifies the extra offset of the figure in millimeters." << std::endl;
-  std::cout << "If not given, an offset of 0.5 millimeters is used." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --no-adapt" << std::endl;
-  std::cout << "Do not adapt mesh after refinement." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --help" << std::endl;
-  std::cout << "Displays this message" << std::endl;
+  std::cout << "\n";
+  std::cout << "mesh2eps: Converts a mesh from FEAT format to EPS format" << "\n";
+  std::cout << "\n";
+  std::cout << "Mandatory arguments:" << "\n";
+  std::cout << "--------------------" << "\n";
+  std::cout << " --mesh <path to mesh file(s)>" << "\n";
+  std::cout << "Specifies the sequence of input mesh files paths." << "\n";
+  std::cout << "\n";
+  std::cout << "Optional arguments:" << "\n";
+  std::cout << "-------------------" << "\n";
+  std::cout << " --eps <path to eps file>"  << "\n";
+  std::cout << "Specifies the path of the output EPS file." << "\n";
+  std::cout << "If not given, the name of the first input mesh file is used." << "\n";
+  std::cout << "\n";
+  std::cout << " --level [lvl_max [lvl_min]]" << "\n";
+  std::cout << "Specifies the minimum and maximum refinement levels." << "\n";
+  std::cout << "If not given, only level 0 is processed." << "\n";
+  std::cout << "\n";
+  std::cout << " --box [width height]" << "\n";
+  std::cout << "Specifies the bounding box of the figure in millimeters." << "\n";
+  std::cout << "If not given, a bounding box of 100 x 100 millimeters is used." << "\n";
+  std::cout << "\n";
+  std::cout << " --stroke [width]" << "\n";
+  std::cout << "Specifies the stroke width of the edges in millimeters." << "\n";
+  std::cout << "If not given, a stroke width of 0.1 millimeters is used." << "\n";
+  std::cout << "\n";
+  std::cout << " --extra [offset]" << "\n";
+  std::cout << "Specifies the extra offset of the figure in millimeters." << "\n";
+  std::cout << "If not given, an offset of 0.5 millimeters is used." << "\n";
+  std::cout << "\n";
+  std::cout << " --no-adapt" << "\n";
+  std::cout << "Do not adapt mesh after refinement." << "\n";
+  std::cout << "\n";
+  std::cout << " --help" << "\n";
+  std::cout << "Displays this message" << "\n";
 }
 
 String get_file_title(const String& filename)
@@ -93,19 +93,19 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   try
 #endif
   {
-    std::cout << "Parsing mesh files..." << std::endl;
+    std::cout << "Parsing mesh files..." << "\n";
     // Now parse the mesh file
     mesh_reader.parse(*node, *atlas);
   }
 #ifndef DEBUG
   catch(std::exception& exc)
   {
-    std::cerr << "ERROR: " << exc.what() << std::endl;
+    std::cerr << "ERROR: " << exc.what() << "\n";
     return 1;
   }
   catch(...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     return 1;
   }
 #endif
@@ -122,7 +122,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   {
     if(lvl > 0)
     {
-      std::cout << "Refining up to level " << lvl << "..." << std::endl;
+      std::cout << "Refining up to level " << lvl << "..." << "\n";
       node = node->refine_unique(adapt_mode);
     }
 
@@ -130,7 +130,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
       continue;
 
     FEAT::String epsname = filename + "." + stringify(lvl) + ".eps";
-    std::cout << "Writing file '" << epsname << "'..." << std::endl;
+    std::cout << "Writing file '" << epsname << "'..." << "\n";
 
     Geometry::ExportEPS::write(epsname, *node->get_mesh(), box_x, box_y, stroke, extra);
   }
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
 
     display_help();
 
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
   {
-    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << std::endl;
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
     display_help();
     return 1;
   }
@@ -203,14 +203,14 @@ int main(int argc, char* argv[])
   // get mesh type
   const String mtype = mesh_reader.get_meshtype_string();
 
-  std::cout << "Mesh Type: " << mtype << std::endl;
+  std::cout << "Mesh Type: " << mtype << "\n";
 
   if(mtype == "conformal:hypercube:2:2")
     return run_xml<H2M2D>(args, mesh_reader, eps_name);
   if(mtype == "conformal:simplex:2:2")
     return run_xml<S2M2D>(args, mesh_reader, eps_name);
 
-  std::cout << "ERROR: unsupported mesh type!" << std::endl;
+  std::cout << "ERROR: unsupported mesh type!" << "\n";
 
   return 1;
 }

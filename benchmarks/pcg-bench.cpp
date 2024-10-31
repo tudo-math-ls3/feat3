@@ -23,17 +23,17 @@ void run(PreferredBackend backend)
 {
   Backend::set_preferred_backend(PreferredBackend::generic);
 
-  std::cout << String(100, '=') << std::endl;
-  std::cout << "Backend..: " << backend << std::endl;
-  std::cout << "DataType.: " << Type::Traits<DT_>::name() << std::endl;
-  std::cout << "IndexType: " << Type::Traits<IT_>::name() << std::endl;
+  std::cout << String(100, '=') << "\n";
+  std::cout << "Backend..: " << backend << "\n";
+  std::cout << "DataType.: " << Type::Traits<DT_>::name() << "\n";
+  std::cout << "IndexType: " << Type::Traits<IT_>::name() << "\n";
 
   // create matrix
   LAFEM::PointstarFactoryFE<DT_, IT_> factory(Index(2000));
   LAFEM::SparseMatrixCSR<DT_, IT_> matrix = factory.matrix_csr();
 
-  std::cout << "NumDofs..: " << matrix.rows() << std::endl;
-  std::cout << "NumNZEs..: " << matrix.used_elements() << std::endl;
+  std::cout << "NumDofs..: " << matrix.rows() << "\n";
+  std::cout << "NumNZEs..: " << matrix.used_elements() << "\n";
 
   // create vectors
   LAFEM::DenseVector<DT_, IT_> vec_ref = factory.vector_q2_bubble();
@@ -82,11 +82,11 @@ void run(PreferredBackend backend)
   unsigned long long byte = (8ull*n + k*(15ull*n + nze)) * sizeof(DT_) + k*(n+nze)*sizeof(IT_);
 
   double sec = stamp_2.elapsed(stamp_1);
-  std::cout << "NumIters.: " << k << std::endl;
-  std::cout << "RefError.: " << stringify_fp_sci(err) << std::endl;
-  std::cout << "Runtime..: " << stamp_2.elapsed_string(stamp_1) << std::endl;
-  std::cout << "GFLOP/s..: " << double(flop) / sec * 1E-9 << std::endl;
-  std::cout << "GBYTE/s..: " << double(byte) / sec * 0.931E-9 << std::endl;
+  std::cout << "NumIters.: " << k << "\n";
+  std::cout << "RefError.: " << stringify_fp_sci(err) << "\n";
+  std::cout << "Runtime..: " << stamp_2.elapsed_string(stamp_1) << "\n";
+  std::cout << "GFLOP/s..: " << double(flop) / sec * 1E-9 << "\n";
+  std::cout << "GBYTE/s..: " << double(byte) / sec * 0.931E-9 << "\n";
 }
 
 int main(int argc, char ** argv)

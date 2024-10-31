@@ -244,7 +244,7 @@ namespace FEAT
           _alpha_soft_max = this->_alpha_0 + extrapolation_width*this->_alpha_0;
           _alpha_soft_max = Math::min(_alpha_soft_max, _alpha_hard_max);
 
-          //std::cout << "Linesearch initial alpha " << this->_alpha_0 << std::endl;
+          //std::cout << "Linesearch initial alpha " << this->_alpha_0 << "\n";
 
           DataType alpha_lo(0);
           // It is critical that _f_0 was set from the outside!
@@ -286,15 +286,15 @@ namespace FEAT
               _alpha_soft_min = alpha_lo;
               _alpha_soft_max = alpha + extrapolation_width*Math::abs(alpha - alpha_lo);
             }
-            //std::cout << "Set alpha_smin " << _alpha_soft_min << " alpha_smax " << _alpha_soft_max << std::endl;
+            //std::cout << "Set alpha_smin " << _alpha_soft_min << " alpha_smax " << _alpha_soft_max << "\n";
 
             // Update solution: sol <- initial_sol + _alpha*dir
             vec_sol.copy(this->_vec_initial_sol);
             vec_sol.axpy(this->_vec_pn, alpha);
-            //std::cout << "Linesearch alpha " << alpha << std::endl;
-            //std::cout << "initial_sol " << *(this->_vec_initial_sol) << std::endl;
-            //std::cout << "dir " << *this->_vec_pn << std::endl;
-            //std::cout << "sol " << *vec_sol << std::endl;
+            //std::cout << "Linesearch alpha " << alpha << "\n";
+            //std::cout << "initial_sol " << *(this->_vec_initial_sol) << "\n";
+            //std::cout << "dir " << *this->_vec_pn << "\n";
+            //std::cout << "sol " << *vec_sol << "\n";
 
             // Prepare and evaluate
             this->_functional.prepare(vec_sol, this->_filter);
@@ -321,13 +321,13 @@ namespace FEAT
             // If we are not successful, check if the interval of uncertainty has become too small
             else if(min_in_interval && (_alpha_soft_max - _alpha_soft_min) <= this->_tol_step*_alpha_soft_max)
             {
-              //std::cout << "interval width " << _alpha_soft_max - _alpha_soft_min << " : " << this->_tol_step*_alpha_soft_max << std::endl;
+              //std::cout << "interval width " << _alpha_soft_max - _alpha_soft_min << " : " << this->_tol_step*_alpha_soft_max << "\n";
               status = Status::stagnated;
             }
             // Stagnation due to rounding errors
             //if(min_in_interval && (alpha <= _alpha_soft_min || alpha >= _alpha_soft_max))
             //{
-            //  std::cout << "Rounding errors" << std::endl;
+            //  std::cout << "Rounding errors" << "\n";
             //  status = Status::stagnated;
             //}
             // This is not used at the moment because it is only relevant if there are constraints limiting the
@@ -347,7 +347,7 @@ namespace FEAT
                   interval_known = true;
                 }
 
-            //std::cout << "interval known " << interval_known << std::endl;
+            //std::cout << "interval known " << interval_known << "\n";
             // If we do not know that the minimum was in the previous interval of uncertainty, we need to compute a
             // new step size to expand the interval of uncertainty at the start of the next iteration.
             if(!interval_known && (fval <= fval_lo)
@@ -377,7 +377,7 @@ namespace FEAT
               _polynomial_fit(alpha, fval, df, alpha_lo, fval_lo, df_lo, alpha_hi, fval_hi, df_hi, min_in_interval,
               drive_to_bndry);
 
-              //std::cout << "width " << width << " width_old " << width_old << " min_in_interval " << min_in_interval <<std::endl;
+              //std::cout << "width " << width << " width_old " << width_old << " min_in_interval " << min_in_interval <<"\n";
 
               if(min_in_interval)
               {
@@ -385,7 +385,7 @@ namespace FEAT
                 {
                   //std::cout << "Forcing " << alpha << " to ";
                   alpha = alpha_lo + DataType(0.5)*(alpha_hi - alpha_lo);
-                  //std::cout << alpha << std::endl;
+                  //std::cout << alpha << "\n";
                 }
                 width_old = width;
                 width = Math::abs(alpha_lo - alpha_hi);
@@ -408,7 +408,7 @@ namespace FEAT
           {
             this->_alpha_min = alpha_lo;
             this->_fval_min = fval_lo;
-            //std::cout << "Unusual termination alpha_lo " << alpha_lo << "fval_lo " << fval_lo << std::endl;
+            //std::cout << "Unusual termination alpha_lo " << alpha_lo << "fval_lo " << fval_lo << "\n";
             vec_sol.copy(this->_vec_initial_sol);
             vec_sol.axpy(this->_vec_pn, alpha_lo);
 
@@ -497,7 +497,7 @@ namespace FEAT
               alpha_new = alpha_c;
             else
               alpha_new = (alpha_q + alpha_c)/DataType(2);
-            //std::cout << "Case 1: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << std::endl;
+            //std::cout << "Case 1: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << "\n";
 
           }
           // Case 2: The first derivative changes sign
@@ -513,7 +513,7 @@ namespace FEAT
             alpha_q = _argmin_quadratic(alpha_lo, fval_lo, df_lo, alpha, fval, df, true);
             // Take the step closer to the new step alpha
             Math::abs(alpha - alpha_c) > Math::abs(alpha - alpha_q) ? alpha_new = alpha_c : alpha_new = alpha_q;
-            //std::cout << "Case 2: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << std::endl;
+            //std::cout << "Case 2: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << "\n";
           }
           // Case 3: The absolute value of the derivative increases
           // We also know that the function value increased in the last trial step and that the derivative did not
@@ -536,7 +536,7 @@ namespace FEAT
             {
               min_in_interval ? alpha_new = alpha_q : alpha_new = alpha_c;
             }
-            //std::cout << "Case 3: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << std::endl;
+            //std::cout << "Case 3: alpha " << alpha_new << " q " << alpha_q << " c " << alpha_c << "\n";
           }
           // Case 4: The absolute value of the derivative did not increase
           // We also know that the function value increased in the last trial step and that the derivative did not
@@ -556,7 +556,7 @@ namespace FEAT
             {
               alpha > alpha_lo ? alpha_new = _alpha_soft_max : alpha_new = _alpha_soft_min;
             }
-            //std::cout << "Case 4: alpha " << alpha_new << std::endl;
+            //std::cout << "Case 4: alpha " << alpha_new << "\n";
           }
 
             // Update the inverval of uncertainty. Has to happen befor we clamp the step to the admissible interval.
@@ -585,20 +585,20 @@ namespace FEAT
             // If we know the minimum is in the interval, we can drive alpha to the corresponding end more quickly
             if(min_in_interval && drive_to_bndry)
             {
-              //std::cout << "Bracketing adjust " << alpha_lo << " " << alpha_hi << " " << alpha_new << std::endl;
+              //std::cout << "Bracketing adjust " << alpha_lo << " " << alpha_hi << " " << alpha_new << "\n";
               //std::cout << "Bracketing adjust alpha_new from " << alpha_new;
               if(alpha_lo < alpha_hi)
                 alpha_new = Math::min(alpha_lo + DataType(0.66)*(alpha_hi - alpha_lo), alpha_new);
               else
                 alpha_new = Math::max(alpha_lo + DataType(0.66)*(alpha_hi - alpha_lo), alpha_new);
-              //std::cout << " to " << alpha_new << std::endl;
+              //std::cout << " to " << alpha_new << "\n";
             }
 
             alpha = alpha_new;
 
-            //std::cout << "Polynomial fit: new " << alpha << " " << fval << " " << df <<std::endl;
-            //std::cout << "Polynomial fit: lo  " << alpha_lo << " " << fval_lo << " " << df_lo <<std::endl;
-            //std::cout << "Polynomial fit: hi  " << alpha_hi << " " << fval_hi << " " << df_hi <<std::endl;
+            //std::cout << "Polynomial fit: new " << alpha << " " << fval << " " << df <<"\n";
+            //std::cout << "Polynomial fit: lo  " << alpha_lo << " " << fval_lo << " " << df_lo <<"\n";
+            //std::cout << "Polynomial fit: hi  " << alpha_hi << " " << fval_hi << " " << df_hi <<"\n";
 
           return Status::success;
         }
@@ -708,11 +708,11 @@ namespace FEAT
 
           DataType r = Math::sqr(d1/scale) - (df_lo/scale) * (df_hi/scale);
 
-          //std::cout << "fval_hi " << fval_hi << " fval_lo "<< fval_lo << std::endl;
-          //std::cout << "alpha_hi " << alpha_hi << " alpha_lo "<< alpha_lo << std::endl;
-          //std::cout << "df_hi " << df_hi << " df_lo "<< df_lo << std::endl;
-          //std::cout << "d1 " << d1 << std::endl;
-          //std::cout << "scale " << scale << std::endl;
+          //std::cout << "fval_hi " << fval_hi << " fval_lo "<< fval_lo << "\n";
+          //std::cout << "alpha_hi " << alpha_hi << " alpha_lo "<< alpha_lo << "\n";
+          //std::cout << "df_hi " << df_hi << " df_lo "<< df_lo << "\n";
+          //std::cout << "d1 " << d1 << "\n";
+          //std::cout << "scale " << scale << "\n";
 
           DataType d2(0);
 
@@ -726,8 +726,8 @@ namespace FEAT
             // This sorting is done to avoid annihilation
             df_hi*df_lo > DataType(0) ?  q = d2 +(df_hi-df_lo) + d2 : q = d2 - df_lo + d2 + df_hi;
 
-            //std::cout << "d2 " << d2 << std::endl;
-            //std::cout << "p " << p << " q " << q << std::endl;
+            //std::cout << "d2 " << d2 << "\n";
+            //std::cout << "p " << p << " q " << q << "\n";
 
             alpha += (alpha_hi - alpha_lo)*(p/q);
           }
@@ -742,8 +742,8 @@ namespace FEAT
             //  q = d2 +(df_hi-df_lo) + d2;
             //else
             //  q = d2 - df_lo + d2 +df_hi;
-            //std::cout << "d2 " << d2 << std::endl;
-            //std::cout << "p " << (d2 - df_lo + d1) << " q " << q << std::endl;
+            //std::cout << "d2 " << d2 << "\n";
+            //std::cout << "p " << (d2 - df_lo + d1) << " q " << q << "\n";
 
             (alpha_lo < alpha_hi && df_lo > DataType(0) )? alpha = _alpha_soft_min: alpha = _alpha_soft_max;
           }
@@ -778,13 +778,13 @@ namespace FEAT
           DataType p(d2 - df_lo + d1);
           DataType q(d2 +(df_hi - df_lo) + d2);
 
-          //std::cout << "fval_hi " << fval_hi << " fval_lo "<< fval_lo << std::endl;
-          //std::cout << "alpha_hi " << alpha_hi << " alpha_lo "<< alpha_lo << std::endl;
-          //std::cout << "df_hi " << df_hi << " df_lo "<< df_lo << std::endl;
-          //std::cout << "d1 " << d1 << std::endl;
-          //std::cout << "scale " << scale << std::endl;
-          //std::cout << "d2 " << d2 << std::endl;
-          //std::cout << "p " << (d2 - df_lo + d1) << " q " << q << std::endl;
+          //std::cout << "fval_hi " << fval_hi << " fval_lo "<< fval_lo << "\n";
+          //std::cout << "alpha_hi " << alpha_hi << " alpha_lo "<< alpha_lo << "\n";
+          //std::cout << "df_hi " << df_hi << " df_lo "<< df_lo << "\n";
+          //std::cout << "d1 " << d1 << "\n";
+          //std::cout << "scale " << scale << "\n";
+          //std::cout << "d2 " << d2 << "\n";
+          //std::cout << "p " << (d2 - df_lo + d1) << " q " << q << "\n";
 
           if( p/q < DataType(0) && d2 != DataType(0))
             alpha_c += p/q*(alpha_hi - alpha_lo);

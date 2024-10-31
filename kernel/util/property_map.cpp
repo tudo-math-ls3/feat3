@@ -470,7 +470,7 @@ namespace FEAT
     EntryMap::const_iterator vend(_values.end());
     for( ; vit != vend ; ++vit)
     {
-      os << prefix << (*vit).first << " = " << (*vit).second << std::endl;
+      os << prefix << (*vit).first << " = " << (*vit).second << "\n";
     }
 
     // dump subsections
@@ -479,14 +479,14 @@ namespace FEAT
     for( ; sit != send ; ++sit)
     {
       // section name and opening brace
-      os << prefix << "[" << (*sit).first << "]" << std::endl;
-      os << prefix << "{" << std::endl;
+      os << prefix << "[" << (*sit).first << "]" << "\n";
+      os << prefix << "{" << "\n";
 
       // dump subsection with increased indent
       (*sit).second->write(os, indent + 1);
 
       // closing brace, including section name as comment
-      os << prefix << "} # end of [" << (*sit).first << "]" << std::endl;
+      os << prefix << "} # end of [" << (*sit).first << "]" << "\n";
     }
   }
 } //namespace FEAT

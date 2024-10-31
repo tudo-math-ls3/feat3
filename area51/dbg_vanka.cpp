@@ -246,10 +246,10 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
   stamp2.stamp();
   String solve_time = stamp2.elapsed_string(stamp1, TimeFormat::s_m);
 
-  /*std::cout << std::endl
-            << "Solver Status: " << status << std::endl;
-  std::cout << "Convergence..: " << solver->get_conv_rate() << std::endl;
-  std::cout << "Elapsed Time.: " << stamp2.elapsed_string(stamp1, TimeFormat::s_m) << std::endl;*/
+  /*std::cout << "\n"
+            << "Solver Status: " << status << "\n";
+  std::cout << "Convergence..: " << solver->get_conv_rate() << "\n";
+  std::cout << "Elapsed Time.: " << stamp2.elapsed_string(stamp1, TimeFormat::s_m) << "\n";*/
   std::cout << name << ": ";
   switch(vtype)
   {
@@ -269,7 +269,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
     << solve_time << " "
     << stringify(vanka->data_size()).pad_front(10)
     << stringify(matrix.used_elements()).pad_front(10)
-    << std::endl;
+    << "\n";
 }
 
 int main(int argc, char** argv)

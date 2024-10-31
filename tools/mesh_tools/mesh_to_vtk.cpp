@@ -19,65 +19,65 @@ using namespace FEAT::Geometry;
 
 static void display_help()
 {
-  std::cout << std::endl;
-  std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Mandatory arguments:" << std::endl;
-  std::cout << "--------------------" << std::endl;
-  std::cout << " --mesh <path to mesh file(s)>" << std::endl;
-  std::cout << "Specifies the sequence of input mesh files paths." << std::endl;
-  std::cout << std::endl;
-  std::cout << "Optional arguments:" << std::endl;
-  std::cout << "-------------------" << std::endl;
-  std::cout << " --vtk <path to vtk file>" << std::endl;
-  std::cout << "Specifies the path of the output VTK file." << std::endl;
-  std::cout << "If not given, the name of the first input mesh file is used." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --level [lvl_max [lvl_min]]" << std::endl;
-  std::cout << "Specifies the minimum and maximum refinement levels." << std::endl;
-  std::cout << "If not given, only level 0 is processed." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --origin <x> [<y> [<z>]]" << std::endl;
-  std::cout << "Specifies the translation origin." << std::endl;
-  std::cout << "This translation is subtracted before applying the rotation." << std::endl;
-  std::cout << "If not given, all origins are set to 0." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --angles <angle>" << std::endl;
-  std::cout << " --angles <yaw> <pitch> <roll>" << std::endl;
-  std::cout << "Specifies the rotation angle (2D) or the yaw-pitch-roll angles (3D)." << std::endl;
-  std::cout << "If not given, all angles are set to 0." << std::endl;
-  std::cout << "Note: all angles are given in revolutions (full turns):" << std::endl;
-  std::cout << "      1 revolution = 360 degrees = 2pi radians" << std::endl;
-  std::cout << std::endl;
-  std::cout << " --offset <x> [<y> [<z>]]" << std::endl;
-  std::cout << "Specifies the translation offset." << std::endl;
-  std::cout << "This translation is added after applying the rotation." << std::endl;
-  std::cout << "If not given, all offsets are set to 0." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --no-adapt" << std::endl;
-  std::cout << "Do not adapt mesh after refinement." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --no-dist" << std::endl;
-  std::cout << "Do not compute distance to charts." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --no-proj" << std::endl;
-  std::cout << "Do not compute projection to charts" << std::endl;
-  std::cout << std::endl;
-  std::cout << " --no-volume" << std::endl;
-  std::cout << "Do not compute cell volumes" << std::endl;
-  std::cout << std::endl;
-  std::cout << " --hit-test <name1> <formula1> [<name2> <formula2> ...]" << std::endl;
-  std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts" << std::endl;
-  std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair" << std::endl;
-  std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula" << std::endl;
-  std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part." << std::endl;
-  std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates" << std::endl;
-  std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively." << std::endl;
-  std::cout << "Please note that this option can only be used if FEAT is configured and linked against" << std::endl;
-  std::cout << "the 'fparser' third-party library." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --help" << std::endl;
-  std::cout << "Displays this message" << std::endl;
+  std::cout << "\n";
+  std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << "\n";
+  std::cout << "\n";
+  std::cout << "Mandatory arguments:" << "\n";
+  std::cout << "--------------------" << "\n";
+  std::cout << " --mesh <path to mesh file(s)>" << "\n";
+  std::cout << "Specifies the sequence of input mesh files paths." << "\n";
+  std::cout << "\n";
+  std::cout << "Optional arguments:" << "\n";
+  std::cout << "-------------------" << "\n";
+  std::cout << " --vtk <path to vtk file>" << "\n";
+  std::cout << "Specifies the path of the output VTK file." << "\n";
+  std::cout << "If not given, the name of the first input mesh file is used." << "\n";
+  std::cout << "\n";
+  std::cout << " --level [lvl_max [lvl_min]]" << "\n";
+  std::cout << "Specifies the minimum and maximum refinement levels." << "\n";
+  std::cout << "If not given, only level 0 is processed." << "\n";
+  std::cout << "\n";
+  std::cout << " --origin <x> [<y> [<z>]]" << "\n";
+  std::cout << "Specifies the translation origin." << "\n";
+  std::cout << "This translation is subtracted before applying the rotation." << "\n";
+  std::cout << "If not given, all origins are set to 0." << "\n";
+  std::cout << "\n";
+  std::cout << " --angles <angle>" << "\n";
+  std::cout << " --angles <yaw> <pitch> <roll>" << "\n";
+  std::cout << "Specifies the rotation angle (2D) or the yaw-pitch-roll angles (3D)." << "\n";
+  std::cout << "If not given, all angles are set to 0." << "\n";
+  std::cout << "Note: all angles are given in revolutions (full turns):" << "\n";
+  std::cout << "      1 revolution = 360 degrees = 2pi radians" << "\n";
+  std::cout << "\n";
+  std::cout << " --offset <x> [<y> [<z>]]" << "\n";
+  std::cout << "Specifies the translation offset." << "\n";
+  std::cout << "This translation is added after applying the rotation." << "\n";
+  std::cout << "If not given, all offsets are set to 0." << "\n";
+  std::cout << "\n";
+  std::cout << " --no-adapt" << "\n";
+  std::cout << "Do not adapt mesh after refinement." << "\n";
+  std::cout << "\n";
+  std::cout << " --no-dist" << "\n";
+  std::cout << "Do not compute distance to charts." << "\n";
+  std::cout << "\n";
+  std::cout << " --no-proj" << "\n";
+  std::cout << "Do not compute projection to charts" << "\n";
+  std::cout << "\n";
+  std::cout << " --no-volume" << "\n";
+  std::cout << "Do not compute cell volumes" << "\n";
+  std::cout << "\n";
+  std::cout << " --hit-test <name1> <formula1> [<name2> <formula2> ...]" << "\n";
+  std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts" << "\n";
+  std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair" << "\n";
+  std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula" << "\n";
+  std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part." << "\n";
+  std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates" << "\n";
+  std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively." << "\n";
+  std::cout << "Please note that this option can only be used if FEAT is configured and linked against" << "\n";
+  std::cout << "the 'fparser' third-party library." << "\n";
+  std::cout << "\n";
+  std::cout << " --help" << "\n";
+  std::cout << "Displays this message" << "\n";
 }
 
 String get_file_title(const String& filename)
@@ -103,19 +103,19 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 1, 1>& offset, Tiny::V
   int nori = args.parse("origin", origin[0]);
   if(args.check("angles") >= 0)
   {
-    std::cerr << "ERROR: option '--angles' is invalid for 1D meshes" << std::endl;
+    std::cerr << "ERROR: option '--angles' is invalid for 1D meshes" << "\n";
     return -1;
   }
 
   // parse error?
   if(noff < 0)
   {
-    std::cerr << "ERROR: could not parse '--offset <x>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--offset <x>' parameters" << "\n";
     return -1;
   }
   if(nori < 0)
   {
-    std::cerr << "ERROR: could not parse '--origin <x>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--origin <x>' parameters" << "\n";
     return -1;
   }
 
@@ -132,34 +132,34 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 2, 2>& offset, Tiny::V
   // parse error?
   if(noff < 0)
   {
-    std::cerr << "ERROR: could not parse '--offset <x> <y>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--offset <x> <y>' parameters" << "\n";
     return -1;
   }
   if(nori < 0)
   {
-    std::cerr << "ERROR: could not parse '--origin <x> <y>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--origin <x> <y>' parameters" << "\n";
     return -1;
   }
   if(nang < 0)
   {
-    std::cerr << "ERROR: could not parse '--angles <angle>" << std::endl;
+    std::cerr << "ERROR: could not parse '--angles <angle>" << "\n";
     return -1;
   }
 
   // invalid argument count?
   if((noff > 0) && (noff != 2))
   {
-    std::cerr << "ERROR: invalid number of '--offset <x> <y>' parameters" << std::endl;
+    std::cerr << "ERROR: invalid number of '--offset <x> <y>' parameters" << "\n";
     return -1;
   }
   if((nori > 0) && (nori != 2))
   {
-    std::cerr << "ERROR: invalid number of '--origin <x> <y>' parameters" << std::endl;
+    std::cerr << "ERROR: invalid number of '--origin <x> <y>' parameters" << "\n";
     return -1;
   }
   if((nang > 0) && (nang != 1))
   {
-    std::cerr << "ERROR: invalid number of '--angles <angle>' parameters" << std::endl;
+    std::cerr << "ERROR: invalid number of '--angles <angle>' parameters" << "\n";
     return -1;
   }
 
@@ -176,34 +176,34 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 3, 3>& offset, Tiny::V
   // parse error?
   if(noff < 0)
   {
-    std::cerr << "ERROR: could not parse '--offset <x> <y> <z>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--offset <x> <y> <z>' parameters" << "\n";
     return -1;
   }
   if(nori < 0)
   {
-    std::cerr << "ERROR: could not parse '--origin <x> <y> <z>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--origin <x> <y> <z>' parameters" << "\n";
     return -1;
   }
   if(nang < 0)
   {
-    std::cerr << "ERROR: could not parse '--angles <yaw> <pitch> <roll>' parameters" << std::endl;
+    std::cerr << "ERROR: could not parse '--angles <yaw> <pitch> <roll>' parameters" << "\n";
     return -1;
   }
 
   // invalid argument count?
   if((noff > 0) && (noff != 3))
   {
-    std::cerr << "ERROR: invalid number of '--offset <x> <y> <z>' parameters" << std::endl;
+    std::cerr << "ERROR: invalid number of '--offset <x> <y> <z>' parameters" << "\n";
     return -1;
   }
   if((nori > 0) && (nori != 3))
   {
-    std::cerr << "ERROR: invalid number of '--origin <x> <y> <z>' parameters" << std::endl;
+    std::cerr << "ERROR: invalid number of '--origin <x> <y> <z>' parameters" << "\n";
     return -1;
   }
   if((nang > 0) && (nang != 3))
   {
-    std::cerr << "ERROR: invalid number of '--angles <yaw> <pitch> <roll>' parameters" << std::endl;
+    std::cerr << "ERROR: invalid number of '--angles <yaw> <pitch> <roll>' parameters" << "\n";
     return -1;
   }
 
@@ -221,7 +221,7 @@ bool build_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node, const std::ma
     String name = it->first;
     String formula = it->second;
 
-    std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'..." << std::endl;
+    std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'..." << "\n";
 
     try
     {
@@ -242,8 +242,8 @@ bool build_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node, const std::ma
     }
     catch(std::exception& exc)
     {
-      std::cerr << "ERROR: in boundary function formula '" << formula << "'" << std::endl;
-      std::cerr << exc.what() << std::endl;
+      std::cerr << "ERROR: in boundary function formula '" << formula << "'" << "\n";
+      std::cerr << exc.what() << "\n";
       return false;
     }
   }
@@ -282,7 +282,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     std::deque<String> parts = args.query("hit-test")->second;
     if(parts.size() % 2u != 0u)
     {
-      std::cerr << "ERROR: invalid number of parameters for option --hit-test, expected an even count" << std::endl;
+      std::cerr << "ERROR: invalid number of parameters for option --hit-test, expected an even count" << "\n";
       return 1;
     }
 
@@ -292,7 +292,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 #else // no FEAT_HAVE_FPARSER
   if(args.check("hit-test") >= 0)
   {
-    std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts" << std::endl;
+    std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts" << "\n";
     return 1;
   }
 #endif // FEAT_HAVE_FPARSER
@@ -307,19 +307,19 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   try
 #endif
   {
-    std::cout << "Parsing mesh files..." << std::endl;
+    std::cout << "Parsing mesh files..." << "\n";
     // Now parse the mesh file
     mesh_reader.parse(*node, *atlas, &part_set);
   }
 #ifndef DEBUG
   catch(std::exception& exc)
   {
-    std::cerr << "ERROR: " << exc.what() << std::endl;
+    std::cerr << "ERROR: " << exc.what() << "\n";
     return 1;
   }
   catch(...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     return 1;
   }
 #endif
@@ -351,7 +351,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   {
     if(lvl > 0)
     {
-      std::cout << "Refining up to level " << lvl << "..." << std::endl;
+      std::cout << "Refining up to level " << lvl << "..." << "\n";
       node = node->refine_unique(adapt_mode);
     }
 
@@ -375,7 +375,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
     // Create a VTK exporter for our mesh
     FEAT::String vtkname = filename + "." + stringify(lvl);
-    std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
+    std::cout << "Writing file '" << vtkname << ".vtu'..." << "\n";
     Geometry::ExportVTK<Mesh_> exporter(mesh);
 
     std::vector<double> vtx_data(mesh.get_num_entities(0), 0.0);
@@ -543,7 +543,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
 
     display_help();
     return 1;
@@ -552,7 +552,7 @@ int main(int argc, char* argv[])
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
   {
-    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << std::endl;
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
     display_help();
     return 1;
   }
@@ -576,7 +576,7 @@ int main(int argc, char* argv[])
   // get mesh type
   const String mtype = mesh_reader.get_meshtype_string();
 
-  std::cout << "Mesh Type: " << mtype << std::endl;
+  std::cout << "Mesh Type: " << mtype << "\n";
 
   if(mtype == "conformal:hypercube:1:1")
     return run_xml<H1M1D>(args, mesh_reader, vtk_name);
@@ -597,7 +597,7 @@ int main(int argc, char* argv[])
   if(mtype == "conformal:simplex:3:3")
     return run_xml<S3M3D>(args, mesh_reader, vtk_name);
 
-  std::cout << "ERROR: unsupported mesh type!" << std::endl;
+  std::cout << "ERROR: unsupported mesh type!" << "\n";
 
   return 1;
 }

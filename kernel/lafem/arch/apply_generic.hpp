@@ -414,7 +414,7 @@ namespace FEAT
         default:
 #ifdef DEBUG
           /// \todo print warning in feat log file
-          std::cout << "Warning: Apply not optimized for " << num_of_offsets << " offsets!" << std::endl;
+          std::cout << "Warning: Apply not optimized for " << num_of_offsets << " offsets!" << "\n";
 #endif
           Intern::ApplyBanded::apply_banded_generic(r, alpha, x, beta, val, offsets, num_of_offsets, rows, columns);
         }

@@ -525,7 +525,7 @@ namespace FEAT
             _population.pop_back();
         }
 
-        //std::cout<<"pre: "<<_population.back().get_cell_deviation()<<" " <<_population.back().get_boundary_deviation()<<" " << _population.back().get_boundary_size()<<std::endl;
+        //std::cout<<"pre: "<<_population.back().get_cell_deviation()<<" " <<_population.back().get_boundary_deviation()<<" " << _population.back().get_boundary_size()<<"\n";
 
         //mutate each of the 10 individuals and store the top 10 fittest of all in _population
         at.stamp();
@@ -548,7 +548,7 @@ namespace FEAT
         while (_population.size() > 1)
           _population.pop_back();
 
-        //std::cout<<_population.back().get_cell_deviation()<<" " <<_population.back().get_boundary_deviation()<<" " << _population.back().get_boundary_size()<<std::endl;
+        //std::cout<<_population.back().get_cell_deviation()<<" " <<_population.back().get_boundary_deviation()<<" " << _population.back().get_boundary_size()<<"\n";
       }
 
       /**
@@ -606,7 +606,7 @@ namespace FEAT
         int _rank = _comm.rank();
         if (_rank == (int)lowest_rank)
         {
-          //std::cout<<"selected: " << _population.front().get_cell_deviation()<<" " <<_population.front().get_boundary_deviation()<<" " << _population.front().get_boundary_size()<<std::endl;
+          //std::cout<<"selected: " << _population.front().get_cell_deviation()<<" " <<_population.front().get_boundary_deviation()<<" " << _population.front().get_boundary_size()<<"\n";
           Adjacency::Graph graph(_num_patches, _num_elems, _num_elems);
           Index* ptr = graph.get_domain_ptr();
           Index* idx = graph.get_image_idx();

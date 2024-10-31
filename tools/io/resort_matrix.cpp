@@ -18,14 +18,14 @@ int main(int argc, char ** argv)
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   if (argc != 3 && argc != 2)
   {
-    std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'"<<std::endl;
+    std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'"<<"\n";
     FEAT::Runtime::abort();
   }
 
   String input(argv[1]);
   if (input.size() < 5)
   {
-    std::cout<<"Input Filetype not known: " << input << std::endl;
+    std::cout<<"Input Filetype not known: " << input << "\n";
     FEAT::Runtime::abort();
   }
   String input_extension(input.substr(input.size() - 4, 4));
@@ -36,7 +36,7 @@ int main(int argc, char ** argv)
     orig.read_from(FileMode::fm_csr, input);
   else
   {
-    std::cout<<"Input Filetype not known: " << input << std::endl;
+    std::cout<<"Input Filetype not known: " << input << "\n";
     FEAT::Runtime::abort();
   }
 
@@ -44,7 +44,7 @@ int main(int argc, char ** argv)
   Index best_radius;
   Index best_radius_index;
   orig.radius_row(best_radius, best_radius_index);
-  std::cout<<"Initial: "<<best_radius<<std::endl;
+  std::cout<<"Initial: "<<best_radius<<"\n";
 
   SparseMatrixCSR<double, Index> best;
   best.clone(orig, CloneMode::Deep);
@@ -59,7 +59,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::minimum_degree SortType::standard: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::minimum_degree SortType::standard: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::minimum_degree SortType::standard: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::minimum_degree SortType::standard: "<<best_radius<<"\n";
   }
 
   perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::standard);
@@ -80,7 +80,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::maximum_degree SortType::standard: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::maximum_degree SortType::standard: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
@@ -90,7 +90,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::maximum_degree SortType::standard: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::maximum_degree SortType::standard: "<<best_radius<<"\n";
   }
 
   perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::standard);
@@ -101,7 +101,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::default SortType::standard: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::default SortType::standard: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::standard);
   csr = orig.clone(CloneMode::Deep);
@@ -111,7 +111,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::default SortType::standard: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::default SortType::standard: "<<best_radius<<"\n";
   }
 
 
@@ -123,7 +123,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::minimum_degree SortType::asc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::minimum_degree SortType::asc: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
@@ -133,7 +133,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::minimum_degree SortType::asc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::minimum_degree SortType::asc: "<<best_radius<<"\n";
   }
 
   perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::asc);
@@ -144,7 +144,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::maximum_degree SortType::asc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::maximum_degree SortType::asc: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
@@ -154,7 +154,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::maximum_degree SortType::asc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::maximum_degree SortType::asc: "<<best_radius<<"\n";
   }
 
   perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::asc);
@@ -165,7 +165,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::default SortType::asc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::default SortType::asc: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::asc);
   csr = orig.clone(CloneMode::Deep);
@@ -175,7 +175,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::standard SortType::asc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::standard SortType::asc: "<<best_radius<<"\n";
   }
 
 
@@ -187,7 +187,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::minimum_degree SortType::desc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::minimum_degree SortType::desc: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::minimum_degree, Adjacency::CuthillMcKee::SortType::desc);
   csr = orig.clone(CloneMode::Deep);
@@ -197,7 +197,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::minimum_degree SortType::desc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::minimum_degree SortType::desc: "<<best_radius<<"\n";
   }
 
   perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::desc);
@@ -208,7 +208,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::maximum_degree SortType::desc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::maximum_degree SortType::desc: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::maximum_degree, Adjacency::CuthillMcKee::SortType::desc);
   csr = orig.clone(CloneMode::Deep);
@@ -218,7 +218,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::maximum_degree SortType::desc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::maximum_degree SortType::desc: "<<best_radius<<"\n";
   }
 
   perm = CuthillMcKee::compute(graph, true, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::desc);
@@ -229,7 +229,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"true RootType::standard SortType::desc: "<<best_radius<<std::endl;
+    std::cout<<"true RootType::standard SortType::desc: "<<best_radius<<"\n";
   }
   perm = CuthillMcKee::compute(graph, false, Adjacency::CuthillMcKee::RootType::standard, Adjacency::CuthillMcKee::SortType::desc);
   csr = orig.clone(CloneMode::Deep);
@@ -239,7 +239,7 @@ int main(int argc, char ** argv)
   {
     best_radius = test_radius;
     best.clone(csr, CloneMode::Deep);
-    std::cout<<"false RootType::standard SortType::desc: "<<best_radius<<std::endl;
+    std::cout<<"false RootType::standard SortType::desc: "<<best_radius<<"\n";
   }
 
   if (argc != 2)
@@ -247,7 +247,7 @@ int main(int argc, char ** argv)
     String output(argv[2]);
     if (output.size() < 5)
     {
-      std::cout<<"Output Filetype not known: " << output << std::endl;
+      std::cout<<"Output Filetype not known: " << output << "\n";
       FEAT::Runtime::abort();
     }
     String output_extension(output.substr(output.size() - 4, 4));
@@ -257,7 +257,7 @@ int main(int argc, char ** argv)
       best.write_out(FileMode::fm_csr, output);
     else
     {
-      std::cout<<"Output Filetype not known: " << output << std::endl;
+      std::cout<<"Output Filetype not known: " << output << "\n";
       FEAT::Runtime::abort();
     }
   }

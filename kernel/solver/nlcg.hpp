@@ -457,12 +457,12 @@ namespace FEAT
           this->_vec_p.copy(this->_vec_z);
 
 
-          ////std::cout << "dir " << *_vec_p << std::endl;
+          ////std::cout << "dir " << *_vec_p << "\n";
           //DataType max_elem(this->_vec_p.max_element());
           //DataType scale1 = DataType(1)/max_elem;
-          //std::cout << "max_elem   " << max_elem << " " << scale1 << std::endl;
+          //std::cout << "max_elem   " << max_elem << " " << scale1 << "\n";
           //DataType scale2(DataType(1)/new_norm);
-          //std::cout << " new norm  " << new_norm << " " << scale2 << std::endl;
+          //std::cout << " new norm  " << new_norm << " " << scale2 << "\n";
 
           // Compute initial eta = < p, r>
           eta = this->_vec_p.dot(this->_vec_r);
@@ -584,7 +584,7 @@ namespace FEAT
             // Set beta = 0 or compute depending on the restart flag
             restart ? beta = DataType(0) : beta = compute_beta(gamma, gamma_prev);
 
-            //std::cout << "Beta " << beta << info << std::endl;
+            //std::cout << "Beta " << beta << info << "\n";
 
             // We need to check beta again here as some direction updates might set it to zero
             // Discard the old search direction and perform (preconditioned) steepest descent
@@ -601,9 +601,9 @@ namespace FEAT
 
             //max_elem = this->_vec_p.max_element();
             //scale1 = DataType(1)/max_elem;
-            //std::cout << "max_elem   " << max_elem << " " << scale1 << std::endl;
+            //std::cout << "max_elem   " << max_elem << " " << scale1 << "\n";
             //scale2 = DataType(1)/new_norm;
-            //std::cout << " new norm  " << new_norm << " " << scale2 << std::endl;
+            //std::cout << " new norm  " << new_norm << " " << scale2 << "\n";
 
             eta = this->_vec_p.dot(this->_vec_r);
 

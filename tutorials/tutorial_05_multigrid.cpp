@@ -194,7 +194,7 @@ namespace Tutorial05
 
     // First of all, let's create the coarse level
     {
-      std::cout << "Creating coarse level " << level_min << "..." << std::endl;
+      std::cout << "Creating coarse level " << level_min << "..." << "\n";
 
       // Create the coarse mesh factory
       Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level_min);
@@ -206,7 +206,7 @@ namespace Tutorial05
     // Now, let's refine up to the maximum level
     for(Index ilevel(level_min); ilevel < level_max; ++ilevel)
     {
-      std::cout << "Refining to level " << (ilevel+1) << "..." << std::endl;
+      std::cout << "Refining to level " << (ilevel+1) << "..." << "\n";
 
       // The StandardRefinery is another mesh factory class, which creates a new mesh by
       // applying the "standard-regular-refinement" algorithm onto a given input mesh.
@@ -231,7 +231,7 @@ namespace Tutorial05
     // Now loop over all levels:
     for(Index ilevel(level_min); ilevel <= level_max; ++ilevel)
     {
-      std::cout << "Assembling Matrix and Filter for level " << ilevel << "..." << std::endl;
+      std::cout << "Assembling Matrix and Filter for level " << ilevel << "..." << "\n";
 
       // Get a reference to the corresponding level for easier member access
       Level& lvl = *levels.at(std::size_t(level_max - ilevel));
@@ -267,7 +267,7 @@ namespace Tutorial05
     // Now loop over all level pairs:
     for(Index ilevel(level_min); ilevel < level_max; ++ilevel)
     {
-      std::cout << "Assembling Grid Transfer for level " << ilevel << "..." << std::endl;
+      std::cout << "Assembling Grid Transfer for level " << ilevel << "..." << "\n";
 
       // Get references to the corresponding coarse and fine levels:
       Level& lvl_fine   = *levels.at(std::size_t(level_max - ilevel - 1));
@@ -330,7 +330,7 @@ namespace Tutorial05
     vec_sol.format();
     vec_rhs.format();
 
-    std::cout << "Assembling right-hand-side vector..." << std::endl;
+    std::cout << "Assembling right-hand-side vector..." << "\n";
 
     // Now assemble the right-hand-side vector; this is virtually identical to tutorial 01.
 
@@ -353,7 +353,7 @@ namespace Tutorial05
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Multigrid Solver set-up
 
-    std::cout << "Setting up Multigrid solver..." << std::endl;
+    std::cout << "Setting up Multigrid solver..." << "\n";
 
     // All matrices, filters and vectors have been assembled, so we can start to set up our geometric
     // multigrid solver. Naturally, this task is more complex than the setup of a simple PCG-SSOR
@@ -467,7 +467,7 @@ namespace Tutorial05
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    std::cout << std::endl << "Solving..." << std::endl;
+    std::cout << "\n" << "Solving..." << "\n";
 
     // Finally, there is one important point to keep in mind when using a multigrid solver:
     // The "multigrid" object, which we have created above, does not initialize its smoothers
@@ -500,15 +500,15 @@ namespace Tutorial05
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors
 
-    std::cout << std::endl << "Computing errors against reference solution..." << std::endl;
+    std::cout << "\n" << "Computing errors against reference solution..." << "\n";
 
     // Compute the error norms:
     auto error_info = Assembly::integrate_error_function<1>(
       lvl_fine.domain_assembler, sol_function, vec_sol, lvl_fine.space, cubature_name);
 
     // Print the error norms to the console
-    std::cout << "Error Analysis:" << std::endl;
-    std::cout << error_info.print_norms() << std::endl;
+    std::cout << "Error Analysis:" << "\n";
+    std::cout << error_info.print_norms() << "\n";
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
@@ -516,7 +516,7 @@ namespace Tutorial05
     // Build the filename string
     String vtk_name(String("./tutorial-05-multigrid-lvl") + stringify(level_max));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
     // Create a VTK exporter for our mesh
     Geometry::ExportVTK<MeshType> exporter(lvl_fine.mesh);
@@ -529,7 +529,7 @@ namespace Tutorial05
     exporter.write(vtk_name);
 
     // That's all, folks.
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   } // void main(...)
 } // namespace Tutorial05
 
@@ -540,7 +540,7 @@ int main(int argc, char* argv[])
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #05: Geometric Multigrid" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #05: Geometric Multigrid" << "\n";
 
   Index level_max(3), level_min(1);
 
@@ -552,8 +552,8 @@ int main(int argc, char* argv[])
     if(!String(argv[1]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[1] << "' as maximum refinement level." << std::endl;
-      std::cerr << "Note: The first argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[1] << "' as maximum refinement level." << "\n";
+      std::cerr << "Note: The first argument must be a positive integer." << "\n";
       Runtime::abort();
     }
     // parse successful
@@ -566,8 +566,8 @@ int main(int argc, char* argv[])
     if(!String(argv[2]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[2] << "' as minimum refinement level." << std::endl;
-      std::cerr << "Note: The second argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[2] << "' as minimum refinement level." << "\n";
+      std::cerr << "Note: The second argument must be a positive integer." << "\n";
       Runtime::abort();
     }
     // parse successful
@@ -578,18 +578,18 @@ int main(int argc, char* argv[])
   if(level_max < level_min)
   {
     // minimum level greater than maximum level
-    std::cerr << "ERROR: Minimum level " << level_min << " is greater than the maximum level " << level_max << std::endl;
+    std::cerr << "ERROR: Minimum level " << level_min << " is greater than the maximum level " << level_max << "\n";
     Runtime::abort();
   }
   if(level_max == level_min)
   {
     // minimum and maximum levels are equal
-    std::cout << "WARNING: Minimum and maximum levels are equal" << std::endl;
+    std::cout << "WARNING: Minimum and maximum levels are equal" << "\n";
   }
 
   // print selected levels
-  std::cout << "Level-Min: " << level_min << std::endl;
-  std::cout << "Level-Max: " << level_max << std::endl;
+  std::cout << "Level-Min: " << level_min << "\n";
+  std::cout << "Level-Max: " << level_max << "\n";
 
   // call the tutorial's main function
   Tutorial05::main(level_max, level_min);

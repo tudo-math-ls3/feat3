@@ -47,8 +47,8 @@ void run(PreferredBackend backend)
 
     Index size(sys.rows());
     Index used_elements(sys.template used_elements<Perspective::pod>());
-    std::cout<<backend<<" "<<sys.name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" Blocksize: " << stringify(Blocksize_) << std::endl;
-    std::cout<<"vector size: "<<size<<", Blocksize: " << stringify(Blocksize_) << ", used elements: "<<used_elements<<std::endl;
+    std::cout<<backend<<" "<<sys.name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" Blocksize: " << stringify(Blocksize_) << "\n";
+    std::cout<<"vector size: "<<size<<", Blocksize: " << stringify(Blocksize_) << ", used elements: "<<used_elements<<"\n";
     DenseVectorBlocked<DT_, IT_, Blocksize_> b(size);
     for (Index i (0) ; i < b.size() ; ++i)
     {
@@ -70,7 +70,7 @@ void run(PreferredBackend backend)
     auto func = [&] () { sys.apply(b, x); };
     run_bench(func, flops, bytes);
 
-    std::cout<<"control norm: "<<x.norm2()<<std::endl;
+    std::cout<<"control norm: "<<x.norm2()<<"\n";
   }
 
   {
@@ -81,8 +81,8 @@ void run(PreferredBackend backend)
 
     Index size(sys.rows());
     Index used_elements(sys.template used_elements<Perspective::pod>());
-    std::cout<<backend<<" "<<sys.name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<< std::endl;
-    std::cout<<"vector size: "<<size<<", used elements: "<<used_elements<<std::endl;
+    std::cout<<backend<<" "<<sys.name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<< "\n";
+    std::cout<<"vector size: "<<size<<", used elements: "<<used_elements<<"\n";
     DenseVector<DT_, IT_> b(size);
     for (Index i (0) ; i < b.size() ; ++i)
     {
@@ -101,7 +101,7 @@ void run(PreferredBackend backend)
     auto func = [&] () { sys.apply(b, x); };
     run_bench(func, flops, bytes);
 
-    std::cout<<"control norm: "<<x.norm2()<<std::endl;
+    std::cout<<"control norm: "<<x.norm2()<<"\n";
   }
 }
 

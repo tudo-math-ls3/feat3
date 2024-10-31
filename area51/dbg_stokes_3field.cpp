@@ -281,9 +281,9 @@ namespace Stokes3Field
     std::deque<std::pair<int,String>> unsupported = args.query_unsupported();
     if(!unsupported.empty())
     {
-      std::cerr << std::endl;
+      std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       Runtime::abort();
     }
 
@@ -291,12 +291,12 @@ namespace Stokes3Field
 
     if(asym_sigma)
     {
-      std::cout << "Running 4-component sigma version (asymmetric)" << std::endl;
+      std::cout << "Running 4-component sigma version (asymmetric)" << "\n";
       run<2, 4>(args);
     }
     else
     {
-      std::cout << "Running 3-component sigma version (symmetric)" << std::endl;
+      std::cout << "Running 3-component sigma version (symmetric)" << "\n";
       run<2, 3>(args);
     }
   }
@@ -364,7 +364,7 @@ namespace Stokes3Field
 
     args.parse("level", level);
 
-    std::cout << "Level: " << level << std::endl;
+    std::cout << "Level: " << level << "\n";
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -391,7 +391,7 @@ namespace Stokes3Field
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Symbolic Matrix Assembly" << std::endl;
+    std::cout << "Symbolic Matrix Assembly" << "\n";
 
     // As usual, we create first an empty matrix.
     SystemMatrixType matrix;
@@ -435,7 +435,7 @@ namespace Stokes3Field
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
-    std::cout << "Numeric Matrix Assembly" << std::endl;
+    std::cout << "Numeric Matrix Assembly" << "\n";
 
     Cubature::DynamicFactory cubature("auto-degree:7");
 
@@ -463,7 +463,7 @@ namespace Stokes3Field
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Filter Assembly" << std::endl;
+    std::cout << "Filter Assembly" << "\n";
 
     SystemFilterType filter;
 
@@ -492,9 +492,9 @@ namespace Stokes3Field
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #ifndef FEAT_HAVE_UMFPACK
-    std::cout << "UMFPACK not enabled; skipping solver step" << std::endl;
+    std::cout << "UMFPACK not enabled; skipping solver step" << "\n";
 #else
-    std::cout << "Solving System" << std::endl;
+    std::cout << "Solving System" << "\n";
 
     auto solver = Solver::new_generic_umfpack(matrix);
 
@@ -505,7 +505,7 @@ namespace Stokes3Field
     }
     catch(std::exception& e)
     {
-      std::cout << "ERROR: " << e.what() << std::endl;
+      std::cout << "ERROR: " << e.what() << "\n";
       return;
     }
 
@@ -519,11 +519,11 @@ namespace Stokes3Field
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Analyse velocity field
 
-    std::cout << std::endl << "Velocity Field Analysis" << std::endl;
+    std::cout << "\n" << "Velocity Field Analysis" << "\n";
 
     Assembly::VelocityInfo<DataType, dim> velo_info = Assembly::VelocityAnalyser::compute(vec_sol_v, space_velo, cubature);
 
-    std::cout << velo_info << std::endl;
+    std::cout << velo_info << "\n";
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
@@ -534,7 +534,7 @@ namespace Stokes3Field
     {
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -554,7 +554,7 @@ namespace Stokes3Field
     }
 
     // That's all, folks.
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   } // int main(...)
 } // namespace Stokes3Field
 

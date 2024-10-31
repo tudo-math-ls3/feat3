@@ -27,7 +27,7 @@ namespace FEAT
         static Index refine_simple(TargetSet&,const TargetSet&,const Index,const Index[],const Index[])
         {
           std::cout << "SPECIALISE ME: StructuredTargetRefiner<" << shape_dim_
-            << "," << cell_dim_ << "," << child_dim_ << ">" << std::endl;
+            << "," << cell_dim_ << "," << child_dim_ << ">" << "\n";
           return Index(0);
         }
       };*/

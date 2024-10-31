@@ -152,7 +152,7 @@ namespace DbgSphereFem
       smoother->set_min_iter(4);
       lvl.smoother = smoother;
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
     // multigrid hierarchy
     auto mg_hierarchy = std::make_shared<Solver::MultiGridHierarchy<MatrixType, FilterType, TransferType>>(lvl_max+1);
@@ -179,12 +179,12 @@ namespace DbgSphereFem
     // Assemble and solve
     for(Index ilvl(1); ilvl <= lvl_max; ++ilvl)
     {
-      std::cout << String(80, '*') << std::endl;
-      std::cout << "Level: " << stringify(ilvl).pad_front(2) << std::endl;
+      std::cout << String(80, '*') << "\n";
+      std::cout << "Level: " << stringify(ilvl).pad_front(2) << "\n";
 
       // get the current level
       Level& lvl = *levels.at(lvl_max-ilvl);
-      std::cout << "Dofs.: " << stringify(lvl.matrix.rows()) << std::endl;
+      std::cout << "Dofs.: " << stringify(lvl.matrix.rows()) << "\n";
 
       // create vectors
       VectorType vec_sol = lvl.matrix.create_vector_l();
@@ -211,8 +211,8 @@ namespace DbgSphereFem
 
       // try to compute error
       auto err = Assembly::ScalarErrorComputer<1, true>::compute(vec_sol, sol_func, lvl.space, cubature);
-      std::cout << "H0-Error: " << stringify_fp_sci(err.norm_h0) << std::endl;
-      std::cout << "H1-Error: " << stringify_fp_sci(err.norm_h1) << std::endl;
+      std::cout << "H0-Error: " << stringify_fp_sci(err.norm_h0) << "\n";
+      std::cout << "H1-Error: " << stringify_fp_sci(err.norm_h1) << "\n";
 
       vh0.push_back(err.norm_h0);
       vh1.push_back(err.norm_h1);
@@ -227,7 +227,7 @@ namespace DbgSphereFem
         {
           std::cout << " | " << stringify_fp_fix(vh0[k-1]/vh0[k]) << "   " << stringify_fp_fix(vh1[k-1]/vh1[k]);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
     }
     mg_hierarchy->done();

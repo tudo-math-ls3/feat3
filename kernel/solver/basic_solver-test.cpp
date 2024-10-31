@@ -72,7 +72,7 @@ public:
     #endif
 
     // set solver name and plot summary
-    std::cout << std::endl;
+    std::cout << "\n";
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
@@ -387,7 +387,7 @@ public:
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
     // set solver name and plot summary
-    std::cout << std::endl;
+    std::cout << "\n";
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
@@ -611,7 +611,7 @@ public:
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
     // set solver name and plot summary
-    std::cout << std::endl;
+    std::cout << "\n";
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 
@@ -715,7 +715,7 @@ public:
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.5));
 
     // set solver name and plot summary
-    std::cout << std::endl;
+    std::cout << "\n";
     solver.set_plot_name(name);
     solver.set_plot_mode(PlotMode::summary);
 

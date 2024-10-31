@@ -587,7 +587,7 @@ namespace FEAT
             os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">\n";
             for(Index j(0); j < _num_verts; ++j)
             {
-              os << stringify_fp_sci(var.second[j], _var_prec) << std::endl;
+              os << stringify_fp_sci(var.second[j], _var_prec) << "\n";
             }
             os << "</DataArray>\n";
           }
@@ -601,7 +601,7 @@ namespace FEAT
             {
               os << stringify_fp_sci(var.second[3*j+0], _var_prec) << " ";
               os << stringify_fp_sci(var.second[3*j+1], _var_prec) << " ";
-              os << stringify_fp_sci(var.second[3*j+2], _var_prec) << std::endl;
+              os << stringify_fp_sci(var.second[3*j+2], _var_prec) << "\n";
             }
             os << "</DataArray>\n";
           }
@@ -621,7 +621,7 @@ namespace FEAT
               os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">\n";
               for(Index j(0); j < _num_cells; ++j)
               {
-                os << stringify_fp_sci(var.second[j], _var_prec) << std::endl;
+                os << stringify_fp_sci(var.second[j], _var_prec) << "\n";
               }
               os << "</DataArray>\n";
             }
@@ -639,7 +639,7 @@ namespace FEAT
               {
                 os << stringify_fp_sci(var.second[3*j+0], _var_prec) << " ";
                 os << stringify_fp_sci(var.second[3*j+1], _var_prec) << " ";
-                os << stringify_fp_sci(var.second[3*j+2], _var_prec) << std::endl;
+                os << stringify_fp_sci(var.second[3*j+2], _var_prec) << "\n";
               }
               os << "</DataArray>\n";
             }
@@ -662,7 +662,7 @@ namespace FEAT
           {
             os << " 0";
           }
-          os << std::endl;
+          os << "\n";
         }
         os << "</DataArray>\n";
         os << "</Points>\n";
@@ -678,19 +678,19 @@ namespace FEAT
           {
             os << " " << idx(i, VTKShapeType::map(j));
           }
-          os << std::endl;
+          os << "\n";
         }
         os << "</DataArray>\n";
         os << "<DataArray type=\"UInt32\" Name=\"offsets\">\n";
         for(Index i(0); i < _num_cells; ++i)
         {
-          os << ((i+1) * verts_per_cell) << std::endl;
+          os << ((i+1) * verts_per_cell) << "\n";
         }
         os << "</DataArray>\n";
         os << "<DataArray type=\"UInt32\" Name=\"types\">\n";
         for(Index i(0); i < _num_cells; ++i)
         {
-          os << VTKShapeType::type << std::endl;
+          os << VTKShapeType::type << "\n";
         }
         os << "</DataArray>\n";
         os << "</Cells>\n";

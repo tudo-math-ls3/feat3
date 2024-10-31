@@ -139,7 +139,7 @@ public:
 
     // fill a, b and d with random values
     Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
     Random rng(seed);
     for(Index i(0); i < a.used_elements(); ++i)
     {

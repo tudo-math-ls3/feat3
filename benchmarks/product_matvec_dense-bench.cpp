@@ -41,7 +41,7 @@ void run(PreferredBackend backend)
   DenseVector<DT_, Index> r(size, 4711.);
 
   Backend::set_preferred_backend(backend);
-  std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << std::endl;
+  std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << "\n";
 
   double flops(double(x.used_elements()));
   flops *= 2;
@@ -55,7 +55,7 @@ void run(PreferredBackend backend)
   run_bench(func, flops, bytes);
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm2()<<std::endl;
+  std::cout<<"control norm: "<<r.norm2()<<"\n";
 }
 
 int main(int argc, char ** argv)

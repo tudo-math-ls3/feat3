@@ -56,9 +56,9 @@ namespace HFEM_direct
   {
     (void)vref_orig; //disable unused warning
     Backend::set_preferred_backend(backend);
-    std::cout<<"========================================"<<std::endl;
-    std::cout<<"DataType: " << Type::Traits<DT_>::name()<<std::endl;
-    std::cout<<"nrhs: "<<nrhs<<std::endl;
+    std::cout<<"========================================"<<"\n";
+    std::cout<<"DataType: " << Type::Traits<DT_>::name()<<"\n";
+    std::cout<<"nrhs: "<<nrhs<<"\n";
 
     LAFEM::SparseMatrixCSR<DT_, IT_> D;
     D.convert(D_orig);
@@ -136,7 +136,7 @@ namespace HFEM_direct
       /*MemoryPool::synchronize();
       for (Index i(0) ; i < 25 ; ++i)
       {
-        std::cout<<v(i,0) << " " << vref_orig(i)<<std::endl;
+        std::cout<<v(i,0) << " " << vref_orig(i)<<"\n";
       }
       exit(0);*/
 
@@ -184,14 +184,14 @@ namespace HFEM_direct
     {
       norm += w(i,0);
     }
-    std::cout<<"Norm: " << norm << std::endl;*/
+    std::cout<<"Norm: " << norm << "\n";*/
 
     double average(at.elapsed_now() / double(iters-1));
-    std::cout<<"TOE [s]: "<<average<<std::endl;
+    std::cout<<"TOE [s]: "<<average<<"\n";
     double dofs(double((f_orig.size() + g_orig.size() + h_orig.size()) * nrhs));
-    std::cout<<"MDOFs: " << dofs / 1e6 << std::endl;
+    std::cout<<"MDOFs: " << dofs / 1e6 << "\n";
     double dofsps(dofs / average);
-    std::cout<<"MDOF/s: "<<dofsps / 1e6 <<std::endl;
+    std::cout<<"MDOF/s: "<<dofsps / 1e6 <<"\n";
   } // void run_solver
 
   void main(int argc, char* argv[])
@@ -208,9 +208,9 @@ namespace HFEM_direct
     std::deque<std::pair<int,String>> unsupported = args.query_unsupported();
     if(!unsupported.empty())
     {
-      std::cerr << std::endl;
+      std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       Runtime::abort();
     }
 
@@ -270,8 +270,8 @@ namespace HFEM_direct
       }
     }
 
-    std::cout<<"config basename: " << basename<<std::endl;
-    std::cout<<"preloading Data..."<<std::endl;
+    std::cout<<"config basename: " << basename<<"\n";
+    std::cout<<"preloading Data..."<<"\n";
     LAFEM::SparseMatrixCSR<double, Index> D_orig(LAFEM::FileMode::fm_csr, dir_path + "/" + basename + "_D.csr");
     LAFEM::SparseMatrixCSR<double, Index> Dt_orig(LAFEM::FileMode::fm_csr, dir_path + "/" + basename + "_Dt.csr");
     LAFEM::DenseMatrix<double, Index> Atttinvd_orig(LAFEM::FileMode::fm_dm, dir_path + "/" + basename + "_Atttinvd.dm");
@@ -287,11 +287,11 @@ namespace HFEM_direct
     LAFEM::DenseVector<double, Index> g_orig(LAFEM::FileMode::fm_dv, dir_path + "/" + basename + "_g.dv");
     LAFEM::DenseVector<double, Index> h_orig(LAFEM::FileMode::fm_dv, dir_path + "/" + basename + "_h.dv");
     LAFEM::DenseVector<double, Index> vref_orig;//(LAFEM::FileMode::fm_dv, dir_path + "/" + basename + "_vref.dv");
-    std::cout<<"finished"<<std::endl;
-    std::cout<<"datatype selection: "<<sdatatype<<std::endl;
-    std::cout<<"cells: "<<distrib.size()<<std::endl;
-    std::cout<<"blocks: "<<distrib<<std::endl;
-    std::cout<<"Selected backend: " << backend << std::endl;
+    std::cout<<"finished"<<"\n";
+    std::cout<<"datatype selection: "<<sdatatype<<"\n";
+    std::cout<<"cells: "<<distrib.size()<<"\n";
+    std::cout<<"blocks: "<<distrib<<"\n";
+    std::cout<<"Selected backend: " << backend << "\n";
 
     typedef unsigned int IT_;
 

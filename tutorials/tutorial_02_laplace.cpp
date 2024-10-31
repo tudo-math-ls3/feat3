@@ -231,7 +231,7 @@ namespace Tutorial02
   {
     // Create Mesh, Boundary, Trafo and Space
 
-    std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
+    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
 
     // Create the mesh
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
@@ -243,7 +243,7 @@ namespace Tutorial02
 
     // Create Mesh, Boundary, Trafo and Space
 
-    std::cout << "Creating Trafo and Space..." << std::endl;
+    std::cout << "Creating Trafo and Space..." << "\n";
 
     // Let's create a trafo object now.
     TrafoType trafo(mesh);
@@ -254,7 +254,7 @@ namespace Tutorial02
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Allocating matrix and vectors..." << std::endl;
+    std::cout << "Allocating matrix and vectors..." << "\n";
 
     // Allocate matrix and assemble its structure
     MatrixType matrix;
@@ -274,7 +274,7 @@ namespace Tutorial02
     // Choose a cubature rule
     String cubature_name = "auto-degree:5";
 
-    std::cout << "Assembling system matrix..." << std::endl;
+    std::cout << "Assembling system matrix..." << "\n";
 
     // First of all, format the matrix and vector entries to zero.
     matrix.format();
@@ -294,7 +294,7 @@ namespace Tutorial02
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Assembling boundary conditions..." << std::endl;
+    std::cout << "Assembling boundary conditions..." << "\n";
 
     // The next step is the assembly of the inhomogeneous Dirichlet boundary conditions.
     // For this task, we require a Unit-Filter assembler:
@@ -318,7 +318,7 @@ namespace Tutorial02
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition
 
-    std::cout << "Imposing boundary conditions..." << std::endl;
+    std::cout << "Imposing boundary conditions..." << "\n";
 
     // Apply the filter onto the system matrix...
     filter.filter_mat(matrix);
@@ -330,7 +330,7 @@ namespace Tutorial02
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    std::cout << "Solving linear system..." << std::endl;
+    std::cout << "Solving linear system..." << "\n";
 
     // Create a SSOR preconditioner
     auto precond = Solver::new_ssor_precond(PreferredBackend::generic, matrix, filter);
@@ -353,15 +353,15 @@ namespace Tutorial02
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors
 
-    std::cout << "Computing errors against reference solution..." << std::endl;
+    std::cout << "Computing errors against reference solution..." << "\n";
 
     // Compute the error norms:
     auto error_info = Assembly::integrate_error_function<1>(
       domain_assembler, sol_function, vec_sol, space, cubature_name);
 
     // Print the error norms to the console
-    std::cout << "Error Analysis:" << std::endl;
-    std::cout << error_info.print_norms() << std::endl;
+    std::cout << "Error Analysis:" << "\n";
+    std::cout << error_info.print_norms() << "\n";
 
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -372,7 +372,7 @@ namespace Tutorial02
     // First of all, build the filename string
     String vtk_name(String("./tutorial-02-laplace-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
     // project solution and right-hand-side vectors
     VectorType vertex_sol, vertex_rhs;
@@ -390,7 +390,7 @@ namespace Tutorial02
     exporter.write(vtk_name);
 
     // That's it for today.
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   } // void main(...)
 } // namespace Tutorial02
 
@@ -401,7 +401,7 @@ int main(int argc, char* argv[])
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #02: Laplace" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #02: Laplace" << "\n";
 
   // The desired mesh refinement level, defaulted to 3
   Index level(3);
@@ -414,8 +414,8 @@ int main(int argc, char* argv[])
     if(!String(argv[argc-1]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << std::endl;
-      std::cerr << "Note: The last argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << "\n";
+      std::cerr << "Note: The last argument must be a positive integer." << "\n";
       Runtime::abort();
     }
     // parse successful

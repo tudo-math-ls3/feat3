@@ -1323,12 +1323,12 @@ int main(int argc, char* argv[])
   }
   catch(std::exception& e)
   {
-    std::cerr << "ERROR: " << e.what() << std::endl;
+    std::cerr << "ERROR: " << e.what() << "\n";
     FEAT::Runtime::abort();
   }
   catch (...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     FEAT::Runtime::abort();
   }
   return 0;

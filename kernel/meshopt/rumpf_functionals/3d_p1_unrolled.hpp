@@ -172,22 +172,22 @@ namespace FEAT
             //add_grad_det_1_part(grad_det, x, h);
             //add_grad_rec_det_1_part(grad_rec_det, x, h);
 
-            //std::cout << "grad_frobenius"<< std::endl << grad_frobenius << std::endl;
-            //std::cout << "grad_cof"<< std::endl << grad_cof << std::endl;
-            //std::cout << "grad_cof1"<< std::endl << grad_cof1<< std::endl;
-            //std::cout << "grad_cof2"<< std::endl << grad_cof-grad_cof1<< std::endl;
-            //std::cout << "grad_det"<< std::endl << grad_det << std::endl;
-            //std::cout << "grad_rec_det"<< std::endl << grad_rec_det << std::endl;
+            //std::cout << "grad_frobenius"<< "\n" << grad_frobenius << "\n";
+            //std::cout << "grad_cof"<< "\n" << grad_cof << "\n";
+            //std::cout << "grad_cof1"<< "\n" << grad_cof1<< "\n";
+            //std::cout << "grad_cof2"<< "\n" << grad_cof-grad_cof1<< "\n";
+            //std::cout << "grad_det"<< "\n" << grad_det << "\n";
+            //std::cout << "grad_rec_det"<< "\n" << grad_rec_det << "\n";
             //
-            //std::cout << "x = " << std::endl << x << std::endl;
-            //std::cout << "h = " << std::endl << h << std::endl;
+            //std::cout << "x = " << "\n" << x << "\n";
+            //std::cout << "h = " << "\n" << h << "\n";
             //std::cout << "fval = " << stringify_fp_sci(fval) << ", "
             //<< stringify_fp_sci(fval_frobenius)<< ", "
             //<< stringify_fp_sci(fval_cof)<< ", "
             //<< stringify_fp_sci(fval_det) << ", "
-            //<< stringify_fp_sci(fval_rec_det) << std::endl;
+            //<< stringify_fp_sci(fval_rec_det) << "\n";
 
-            //std::cout << "local grad " << std::endl << grad << std::endl;
+            //std::cout << "local grad " << "\n" << grad << "\n";
           }
 
           void eval_fval_cellwise(DataType& fval, const TgradR& DOXY(mat_tensor), const TrafoEvaluator& DOXY(trafo_eval), const SpaceEvaluator& DOXY(space_eval), const Tx& x, const DataType& h, DataType& fval_frobenius, DataType& fval_cof, DataType& fval_det)
@@ -223,7 +223,7 @@ namespace FEAT
 
             fval = fval_frobenius + fval_cof + fval_det;
 
-            //std::cout << "fval = " << stringify_fp_sci(fval) << ", "  << stringify_fp_sci(fval_frobenius)<< ", "  << stringify_fp_sci(fval_det) << ", "  << stringify_fp_sci(fval_rec_det) << std::endl;
+            //std::cout << "fval = " << stringify_fp_sci(fval) << ", "  << stringify_fp_sci(fval_frobenius)<< ", "  << stringify_fp_sci(fval_det) << ", "  << stringify_fp_sci(fval_rec_det) << "\n";
 
           }
 
@@ -265,10 +265,10 @@ namespace FEAT
 
             DataType der_h(frobenius_der_h + cof_der_h + det_der_h + rec_det_der_h);
 
-            //std::cout << "norm_der_h = " << stringify_fp_sci(this->_fac_frobenius*norm_der_h) << std::endl <<
-            //  " det_der_h = " << stringify_fp_sci(this->_fac_det*det_der_h) << std::endl <<
-            //  " rec_det_der_h = " << stringify_fp_sci(this->_fac_rec_det*rec_det_der_h) << std::endl;
-            //std::cout << "full_der_h " << stringify_fp_sci(der_h) <<  std::endl;
+            //std::cout << "norm_der_h = " << stringify_fp_sci(this->_fac_frobenius*norm_der_h) << "\n" <<
+            //  " det_der_h = " << stringify_fp_sci(this->_fac_det*det_der_h) << "\n" <<
+            //  " rec_det_der_h = " << stringify_fp_sci(this->_fac_rec_det*rec_det_der_h) << "\n";
+            //std::cout << "full_der_h " << stringify_fp_sci(der_h) <<  "\n";
 
             for(int i(0); i < Tx::m; ++i)
             {

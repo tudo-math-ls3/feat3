@@ -255,8 +255,8 @@ namespace DbgIsoParam
 
     Cubature::DynamicFactory cubature("gauss-legendre:5");
 
-    std::cout << String(80, '#') << std::endl;
-    std::cout << name << std::endl;
+    std::cout << String(80, '#') << "\n";
+    std::cout << name << "\n";
     //VectorType vec_sol;
     //Assembly::Interpolator::project(vec_sol, sol_function, space);
 
@@ -384,17 +384,17 @@ namespace DbgIsoParam
       run_trafo(err[3], trafo_3, mpart, String("Trafo3 on Level ") + stringify(lvl));
     }
 
-    std::cout << String(80, '#') << std::endl;
-    std::cout << String(80, '#') << std::endl;
-    std::cout << String(80, '#') << std::endl;
+    std::cout << String(80, '#') << "\n";
+    std::cout << String(80, '#') << "\n";
+    std::cout << String(80, '#') << "\n";
 
-    std::cout << "H0 Errors" << std::endl << "     ";
+    std::cout << "H0 Errors" << "\n" << "     ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
     std::cout << "   ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "  ";
-    std::cout << std::endl;
+    std::cout << "\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -409,18 +409,18 @@ namespace DbgIsoParam
           for(int  j(0); j < ns; ++j)
             std::cout << stringify_fp_fix(errs.at(lvl-1)(i,j,0) / errs.at(lvl)(i,j,0), 3, 7);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
 
-    std::cout << "H1 Errors" << std::endl << "     ";
+    std::cout << "H1 Errors" << "\n" << "     ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
     std::cout << "   ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "  ";
-    std::cout << std::endl;
+    std::cout << "\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -435,17 +435,17 @@ namespace DbgIsoParam
           for(int  j(0); j < ns; ++j)
             std::cout << stringify_fp_fix(errs.at(lvl-1)(i,j,1) / errs.at(lvl)(i,j,1), 3, 7);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
-    std::cout << "H2 Errors" << std::endl << "     ";
+    std::cout << "H2 Errors" << "\n" << "     ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
     std::cout << "   ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "  ";
-    std::cout << std::endl;
+    std::cout << "\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -460,7 +460,7 @@ namespace DbgIsoParam
           for(int  j(0); j < ns; ++j)
             std::cout << stringify_fp_fix(errs.at(lvl)(i,j,2) > 0.0 ? errs.at(lvl-1)(i,j,2) / errs.at(lvl)(i,j,2) : 0.0, 3, 7);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
   }
 } // namespace DbgIsoParam

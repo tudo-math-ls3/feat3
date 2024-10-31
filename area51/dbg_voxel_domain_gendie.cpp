@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
   /*if(argc < 2)
   {
-    std::cout << "USAGE: " << argv[0] << " <OFF-file>" << std::endl;
+    std::cout << "USAGE: " << argv[0] << " <OFF-file>" << "\n";
     return 0;
   }*/
 

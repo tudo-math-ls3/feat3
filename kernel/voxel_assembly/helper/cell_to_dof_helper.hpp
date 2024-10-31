@@ -112,17 +112,17 @@ namespace FEAT
         const Index begin = cell*num_loc_dofs;
         const Index end = (cell+1)*num_loc_dofs;
         const Index* loc_map = mapping + begin;
-        std::cout << "Mapping at cell " << cell << std::endl;
+        std::cout << "Mapping at cell " << cell << "\n";
         for(Index i = begin; i < end; ++i)
         {
           std::cout << loc_map[i] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
         for(Index i = begin; i < end; ++i)
         {
           std::cout << sorter[i] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       } //*/
     }
   }

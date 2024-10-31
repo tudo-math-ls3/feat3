@@ -60,8 +60,8 @@ namespace Tutorial01
     if(argc > 1) String(argv[1]).parse(level);
     if(argc > 2) String(argv[2]).parse(cores);
 
-    std::cout << "Level: " << level << std::endl;
-    std::cout << "Cores: " << cores << std::endl;
+    std::cout << "Level: " << level << "\n";
+    std::cout << "Cores: " << cores << "\n";
 
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
 
@@ -94,7 +94,7 @@ namespace Tutorial01
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_op, space, cubature_factory, -4.0);
     watch_1.stop();
 
-    std::cout << "Time 1: " << watch_1.elapsed_string().pad_front(10) << std::endl;
+    std::cout << "Time 1: " << watch_1.elapsed_string().pad_front(10) << "\n";
 
     // create integral assembler
     if(true)
@@ -111,13 +111,13 @@ namespace Tutorial01
       watch_2.start();
       integrator.assemble_master(laplace_job);
       watch_2.stop();
-      std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << "\n";
 
       watch_3.start();
       //integrator.assemble(laplace_job);
       assemble_bilinear_operator_matrix_1(integrator, matrix, laplace_op, space, cub_name);
       watch_3.stop();
-      std::cout << "Time 3: " << watch_3.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 3: " << watch_3.elapsed_string().pad_front(10) << "\n";
     }
 
 
@@ -136,13 +136,13 @@ namespace Tutorial01
       watch_4.start();
       integrator.assemble_master(laplace_job);
       watch_4.stop();
-      std::cout << "Time 4: " << watch_4.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 4: " << watch_4.elapsed_string().pad_front(10) << "\n";
 
       watch_5.start();
       //integrator.assemble(laplace_job);
       assemble_bilinear_operator_matrix_1(integrator, matrix, laplace_op, space, cub_name);
       watch_5.stop();
-      std::cout << "Time 5: " << watch_5.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 5: " << watch_5.elapsed_string().pad_front(10) << "\n";
     }
 
     if(true)
@@ -166,7 +166,7 @@ namespace Tutorial01
       assemble_bilinear_operator_matrix_1(integrator, matrix_b, laplace_op_b, space, cub_name, 1.0);
       assemble_bilinear_operator_matrix_2(integrator, matrix_b, laplace_op_b, space, space, cub_name, -1.0);
       watch_2.stop();
-      std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << std::endl;
+      std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << "\n";
 
       DataType vmax = 0.0;
       auto* val = matrix_b.val();
@@ -174,7 +174,7 @@ namespace Tutorial01
         vmax = Math::max(vmax, Math::abs(val[i].norm_frobenius_sqr()));
       vmax = Math::sqrt(vmax);
 
-      std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << std::endl;
+      std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << "\n";
 
     }
 
@@ -183,7 +183,7 @@ namespace Tutorial01
     for(Index i(0); i < matrix.used_elements(); ++i)
       vmax = Math::max(vmax, Math::abs(val[i]));
 
-    std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << std::endl;
+    std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << "\n";
   } // void main(...)
 } // namespace Tutorial01
 

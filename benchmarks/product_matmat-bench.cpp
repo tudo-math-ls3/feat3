@@ -44,7 +44,7 @@ void run(PreferredBackend backend)
 
   Backend::set_preferred_backend(backend);
 
-  std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << std::endl;
+  std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << "\n";
 
   double flops = 2. * double(x.rows() * x.rows() * r.columns() + r.columns());
   double bytes = 2. * double(x.rows() * x.columns() * y.columns() + r.columns() * r.rows());
@@ -82,7 +82,7 @@ void run(PreferredBackend backend)
   }
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm_frobenius()<<std::endl;
+  std::cout<<"control norm: "<<r.norm_frobenius()<<"\n";
 }
 
 int main(int argc, char ** argv)

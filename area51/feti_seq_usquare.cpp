@@ -239,7 +239,7 @@ namespace FETI{
     // assuming that it is greater than the base-mesh level the generator gave us:
     if(lvl < level)
     {
-      std::cout << "Refining Mesh to Level " + stringify(level) + "..." << std::endl;
+      std::cout << "Refining Mesh to Level " + stringify(level) + "..." << "\n";
 
       for(; lvl < level; ++lvl)
       {
@@ -1330,7 +1330,7 @@ namespace FETI{
       (*it)->neighbour_maxsize = neighbour_maxsize;
     }
 
-    std::cout << "Everything initalized!" << std::endl;
+    std::cout << "Everything initalized!" << "\n";
     for(auto it = domain_vec.begin(); it != domain_vec.end(); ++it)
     {
        (*it)->assemble_BR_columns(domain_vec);

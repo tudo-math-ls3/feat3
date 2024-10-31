@@ -155,7 +155,7 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
     strat = Geometry::PermutationStrategy::geometric_cuthill_mckee_reversed;
   else
   {
-    std::cout << "ERROR: unknown permutation strategy '" << sperm << "'" << std::endl;
+    std::cout << "ERROR: unknown permutation strategy '" << sperm << "'" << "\n";
     return;
   }
 
@@ -163,31 +163,31 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
   switch(strat)
   {
   case Geometry::PermutationStrategy::none:
-    std::cout << "none" << std::endl;
+    std::cout << "none" << "\n";
     break;
   case Geometry::PermutationStrategy::other:
-    std::cout << "other" << std::endl;
+    std::cout << "other" << "\n";
     break;
   case Geometry::PermutationStrategy::random:
-    std::cout << "random" << std::endl;
+    std::cout << "random" << "\n";
     break;
   case Geometry::PermutationStrategy::colored:
-    std::cout << "colored" << std::endl;
+    std::cout << "colored" << "\n";
     break;
   case Geometry::PermutationStrategy::lexicographic:
-    std::cout << "lexicographic" << std::endl;
+    std::cout << "lexicographic" << "\n";
     break;
   case Geometry::PermutationStrategy::cuthill_mckee:
-    std::cout << "algebraic Cuthill-McKee" << std::endl;
+    std::cout << "algebraic Cuthill-McKee" << "\n";
     break;
   case Geometry::PermutationStrategy::cuthill_mckee_reversed:
-    std::cout << "algebraic Cuthill-McKee reversed" << std::endl;
+    std::cout << "algebraic Cuthill-McKee reversed" << "\n";
     break;
   case Geometry::PermutationStrategy::geometric_cuthill_mckee:
-    std::cout << "geometric Cuthill-McKee" << std::endl;
+    std::cout << "geometric Cuthill-McKee" << "\n";
     break;
   case Geometry::PermutationStrategy::geometric_cuthill_mckee_reversed:
-    std::cout << "geometric Cuthill-McKee reversed" << std::endl;
+    std::cout << "geometric Cuthill-McKee reversed" << "\n";
     break;
   default:
     // make picky compilers STFU
@@ -205,19 +205,19 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
   try
 #endif
   {
-    std::cout << "Parsing mesh files..." << std::endl;
+    std::cout << "Parsing mesh files..." << "\n";
     // Now parse the mesh file
     mesh_reader.parse(*node, atlas, nullptr);
   }
 #ifndef DEBUG
   catch(std::exception& exc)
   {
-    std::cerr << "ERROR: " << exc.what() << std::endl;
+    std::cerr << "ERROR: " << exc.what() << "\n";
     return;
   }
   catch(...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     return;
   }
 #endif
@@ -230,7 +230,7 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
   // refine
   for(Index lvl(1); lvl <= lvl_max; ++lvl)
   {
-    std::cout << "Refining up to level " << lvl << "..." << std::endl;
+    std::cout << "Refining up to level " << lvl << "..." << "\n";
     auto coarse = std::move(node);
     node = coarse->refine_unique();
 
@@ -251,9 +251,9 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
 
     // validate coloring/layering
     if(!mesh.validate_element_coloring())
-      std::cout << "WARNING: invalid coloring!" << std::endl;
+      std::cout << "WARNING: invalid coloring!" << "\n";
     if(!mesh.validate_element_layering())
-      std::cout << "WARNING: invalid layering!" << std::endl;
+      std::cout << "WARNING: invalid layering!" << "\n";
 
     VectorType vec_f1, vec_f2;
     prolongate(vec_f1, vec_f2, *fine->get_mesh(), *coarse->get_mesh());
@@ -261,7 +261,7 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
     // Create a VTK exporter for our mesh
     FEAT::String vtkname = filename + "." + stringify(lvl);
 
-    std::cout << "Writing file '" << vtkname << ".vtu'..." << std::endl;
+    std::cout << "Writing file '" << vtkname << ".vtu'..." << "\n";
     Geometry::ExportVTK<Mesh_> exporter(mesh);
 
     process_coloring(exporter, mesh);
@@ -294,14 +294,14 @@ void run(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
     return;
   }
 
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
   {
-    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << std::endl;
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
     return;
   }
 
@@ -324,13 +324,13 @@ void run(int argc, char* argv[])
   // get mesh type
   const String mtype = mesh_reader.get_meshtype_string();
 
-  std::cout << "Mesh Type: " << mtype << std::endl;
+  std::cout << "Mesh Type: " << mtype << "\n";
 
   if(mtype == "conformal:hypercube:2:2") run_xml<H2M2D>(args, mesh_reader, vtk_name); else
   if(mtype == "conformal:hypercube:3:3") run_xml<H3M3D>(args, mesh_reader, vtk_name); else
   if(mtype == "conformal:simplex:2:2") run_xml<S2M2D>(args, mesh_reader, vtk_name); else
   if(mtype == "conformal:simplex:3:3") run_xml<S3M3D>(args, mesh_reader, vtk_name); else
-  std::cout << "ERROR: unsupported mesh type!" << std::endl;
+  std::cout << "ERROR: unsupported mesh type!" << "\n";
 }
 
 int main(int argc, char* argv[])

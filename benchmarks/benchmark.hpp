@@ -41,10 +41,10 @@ namespace FEAT
       func();
       MemoryPool::synchronize();
       double test_run_time(at.elapsed_now());
-      std::cout<<"test time: "<<test_run_time<<std::endl;
+      std::cout<<"test time: "<<test_run_time<<"\n";
       if (test_run_time < 0.1)
         iters = Index(0.1 / test_run_time) + 1;
-      std::cout<<"iters: "<<iters<<std::endl;
+      std::cout<<"iters: "<<iters<<"\n";
 
       std::vector<double> times;
       for (Index i(0) ; i < 10 ; ++i)
@@ -63,21 +63,21 @@ namespace FEAT
       for (auto & time : times)
         mean += time;
       mean /= double(times.size());
-      std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs."<<std::endl;
-      std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<std::endl;
+      std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs."<<"\n";
+      std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<"\n";
       flops *= double(iters);
       flops /= mean;
       flops /= 1000.; // kilo
       flops /= 1000.; // mega
       flops /= 1000.; // giga
-      std::cout<<"GFlop/s: "<<flops<<std::endl;
+      std::cout<<"GFlop/s: "<<flops<<"\n";
       bytes *= double(iters);
       bytes /= mean;
       bytes /= 1024.; // kilo
       bytes /= 1024.; // mega
       bytes /= 1024.; // giga
-      std::cout<<"GByte/s: "<<bytes<<std::endl;
-      std::cout<<"=============================================="<<std::endl;
+      std::cout<<"GByte/s: "<<bytes<<"\n";
+      std::cout<<"=============================================="<<"\n";
     }
   }
 }

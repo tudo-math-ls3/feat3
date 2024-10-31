@@ -107,7 +107,7 @@ public:
     std::shared_ptr<MeshType> mesh;
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
 
-    std::cout << "Q1: Gradient" << std::endl;
+    std::cout << "Q1: Gradient" << "\n";
     mesh = std::make_shared<MeshType>(mesh_factory);
     for(IT_ level = IT_(1); level < level_max; ++level)
     {
@@ -123,9 +123,9 @@ public:
       // test Q1
       test_space(space, level, DataType(level < 11 ? ref_jumps_q1_grad[level] : 0.0));
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
-    std::cout << "Q2: Gradient" << std::endl;
+    std::cout << "Q2: Gradient" << "\n";
     mesh = std::make_shared<MeshType>(mesh_factory);
     for(IT_ level = IT_(1); level < level_max; ++level)
     {
@@ -141,9 +141,9 @@ public:
       // test Q2
       test_space(space, level, DataType(level < 10 ? ref_jumps_q2_grad[level] : 0.0));
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
-    std::cout << "Q1~: Gradient" << std::endl;
+    std::cout << "Q1~: Gradient" << "\n";
     mesh = std::make_shared<MeshType>(mesh_factory);
     for(IT_ level = IT_(1); level < level_max; ++level)
     {
@@ -159,7 +159,7 @@ public:
       // test Q1~
       test_space(space, level, DataType(level < 11 ? ref_jumps_q1t_grad[level] : 0.0));
     }
-    std::cout << std::endl;
+    std::cout << "\n";
   }
 
   template<typename Space_>
@@ -198,7 +198,7 @@ public:
     std::cout << "Level " << stringify(level).pad_front(2) << ": "
       << stringify_fp_sci(jump, 12) << " | "
       << stringify_fp_sci(ref_value, 12) << " | "
-      << stringify_fp_sci(Math::abs(ref_value-jump), 5) << std::endl;
+      << stringify_fp_sci(Math::abs(ref_value-jump), 5) << "\n";
 
     // check
     TEST_CHECK_EQUAL_WITHIN_EPS(jump, ref_value, tol);

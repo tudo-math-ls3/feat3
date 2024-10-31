@@ -1164,21 +1164,21 @@ public:
 
     /////////////////////////
 
-    std::cout<<xb<<std::endl;
+    std::cout<<xb<<"\n";
     a.apply(rb, xb);
     DT_ ref_norm = rb.norm2();
 
     auto a_backup = a.clone(CloneMode::Deep);
 
     Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
     Random rng(seed);
     Adjacency::Permutation perm(a.rows(), rng);
 
     a.permute(perm, perm);
     xb.permute(perm);
 
-    std::cout<<xb<<std::endl;
+    std::cout<<xb<<"\n";
     a.apply(rb, xb);
     DT_ norm = r.norm2();
     TEST_CHECK_RELATIVE(norm, ref_norm, eps);

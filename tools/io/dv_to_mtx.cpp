@@ -16,7 +16,7 @@ int main(int argc, char ** argv)
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   if (argc != 3)
   {
-    std::cout<<"Usage 'dv2mtx dv-file mtx-file'"<<std::endl;
+    std::cout<<"Usage 'dv2mtx dv-file mtx-file'"<<"\n";
     FEAT::Runtime::abort();
   }
 

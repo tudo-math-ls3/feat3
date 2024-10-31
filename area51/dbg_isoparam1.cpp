@@ -307,7 +307,7 @@ namespace DbgIsoParam
       merrs.at(lvl)[3] = calc_mean_dist(trafo_3, mpart, 5);
     }
 
-    std::cout << "Volume Errors" << std::endl;
+    std::cout << "Volume Errors" << "\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -320,11 +320,11 @@ namespace DbgIsoParam
         for(std::size_t i(0); i < ns; ++i)
           std::cout << stringify_fp_fix(verrs.at(lvl-1)[i] / verrs.at(lvl)[i], 3, 8);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
-    std::cout << "Circumference Errors" << std::endl;
+    std::cout << "Circumference Errors" << "\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -337,11 +337,11 @@ namespace DbgIsoParam
         for(std::size_t i(0); i < ns; ++i)
           std::cout << stringify_fp_fix(cerrs.at(lvl-1)[i] / cerrs.at(lvl)[i], 3, 8);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
-    std::cout << "Mean Distance" << std::endl;
+    std::cout << "Mean Distance" << "\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -354,9 +354,9 @@ namespace DbgIsoParam
         for(std::size_t i(0); i < ns; ++i)
           std::cout << stringify_fp_fix(merrs.at(lvl-1)[i] / merrs.at(lvl)[i], 3, 8);
       }
-      std::cout << std::endl;
+      std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 
   }
 } // namespace DbgIsoParam

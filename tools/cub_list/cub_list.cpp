@@ -110,18 +110,18 @@ void print_avail_scalar()
   AvailFunctor functor(names, aliases);
   Scalar::FactoryWrapper::factory(functor);
 
-  std::cout << "Available scalar cubature names:" << std::endl;
+  std::cout << "Available scalar cubature names:" << "\n";
   for(StringSet::iterator it(names.begin()); it != names.end(); ++it)
   {
-    std::cout << *it << std::endl;
+    std::cout << *it << "\n";
   }
 
-  std::cout << std::endl << "Available scalar cubature aliases:" << std::endl;
+  std::cout << "\n" << "Available scalar cubature aliases:" << "\n";
   for(StringMap::iterator it(aliases.begin()); it != aliases.end(); ++it)
   {
-    std::cout << it->first << " [ " << it->second << " ]" << std::endl;
+    std::cout << it->first << " [ " << it->second << " ]" << "\n";
   }
-  std::cout << std::endl;
+  std::cout << "\n";
 }
 
 // Prints the cubature points for a specific scalar cubature rule
@@ -132,12 +132,12 @@ void test_dynamic_scalar(const String& name)
   Scalar::DynamicFactory factory(name);
   if(!factory.create(rule))
   {
-    std::cout << "ERROR: No scalar cubature rule named '" << name << "' found!" << std::endl;
+    std::cout << "ERROR: No scalar cubature rule named '" << name << "' found!" << "\n";
     return;
   }
 
   // print output
-  std::cout << "\nPrinting scalar cubature rule '" << rule.get_name() << "':" << std::endl;
+  std::cout << "\nPrinting scalar cubature rule '" << rule.get_name() << "':" << "\n";
   printf("      Weight          Coord\n");
   for(int i(0); i < rule.get_num_points(); ++i)
   {
@@ -154,18 +154,18 @@ void print_avail()
   AvailFunctor functor(names, aliases);
   FactoryWrapper<Shape_>::factory_no_refine(functor);
 
-  std::cout << "Available cubature names for '" << Shape_::name() << "' :" << std::endl;
+  std::cout << "Available cubature names for '" << Shape_::name() << "' :" << "\n";
   for(StringSet::iterator it(names.begin()); it != names.end(); ++it)
   {
-    std::cout << *it << std::endl;
+    std::cout << *it << "\n";
   }
 
-  std::cout << std::endl << "Available cubature aliases for '" << Shape_::name() << "' :" << std::endl;
+  std::cout << "\n" << "Available cubature aliases for '" << Shape_::name() << "' :" << "\n";
   for(StringMap::iterator it(aliases.begin()); it != aliases.end(); ++it)
   {
-    std::cout << it->first << " [ " << it->second << " ]" << std::endl;
+    std::cout << it->first << " [ " << it->second << " ]" << "\n";
   }
-  std::cout << std::endl;
+  std::cout << "\n";
 }
 
 // Prints the auto-degree aliases for a specific shape
@@ -174,10 +174,10 @@ void print_auto_degree()
 {
   int max_degree = AutoAlias<Shape_>::max_auto_degree;
 
-  std::cout << "\nPrinting auto-degree mappings for '" << Shape_::name() << "':" << std::endl;
+  std::cout << "\nPrinting auto-degree mappings for '" << Shape_::name() << "':" << "\n";
   for(int i(1); i <= max_degree; ++i)
   {
-    std::cout << "auto-degree:" << i << " -> " << AutoAlias<Shape_>::map("auto-degree:" + stringify(i)) << std::endl;
+    std::cout << "auto-degree:" << i << " -> " << AutoAlias<Shape_>::map("auto-degree:" + stringify(i)) << "\n";
   }
 }
 
@@ -195,12 +195,12 @@ void test_dynamic(const String& name)
   Rule<Shape_> rule;
   if(!DynamicFactory::create(rule, name))
   {
-    std::cout << "ERROR: No " + Shape_::name() + " cubature rule named '" << name << "' found!" << std::endl;
+    std::cout << "ERROR: No " + Shape_::name() + " cubature rule named '" << name << "' found!" << "\n";
     return;
   }
 
   // print output
-  std::cout << "\nPrinting " + Shape_::name() + " cubature rule '" << rule.get_name() << "':" << std::endl;
+  std::cout << "\nPrinting " + Shape_::name() + " cubature rule '" << rule.get_name() << "':" << "\n";
   printf("      Weight          X-Coord");
   if(Shape_::dimension >= 2)
     printf("         Y-Coord");
@@ -235,73 +235,73 @@ int main(int argc, char* argv[])
   if(argc < 2)
   {
     // print help message
-    std::cout << "FEAT Dynamic Cubature List Tool" << std::endl << std::endl;
+    std::cout << "FEAT Dynamic Cubature List Tool" << "\n" << "\n";
     //            ---------1---------2---------3---------4---------5---------6---------7---------8
     //            123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
-    std::cout << "This tool can be used to display and debug all cubature rules currently" << std::endl;
-    std::cout << "supported by the FEAT::Cubature::DynamicFactory class." << std::endl;
-    std::cout << std::endl;
-    std::cout << "    USAGE:    cub-list <shape> [<name>]" << std::endl;
-    std::cout << std::endl;
-    std::cout << "where <shape> is either 's1', 's2', 's3', 'h1', 'h2' or 'h3' identifying the" << std::endl;
-    std::cout << "Simplex<n> or Hypercube<n> shape. Moreover, 'scalar' will refer to scalar rules." << std::endl;
-    std::cout << std::endl;
-    std::cout << "If both arguments are given, this tool will print out the weights and point" << std::endl;
-    std::cout << "coordinates of the cubature rule identified by <name>." << std::endl;
-    std::cout << std::endl;
-    std::cout << "If only the first argument is given, this tool will print a list of all" << std::endl;
-    std::cout << "available cubature rule names for the specified shape, including its aliases." << std::endl;
-    std::cout << "If <shape> is 'all', this tools prints out the cubature rules for all shapes." << std::endl;
-    std::cout << std::endl << std::endl;
-    std::cout << "Further information:" << std::endl;
-    std::cout << "--------------------" << std::endl;
-    std::cout << "There are two types of cubature rules: variadic and non-variadic ones." << std::endl;
-    std::cout << "A variaric cubature rule is parameterized in the number of desired cubature" << std::endl;
-    std::cout << "points. In this case the point-count parameter is appended by a colon to the" << std::endl;
-    std::cout << "cubature rule name; e.g. 'gauss-legendre:3', identifies the 3-point" << std::endl;
-    std::cout << "Gauss-Legendre rule." << std::endl;
-    std::cout << "For variadic cubature rules, this tool appends the minimum and maximum" << std::endl;
-    std::cout << "point count to the rule name, e.g. 'gauss-legendre:<1-5>' means that the" << std::endl;
-    std::cout << "DynamicFactory can generate Gauss-Legendre rules for at least 1 and at most" << std::endl;
-    std::cout << "5 points." << std::endl;
-    std::cout << std::endl;
-    std::cout << "For the Simplex<1> shape, cubature rules, which are generated from scalar rules," << std::endl;
-    std::cout << "are prefixed by 'scalar:'. For Hypercube<n> shapes, the prefix 'tensor:' states" << std::endl;
-    std::cout << "that the cubature rule is generated by a tensor-product of a scalar rule." << std::endl;
-    std::cout << "The 'scalar:' and 'tensor:' prefixes must not be used for the DynamicFactory" << std::endl;
-    std::cout << "by applications; these prefixes are only used by this tool for convenience." << std::endl;
-    std::cout << std::endl;
-    std::cout << "Several cubature rules have aliases, i.e. one and the same cubature rule may" << std::endl;
-    std::cout << "be identified by several names. This tool lists all available aliases and" << std::endl;
-    std::cout << "appends the 'real' name in square brackets. Example: The output line" << std::endl;
-    std::cout << "   simpson [ newton-cotes-closed:3 ]" << std::endl;
-    std::cout << "indicates that 'simpson' is an alias for the rule 'newton-cotes-closed:3'." << std::endl;
-    std::cout << std::endl << std::endl;
-    std::cout << "Automatic Rules:" << std::endl;
-    std::cout << "----------------" << std::endl;
-    std::cout << "In addition to the actual cubature rules and their aliases, there exist aliases" << std::endl;
-    std::cout << "called 'auto-aliased rules'. These auto-aliases are implemented for each shape" << std::endl;
-    std::cout << "and will try to select the most appropriate cubature rule fulfilling the desired" << std::endl;
-    std::cout << "requirements, if possible." << std::endl;
-    std::cout << std::endl;
-    std::cout << "Currently, the only supported auto-aliased rule is the 'auto-degree:<d>' alias," << std::endl;
-    std::cout << "which refers to the least-point inner cubature rule capable of integrating" << std::endl;
-    std::cout << "polynomials up to degree <d> exactly or to the highest-order cubature rule" << std::endl;
-    std::cout << "available if no exact cubature rule is available. Example: the 'auto-degree:2'" << std::endl;
-    std::cout << "alias refers to 'tensor:gauss-legendre:2' for Hypercube<n> shapes." << std::endl;
-    std::cout << std::endl;
-    std::cout << "A list of all auto-degree mappings supported by a shape can be printed by" << std::endl;
-    std::cout << "specifying 'auto-degree' as the cubature name, e.g. the command" << std::endl;
-    std::cout << "   cub-list h2 auto-degree" << std::endl;
-    std::cout << "will print all auto-degree aliases for quadrilaterals." << std::endl;
-    std::cout << std::endl << std::endl;
-    std::cout << "Refined Rules:" << std::endl;
-    std::cout << "--------------" << std::endl;
-    std::cout << "Each Simplex and Hypercube cubature rule may also be refined by prefixing the" << std::endl;
-    std::cout << "cubature name by 'refine*n:', where 'n' is a positive integer specifying the" << std::endl;
-    std::cout << "desired number of refinement steps. This allows to generate cubature rules of" << std::endl;
-    std::cout << "higher precision (but not higher order) from other cubature rules." << std::endl;
-    std::cout << "Note: 'refine:' is identical to 'refine*1:'." << std::endl;
+    std::cout << "This tool can be used to display and debug all cubature rules currently" << "\n";
+    std::cout << "supported by the FEAT::Cubature::DynamicFactory class." << "\n";
+    std::cout << "\n";
+    std::cout << "    USAGE:    cub-list <shape> [<name>]" << "\n";
+    std::cout << "\n";
+    std::cout << "where <shape> is either 's1', 's2', 's3', 'h1', 'h2' or 'h3' identifying the" << "\n";
+    std::cout << "Simplex<n> or Hypercube<n> shape. Moreover, 'scalar' will refer to scalar rules." << "\n";
+    std::cout << "\n";
+    std::cout << "If both arguments are given, this tool will print out the weights and point" << "\n";
+    std::cout << "coordinates of the cubature rule identified by <name>." << "\n";
+    std::cout << "\n";
+    std::cout << "If only the first argument is given, this tool will print a list of all" << "\n";
+    std::cout << "available cubature rule names for the specified shape, including its aliases." << "\n";
+    std::cout << "If <shape> is 'all', this tools prints out the cubature rules for all shapes." << "\n";
+    std::cout << "\n" << "\n";
+    std::cout << "Further information:" << "\n";
+    std::cout << "--------------------" << "\n";
+    std::cout << "There are two types of cubature rules: variadic and non-variadic ones." << "\n";
+    std::cout << "A variaric cubature rule is parameterized in the number of desired cubature" << "\n";
+    std::cout << "points. In this case the point-count parameter is appended by a colon to the" << "\n";
+    std::cout << "cubature rule name; e.g. 'gauss-legendre:3', identifies the 3-point" << "\n";
+    std::cout << "Gauss-Legendre rule." << "\n";
+    std::cout << "For variadic cubature rules, this tool appends the minimum and maximum" << "\n";
+    std::cout << "point count to the rule name, e.g. 'gauss-legendre:<1-5>' means that the" << "\n";
+    std::cout << "DynamicFactory can generate Gauss-Legendre rules for at least 1 and at most" << "\n";
+    std::cout << "5 points." << "\n";
+    std::cout << "\n";
+    std::cout << "For the Simplex<1> shape, cubature rules, which are generated from scalar rules," << "\n";
+    std::cout << "are prefixed by 'scalar:'. For Hypercube<n> shapes, the prefix 'tensor:' states" << "\n";
+    std::cout << "that the cubature rule is generated by a tensor-product of a scalar rule." << "\n";
+    std::cout << "The 'scalar:' and 'tensor:' prefixes must not be used for the DynamicFactory" << "\n";
+    std::cout << "by applications; these prefixes are only used by this tool for convenience." << "\n";
+    std::cout << "\n";
+    std::cout << "Several cubature rules have aliases, i.e. one and the same cubature rule may" << "\n";
+    std::cout << "be identified by several names. This tool lists all available aliases and" << "\n";
+    std::cout << "appends the 'real' name in square brackets. Example: The output line" << "\n";
+    std::cout << "   simpson [ newton-cotes-closed:3 ]" << "\n";
+    std::cout << "indicates that 'simpson' is an alias for the rule 'newton-cotes-closed:3'." << "\n";
+    std::cout << "\n" << "\n";
+    std::cout << "Automatic Rules:" << "\n";
+    std::cout << "----------------" << "\n";
+    std::cout << "In addition to the actual cubature rules and their aliases, there exist aliases" << "\n";
+    std::cout << "called 'auto-aliased rules'. These auto-aliases are implemented for each shape" << "\n";
+    std::cout << "and will try to select the most appropriate cubature rule fulfilling the desired" << "\n";
+    std::cout << "requirements, if possible." << "\n";
+    std::cout << "\n";
+    std::cout << "Currently, the only supported auto-aliased rule is the 'auto-degree:<d>' alias," << "\n";
+    std::cout << "which refers to the least-point inner cubature rule capable of integrating" << "\n";
+    std::cout << "polynomials up to degree <d> exactly or to the highest-order cubature rule" << "\n";
+    std::cout << "available if no exact cubature rule is available. Example: the 'auto-degree:2'" << "\n";
+    std::cout << "alias refers to 'tensor:gauss-legendre:2' for Hypercube<n> shapes." << "\n";
+    std::cout << "\n";
+    std::cout << "A list of all auto-degree mappings supported by a shape can be printed by" << "\n";
+    std::cout << "specifying 'auto-degree' as the cubature name, e.g. the command" << "\n";
+    std::cout << "   cub-list h2 auto-degree" << "\n";
+    std::cout << "will print all auto-degree aliases for quadrilaterals." << "\n";
+    std::cout << "\n" << "\n";
+    std::cout << "Refined Rules:" << "\n";
+    std::cout << "--------------" << "\n";
+    std::cout << "Each Simplex and Hypercube cubature rule may also be refined by prefixing the" << "\n";
+    std::cout << "cubature name by 'refine*n:', where 'n' is a positive integer specifying the" << "\n";
+    std::cout << "desired number of refinement steps. This allows to generate cubature rules of" << "\n";
+    std::cout << "higher precision (but not higher order) from other cubature rules." << "\n";
+    std::cout << "Note: 'refine:' is identical to 'refine*1:'." << "\n";
     return 0;
   }
 
@@ -322,7 +322,7 @@ int main(int argc, char* argv[])
     else if(String(argv[1]).compare_no_case("h3") == 0)
       test_dynamic< Shape::Hypercube<3> >(argv[2]);
     else
-      std::cout << "ERROR: Unknown Shape '" << argv[1] << "'" << std::endl;
+      std::cout << "ERROR: Unknown Shape '" << argv[1] << "'" << "\n";
   }
   else
   {
@@ -343,7 +343,7 @@ int main(int argc, char* argv[])
     else if(String(argv[1]).compare_no_case("h3") == 0)
       print_avail< Shape::Hypercube<3> >();
     else
-      std::cout << "ERROR: Unknown Shape '" << argv[1] << "'" << std::endl;
+      std::cout << "ERROR: Unknown Shape '" << argv[1] << "'" << "\n";
   }
 
   return 0;

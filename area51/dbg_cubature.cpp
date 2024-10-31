@@ -248,12 +248,12 @@ namespace DbgCubature
     args.parse("tol", tol);
 
 
-    std::cout << "Shape...: " << Shape_::name() << std::endl;
-    std::cout << "DataType: " << Type::Traits<DataType>::name() << std::endl;
-    std::cout << "Level...: " << level << std::endl;
-    std::cout << "Disto...: " << disto << std::endl;
-    std::cout << "Degree..: " << degree << std::endl;
-    std::cout << "Tol.....: " << tol << std::endl;
+    std::cout << "Shape...: " << Shape_::name() << "\n";
+    std::cout << "DataType: " << Type::Traits<DataType>::name() << "\n";
+    std::cout << "Level...: " << level << "\n";
+    std::cout << "Disto...: " << disto << "\n";
+    std::cout << "Degree..: " << degree << "\n";
+    std::cout << "Tol.....: " << tol << "\n";
 
     // create mesh
     Geometry::RefinedUnitCubeFactory<MeshType> factory(level);
@@ -263,13 +263,13 @@ namespace DbgCubature
     TrafoType trafo(mesh);
 
     const Index num_elems = mesh.get_num_elements();
-    std::cout << "Elements: " << num_elems << std::endl;
-    std::cout << std::endl;
+    std::cout << "Elements: " << num_elems << "\n";
+    std::cout << "\n";
 
     // create cubature rule
     String cub_rule;
     args.parse("rule", cub_rule);
-    std::cout << "Rule Name Given.: " << cub_rule << std::endl;
+    std::cout << "Rule Name Given.: " << cub_rule << "\n";
 
     // create cubature factory
     Cubature::DynamicFactory cubature_factory(cub_rule);
@@ -282,13 +282,13 @@ namespace DbgCubature
     }
     catch(std::exception& e)
     {
-      std::cout << "ERROR: Failed to create cubature rule" << std::endl;
-      std::cout << e.what() << std::endl;
+      std::cout << "ERROR: Failed to create cubature rule" << "\n";
+      std::cout << e.what() << "\n";
       return;
     }
-    std::cout << "Rule Name Mapped: " << cubature.get_name() << std::endl;
-    std::cout << "Number of Points: " << cubature.get_num_points() << std::endl;
-    std::cout << std::endl;
+    std::cout << "Rule Name Mapped: " << cubature.get_name() << "\n";
+    std::cout << "Number of Points: " << cubature.get_num_points() << "\n";
+    std::cout << "\n";
 
 
     // build powers vector
@@ -328,7 +328,7 @@ namespace DbgCubature
     int max_degree = degree;
 
     std::cout << "  Monomial" << String(6*dim-8, ' ');
-    std::cout << "Deg   Cubature       Exact          Relative Error" << std::endl;
+    std::cout << "Deg   Cubature       Exact          Relative Error" << "\n";
 
     // loop over all monomials
     for(std::size_t imono(0u); imono < powers.size(); ++imono)
@@ -356,11 +356,11 @@ namespace DbgCubature
         max_degree = Math::min(max_degree, deg-1);
       }
 
-      std::cout << std::endl;
+      std::cout << "\n";
     }
 
-    std::cout << std::endl;
-    std::cout << "Maximum Exact Degree: " << max_degree << std::endl;
+    std::cout << "\n";
+    std::cout << "Maximum Exact Degree: " << max_degree << "\n";
 
     // number of cubature points
   }
@@ -379,20 +379,20 @@ namespace DbgCubature
     std::deque<std::pair<int,String>> unsupported = args.query_unsupported();
     if(!unsupported.empty())
     {
-      std::cerr << std::endl;
+      std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       return;
     }
 
     if(args.check("shape") <= 0)
     {
-      std::cout << "ERROR: mandatory shape parameter '--shape <shape>' is missing!" << std::endl;
-      std::cout << "Valid shape parameters are:" << std::endl;
-      std::cout << "s2         Simplex<2>" << std::endl;
-      std::cout << "s3         Simplex<3>" << std::endl;
-      std::cout << "h2         Hypercube<2>" << std::endl;
-      std::cout << "h3         Hypercube<3>" << std::endl;
+      std::cout << "ERROR: mandatory shape parameter '--shape <shape>' is missing!" << "\n";
+      std::cout << "Valid shape parameters are:" << "\n";
+      std::cout << "s2         Simplex<2>" << "\n";
+      std::cout << "s3         Simplex<3>" << "\n";
+      std::cout << "h2         Hypercube<2>" << "\n";
+      std::cout << "h3         Hypercube<3>" << "\n";
       return;
     }
 
@@ -403,12 +403,12 @@ namespace DbgCubature
     if(shape.compare_no_case("h2") == 0) run<Shape::Hypercube<2>>(args); else
     if(shape.compare_no_case("h3") == 0) run<Shape::Hypercube<3>>(args); else
     {
-      std::cout << "ERROR: Failed to parse '" << shape << "' as shape parameter" << std::endl;
-      std::cout << "Valid shape parameters are:" << std::endl;
-      std::cout << "s2         Simplex<2>" << std::endl;
-      std::cout << "s3         Simplex<3>" << std::endl;
-      std::cout << "h2         Hypercube<2>" << std::endl;
-      std::cout << "h3         Hypercube<3>" << std::endl;
+      std::cout << "ERROR: Failed to parse '" << shape << "' as shape parameter" << "\n";
+      std::cout << "Valid shape parameters are:" << "\n";
+      std::cout << "s2         Simplex<2>" << "\n";
+      std::cout << "s3         Simplex<3>" << "\n";
+      std::cout << "h2         Hypercube<2>" << "\n";
+      std::cout << "h3         Hypercube<3>" << "\n";
       return;
     }
   }

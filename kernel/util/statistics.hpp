@@ -560,90 +560,90 @@ namespace FEAT
           struct tm * ts = localtime(&t);
 
           file << "timestamp " << stringify(ts->tm_mon + 1) << "/" << stringify(ts->tm_mday) << "/" << stringify(ts->tm_year + 1900) << " " << stringify(ts->tm_hour)
-            << ":" << stringify(ts->tm_min) << ":" << stringify(ts->tm_sec) << std::endl;
+            << ":" << stringify(ts->tm_min) << ":" << stringify(ts->tm_sec) << "\n";
         }
 
-        file << std::endl;
+        file << "\n";
 
-        file << "#global time" << std::endl;
-        file << "partition " << stringify(toe_partition) << std::endl;
-        file << "assembly " << stringify(toe_assembly) << std::endl;
-        file << "solve " << stringify(toe_solve) << std::endl;
+        file << "#global time" << "\n";
+        file << "partition " << stringify(toe_partition) << "\n";
+        file << "assembly " << stringify(toe_assembly) << "\n";
+        file << "solve " << stringify(toe_solve) << "\n";
 
-        file << std::endl;
+        file << "\n";
 
-        file << "#solver time" << std::endl;
-        file << "reduction " << stringify(get_time_reduction()) << std::endl;
-        file << "axpy " << stringify(get_time_axpy()) << std::endl;
-        file << "blas2 " << stringify(get_time_blas2()) << std::endl;
-        file << "precon " << stringify(get_time_precon()) << std::endl;
-        file << "mpi " << stringify(get_time_mpi_execute()) << std::endl;
-        file << "wait reduction" << stringify(get_time_mpi_wait_reduction()) << std::endl;
-        file << "wait blas2" << stringify(get_time_mpi_wait_blas2()) << std::endl;
+        file << "#solver time" << "\n";
+        file << "reduction " << stringify(get_time_reduction()) << "\n";
+        file << "axpy " << stringify(get_time_axpy()) << "\n";
+        file << "blas2 " << stringify(get_time_blas2()) << "\n";
+        file << "precon " << stringify(get_time_precon()) << "\n";
+        file << "mpi " << stringify(get_time_mpi_execute()) << "\n";
+        file << "wait reduction" << stringify(get_time_mpi_wait_reduction()) << "\n";
+        file << "wait blas2" << stringify(get_time_mpi_wait_blas2()) << "\n";
 
-        file << std::endl;
+        file << "\n";
 
-        file << "#global size" << std::endl;
-        file << "domain " << stringify(domain_bytes) << std::endl;
-        file << "mpi " << stringify(mpi_bytes) << std::endl;
-        file << "la " << stringify(la_bytes) << std::endl;
+        file << "#global size" << "\n";
+        file << "domain " << stringify(domain_bytes) << "\n";
+        file << "mpi " << stringify(mpi_bytes) << "\n";
+        file << "la " << stringify(la_bytes) << "\n";
 
-        file << std::endl;
+        file << "\n";
 
-        file <<"#problem size" << std::endl;
-        file << "cells " << stringify(cells) << std::endl;
-        file << "dofs " << stringify(dofs) << std::endl;
-        file << "nzes " << stringify(nzes) << std::endl;
+        file <<"#problem size" << "\n";
+        file << "cells " << stringify(cells) << "\n";
+        file << "dofs " << stringify(dofs) << "\n";
+        file << "nzes " << stringify(nzes) << "\n";
 
-        file << std::endl;
+        file << "\n";
 
-        file << "#solver statistics" << std::endl;
+        file << "#solver statistics" << "\n";
         for (auto stat : _solver_statistics)
         {
-          file << stat.first << std::endl;
+          file << stat.first << "\n";
 
-          file << "#defects" << std::endl;
+          file << "#defects" << "\n";
           for (Index i(0) ; i < stat.second.defect.size() ; ++i)
           {
             if (i == 0 && stat.second.defect.at(i) == double(-1))
               continue;
             if (stat.second.defect.at(i) == double(-1))
-              file << "-" << std::endl;
+              file << "-" << "\n";
             else
-              file << stringify_fp_sci(stat.second.defect.at(i)) << std::endl;
+              file << stringify_fp_sci(stat.second.defect.at(i)) << "\n";
           }
 
-          file << "#toe" << std::endl;
+          file << "#toe" << "\n";
           for (Index i(0) ; i < stat.second.toe.size() ; ++i)
           {
             if (i == 0 && stat.second.toe.at(i) == double(-1))
               continue;
             if (stat.second.toe.at(i) == double(-1))
-              file << "-" << std::endl;
+              file << "-" << "\n";
             else
-              file << stringify_fp_sci(stat.second.toe.at(i)) << std::endl;
+              file << stringify_fp_sci(stat.second.toe.at(i)) << "\n";
           }
 
-          file << "#mpi_execute" << std::endl;
+          file << "#mpi_execute" << "\n";
           for (Index i(0) ; i < stat.second.mpi_execute.size() ; ++i)
           {
             if (i == 0 && stat.second.mpi_execute.at(i) == double(-1))
               continue;
             if (stat.second.mpi_execute.at(i) == double(-1))
-              file << "-" << std::endl;
+              file << "-" << "\n";
             else
-              file << stringify_fp_sci(stat.second.mpi_execute.at(i)) << std::endl;
+              file << stringify_fp_sci(stat.second.mpi_execute.at(i)) << "\n";
           }
 
-          file << "#mpi_wait" << std::endl;
+          file << "#mpi_wait" << "\n";
           for (Index i(0) ; i < stat.second.mpi_wait.size() ; ++i)
           {
             if (i == 0 && stat.second.mpi_wait.at(i) == double(-1))
               continue;
             if (stat.second.mpi_wait.at(i) == double(-1))
-              file << "-" << std::endl;
+              file << "-" << "\n";
             else
-              file << stringify_fp_sci(stat.second.mpi_wait.at(i)) << std::endl;
+              file << stringify_fp_sci(stat.second.mpi_wait.at(i)) << "\n";
           }
         }
 

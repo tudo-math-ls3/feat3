@@ -219,7 +219,7 @@ namespace Tutorial07
   {
     // As usual, create a mesh and the corresponding boundary mesh-part first.
 
-    std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
+    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
 
     // Create the mesh
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
@@ -232,7 +232,7 @@ namespace Tutorial07
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Trafo and Finite Element Space initialization
 
-    std::cout << "Creating Trafo and Spaces..." << std::endl;
+    std::cout << "Creating Trafo and Spaces..." << "\n";
 
     // Create the trafo
     TrafoType trafo(mesh);
@@ -243,7 +243,7 @@ namespace Tutorial07
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
-    std::cout << "Allocating matrix and vectors..." << std::endl;
+    std::cout << "Allocating matrix and vectors..." << "\n";
 
     // As usual, we create first an empty matrix.
     SystemMatrixType matrix;
@@ -318,7 +318,7 @@ namespace Tutorial07
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Assembling boundary conditions..." << std::endl;
+    std::cout << "Assembling boundary conditions..." << "\n";
 
     // Now we have to assemble the boundary condition filters, which is also performed by
     // assembling the individual parts of the system filter. So, first of all, let us create
@@ -369,7 +369,7 @@ namespace Tutorial07
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition
 
-    std::cout << "Imposing boundary conditions..." << std::endl;
+    std::cout << "Imposing boundary conditions..." << "\n";
 
     // As usual, apply the filter onto the initial solution and right-hand-side vectors:
     filter.filter_rhs(vec_rhs);
@@ -403,7 +403,7 @@ namespace Tutorial07
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    std::cout << "Solving linear system..." << std::endl;
+    std::cout << "Solving linear system..." << "\n";
 
     // We have to set up a linear solver now. As we a dealing with a non-scalar system of the form
     // of a saddle-point system here, our choice of solvers and preconditioners is significantly
@@ -474,7 +474,7 @@ namespace Tutorial07
     // for a change here, so let us analyze the velocity field, i.e. compute various quantities
     // from our field: divergence, vorticity and its H0/H1-norms.
 
-    std::cout << std::endl << "Performing velocity field analysis..." << std::endl;
+    std::cout << "\n" << "Performing velocity field analysis..." << "\n";
 
     // The class that performs this analysis is the "VelocityAnalyser" and it returns a
     // "VelicityInfo" object of the appropriate datatype and dimension:
@@ -486,7 +486,7 @@ namespace Tutorial07
 
     // Just as the "ScalarErrorInfo", that is returned by the "ScalarErrorComputer", we can now
     // simply push the velo_info object to cout:
-    std::cout << velo_info << std::endl;
+    std::cout << velo_info << "\n";
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
@@ -494,7 +494,7 @@ namespace Tutorial07
     // First of all, build the filename string
     String vtk_name(String("./tutorial-07-stokes-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
     // Create a VTK exporter for our mesh
     Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -524,7 +524,7 @@ namespace Tutorial07
     exporter.write(vtk_name);
 
     // That's all, folks.
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   } // int main(...)
 } // namespace Tutorial07
 
@@ -535,7 +535,7 @@ int main(int argc, char* argv[])
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #07: Stokes" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #07: Stokes" << "\n";
 
   // Specify the desired mesh refinement level, defaulted to 3.
   // Note that FEAT uses its own "Index" type rather than a wild mixture of int, uint, long
@@ -552,19 +552,19 @@ int main(int argc, char* argv[])
     if(!String(argv[argc-1]).parse(ilevel) || (ilevel < 1))
     {
       // Failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << std::endl;
-      std::cerr << "Note: The last argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << "\n";
+      std::cerr << "Note: The last argument must be a positive integer." << "\n";
       // Abort our runtime environment
       Runtime::abort();
     }
     // If parsing was successful, use the given information and notify the user
     level = Index(ilevel);
-    std::cout << "Refinement level: " << level << std::endl;
+    std::cout << "Refinement level: " << level << "\n";
   }
   else
   {
     // No command line parameter given, so inform the user that defaults are used
-    std::cout << "Refinement level (default): " << level << std::endl;
+    std::cout << "Refinement level (default): " << level << "\n";
   }
 
   // call the tutorial's main function

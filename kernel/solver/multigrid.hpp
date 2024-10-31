@@ -1490,7 +1490,7 @@ namespace FEAT
           //std::cout << " >";
           //for(std::size_t i(0); i <= std::size_t(top_lvl); ++i)
           //  std::cout << " " << _counters[i];
-          //std::cout << std::endl;
+          //std::cout << "\n";
           // <<<<< DEBUG <<<<<
 
           // prolongate to current peak-level without post-smoothing

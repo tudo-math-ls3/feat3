@@ -363,7 +363,7 @@ void Statistics::print_solver_expressions()
       case Solver::ExpressionType::start_solve:
         {
           String s = stringify(expression->get_type()) + "[" + expression->solver_name + "]";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           padding += 2;
           break;
         }
@@ -371,7 +371,7 @@ void Statistics::print_solver_expressions()
         {
           auto t = dynamic_cast<Solver::ExpressionEndSolve*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + stringify(t->status) + " / " + stringify(t->iters) + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           padding -= 2;
           break;
         }
@@ -379,95 +379,95 @@ void Statistics::print_solver_expressions()
         {
           auto t = dynamic_cast<Solver::ExpressionDefect*>(expression.get());
           String s = stringify(t->get_type()) + "[" + stringify(t->solver_name) + "] (" + stringify(t->def) + " / " + stringify(t->iter) + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_precond:
         {
           auto t = dynamic_cast<Solver::ExpressionCallPrecond*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + t->precond_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_precond_l:
         {
           auto t = dynamic_cast<Solver::ExpressionCallPrecondL*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + t->precond_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_precond_r:
         {
           auto t = dynamic_cast<Solver::ExpressionCallPrecondR*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + t->precond_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_smoother:
         {
           auto t = dynamic_cast<Solver::ExpressionCallSmoother*>(expression.get());
           String s = stringify(t->get_type()) + "[" + stringify(t->solver_name) + "] (" + t->smoother_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_coarse_solver:
         {
           auto t = dynamic_cast<Solver::ExpressionCallCoarseSolver*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + t->coarse_solver_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::prol:
         {
           auto t = dynamic_cast<Solver::ExpressionProlongation*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + stringify(t->level) + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::rest:
         {
           auto t = dynamic_cast<Solver::ExpressionRestriction*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + stringify(t->level) + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::timings:
         {
           auto t = dynamic_cast<Solver::ExpressionTimings*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + stringify(t->solver_toe) + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::level_timings:
         {
           auto t = dynamic_cast<Solver::ExpressionLevelTimings*>(expression.get());
           String s = stringify(t->get_type()) + "[" + t->solver_name + "] (" + stringify(t->level) + " / " + stringify(t->level_toe) + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_uzawa_s:
         {
           auto t = dynamic_cast<Solver::ExpressionCallUzawaS*>(expression.get());
           String s = stringify(t->get_type()) + "[" + stringify(t->solver_name) + "] (" + t->solver_s_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       case Solver::ExpressionType::call_uzawa_a:
         {
           auto t = dynamic_cast<Solver::ExpressionCallUzawaA*>(expression.get());
           String s = stringify(t->get_type()) + "[" + stringify(t->solver_name) + "] (" + t->solver_a_name + ")";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
       default:
         {
           String s = stringify(expression->get_type()) + "[" + expression->solver_name + "]";
-          std::cout<<String(padding, ' ') << s << std::endl;
+          std::cout<<String(padding, ' ') << s << "\n";
           break;
         }
     }
   }
-  std::cout<<std::endl;
+  std::cout<<"\n";
 }
 
 String Statistics::get_formatted_times(double total_time)

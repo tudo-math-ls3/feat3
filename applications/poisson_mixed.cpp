@@ -538,7 +538,7 @@ namespace PoissonMixed
     //  typename SystemLevelType::GlobalPresVector diag_a(lvl.matrix_d.create_vector_l());
     //  full_matrix_sys.extract_diag(diag_a);
 
-    //  std::cout << comm.rank() << " full_diag_a " << diag_a.local() << std::endl;
+    //  std::cout << comm.rank() << " full_diag_a " << diag_a.local() << "\n";
 
     //  typename SystemLevelType::GlobalVeloVector lumped_matrix_a(lvl.matrix_a.create_vector_r());
     //  lvl.matrix_a.local().lump_rows(lumped_matrix_a.local());
@@ -547,7 +547,7 @@ namespace PoissonMixed
     //  GlobalLumpedSystemMatrix lumped_matrix_sys(lumped_matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo);
     //  lumped_matrix_sys.extract_diag(diag_a);
 
-    //  std::cout <<  comm.rank() << " lump_diag_a " << diag_a.local() << std::endl;
+    //  std::cout <<  comm.rank() << " lump_diag_a " << diag_a.local() << "\n";
     //}
 
     auto mgv = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);

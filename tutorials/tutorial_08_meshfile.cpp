@@ -193,12 +193,12 @@ namespace Tutorial08
     // at all, as otherwise this application would call Runtime::abort() further below:
     if(args.num_args() <= 1)
     {
-      std::cout << std::endl;
-      std::cout << "Info: For this tutorial, you need to specify at least one" << std::endl;
-      std::cout << "input mesh file via the '--mesh <filenames...>' option." << std::endl;
-      std::cout << std::endl;
+      std::cout << "\n";
+      std::cout << "Info: For this tutorial, you need to specify at least one" << "\n";
+      std::cout << "input mesh file via the '--mesh <filenames...>' option." << "\n";
+      std::cout << "\n";
 
-      std::cout << "Supported Options:" << std::endl;
+      std::cout << "Supported Options:" << "\n";
       std::cout << args.get_supported_help();
       return;
     }
@@ -210,7 +210,7 @@ namespace Tutorial08
       // Print unsupported options
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       {
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       }
 
       // And abort
@@ -223,7 +223,7 @@ namespace Tutorial08
     if(args.check("mesh") <= 0)
     {
       // This tutorial requires at least one mesh file...
-      std::cerr << std::endl << "ERROR: You have to specify at least one mesh file via '--mesh <files...>'" << std::endl;
+      std::cerr << "\n" << "ERROR: You have to specify at least one mesh file via '--mesh <files...>'" << "\n";
 
       // ...so we cannot continue without one.
       Runtime::abort();
@@ -253,7 +253,7 @@ namespace Tutorial08
     // For convenience, we'll print the filenames to the console by utilizing the
     // 'stringify_join' function that will stringify each item in the deque and
     // concatenate them using a separator string:
-    std::cout << "Mesh Files: " << stringify_join(filenames, " ") << std::endl;
+    std::cout << "Mesh Files: " << stringify_join(filenames, " ") << "\n";
 
     // Now we can create the actual reader object. Note that we need only one mesh reader
     // object even if there are multiple files to be read.
@@ -271,7 +271,7 @@ namespace Tutorial08
     catch(const std::exception& exc)
     {
       // Something went wrong; probably one of the files could not be opened...
-      std::cerr << std::endl << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -294,7 +294,7 @@ namespace Tutorial08
     catch(const std::exception& exc)
     {
       // Oops...
-      std::cerr << std::endl << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -310,15 +310,15 @@ namespace Tutorial08
     // required files -- or the mesh file simply did not specify the mesh-type.
     if(mesh_type.empty())
     {
-      std::cout << std::endl;
-      std::cout << "ERROR: Mesh file(s) did not provide a mesh-type!" << std::endl;
-      std::cout << std::endl;
-      std::cout << "Did you supply all required mesh-files?" << std::endl;
+      std::cout << "\n";
+      std::cout << "ERROR: Mesh file(s) did not provide a mesh-type!" << "\n";
+      std::cout << "\n";
+      std::cout << "Did you supply all required mesh-files?" << "\n";
       Runtime::abort();
     }
 
     // And we'll print the mesh type string to the console:
-    std::cout << "Mesh Type : " << mesh_type << std::endl;
+    std::cout << "Mesh Type : " << mesh_type << "\n";
 
     // Now comes the interesting part:
     // The "mesh_type" string specifies the mesh-type and therefore the shape-type
@@ -342,7 +342,7 @@ namespace Tutorial08
       // The mesh-type is either invalid or not supported. In fact, there are some
       // other valid mesh-type specifiers (e.g. sub-dimensional meshes), which this
       // (and most other) application does not support by construction.
-      std::cout << std::endl << "ERROR: unsupported mesh type!" << std::endl;
+      std::cout << "\n" << "ERROR: unsupported mesh type!" << "\n";
       Runtime::abort();
     }
 
@@ -360,7 +360,7 @@ namespace Tutorial08
     typedef Shape_ ShapeType;
 
     // Let's print out the shape-type name just for convenience:
-    std::cout << "Shape Type: " << ShapeType::name() << std::endl;
+    std::cout << "Shape Type: " << ShapeType::name() << "\n";
 
     // Now that we know the shape-type that we want to use in this specialization of the
     // 'run' function template, we can continue with the remaining typedefs as usual:
@@ -396,7 +396,7 @@ namespace Tutorial08
     std::unique_ptr<RootMeshNodeType> mesh_node;
 
     // Okay, let the parsing begin:
-    std::cout << "Parsing mesh files..." << std::endl;
+    std::cout << "Parsing mesh files..." << "\n";
 
     // At this point, a lot of errors could occur if either one of the files is corrupt/invalid
     // or if the set of different input files is inconsistent/mismatching. Therefore, we enclose
@@ -411,7 +411,7 @@ namespace Tutorial08
     catch(const std::exception& exc)
     {
       // That's not good...
-      std::cerr << std::endl << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -424,7 +424,7 @@ namespace Tutorial08
     // interested in any additional mesh-parts that the management code had to create for internal
     // use (mesh-parts for "internal use" are characterized by a leading underscore in their name).
     std::deque<String> meshpart_names = mesh_node->get_mesh_part_names(true);
-    std::cout << "Mesh Parts: " << stringify_join(meshpart_names, " ") << std::endl;
+    std::cout << "Mesh Parts: " << stringify_join(meshpart_names, " ") << "\n";
 
     // In many cases, the mesh-file only contains a relatively "coarse" mesh that first has to be
     // refined a few times to obtain a mesh that is fine enough for a finite element discretization.
@@ -437,7 +437,7 @@ namespace Tutorial08
     if(args.parse("level", level) < 0)
     {
       // That's not meant to happen...
-      std::cerr << std::endl << "ERROR: Failed to parse '--level' parameter" << std::endl;
+      std::cerr << "\n" << "ERROR: Failed to parse '--level' parameter" << "\n";
 
       // and abort our program
       Runtime::abort();
@@ -445,7 +445,7 @@ namespace Tutorial08
 
     // Did the user specify a level > 0?
     if(level > Index(0))
-      std::cout << "Refining Mesh to Level " << level << "..." << std::endl;
+      std::cout << "Refining Mesh to Level " << level << "..." << "\n";
 
     // Okay, so let's refine the mesh-node up to the desired level:
     for(Index lvl(0); lvl < level; ++lvl)
@@ -463,7 +463,7 @@ namespace Tutorial08
     MeshType& mesh = *mesh_node->get_mesh();
 
     // We'll print out the number of mesh elements just for kicks:
-    std::cout << "Number of Elements: " << mesh.get_num_elements() << std::endl;
+    std::cout << "Number of Elements: " << mesh.get_num_elements() << "\n";
 
     // From this point on, the remainder of this tutorial's code is mostly identical to the
     // code from tutorial 01. The only interesting remaining difference is the assembly of the
@@ -543,12 +543,12 @@ namespace Tutorial08
       // to check this case here:
       if(mesh_part == nullptr)
       {
-        std::cerr << std::endl << "ERROR: no mesh-part named '" << part_name << "' could be found!" << std::endl;
+        std::cerr << "\n" << "ERROR: no mesh-part named '" << part_name << "' could be found!" << "\n";
         Runtime::abort();
       }
 
       // Okay, that mesh-part exists, so add it to the assembler:
-      std::cout << "Adding mesh-part '" << part_name << "' to Dirichlet assembler..." << std::endl;
+      std::cout << "Adding mesh-part '" << part_name << "' to Dirichlet assembler..." << "\n";
       unit_asm.add_mesh_part(*mesh_part);
     }
 
@@ -569,7 +569,7 @@ namespace Tutorial08
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    std::cout << std::endl << "Solving System..." << std::endl;
+    std::cout << "\n" << "Solving System..." << "\n";
 
     // Create an ILU(0) preconditioner
     auto precond = Solver::new_ilu_precond(PreferredBackend::generic, matrix, filter);
@@ -597,8 +597,8 @@ namespace Tutorial08
     String vtk_name;
     if(args.parse("vtk", vtk_name) > 0)
     {
-      std::cout << std::endl;
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+      std::cout << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -611,7 +611,7 @@ namespace Tutorial08
     }
 
     // That's it for today.
-    std::cout << std::endl << "Finished!" << std::endl;
+    std::cout << "\n" << "Finished!" << "\n";
   } // void run<Shape_>(...)
 
 } // namespace Tutorial08
@@ -623,7 +623,7 @@ int main(int argc, char* argv[])
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #08: MeshFileReader" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #08: MeshFileReader" << "\n";
 
   // call the tutorial's main function
   Tutorial08::main(argc, argv);

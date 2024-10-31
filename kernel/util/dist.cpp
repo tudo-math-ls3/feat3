@@ -783,7 +783,7 @@ namespace FEAT
     {
       XASSERTM((0 <= root) && (root < _size), "invalid root rank argument");
       if(root == _rank)
-        os << msg << std::endl;
+        os << msg << "\n";
     }
 
     void Comm::allprint(std::ostream& os, const String& msg, int root) const
@@ -829,7 +829,7 @@ namespace FEAT
 
           // print all lines prefixed
           for(auto it = lines.begin(); it != lines.end(); ++it)
-            os << '[' << prefix << "] " << (*it) << std::endl;
+            os << '[' << prefix << "] " << (*it) << "\n";
         }
       }
       else // rank != root
@@ -1277,12 +1277,12 @@ namespace FEAT
 
     void Comm::print(std::ostream& os, const String& msg, int) const
     {
-      os << msg << std::endl;
+      os << msg << "\n";
     }
 
     void Comm::allprint(std::ostream& os, const String& msg, int) const
     {
-      os << msg << std::endl;
+      os << msg << "\n";
     }
 #endif // FEAT_HAVE_MPI
   } // namespace Dist

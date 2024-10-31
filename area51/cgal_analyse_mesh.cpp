@@ -131,13 +131,13 @@ namespace AnalyseMeshCGAL
     // at all, as otherwise this application would call Runtime::abort() further below:
     if(args.num_args() <= 2)
     {
-      std::cout << std::endl;
-      std::cout << "Info: For this application, you need to specify at least one" << std::endl;
-      std::cout << "input mesh file via the '--mesh <filenames...>' option." << std::endl;
-      std::cout << "and the off-file via the '--off <filename>' option" <<std::endl;
-      std::cout << std::endl;
+      std::cout << "\n";
+      std::cout << "Info: For this application, you need to specify at least one" << "\n";
+      std::cout << "input mesh file via the '--mesh <filenames...>' option." << "\n";
+      std::cout << "and the off-file via the '--off <filename>' option" <<"\n";
+      std::cout << "\n";
 
-      std::cout << "Supported Options:" << std::endl;
+      std::cout << "Supported Options:" << "\n";
       std::cout << args.get_supported_help();
       return;
     }
@@ -149,7 +149,7 @@ namespace AnalyseMeshCGAL
       // Print unsupported options
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       {
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       }
 
       // And abort
@@ -162,7 +162,7 @@ namespace AnalyseMeshCGAL
     if(args.check("mesh") <= 0)
     {
       // This tool requires at least one mesh file...
-      std::cerr << std::endl << "ERROR: You have to specify at least one mesh file via '--mesh <files...>'" << std::endl;
+      std::cerr << "\n" << "ERROR: You have to specify at least one mesh file via '--mesh <files...>'" << "\n";
 
       // ...so we cannot continue without one.
       Runtime::abort();
@@ -170,7 +170,7 @@ namespace AnalyseMeshCGAL
     if(args.check("off") <= 0)
     {
       // This application requires at least one off file...
-      std::cerr << std::endl << "ERROR: You have to specify one off file via '--off <filename>'" << std::endl;
+      std::cerr << "\n" << "ERROR: You have to specify one off file via '--off <filename>'" << "\n";
 
       // ...so we cannot continue without one.
       Runtime::abort();
@@ -200,7 +200,7 @@ namespace AnalyseMeshCGAL
     // For convenience, we'll print the filenames to the console by utilising the
     // 'stringify_join' function that will stringify each item in the deque and
     // concatenate them using a separator string:
-    std::cout << "Mesh Files: " << stringify_join(filenames, " ") << std::endl;
+    std::cout << "Mesh Files: " << stringify_join(filenames, " ") << "\n";
 
     // Now we can create the actual reader object. Note that we need only one mesh reader
     // object even if there are multiple files to be read.
@@ -218,7 +218,7 @@ namespace AnalyseMeshCGAL
     catch(const std::exception& exc)
     {
       // Something went wrong; probably one of the files could not be opened...
-      std::cerr << std::endl << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -241,7 +241,7 @@ namespace AnalyseMeshCGAL
     catch(const std::exception& exc)
     {
       // Oops...
-      std::cerr << std::endl << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -257,15 +257,15 @@ namespace AnalyseMeshCGAL
     // required files -- or the mesh file simply did not specify the mesh-type.
     if(mesh_type.empty())
     {
-      std::cout << std::endl;
-      std::cout << "ERROR: Mesh file(s) did not provide a mesh-type!" << std::endl;
-      std::cout << std::endl;
-      std::cout << "Did you supply all required mesh-files?" << std::endl;
+      std::cout << "\n";
+      std::cout << "ERROR: Mesh file(s) did not provide a mesh-type!" << "\n";
+      std::cout << "\n";
+      std::cout << "Did you supply all required mesh-files?" << "\n";
       Runtime::abort();
     }
 
     // And we'll print the mesh type string to the console:
-    std::cout << "Mesh Type : " << mesh_type << std::endl;
+    std::cout << "Mesh Type : " << mesh_type << "\n";
 
     // Now comes the interesting part:
     // The "mesh_type" string specifies the mesh-type and therefore the shape-type
@@ -291,7 +291,7 @@ namespace AnalyseMeshCGAL
       // The mesh-type is either invalid or not supported. In fact, there are some
       // other valid mesh-type specifiers (e.g. sub-dimensional meshes), which this
       // (and most other) application does not support by construction.
-      std::cout << std::endl << "ERROR: unsupported mesh type!" << std::endl;
+      std::cout << "\n" << "ERROR: unsupported mesh type!" << "\n";
       Runtime::abort();
     }
 
@@ -309,7 +309,7 @@ namespace AnalyseMeshCGAL
     typedef Shape_ ShapeType;
 
     // Let's print out the shape-type name just for convenience:
-    std::cout << "Shape Type: " << ShapeType::name() << std::endl;
+    std::cout << "Shape Type: " << ShapeType::name() << "\n";
 
     // Now that we know the shape-type that we want to use in this specialization of the
     // 'run' function template, we can continue with the remaining typedefs as usual:
@@ -339,7 +339,7 @@ namespace AnalyseMeshCGAL
     std::unique_ptr<RootMeshNodeType> mesh_node;
 
     // Okay, let the parsing begin:
-    std::cout << "Parsing mesh files..." << std::endl;
+    std::cout << "Parsing mesh files..." << "\n";
 
     // At this point, a lot of errors could occur if either one of the files is corrupt/invalid
     // or if the set of different input files is inconsistent/mismatching. Therefore, we enclose
@@ -354,7 +354,7 @@ namespace AnalyseMeshCGAL
     catch(const std::exception& exc)
     {
       // That's not good...
-      std::cerr << std::endl << "ERROR: " << exc.what() << std::endl;
+      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -367,7 +367,7 @@ namespace AnalyseMeshCGAL
     // interested in any additional mesh-parts that the management code had to create for internal
     // use (mesh-parts for "internal use" are characterized by a leading underscore in their name).
     std::deque<String> meshpart_names = mesh_node->get_mesh_part_names(true);
-    std::cout << "Mesh Parts: " << stringify_join(meshpart_names, " ") << std::endl;
+    std::cout << "Mesh Parts: " << stringify_join(meshpart_names, " ") << "\n";
 
     // In many cases, the mesh-file only contains a relatively "coarse" mesh that first has to be
     // refined a few times to obtain a mesh that is fine enough for a finite element discretization.
@@ -380,7 +380,7 @@ namespace AnalyseMeshCGAL
     if(args.parse("level", level) < 0)
     {
       // That's not meant to happen...
-      std::cerr << std::endl << "ERROR: Failed to parse '--level' parameter" << std::endl;
+      std::cerr << "\n" << "ERROR: Failed to parse '--level' parameter" << "\n";
 
       // and abort our program
       Runtime::abort();
@@ -388,7 +388,7 @@ namespace AnalyseMeshCGAL
 
     // Did the user specify a level > 0?
     if(level > Index(0))
-      std::cout << "Refining Mesh to Level " << level << "..." << std::endl;
+      std::cout << "Refining Mesh to Level " << level << "..." << "\n";
 
     // Okay, so let's refine the mesh-node up to the desired level:
     for(Index lvl(0); lvl < level; ++lvl)
@@ -409,8 +409,8 @@ namespace AnalyseMeshCGAL
     // We'll print out the number of mesh elements just for kicks:
     Index number_of_elements = mesh.get_num_elements();
     Index number_of_vertices = mesh.get_num_vertices();
-    std::cout << "Number of Elements: " << number_of_elements << std::endl;
-    std::cout << "Number of Vertices: " << number_of_vertices << std::endl;
+    std::cout << "Number of Elements: " << number_of_elements << "\n";
+    std::cout << "Number of Vertices: " << number_of_vertices << "\n";
 
     // Vectors to save the result
     VectorType distance_to_off(number_of_vertices);
@@ -422,7 +422,7 @@ namespace AnalyseMeshCGAL
     DataType* in_out = inside_outside.elements();
 
     // load the off-file with the cgal-wrapper
-    std::cout<<"Loading the off-file"<<std::endl;
+    std::cout<<"Loading the off-file"<<"\n";
     String off_file_name;
     args.parse("off",off_file_name);
     Geometry::CGALWrapper<DataType> cw(off_file_name, Geometry::CGALFileMode::fm_off);
@@ -467,8 +467,8 @@ namespace AnalyseMeshCGAL
     String vtk_name;
     if(args.parse("vtk", vtk_name) > 0)
     {
-      std::cout << std::endl;
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+      std::cout << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -483,7 +483,7 @@ namespace AnalyseMeshCGAL
     }
 
     // That's it for today.
-    std::cout << std::endl << "Finished!" << std::endl;
+    std::cout << "\n" << "Finished!" << "\n";
   } // void run<Shape_>(...)
 
 } // namespace
@@ -506,7 +506,7 @@ int main(int argc, char* argv[])
 int main(/*int argc, char* argv[]*/)
 {
   // Print a welcome message
-  std::cerr << "Not Compiled with CGAL. Cannot run without CGAL" << std::endl;
+  std::cerr << "Not Compiled with CGAL. Cannot run without CGAL" << "\n";
   return 1;
 }
 

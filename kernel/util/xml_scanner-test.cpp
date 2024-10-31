@@ -114,70 +114,70 @@ public:
     // empty root
     {
       stringstream ioss;
-      ioss << "<>" << std::endl;
+      ioss << "<>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // Bogus root
     {
       stringstream ioss;
-      ioss << "<Foo bar>" << std::endl;
+      ioss << "<Foo bar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // closed root
     {
       stringstream ioss;
-      ioss << "<Foobar />" << std::endl;
+      ioss << "<Foobar />" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // terminated root
     {
       stringstream ioss;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // content root
     {
       stringstream ioss;
-      ioss << "Foobar" << std::endl;
+      ioss << "Foobar" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // invalid root markup
     {
       stringstream ioss;
-      ioss << "<Foobar" << std::endl;
+      ioss << "<Foobar" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // invalid root markup
     {
       stringstream ioss;
-      ioss << "Foobar>" << std::endl;
+      ioss << "Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // invalid markup name character
     {
       stringstream ioss;
-      ioss << "<Foob@r>" << std::endl;
+      ioss << "<Foob@r>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // invalid markup name (starts with digit)
     {
       stringstream ioss;
-      ioss << "<7Foobar>" << std::endl;
+      ioss << "<7Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.read_root(), Xml::SyntaxError);
     }
     // valid root
     {
       stringstream ioss;
-      ioss << "<F00bar>" << std::endl;
+      ioss << "<F00bar>" << "\n";
       Xml::Scanner scanner(ioss);
       scanner.read_root();
       TEST_CHECK(scanner.is_cur_markup());
@@ -197,39 +197,39 @@ public:
     // no terminator (end-of-file)
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // bogus terminator
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "</Foobar/>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "</Foobar/>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // bogus terminator
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "</Foobar test=\"fail\">" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "</Foobar test=\"fail\">" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // invalid terminator
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "</Deadbeef>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "</Deadbeef>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // valid terminator
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "</Foobar>" << "\n";
       // this should not throw anything
       Xml::Scanner scanner(ioss);
       scanner.scan(root_parser);
@@ -237,8 +237,8 @@ public:
     // valid terminator
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "</  Foobar  >" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "</  Foobar  >" << "\n";
       // this should not throw anything
       Xml::Scanner scanner(ioss);
       scanner.scan(root_parser);
@@ -255,56 +255,56 @@ public:
     // invalid markup (bogus data)
     {
       stringstream ioss;
-      ioss << "<Foobar bla>" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar bla>" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // invalid markup (no attribute value)
     {
       stringstream ioss;
-      ioss << "<Foobar name= >" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar name= >" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // invalid markup (missing quotes)
     {
       stringstream ioss;
-      ioss << "<Foobar name=\" >" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar name=\" >" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // invalid markup (no attribute name)
     {
       stringstream ioss;
-      ioss << "<Foobar =\"bla\" >" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar =\"bla\" >" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // invalid markup (invalid attribute character)
     {
       stringstream ioss;
-      ioss << "<Foobar f@t=\"bla\" >" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar f@t=\"bla\" >" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // invalid markup (invalid attribute character)
     {
       stringstream ioss;
-      ioss << "<Foobar 1ft=\"bla\" >" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar 1ft=\"bla\" >" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::SyntaxError);
     }
     // valid markup (two attributes)
     {
       stringstream ioss;
-      ioss << "<Foobar dead=\"beef\" cr0w=\"\" >" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar dead=\"beef\" cr0w=\"\" >" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       scanner.read_root();
       TEST_CHECK( scanner.is_cur_markup());
@@ -335,45 +335,45 @@ public:
     // unsupported markup
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "  <Unknown />" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "  <Unknown />" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::GrammarError);
     }
     // invalid closed markup
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "  <Test1 />" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "  <Test1 />" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::GrammarError);
     }
     // invalid content in markup
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "  <Test2>" << std::endl;
-      ioss << "    content" << std::endl;
-      ioss << "  </Test2>" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "  <Test2>" << "\n";
+      ioss << "    content" << "\n";
+      ioss << "  </Test2>" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::GrammarError);
     }
     // valid
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "  <Test1>" << std::endl;
-      ioss << "    content" << std::endl;
-      ioss << "    <Bla/>" << std::endl;
-      ioss << "  </Test1>" << std::endl;
-      ioss << "  <Test2/>" << std::endl;
-      ioss << "  <Test2>" << std::endl;
-      ioss << "    <Bla/>" << std::endl;
-      ioss << "  </Test2>" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "  <Test1>" << "\n";
+      ioss << "    content" << "\n";
+      ioss << "    <Bla/>" << "\n";
+      ioss << "  </Test1>" << "\n";
+      ioss << "  <Test2/>" << "\n";
+      ioss << "  <Test2>" << "\n";
+      ioss << "    <Bla/>" << "\n";
+      ioss << "  </Test2>" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       // this should not throw anything
       scanner.scan(root_parser);
@@ -390,24 +390,24 @@ public:
     // missing mandatory attribute
     {
       stringstream ioss;
-      ioss << "<Foobar>" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar>" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::GrammarError);
     }
     // unsupported attribute
     {
       stringstream ioss;
-      ioss << "<Foobar mandat=\"\" unknown=\"attribute\">" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar mandat=\"\" unknown=\"attribute\">" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       TEST_CHECK_THROWS(scanner.scan(root_parser), Xml::GrammarError);
     }
     // valid attributes
     {
       stringstream ioss;
-      ioss << "<Foobar mandat=\"given\">" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar mandat=\"given\">" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       // this should not throw anything
       scanner.scan(root_parser);
@@ -415,8 +415,8 @@ public:
     // valid attributes
     {
       stringstream ioss;
-      ioss << "<Foobar mandat=\"given\" option=\"also given\">" << std::endl;
-      ioss << "</Foobar>" << std::endl;
+      ioss << "<Foobar mandat=\"given\" option=\"also given\">" << "\n";
+      ioss << "</Foobar>" << "\n";
       Xml::Scanner scanner(ioss);
       // this should not throw anything
       scanner.scan(root_parser);

@@ -426,12 +426,12 @@ int main(int argc, char* argv [])
   }
   catch (const std::exception& exc)
   {
-    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << "\n";
     FEAT::Runtime::abort();
   }
   catch (...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     FEAT::Runtime::abort();
   }
   return 0;
@@ -441,7 +441,7 @@ int main(int argc, char* argv [])
 
 int main(/*int argc, char* argv []*/)
 {
-  std::cerr << "ERROR: Not compiled with CGAL!" << std::endl;
+  std::cerr << "ERROR: Not compiled with CGAL!" << "\n";
   return 1;
 }
 

@@ -135,7 +135,7 @@ public:
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     // create random matrix
     const Index tsize(20);

@@ -26,7 +26,7 @@ void add_mesh_part(RMESH * rmesh, String & file)
     std::ifstream par_file(file);
     if (!par_file)
     {
-      std::cerr<<"file " << file << " not found!"<<std::endl;
+      std::cerr<<"file " << file << " not found!"<<"\n";
     }
 
     String header;
@@ -66,8 +66,8 @@ int main(int argc, char ** argv)
     FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
     if (argc < 3)
     {
-        std::cout << "Usage 'tri2mesh file.prj mesh.xml [coord-scaling-factor]'" << std::endl;
-        std::cout << "Must be executed in the file.prj directory, as no folder voodoo takes place internally." << std::endl;
+        std::cout << "Usage 'tri2mesh file.prj mesh.xml [coord-scaling-factor]'" << "\n";
+        std::cout << "Must be executed in the file.prj directory, as no folder voodoo takes place internally." << "\n";
         FEAT::Runtime::abort();
     }
 
@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
     std::ifstream file_prj(input);
     if (!file_prj)
     {
-      std::cerr<<"file " << input << " not found!"<<std::endl;
+      std::cerr<<"file " << input << " not found!"<<"\n";
       exit(1);
     }
     for (String line ; getline(file_prj, line); )
@@ -101,14 +101,14 @@ int main(int argc, char ** argv)
     }
     if (it == file_list.end())
     {
-      std::cerr<<"no .tri file found in " << input << " !"<<std::endl;
+      std::cerr<<"no .tri file found in " << input << " !"<<"\n";
       exit(1);
     }
 
     std::ifstream mesh_tri(*it);
     if (!mesh_tri)
     {
-      std::cerr<<"file " << *it << " not found!"<<std::endl;
+      std::cerr<<"file " << *it << " not found!"<<"\n";
     }
 
     file_list.erase(it);
@@ -184,7 +184,7 @@ int main(int argc, char ** argv)
     {
       if (!file.ends_with(".par"))
       {
-        std::cerr<<file<<" has unsupported type in file.prj!"<<std::endl;
+        std::cerr<<file<<" has unsupported type in file.prj!"<<"\n";
         exit(1);
       }
       add_mesh_part(rmesh.get(), file);

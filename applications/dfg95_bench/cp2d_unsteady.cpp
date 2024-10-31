@@ -428,7 +428,7 @@ namespace NavierStokesCP2D
           setup_fb_c2d_03();
         else
         {
-          std::cerr << "ERROR: unknown setup '" << s << "'" << std::endl;
+          std::cerr << "ERROR: unknown setup '" << s << "'" << "\n";
           return false;
         }
       }
@@ -1548,7 +1548,7 @@ namespace NavierStokesCP2D
           line += " | ";
           line += stringify(iter_v).pad_front(4) + " ";
           line += stringify(iter_p).pad_front(4);
-          std::cout << line;// << std::endl;
+          std::cout << line;// << "\n";
         }
       } // non-linear loop
 
@@ -1642,7 +1642,7 @@ namespace NavierStokesCP2D
       {
         String line(" | ");
         line += stamp_start.elapsed_string_now().pad_front(10);
-        std::cout << line << std::endl;
+        std::cout << line << "\n";
       }
 
       // VTK-Export
@@ -1925,12 +1925,12 @@ int main(int argc, char* argv [])
   }
   catch (const std::exception& exc)
   {
-    std::cerr << "ERROR: unhandled exception: " << exc.what() << std::endl;
+    std::cerr << "ERROR: unhandled exception: " << exc.what() << "\n";
     FEAT::Runtime::abort();
   }
   catch (...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     FEAT::Runtime::abort();
   }
   return 0;

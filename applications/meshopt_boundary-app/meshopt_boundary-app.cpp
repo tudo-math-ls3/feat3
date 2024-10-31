@@ -742,7 +742,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
   }
 
   if( args.check("test") >=0 )
@@ -885,29 +885,29 @@ static void read_test_application_config(std::stringstream& iss, const int test_
 {
   if(test_number == 1)
   {
-    iss << "[ApplicationSettings]" << std::endl;
-    iss << "mesh_optimizer = DuDvDefault" << std::endl;
-    iss << "solver_config_file = ./solver_config.ini" << std::endl;
-    iss << "delta_t = 1e-2" << std::endl;
-    iss << "t_end = 2e-2" << std::endl;
-    iss << "midpoint = 0.0 0.0" << std::endl;
+    iss << "[ApplicationSettings]" << "\n";
+    iss << "mesh_optimizer = DuDvDefault" << "\n";
+    iss << "solver_config_file = ./solver_config.ini" << "\n";
+    iss << "delta_t = 1e-2" << "\n";
+    iss << "t_end = 2e-2" << "\n";
+    iss << "midpoint = 0.0 0.0" << "\n";
 
-    iss << "[DomainControlSettings]" << std::endl;
-    iss << "lvl_min = 1" << std::endl;
-    iss << "lvl_max = 5" << std::endl;
+    iss << "[DomainControlSettings]" << "\n";
+    iss << "lvl_min = 1" << "\n";
+    iss << "lvl_max = 5" << "\n";
   }
   else if(test_number == 2)
   {
-    iss << "[ApplicationSettings]" << std::endl;
-    iss << "mesh_optimizer = HyperelasticityDefault" << std::endl;
-    iss << "solver_config_file = ./solver_config.ini" << std::endl;
-    iss << "delta_t = 1e-2" << std::endl;
-    iss << "t_end = 2e-2" << std::endl;
-    iss << "midpoint = 0.0 0.0" << std::endl;
+    iss << "[ApplicationSettings]" << "\n";
+    iss << "mesh_optimizer = HyperelasticityDefault" << "\n";
+    iss << "solver_config_file = ./solver_config.ini" << "\n";
+    iss << "delta_t = 1e-2" << "\n";
+    iss << "t_end = 2e-2" << "\n";
+    iss << "midpoint = 0.0 0.0" << "\n";
 
-    iss << "[DomainControlSettings]" << std::endl;
-    iss << "lvl_min = 1" << std::endl;
-    iss << "lvl_max = 3" << std::endl;
+    iss << "[DomainControlSettings]" << "\n";
+    iss << "lvl_min = 1" << "\n";
+    iss << "lvl_max = 3" << "\n";
   }
   else
   {
@@ -919,32 +919,32 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
 {
   if(test_number == 1)
   {
-    iss << "[DuDvDefault]" << std::endl;
-    iss << "type = DuDv" << std::endl;
-    iss << "config_section = DuDvDefaultParameters" << std::endl;
-    iss << "fixed_reference_domain = 1" << std::endl;
-    iss << "dirichlet_boundaries = bnd:o" << std::endl;
+    iss << "[DuDvDefault]" << "\n";
+    iss << "type = DuDv" << "\n";
+    iss << "config_section = DuDvDefaultParameters" << "\n";
+    iss << "fixed_reference_domain = 1" << "\n";
+    iss << "dirichlet_boundaries = bnd:o" << "\n";
 
-    iss << "[DuDvDefaultParameters]" << std::endl;
-    iss << "solver_config = DuDvLinearSolver" << std::endl;
+    iss << "[DuDvDefaultParameters]" << "\n";
+    iss << "solver_config = DuDvLinearSolver" << "\n";
   }
   else if(test_number == 2)
   {
-    iss << "[HyperElasticityDefault]" << std::endl;
-    iss << "type = Hyperelasticity" << std::endl;
-    iss << "config_section = HyperelasticityDefaultParameters" << std::endl;
-    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
+    iss << "[HyperElasticityDefault]" << "\n";
+    iss << "type = Hyperelasticity" << "\n";
+    iss << "config_section = HyperelasticityDefaultParameters" << "\n";
+    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << "\n";
 
-    iss << "[HyperelasticityDefaultParameters]" << std::endl;
-    iss << "global_functional = HyperelasticityFunctional" << std::endl;
-    iss << "cell_functional = RumpfFunctional" << std::endl;
-    iss << "solver_config = NLCG" << std::endl;
-    iss << "fac_norm = 1.0" << std::endl;
-    iss << "fac_det = 1.0" << std::endl;
-    iss << "fac_cof = 0.0" << std::endl;
-    iss << "fac_reg = 5e-8" << std::endl;
-    iss << "exponent_det = 2" << std::endl;
-    iss << "scale_computation = once_uniform" << std::endl;
+    iss << "[HyperelasticityDefaultParameters]" << "\n";
+    iss << "global_functional = HyperelasticityFunctional" << "\n";
+    iss << "cell_functional = RumpfFunctional" << "\n";
+    iss << "solver_config = NLCG" << "\n";
+    iss << "fac_norm = 1.0" << "\n";
+    iss << "fac_det = 1.0" << "\n";
+    iss << "fac_cof = 0.0" << "\n";
+    iss << "fac_reg = 5e-8" << "\n";
+    iss << "exponent_det = 2" << "\n";
+    iss << "scale_computation = once_uniform" << "\n";
   }
   else
   {
@@ -954,89 +954,89 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
 
 static void read_test_solver_config(std::stringstream& iss)
 {
-  iss << "[NLCG]" << std::endl;
-  iss << "type = NLCG" << std::endl;
-  iss << "precon = DuDvPrecon" << std::endl;
-  iss << "plot_mode = all" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  iss << "max_iter = 1000" << std::endl;
-  iss << "linesearch = MQCLinesearch" << std::endl;
-  iss << "direction_update = DYHSHybrid" << std::endl;
-  iss << "keep_iterates = 0" << std::endl;
+  iss << "[NLCG]" << "\n";
+  iss << "type = NLCG" << "\n";
+  iss << "precon = DuDvPrecon" << "\n";
+  iss << "plot_mode = all" << "\n";
+  iss << "tol_rel = 1e-8" << "\n";
+  iss << "max_iter = 1000" << "\n";
+  iss << "linesearch = MQCLinesearch" << "\n";
+  iss << "direction_update = DYHSHybrid" << "\n";
+  iss << "keep_iterates = 0" << "\n";
 
-  iss << "[MQCLinesearch]" << std::endl;
-  iss << "type = MQCLinesearch" << std::endl;
-  iss << "plot_mode = none" << std::endl;
-  iss << "max_iter = 20" << std::endl;
-  iss << "tol_decrease = 1e-3" << std::endl;
-  iss << "tol_curvature = 0.3" << std::endl;
-  iss << "keep_iterates = 0" << std::endl;
+  iss << "[MQCLinesearch]" << "\n";
+  iss << "type = MQCLinesearch" << "\n";
+  iss << "plot_mode = none" << "\n";
+  iss << "max_iter = 20" << "\n";
+  iss << "tol_decrease = 1e-3" << "\n";
+  iss << "tol_curvature = 0.3" << "\n";
+  iss << "keep_iterates = 0" << "\n";
 
-  iss << "[DuDvPrecon]" << std::endl;
-  iss << "type = DuDvPrecon" << std::endl;
-  iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
-  iss << "fixed_reference_domain = 1" << std::endl;
-  iss << "linear_solver = DuDvLinearSolver" << std::endl;
+  iss << "[DuDvPrecon]" << "\n";
+  iss << "type = DuDvPrecon" << "\n";
+  iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << "\n";
+  iss << "fixed_reference_domain = 1" << "\n";
+  iss << "linear_solver = DuDvLinearSolver" << "\n";
 
-  iss << "[DuDvLinearSolver]" << std::endl;
-  //iss << "type = pcg" << std::endl;
-  iss << "max_iter = 10" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  //iss << "precon = MG1" << std::endl;
-  iss << "plot_mode = summary" << std::endl;
+  iss << "[DuDvLinearSolver]" << "\n";
+  //iss << "type = pcg" << "\n";
+  iss << "max_iter = 10" << "\n";
+  iss << "tol_rel = 1e-8" << "\n";
+  //iss << "precon = MG1" << "\n";
+  iss << "plot_mode = summary" << "\n";
 
-  iss << "[DuDvMGSmoother]" << std::endl;
-  iss << "steps = 4" << std::endl;
-  iss << "omega = 0.5" << std::endl;
+  iss << "[DuDvMGSmoother]" << "\n";
+  iss << "steps = 4" << "\n";
+  iss << "omega = 0.5" << "\n";
 
-  iss << "[DuDvMGCoarseSolver]" << std::endl;
-  //iss << "type = pcg" << std::endl;
-  iss << "max_iter = 50" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  //iss << "precon = jac" << std::endl;
+  iss << "[DuDvMGCoarseSolver]" << "\n";
+  //iss << "type = pcg" << "\n";
+  iss << "max_iter = 50" << "\n";
+  iss << "tol_rel = 1e-8" << "\n";
+  //iss << "precon = jac" << "\n";
 
   // the rest of this code was used by the old SolverFactory; it is not used anymore
   /*
-  iss << "[DuDvPrecon]" << std::endl;
-  iss << "type = DuDvPrecon" << std::endl;
-  iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << std::endl;
-  iss << "fixed_reference_domain = 1" << std::endl;
-  iss << "linear_solver = PCG-MG" << std::endl;
+  iss << "[DuDvPrecon]" << "\n";
+  iss << "type = DuDvPrecon" << "\n";
+  iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << "\n";
+  iss << "fixed_reference_domain = 1" << "\n";
+  iss << "linear_solver = PCG-MG" << "\n";
 
-  iss << "[PCG-JAC]" << std::endl;
-  iss << "type = pcg" << std::endl;
-  iss << "max_iter = 50" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  iss << "precon = jac" << std::endl;
+  iss << "[PCG-JAC]" << "\n";
+  iss << "type = pcg" << "\n";
+  iss << "max_iter = 50" << "\n";
+  iss << "tol_rel = 1e-8" << "\n";
+  iss << "precon = jac" << "\n";
 
-  iss << "[PCG-MG]" << std::endl;
-  iss << "type = pcg" << std::endl;
-  iss << "max_iter = 10" << std::endl;
-  iss << "tol_rel = 1e-8" << std::endl;
-  iss << "precon = MG1" << std::endl;
-  iss << "plot_mode = summary" << std::endl;
+  iss << "[PCG-MG]" << "\n";
+  iss << "type = pcg" << "\n";
+  iss << "max_iter = 10" << "\n";
+  iss << "tol_rel = 1e-8" << "\n";
+  iss << "precon = MG1" << "\n";
+  iss << "plot_mode = summary" << "\n";
 
-  iss << "[rich]" << std::endl;
-  iss << "type = richardson" << std::endl;
-  iss << "max_iter = 4" << std::endl;
-  iss << "min_iter = 4" << std::endl;
-  iss << "precon = jac" << std::endl;
+  iss << "[rich]" << "\n";
+  iss << "type = richardson" << "\n";
+  iss << "max_iter = 4" << "\n";
+  iss << "min_iter = 4" << "\n";
+  iss << "precon = jac" << "\n";
 
-  iss << "[jac]" << std::endl;
-  iss << "type = jacobi" << std::endl;
-  iss << "omega = 0.5" << std::endl;
+  iss << "[jac]" << "\n";
+  iss << "type = jacobi" << "\n";
+  iss << "omega = 0.5" << "\n";
 
-  iss << "[MG1]" << std::endl;
-  iss << "type = mg" << std::endl;
-  iss << "hierarchy = s:rich-c:pcg" << std::endl;
-  iss << "lvl_min = -1" << std::endl;
-  iss << "lvl_max = 0" << std::endl;
-  iss << "cycle = v" << std::endl;
+  iss << "[MG1]" << "\n";
+  iss << "type = mg" << "\n";
+  iss << "hierarchy = s:rich-c:pcg" << "\n";
+  iss << "lvl_min = -1" << "\n";
+  iss << "lvl_max = 0" << "\n";
+  iss << "cycle = v" << "\n";
 
-  iss << "[s:rich-c:pcg]" << std::endl;
-  iss << "type = hierarchy" << std::endl;
-  iss << "smoother = rich" << std::endl;
-  iss << "coarse = PCG-JAC" << std::endl;
+  iss << "[s:rich-c:pcg]" << "\n";
+  iss << "type = hierarchy" << "\n";
+  iss << "smoother = rich" << "\n";
+  iss << "coarse = PCG-JAC" << "\n";
   */
 }
 
@@ -1061,15 +1061,15 @@ static void display_help(const Dist::Comm& comm)
   if(comm.rank() == 0)
   {
     std::cout << "meshopt_boundary-app: Moving the boundary of a mesh and computing an extension into the interior"
-    << std::endl;
-    std::cout << "Mandatory arguments:" << std::endl;
-    std::cout << " --application_config: Path to the application configuration file" << std::endl;
-    std::cout << " --mesh-path: Path to the mesh directory" << std::endl;
-    std::cout << "Optional arguments:" << std::endl;
-    std::cout << " --test: Run as a test. Ignores configuration files and uses hard coded settings." << std::endl;
+    << "\n";
+    std::cout << "Mandatory arguments:" << "\n";
+    std::cout << " --application_config: Path to the application configuration file" << "\n";
+    std::cout << " --mesh-path: Path to the mesh directory" << "\n";
+    std::cout << "Optional arguments:" << "\n";
+    std::cout << " --test: Run as a test. Ignores configuration files and uses hard coded settings." << "\n";
     std::cout << " --test [1 or 2]: Run as a test. Ignores configuration files and uses hard coded settings. " <<
-      "Test 1 is quadrilateral cells, test 2 is triangular cells" << std::endl;
-    std::cout << " --vtk <FREQ>: If this is set, vtk files are written every <FREQ> time steps." << std::endl;
-    std::cout << " --help: Displays this text" << std::endl;
+      "Test 1 is quadrilateral cells, test 2 is triangular cells" << "\n";
+    std::cout << " --vtk <FREQ>: If this is set, vtk files are written every <FREQ> time steps." << "\n";
+    std::cout << " --help: Displays this text" << "\n";
   }
 }

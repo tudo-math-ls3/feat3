@@ -18,7 +18,7 @@ namespace FEAT
       static std::vector<int> create_coloring(int lvl)
       {
         int num_per_row = 1 << lvl;
-        // std::cout << num_per_row << std::endl;
+        // std::cout << num_per_row << "\n";
         std::vector<int> vec;
         if constexpr(dim == 3)
         {
@@ -27,7 +27,7 @@ namespace FEAT
           {
             vec[std::size_t(j)] = j % 8;
 
-            // std::cout << std::endl;
+            // std::cout << "\n";
           }
         }
         else
@@ -37,7 +37,7 @@ namespace FEAT
           {
             vec[std::size_t(j)] = j % 4;
 
-            // std::cout << std::endl;
+            // std::cout << "\n";
           }
         }
 
@@ -51,7 +51,7 @@ namespace FEAT
         for(int j = 0; j < num_per_row * num_per_row; ++j)
         {
           vec[std::size_t(j)] = j;
-          // std::cout << std::endl;
+          // std::cout << "\n";
         }
         return vec;
       }

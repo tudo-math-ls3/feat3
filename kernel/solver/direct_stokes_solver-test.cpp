@@ -159,8 +159,8 @@ public:
     auto solver = Solver::new_direct_stokes_solver(matrix, filter);
 
     // print backend and selected solver
-    std::cout << "Selected Backend: " << Backend::get_preferred_backend() << std::endl;
-    std::cout << "Selected Solver: " << solver->name() << std::endl;
+    std::cout << "Selected Backend: " << Backend::get_preferred_backend() << "\n";
+    std::cout << "Selected Solver: " << solver->name() << "\n";
 
     solver->init();
     solver->apply(vec_sol, vec_rhs);
@@ -170,10 +170,10 @@ public:
     matrix.apply(vec_def, vec_sol, vec_rhs, -1.0);
     vec_ref.axpy(vec_sol, -1.0);
 
-    std::cout << "|rhs| = " << stringify_fp_sci(vec_rhs.max_abs_element()) << std::endl;
-    std::cout << "|sol| = " << stringify_fp_sci(vec_sol.max_abs_element()) << std::endl;
-    std::cout << "|def| = " << stringify_fp_sci(vec_def.max_abs_element()) << std::endl;
-    std::cout << "|err| = " << stringify_fp_sci(vec_ref.max_abs_element()) << std::endl;
+    std::cout << "|rhs| = " << stringify_fp_sci(vec_rhs.max_abs_element()) << "\n";
+    std::cout << "|sol| = " << stringify_fp_sci(vec_sol.max_abs_element()) << "\n";
+    std::cout << "|def| = " << stringify_fp_sci(vec_def.max_abs_element()) << "\n";
+    std::cout << "|err| = " << stringify_fp_sci(vec_ref.max_abs_element()) << "\n";
 
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_def.max_abs_element(), DT_(0), tol);
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_ref.max_abs_element(), DT_(0), tol);

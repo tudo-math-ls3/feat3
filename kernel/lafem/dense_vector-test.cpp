@@ -98,7 +98,7 @@ public:
     Adjacency::Permutation prm_nil;
     ap.permute(prm_nil);
     Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
     Random rng(seed);
     Adjacency::Permutation prm_rnd(a.size(), rng);
     ap.permute(prm_rnd);
@@ -819,7 +819,7 @@ public:
       }
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -884,7 +884,7 @@ public:
       }
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -950,7 +950,7 @@ public:
       a(0, DT_(-5));
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1015,7 +1015,7 @@ public:
       }
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);

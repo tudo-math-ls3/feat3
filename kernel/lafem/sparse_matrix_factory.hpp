@@ -174,7 +174,7 @@ namespace FEAT
         {
           std::cout << row_ptr[i] << "  ";
         }
-        std::cout << " " << std::endl;
+        std::cout << " " << "\n";
         */
         return matrix;
       }

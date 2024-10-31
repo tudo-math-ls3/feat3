@@ -258,14 +258,14 @@ namespace Tutorial04
     args.support("g", "<formula>\nSpecifies the Dirichlet boundary condition function g.\n");
 #else // no fparser support
     // Specifying functions at runtime is not supported, so let' display an annoying note instead
-    std::cout << std::endl;
-    std::cout << "Important Note:" << std::endl;
-    std::cout << "This application binary has been configured and build without support for" << std::endl;
-    std::cout << "the 'fparser' third-party library, which is required for the specification" << std::endl;
-    std::cout << "of custom solution, right-hand-side and boundary condition functions." << std::endl;
-    std::cout << "To enable this functionality, please re-configure your FEAT build" << std::endl;
-    std::cout << "by specifying 'fparser' as an additional part of your build-id." << std::endl;
-    std::cout << std::endl;
+    std::cout << "\n";
+    std::cout << "Important Note:" << "\n";
+    std::cout << "This application binary has been configured and build without support for" << "\n";
+    std::cout << "the 'fparser' third-party library, which is required for the specification" << "\n";
+    std::cout << "of custom solution, right-hand-side and boundary condition functions." << "\n";
+    std::cout << "To enable this functionality, please re-configure your FEAT build" << "\n";
+    std::cout << "by specifying 'fparser' as an additional part of your build-id." << "\n";
+    std::cout << "\n";
 #endif // FEAT_HAVE_FPARSER
 
     // Now that we have added all supported options to the parser, we call the 'query_unsupported'
@@ -282,7 +282,7 @@ namespace Tutorial04
       // We loop over all unsupported arguments and print them out:
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       {
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       }
 
       // We could abort program execution here, but instead we remember that we have to print
@@ -297,46 +297,46 @@ namespace Tutorial04
     if(need_help)
     {
       // Okay, let's display some help.
-      std::cout << std::endl;
-      std::cout << "USAGE: " << args.get_arg(0) << " <options>" << std::endl;
-      std::cout << std::endl;
+      std::cout << "\n";
+      std::cout << "USAGE: " << args.get_arg(0) << " <options>" << "\n";
+      std::cout << "\n";
 
       // Now we call the 'get_supported_help' function of the argument parser - this
       // will give us a formatted string containing the supported options and their
       // corresponding short descriptions  which we supplied before:
-      std::cout << "Supported options:" << std::endl;
+      std::cout << "Supported options:" << "\n";
       std::cout << args.get_supported_help();
 
       // In case that we built with support for the fparser library, we also print
       // some additional information regarding the specification of the functions.
 #ifdef FEAT_HAVE_FPARSER
-      std::cout << "Remarks regarding function formulae:" << std::endl;
-      std::cout << "The <formula> parameters of the options '--u', '--f' and '--g'" << std::endl;
+      std::cout << "Remarks regarding function formulae:" << "\n";
+      std::cout << "The <formula> parameters of the options '--u', '--f' and '--g'" << "\n";
       std::cout << "are expected to be function formulae in the variables ";
       switch(ShapeType::dimension)
       {
       case 1:
-        std::cout << "'x'" << std::endl;
+        std::cout << "'x'" << "\n";
         break;
       case 2:
-        std::cout << "'x' and 'y'" << std::endl;
+        std::cout << "'x' and 'y'" << "\n";
         break;
       case 3:
-        std::cout << "'x', 'y' and 'z'" << std::endl;
+        std::cout << "'x', 'y' and 'z'" << "\n";
         break;
       }
-      std::cout << "As an example, one may specify" << std::endl;
-      std::cout << "             --u \"sin(pi*x)*sin(pi*y)\"" << std::endl;
-      std::cout << "to define the reference solution to be the sine-bubble." << std::endl;
-      std::cout << "For a full list of supported expressions and build-in functions, refer to" << std::endl;
-      std::cout << "http://warp.povusers.org/FunctionParser/fparser.html#functionsyntax" << std::endl;
-      std::cout << std::endl;
-      std::cout << "Important Note:" << std::endl;
-      std::cout << "Although it may not be required in all cases, it is highly recommended" << std::endl;
-      std::cout << "that you enclose the function formulae in quotation marks as shown in" << std::endl;
-      std::cout << "example above. If not quoted, your command line interpreter (e.g. bash," << std::endl;
-      std::cout << "csh, cmd) may misinterpret special characters, thus possibly leading to" << std::endl;
-      std::cout << "incorrect program behavior." << std::endl;
+      std::cout << "As an example, one may specify" << "\n";
+      std::cout << "             --u \"sin(pi*x)*sin(pi*y)\"" << "\n";
+      std::cout << "to define the reference solution to be the sine-bubble." << "\n";
+      std::cout << "For a full list of supported expressions and build-in functions, refer to" << "\n";
+      std::cout << "http://warp.povusers.org/FunctionParser/fparser.html#functionsyntax" << "\n";
+      std::cout << "\n";
+      std::cout << "Important Note:" << "\n";
+      std::cout << "Although it may not be required in all cases, it is highly recommended" << "\n";
+      std::cout << "that you enclose the function formulae in quotation marks as shown in" << "\n";
+      std::cout << "example above. If not quoted, your command line interpreter (e.g. bash," << "\n";
+      std::cout << "csh, cmd) may misinterpret special characters, thus possibly leading to" << "\n";
+      std::cout << "incorrect program behavior." << "\n";
 
 #endif // FEAT_HAVE_FPARSER
 
@@ -397,8 +397,8 @@ namespace Tutorial04
       // In this case, we have an error, as the corresponding command line
       // argument could not be parsed, so print out an error message:
       std::cerr << "ERROR: Failed to parse '" << args.get_arg(-iarg_level) << "'";
-      std::cerr << "as parameter for option '--level'" << std::endl;
-      std::cerr << "Expected: a non-negative integer" << std::endl;
+      std::cerr << "as parameter for option '--level'" << "\n";
+      std::cerr << "Expected: a non-negative integer" << "\n";
 
       // and abort our program
       Runtime::abort();
@@ -463,10 +463,10 @@ namespace Tutorial04
       catch(const std::exception& exc)
       {
         // Oops...
-        std::cerr << "ERROR: Cannot parse expression '" << formula_u << "' as function 'u(x,y)'" << std::endl;
+        std::cerr << "ERROR: Cannot parse expression '" << formula_u << "' as function 'u(x,y)'" << "\n";
         // Let's also print the exception's message, which might contain useful information
         // regarding the cause of the error
-        std::cerr << exc.what() << std::endl;
+        std::cerr << exc.what() << "\n";
         Runtime::abort();
       }
     }
@@ -479,8 +479,8 @@ namespace Tutorial04
       }
       catch(const std::exception& exc)
       {
-        std::cerr << "ERROR: Cannot parse expression '" << formula_f << "' as function 'f(x,y)'" << std::endl;
-        std::cerr << exc.what() << std::endl;
+        std::cerr << "ERROR: Cannot parse expression '" << formula_f << "' as function 'f(x,y)'" << "\n";
+        std::cerr << exc.what() << "\n";
         Runtime::abort();
       }
     }
@@ -492,8 +492,8 @@ namespace Tutorial04
       }
       catch(const std::exception& exc)
       {
-        std::cerr << "ERROR: Cannot parse expression '" << formula_g << "' as function 'g(x,y)'" << std::endl;
-        std::cerr << exc.what() << std::endl;
+        std::cerr << "ERROR: Cannot parse expression '" << formula_g << "' as function 'g(x,y)'" << "\n";
+        std::cerr << exc.what() << "\n";
         Runtime::abort();
       }
     }
@@ -504,25 +504,25 @@ namespace Tutorial04
     // At this point, we always output 'x,y' as the arguments of u, f and g, even if this
     // tutorial was modified to use a 1D or 3D shape. This is only to keep the following
     // code simple and to avoid a nested if-orgy here.
-    std::cout << std::endl;
-    std::cout << "Function summary:" << std::endl;
+    std::cout << "\n";
+    std::cout << "Function summary:" << "\n";
     if(have_u)
-      std::cout << "u(x,y) = " << formula_u << std::endl;
+      std::cout << "u(x,y) = " << formula_u << "\n";
     else
-      std::cout << "u(x,y) = - unknown -" << std::endl;
+      std::cout << "u(x,y) = - unknown -" << "\n";
     if(have_f)
-      std::cout << "f(x,y) = " << formula_f << std::endl;
+      std::cout << "f(x,y) = " << formula_f << "\n";
     else if(have_u)
-      std::cout << "f(x,y) = -Laplace(u)" << std::endl;
+      std::cout << "f(x,y) = -Laplace(u)" << "\n";
     else
-      std::cout << "f(x,y) = 0" << std::endl;
+      std::cout << "f(x,y) = 0" << "\n";
     if(have_g)
-      std::cout << "g(x,y) = " << formula_g << std::endl;
+      std::cout << "g(x,y) = " << formula_g << "\n";
     else if(have_u)
-      std::cout << "g(x,y) = u(x,y)" << std::endl;
+      std::cout << "g(x,y) = u(x,y)" << "\n";
     else
-      std::cout << "g(x,y) = 0" << std::endl;
-    std::cout << std::endl;
+      std::cout << "g(x,y) = 0" << "\n";
+    std::cout << "\n";
 
 #else
     // Without the fparser library, we use the sine-bubble as a solution.
@@ -542,7 +542,7 @@ namespace Tutorial04
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Create Mesh, Boundary, Trafo and Space
 
-    std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
+    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
 
     // Create the mesh
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
@@ -552,7 +552,7 @@ namespace Tutorial04
     Geometry::BoundaryFactory<MeshType> boundary_factory(mesh);
     MeshPartType boundary(boundary_factory);
 
-    std::cout << "Creating Trafo and Space..." << std::endl;
+    std::cout << "Creating Trafo and Space..." << "\n";
 
     // Let's create a trafo object now.
     TrafoType trafo(mesh);
@@ -563,7 +563,7 @@ namespace Tutorial04
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Allocating matrix and vectors..." << std::endl;
+    std::cout << "Allocating matrix and vectors..." << "\n";
 
     // Allocate matrix and assemble its structure
     MatrixType matrix;
@@ -654,7 +654,7 @@ namespace Tutorial04
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    std::cout << "Solving System..." << std::endl;
+    std::cout << "Solving System..." << "\n";
 
     // Create a SSOR preconditioner
     auto precond = Solver::new_ssor_precond(PreferredBackend::generic, matrix, filter);
@@ -682,16 +682,16 @@ namespace Tutorial04
 
     if(have_u)
     {
-      std::cout << std::endl;
-      std::cout << "Computing errors against reference solution..." << std::endl;
+      std::cout << "\n";
+      std::cout << "Computing errors against reference solution..." << "\n";
 
       // Compute the error norms:
       auto error_info = Assembly::integrate_error_function<1>(
         domain_assembler, sol_function, vec_sol, space, cubature_name);
 
       // Print the error norms to the console
-      std::cout << "Error Analysis:" << std::endl;
-      std::cout << error_info.print_norms() << std::endl;
+      std::cout << "Error Analysis:" << "\n";
+      std::cout << error_info.print_norms() << "\n";
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -699,8 +699,8 @@ namespace Tutorial04
 
     if(want_vtk)
     {
-      std::cout << std::endl;
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+      std::cout << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
       // project solution and right-hand-side vectors
       VectorType vertex_sol, vertex_rhs;
@@ -719,7 +719,7 @@ namespace Tutorial04
     }
 
     // That's it for today.
-    std::cout << std::endl << "Finished!" << std::endl;
+    std::cout << "\n" << "Finished!" << "\n";
   } // void main(...)
 } // namespace Tutorial04
 
@@ -730,7 +730,7 @@ int main(int argc, char* argv[])
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #04: Parser" << std::endl;
+  std::cout << "Welcome to FEAT's tutorial #04: Parser" << "\n";
 
   // call the tutorial's main function
   Tutorial04::main(argc, argv);

@@ -192,7 +192,7 @@ namespace ElementRegression
     virtual void calc_conv_rates() const
     {
       // print out the test name
-      std::cout << this->_id << std::endl;
+      std::cout << this->_id << "\n";
 
       static constexpr int nl = 6;
 
@@ -219,9 +219,9 @@ namespace ElementRegression
           if(h1_) std::cout << " " << stringify_fp_fix(errs[i-1][1] / errs[i][1], 12, 15);
           if(h2_) std::cout << " " << stringify_fp_fix(errs[i-1][2] / errs[i][2], 12, 15);
         }
-        std::cout << std::endl;
+        std::cout << "\n";
       }
-      std::cout << "Elapsed Time: " << (TimeStamp().elapsed_string(stamp)) << std::endl;
+      std::cout << "Elapsed Time: " << (TimeStamp().elapsed_string(stamp)) << "\n";
     }
 
     virtual void run_error_test() const
@@ -235,17 +235,17 @@ namespace ElementRegression
       // check h0-error
       if(h0_)
       {
-        //std::cout << "H0-Error: " << stringify_fp_sci(err[0], 12) << std::endl;
+        //std::cout << "H0-Error: " << stringify_fp_sci(err[0], 12) << "\n";
         TEST_CHECK_EQUAL_WITHIN_EPS(err[0], h0_ref, eps*h0_ref);
       }
       if(h1_)
       {
-        //std::cout << "H1-Error: " << stringify_fp_sci(err[1], 12) << std::endl;
+        //std::cout << "H1-Error: " << stringify_fp_sci(err[1], 12) << "\n";
         TEST_CHECK_EQUAL_WITHIN_EPS(err[1], h1_ref, eps*h1_ref);
       }
       if(h2_)
       {
-        //std::cout << "H2-Error: " << stringify_fp_sci(err[2], 12) << std::endl;
+        //std::cout << "H2-Error: " << stringify_fp_sci(err[2], 12) << "\n";
         TEST_CHECK_EQUAL_WITHIN_EPS(err[2], h2_ref, eps*h2_ref);
       }
     }

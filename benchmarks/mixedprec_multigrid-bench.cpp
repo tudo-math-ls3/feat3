@@ -360,13 +360,13 @@ namespace MixedPrecMultiGridBench
     std::cout << what.pad_back(25, '.') << ": " << stringify_fp_fix(t, 3, 7);
     if(total > 0.0)
       std::cout << "   [" << stringify_fp_fix(100.0 * t / total, 2, 6) << "%]";
-    std::cout << std::endl;
+    std::cout << "\n";
   }
 
   // print memory usage
   void print_memory(const String& what, double bytes)
   {
-    std::cout << what.pad_back(25, '.') << ": " << stringify_fp_fix(bytes / (1024.0*1024.0*1024.0), 3, 7) << " GB" << std::endl;
+    std::cout << what.pad_back(25, '.') << ": " << stringify_fp_fix(bytes / (1024.0*1024.0*1024.0), 3, 7) << " GB" << "\n";
   }
 
   /**
@@ -388,7 +388,7 @@ namespace MixedPrecMultiGridBench
   template<typename AFP_, typename OFP_, typename IFP_>
   void run(const int level_max, const int max_iter, const int num_inner, const int num_smooth, const double omega)
   {
-    std::cout << "Floating Types: " << Typo<AFP_>::name() << ' ' << Typo<OFP_>::name() << ' ' << Typo<IFP_>::name() << std::endl;
+    std::cout << "Floating Types: " << Typo<AFP_>::name() << ' ' << Typo<OFP_>::name() << ' ' << Typo<IFP_>::name() << "\n";
 
     // create finest level vectors
     LevelVectors<OFP_> finest;
@@ -427,11 +427,11 @@ namespace MixedPrecMultiGridBench
     // print header line
     {
       const auto nps = stringify_fp_sci(OFP_(0)).size();
-      std::cout << std::endl;
+      std::cout << "\n";
       std::cout << "Iter  " << String("Abs. Defect").pad_back(nps);
       std::cout << "   " << String("Rel. Defect").pad_back(nps);
       std::cout << "   " << String("Reduce").pad_back(7);
-      std::cout << "   " << "H0-Error" << std::endl;
+      std::cout << "   " << "H0-Error" << "\n";
     }
 
     // outer multigrid richardson loop
@@ -456,7 +456,7 @@ namespace MixedPrecMultiGridBench
       std::cout << stringify(iter).pad_front(4) + ": " << stringify_fp_sci(def_norm);
       std::cout << " / " << stringify_fp_sci(def_norm/rhs_norm);
       std::cout << " / " << stringify_fp_fix(def_norm/def_prev, 4, 6);
-      std::cout << " / " << stringify_fp_sci(sol_error) << std::endl;
+      std::cout << " / " << stringify_fp_sci(sol_error) << "\n";
 
       // maximum iterations?
       if(iter >= max_iter)
@@ -465,14 +465,14 @@ namespace MixedPrecMultiGridBench
       // divergence?
       if(def_norm > OFP_(1E+10))
       {
-        std::cout << std::endl << ">>> ERROR: solver diverged!" << std::endl;
+        std::cout << "\n" << ">>> ERROR: solver diverged!" << "\n";
         return;
       }
 
       // check for stagnation
       if((iter >= 3) && (def_norm >= OFP_(0.95)*def_prev))
       {
-        std::cout << std::endl << ">>> Solver stagnated!" << std::endl;
+        std::cout << "\n" << ">>> Solver stagnated!" << "\n";
         break;
       }
 
@@ -505,7 +505,7 @@ namespace MixedPrecMultiGridBench
           // plot
           std::cout << stringify(iter).pad_front(3) + " [" << stringify(inner) << "]: "
             << stringify_fp_sci(def_norm_i) << " / " << stringify_fp_sci(def_norm_i/rhs_norm) << " / "
-            << stringify_fp_sci(sol_error_i) << std::endl;
+            << stringify_fp_sci(sol_error_i) << "\n";
         }
 
         // multigrid cycle restriction
@@ -579,12 +579,12 @@ namespace MixedPrecMultiGridBench
 
     watch_total.stop();
 
-    std::cout << std::endl;
-    std::cout << "Final Defect: " << stringify_fp_sci(final_def) << std::endl;
-    std::cout << "Final Error.: " << stringify_fp_sci(final_err) << std::endl;
+    std::cout << "\n";
+    std::cout << "Final Defect: " << stringify_fp_sci(final_def) << "\n";
+    std::cout << "Final Error.: " << stringify_fp_sci(final_err) << "\n";
 
     // print timing summary
-    std::cout << std::endl << "Timing Statistics" << std::endl;
+    std::cout << "\n" << "Timing Statistics" << "\n";
     print_time("Total Multigrid Time", watch_total.elapsed());
     print_time("Inner Multigrid Time", watch_inner.elapsed(), watch_total.elapsed());
     print_time("Smoothing Time", watch_smooth.elapsed(), watch_total.elapsed());
@@ -606,16 +606,16 @@ namespace MixedPrecMultiGridBench
     std::deque<std::pair<int,String>> unsupported = args.query_unsupported();
     if(!unsupported.empty())
     {
-      std::cerr << std::endl;
+      std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       Runtime::abort();
     }
 
 #ifdef FEAT_HAVE_OMP
-    std::cout << "OpenMP max threads: " << omp_get_max_threads() << std::endl;
+    std::cout << "OpenMP max threads: " << omp_get_max_threads() << "\n";
 #else
-    std::cout << "OpenMP not available in this build" << std::endl;
+    std::cout << "OpenMP not available in this build" << "\n";
 #endif
 
 
@@ -645,7 +645,7 @@ namespace MixedPrecMultiGridBench
       << " --num-inner " << num_inner
       << " --num-smooth " << num_smooth
       << " --omega " << omega
-      << " --prec " << precs << std::endl;
+      << " --prec " << precs << "\n";
 
     // If quad-precision is available, we use that for the assembly if the solver runs in double-precision
 #ifdef FEAT_HAVE_QUADMATH
@@ -675,7 +675,7 @@ namespace MixedPrecMultiGridBench
     if(precs == "tp tp") run<f_dp, f_tp, f_tp>(level, max_iter, num_inner, num_smooth, omega); else // double-prec asm
 #endif
     {
-      std::cout << "ERROR: unsupported precision combo " << precs << std::endl;
+      std::cout << "ERROR: unsupported precision combo " << precs << "\n";
       Runtime::abort();
     }
 

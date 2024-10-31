@@ -28,7 +28,7 @@ void run(PreferredBackend backend, const String filename, bool transpose)
   SparseMatrixCSR<DT_, IT_> x(FileMode::fm_csr, filename);
   if (transpose)
     x=x.transpose();
-  std::cout<<"csr loaded "<<x.rows()<< " " <<x.columns()<<std::endl;
+  std::cout<<"csr loaded "<<x.rows()<< " " <<x.columns()<<"\n";
 
 
   DenseMatrix<DT_, Index> r(x.rows(), 5000, DT_(0)), y(x.columns(), 5000, DT_(2.345));
@@ -43,7 +43,7 @@ void run(PreferredBackend backend, const String filename, bool transpose)
   Backend::set_preferred_backend(backend);
 
 
-  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols/dense: " << x.rows()<<" "<<x.columns()<< " "<<r.columns() << std::endl;
+  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols/dense: " << x.rows()<<" "<<x.columns()<< " "<<r.columns() << "\n";
 
   double flops = 2. * double(x.used_elements() * y.columns());
   double bytes = 2. * double(2 * x.used_elements() * x.columns() * y.columns() + r.columns() * r.rows());
@@ -72,7 +72,7 @@ void run(PreferredBackend backend, const String filename, bool transpose)
   }
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm_frobenius()<<std::endl;
+  std::cout<<"control norm: "<<r.norm_frobenius()<<"\n";
 }
 
 int main(int argc, char ** argv)

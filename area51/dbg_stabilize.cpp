@@ -202,9 +202,9 @@ namespace Andicore
     std::deque<std::pair<int,String>> unsupported = args.query_unsupported();
     if(!unsupported.empty())
     {
-      std::cerr << std::endl;
+      std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << std::endl;
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
       Runtime::abort();
     }
 
@@ -222,12 +222,12 @@ namespace Andicore
     args.parse("upsam", upsam);
     args.parse("gamma", gamma);
 
-    std::cout << String("Level").pad_back(20, '.') << ": " << level << std::endl;
-    std::cout << String("nu").pad_back(20, '.') << ": " << nu << std::endl;
-    std::cout << String("beta").pad_back(20, '.') << ": " << beta << std::endl;
-    std::cout << String("theta").pad_back(20, '.') << ": " << theta << std::endl;
-    std::cout << String("upsam").pad_back(20, '.') << ": " << upsam << std::endl;
-    std::cout << String("gamma").pad_back(20, '.') << ": " << gamma << std::endl;
+    std::cout << String("Level").pad_back(20, '.') << ": " << level << "\n";
+    std::cout << String("nu").pad_back(20, '.') << ": " << nu << "\n";
+    std::cout << String("beta").pad_back(20, '.') << ": " << beta << "\n";
+    std::cout << String("theta").pad_back(20, '.') << ": " << theta << "\n";
+    std::cout << String("upsam").pad_back(20, '.') << ": " << upsam << "\n";
+    std::cout << String("gamma").pad_back(20, '.') << ": " << gamma << "\n";
 
     // ********************************************************************************************
 
@@ -294,7 +294,7 @@ namespace Andicore
 
 
     // unstabilized
-    std::cout << "Solving Unstabilized System..." << std::endl;
+    std::cout << "Solving Unstabilized System..." << "\n";
     burgers.nu = nu;
     burgers.beta = beta;
     burgers.theta = theta;
@@ -308,11 +308,11 @@ namespace Andicore
 
     Assembly::ScalarErrorInfo<DataType> errors_1 = Assembly::ScalarErrorComputer<1>::
       compute(vec_sol_1, sol_function, space, cubature);
-    std::cout << errors_1 << std::endl;
+    std::cout << errors_1 << "\n";
 
 
     // streamline diffusion
-    std::cout << "Solving Streamline Diffusion Stabilized System..." << std::endl;
+    std::cout << "Solving Streamline Diffusion Stabilized System..." << "\n";
     burgers.sd_delta = upsam;
     burgers.sd_nu = nu;
     burgers.set_sd_v_norm(vec_conv);
@@ -326,11 +326,11 @@ namespace Andicore
 
     Assembly::ScalarErrorInfo<DataType> errors_2 = Assembly::ScalarErrorComputer<1>::
       compute(vec_sol_2, sol_function, space, cubature);
-    std::cout << errors_2 << std::endl;
+    std::cout << errors_2 << "\n";
 
 
     // EOJ stabilization
-    std::cout << "Solving Jump Stabilized System..." << std::endl;
+    std::cout << "Solving Jump Stabilized System..." << "\n";
     burgers.nu = nu;
     burgers.beta = beta;
     burgers.theta = theta;
@@ -347,12 +347,12 @@ namespace Andicore
 
     Assembly::ScalarErrorInfo<DataType> errors_3 = Assembly::ScalarErrorComputer<1>::
       compute(vec_sol_3, sol_function, space, cubature);
-    std::cout << errors_3 << std::endl;
+    std::cout << errors_3 << "\n";
 
     solver->done_symbolic();
 
 #else // no UMFPACK
-    std::cout << "You need to compile with UMFPACK support." << std::endl;
+    std::cout << "You need to compile with UMFPACK support." << "\n";
 #endif // FEAT_HAVE_UMFPACK
 
     if(args.check("vtk") >= 0)
@@ -360,7 +360,7 @@ namespace Andicore
       String vtk_name(String("./dbg-stabilize-lvl") + stringify(level));
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
       Geometry::ExportVTK<MeshType> exporter(mesh);
       exporter.add_vertex_vector("conv", vec_conv);
@@ -371,7 +371,7 @@ namespace Andicore
       exporter.write(vtk_name);
     }
 
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   }
 } // namespace Andicore
 

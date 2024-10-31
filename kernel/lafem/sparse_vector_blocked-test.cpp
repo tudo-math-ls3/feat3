@@ -71,7 +71,7 @@ public:
     }
 
     Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
     Random rng(seed);
     Adjacency::Permutation prm_rnd(a.size(), rng);
     SparseVectorBlocked<DT_, IT_, 2> ap(a.clone());

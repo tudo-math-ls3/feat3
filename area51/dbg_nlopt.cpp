@@ -83,7 +83,7 @@ int run(Solver_& solver, Operator_& op)
   }
 
   std::cout << "dbg-nlopt: Minimising " << TestTraitsType::name();
-  std::cout << ", starting point is " << starting_point << std::endl;
+  std::cout << ", starting point is " << starting_point << "\n";
   std::cout << "Known minima:";
   const auto& jt = min_points.end();
   auto it = min_points.begin();
@@ -91,7 +91,7 @@ int run(Solver_& solver, Operator_& op)
   {
     std::cout << " " << *it;
   }
-  std::cout << std::endl;
+  std::cout << "\n";
 
   FunctionType my_function;
 
@@ -132,13 +132,13 @@ int run(Solver_& solver, Operator_& op)
 
   String filename("");
 
-  std::cout << "Found solution " << sol << ", distance to nearest minimum: " << stringify_fp_sci(min_dist) << std::endl;
+  std::cout << "Found solution " << sol << ", distance to nearest minimum: " << stringify_fp_sci(min_dist) << "\n";
 
   // Write the iterates to file if we can
   if(solver->iterates != nullptr)
   {
     filename = "dbg_nlopt_"+TestTraitsType::name()+"_iterates";
-    std::cout << "Writing iterates to file " << filename << ".vtu" <<std::endl;
+    std::cout << "Writing iterates to file " << filename << ".vtu" <<"\n";
 
     // This will hold the Tiny::Vectors representing the iterates, which are contained in LAFEM::DenseVectorBlocked
     // containers of length 1 because of the solver interface
@@ -176,7 +176,7 @@ int run(Solver_& solver, Operator_& op)
     scaling(d) = DataType(1.1)*(domain_bounds[d](1) - domain_bounds[d](0));
 
   filename = "dbg_nlopt_"+TestTraitsType::name()+"_domain";
-  std::cout << "Writing domain to file " << filename << ".vtu" << std::endl;
+  std::cout << "Writing domain to file " << filename << ".vtu" << "\n";
 
   // Shape for the mesh for plotting
   typedef Shape::Hypercube<dim> ShapeType;
@@ -228,35 +228,35 @@ int run(Solver_& solver, Operator_& op)
 
 static void display_help()
 {
-  std::cout << "dbg-nlopt: Nonlinear optimizer debugging tool." << std::endl;
-  std::cout << "Required arguments:" << std::endl;
-  std::cout << " --solver [String]: Available solvers are NLCG, NLSD" << std::endl;
+  std::cout << "dbg-nlopt: Nonlinear optimizer debugging tool." << "\n";
+  std::cout << "Required arguments:" << "\n";
+  std::cout << " --solver [String]: Available solvers are NLCG, NLSD" << "\n";
 #ifdef FEAT_HAVE_ALGLIB
-  std::cout << "                    and ALGLIBMinLBFGS, ALGLIBMinCG" << std::endl;
+  std::cout << "                    and ALGLIBMinLBFGS, ALGLIBMinCG" << "\n";
 #else
   std::cout << "                    Compiling with the alglib token in the buildid "
-  << std::endl <<
-  "                    will enable ALGLIBMinLBFGS and ALGLIBMinCG" << std::endl;
+  << "\n" <<
+  "                    will enable ALGLIBMinLBFGS and ALGLIBMinCG" << "\n";
 #endif // FEAT_HAVE_ALGLIB
-  std::cout << "Optional arguments:" << std::endl;
-  std::cout << " --help: Displays this text" << std::endl;
+  std::cout << "Optional arguments:" << "\n";
+  std::cout << " --help: Displays this text" << "\n";
   std::cout << " --linesearch [String]: Available linesearches for NLCG and NLSD are NewtonRaphsonLinesearch,"
-  << std::endl;
+  << "\n";
   std::cout << "                    SecantLinesearch and MQCLinesearch (default)"
-  << std::endl;
+  << "\n";
   std::cout <<
     " --precon [String]: Available preconditioners for NLCG and NLSD are Hessian, ApproximateHessian, none(default)"
-    << std::endl <<
+    << "\n" <<
     " --direction_update [String]: Available search direction updates for NLCG are DaiYuan, DYHSybrid,"
-    << std::endl <<
+    << "\n" <<
     "                              FletcherReeves, HestenesStiefel, HagerZhang and PolakRibiere (default)."
-    << std::endl;
+    << "\n";
 #ifdef FEAT_HAVE_ALGLIB
   std::cout <<
     "                              Available search direction updates for ALGLIBMinCG are DaiYuan,"
-    << std::endl <<
+    << "\n" <<
     "                              and DYHSHybrid."
-    << std::endl;
+    << "\n";
 #endif // FEAT_HAVE_ALGLIB
 }
 
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
     display_help();
 
     Runtime::abort();
@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
 
     auto* update_pair(args.query("direction_update"));
     if(update_pair != nullptr)
-      std::cout << "Parameter direction_update specified for NLSD solver, ignoring it." << std::endl;
+      std::cout << "Parameter direction_update specified for NLSD solver, ignoring it." << "\n";
 
     auto my_solver = new_nlsd(my_op, my_filter, my_linesearch, true, my_precond);
 

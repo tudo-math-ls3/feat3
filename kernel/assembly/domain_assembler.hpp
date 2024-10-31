@@ -1365,26 +1365,26 @@ namespace FEAT
         std::ostringstream oss;
 
         oss << "Elements: " << stringify(this->_element_indices.size()) << " of " <<
-          stringify(this->_trafo.get_mesh().get_num_elements()) << std::endl;
+          stringify(this->_trafo.get_mesh().get_num_elements()) << "\n";
 
-        oss << "Strategy: " << (this->_strategy == ThreadingStrategy::layered ? "layered" : "colored") << std::endl;
+        oss << "Strategy: " << (this->_strategy == ThreadingStrategy::layered ? "layered" : "colored") << "\n";
 
         if(_strategy == ThreadingStrategy::layered)
         {
-          oss << std::endl << "Layers:" << std::endl;
+          oss << "\n" << "Layers:" << "\n";
           for(std::size_t i(0); i+1u < this->_layer_elements.size(); ++i)
           {
             auto jb = this->_layer_elements.at(i);
             auto je = this->_layer_elements.at(i+1);
             oss << stringify(i).pad_front(3) << ": "
               << stringify(je - jb).pad_front(6)
-              << std::endl;
+              << "\n";
           }
-           oss << std::endl;
+           oss << "\n";
 
           double desired = double(this->_element_indices.size()) / Math::max(double(this->_num_worker_threads), 1.0);
-          oss << "Desired : " << stringify(desired) << std::endl;
-          oss << "Threads:" << std::endl;
+          oss << "Desired : " << stringify(desired) << "\n";
+          oss << "Threads:" << "\n";
           for(std::size_t i(0); i+1 < this->_thread_layers.size(); ++i)
           {
             auto jb = this->_thread_layers.at(i);
@@ -1392,16 +1392,16 @@ namespace FEAT
             auto nel = this->_layer_elements.at(je) - this->_layer_elements.at(jb);
             oss << stringify(i).pad_front(3) << ": " << stringify(je-jb).pad_front(4) << " : "
               << stringify(nel).pad_front(6) << " :" << stringify_fp_fix(double(nel) / desired, 3, 6)
-              << std::endl;
+              << "\n";
           }
         }
         else
         {
-          oss << std::endl << "Colors:" << std::endl;
+          oss << "\n" << "Colors:" << "\n";
           for(std::size_t i(0); i+1u < this->_color_elements.size(); ++i)
             oss << stringify(i).pad_front(3) << ": "
               << stringify(this->_color_elements.at(i+1) - this->_color_elements.at(i)).pad_front(6)
-              << std::endl;
+              << "\n";
         }
 
         return oss.str();

@@ -334,14 +334,14 @@ namespace MultiPrecHierarchBench
     prol_mats.reserve(level_max);
 
     // print header line
-    std::cout << std::endl;
+    std::cout << "\n";
     std::cout << "Lvl      Norm2(RHS)";
     if(reduce)
       std::cout << "       #DOFs     #NZE(A)  #NZE(H[A])";
     if((MeshType::shape_dim > 1) || reduce)
       std::cout << "   Iter";
     std::cout << "   Abs-Def-Norm   Rel-Def-Norm       H0-Error       H1-Error     Time";
-    std::cout << std::endl;
+    std::cout << "\n";
 
     // Now, let's refine up to the maximum level
     for(Index ilevel(1); ilevel <= level_max; ++ilevel)
@@ -486,7 +486,7 @@ namespace MultiPrecHierarchBench
         << stringify_fp_sci(errors.norm_h0).pad_front(15)
         << stringify_fp_sci(errors.norm_h1).pad_front(15)
         << stamp.elapsed_string_now().pad_front(9)
-        << std::endl;
+        << "\n";
     } // end of level loop
   } // void main(...)
 } // namespace MultiPrecHierarchBench
@@ -514,8 +514,8 @@ int main(int argc, char* argv[])
     if(!String(argv[3]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[3] << "' as maximum refinement level->" << std::endl;
-      std::cerr << "Note: The first argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[3] << "' as maximum refinement level->" << "\n";
+      std::cerr << "Note: The first argument must be a positive integer." << "\n";
       Runtime::abort();
     }
     // parse successful
@@ -528,8 +528,8 @@ int main(int argc, char* argv[])
     if(!String(argv[4]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[4] << "' as minimum refinement level->" << std::endl;
-      std::cerr << "Note: The second argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[4] << "' as minimum refinement level->" << "\n";
+      std::cerr << "Note: The second argument must be a positive integer." << "\n";
       Runtime::abort();
     }
     // parse successful
@@ -544,22 +544,22 @@ int main(int argc, char* argv[])
   if(level_max < level_min)
   {
     // minimum level greater than maximum level
-    std::cerr << "ERROR: Minimum level " << level_min << " is greater than the maximum level " << level_max << std::endl;
+    std::cerr << "ERROR: Minimum level " << level_min << " is greater than the maximum level " << level_max << "\n";
     Runtime::abort();
   }
   if(level_max == level_min)
   {
     // minimum and maximum levels are equal
-    std::cout << "WARNING: Minimum and maximum levels are equal" << std::endl;
+    std::cout << "WARNING: Minimum and maximum levels are equal" << "\n";
   }
 
   String precs = prec_asm + ":" + prec_sol;
 
   // print selected levels
-  std::cout << "Precision: " << precs << std::endl;
-  std::cout << "Level-Min: " << level_min << std::endl;
-  std::cout << "Level-Max: " << level_max << std::endl;
-  std::cout << "Reduce   : " << (reduce ? "yes" : "no") << std::endl;
+  std::cout << "Precision: " << precs << "\n";
+  std::cout << "Level-Min: " << level_min << "\n";
+  std::cout << "Level-Max: " << level_max << "\n";
+  std::cout << "Reduce   : " << (reduce ? "yes" : "no") << "\n";
 
   // call the tutorial's main function
 #ifdef FEAT_HAVE_QUADMATH
@@ -577,12 +577,12 @@ int main(int argc, char* argv[])
   if(precs == "sp:bp") MultiPrecHierarchBench::main<float, flx_bf16>(level_max, level_min, reduce); else
 #endif
   {
-    std::cout << "ERROR: unsupported precision combo " << precs << std::endl;
+    std::cout << "ERROR: unsupported precision combo " << precs << "\n";
     Runtime::abort();
   }
 
   MemoryUsage mem_use;
-  std::cout << std::endl << mem_use.get_formatted_memory_usage() << std::endl;
+  std::cout << "\n" << mem_use.get_formatted_memory_usage() << "\n";
 
   // Finalize our runtime environment
   return 0;

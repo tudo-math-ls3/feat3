@@ -134,7 +134,7 @@ template
     // Create the mesh quality functional
     HyperelasticityFunctionalType rumpflpumpfl(rmn.get(), trafo, dirichlet_list, slip_list, my_functional, Meshopt::ScaleComputation::current_uniform);
     // Print information
-    std::cout << rumpflpumpfl.info() << std::endl;
+    std::cout << rumpflpumpfl.info() << "\n";
 
     // init() sets the coordinates in the mesh and computes h
     rumpflpumpfl.init();
@@ -178,7 +178,7 @@ template
 
     std::cout << "Pre optimization: fval = " << stringify_fp_sci(fval) <<
       " Shape quality: " << stringify_fp_sci(qual_min) <<
-      " Worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
+      " Worst angle: " << stringify_fp_fix(worst_angle) << "\n";
 
     std::string filename;
     // Write initial state to file
@@ -206,7 +206,7 @@ template
     solver->set_max_iter(100);
     solver->correct(new_coords, rhs);
     solver->done();
-    std::cout << "Solver used: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<std::endl;
+    std::cout << "Solver used: " << FEAT::Statistics::get_formatted_solver_tree().trim() <<"\n";
 
     rumpflpumpfl.eval_fval_grad(fval, grad);
     rumpflpumpfl.eval_fval_cellwise(fval, fval_norm, fval_det, fval_rec_det);
@@ -222,7 +222,7 @@ template
 
     std::cout << "Post optimization: fval = " << stringify_fp_sci(fval) <<
       " Shape quality: " << stringify_fp_sci(qual_min) <<
-      " Worst angle: " << stringify_fp_fix(worst_angle) << std::endl;
+      " Worst angle: " << stringify_fp_fix(worst_angle) << "\n";
 
     // Write optimized initial mesh
     filename = "post_" + helperclass<ShapeType>::print_typename();

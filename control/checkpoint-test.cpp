@@ -86,7 +86,7 @@ public:
       bs2.seekg(0);
       std::uint64_t size_2 = *(std::uint64_t *)(bs2.data()); //read in the size of the output data
       XASSERTM(size_2 < size_1, "With zlib compressed Checkpoint size is bigger than uncompressed");
-      //std::cout << "Size_1 is:" << size_1 << "   size_2 is:" << size_2 << std::endl;*/
+      //std::cout << "Size_1 is:" << size_1 << "   size_2 is:" << size_2 << "\n";*/
       bs2.seekg(0);
       cp.load(bs2);
       LAFEM::DenseVector<DT_, IT_> dv3;
@@ -102,7 +102,7 @@ public:
       bs3.seekg(0);
       std::uint64_t size_3 = *(std::uint64_t *)(bs3.data()); //read in the size of the output data
       XASSERTM(size_3 < size_2, "With zfp compressed Checkpoint size is bigger than zlib compressed");
-      //std::cout << "Size_2 is:" << size_2 << "   size_3 is:" << size_3 << std::endl;
+      //std::cout << "Size_2 is:" << size_2 << "   size_3 is:" << size_3 << "\n";
       bs3.seekg(0);
       cp.load(bs3);
       LAFEM::DenseVector<DT_, IT_> dv4;

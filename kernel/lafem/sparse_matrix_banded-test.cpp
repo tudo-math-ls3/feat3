@@ -50,7 +50,7 @@ public:
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     // create random matrix
     const Index tsize(100);
@@ -205,7 +205,7 @@ public:
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     // create random matrix
     const Index tsize(100);
@@ -310,7 +310,7 @@ public:
 
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     DT_ s(DT_(4.321));
 
@@ -455,7 +455,7 @@ public:
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     DT_ s(DT_(4.321));
 
@@ -545,7 +545,7 @@ public:
     DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     DT_ s(DT_(4.321));
 

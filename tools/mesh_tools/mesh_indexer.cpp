@@ -21,54 +21,54 @@ namespace MeshIndexerTool
 
   void display_help()
   {
-    std::cout << std::endl;
-    std::cout << "mesh-indexer: Creates a FEAT mesh file from vertex coordinate and element index files" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Mandatory arguments:" << std::endl;
-    std::cout << "--------------------" << std::endl;
-    std::cout << "--out <meshfile>" << std::endl;
-    std::cout << "Specifies the filename of the output mesh file that is to be generated." << std::endl;
-    std::cout << std::endl;
-    std::cout << "--vtx <filenames...>" << std::endl;
-    std::cout << "Specifies the name of the input text file that contains the vertex coordinates." << std::endl;
-    std::cout << "Each line of this file should contain the coordinate tuple of a single vertex" << std::endl;
-    std::cout << "and the number of coordinates must match the mesh shape specified by '--shape'." << std::endl;
-    std::cout << "Empty lines and lines beginning with the hash character '#' are ignored. " << std::endl;
-    std::cout << std::endl;
-    std::cout << "--idx <filenames...>" << std::endl;
-    std::cout << "Specifies the name of the input text file that contains the vertices-at-element indices." << std::endl;
-    std::cout << "Each line of this file should contain the vertex-index tuple of a single element" << std::endl;
-    std::cout << "and the number of indices must match the mesh shape specified by '--shape'." << std::endl;
-    std::cout << "Empty lines and lines beginning with the hash character '#' are ignored. " << std::endl;
-    std::cout << "Note: The index of the first vertex is 0, not 1." << std::endl;
-    std::cout << std::endl;
-    std::cout << "--shape <shape>" << std::endl;
-    std::cout << "Specifies the shape of the mesh to be generated. Must be one of the following:" << std::endl;
-    std::cout << " h2  : Hypercube<2> mesh with 2D coordinates" << std::endl;
-    std::cout << " h3  : Hypercube<3> mesh with 3D coordinates" << std::endl;
-    std::cout << " h23 : Hypercube<2> mesh with 3D coordinates" << std::endl;
-    std::cout << " s2  : Simplex<2> mesh with 2D coordinates" << std::endl;
-    std::cout << " s3  : Simplex<3> mesh with 3D coordinates" << std::endl;
-    std::cout << " s23 : Simplex<2> mesh with 3D coordinates" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Optional arguments:" << std::endl;
-    std::cout << "-------------------" << std::endl;
-    std::cout << "--bnd" << std::endl;
-    std::cout << "Specifies that a single mesh part for the entire boundary is to be generated." << std::endl;
-    std::cout << "If specified, the generated meshpart will be named 'bnd'." << std::endl;
-    std::cout << std::endl;
-    std::cout << "--parts <name1> <formula1> [<name2> <formula2> ...]" << std::endl;
-    std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts" << std::endl;
-    std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair" << std::endl;
-    std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula" << std::endl;
-    std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part." << std::endl;
-    std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates" << std::endl;
-    std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively." << std::endl;
-    std::cout << "Please note that this option can only be used if FEAT is configured and linked against" << std::endl;
-    std::cout << "the 'fparser' third-party library." << std::endl;
-    std::cout << std::endl;
-    std::cout << "--help" << std::endl;
-    std::cout << "Displays this message" << std::endl;
+    std::cout << "\n";
+    std::cout << "mesh-indexer: Creates a FEAT mesh file from vertex coordinate and element index files" << "\n";
+    std::cout << "\n";
+    std::cout << "Mandatory arguments:" << "\n";
+    std::cout << "--------------------" << "\n";
+    std::cout << "--out <meshfile>" << "\n";
+    std::cout << "Specifies the filename of the output mesh file that is to be generated." << "\n";
+    std::cout << "\n";
+    std::cout << "--vtx <filenames...>" << "\n";
+    std::cout << "Specifies the name of the input text file that contains the vertex coordinates." << "\n";
+    std::cout << "Each line of this file should contain the coordinate tuple of a single vertex" << "\n";
+    std::cout << "and the number of coordinates must match the mesh shape specified by '--shape'." << "\n";
+    std::cout << "Empty lines and lines beginning with the hash character '#' are ignored. " << "\n";
+    std::cout << "\n";
+    std::cout << "--idx <filenames...>" << "\n";
+    std::cout << "Specifies the name of the input text file that contains the vertices-at-element indices." << "\n";
+    std::cout << "Each line of this file should contain the vertex-index tuple of a single element" << "\n";
+    std::cout << "and the number of indices must match the mesh shape specified by '--shape'." << "\n";
+    std::cout << "Empty lines and lines beginning with the hash character '#' are ignored. " << "\n";
+    std::cout << "Note: The index of the first vertex is 0, not 1." << "\n";
+    std::cout << "\n";
+    std::cout << "--shape <shape>" << "\n";
+    std::cout << "Specifies the shape of the mesh to be generated. Must be one of the following:" << "\n";
+    std::cout << " h2  : Hypercube<2> mesh with 2D coordinates" << "\n";
+    std::cout << " h3  : Hypercube<3> mesh with 3D coordinates" << "\n";
+    std::cout << " h23 : Hypercube<2> mesh with 3D coordinates" << "\n";
+    std::cout << " s2  : Simplex<2> mesh with 2D coordinates" << "\n";
+    std::cout << " s3  : Simplex<3> mesh with 3D coordinates" << "\n";
+    std::cout << " s23 : Simplex<2> mesh with 3D coordinates" << "\n";
+    std::cout << "\n";
+    std::cout << "Optional arguments:" << "\n";
+    std::cout << "-------------------" << "\n";
+    std::cout << "--bnd" << "\n";
+    std::cout << "Specifies that a single mesh part for the entire boundary is to be generated." << "\n";
+    std::cout << "If specified, the generated meshpart will be named 'bnd'." << "\n";
+    std::cout << "\n";
+    std::cout << "--parts <name1> <formula1> [<name2> <formula2> ...]" << "\n";
+    std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts" << "\n";
+    std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair" << "\n";
+    std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula" << "\n";
+    std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part." << "\n";
+    std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates" << "\n";
+    std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively." << "\n";
+    std::cout << "Please note that this option can only be used if FEAT is configured and linked against" << "\n";
+    std::cout << "the 'fparser' third-party library." << "\n";
+    std::cout << "\n";
+    std::cout << "--help" << "\n";
+    std::cout << "Displays this message" << "\n";
   }
 
   int parse_vtx(std::vector<Real>& vtx, const String& filename, const int world_dim)
@@ -79,11 +79,11 @@ namespace MeshIndexerTool
     std::ifstream ifs(filename, std::ios_base::in);
     if(!ifs.is_open() || !ifs.good())
     {
-      std::cerr << "ERROR: failed to open vertex file '" << filename << "'" << std::endl;
+      std::cerr << "ERROR: failed to open vertex file '" << filename << "'" << "\n";
       return 1;
     }
 
-    std::cout << "Parsing vertex file '" << filename << "'..." << std::endl;
+    std::cout << "Parsing vertex file '" << filename << "'..." << "\n";
 
     String line;
     Index line_no(0);
@@ -101,7 +101,7 @@ namespace MeshIndexerTool
       v = line.split_by_whitespaces();
       if(int(v.size()) != world_dim)
       {
-        std::cerr << "ERROR: found " << v.size() << " tokens in line " << line_no << ", but expected " << world_dim << std::endl;
+        std::cerr << "ERROR: found " << v.size() << " tokens in line " << line_no << ", but expected " << world_dim << "\n";
         return 1;
       }
 
@@ -110,7 +110,7 @@ namespace MeshIndexerTool
         Real t(0.0);
         if(!v[i].parse(t))
         {
-          std::cerr << "ERROR: failed to parse vertex coord '" << v[i] << "' in line " << line_no << std::endl;
+          std::cerr << "ERROR: failed to parse vertex coord '" << v[i] << "' in line " << line_no << "\n";
           return 1;
         }
         vtx.push_back(t);
@@ -129,11 +129,11 @@ namespace MeshIndexerTool
     std::ifstream ifs(filename, std::ios_base::in);
     if(!ifs.is_open() || !ifs.good())
     {
-      std::cerr << "ERROR: failed to open index file '" << filename << "'" << std::endl;
+      std::cerr << "ERROR: failed to open index file '" << filename << "'" << "\n";
       return 1;
     }
 
-    std::cout << "Parsing index file '" << filename << "'..." << std::endl;
+    std::cout << "Parsing index file '" << filename << "'..." << "\n";
 
     String line;
     Index line_no(0);
@@ -151,7 +151,7 @@ namespace MeshIndexerTool
       v = line.split_by_whitespaces();
       if(int(v.size()) != num_corners)
       {
-        std::cerr << "ERROR: found " << v.size() << " tokens in line " << line_no << ", but expected " << num_corners << std::endl;
+        std::cerr << "ERROR: found " << v.size() << " tokens in line " << line_no << ", but expected " << num_corners << "\n";
         return 1;
       }
 
@@ -160,12 +160,12 @@ namespace MeshIndexerTool
         Index t(0);
         if(!v[i].parse(t))
         {
-          std::cerr << "ERROR: failed to parse index '" << v[i] << "' in line " << line_no << std::endl;
+          std::cerr << "ERROR: failed to parse index '" << v[i] << "' in line " << line_no << "\n";
           return 1;
         }
         if(t >= num_vertices)
         {
-          std::cerr << "ERROR: vertex index " << t << " out of bounds in line " << line_no << ", expected < " << num_vertices << std::endl;
+          std::cerr << "ERROR: vertex index " << t << " out of bounds in line " << line_no << ", expected < " << num_vertices << "\n";
           return 1;
         }
         idx.push_back(t);
@@ -214,7 +214,7 @@ namespace MeshIndexerTool
   {
     if((pts.size() % 2u) != 0u)
     {
-      std::cerr << "ERROR: invalid number of parameters for option --parts, expected an even count" << std::endl;
+      std::cerr << "ERROR: invalid number of parameters for option --parts, expected an even count" << "\n";
       return false;
     }
 
@@ -228,7 +228,7 @@ namespace MeshIndexerTool
       String formula = *it;
       ++it;
 
-      std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'..." << std::endl;
+      std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'..." << "\n";
 
       try
       {
@@ -246,8 +246,8 @@ namespace MeshIndexerTool
       }
       catch(std::exception& exc)
       {
-        std::cerr << "ERROR: in boundary function formula '" << formula << "'" << std::endl;
-        std::cerr << exc.what() << std::endl;
+        std::cerr << "ERROR: in boundary function formula '" << formula << "'" << "\n";
+        std::cerr << exc.what() << "\n";
         return false;
       }
     }
@@ -260,7 +260,7 @@ namespace MeshIndexerTool
   template<std::size_t dim_>
   void deorphan_vtx(std::vector<Real>& vtx, std::vector<Index>& idx)
   {
-    std::cout << "Removing orphan vertices..." << std::endl;
+    std::cout << "Removing orphan vertices..." << "\n";
 
     // allocate vertex mask
     const std::size_t num_verts = vtx.size() / dim_;
@@ -283,7 +283,7 @@ namespace MeshIndexerTool
 
     if(num_verts == n)
     {
-      std::cout << "No orphan vertices found" << std::endl;
+      std::cout << "No orphan vertices found" << "\n";
       return;
     }
 
@@ -306,8 +306,8 @@ namespace MeshIndexerTool
       i = mask[i];
 
     // done
-    std::cout << "Removed " << (num_verts - n) << " orphan vertices" << std::endl;
-    std::cout << "Now have " << n << " from previously " << num_verts << " vertices" << std::endl;
+    std::cout << "Removed " << (num_verts - n) << " orphan vertices" << "\n";
+    std::cout << "Now have " << n << " from previously " << num_verts << " vertices" << "\n";
   }
 
 
@@ -315,7 +315,7 @@ namespace MeshIndexerTool
   void merge_vtx(std::vector<Real>& vtx, std::vector<std::size_t>& vtx_off,
     std::vector<std::size_t>& vtx_idx, const std::vector<std::vector<Real>>& vvtx)
   {
-    std::cout << "Merging vertex sets..." << std::endl;
+    std::cout << "Merging vertex sets..." << "\n";
     typedef Tiny::Vector<Real, dim_> Vtx;
 
     // count total number of vertex coords and build vertex offsets
@@ -371,8 +371,8 @@ namespace MeshIndexerTool
 
     if(num_vtx < vtx_idx.size())
     {
-      std::cout << "Removed " << (vtx_idx.size()-num_vtx) << " duplicate vertices" << std::endl;
-      std::cout << "Now have " << num_vtx << " from previously " << vtx_idx.size() << " vertices" << std::endl;
+      std::cout << "Removed " << (vtx_idx.size()-num_vtx) << " duplicate vertices" << "\n";
+      std::cout << "Now have " << num_vtx << " from previously " << vtx_idx.size() << " vertices" << "\n";
       vtx.resize(num_vtx * std::size_t(dim_));
     }
   }
@@ -382,7 +382,7 @@ namespace MeshIndexerTool
     std::vector<Index>& idx, const std::vector<std::size_t>& vtx_off,
     const std::vector<std::size_t>& vtx_idx, const std::vector<std::vector<Index>>& iidx)
   {
-    std::cout << "Merging index sets..." << std::endl;
+    std::cout << "Merging index sets..." << "\n";
     typedef std::array<Index, std::size_t(nvi_)> Idx;
 
     std::size_t num_indices(0u);
@@ -452,20 +452,20 @@ namespace MeshIndexerTool
     build_index_set(mesh.template get_index_set<shape_dim, 0>(), idx);
 
     // deduct topology
-    std::cout << "Deducting mesh topology..." << std::endl;
+    std::cout << "Deducting mesh topology..." << "\n";
     mesh.deduct_topology_from_top();
 
     // write final dimensions
-    std::cout << "Mesh entity counts:";// << std::endl;
+    std::cout << "Mesh entity counts:";// << "\n";
     for(int i(0); i <= shape_dim; ++i)
       std::cout << " " << mesh.get_num_entities(i);
-      //std::cout << "Dimension " << i << ": " << mesh.get_num_entities(i) << std::endl;
-    std::cout << std::endl;
+      //std::cout << "Dimension " << i << ": " << mesh.get_num_entities(i) << "\n";
+    std::cout << "\n";
 
     // create boundary mesh part
     if(args.check("bnd") >= 0)
     {
-      std::cout << "Creating boundary meshpart..." << std::endl;
+      std::cout << "Creating boundary meshpart..." << "\n";
       Geometry::BoundaryFactory<MeshType_> bnd_factory(mesh);
       mesh_node.add_mesh_part("bnd", bnd_factory.make_unique());
     }
@@ -480,7 +480,7 @@ namespace MeshIndexerTool
 #else // no FEAT_HAVE_FPARSER
     if(args.check("parts") >= 0)
     {
-      std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts" << std::endl;
+      std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts" << "\n";
       return 1;
     }
 #endif // FEAT_HAVE_FPARSER
@@ -488,17 +488,17 @@ namespace MeshIndexerTool
     String out_name;
     if(args.parse("out", out_name) < 1)
     {
-      std::cerr << "ERROR: mandatory output mesh file must be specified via --out <filename>" << std::endl;
+      std::cerr << "ERROR: mandatory output mesh file must be specified via --out <filename>" << "\n";
       return 1;
     }
 
     // write mesh file
-    std::cout << "Writing output mesh file '" << out_name << "'..." << std::endl;
+    std::cout << "Writing output mesh file '" << out_name << "'..." << "\n";
 
     std::ofstream ofs(out_name, std::ios_base::out);
     if(!ofs.is_open() || !ofs.good())
     {
-      std::cerr << "ERROR: Failed to open output file '" << out_name << "'" << std::endl;
+      std::cerr << "ERROR: Failed to open output file '" << out_name << "'" << "\n";
       return 1;
     }
 
@@ -540,13 +540,13 @@ namespace MeshIndexerTool
 
     if(args.check("vtx") < 1)
     {
-      std::cerr << "ERROR: mandatory vertex coordinate input files must be specified via --vtx <filenames...>" << std::endl;
+      std::cerr << "ERROR: mandatory vertex coordinate input files must be specified via --vtx <filenames...>" << "\n";
       display_help();
       return 1;
     }
     if(args.check("idx") < 1)
     {
-      std::cerr << "ERROR: mandatory element indices input files must be specified via --idx <filenames...>" << std::endl;
+      std::cerr << "ERROR: mandatory element indices input files must be specified via --idx <filenames...>" << "\n";
       display_help();
       return 1;
     }
@@ -554,7 +554,7 @@ namespace MeshIndexerTool
     String shape_type;
     if(args.parse("shape", shape_type) < 1)
     {
-      std::cerr << "ERROR: mandatory shape type option --shape <shapename> is missing" << std::endl;
+      std::cerr << "ERROR: mandatory shape type option --shape <shapename> is missing" << "\n";
       display_help();
       return 1;
     }
@@ -602,13 +602,13 @@ namespace MeshIndexerTool
       int rtn = parse_vtx(vtx.at(i), vtx_files.at(i), world_dim);
       if(rtn != 0)
         return rtn;
-      std::cout << "Parsed " << Index(vtx.at(i).size()) / Index(world_dim) << " vertices from file" << std::endl;
+      std::cout << "Parsed " << Index(vtx.at(i).size()) / Index(world_dim) << " vertices from file" << "\n";
       num_vertices += Index(vtx.at(i).size());
     }
     num_vertices /= Index(world_dim);
 
     // compute number of parsed vertices
-    std::cout << "Parsed " << num_vertices << " total vertices" << std::endl << std::endl;
+    std::cout << "Parsed " << num_vertices << " total vertices" << "\n" << "\n";
 
     // parse index file
     const std::deque<String>& idx_files = args.query("idx")->second;
@@ -620,12 +620,12 @@ namespace MeshIndexerTool
       if(rtn != 0)
         return rtn;
 
-      std::cout << "Parsed " << Index(idx.at(i).size()) / Index(num_corners) << " elements from file" << std::endl;
+      std::cout << "Parsed " << Index(idx.at(i).size()) / Index(num_corners) << " elements from file" << "\n";
       num_elements += Index(idx.at(i).size());
     }
 
     num_elements /= Index(num_corners);
-    std::cout << "Parsed " << num_elements << " total elements" << std::endl << std::endl;
+    std::cout << "Parsed " << num_elements << " total elements" << "\n" << "\n";
 
     if(shape_type.compare_no_case("h2") == 0)
       return run_shape<H2M2D>(args, vtx, idx);
@@ -640,7 +640,7 @@ namespace MeshIndexerTool
     if(shape_type.compare_no_case("s3") == 0)
       return run_shape<S3M3D>(args, vtx, idx);
 
-    std::cerr << "ERROR: invalid shape type '" << shape_type << "'" << std::endl;
+    std::cerr << "ERROR: invalid shape type '" << shape_type << "'" << "\n";
     display_help();
     return 1;
   }

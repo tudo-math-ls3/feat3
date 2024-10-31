@@ -701,7 +701,7 @@ namespace FEAT
         if(_comm != nullptr)
           _comm->print(line);
         else
-          std::cout << line << std::endl;
+          std::cout << line << "\n";
       }
 
       /**

@@ -173,17 +173,17 @@ namespace FEAT
         os << "H0-Norm...: " << stringify_fp_sci(vi.norm_h0) << " [";
         for(int i(0); i < dim_; ++i)
           os << " " << stringify_fp_sci(vi.norm_h0_comp[i]);
-        os << " ]" << std::endl;
+        os << " ]" << "\n";
 
         // print H1-norms
         os << "H1-Norm...: " << stringify_fp_sci(vi.norm_h1) << " [";
         for(int i(0); i < dim_; ++i)
           os << " " << stringify_fp_sci(vi.norm_h1_comp[i]);
-        os << " ]" << std::endl;
+        os << " ]" << "\n";
 
         // print divergence and vorticity norms
-        os << "Divergence: " << stringify_fp_sci(vi.divergence) << std::endl;
-        os << "Vorticity.: " << stringify_fp_sci(vi.vorticity) << std::endl;
+        os << "Divergence: " << stringify_fp_sci(vi.divergence) << "\n";
+        os << "Vorticity.: " << stringify_fp_sci(vi.vorticity) << "\n";
 
         return os;
       }

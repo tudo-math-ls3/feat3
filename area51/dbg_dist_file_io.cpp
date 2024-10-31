@@ -81,14 +81,14 @@ namespace DbgDistFileIO
     if(shared1.size() != shared2.size())
     {
       std::cerr << "ERROR on rank " << comm.rank() << ": shared size mismatch: expected "
-        << shared1.size() << " but got " << buffer2.size() << std::endl;
+        << shared1.size() << " but got " << buffer2.size() << "\n";
     }
 
     // compare buffer size
     if(buffer2.size() != my_size)
     {
       std::cerr << "ERROR on rank " << comm.rank() << ": buffer size mismatch: expected "
-        << my_size << " but got " << buffer2.size() << std::endl;
+        << my_size << " but got " << buffer2.size() << "\n";
       Runtime::abort();
     }
 
@@ -115,7 +115,7 @@ namespace DbgDistFileIO
       if(shared1[i] != shared1[i])
       {
         std::cerr << "ERROR on rank " << comm.rank() << ": shared data mismatch at byte " << i
-          << ": expected " << int(shared1[i]) << " but got " << int(shared2[i]) << std::endl;
+          << ": expected " << int(shared1[i]) << " but got " << int(shared2[i]) << "\n";
         Runtime::abort();
       }
     }
@@ -126,7 +126,7 @@ namespace DbgDistFileIO
       if(buffer1[i] != buffer2[i])
       {
         std::cerr << "ERROR on rank " << comm.rank() << ": buffer data mismatch at byte " << i
-          << ": expected " << int(buffer1[i]) << " but got " << int(buffer2[i]) << std::endl;
+          << ": expected " << int(buffer1[i]) << " but got " << int(buffer2[i]) << "\n";
         Runtime::abort();
       }
     }

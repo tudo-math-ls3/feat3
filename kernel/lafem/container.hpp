@@ -589,7 +589,7 @@ namespace FEAT
           }
         }
         uiarray[0] = raw_size + 16u; //padding
-        //std::cout << "Compressed size is: " << uiarray[0] << std::endl;
+        //std::cout << "Compressed size is: " << uiarray[0] << "\n";
 
         result.resize(std::size_t(uiarray[0]));
         return result;
@@ -653,10 +653,10 @@ namespace FEAT
         XASSERT(Type::Traits<IT_>::is_signed == Type::Helper::extract_signedness(uiarray[3]));
 
         if (sizeof(DT_) > Type::Helper::extract_type_size(uiarray[2]))
-          std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!"<<std::endl;
+          std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!"<<"\n";
 
         if (sizeof(IT_) > Type::Helper::extract_type_size(uiarray[3]))
-          std::cerr<<"Warning: You are reading a container integral type in higher precision then it was saved before!"<<std::endl;
+          std::cerr<<"Warning: You are reading a container integral type in higher precision then it was saved before!"<<"\n";
 
         CompressionModes compress = (CompressionModes)uiarray[10];
         //test whether system has right third_party software loaded:

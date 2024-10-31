@@ -16,43 +16,43 @@ using namespace FEAT;
 
 static void display_help()
 {
-  std::cout << std::endl;
-  std::cout << "mesh2tri: Converts a mesh from FEAT 3 format to legacy FEATFLOW 1/2 TRI format" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Mandatory arguments:" << std::endl;
-  std::cout << "--------------------" << std::endl;
-  std::cout << " --mesh <path to mesh file(s)>" << std::endl;
-  std::cout << "Specifies the sequence of input mesh files paths." << std::endl;
-  std::cout << std::endl;
-  std::cout << "Optional arguments:" << std::endl;
-  std::cout << "-------------------" << std::endl;
-  std::cout << " --tri <path to tri file>" << std::endl;
-  std::cout << "Specifies the path of the output TRI file." << std::endl;
-  std::cout << "If not given, the name of the first input mesh file is used." << std::endl;
-  std::cout << std::endl;
+  std::cout << "\n";
+  std::cout << "mesh2tri: Converts a mesh from FEAT 3 format to legacy FEATFLOW 1/2 TRI format" << "\n";
+  std::cout << "\n";
+  std::cout << "Mandatory arguments:" << "\n";
+  std::cout << "--------------------" << "\n";
+  std::cout << " --mesh <path to mesh file(s)>" << "\n";
+  std::cout << "Specifies the sequence of input mesh files paths." << "\n";
+  std::cout << "\n";
+  std::cout << "Optional arguments:" << "\n";
+  std::cout << "-------------------" << "\n";
+  std::cout << " --tri <path to tri file>" << "\n";
+  std::cout << "Specifies the path of the output TRI file." << "\n";
+  std::cout << "If not given, the name of the first input mesh file is used." << "\n";
+  std::cout << "\n";
   //            ---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0
   //           "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
-  std::cout << " --knpr [<mesh-part-names...>]" << std::endl;
-  std::cout << "Specifies how the nodal property array KNPR is to be defined." << std::endl;
-  std::cout << "If not given, then the entire nodal property array is formatted to 0." << std::endl;
-  std::cout << "If given without any mesh-part names, then the nodal property is set to 0" << std::endl;
-  std::cout << "for all interior vertices and to 1 for all boundary vertices." << std::endl;
-  std::cout << "If at least one mesh-part name is given, then all vertices belonging to the" << std::endl;
-  std::cout << "first mesh-part get the nodal property 1, all vertices belonging to the second" << std::endl;
-  std::cout << "mesh-part get the nodal property 2, etc., and all remaining vertices get the" << std::endl;
-  std::cout << "nodal property 0. If multiple mesh-parts are to be combined so that all their" << std::endl;
-  std::cout << "vertices belong to the same nodal property group, then you can specify that" << std::endl;
-  std::cout << "group of mesh-parts by specifying their names in a double-quoted string, e.g." << std::endl;
-  std::cout << "  --knpr bnd:l \"bnd:t bnd:b\" bnd:r" << std::endl;
-  std::cout << "will yield 3 nodal property groups:" << std::endl;
-  std::cout << "bnd:l -> 1, bnd:t -> 2, bnd:b -> 2, bnd:r -> 3, the rest -> 0" << std::endl;
-  std::cout << std::endl;
-  std::cout << " --level [lvl_max [lvl_min]]" << std::endl;
-  std::cout << "Specifies the minimum and maximum refinement levels." << std::endl;
-  std::cout << "If not given, only level 0 is processed." << std::endl;
-  std::cout << std::endl;
-  std::cout << " --help" << std::endl;
-  std::cout << "Displays this message" << std::endl;
+  std::cout << " --knpr [<mesh-part-names...>]" << "\n";
+  std::cout << "Specifies how the nodal property array KNPR is to be defined." << "\n";
+  std::cout << "If not given, then the entire nodal property array is formatted to 0." << "\n";
+  std::cout << "If given without any mesh-part names, then the nodal property is set to 0" << "\n";
+  std::cout << "for all interior vertices and to 1 for all boundary vertices." << "\n";
+  std::cout << "If at least one mesh-part name is given, then all vertices belonging to the" << "\n";
+  std::cout << "first mesh-part get the nodal property 1, all vertices belonging to the second" << "\n";
+  std::cout << "mesh-part get the nodal property 2, etc., and all remaining vertices get the" << "\n";
+  std::cout << "nodal property 0. If multiple mesh-parts are to be combined so that all their" << "\n";
+  std::cout << "vertices belong to the same nodal property group, then you can specify that" << "\n";
+  std::cout << "group of mesh-parts by specifying their names in a double-quoted string, e.g." << "\n";
+  std::cout << "  --knpr bnd:l \"bnd:t bnd:b\" bnd:r" << "\n";
+  std::cout << "will yield 3 nodal property groups:" << "\n";
+  std::cout << "bnd:l -> 1, bnd:t -> 2, bnd:b -> 2, bnd:r -> 3, the rest -> 0" << "\n";
+  std::cout << "\n";
+  std::cout << " --level [lvl_max [lvl_min]]" << "\n";
+  std::cout << "Specifies the minimum and maximum refinement levels." << "\n";
+  std::cout << "If not given, only level 0 is processed." << "\n";
+  std::cout << "\n";
+  std::cout << " --help" << "\n";
+  std::cout << "Displays this message" << "\n";
 }
 
 String get_file_title(const String& filename)
@@ -89,7 +89,7 @@ int build_nodal_properties(SimpleArgParser& args, std::vector<int>& node_prop, c
   // create nodal properties from entire boundary?
   if(args.check("knpr") == 0)
   {
-    std::cout << "Building nodal property #1 from entire boundary..." << std::endl;
+    std::cout << "Building nodal property #1 from entire boundary..." << "\n";
     Geometry::BoundaryFactory<Mesh_> bnd_factory(*mesh_node.get_mesh());
     Geometry::MeshPart<Mesh_> bnd_part(bnd_factory);
     mask_nodal_properties(node_prop, bnd_part.template get_target_set<0>(), 1);
@@ -104,7 +104,7 @@ int build_nodal_properties(SimpleArgParser& args, std::vector<int>& node_prop, c
     std::deque<String> part_names = snpr.at(k).split_by_whitespaces();
 
     std::cout << "Building nodal property #" << k << " from mesh part(s) '" <<
-      stringify_join(part_names, "', '") << "'..." << std::endl;
+      stringify_join(part_names, "', '") << "'..." << "\n";
 
     // loop over all mesh-parts
     for(const String& part_name : part_names)
@@ -112,7 +112,7 @@ int build_nodal_properties(SimpleArgParser& args, std::vector<int>& node_prop, c
       const auto* part = mesh_node.find_mesh_part(part_name);
       if(part == nullptr)
       {
-        std::cerr << "ERROR: Could not find mesh part named '" << part_name << "'" << std::endl;
+        std::cerr << "ERROR: Could not find mesh part named '" << part_name << "'" << "\n";
         return -1;
       }
 
@@ -160,7 +160,7 @@ bool write_tri(const String& filename, const Geometry::RootMeshNode<Mesh_>& mesh
   std::ofstream ofs(filename);
   if(!ofs)
   {
-    std::cerr << "ERROR: Failed to open '" << filename << "' for writing!" << std::endl;
+    std::cerr << "ERROR: Failed to open '" << filename << "' for writing!" << "\n";
     return false;
   }
 
@@ -241,19 +241,19 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   try
 #endif
   {
-    std::cout << "Parsing mesh files..." << std::endl;
+    std::cout << "Parsing mesh files..." << "\n";
     // Now parse the mesh file
     mesh_reader.parse(*node, *atlas);
   }
 #ifndef DEBUG
   catch(std::exception& exc)
   {
-    std::cerr << "ERROR: " << exc.what() << std::endl;
+    std::cerr << "ERROR: " << exc.what() << "\n";
     return 1;
   }
   catch(...)
   {
-    std::cerr << "ERROR: unknown exception" << std::endl;
+    std::cerr << "ERROR: unknown exception" << "\n";
     return 1;
   }
 #endif
@@ -266,7 +266,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   {
     if(lvl > 0)
     {
-      std::cout << "Refining up to level " << lvl << "..." << std::endl;
+      std::cout << "Refining up to level " << lvl << "..." << "\n";
       node = node->refine_unique();
     }
 
@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << std::endl;
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
 
     display_help();
     return 1;
@@ -328,7 +328,7 @@ int main(int argc, char* argv[])
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
   {
-    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << std::endl;
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
     display_help();
     return 1;
   }
@@ -348,7 +348,7 @@ int main(int argc, char* argv[])
   // get mesh type
   const String mtype = mesh_reader.get_meshtype_string();
 
-  std::cout << "Mesh Type: " << mtype << std::endl;
+  std::cout << "Mesh Type: " << mtype << "\n";
 
   if(mtype == "conformal:hypercube:2:2")
     return run_xml<H2M2D>(args, mesh_reader, filenames.front());
@@ -359,7 +359,7 @@ int main(int argc, char* argv[])
   if(mtype == "conformal:simplex:3:3")
     return run_xml<S3M3D>(args, mesh_reader, filenames.front());
 
-  std::cout << "ERROR: unsupported mesh type!" << std::endl;
+  std::cout << "ERROR: unsupported mesh type!" << "\n";
 
   return 1;
 }

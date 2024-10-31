@@ -155,7 +155,7 @@ public:
       trafo_eval.prepare(Index(3));
       const DataType_ len_3 = trafo_eval.volume();
       trafo_eval.finish();
-      //std::cout << std::setprecision(15) << len_0 << " / " << len_1 << " / " << len_2 << " / " << len_3 << std::endl;
+      //std::cout << std::setprecision(15) << len_0 << " / " << len_1 << " / " << len_2 << " / " << len_3 << "\n";
       TEST_CHECK_EQUAL_WITHIN_EPS(len_0, DataType_(9.0553851381374166266), eps);
       TEST_CHECK_EQUAL_WITHIN_EPS(len_1, DataType_(7.2592839594939513807), eps);
       TEST_CHECK_EQUAL_WITHIN_EPS(len_2, DataType_(6.4187043030908643875), eps);

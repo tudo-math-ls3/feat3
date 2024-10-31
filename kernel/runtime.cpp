@@ -50,13 +50,13 @@ void Runtime::initialize(int& argc, char**& argv)
 
   if (_initialized)
   {
-    std::cerr << "ERROR: Runtime::initialize called twice!" << std::endl;
+    std::cerr << "ERROR: Runtime::initialize called twice!" << "\n";
     std::cerr.flush();
     Runtime::abort();
   }
   if (_finalized)
   {
-    std::cerr << "ERROR: Runtime::initialize called after Runtime::finalize!" << std::endl;
+    std::cerr << "ERROR: Runtime::initialize called after Runtime::finalize!" << "\n";
     std::cerr.flush();
     Runtime::abort();
   }
@@ -64,7 +64,7 @@ void Runtime::initialize(int& argc, char**& argv)
   // initialize Dist operations
   if(!Dist::initialize(argc, argv))
   {
-    std::cerr << "ERROR: Failed to initialize Dist operations!" << std::endl;
+    std::cerr << "ERROR: Failed to initialize Dist operations!" << "\n";
     std::cerr.flush();
     Runtime::abort();
   }
@@ -366,9 +366,9 @@ void Runtime::initialize(int& argc, char**& argv)
     {
 #ifdef FEAT_HAVE_MPI
       // in an MPI case, the ranks to debug have to be specified
-      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << " runs rank " << my_rank << std::endl;
+      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << " runs rank " << my_rank << "\n";
 #else // no FEAT_HAVE_MPI
-      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << std::endl;
+      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << "\n";
 #endif // FEAT_HAVE_MPI
     }
 #endif // defined(_WIN32)
@@ -413,13 +413,13 @@ int Runtime::finalize()
 {
   if (!_initialized)
   {
-    std::cerr << "ERROR: Runtime::finalize called before Runtime::initialize!" << std::endl;
+    std::cerr << "ERROR: Runtime::finalize called before Runtime::initialize!" << "\n";
     std::cerr.flush();
     Runtime::abort();
   }
   if (_finalized)
   {
-    std::cerr << "ERROR: Runtime::finalize called twice!" << std::endl;
+    std::cerr << "ERROR: Runtime::finalize called twice!" << "\n";
     std::cerr.flush();
     Runtime::abort();
   }

@@ -101,7 +101,7 @@ public:
 
     // create time seeded RNG
     Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
     Random rngt(seed);
 
     // test 10 times

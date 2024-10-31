@@ -135,7 +135,7 @@ public:
       DataType vector_err = vector_diff.norm_euclid();
       DataType matrix_err = matrix_diff.norm_frobenius();
 
-//       std::cout << point << " > " << scalar_err << " | " << vector_err << " | " << matrix_err << std::endl;
+//       std::cout << point << " > " << scalar_err << " | " << vector_err << " | " << matrix_err << "\n";
 
       // check errors against tolerances
       TEST_CHECK(scalar_err < val_tol);

@@ -99,7 +99,7 @@ namespace DbgSlipAsm
       std::cout << stringify_fp_sci(rmax, 5, 10) << " / " << stringify_fp_sci(rmean, 5, 10);
       if(prev_max > 0.0)
         std::cout << " / " << stringify_fp_fix(prev_max / rmax, 3, 7) << " / " << stringify_fp_fix(prev_mean / rmean, 3, 7);
-      std::cout << std::endl;
+      std::cout << "\n";
       prev_max = rmax;
       prev_mean = rmean;
 
@@ -202,7 +202,7 @@ namespace DbgSlipAsm
       std::cout << stringify_fp_sci(rmax, 5, 10) << " / " << stringify_fp_sci(rmean, 5, 10);
       if(prev_max > 0.0)
         std::cout << " / " << stringify_fp_fix(prev_max / rmax, 3, 7) << " / " << stringify_fp_fix(prev_mean / rmean, 3, 7);
-      std::cout << std::endl;
+      std::cout << "\n";
       prev_max = rmax;
       prev_mean = rmean;
 

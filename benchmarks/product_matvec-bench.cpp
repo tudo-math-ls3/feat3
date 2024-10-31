@@ -38,8 +38,8 @@ void run(PreferredBackend backend)
   Index size(sys.rows());
 
   Backend::set_preferred_backend(backend);
-  std::cout<<backend<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
-  std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
+  std::cout<<backend<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<"\n";
+  std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<"\n";
   DenseVector<DT_, IT_> x(size);
   for (Index i (0) ; i < x.size() ; ++i)
     x(i, DT_(i%100) / DT_(100));
@@ -57,7 +57,7 @@ void run(PreferredBackend backend)
   run_bench(func, flops, bytes);
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<x.norm2()<<std::endl;
+  std::cout<<"control norm: "<<x.norm2()<<"\n";
 }
 
 int main(int argc, char ** argv)

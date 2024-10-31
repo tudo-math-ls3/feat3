@@ -179,8 +179,8 @@ namespace DbgBurgersAsm
     domain_asm.assemble(bbm_job);
     domain_asm.assemble(bbv_job);
 
-    std::cout << "Diff of Blocked Matrix: " << stringify_fp_sci(diff_max(bmatrix_1, bmatrix_2)) << std::endl;
-    std::cout << "Diff of Blocked Vector: " << stringify_fp_sci(diff_max(bvec_rhs_1, bvec_rhs_2)) << std::endl;
+    std::cout << "Diff of Blocked Matrix: " << stringify_fp_sci(diff_max(bmatrix_1, bmatrix_2)) << "\n";
+    std::cout << "Diff of Blocked Vector: " << stringify_fp_sci(diff_max(bvec_rhs_1, bvec_rhs_2)) << "\n";
 
     burgers_asm.deformation = false;
     burgers_asm.nu = burgers_asm.theta = burgers_asm.beta = 1.0;
@@ -212,8 +212,8 @@ namespace DbgBurgersAsm
     domain_asm.assemble(bsm_job);
     domain_asm.assemble(bsv_job);
 
-    std::cout << "Diff of Scalar  Matrix: " << stringify_fp_sci(diff_max(smatrix_1, smatrix_2)) << std::endl;
-    std::cout << "Diff of Scalar  Vector: " << stringify_fp_sci(diff_max(svec_rhs_1, svec_rhs_2)) << std::endl;
+    std::cout << "Diff of Scalar  Matrix: " << stringify_fp_sci(diff_max(smatrix_1, smatrix_2)) << "\n";
+    std::cout << "Diff of Scalar  Vector: " << stringify_fp_sci(diff_max(svec_rhs_1, svec_rhs_2)) << "\n";
   }
 }
 

@@ -409,7 +409,7 @@ public:
         // print some numbers to the console
         std::cout << n << "/" << k << ": ";
         std::cout << stringify_fp_sci(Math::abs(ret)) << " : ";
-        std::cout << stringify_fp_sci(xl) << " / " << stringify_fp_sci(xr) << std::endl;
+        std::cout << stringify_fp_sci(xl) << " / " << stringify_fp_sci(xr) << "\n";
 
         // make sure the pivot quotient is not bogus
         TEST_CHECK(Math::isfinite(ret));
@@ -417,7 +417,7 @@ public:
         // only check result ifpivot quotient is normal
         if(!Math::isnormal(ret))
         {
-          std::cerr << "WARNING: pivot quotient is not normal!" << std::endl;
+          std::cerr << "WARNING: pivot quotient is not normal!" << "\n";
           continue;
         }
 

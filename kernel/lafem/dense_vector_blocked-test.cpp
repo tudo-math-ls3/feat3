@@ -124,7 +124,7 @@ public:
 
     // random constructor check
     Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
     Random rng(seed);
     DT_ rnd_range[2];
     IT_ rnd_size = 3*1234;
@@ -927,7 +927,7 @@ public:
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -999,7 +999,7 @@ public:
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1072,7 +1072,7 @@ public:
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1145,7 +1145,7 @@ public:
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1215,7 +1215,7 @@ public:
       ref.copy(a);
 
       Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << std::endl;
+      std::cout << "seed: " << seed << "\n";
       Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);

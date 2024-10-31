@@ -62,19 +62,19 @@ namespace Tutorial01
     typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
     typedef Geometry::BoundaryFactory<MeshType> BoundaryFactoryType;
 
-    std::cout << "Creating Mesh on Level " << level << "..." << std::endl;
+    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
     MeshFactoryType mesh_factory(level);
     MeshType mesh(mesh_factory);
 
-    std::cout << "Creating Boundary..." << std::endl;
+    std::cout << "Creating Boundary..." << "\n";
     BoundaryFactoryType boundary_factory(mesh);
     BoundaryType boundary(boundary_factory);
 
-    std::cout << "Creating Trafo..." << std::endl;
+    std::cout << "Creating Trafo..." << "\n";
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     TrafoType trafo(mesh);
 
-    std::cout << "Creating Space..." << std::endl;
+    std::cout << "Creating Space..." << "\n";
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
     SpaceType space(trafo);
 
@@ -85,7 +85,7 @@ namespace Tutorial01
 
     FilterType filter;
 
-    std::cout << "Allocating and initialising vectors and matrix..." << std::endl;
+    std::cout << "Allocating and initialising vectors and matrix..." << "\n";
     MatrixType matrix;
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
     VectorType vec_sol(space.get_num_dofs());
@@ -93,13 +93,13 @@ namespace Tutorial01
 
     Cubature::DynamicFactory cubature_factory("auto-degree:5");
 
-    std::cout << "Assembling system matrix..." << std::endl;
+    std::cout << "Assembling system matrix..." << "\n";
     matrix.format();
 
     Assembly::Common::LaplaceOperator laplace_operator;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, laplace_operator, space, cubature_factory);
 
-    std::cout << "Assembling right-hand-side vector..." << std::endl;
+    std::cout << "Assembling right-hand-side vector..." << "\n";
     vec_rhs.format();
     {
       Analytic::Common::SineBubbleFunction<2> sol_function;
@@ -125,9 +125,9 @@ namespace Tutorial01
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     vec_sol.format(4.0 / Math::sqr(PI));
-    std::cout << "Assembling boundary conditions..." << std::endl;
+    std::cout << "Assembling boundary conditions..." << "\n";
 
-    std::cout << "Solving linear system..." << std::endl;
+    std::cout << "Solving linear system..." << "\n";
     //auto precond = Solver::new_ssor_precond(matrix, filter);
     //auto precond = Solver::new_ilu_precond(matrix, filter);
     auto solver = Solver::new_pcg(matrix, filter/*, precond*/);
@@ -146,13 +146,13 @@ namespace Tutorial01
       Assembly::ScalarErrorInfo<DataType> errors = Assembly::ScalarErrorComputer<1>::
         compute(vec_sol,sol_function, space, cubature_factory);
 
-      std::cout << errors << std::endl;
+      std::cout << errors << "\n";
     }
 
     // First of all, build the filename string
     String vtk_name(String("./dbg-trace-2-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << std::endl;
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
 
     // Create a VTK exporter for our mesh
     Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -165,7 +165,7 @@ namespace Tutorial01
     exporter.write(vtk_name);
 
     // That's all, folks.
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished!" << "\n";
   } // int main(...)
 } // namespace Tutorial01
 
@@ -190,19 +190,19 @@ int main(int argc, char* argv[])
     if(!String(argv[argc-1]).parse(ilevel) || (ilevel < 1))
     {
       // Failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << std::endl;
-      std::cerr << "Note: The last argument must be a positive integer." << std::endl;
+      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << "\n";
+      std::cerr << "Note: The last argument must be a positive integer." << "\n";
       // Abort our runtime environment
       Runtime::abort();
     }
     // If parsing was successful, use the given information and notify the user
     level = Index(ilevel);
-    std::cout << "Refinement level: " << level << std::endl;
+    std::cout << "Refinement level: " << level << "\n";
   }
   else
   {
     // No command line parameter given, so inform the user that defaults are used
-    std::cout << "Refinement level (default): " << level << std::endl;
+    std::cout << "Refinement level (default): " << level << "\n";
   }
 
   // call the tutorial's main function

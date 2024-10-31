@@ -44,7 +44,7 @@ namespace FEAT
           Tiny::Matrix<DataType, num_loc_dofs, num_loc_dofs> loc_mat;
           // now do work for this cell
           IndexType cell = IndexType(coloring_map[idx]);
-          // std::cout << "Starting with cell " << cell << std::endl;
+          // std::cout << "Starting with cell " << cell << "\n";
           const IndexSetWrapper<IndexType> local_dofs_w{cell_to_dof, IndexType(num_loc_dofs)};
           const IndexType* local_dofs = cell_to_dof + cell*num_loc_dofs;
           const IndexType* local_dof_sorter = cell_to_dof_sorter + cell*num_loc_dofs;

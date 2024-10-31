@@ -29,7 +29,7 @@ bool operator==(const A & a, const A & b)
 
 std::ostream & operator<< (std::ostream & lhs, const A & b)
 {
-  lhs << "A: "<< b.flag << std::endl;
+  lhs << "A: "<< b.flag << "\n";
   return lhs;
 }
 

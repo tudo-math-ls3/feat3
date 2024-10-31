@@ -733,7 +733,7 @@ namespace FEAT
         case FileMode::fm_bm:
         case FileMode::fm_binary:
           if (! std::is_same<DT_, double>::value)
-            std::cout<<"Warning: You are writing out a banded matrix that is not double precision!"<<std::endl;
+            std::cout<<"Warning: You are writing out a banded matrix that is not double precision!"<<"\n";
 
         this->template _serialize<double, std::uint64_t>(FileMode::fm_bm, file);
           break;

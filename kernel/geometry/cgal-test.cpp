@@ -44,16 +44,16 @@ public:
     const DT_ tol = DT_(2) * Math::max(Math::eps<DT_>(), DT_(Math::eps<double>()));
     {
       std::stringstream mts;
-      mts<<"OFF"<<std::endl;
-      mts<<"4 4 6"<<std::endl;
-      mts<<"0.0 0.0 2.0"<<std::endl;
-      mts<<"1.632993 -0.942809 -0.666667"<<std::endl;
-      mts<<"0.000000 1.885618 -0.666667"<<std::endl;
-      mts<<"-1.632993 -0.942809 -0.666667"<<std::endl;
-      mts<<"3 1 0 3"<<std::endl;
-      mts<<"3 2 0 1"<<std::endl;
-      mts<<"3 3 0 2"<<std::endl;
-      mts<<"3 3 2 1"<<std::endl;
+      mts<<"OFF"<<"\n";
+      mts<<"4 4 6"<<"\n";
+      mts<<"0.0 0.0 2.0"<<"\n";
+      mts<<"1.632993 -0.942809 -0.666667"<<"\n";
+      mts<<"0.000000 1.885618 -0.666667"<<"\n";
+      mts<<"-1.632993 -0.942809 -0.666667"<<"\n";
+      mts<<"3 1 0 3"<<"\n";
+      mts<<"3 2 0 1"<<"\n";
+      mts<<"3 3 0 2"<<"\n";
+      mts<<"3 3 2 1"<<"\n";
 
       CGALWrapper<DT_> cw2(mts, CGALFileMode::fm_off);
       CGALWrapper<DT_> cw_alt(std::move(cw2));
@@ -81,16 +81,16 @@ public:
 
       // setup cgal
       std::stringstream mts;
-      mts<<"OFF"<<std::endl;
-      mts<<"4 4 6"<<std::endl;
-      mts<<"0.0 0.0 2.0"<<std::endl;
-      mts<<"1.632993 -0.942809 -0.666667"<<std::endl;
-      mts<<"0.000000 1.885618 -0.666667"<<std::endl;
-      mts<<"-1.632993 -0.942809 -0.666667"<<std::endl;
-      mts<<"3 1 0 3"<<std::endl;
-      mts<<"3 2 0 1"<<std::endl;
-      mts<<"3 3 0 2"<<std::endl;
-      mts<<"3 3 2 1"<<std::endl;
+      mts<<"OFF"<<"\n";
+      mts<<"4 4 6"<<"\n";
+      mts<<"0.0 0.0 2.0"<<"\n";
+      mts<<"1.632993 -0.942809 -0.666667"<<"\n";
+      mts<<"0.000000 1.885618 -0.666667"<<"\n";
+      mts<<"-1.632993 -0.942809 -0.666667"<<"\n";
+      mts<<"3 1 0 3"<<"\n";
+      mts<<"3 2 0 1"<<"\n";
+      mts<<"3 3 0 2"<<"\n";
+      mts<<"3 3 2 1"<<"\n";
 
       CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
 
@@ -105,7 +105,7 @@ public:
       {
         // #ifdef FEAT_HAVE_OMP
         // if(i == 0)
-        //   std::cout << "Num threads are " << omp_get_num_threads() << std::endl;
+        //   std::cout << "Num threads are " << omp_get_num_threads() << "\n";
         // #endif
         inside_test2[i] = int(cw.point_inside(points[i][0], points[i][1], points[i][2]));
       }
@@ -118,16 +118,16 @@ public:
 
     {
       std::stringstream mts;
-      mts<<"OFF"<<std::endl;
-      mts<<"4 4 6"<<std::endl;
-      mts<<"0.0 0.0 2.0"<<std::endl;
-      mts<<"1.632993 -0.942809 -0.666667"<<std::endl;
-      mts<<"0.000000 1.885618 -0.666667"<<std::endl;
-      mts<<"-1.632993 -0.942809 -0.666667"<<std::endl;
-      mts<<"3 1 0 3"<<std::endl;
-      mts<<"3 2 0 1"<<std::endl;
-      mts<<"3 3 0 2"<<std::endl;
-      mts<<"3 3 2 1"<<std::endl;
+      mts<<"OFF"<<"\n";
+      mts<<"4 4 6"<<"\n";
+      mts<<"0.0 0.0 2.0"<<"\n";
+      mts<<"1.632993 -0.942809 -0.666667"<<"\n";
+      mts<<"0.000000 1.885618 -0.666667"<<"\n";
+      mts<<"-1.632993 -0.942809 -0.666667"<<"\n";
+      mts<<"3 1 0 3"<<"\n";
+      mts<<"3 2 0 1"<<"\n";
+      mts<<"3 3 0 2"<<"\n";
+      mts<<"3 3 2 1"<<"\n";
 
       CGALWrapper<DT_> cw2(mts, CGALFileMode::fm_off);
       TEST_CHECK_EQUAL(cw2.point_inside(DT_(50), DT_(50), DT_(50)), false);
@@ -135,14 +135,14 @@ public:
     }
     {
       std::stringstream mts;
-      mts<<"OFF"<<std::endl;
-      mts<<"4 2 5"<<std::endl;
-      mts<<"0.0 0.0 0.0"<<std::endl;
-      mts<<"0.0 0.0 1.0"<<std::endl;
-      mts<<"0.0 1.0 0.0"<<std::endl;
-      mts<<"0.0 1.0 1.0"<<std::endl;
-      mts<<"3 0 1 2"<<std::endl;
-      mts<<"3 1 3 2"<<std::endl;
+      mts<<"OFF"<<"\n";
+      mts<<"4 2 5"<<"\n";
+      mts<<"0.0 0.0 0.0"<<"\n";
+      mts<<"0.0 0.0 1.0"<<"\n";
+      mts<<"0.0 1.0 0.0"<<"\n";
+      mts<<"0.0 1.0 1.0"<<"\n";
+      mts<<"3 0 1 2"<<"\n";
+      mts<<"3 1 3 2"<<"\n";
 
       FEAT::Tiny::Vector<DT_, 3> spoint{{DT_(0.11), DT_(0.65), DT_(0.234)}};
 
@@ -176,14 +176,14 @@ public:
 
     {
       std::stringstream mts;
-      mts<<"OFF"<<std::endl;
-      mts<<"4 2 5"<<std::endl;
-      mts<<"0.0 0.0 0.0"<<std::endl;
-      mts<<"0.0 0.0 1.0"<<std::endl;
-      mts<<"0.0 1.0 0.0"<<std::endl;
-      mts<<"0.0 1.0 1.0"<<std::endl;
-      mts<<"3 0 1 2"<<std::endl;
-      mts<<"3 1 3 2"<<std::endl;
+      mts<<"OFF"<<"\n";
+      mts<<"4 2 5"<<"\n";
+      mts<<"0.0 0.0 0.0"<<"\n";
+      mts<<"0.0 0.0 1.0"<<"\n";
+      mts<<"0.0 1.0 0.0"<<"\n";
+      mts<<"0.0 1.0 1.0"<<"\n";
+      mts<<"3 0 1 2"<<"\n";
+      mts<<"3 1 3 2"<<"\n";
 
       FEAT::Tiny::Vector<DT_, 3> spoint{{DT_(0.11), DT_(0.65), DT_(0.234)}};
       typename CGALWrapper<DT_>::TransformMatrix mat;

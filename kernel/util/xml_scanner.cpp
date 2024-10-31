@@ -62,14 +62,14 @@ namespace FEAT
       {
         std::cout << " " << it->first << "=\"" << it->second << "\"";
       }
-      std::cout << (closed ? " />" : ">") << std::endl;
+      std::cout << (closed ? " />" : ">") << "\n";
     }
 
     void DumpParser::close(int iline, const String&)
     {
       if(_lines) std::cout << std::setw(5) << iline << ":";
       std::cout << std::string(_indent, ' ');
-      std::cout << "</" << _name << ">" << std::endl;
+      std::cout << "</" << _name << ">" << "\n";
     }
 
     std::shared_ptr<MarkupParser> DumpParser::markup(int, const String&, const String& name)
@@ -81,7 +81,7 @@ namespace FEAT
     {
       if(_lines) std::cout << std::setw(5) << iline << ":";
       std::cout << std::string(_indent+2, ' ');
-      std::cout << sline << std::endl;
+      std::cout << sline << "\n";
       return true;
     }
 

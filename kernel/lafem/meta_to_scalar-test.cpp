@@ -202,7 +202,7 @@ public:
   {
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     DenseVector<DT_, IT_> dv11(18);
     for (Index i(0) ; i < dv11.size() ; ++i)
@@ -333,7 +333,7 @@ public:
 
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random random(seed);
-    std::cout << "seed: " << seed << std::endl;
+    std::cout << "seed: " << seed << "\n";
 
     DenseVec dv[7];
     for (Index j(0); j < 7; ++j)
@@ -411,7 +411,7 @@ public:
     DenseVector<DT_, IT_> tv_scalar;
     tv_scalar.convert(tv);
 
-    std::cout << tv.template at<1>().size() << std::endl;
+    std::cout << tv.template at<1>().size() << "\n";
 
     for (Index i(0); i < tv.template at<2>().template at<0>().size(); ++i)
     {

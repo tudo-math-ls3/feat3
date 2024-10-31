@@ -212,7 +212,7 @@ int main(int argc, char** argv)
   }
   catch(std::exception& exc)
   {
-    std::cout << exc.what() << std::endl;
+    std::cout << exc.what() << "\n";
     FEAT::Runtime::abort();
   }
 #endif
