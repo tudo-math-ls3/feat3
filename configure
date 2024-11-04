@@ -173,6 +173,12 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("--trilinos_path")
   print ("  Path to a FROSch compatible Trilinos installation.")
   print ("")
+  print ("--likwid_explicit_path=path/to/likwid/prefix")
+  print ("  This flag turn off the internal find_package mechanism of cmake and instead uses")
+  print ("  the provided prefix path to the install directory of likwid, i.e. .../prefix/include/likwid.h")
+  print ("  and .../prefix/lib/liblikwid.so must exist and in turn are guranteed to be used.")
+  print ("  This option will probably be removed in a future release with an internal find script.")
+  print ("")
   print ("--likwid_markers=mark1,mark2,mark3")
   print ("  Decide in a comma separated list, which performance markers are activated.")
   print ("  Current choices: kernel app special cuda . Defaults to app.")
@@ -296,6 +302,7 @@ cuda_verbose = False
 restrict_errors = False
 trilinos_path = ""
 marker_options = ""
+explicit_likwid_path = ""
 prefer_external_libs = False
 
 unused_extra_options = copy.copy(extra_options)
@@ -430,6 +437,18 @@ for option in extra_options:
       print ("Error: No valid marker options in " + option)
       print ("Valid options are: kernel app special")
       exit(1)
+
+  if option.startswith("--likwid_explicit_path="):
+    unused_extra_options.remove(option)
+    if explicit_likwid_path:
+      print ("Error: multiple likwid_explicit_path parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    tmp_path = option.replace("--likwid_explicit_path=", "", 1)
+    if(tmp_path == ""):
+      print ("Error: No path given in " + option)
+      exit(1)
+    explicit_likwid_path = tmp_path
+    cmake_flags += " -DFEAT_EXPLICIT_LIKWID_PATH:FILEPATH=" + explicit_likwid_path
 
   if option.startswith("--prefer_external_libraries"):
     unused_extra_options.remove(option)

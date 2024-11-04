@@ -22,6 +22,7 @@ add_library(kernel-voxel-assembly-arch STATIC ${kernel-voxel-assembly-arch-list}
 if (FEAT_COTIRE)
   cotire(kernel-voxel-assembly-arch)
 endif (FEAT_COTIRE)
+target_link_libraries(kernel-voxel-assembly-arch PRIVATE kernel-util)
 
 if (FEAT_HAVE_CUDA)
   add_library(kernel-voxel-assembly-arch-cuda STATIC
