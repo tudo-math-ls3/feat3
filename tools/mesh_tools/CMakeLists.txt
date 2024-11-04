@@ -13,6 +13,9 @@ target_link_libraries(mesh-extruder feat)
 add_executable(mesh2eps mesh_to_eps.cpp)
 target_link_libraries(mesh2eps feat)
 
+add_executable(mesh2svg mesh_to_svg.cpp)
+target_link_libraries(mesh2svg feat)
+
 add_executable(mesh2vtk mesh_to_vtk.cpp)
 target_link_libraries(mesh2vtk feat)
 
