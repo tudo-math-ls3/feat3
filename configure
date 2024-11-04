@@ -124,7 +124,8 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  Selects the system compiler (and header files) used by nvcc.")
   print ("")
   print ("--cuda_arch=sm_60")
-  print ("  Selects the cuda architecture target (defaults to sm_60 if not set).")
+  print ("  Selects the cuda architecture target (defaults to check by return value of nvidia-smi,")
+  print ("  if not available, defaults to sm_60.")
   print ("")
   print ("--export_compile_commands")
   print ("  Let CMake export the used compile commands to compile_commands.json.")
@@ -628,7 +629,18 @@ if "cuda" in buildid:
   cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
   if not cuda_arch:
     cuda_arch = "native"
-    cuda_arch_int = 60
+    call_args = ("nvidia-smi", "--query-gpu=compute_cap", "--format=csv,noheader")
+    popen = subprocess.Popen(call_args, stdout=subprocess.PIPE, text=True)
+    popen.wait()
+    output = popen.stdout.read()
+    if("command not found..." in output):
+      cuda_arch_int = 60
+    else:
+      output_split = output.split(".")
+      if(len(output_split) != 2):
+        print("ERROR: Could not parse output of nvidia-smi querry" + output)
+        sys.exit(1)
+      cuda_arch_int = int(output_split[0])*10 + int(output_split[1])
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
   cmake_flags += " -DCMAKE_CUDA_ARCHITECTURES=" + str(cuda_arch_int)
 
