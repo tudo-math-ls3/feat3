@@ -1,5 +1,7 @@
 var NAVTREEINDEX121 =
 {
+"feat_for_win_vs17.html#win_vs17_prereqs_mpi":[18,0,2],
+"feat_for_win_vs17.html#win_vs17_prereqs_python":[18,0,1],
 "feat_for_win_vs17.html#win_vs17_prereqs_vs":[18,0,0],
 "feat_for_win_vs17.html#win_vs17_thirdparty":[18,1],
 "feat_for_win_vs17.html#win_vs17_vcgen_tool":[18,2],
@@ -247,7 +249,5 @@ var NAVTREEINDEX121 =
 "lagrange1_2node__functional_8hpp_source.html":[28,0,1,9,7,3],
 "lagrange2_2dof__traits_8hpp_source.html":[28,0,1,9,8,1],
 "lagrange2_2element_8hpp_source.html":[28,0,1,9,8,2],
-"lagrange2_2node__functional_8hpp_source.html":[28,0,1,9,8,4],
-"lagrange3_2dof__traits_8hpp_source.html":[28,0,1,9,9,0],
-"lagrange3_2element_8hpp_source.html":[28,0,1,9,9,1]
+"lagrange2_2node__functional_8hpp_source.html":[28,0,1,9,8,4]
 };

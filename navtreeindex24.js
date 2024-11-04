@@ -217,8 +217,8 @@ var NAVTREEINDEX24 =
 "class_f_e_a_t_1_1_cubature_1_1_auto_alias.html":[26,0,0,3,1],
 "class_f_e_a_t_1_1_cubature_1_1_auto_alias.html#afde70713d9bd91fa62ba43ffb8afb02b":[27,0,0,4,1,0],
 "class_f_e_a_t_1_1_cubature_1_1_auto_alias.html#afde70713d9bd91fa62ba43ffb8afb02b":[26,0,0,3,1,0],
-"class_f_e_a_t_1_1_cubature_1_1_barycentre_driver.html":[27,0,0,4,2],
 "class_f_e_a_t_1_1_cubature_1_1_barycentre_driver.html":[26,0,0,3,2],
+"class_f_e_a_t_1_1_cubature_1_1_barycentre_driver.html":[27,0,0,4,2],
 "class_f_e_a_t_1_1_cubature_1_1_barycentre_driver_3_01_shape_1_1_hypercube_3_01dim___01_4_01_4.html":[27,0,0,4,3],
 "class_f_e_a_t_1_1_cubature_1_1_barycentre_driver_3_01_shape_1_1_hypercube_3_01dim___01_4_01_4.html":[26,0,0,3,3],
 "class_f_e_a_t_1_1_cubature_1_1_barycentre_driver_3_01_shape_1_1_hypercube_3_01dim___01_4_01_4.html#a7f47bcee215a325fca3f589b2a59b4c0":[27,0,0,4,3,0],
@@ -243,11 +243,11 @@ var NAVTREEINDEX24 =
 "class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01false_01_4.html#a9675248b1a9b2dce8f890ac052d62137":[26,0,0,3,7,1],
 "class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html":[26,0,0,3,8],
 "class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html":[27,0,0,4,8],
-"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a206dfb71b77df80dfd8dbcb08034a0b1":[26,0,0,3,8,4],
 "class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a206dfb71b77df80dfd8dbcb08034a0b1":[27,0,0,4,8,4],
-"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a59166cae0764a54fc42e19d1dcdadb8d":[26,0,0,3,8,2],
+"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a206dfb71b77df80dfd8dbcb08034a0b1":[26,0,0,3,8,4],
 "class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a59166cae0764a54fc42e19d1dcdadb8d":[27,0,0,4,8,2],
-"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a78bdbfc319e9c6f9c370f34a2d083b20":[26,0,0,3,8,3],
+"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a59166cae0764a54fc42e19d1dcdadb8d":[26,0,0,3,8,2],
 "class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a78bdbfc319e9c6f9c370f34a2d083b20":[27,0,0,4,8,3],
-"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#ab3a34dc256e97bfab0ed68ae4a320fd0":[26,0,0,3,8,1]
+"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#a78bdbfc319e9c6f9c370f34a2d083b20":[26,0,0,3,8,3],
+"class_f_e_a_t_1_1_cubature_1_1_driver_factory_3_01_driver___00_01_shape___00_01true_01_4.html#ab3a34dc256e97bfab0ed68ae4a320fd0":[27,0,0,4,8,1]
 };

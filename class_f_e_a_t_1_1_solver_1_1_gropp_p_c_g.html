@@ -788,7 +788,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="gropppcg_8hpp_source.html#l00173">173</a> of file <a class="el" href="gropppcg_8hpp_source.html">gropppcg.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l01071">FEAT::Solver::PreconditionedIterativeSolver&lt; Matrix_::VectorTypeR &gt;::_apply_precond()</a>, <a class="el" href="iterative_8hpp_source.html#l00748">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00903">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_update_defect()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00466">FEAT::Solver::IterationStats::destroy()</a>, <a class="el" href="iterative_8hpp_source.html#l00406">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_num_iter()</a>, <a class="el" href="gropppcg_8hpp_source.html#l00110">FEAT::Solver::GroppPCG&lt; Matrix_, Filter_ &gt;::name()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda5e543256c480ac577d30f76f9120eb74">FEAT::Solver::undefined</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l01073">FEAT::Solver::PreconditionedIterativeSolver&lt; Matrix_::VectorTypeR &gt;::_apply_precond()</a>, <a class="el" href="iterative_8hpp_source.html#l00748">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00903">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_update_defect()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00466">FEAT::Solver::IterationStats::destroy()</a>, <a class="el" href="iterative_8hpp_source.html#l00406">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_num_iter()</a>, <a class="el" href="gropppcg_8hpp_source.html#l00110">FEAT::Solver::GroppPCG&lt; Matrix_, Filter_ &gt;::name()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda5e543256c480ac577d30f76f9120eb74">FEAT::Solver::undefined</a>.</p>
 
 </div>
 </div>
@@ -834,6 +834,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Applies the preconditioner onto a defect vector. </p>
 <dl class="section note"><dt>Note</dt><dd>If no preconditioner is present, this function will simply copy the input vector's contents into the output vector, therefore emulating an "identity preconditioner".</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>vec_cor and vec_def must <b>not</b> refer to the same vector object!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">vec_cor</td><td>A reference to the vector that shall receive the preconditioned defect.</td></tr>
@@ -844,7 +845,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the preconditioner application was successful, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l01071">1071</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l01073">1073</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>

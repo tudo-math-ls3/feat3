@@ -818,6 +818,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Applies the preconditioner onto a defect vector. </p>
 <dl class="section note"><dt>Note</dt><dd>If no preconditioner is present, this function will simply copy the input vector's contents into the output vector, therefore emulating an "identity preconditioner".</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>vec_cor and vec_def must <b>not</b> refer to the same vector object!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">vec_cor</td><td>A reference to the vector that shall receive the preconditioned defect.</td></tr>
@@ -828,7 +829,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the preconditioner application was successful, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l01071">1071</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l01073">1073</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
