@@ -41,20 +41,24 @@ namespace FEAT
       ValueType_ MinAbsIndex::value_blocked_generic(const ValueType_ * const x, const Index size)
       {
         ValueType_ min(0);
-        Index min_i(0);
 
-        for(int j(0); j < ValueType_::n; ++j)
+        if(size > 0)
         {
-          min[j] = Math::abs(x[0][j]);
-          for (Index i(0) ; i < size ; ++i)
+          for(int j(0); j < ValueType_::n; ++j)
           {
-            if(Math::abs(x[i][j]) < Math::abs(x[min_i][j]))
+            min[j] = Math::abs(x[0][j]);
+          }
+        }
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for(int j(0); j < ValueType_::n; ++j)
+          {
+            if(Math::abs(x[i][j]) < Math::abs(min[j]))
             {
               min[j] = Math::abs(x[i][j]);
-              min_i = i;
             }
           }
-          min_i=Index(0);
         }
         return min;
       }

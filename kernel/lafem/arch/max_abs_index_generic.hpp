@@ -40,20 +40,24 @@ namespace FEAT
       ValueType_ MaxAbsIndex::value_blocked_generic(const ValueType_ * const x, const Index size)
       {
         ValueType_ max(0);
-        Index max_i(0);
 
-        for(int j(0); j < ValueType_::n; ++j)
+        if(size > 0)
         {
-          max[j] = Math::abs(x[0][j]);
-          for (Index i(0) ; i < size ; ++i)
+          for(int j(0); j < ValueType_::n; ++j)
           {
-            if(Math::abs(x[i][j]) > Math::abs(x[max_i][j]))
+            max[j] = Math::abs(x[0][j]);
+          }
+        }
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for(int j(0); j < ValueType_::n; ++j)
+          {
+            if(Math::abs(x[i][j]) > Math::abs(max[j]))
             {
               max[j] = Math::abs(x[i][j]);
-              max_i = i;
             }
           }
-          max_i=Index(0);
         }
         return max;
       }

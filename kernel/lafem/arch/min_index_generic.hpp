@@ -33,7 +33,6 @@ namespace FEAT
             min_i = i;
           }
         }
-
         return min_i;
       }
 
@@ -41,20 +40,21 @@ namespace FEAT
       ValueType_ MinIndex::value_blocked_generic(const ValueType_ * const x, const Index size)
       {
         ValueType_ min(0);
-        Index min_i(0);
 
-        for(int j(0); j < ValueType_::n; ++j)
+        if(size > 0)
         {
-          min[j] = x[0][j];
-          for (Index i(0) ; i < size ; ++i)
+          min = x[0];
+        }
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for(int j(0); j < ValueType_::n; ++j)
           {
-            if(x[i][j] < x[min_i][j])
+            if(x[i][j] < min[j])
             {
               min[j] = x[i][j];
-              min_i = i;
             }
           }
-          min_i=Index(0);
         }
         return min;
       }

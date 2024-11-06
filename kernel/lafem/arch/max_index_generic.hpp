@@ -41,19 +41,21 @@ namespace FEAT
       ValueType_ MaxIndex::value_blocked_generic(const ValueType_ * const x, const Index size)
       {
         ValueType_ max(0);
-        Index max_i(0);
-        for(int j(0); j < ValueType_::n; ++j)
+
+        if(size > 0)
         {
-          max[j] = x[0][j];
-          for (Index i(0) ; i < size ; ++i)
+          max = x[0];
+        }
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for(int j(0); j < ValueType_::n; ++j)
           {
-            if(x[i][j] > x[max_i][j])
+            if(x[i][j] > max[j])
             {
               max[j] = x[i][j];
-              max_i = i;
             }
           }
-          max_i=Index(0);
         }
         return max;
       }
