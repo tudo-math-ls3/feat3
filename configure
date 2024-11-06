@@ -633,14 +633,20 @@ if "cuda" in buildid:
     popen = subprocess.Popen(call_args, stdout=subprocess.PIPE, text=True)
     popen.wait()
     output = popen.stdout.read()
-    if("command not found..." in output):
+    cuda_arch_int = 10000000
+    if("command not found..." in output or "error" in output.lower()):
       cuda_arch_int = 60
     else:
-      output_split = output.split(".")
-      if(len(output_split) != 2):
-        print("ERROR: Could not parse output of nvidia-smi querry" + output)
-        sys.exit(1)
-      cuda_arch_int = int(output_split[0])*10 + int(output_split[1])
+      output_split_glob = output.splitlines()
+      for output_str in output_split_glob:
+        output_split = output_str.split(".")
+        if(len(output_split) != 2):
+          print("ERROR: Could not parse output of nvidia-smi querry" + output)
+          sys.exit(1)
+        cuda_arch_int = min(cuda_arch_int, int(output_split[0])*10 + int(output_split[1]))
+    if(cuda_arch_int < 60):
+      print("Warning: Lowest device compute capability at " + str(cuda_arch_int) + "\n feat cuda will not work as expected")
+      cuda_arch_int = 60
   cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
   cmake_flags += " -DCMAKE_CUDA_ARCHITECTURES=" + str(cuda_arch_int)
 
