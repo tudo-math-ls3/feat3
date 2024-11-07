@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_MEAN_FILTER_ASSEMBLER_HPP
-#define KERNEL_ASSEMBLY_MEAN_FILTER_ASSEMBLER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/mean_filter.hpp>
@@ -148,5 +146,3 @@ namespace FEAT
     }; // class MeanFilterAssembler
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_MEAN_FILTER_ASSEMBLER_HPP

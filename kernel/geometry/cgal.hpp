@@ -2,17 +2,15 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
 #pragma once
-#include <cstddef>
-#ifndef KERNEL_GEOMETRY_CGAL_HPP
-#define KERNEL_GEOMETRY_CGAL_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
 #if defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
+
+#include <cstddef>
 
 namespace FEAT
 {
@@ -95,4 +93,3 @@ namespace FEAT
   } // namespace Geometry
 } // namespace FEAT
 #endif //defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
-#endif //KERNEL_GEOMETRY_CGAL_HPP

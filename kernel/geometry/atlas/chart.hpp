@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_ATLAS_CHART_HPP
-#define KERNEL_GEOMETRY_ATLAS_CHART_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/mesh_part.hpp>
@@ -506,4 +504,3 @@ namespace FEAT
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAT
-#endif // KERNEL_GEOMETRY_ATLAS_CHART_HPP

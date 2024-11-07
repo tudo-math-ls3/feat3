@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef GLOBAL_SYNCH_MAT_HPP
-#define GLOBAL_SYNCH_MAT_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -383,5 +381,3 @@ namespace FEAT
     }
   } // namespace Global
 } // namespace FEAT
-
-#endif // GLOBAL_SYNCH_MAT_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_KERNEL_SOLVER_QPENALTY
-#define FEAT_KERNEL_SOLVER_QPENALTY 1
 namespace FEAT
 {
   namespace Solver
@@ -429,5 +427,3 @@ namespace FEAT
 
   }
 } // namespace FEAT
-
-#endif // FEAT_KERNEL_SOLVER_QPENALTY

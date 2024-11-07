@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ANALYTIC_PARSED_FUNCTION_HPP
-#define KERNEL_ANALYTIC_PARSED_FUNCTION_HPP 1
 
 #include <kernel/analytic/function.hpp>
 #include <kernel/util/exception.hpp>
@@ -615,4 +613,3 @@ namespace FEAT
 } // namespace FEAT
 
 #endif // FEAT_HAVE_FPARSER
-#endif // KERNEL_ANALYTIC_PARSED_FUNCTION_HPP

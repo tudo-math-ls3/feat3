@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_SUPERLU_HPP
-#define KERNEL_SOLVER_SUPERLU_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -213,4 +211,3 @@ namespace FEAT
 } // namespace FEAT
 
 #endif // defined(FEAT_HAVE_SUPERLU_DIST) || defined(DOXYGEN)
-#endif // KERNEL_SOLVER_SUPERLU_HPP

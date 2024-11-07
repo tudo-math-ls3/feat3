@@ -2,11 +2,7 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
 #pragma once
-
-#ifndef FEAT_LIKWID_MARKER_HPP
-#define FEAT_LIKWID_MARKER_HPP 1
 
 
 /** \file
@@ -114,5 +110,3 @@
 #define FEAT_NVMARKER_STOP(regionTag) LIKWID_NVMARKER_STOP(regionTag)
 #define FEAT_NVMARKER_RESET(regionTag) LIKWID_NVMARKER_RESET(regionTag)
 #define FEAT_NVMARKER_GET(name, ngpu, nevents, eventlist, time, count) LIKWID_NVMARKER_GET(name, ngpu, nevents, eventlist, time, count)
-
-#endif //FEAT_LIKWID_MARKER_HPP

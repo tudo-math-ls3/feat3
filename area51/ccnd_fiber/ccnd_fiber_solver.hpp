@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CCND_FIBER_STEADY_SOLVER_HPP
-#define CCND_FIBER_STEADY_SOLVER_HPP 1
 
 #include <area51/ccnd_fiber/ccnd_fiber_common.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
@@ -2625,5 +2623,3 @@ Solver::Status solve_navier(GlobalSystemVector& vec_sol, const GlobalSystemVecto
 
 
 }
-
-#endif

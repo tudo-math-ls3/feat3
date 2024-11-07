@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_BURGERS_ASSEMBLY_JOB_HPP
-#define KERNEL_ASSEMBLY_BURGERS_ASSEMBLY_JOB_HPP
 
 #include <kernel/assembly/base.hpp>
 #include <kernel/assembly/asm_traits.hpp>
@@ -1377,5 +1375,3 @@ namespace FEAT
     }; // class BurgersScalarVectorAssemblyJob<...>
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_BURGERS_ASSEMBLY_JOB_HPP

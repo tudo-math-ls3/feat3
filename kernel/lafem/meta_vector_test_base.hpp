@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_META_VECTOR_TEST_BASE_HPP
-#define KERNEL_LAFEM_META_VECTOR_TEST_BASE_HPP 1
 
 #include <kernel/base_header.hpp>
 // #include <kernel/archs.hpp>
@@ -159,5 +157,3 @@ namespace FEAT
     }; // MetaVectorTestBase
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_META_VECTOR_TEST_BASE_HPP

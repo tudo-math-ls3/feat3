@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_APPLICATIONS_CCND_SIMPLE_DOMAIN_HPP
-#define FEAT_APPLICATIONS_CCND_SIMPLE_DOMAIN_HPP 1
 
 #include "base.hpp"
 
@@ -116,5 +114,3 @@ namespace CCNDSimple
     virtual void print_info();
   }; // class DomainControl
 } // namespace CCNDSimple
-
-#endif // FEAT_APPLICATIONS_CCND_SIMPLE_DOMAIN_HPP

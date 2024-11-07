@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_DOMAIN_DOMAIN_CONTROL_HPP
-#define CONTROL_DOMAIN_DOMAIN_CONTROL_HPP 1
 
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_quality_heuristic.hpp>
@@ -790,5 +788,3 @@ namespace FEAT
     } // namespace Domain
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_DOMAIN_DOMAIN_CONTROL_HPP

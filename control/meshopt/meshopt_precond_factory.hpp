@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_MESHOPT_MESHOPT_PRECOND_FACTORY_HPP
-#define CONTROL_MESHOPT_MESHOPT_PRECOND_FACTORY_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -131,4 +129,3 @@ namespace FEAT
     } // namespace Meshopt
   } // namespace Control
 } //namespace FEAT
-#endif // CONTROL_MESHOPT_MESHOPT_PRECOND_FACTORY_HPP

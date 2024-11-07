@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_GATE_HPP
-#define KERNEL_GLOBAL_GATE_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -680,5 +678,3 @@ namespace FEAT
     }; // class Gate<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_GATE_HPP

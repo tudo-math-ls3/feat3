@@ -124,8 +124,6 @@
 // \author Peter Zajac
 //
 #pragma once
-#ifndef APPLICATIONS_CCND_UNSTEADY_APPBASE_HPP
-#define APPLICATIONS_CCND_UNSTEADY_APPBASE_HPP 1
 
 #include "ccnd_steady_appbase.hpp"
 
@@ -684,5 +682,3 @@ namespace CCND
     }
   }; // class UnsteadyAppBase<...>
 } // namespace CCND
-
-#endif // APPLICATIONS_CCND_UNSTEADY_APPBASE_HPP

@@ -3,8 +3,6 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 #pragma once
-#ifndef APPLICATIONS_DFG95_BENCH_CCND_COMMON_HPP
-#define APPLICATIONS_DFG95_BENCH_CCND_COMMON_HPP 1
 
 #include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
@@ -783,5 +781,3 @@ namespace DFG95
     }
   }; // class NavierStokesBlockedSystemLevel
 } // namespace DFG95
-
-#endif // APPLICATIONS_DFG95_BENCH_CCND_COMMON_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_VECTOR_HPP
-#define KERNEL_GLOBAL_VECTOR_HPP 1
 
 #include <kernel/global/gate.hpp>
 #include <kernel/util/math.hpp>
@@ -614,5 +612,3 @@ namespace FEAT
     }; // class Vector<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_VECTOR_HPP

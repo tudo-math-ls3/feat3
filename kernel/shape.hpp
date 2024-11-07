@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SHAPE_HPP
-#define KERNEL_SHAPE_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -423,5 +421,3 @@ namespace FEAT
     /// \endcond
   } // namespace Shape
 } // namespace FEAT
-
-#endif // KERNEL_SHAPE_HPP

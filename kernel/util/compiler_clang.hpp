@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_CLANG_HPP
-#define KERNEL_UTIL_COMPILER_CLANG_HPP 1
 
 /**
  * \file compiler_clang.hpp
@@ -91,5 +89,3 @@
 #define FORCE_INLINE inline __attribute__((always_inline))
 
 #endif // !defined(FEAT_COMPILER) && defined(__clang__)
-
-#endif // KERNEL_UTIL_COMPILER_CLANG_HPP

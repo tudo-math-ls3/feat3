@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_MUXER_HPP
-#define KERNEL_GLOBAL_MUXER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
@@ -514,5 +512,3 @@ namespace FEAT
     }; // class Muxer<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_MUXER_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_COMMON_OPERATORS_HPP
-#define KERNEL_ASSEMBLY_COMMON_OPERATORS_HPP 1
 
 // includes, FEAT
 #include <kernel/assembly/bilinear_operator.hpp>
@@ -1416,5 +1414,3 @@ namespace FEAT
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_COMMON_OPERATORS_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_VANKA_HPP
-#define KERNEL_SOLVER_VANKA_HPP 1
 
 // includes, FEAT
 #include <kernel/solver/base.hpp>
@@ -2006,5 +2004,3 @@ namespace FEAT
     }
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_VANKA_HPP

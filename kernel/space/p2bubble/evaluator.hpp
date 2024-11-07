@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_P2BUBBLE_EVALUATOR_HPP
-#define KERNEL_SPACE_P2BUBBLE_EVALUATOR_HPP 1
 
 // includes, FEAT
 #include <kernel/space/parametric_evaluator.hpp>
@@ -205,5 +203,3 @@ namespace FEAT
     } // namespace P2Bubble
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_P2BUBBLE_EVALUATOR_HPP

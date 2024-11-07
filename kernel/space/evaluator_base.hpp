@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_EVALUATOR_BASE_HPP
-#define KERNEL_SPACE_EVALUATOR_BASE_HPP 1
 
 // includes, FEAT
 #include <kernel/space/eval_data.hpp>
@@ -267,5 +265,3 @@ namespace FEAT
     /// \endcond
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_EVALUATOR_BASE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_BLOCKED_BASIC_HPP
-#define CONTROL_BLOCKED_BASIC_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
@@ -369,5 +367,3 @@ namespace FEAT
     }; // class BlockedCombinedSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_BLOCKED_BASIC_HPP

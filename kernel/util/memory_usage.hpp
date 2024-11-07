@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_MEMORY_USAGE_HPP
-#define KERNEL_UTIL_MEMORY_USAGE_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -238,5 +236,3 @@ namespace FEAT
     }
   }; //class MemoryUsage
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_MEMORY_USAGE_HPP

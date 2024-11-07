@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_PARTI_ZOLTAN_HPP
-#define KERNEL_GEOMETRY_PARTI_ZOLTAN_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -164,4 +162,3 @@ namespace FEAT
 } // namespace FEAT
 
 #endif // FEAT_HAVE_ZOLTAN
-#endif // KERNEL_GEOMETRY_PARTI_ZOLTAN_HPP

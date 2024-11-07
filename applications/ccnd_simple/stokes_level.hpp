@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_APPLICATIONS_CCND_SIMPLE_STOKES_LEVEL_HPP
-#define FEAT_APPLICATIONS_CCND_SIMPLE_STOKES_LEVEL_HPP 1
 
 #include "domain.hpp"
 
@@ -161,5 +159,3 @@ namespace CCNDSimple
   /// the local matrix A block
   typedef StokesLevel::LocalMatrixBlockA LocalMatrixBlockA;
 } // namespace CCNDSimple
-
-#endif // FEAT_APPLICATIONS_CCND_SIMPLE_STOKES_LEVEL_HPP

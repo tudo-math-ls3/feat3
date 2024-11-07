@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FEAT_KERNEL_VOXEL_ASSEMBLY_BURGERS_HPP
-#define FEAT_KERNEL_VOXEL_ASSEMBLY_BURGERS_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/backend.hpp>
@@ -1774,5 +1772,3 @@ namespace FEAT
 #endif
   }
 }
-
-#endif

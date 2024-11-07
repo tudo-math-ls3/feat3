@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_MATRIX_HPP
-#define KERNEL_GLOBAL_MATRIX_HPP 1
 
 #include <kernel/lafem/container.hpp> // required for LAFEM::CloneMode
 #include <kernel/global/gate.hpp>
@@ -648,5 +646,3 @@ namespace FEAT
     }; // class Matrix<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_MATRIX_HPP

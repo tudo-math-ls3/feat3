@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_MESHOPT_RUMPF_TRAFO_HPP
-#define KERNEL_MESHOPT_RUMPF_TRAFO_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -807,4 +805,3 @@ namespace FEAT
     /// \endcond
   } // namespace Meshopt
 } // namespace FEAT
-#endif // KERNEL_MESHOPT_RUMPF_TRAFO_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_META_ELEMENT_HPP
-#define KERNEL_LAFEM_META_ELEMENT_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -109,5 +107,3 @@ namespace FEAT
     /// \endcond
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_META_ELEMENT_HPP

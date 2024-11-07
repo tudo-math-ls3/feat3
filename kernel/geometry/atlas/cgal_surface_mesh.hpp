@@ -2,12 +2,7 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
 #pragma once
-
-#include <memory>
-#ifndef KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP
-#define KERNEL_GEOMETRY_ATLAS_CGAL_CHART_HPP 1
 
 #include "kernel/util/assertion.hpp"
 #include <kernel/geometry/atlas/chart.hpp>
@@ -16,6 +11,7 @@
 #include <kernel/geometry/cgal.hpp>
 #include <kernel/runtime.hpp>
 
+#include <memory>
 
 namespace FEAT
 {
@@ -427,4 +423,3 @@ namespace FEAT
     } //namespace Atlas
   } //namespace Geometry
 } //namespace FEAT
-#endif

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_INTERN_CONGRUENCY_MAPPING_HPP
-#define KERNEL_GEOMETRY_INTERN_CONGRUENCY_MAPPING_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/intern/congruency_sampler.hpp>
@@ -281,5 +279,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_INTERN_CONGRUENCY_MAPPING_HPP

@@ -2,9 +2,8 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
+#pragma once
 
-#ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP
-#define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/mirror_assembler.hpp>
@@ -1010,4 +1009,3 @@ namespace FEAT
 
   } // namespace Control
 } //namespace FEAT
-#endif // FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_HPP

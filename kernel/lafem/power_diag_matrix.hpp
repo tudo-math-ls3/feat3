@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_POWER_DIAG_MATRIX_HPP
-#define KERNEL_LAFEM_POWER_DIAG_MATRIX_HPP 1
 
 // includes, FEAT
 #include <kernel/lafem/power_vector.hpp>
@@ -1127,5 +1125,3 @@ namespace FEAT
     /// \endcond
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_POWER_DIAG_MATRIX_HPP

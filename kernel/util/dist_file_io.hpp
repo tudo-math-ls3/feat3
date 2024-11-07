@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_DIST_FILE_IO_HPP
-#define KERNEL_UTIL_DIST_FILE_IO_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/binary_stream.hpp>
@@ -466,5 +464,3 @@ namespace FEAT
     static void _write_file(BinaryStream& stream, const String& filename, bool truncate);
   }; // class DistFileIO
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_DIST_FILE_IO_HPP

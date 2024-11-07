@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_TRANSFER_HPP
-#define KERNEL_GLOBAL_TRANSFER_HPP 1
 
 #include <kernel/global/muxer.hpp>
 #include <kernel/global/vector.hpp>
@@ -336,5 +334,3 @@ namespace FEAT
     }; // class Transfer<..>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_TRANSFER_HPP

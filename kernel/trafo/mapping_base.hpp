@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_TRAFO_MAPPING_BASE_HPP
-#define KERNEL_TRAFO_MAPPING_BASE_HPP 1
 
 // includes, FEAT
 #include <kernel/trafo/evaluator_base.hpp>
@@ -121,5 +119,3 @@ namespace FEAT
     }; // class MappingBase<...>
   } // namespace Trafo
 } // namespace FEAT
-
-#endif // KERNEL_TRAFO_MAPPING_BASE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_BASE_HEADER_HPP
-#define KERNEL_BASE_HEADER_HPP 1
 
 /**
  * \file
@@ -141,5 +139,3 @@ namespace FEAT
 #define CUDA_DEVICE
 #define CUDA_HOST_DEVICE
 #endif
-
-#endif // KERNEL_BASE_HEADER_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_STATISTICS_HPP
-#define KERNEL_UTIL_STATISTICS_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
@@ -651,5 +649,3 @@ namespace FEAT
       }*/
   };
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_STATISTICS_HPP

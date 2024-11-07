@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_TRANSFER_HPP
-#define KERNEL_LAFEM_TRANSFER_HPP 1
 
 #include <kernel/lafem/base.hpp>
 #include <kernel/util/exception.hpp>
@@ -311,5 +309,3 @@ namespace FEAT
     }; // class Transfer<...>
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_TRANSFER_HPP

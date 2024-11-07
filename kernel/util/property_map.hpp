@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_PROPERTY_MAP_HPP
-#define KERNEL_UTIL_PROPERTY_MAP_HPP 1
 
 // includes, FEAT
 #include <kernel/util/exception.hpp>
@@ -470,5 +468,3 @@ namespace FEAT
     void write(std::ostream& os, String::size_type indent = 0) const;
   }; // class PropertyMap
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_PROPERTY_MAP_HPP

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef AREA51_CCND_FIBER_COMMON_HPP
-#define AREA51_CCND_FIBER_COMMON_HPP 1
 
 #include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
@@ -781,4 +779,3 @@ namespace CCND_FIBER
     }
   }; // class ModNavierStokesBlockedMeanPresSystemLevel
 }
-#endif

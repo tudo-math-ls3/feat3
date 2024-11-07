@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ANALYTIC_FUNCTION_HPP
-#define KERNEL_ANALYTIC_FUNCTION_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -438,5 +436,3 @@ namespace FEAT
 
   } // namespace Analytic
 } // namespace FEAT
-
-#endif // KERNEL_ANALYTIC_FUNCTION_HPP

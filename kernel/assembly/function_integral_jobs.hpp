@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_FUNCTION_INTEGRAL_JOBS_HPP
-#define KERNEL_ASSEMBLY_FUNCTION_INTEGRAL_JOBS_HPP 1
 
 #include <kernel/assembly/base.hpp>
 #include <kernel/assembly/asm_traits.hpp>
@@ -1857,4 +1855,3 @@ namespace FEAT
     }; // class ErrorFunctionIntegralJob<...>
   } // namespace Assembly
 } // namespace FEAT
-#endif // KERNEL_ASSEMBLY_FUNCTION_INTEGRAL_JOBS_HPP

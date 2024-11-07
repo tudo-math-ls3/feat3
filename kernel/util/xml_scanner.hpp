@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_XML_SCANNER_HPP
-#define KERNEL_UTIL_XML_SCANNER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
@@ -573,5 +571,3 @@ namespace FEAT
     }; // class Scanner
   } // namespace Xml
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_XML_SCANNER_HPP

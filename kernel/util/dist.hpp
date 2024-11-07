@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_DIST_HPP
-#define KERNEL_UTIL_DIST_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -3147,5 +3145,3 @@ namespace FEAT
     }; // class Comm
   } // namespace Dist
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_DIST_HPP

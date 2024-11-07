@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_RGCR_HPP
-#define KERNEL_SOLVER_RGCR_HPP 1
 
 // includes, FEAT
 #include <kernel/solver/iterative.hpp>
@@ -296,5 +294,3 @@ namespace FEAT
     }
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_RGCR_HPP

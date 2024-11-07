@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_PARTI_PARMETIS_HPP
-#define KERNEL_GEOMETRY_PARTI_PARMETIS_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -150,4 +148,3 @@ namespace FEAT
 } // namespace FEAT
 
 #endif // FEAT_HAVE_PARMETIS
-#endif // KERNEL_GEOMETRY_PARTI_PARMETIS_HPP

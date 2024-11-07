@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_SCALAR_MIXED_HPP
-#define CONTROL_SCALAR_MIXED_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -409,5 +407,3 @@ namespace FEAT
     }; // class ScalarMixedSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_SCALAR_MIXED_HPP

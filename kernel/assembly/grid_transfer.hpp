@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_GRID_TRANSFER_HPP
-#define KERNEL_ASSEMBLY_GRID_TRANSFER_HPP 1
 
 // includes, FEAT
 #include <kernel/util/exception.hpp>
@@ -2020,5 +2018,3 @@ namespace FEAT
     }; // class GridTransfer<...>
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_GRID_TRANSFER_HPP

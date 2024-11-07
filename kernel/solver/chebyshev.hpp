@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_CHEBYSHEV_PRECOND_HPP
-#define KERNEL_SOLVER_CHEBYSHEV_PRECOND_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -333,5 +331,3 @@ namespace FEAT
     }
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_CHEBYSHEV_PRECOND_HPP

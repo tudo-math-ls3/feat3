@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_TEST_ANALYTIC_FUNCTION_OPERATOR
-#define KERNEL_SOLVER_TEST_ANALYTIC_FUNCTION_OPERATOR 1
 #include <kernel/base_header.hpp>
 #include <kernel/analytic/function.hpp>
 
@@ -282,5 +280,3 @@ namespace FEAT
     };
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_TEST_ANALYTIC_FUNCTION_OPERATOR

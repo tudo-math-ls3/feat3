@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_TEST_AUX_VALIDATE_NEIGHBOURS_HPP
-#define KERNEL_GEOMETRY_TEST_AUX_VALIDATE_NEIGHBOURS_HPP 1
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
@@ -102,5 +100,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_TEST_AUX_VALIDATE_NEIGHBOURS_HPP

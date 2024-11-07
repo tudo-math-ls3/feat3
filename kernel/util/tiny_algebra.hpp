@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_TINY_ALGEBRA_HPP
-#define KERNEL_UTIL_TINY_ALGEBRA_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
@@ -3953,5 +3951,3 @@ namespace FEAT
     /// \endcond
   } // namespace Tiny
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_TINY_ALGEBRA_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_SPLITTER_HPP
-#define KERNEL_GLOBAL_SPLITTER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/base.hpp>
@@ -479,5 +477,3 @@ namespace FEAT
     }; // class Splitter<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_SPLITTER_HPP

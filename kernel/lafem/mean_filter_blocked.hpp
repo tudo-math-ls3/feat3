@@ -2,10 +2,7 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
 #pragma once
-#ifndef KERNEL_LAFEM_MEAN_FILTER_BLOCKED_HPP
-#define KERNEL_LAFEM_MEAN_FILTER__BLOCKED_HPP 1
 
 // includes, FEAT
 #include <kernel/lafem/dense_vector_blocked.hpp>
@@ -301,5 +298,3 @@ namespace FEAT
     }; // class MeanFilterBlocked<...>
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_MEAN_FILTER_BLOCKED_HPP

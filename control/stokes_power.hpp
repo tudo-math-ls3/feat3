@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_STOKES_POWER_HPP
-#define CONTROL_STOKES_POWER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -897,5 +895,3 @@ namespace FEAT
     }; // struct StokesPowerUnitVeloNonePresSystemLevel<...>
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_STOKES_POWER_HPP

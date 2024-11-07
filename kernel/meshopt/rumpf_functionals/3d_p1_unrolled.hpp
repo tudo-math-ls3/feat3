@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_MESHOPT_RUMPF_FUNCTIONALS_3D_P1_UNROLLED_HPP
-#define KERNEL_MESHOPT_RUMPF_FUNCTIONALS_3D_P1_UNROLLED_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/shape.hpp>
@@ -609,4 +607,3 @@ namespace FEAT
     /// \endcond
   } // namespace Meshopt
 } // namespace FEAT
-#endif // KERNEL_MESHOPT_RUMPF_FUNCTIONALS_2D_P1_UNROLLED_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_DOF_MAPPING_RENDERER_HPP
-#define KERNEL_SPACE_DOF_MAPPING_RENDERER_HPP 1
 
 // includes, FEAT
 #include <kernel/adjacency/graph.hpp>
@@ -77,5 +75,3 @@ namespace FEAT
     }; // class DofMappingRenderer
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_DOF_MAPPING_RENDERER_HPP

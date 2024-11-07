@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_REFINE_FACTORY_HPP
-#define KERNEL_CUBATURE_REFINE_FACTORY_HPP 1
 
 // includes, FEAT
 #include <kernel/cubature/rule.hpp>
@@ -796,5 +794,3 @@ namespace FEAT
     /// \endcond
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_REFINE_FACTORY_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_STRING_HPP
-#define KERNEL_UTIL_STRING_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -1292,5 +1290,3 @@ namespace std
 }
 #endif // FEAT_HAVE_QUADMATH
 #endif // __CUDACC__
-
-#endif // KERNEL_UTIL_STRING_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_OS_WINDOWS_HPP
-#define KERNEL_UTIL_OS_WINDOWS_HPP
 #if defined(_WIN32) || defined(DOXYGEN)
 
 #include <kernel/base_header.hpp>
@@ -97,4 +95,3 @@ namespace FEAT
 } // namespace FEAT
 
 #endif // defined(_WIN32) || defined(DOXYGEN)
-#endif // KERNEL_UTIL_OS_WINDOWS_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP
-#define FEAT_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
@@ -105,5 +103,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // FEAT_KERNEL_GEOMETRY_INTERN_FACET_NEIGHBOURS_HPP

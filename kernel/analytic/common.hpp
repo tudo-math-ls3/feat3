@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ANALYTIC_COMMON_HPP
-#define KERNEL_ANALYTIC_COMMON_HPP 1
 
 // includes, FEAT
 #include <kernel/analytic/static_wrapper.hpp>
@@ -4658,5 +4656,3 @@ namespace FEAT
     } // namespace Common
   } // namespace Analytic
 } // namespace FEAT
-
-#endif // KERNEL_ANALYTIC_COMMON_HPP

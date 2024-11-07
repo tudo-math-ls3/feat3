@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_ASSEMBLY_GATE_ASM_HPP
-#define CONTROL_ASSEMBLY_GATE_ASM_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -252,5 +250,3 @@ namespace FEAT
     } // namespace Asm
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_ASSEMBLY_GATE_ASM_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP
-#define KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/export_vtk.hpp>
@@ -266,4 +264,3 @@ namespace FEAT
 
   } // namespace Meshopt
 } // namespace FEAT
-#endif // KERNEL_MESHOPT_MESH_QUALITY_FUNCTIONAL_HPP

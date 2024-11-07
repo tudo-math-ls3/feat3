@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_STRING_MAPPED_HPP
-#define KERNEL_UTIL_STRING_MAPPED_HPP 1
 
 // includes, FEAT
 #include <kernel/util/string.hpp>
@@ -187,5 +185,3 @@ namespace FEAT
     return string_mapped(value, value_map).lookup(str);
   }
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_STRING_MAPPED_HPP

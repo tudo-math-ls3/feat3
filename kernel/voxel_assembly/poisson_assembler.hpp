@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FEAT_KERNEL_VOXEL_ASSEMBLY_POISSON_HPP
-#define FEAT_KERNEL_VOXEL_ASSEMBLY_POISSON_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/backend.hpp>
@@ -232,6 +230,3 @@ namespace FEAT
     #endif // __CUDACC__
   }
 }
-
-
-#endif

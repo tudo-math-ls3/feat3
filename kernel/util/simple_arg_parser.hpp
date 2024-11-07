@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_SIMPLE_ARG_PARSER_HPP
-#define KERNEL_UTIL_SIMPLE_ARG_PARSER_HPP 1
 
 // includes, FEAT
 #include <kernel/util/string.hpp>
@@ -514,5 +512,3 @@ namespace FEAT
     /// \endcond
   }; // class SimpleArgParser
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_SIMPLE_ARG_PARSER_HPP

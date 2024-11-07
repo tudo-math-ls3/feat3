@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_SOLVER_ALGLIB_WRAPPER
-#define FEAT_SOLVER_ALGLIB_WRAPPER 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
@@ -1095,4 +1093,3 @@ namespace FEAT
   } // namespace Solver
 } // namespace FEAT
 #endif // defined(FEAT_HAVE_ALGLIB) || defined(DOXYGEN)
-#endif // FEAT_KERNEL_SOLVER_ALGLIB_WRAPPER

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP
-#define KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/intern/index_representative.hpp>
@@ -534,5 +532,3 @@ namespace FEAT
     };
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP

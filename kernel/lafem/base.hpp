@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_BASE_HPP
-#define KERNEL_LAFEM_BASE_HPP 1
 
 /**
  * \file
@@ -126,5 +124,3 @@ namespace FEAT
     constexpr std::size_t FileOutStreamBufferSize = 16777216u;
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_BASE_HPP

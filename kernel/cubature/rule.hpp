@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_RULE_HPP
-#define KERNEL_CUBATURE_RULE_HPP
 
 // includes, FEAT
 #include <kernel/shape.hpp>
@@ -188,5 +186,3 @@ namespace FEAT
     }; // class Rule<...>
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_RULE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_MEAN_FILTER_HPP
-#define KERNEL_GLOBAL_MEAN_FILTER_HPP 1
 
 // includes, FEAT
 #include <kernel/lafem/dense_vector.hpp>
@@ -282,6 +280,3 @@ namespace FEAT
     }; // class MeanFilter<...>
   } // namespace Global
 } // namespace FEAT
-
-
-#endif // KERNEL_GLOBAL_MEAN_FILTER_HPP

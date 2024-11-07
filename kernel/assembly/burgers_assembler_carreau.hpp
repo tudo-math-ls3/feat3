@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_BURGERS_ASSEMBLER_CARREAU_HPP
-#define KERNEL_ASSEMBLY_BURGERS_ASSEMBLER_CARREAU_HPP
 
 #include <algorithm>
 #include <kernel/assembly/asm_traits.hpp>
@@ -797,5 +795,3 @@ namespace FEAT
     }; // class BurgersAssembler<...>
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_BURGERS_ASSEMBLER_HPP

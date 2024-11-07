@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_SCALAR_NEWTON_COTES_CLOSED_DRIVER_HPP
-#define KERNEL_CUBATURE_SCALAR_NEWTON_COTES_CLOSED_DRIVER_HPP 1
 
 // includes, FEAT
 #include <kernel/cubature/scalar/driver_base.hpp>
@@ -157,5 +155,3 @@ namespace FEAT
     } // namespace Scalar
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_SCALAR_NEWTON_COTES_CLOSED_DRIVER_HPP

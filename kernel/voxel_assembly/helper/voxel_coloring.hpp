@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FEAT_KERNEL_VOXEL_ASSEMBLY_HELPER_COLORING_HPP
-#define FEAT_KERNEL_VOXEL_ASSEMBLY_HELPER_COLORING_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/adjacency/graph.hpp>
@@ -84,5 +82,3 @@ namespace FEAT
     }
   }
 }
-
-#endif

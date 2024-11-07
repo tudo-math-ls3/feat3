@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_ASSEMBLY_SLIP_FILTER_SYNC_HPP
-#define CONTROL_ASSEMBLY_SLIP_FILTER_SYNC_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/slip_filter.hpp>
@@ -116,5 +114,3 @@ namespace FEAT
     } // namespace Asm
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_ASSEMBLY_SLIP_FILTER_SYNC_HPP

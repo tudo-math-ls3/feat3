@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_SYNCH_VEC_HPP
-#define KERNEL_GLOBAL_SYNCH_VEC_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -223,5 +221,3 @@ namespace FEAT
     }; // class SynchVectorTicket
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_SYNCH_VEC_HPP

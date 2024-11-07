@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_PARTI_2LVL_HPP
-#define KERNEL_GEOMETRY_PARTI_2LVL_HPP 1
 
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -178,5 +176,3 @@ namespace FEAT
     }; // class Parti2Lvl
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_PARTI_2LVL_HPP

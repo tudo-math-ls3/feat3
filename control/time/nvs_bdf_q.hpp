@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_TIME_NVS_BDF_Q_HPP
-#define CONTROL_TIME_NVS_BDF_Q_HPP 1
 #include <kernel/base_header.hpp>
 #include <control/time/base.hpp>
 
@@ -469,5 +467,3 @@ namespace FEAT
     } // namespace Time
   } // namespace Control
 } // name FEAT
-
-#endif // CONTROL_TIME_NVS_BDF_Q_HPP

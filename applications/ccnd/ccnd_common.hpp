@@ -3,8 +3,6 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 #pragma once
-#ifndef APPLICATIONS_CCND_COMMON_HPP
-#define APPLICATIONS_CCND_COMMON_HPP 1
 
 #include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
@@ -572,5 +570,3 @@ namespace CCND
     }
   }; // struct BenchmarkStats<...>
 } // namespace CCND
-
-#endif // APPLICATIONS_CCND_COMMON_HPP

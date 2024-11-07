@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_INTERN_INDEX_SET_FILLER_HPP
-#define KERNEL_GEOMETRY_INTERN_INDEX_SET_FILLER_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/index_set.hpp>
@@ -83,5 +81,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_INTERN_INDEX_SET_FILLER_HPP

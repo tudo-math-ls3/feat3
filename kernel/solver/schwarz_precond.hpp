@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_SCHWARZ_PRECOND_HPP
-#define KERNEL_SOLVER_SCHWARZ_PRECOND_HPP 1
 
 #include <kernel/solver/base.hpp>
 #include <kernel/global/vector.hpp>
@@ -267,5 +265,3 @@ namespace FEAT
     }
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_SCHWARZ_PRECOND_HPP

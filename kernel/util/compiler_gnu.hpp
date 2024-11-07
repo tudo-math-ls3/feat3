@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_GNU_HPP
-#define KERNEL_UTIL_COMPILER_GNU_HPP 1
 
 /**
  * \file compiler_gnu.hpp
@@ -78,5 +76,3 @@
 #define FORCE_INLINE inline __attribute__((always_inline))
 
 #endif // !defined(FEAT_COMPILER) && defined(__GNUC__)
-
-#endif // KERNEL_UTIL_COMPILER_GNU_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_MESHOPT_BASE_HPP
-#define KERNEL_MESHOPT_BASE_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/space/lagrange1/element.hpp>
@@ -51,4 +49,3 @@ namespace FEAT
     } // namespace Intern
   } // namespace Meshopt
 } // namespace FEAT
-#endif // KERNEL_MESHOPT_BASE_HPP

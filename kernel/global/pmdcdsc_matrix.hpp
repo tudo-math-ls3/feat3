@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_PMDCDSC_MATRIX_HPP
-#define KERNEL_GLOBAL_PMDCDSC_MATRIX_HPP 1
 
 // includes, FEAT
 #include <kernel/global/vector.hpp>
@@ -1509,5 +1507,3 @@ namespace FEAT
     }; // class PMDCDSCMatrix<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_PMDCDSC_MATRIX_HPP

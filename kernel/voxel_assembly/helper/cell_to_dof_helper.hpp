@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FEAT_KERNEL_VOXEL_ASSEMBLY_HELPER_CELL_TO_DOF_HPP
-#define FEAT_KERNEL_VOXEL_ASSEMBLY_HELPER_CELL_TO_DOF_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/index_set.hpp>
@@ -127,5 +125,3 @@ namespace FEAT
     }
   }
 }
-
-#endif

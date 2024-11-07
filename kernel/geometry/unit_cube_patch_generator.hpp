@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_UNIT_CUBE_PATCH_GENERATOR_HPP
-#define KERNEL_GEOMETRY_UNIT_CUBE_PATCH_GENERATOR_HPP 1
 
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/common_factories.hpp>
@@ -906,5 +904,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_UNIT_CUBE_PATCH_GENERATOR_HPP

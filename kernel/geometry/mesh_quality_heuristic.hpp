@@ -2,9 +2,7 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
-#ifndef FEAT_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC
-#define FEAT_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC 1
+#pragma once
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/math.hpp>
@@ -674,4 +672,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-#endif // FEAT_KERNEL_GEOMETRY_MESH_QUALITY_HEURISTIC

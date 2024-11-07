@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_NLOPT_PRECOND
-#define KERNEL_SOLVER_NLOPT_PRECOND 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/util/dist.hpp>
@@ -205,5 +203,3 @@ namespace FEAT
 
   } // namespace Solver
 }// namespace FEAT
-
-#endif // KERNEL_SOLVER_NLOPT_PRECOND

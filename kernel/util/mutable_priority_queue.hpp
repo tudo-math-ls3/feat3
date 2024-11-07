@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_MUTATBLE_PRIORITY_QUEUE_HPP
-#define KERNEL_UTIL_MUTATBLE_PRIORITY_QUEUE_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -185,4 +183,3 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           }
       };
 }
-#endif // KERNEL_UTIL_MUTATBLE_PRIORITY_QUEUE_HPP

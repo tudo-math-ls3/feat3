@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_VELOCITY_ANALYSER_HPP
-#define KERNEL_ASSEMBLY_VELOCITY_ANALYSER_HPP 1
 
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -649,5 +647,3 @@ namespace FEAT
     /// \endcond
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_VELOCITY_ANALYSER_HPP

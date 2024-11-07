@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_FILTER_SEQUENCE_HPP
-#define KERNEL_LAFEM_FILTER_SEQUENCE_HPP 1
 
 #include <deque>
 
@@ -216,5 +214,3 @@ namespace FEAT
 
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_FILTER_SEQUENCE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_ATLAS_EXTRUDE_HPP
-#define KERNEL_GEOMETRY_ATLAS_EXTRUDE_HPP 1
 
 #include <kernel/geometry/atlas/chart.hpp>
 // supported sub-charts:
@@ -488,5 +486,3 @@ namespace FEAT
     } // namespace Atlas
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_ATLAS_EXTRUDE_HPP

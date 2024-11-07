@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ADJACENCY_CUTHILLMCKEE_HPP
-#define KERNEL_ADJACENCY_CUTHILLMCKEE_HPP 1
 
 // includes, FEAT
 #include <kernel/adjacency/permutation.hpp>
@@ -144,5 +142,3 @@ namespace FEAT
     }; // class CuthillMcKee
   } // namespace Adjacency
 } // namespace FEAT
-
-#endif // KERNEL_ADJACENCY_CUTHILLMCKEE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_AUTO_ALIAS_HPP
-#define KERNEL_CUBATURE_AUTO_ALIAS_HPP 1
 
 // includes, FEAT
 #include <kernel/shape.hpp>
@@ -212,5 +210,3 @@ namespace FEAT
     /// \endcond
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_AUTO_ALIAS_HPP

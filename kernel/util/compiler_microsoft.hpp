@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_MICROSOFT_HPP
-#define KERNEL_UTIL_COMPILER_MICROSOFT_HPP 1
 
 /**
  * \file compiler_microsoft.hpp
@@ -141,5 +139,3 @@
 #endif
 
 #endif // !defined(FEAT_COMPILER) && defined(_MSC_VER)
-
-#endif // KERNEL_UTIL_COMPILER_MICROSOFT_HPP

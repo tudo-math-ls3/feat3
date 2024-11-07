@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ADJACENCY_EXPORT_TGA_HPP
-#define KERNEL_ADJACENCY_EXPORT_TGA_HPP 1
 
 // includes, FEAT
 #include <kernel/adjacency/adjactor.hpp>
@@ -140,5 +138,3 @@ namespace FEAT
     }; // class ExportTGA
   } // namespace Adjacency
 } // namespace FEAT
-
-#endif // KERNEL_ADJACENCY_EXPORT_TGA_HPP

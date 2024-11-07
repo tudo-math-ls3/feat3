@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_COMMON_FACTORIES_HPP
-#define KERNEL_GEOMETRY_COMMON_FACTORIES_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/mesh_part.hpp>
@@ -1430,5 +1428,3 @@ namespace FEAT
     using RefinedUnitSphereFactory = RefineFactory<MeshType_, Geometry::UnitSphereFactory>;
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_COMMON_FACTORIES_HPP

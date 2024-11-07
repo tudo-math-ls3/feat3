@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_DISCONTINUOUS_DOF_TRAITS_HPP
-#define KERNEL_SPACE_DISCONTINUOUS_DOF_TRAITS_HPP 1
 
 // includes, FEAT
 #include <kernel/space/discontinuous/variant.hpp>
@@ -46,5 +44,3 @@ namespace FEAT
     } // namespace Discontinuous
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_DISCONTINUOUS_DOF_TRAITS_HPP

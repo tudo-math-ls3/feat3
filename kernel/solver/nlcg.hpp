@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_SOLVER_NLCG
-#define FEAT_SOLVER_NLCG 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
@@ -955,5 +953,3 @@ namespace FEAT
       }
   } //namespace Solver
 } // namespace FEAT
-
-#endif

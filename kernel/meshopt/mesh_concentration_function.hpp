@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_MESHOPT_MESH_CONCENTRATION_FUNCTION_HPP
-#define KERNEL_MESHOPT_MESH_CONCENTRATION_FUNCTION_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/shape.hpp>
@@ -1833,4 +1831,3 @@ namespace FEAT
     };
   } // namespace Meshopt
 } // namespace FEAST
-#endif // KERNEL_MESHOPT_MESH_CONCENTRATION_FUNCTION_HPP

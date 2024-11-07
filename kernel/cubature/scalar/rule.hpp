@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_SCALAR_RULE_HPP
-#define KERNEL_CUBATURE_SCALAR_RULE_HPP
 
 // includes, FEAT
 #include <kernel/util/assertion.hpp>
@@ -164,5 +162,3 @@ namespace FEAT
     } // namespace Scalar
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_SCALAR_RULE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_APPLICATIONS_CCND_SIMPLE_BASE_HPP
-#define FEAT_APPLICATIONS_CCND_SIMPLE_BASE_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/runtime.hpp>
@@ -121,5 +119,3 @@ namespace CCNDSimple
     print_pad(comm, "Total Runtime", watch_total.elapsed_string().pad_front(10) + " seconds [" + watch_total.elapsed_string(TimeFormat::h_m_s_m) + "]");
   }
 } // namespace CCNDSimple
-
-#endif // FEAT_APPLICATIONS_CCND_SIMPLE_BASE_HPP

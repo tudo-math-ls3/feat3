@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ANALYTIC_LAMBDA_FUNCTION_HPP
-#define KERNEL_ANALYTIC_LAMBDA_FUNCTION_HPP 1
 
 #include <kernel/analytic/function.hpp>
 #include <kernel/util/exception.hpp>
@@ -1892,5 +1890,3 @@ namespace FEAT
     }
   } // namespace Analytic
 } // namespace FEAT
-
-#endif // KERNEL_ANALYTIC_LAMBDA_FUNCTION_HPP

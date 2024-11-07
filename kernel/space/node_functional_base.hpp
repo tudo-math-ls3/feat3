@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_NODE_FUNCTIONAL_BASE_HPP
-#define KERNEL_SPACE_NODE_FUNCTIONAL_BASE_HPP 1
 
 // includes, FEAT
 #include <kernel/space/base.hpp>
@@ -153,5 +151,3 @@ namespace FEAT
     }; // class NodeFunctionalNull<...>
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_NODE_FUNCTIONAL_BASE_HPP

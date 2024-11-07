@@ -1,6 +1,4 @@
 #pragma once
-#ifndef KERNEL_SPACE_LAGRANGE2_DETAILS_HPP
-#define KERNEL_SPACE_LAGRANGE2_DETAILS_HPP 1
 
 // This file defines detail implementations as templated functions.
 // This is mainly done due to avoid code duplication for the voxel assembly.
@@ -851,5 +849,3 @@ namespace FEAT
     }
   }
 }
-
-#endif

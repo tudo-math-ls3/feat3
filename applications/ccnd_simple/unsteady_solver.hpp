@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_APPLICATIONS_CCND_SIMPLE_UNSTEADY_SOLVER_HPP
-#define FEAT_APPLICATIONS_CCND_SIMPLE_UNSTEADY_SOLVER_HPP 1
 
 #include "steady_solver.hpp"
 
@@ -199,5 +197,3 @@ namespace CCNDSimple
 
   }; // class UnsteadySolver
 } // namespace CCNDSimple
-
-#endif // FEAT_APPLICATIONS_CCND_SIMPLE_UNSTEADY_SOLVER_HPP

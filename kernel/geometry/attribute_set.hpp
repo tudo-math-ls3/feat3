@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_ATTRIBUTE_SET_HPP
-#define KERNEL_GEOMETRY_ATTRIBUTE_SET_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -190,4 +188,3 @@ namespace FEAT
     }; // class AttributeSet<...>
   } // namespace Geometry
 } // namespace FEAT
-#endif // KERNEL_GEOMETRY_ATTRIBUTE_SET_HPP

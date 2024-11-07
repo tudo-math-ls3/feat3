@@ -1,6 +1,4 @@
 #pragma once
-#ifndef KERNEL_ASSEMBLY_SPACE_HELPER_HPP
-#define KERNEL_ASSEMBLY_SPACE_HELPER_HPP 1
 
 // base FEAT includes
 #include <kernel/base_header.hpp>
@@ -259,6 +257,3 @@ namespace FEAT
   }
 
 }
-
-
-#endif

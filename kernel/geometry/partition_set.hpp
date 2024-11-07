@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_PARTITION_SET_HPP
-#define KERNEL_GEOMETRY_PARTITION_SET_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/adjacency/dynamic_graph.hpp>
@@ -291,5 +289,3 @@ namespace FEAT
     }; // class PartitionSet
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_PARTITION_SET_HPP

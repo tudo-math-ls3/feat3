@@ -4,9 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 #pragma once
 
-#ifndef KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP
-#define KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP 1
-
 // includes, FEAT
 #include <kernel/geometry/hit_test_factory.hpp>
 #include <kernel/analytic/function.hpp>
@@ -213,4 +210,3 @@ namespace FEAT
   } // namespace Geometry
 }//namespace FEAT
 #endif // defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)
-#endif //KERNEL_GEOMETRY_PARSED_HIT_TEST_FACTORY_HPP

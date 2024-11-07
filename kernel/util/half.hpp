@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_HALF_HPP
-#define KERNEL_UTIL_HALF_HPP 1
 
 // if cuda supports fp16 arithmetics, include the cuda sdk fp16 header for cpu and gpu computing in datatype __half
 #ifdef FEAT_HAVE_HALFMATH
@@ -99,5 +97,3 @@ namespace FEAT
 #endif // FEAT_HAVE_HALFMATH
 
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_HALF_HPP

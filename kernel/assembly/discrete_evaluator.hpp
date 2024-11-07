@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_DISCRETE_EVALUATOR_HPP
-#define KERNEL_ASSEMBLY_DISCRETE_EVALUATOR_HPP
 
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
@@ -819,5 +817,3 @@ namespace FEAT
     }; // class DiscreteEvaluator<...>
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_DISCRETE_EVALUATOR_HPP

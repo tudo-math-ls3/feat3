@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_INTEL_HPP
-#define KERNEL_UTIL_COMPILER_INTEL_HPP 1
 
 /**
  * \file compiler_intel.hpp
@@ -81,5 +79,3 @@ _Pragma("warning(disable:2196)")
 #define FORCE_INLINE inline __forceinline
 
 #endif // !defined(FEAT_COMPILER) && defined(__INTEL_COMPILER)
-
-#endif // KERNEL_UTIL_COMPILER_INTEL_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_EVAL_TAGS_HPP
-#define KERNEL_EVAL_TAGS_HPP 1
 
 #include <kernel/base_header.hpp>
 
@@ -155,5 +153,3 @@ namespace FEAT
     return (static_cast<int>(a) & 0x3F) != 0;
   }
 } // namespace FEAT
-
-#endif // KERNEL_EVAL_TAGS_HPP

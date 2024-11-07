@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_ARGYRIS_DOF_TRAITS_HPP
-#define KERNEL_SPACE_ARGYRIS_DOF_TRAITS_HPP 1
 
 // includes, FEAT
 #include <kernel/shape.hpp>
@@ -43,5 +41,3 @@ namespace FEAT
     } // namespace Argyris
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_ARGYRIS_DOF_TRAITS_HPP

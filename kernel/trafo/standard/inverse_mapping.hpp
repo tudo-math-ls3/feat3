@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_TRAFO_STANDARD_INVERSE_MAPPING
-#define KERNEL_TRAFO_STANDARD_INVERSE_MAPPING 1
 #include <kernel/base_header.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 
@@ -244,4 +242,3 @@ namespace FEAT
     } // namespace Standard
   } // namespace Trafo
 } // namespace FEAT
-#endif //KERNEL_TRAFO_STANDARD_INVERSE_MAPPING

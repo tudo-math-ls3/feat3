@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_TRAFO_INVERSE_MAPPING_HPP
-#define KERNEL_TRAFO_INVERSE_MAPPING_HPP 1
 
 #include <kernel/trafo/mapping_base.hpp>
 #include <kernel/util/exception.hpp>
@@ -617,5 +615,3 @@ namespace FEAT
     /// \endcond
   } // namespace Trafo
 } // namespace FEAT
-
-#endif // KERNEL_TRAFO_INVERSE_MAPPING_HPP

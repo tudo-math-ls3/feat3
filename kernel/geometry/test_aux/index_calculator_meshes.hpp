@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_TEST_AUX_INDEX_CALCULATOR_MESHES_HPP
-#define KERNEL_GEOMETRY_TEST_AUX_INDEX_CALCULATOR_MESHES_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/index_calculator.hpp>
@@ -60,5 +58,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_TEST_AUX_INDEX_CALCULATOR_MESHES_HPP

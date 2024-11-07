@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_ALG_DOF_PARTI_HPP
-#define KERNEL_GLOBAL_ALG_DOF_PARTI_HPP 1
 
 #include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/global/gate.hpp>
@@ -1793,5 +1791,3 @@ namespace FEAT
     }; // class AlgDofPartiMatrixCSR
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_ALG_DOF_PARTI_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_APPLICATIONS_CCND_SIMPLE_STEADY_SOLVER_HPP
-#define FEAT_APPLICATIONS_CCND_SIMPLE_STEADY_SOLVER_HPP 1
 
 #include "stokes_level.hpp"
 
@@ -409,5 +407,3 @@ namespace CCNDSimple
     virtual void release();
   }; // class StokesSteadySolver
 } // namespace CCNDSimple
-
-#endif // FEAT_APPLICATIONS_CCND_SIMPLE_STEADY_SOLVER_HPP

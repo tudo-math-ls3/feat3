@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_TEST_AUX_TETRIS_HEXA_HPP
-#define KERNEL_GEOMETRY_TEST_AUX_TETRIS_HEXA_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -68,5 +66,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_TEST_AUX_TETRIS_HEXA_HPP

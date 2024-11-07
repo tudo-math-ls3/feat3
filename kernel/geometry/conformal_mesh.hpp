@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_CONFORMAL_MESH_HPP
-#define KERNEL_GEOMETRY_CONFORMAL_MESH_HPP 1
 
 // includes, FEAT
 #include <kernel/geometry/factory.hpp>
@@ -826,5 +824,3 @@ namespace FEAT
 #endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_CONFORMAL_MESH_HPP

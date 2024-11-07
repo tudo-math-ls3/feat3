@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_AVAIL_FUNCTOR_HPP
-#define KERNEL_CUBATURE_AVAIL_FUNCTOR_HPP 1
 
 // includes, FEAT
 #include <kernel/util/string.hpp>
@@ -136,5 +134,3 @@ namespace FEAT
     /// \endcond
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_AVAIL_FUNCTOR_HPP

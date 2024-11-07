@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_Global_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP
-#define KERNEL_Global_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
@@ -354,5 +352,3 @@ namespace FEAT
     }; // class SymmetricLumpedSchurMatrix<...>
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_Global_SYMMETRIC_LUMPED_SCHUR_MATRIX_HPP

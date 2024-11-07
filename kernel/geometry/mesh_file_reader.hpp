@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_MESH_FILE_READER_HPP
-#define KERNEL_GEOMETRY_MESH_FILE_READER_HPP 1
 
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
@@ -1871,5 +1869,3 @@ namespace FEAT
 #endif // FEAT_EICKT
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_MESH_FILE_READER_HPP

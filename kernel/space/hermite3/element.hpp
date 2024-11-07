@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_HERMITE3_ELEMENT_HPP
-#define KERNEL_SPACE_HERMITE3_ELEMENT_HPP 1
 
 // includes, FEAT
 #include <kernel/space/element_base.hpp>
@@ -144,5 +142,3 @@ namespace FEAT
     } // namespace Hermite3
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_HERMITE3_ELEMENT_HPP

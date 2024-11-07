@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP
-#define KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP 1
 
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -164,5 +162,3 @@ namespace FEAT
 
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP

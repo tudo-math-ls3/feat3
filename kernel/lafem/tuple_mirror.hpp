@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_TUPLE_MIRROR_HPP
-#define KERNEL_LAFEM_TUPLE_MIRROR_HPP 1
 
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>
@@ -403,5 +401,3 @@ namespace FEAT
     /// \endcond
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_TUPLE_MIRROR_HPP

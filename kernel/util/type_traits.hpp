@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_TYPE_TRAITS_HPP
-#define KERNEL_UTIL_TYPE_TRAITS_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -668,5 +666,3 @@ namespace FEAT
 #endif // FEAT_HAVE_FLOATX && !__CUDACC__
   } // namespace Type
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_TYPE_TRAITS_HPP

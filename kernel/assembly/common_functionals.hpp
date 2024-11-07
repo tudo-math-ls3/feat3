@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP
-#define KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP 1
 
 // includes, FEAT
 #include <kernel/analytic/function.hpp>
@@ -252,5 +250,3 @@ namespace FEAT
     } // namespace Common
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_COMMON_FUNCTIONALS_HPP

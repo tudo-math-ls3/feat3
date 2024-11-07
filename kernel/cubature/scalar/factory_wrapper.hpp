@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_CUBATURE_SCALAR_FACTORY_WRAPPER_HPP
-#define KERNEL_CUBATURE_SCALAR_FACTORY_WRAPPER_HPP 1
 
 // includes, FEAT
 #include <kernel/cubature/scalar/driver_factory.hpp>
@@ -102,5 +100,3 @@ namespace FEAT
     } // namespace Scalar
   } // namespace Cubature
 } // namespace FEAT
-
-#endif // KERNEL_CUBATURE_SCALAR_DRIVER_WRAPPER_HPP

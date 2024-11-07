@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_STOP_WATCH_HPP
-#define KERNEL_UTIL_STOP_WATCH_HPP 1
 
 // includes, FEAT
 #include <kernel/util/time_stamp.hpp>
@@ -122,5 +120,3 @@ namespace FEAT
     }
   }; // class StopWatch
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_STOP_WATCH_HPP

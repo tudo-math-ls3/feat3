@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_Q1TBNP_DOF_TRAITS_HPP
-#define KERNEL_SPACE_Q1TBNP_DOF_TRAITS_HPP 1
 
 // includes, FEAT
 #include <kernel/shape.hpp>
@@ -51,5 +49,3 @@ namespace FEAT
     } // namespace Q1TBNP
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_Q1TBNP_DOF_TRAITS_HPP

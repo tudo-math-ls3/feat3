@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FEAT_KERNEL_VOXEL_ASSEMBLY_POLICIES_HPP
-#define FEAT_KERNEL_VOXEL_ASSEMBLY_POLICIES_HPP
 
 namespace FEAT
 {
@@ -12,5 +10,3 @@ namespace FEAT
 
   }
 }
-
-#endif

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_GPDV_ASSEMBLER_HPP
-#define KERNEL_ASSEMBLY_GPDV_ASSEMBLER_HPP 1
 
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
@@ -249,5 +247,3 @@ namespace FEAT
     };
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_GPDV_ASSEMBLER_HPP

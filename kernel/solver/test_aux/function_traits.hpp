@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_TEST_AUX_FUNCTION_TRAITS
-#define KERNEL_SOLVER_TEST_AUX_FUNCTION_TRAITS 1
 #include <kernel/base_header.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -299,5 +297,3 @@ namespace FEAT
     /// \endcond
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_TEST_AUX_FUNCTION_TRAITS

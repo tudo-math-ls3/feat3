@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_KERNEL_SOLVER_MQC_LINESEARCH
-#define FEAT_KERNEL_SOLVER_MQC_LINESEARCH 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/linesearch.hpp>
 
@@ -848,4 +846,3 @@ namespace FEAT
 
   } // namespace Solver
 } // namespace FEAT
-#endif // FEAT_KERNEL_SOLVER_MQC_LINESEARCH

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_NULL_MATRIX_HPP
-#define KERNEL_LAFEM_NULL_MATRIX_HPP 1
 
 #include <kernel/lafem/base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -860,5 +858,3 @@ namespace FEAT
     }; // class NullMatrix
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_NULL_MATRIX_HPP

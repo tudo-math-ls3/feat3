@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_CRAY_HPP
-#define KERNEL_UTIL_COMPILER_CRAY_HPP 1
 
 /**
  * \file compiler_cray.hpp
@@ -23,5 +21,3 @@
 #define FEAT_COMPILER "Cray C++ Compiler " // _RELEASE_STRING
 
 #endif // !defined(FEAT_COMPILER) && defined(_CRAYC)
-
-#endif // KERNEL_UTIL_COMPILER_CRAY_HPP

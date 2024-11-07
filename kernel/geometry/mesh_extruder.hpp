@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_MESH_EXTRUDER_HPP
-#define KERNEL_GEOMETRY_MESH_EXTRUDER_HPP 1
 
 #include <kernel/geometry/atlas/extrude.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -1024,5 +1022,3 @@ namespace FEAT
     }; // class MeshPartSliceExtruderFactory<ConformalMesh<Shape::Hypercube<2>,...>>
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_MESH_EXTRUDER_HPP

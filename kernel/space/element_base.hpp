@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_ELEMENT_BASE_HPP
-#define KERNEL_SPACE_ELEMENT_BASE_HPP 1
 
 // includes, FEAT
 #include <kernel/space/dof_mapping_base.hpp>
@@ -215,5 +213,3 @@ namespace FEAT
     }; // class ElementBase<...>
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_ELEMENT_BASE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_CUSOLVER_HPP
-#define KERNEL_SOLVER_CUSOLVER_HPP 1
 #include <kernel/base_header.hpp>
 
 #include <kernel/solver/base.hpp>
@@ -121,5 +119,3 @@ namespace FEAT
     };
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_CUSOLVER_HPP

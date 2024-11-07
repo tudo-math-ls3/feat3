@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_META_MATH_HPP
-#define KERNEL_UTIL_META_MATH_HPP 1
 
 #include <kernel/util/assertion.hpp>
 
@@ -103,5 +101,3 @@ namespace FEAT
     /// \endcond
   } // namespace MetaMath
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_META_MATH_HPP

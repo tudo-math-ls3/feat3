@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP
-#define FEAT_CONTROL_MESHOPT_MESHOPT_CONTROL_FACTORY_HPP 1
 #include <kernel/base_header.hpp>
 
 #include <kernel/meshopt/rumpf_functionals/p1.hpp>
@@ -486,5 +484,3 @@ namespace FEAT
     } // namespace Meshopt
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_MESHOPT_MESHOPT_SOLVER_FACTORY_HPP

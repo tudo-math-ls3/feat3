@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_MESHOPT_DUDV_FUNCTIONAL_HPP
-#define KERNEL_MESHOPT_DUDV_FUNCTIONAL_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp> // for BilinearOperatorAssembler
@@ -491,4 +489,3 @@ namespace FEAT
 #endif // FEAT_EICKT
   } // namespace Meshopt
 } // namespace FEAT
-#endif // KERNEL_MESHOPT_DUDV_FUNCTIONAL_HPP

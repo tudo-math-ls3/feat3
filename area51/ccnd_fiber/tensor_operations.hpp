@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FIBER_TENSOR_OPERATIONS_HPP
-#define FIBER_TENSOR_OPERATIONS_HPP 1
 
 //includes, FEAT
 #include <kernel/util/tiny_algebra.hpp>
@@ -802,4 +800,3 @@ namespace CCND_FIBER
 
 
 }
-#endif

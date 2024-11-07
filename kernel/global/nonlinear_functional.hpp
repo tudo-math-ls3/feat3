@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GLOBAL_NONLINEAR_FUNCTIONAL_HPP
-#define KERNEL_GLOBAL_NONLINEAR_FUNCTIONAL_HPP 1
 
 #include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
@@ -400,5 +398,3 @@ namespace FEAT
     };
   } // namespace Global
 } // namespace FEAT
-
-#endif // KERNEL_GLOBAL_NONLINEAR_FUNCTIONAL

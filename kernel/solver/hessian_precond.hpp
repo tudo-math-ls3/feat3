@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_HESSIAN_PRECOND
-#define KERNEL_SOLVER_HESSIAN_PRECOND 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/nlopt_precond.hpp>
 #include <kernel/solver/test_aux/analytic_function_operator.hpp>
@@ -334,5 +332,3 @@ namespace FEAT
 
   } // namespace Solver
 } // namespace FEAT
-
-#endif // KERNEL_SOLVER_HESSIAN_PRECOND

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_CONTROL_TIME_BASE_HPP
-#define FEAT_CONTROL_TIME_BASE_HPP 1
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <iostream>
@@ -80,4 +78,3 @@ namespace FEAT
     } // namespace Time
   } // namespace Control
 } // namespace FEAT
-#endif // FEAT_CONTROL_TIME_BASE_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ANALYTIC_AUTO_DERIVE_HPP
-#define KERNEL_ANALYTIC_AUTO_DERIVE_HPP 1
 
 // includes, FEAT
 #include <kernel/analytic/function.hpp>
@@ -535,5 +533,3 @@ namespace FEAT
     }; // class AutoDerive<...>
   } // namespace Analytic
 } // namespace FEAT
-
-#endif // KERNEL_ANALYTIC_AUTO_DERIVE_HPP

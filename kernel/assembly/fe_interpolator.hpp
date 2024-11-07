@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_FE_INTERPOLATOR_HPP
-#define KERNEL_ASSEMBLY_FE_INTERPOLATOR_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -399,5 +397,3 @@ namespace FEAT
 
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_FE_INTERPOLATOR_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_STATISTICS_HPP
-#define CONTROL_STATISTICS_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
@@ -117,5 +115,3 @@ namespace FEAT
     }; // StatisticsControl
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_STATISTICS_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_APPLICATIONS_CCND_SIMPLE_VTK_WRITER_HPP
-#define FEAT_APPLICATIONS_CCND_SIMPLE_VTK_WRITER_HPP 1
 
 #include "domain.hpp"
 #include "stokes_level.hpp"
@@ -132,5 +130,3 @@ namespace CCNDSimple
     void write();
   }; // class VtkWriter
 } // namespace CCNDSimple
-
-#endif // FEAT_APPLICATIONS_CCND_SIMPLE_VTK_WRITER_HPP

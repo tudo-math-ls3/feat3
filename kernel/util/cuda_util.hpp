@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_CUDA_UTIL_HPP
-#define KERNEL_UTIL_CUDA_UTIL_HPP 1
 
 #ifdef FEAT_HAVE_CUDA
 
@@ -119,5 +117,3 @@ namespace FEAT
   }
 }
 #endif // FEAT_HAVE_CUDA
-
-#endif //KERNEL_UTIL_CUDA_UTIL_HPP

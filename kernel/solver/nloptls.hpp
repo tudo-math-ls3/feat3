@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef FEAT_SOLVER_NLOPTLS
-#define FEAT_SOLVER_NLOPTLS 1
 #include <kernel/base_header.hpp>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
@@ -420,4 +418,3 @@ namespace FEAT
     };
   } // namespace Solver
 } //namespace FEAT
-#endif // FEAT_SOLVER_NLOPTLS

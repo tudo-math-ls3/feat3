@@ -1,6 +1,4 @@
 #pragma once
-#ifndef AREA51_CCND_TEST_FUNCTION
-#define AREA51_CCND_TEST_FUNCTION 1
 
 #include <area51/ccnd_fiber/ccnd_fiber_common.hpp>
 
@@ -4284,4 +4282,3 @@ namespace CCND_FIBER
 
 
 }
-#endif

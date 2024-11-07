@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_MESH_FILE_WRITER_HPP
-#define KERNEL_GEOMETRY_MESH_FILE_WRITER_HPP 1
 
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -486,5 +484,3 @@ namespace FEAT
     }; // class MeshFileWriter
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_MESH_FILE_WRITER_HPP

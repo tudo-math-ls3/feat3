@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SPACE_DOF_MAPPING_COMMON_HPP
-#define KERNEL_SPACE_DOF_MAPPING_COMMON_HPP 1
 
 // includes, FEAT
 #include <kernel/space/dof_mapping_base.hpp>
@@ -353,5 +351,3 @@ namespace FEAT
     /// \endcond
   } // namespace Space
 } // namespace FEAT
-
-#endif // KERNEL_SPACE_DOF_MAPPING_COMMON_HPP

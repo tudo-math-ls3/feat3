@@ -1,6 +1,4 @@
 #pragma once
-#ifndef KERNEL_LAFEM_VECGASC_HELPER_HPP
-#define KERNEL_LAFEM_VECGASC_HELPER_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -186,5 +184,3 @@ namespace FEAT
     }; //struct GPUVectorGatherScatterHelper
   }
 }
-
-#endif

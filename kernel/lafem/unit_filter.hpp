@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_UNIT_FILTER_HPP
-#define KERNEL_LAFEM_UNIT_FILTER_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -421,5 +419,3 @@ namespace FEAT
     }; // class UnitFilter<...>
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_UNIT_FILTER_HPP

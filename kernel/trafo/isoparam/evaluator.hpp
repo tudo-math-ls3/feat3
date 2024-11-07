@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_TRAFO_ISOPARAM_EVALUATOR_HPP
-#define KERNEL_TRAFO_ISOPARAM_EVALUATOR_HPP 1
 
 #include <kernel/trafo/standard/evaluator.hpp>
 #include <kernel/geometry/atlas/chart.hpp>
@@ -1558,5 +1556,3 @@ namespace FEAT
     } // namespace Isoparam
   } // namespace Trafo
 } // namespace FEAT
-
-#endif // KERNEL_TRAFO_ISOPARAM_EVALUATOR_HPP

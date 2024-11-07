@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_INTERN_STANDARD_REFINEMENT_TRAITS_HPP
-#define KERNEL_GEOMETRY_INTERN_STANDARD_REFINEMENT_TRAITS_HPP 1
 
 // includes, FEAT
 #include <kernel/shape.hpp>
@@ -351,5 +349,3 @@ namespace FEAT
     /// \endcond
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_INTERN_STANDARD_REFINEMENT_TRAITS_HPP

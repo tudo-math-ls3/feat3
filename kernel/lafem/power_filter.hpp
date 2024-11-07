@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_POWER_FILTER_HPP
-#define KERNEL_LAFEM_POWER_FILTER_HPP 1
 
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/meta_element.hpp>
@@ -352,5 +350,3 @@ namespace FEAT
     /// \endcond
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_POWER_FILTER_HPP

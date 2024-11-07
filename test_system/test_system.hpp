@@ -2,11 +2,7 @@
 // Copyright (C) 2010 - 2023 by Stefan Turek & the FEAT group
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
-
 #pragma once
-#ifndef TEST_SYSTEM_TEST_SYSTEM_HPP
-/// Header guard
-#define TEST_SYSTEM_TEST_SYSTEM_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -399,5 +395,3 @@ namespace FEAT
       throw; } \
     post; \
   } while (false)
-
-#endif // TEST_SYSTEM_TEST_SYSTEM_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ADJACENCY_DYNAMIC_GRAPH_HPP
-#define KERNEL_ADJACENCY_DYNAMIC_GRAPH_HPP 1
 
 // includes, FEAT
 #include <kernel/adjacency/base.hpp>
@@ -534,5 +532,3 @@ namespace FEAT
     }; // class DynamicGraph
   } // namespace Adjacency
 } // namespace FEAT
-
-#endif // KERNEL_ADJACENCY_DYNAMIC_GRAPH_HPP

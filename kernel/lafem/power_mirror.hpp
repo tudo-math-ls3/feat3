@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_LAFEM_POWER_MIRROR_HPP
-#define KERNEL_LAFEM_POWER_MIRROR_HPP 1
 
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
@@ -299,5 +297,3 @@ namespace FEAT
     }; // class PowerMirror<...>
   } // namespace LAFEM
 } // namespace FEAT
-
-#endif // KERNEL_LAFEM_POWER_MIRROR_HPP

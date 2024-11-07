@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_ADJACENCY_PERMUTATION_HPP
-#define KERNEL_ADJACENCY_PERMUTATION_HPP 1
 
 // includes, FEAT
 #include <kernel/util/assertion.hpp>
@@ -285,5 +283,3 @@ namespace FEAT
     }; // class Permutation
   } // namespace Adjacency
 } // namespace FEAT
-
-#endif // KERNEL_ADJACENCY_PERMUTATION_HPP

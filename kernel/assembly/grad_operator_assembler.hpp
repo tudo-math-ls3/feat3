@@ -5,8 +5,6 @@
 
 
 #pragma once
-#ifndef KERNEL_ASSEMBLY_GRAD_OPERATOR_ASSEMBLER_HPP
-#define KERNEL_ASSEMBLY_GRAD_OPERATOR_ASSEMBLER_HPP 1
 
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
@@ -409,5 +407,3 @@ namespace FEAT
     };
   } // namespace Assembly
 } // namespace FEAT
-
-#endif // KERNEL_ASSEMBLY_GRAD_OPERATOR_ASSEMBLER_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_TIMESTAMP_HPP
-#define KERNEL_UTIL_TIMESTAMP_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -299,5 +297,3 @@ namespace FEAT
     }
   }; // class TimeStamp
 } // namespace FEAT
-
-#endif // KERNEL_UTIL_TIMESTAMP_HPP

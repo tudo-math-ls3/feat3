@@ -5,8 +5,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_SOLVER_AMAVANKA_BASE_HPP
-#define KERNEL_SOLVER_AMAVANKA_BASE_HPP 1
 
 #include <kernel/lafem/null_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
@@ -2115,5 +2113,3 @@ namespace FEAT
     /// \endcond
   }
 }
-
-#endif // KERNEL_SOLVER_AMAVANKA_HPP

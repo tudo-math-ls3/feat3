@@ -1,6 +1,4 @@
 #pragma once
-#ifndef AREA51_CCND_FUNCTION_FIBER
-#define AREA51_CCND_FUNCTION_FIBER 1
 
 #include <area51/ccnd_fiber/ccnd_fiber_common.hpp>
 #include <kernel/analytic/function.hpp>
@@ -96,5 +94,3 @@ namespace CCND_FIBER
     };
   }; // class ContractInflowFunction for dim = 2
 }
-
-#endif

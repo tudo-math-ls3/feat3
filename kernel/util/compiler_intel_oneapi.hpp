@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_COMPILER_INTEL_ONEAPI_HPP
-#define KERNEL_UTIL_COMPILER_INTEL_ONEAPI_HPP 1
 
 /**
  * \file compiler_intel.hpp
@@ -57,5 +55,3 @@
 #define FORCE_INLINE inline __forceinline
 
 #endif // !defined(FEAT_COMPILER) && defined(__INTEL_LLVM_COMPILER)
-
-#endif // KERNEL_UTIL_COMPILER_INTEL_ONEAPI_HPP

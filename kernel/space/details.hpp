@@ -1,6 +1,4 @@
 #pragma once
-#ifndef KERNEL_SPACE_DETAILS_HPP
-#define KERNEL_SPACE_DETAILS_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -60,5 +58,3 @@ namespace FEAT
     };
   }
 }
-
-#endif

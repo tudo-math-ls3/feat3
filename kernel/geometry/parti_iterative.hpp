@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_GEOMETRY_PARTI_ITERATIVE_HPP
-#define KERNEL_GEOMETRY_PARTI_ITERATIVE_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/adjacency/graph.hpp>
@@ -647,5 +645,3 @@ namespace FEAT
     }; // class PartiIterative
   } // namespace Geometry
 } // namespace FEAT
-
-#endif // KERNEL_GEOMETRY_PARTI_ITERATIVE_HPP

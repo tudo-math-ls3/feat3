@@ -1,6 +1,4 @@
 #pragma once
-#ifndef FEAT_KERNEL_VOXEL_ASSEMBLY_COMMON_HPP
-#define FEAT_KERNEL_VOXEL_ASSEMBLY_COMMON_HPP 1
 
 #include <kernel/base_header.hpp>
 #include <kernel/shape.hpp>
@@ -246,4 +244,3 @@ namespace FEAT
 
   }
 }
-#endif

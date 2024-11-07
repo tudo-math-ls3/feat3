@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef KERNEL_UTIL_BINARY_STREAM_HPP
-#define KERNEL_UTIL_BINARY_STREAM_HPP 1
 
 // includes, system
 #include <vector>
@@ -297,4 +295,3 @@ namespace FEAT
     }
   }; // class BinaryStream
 } // namespace FEAT
-#endif // KERNEL_UTIL_BINARY_STREAM_HPP

@@ -4,8 +4,6 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #pragma once
-#ifndef CONTROL_DOMAIN_UNIT_CUBE_DOMAIN_CONTROL_HPP
-#define CONTROL_DOMAIN_UNIT_CUBE_DOMAIN_CONTROL_HPP 1
 
 #include <kernel/geometry/unit_cube_patch_generator.hpp>
 #include <control/domain/domain_control.hpp>
@@ -609,5 +607,3 @@ namespace FEAT
     } // namespace Domain
   } // namespace Control
 } // namespace FEAT
-
-#endif // CONTROL_DOMAIN_UNIT_CUBE_DOMAIN_CONTROL_HPP
