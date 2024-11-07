@@ -315,31 +315,7 @@ namespace FEAT
 
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
-        const IT_* row_ptr(matrix.row_ptr());
-        const IT_* col_idx(matrix.col_ind());
-        typename SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          const IT_ ix(_sv.indices()[i]);
-          const ValueType vx(_sv.elements()[i]);
-
-          // replace by unit row
-          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
-          {
-            // loop over rows in the block
-            for(int k(0); k < BlockSize_; ++k)
-            {
-              // possibly skip row if filter value is NaN
-              if(_ignore_nans && Math::isnan(vx[k]))
-                continue;
-              for(int l(0); l < BlockWidth_; ++l)
-                v[j][k][l] = DT_(0);
-              if((col_idx[j] == ix) && (k < BlockWidth_))
-                v[j][k][k] = DT_(1);
-            }
-          }
-        }
+        Arch::UnitFilterBlocked::template filter_unit_mat<DT_, IT_>(matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), BlockSize_, BlockWidth_, _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       template<int BlockWidth_>
@@ -350,28 +326,7 @@ namespace FEAT
 
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
-        const IT_* row_ptr(matrix.row_ptr());
-        typename SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_>::ValueType* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          const IT_ ix(_sv.indices()[i]);
-          const ValueType vx(_sv.elements()[i]);
-
-          // replace by unit row
-          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
-          {
-            // loop over rows in the block
-            for(int k(0); k < BlockSize_; ++k)
-            {
-              // possibly skip row if filter value is NaN
-              if(_ignore_nans && Math::isnan(vx[k]))
-                continue;
-              for(int l(0); l < BlockWidth_; ++l)
-                v[j][k][l] = DT_(0);
-            }
-          }
-        }
+        Arch::UnitFilterBlocked::template filter_offdiag_row_mat<DT_, IT_>(matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), BlockSize_, BlockWidth_, _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       template<int BlockWidth_>
@@ -404,6 +359,11 @@ namespace FEAT
         if(_sv.used_elements() == Index(0))
           return;
 
+        if(matrix_a.val() == matrix_m.val())
+        {
+          XABORTM("Matrices are not allowed to hold the same data");
+        }
+
         XASSERTM(_sv.size() == matrix_a.rows(), "Matrix size does not match!");
         XASSERTM(_sv.size() == matrix_m.rows(), "Matrix size does not match!");
 
@@ -412,29 +372,7 @@ namespace FEAT
         XASSERTM(row_ptr == matrix_m.row_ptr(), "matrix A and M must share their layout");
         XASSERTM(col_idx == matrix_m.col_ind(), "matrix A and M must share their layout");
 
-        Tiny::Matrix<DataType, BlockSize_, BlockWidth_>* val_a(matrix_a.val());
-        const Tiny::Matrix<DataType, BlockSize_, BlockWidth_>* val_m(matrix_m.val());
-
-        const IT_* idx = get_indices();
-        const Tiny::Vector<DataType, BlockSize_>* val = get_values();
-
-        // loop over all filter entries
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          // replace row of A by scaled row of M
-          Index row(idx[i]);
-          for(IndexType j(row_ptr[row]); j < row_ptr[row + 1]; ++j)
-          {
-            //val_a[j] = val[i] * val_m[j];
-            for(int k(0); k < BlockSize_; ++k)
-            {
-              for(int l(0); l < BlockWidth_; ++l)
-              {
-                val_a[j][k][l] = val[i][k] * val_m[j][k][l];
-              }
-            }
-          }
-        }
+        Arch::UnitFilterBlocked::template filter_weak_matrix_rows<DT_, IT_>(matrix_a.template val<LAFEM::Perspective::pod>(), matrix_m.template val<LAFEM::Perspective::pod>(), row_ptr, BlockSize_, BlockWidth_, _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements());
       }
 
 
@@ -450,8 +388,8 @@ namespace FEAT
           return;
 
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilterBlocked::template filter_rhs<BlockSize_>
-          (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
+        Arch::UnitFilterBlocked::template filter_rhs
+          (vector.template elements<Perspective::pod>(), BlockSize_, _sv.template elements<Perspective::pod>(),
           _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
@@ -479,8 +417,8 @@ namespace FEAT
           return;
 
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilterBlocked::template filter_def<BlockSize_>
-          (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(),
+        Arch::UnitFilterBlocked::template filter_def
+          (vector.template elements<Perspective::pod>(), BlockSize_, _sv.template elements<Perspective::pod>(),
           _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 

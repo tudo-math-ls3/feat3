@@ -182,6 +182,20 @@ namespace FEAT
     #endif
 
 
+    template<typename DT_>
+    __host__ __device__ __forceinline__ bool cuda_isnan(DT_ val)
+    {
+      return isnan(val);
+    }
+
+    #ifdef FEAT_HAVE_HALFMATH
+    template<> __host__ __device__ __forceinline__ bool cuda_isnan<Half>(Half val)
+    {
+      return  __hisnan(val);
+    }
+    #endif
+
+
     /**
      * \brief Evaluates the sine function.
      *

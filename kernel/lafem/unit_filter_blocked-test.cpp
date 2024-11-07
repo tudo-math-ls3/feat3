@@ -287,8 +287,10 @@ public:
     matrix_c.val()[16] = DT_(-1) * matrix_a2.val()[16];
     matrix_c.val()[17] = DT_(-1) * matrix_a2.val()[17];
 
+    auto matrix_a3 = matrix_a2.clone(LAFEM::CloneMode::Weak);
+
     // apply weak filter onto a2
-    filter.filter_weak_matrix_rows(matrix_a2, matrix_a2);
+    filter.filter_weak_matrix_rows(matrix_a2, matrix_a3);
 
     // subtract reference
     matrix_a2.axpy(matrix_c, -DT_(1));

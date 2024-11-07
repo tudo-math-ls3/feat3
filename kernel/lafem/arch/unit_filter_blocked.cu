@@ -8,6 +8,7 @@
 #include <kernel/lafem/arch/unit_filter_blocked.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/memory_pool.hpp>
+#include <kernel/util/cuda_math.cuh>
 
 /// \cond internal
 namespace FEAT
@@ -16,49 +17,133 @@ namespace FEAT
   {
     namespace Intern
     {
-      template <typename DT_, typename IT_, int BlockSize_>
-      __global__ void cuda_unit_filter_blocked_rhs(DT_ * v, const DT_ * sv_elements, const IT_ * sv_indices, const Index ue, bool ign_nans)
+      template <typename DT_, typename IT_>
+      __global__ void cuda_unit_filter_blocked_rhs(DT_ * __restrict__ v, int block_size, const DT_ * __restrict__ sv_elements, const IT_ * __restrict__ sv_indices,
+                                                  const Index ue, bool ign_nans)
       {
-        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx >= ue)
-          return;
-
-        Index block_size = Index(BlockSize_);
-        if(ign_nans)
+        int idx = threadIdx.x + blockDim.x * blockIdx.x;
+        // grid strided for loop
+        for(int i = idx; idx < ue; idx += blockDim.x * gridDim.x)
         {
-          for(Index j(0) ; j < block_size; ++j)
+          if(ign_nans)
           {
-            if(!isnan(sv_elements[block_size * idx + j]))
-              v[block_size* sv_indices[idx] + j] = sv_elements[block_size * idx + j];
+            for(Index j(0) ; j < block_size; ++j)
+            {
+              if(!isnan(sv_elements[block_size * idx + j]))
+                v[block_size* sv_indices[i] + j] = sv_elements[block_size * i + j];
+            }
           }
-        }
-        else
-        {
-          for(Index j(0) ; j < block_size; ++j)
-            v[block_size* sv_indices[idx] + j] = sv_elements[block_size * idx + j];
+          else
+          {
+            for(Index j(0) ; j < block_size; ++j)
+              v[block_size* sv_indices[i] + j] = sv_elements[block_size * i + j];
+          }
         }
       }
 
-      template <typename DT_, typename IT_, int BlockSize_>
-      __global__ void cuda_unit_filter_blocked_def(DT_ * v, const DT_ * sv_elements, const IT_ * sv_indices, const Index ue, bool ign_nans)
+      template <typename DT_, typename IT_>
+      __global__ void cuda_unit_filter_blocked_def(DT_ * __restrict__ v, int block_size, const DT_ * __restrict__ sv_elements, const IT_ * __restrict__ sv_indices,
+                                                    const Index ue, bool ign_nans)
       {
-        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx >= ue)
-          return;
-
-        Index block_size = Index(BlockSize_);
-        if(ign_nans)
+        int idx = threadIdx.x + blockDim.x * blockIdx.x;
+        // grid strided for loop
+        for(int i = idx; idx < ue; idx += blockDim.x * gridDim.x)
         {
-          for(Index j(0) ; j < block_size; ++j)
+          if(ign_nans)
           {
-            if(!isnan(sv_elements[block_size * idx + j]))
-              v[block_size* sv_indices[idx] + j] = DT_(0);
+            for(Index j(0) ; j < block_size; ++j)
+            {
+              if(!isnan(sv_elements[block_size * i + j]))
+                v[block_size* sv_indices[i] + j] = DT_(0);
+            }
+          }
+          else
+          {
+            for(Index j(0) ; j < block_size; ++j)
+              v[block_size * sv_indices[i] + j] = DT_(0);
           }
         }
-        else
+      }
+
+      template<typename DT_, typename IT_>
+      __global__ void cuda_filter_unit_mat(DT_* __restrict__ mat, const IT_* __restrict__ const row_ptr, const IT_* __restrict__ const col_idx, int block_height,
+                                          int block_width, const DT_ * __restrict__ const sv_elements, const IT_ * __restrict__ const sv_indices, const Index ue, bool ign_nans)
+      {
+        int idx = threadIdx.x + blockDim.x * blockIdx.x;
+        // grid strided for loop
+        for(int i = idx; idx < ue; idx += blockDim.x * gridDim.x)
         {
-          for(Index j(0) ; j < block_size; ++j)
-            v[block_size * sv_indices[idx] + j] = DT_(0);
+          const IT_ ix(sv_indices[i]);
+          const DT_* vx(&sv_elements[i*block_height]);
+
+          // replace by unit row
+          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          {
+            // loop over rows in the block
+            for(int k(0); k < block_height; ++k)
+            {
+              // possibly skip row if filter value is NaN
+              if(ign_nans && CudaMath::cuda_isnan(vx[k]))
+                continue;
+              for(int l(0); l < block_width; ++l)
+                mat[j*block_height*block_width + k*block_width +l] = DT_(0);
+              if((col_idx[j] == ix) && (k < block_width))
+                mat[j*block_height*block_width + k*block_width +k] = DT_(1);
+            }
+          }
+        }
+      }
+
+      template<typename DT_, typename IT_>
+      __global__ void cuda_filter_offdiag_row_mat(DT_* __restrict__ mat, const IT_* __restrict__ const row_ptr, int block_height, int block_width,
+                                                  const DT_ * __restrict__ const sv_elements, const IT_ * __restrict__ const sv_indices, const Index ue, bool ign_nans)
+      {
+        int idx = threadIdx.x + blockDim.x * blockIdx.x;
+        // grid strided for loop
+        for(int i = idx; idx < ue; idx += blockDim.x * gridDim.x)
+        {
+          const IT_ ix(sv_indices[i]);
+          const DT_* vx(&sv_elements[i*block_height]);
+
+          // replace by unit row
+          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          {
+            // loop over rows in the block
+            for(int k(0); k < block_height; ++k)
+            {
+              // possibly skip row if filter value is NaN
+              if(ign_nans && CudaMath::cuda_isnan(vx[k]))
+                continue;
+              for(int l(0); l < block_width; ++l)
+                mat[j*block_height*block_width + k*block_width +l] = DT_(0);
+            }
+          }
+        }
+      }
+
+      template<typename DT_, typename IT_>
+      __global__ void cuda_filter_weak_matrix_rows(DT_ * __restrict__ mat_a, const DT_ * __restrict__ const mat_m, const IT_* __restrict__ const row_ptr, int block_height,
+                                                   int block_width, const DT_ * __restrict__ const sv_elements, const IT_ * __restrict__ const sv_indices, const Index ue)
+      {
+        int idx = threadIdx.x + blockDim.x * blockIdx.x;
+        // grid strided for loop
+        for(int i = idx; idx < ue; idx += blockDim.x * gridDim.x)
+        {
+          const IT_ ix(sv_indices[i]);
+          const DT_* vx(&sv_elements[i*block_height]);
+
+          // replace by unit row
+          for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          {
+            // loop over rows in the block
+            for(int k(0); k < block_height; ++k)
+            {
+              for(int l(0); l < block_width; ++l)
+              {
+                mat_a[j*block_height*block_width + k*block_width + l] = vx[k] * mat_m[j*block_height*block_width + k*block_width + l];
+              }
+            }
+          }
         }
       }
     }
@@ -70,8 +155,8 @@ using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
 
-template <int BlockSize_, typename DT_, typename IT_>
-void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
+template <typename DT_, typename IT_>
+void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, int block_size, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
 {
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
@@ -79,7 +164,7 @@ void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, 
   block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
-  FEAT::LAFEM::Intern::cuda_unit_filter_blocked_rhs<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue, ign_nans);
+  FEAT::LAFEM::Intern::cuda_unit_filter_blocked_rhs<DT_, IT_><<<grid, block>>>(v, block_size, sv_elements, sv_indices, ue, ign_nans);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -89,25 +174,13 @@ void UnitFilterBlocked::filter_rhs_cuda(DT_ * v, const DT_ * const sv_elements, 
 #endif
 }
 
-template void UnitFilterBlocked::filter_rhs_cuda<1, float, std::uint64_t>(float *, const float * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<1, double, std::uint64_t>(double *, const double * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<1, float, std::uint32_t>(float *, const float * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<1, double, std::uint32_t>(double *, const double * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<2, float, std::uint64_t>(float *, const float * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<2, double, std::uint64_t>(double *, const double * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<2, float, std::uint32_t>(float *, const float * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<2, double, std::uint32_t>(double *, const double * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<3, float, std::uint64_t>(float *, const float * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<3, double, std::uint64_t>(double *, const double * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<3, float, std::uint32_t>(float *, const float * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<3, double, std::uint32_t>(double *, const double * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<4, float, std::uint64_t>(float *, const float * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<4, double, std::uint64_t>(double *, const double * const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<4, float, std::uint32_t>(float *, const float * const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_rhs_cuda<4, double, std::uint32_t>(double *, const double * const, const std::uint32_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint64_t>(float *, int, const float * const, const std::uint64_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint64_t>(double *, int, const double * const, const std::uint64_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_rhs_cuda<float, std::uint32_t>(float *, int, const float * const, const std::uint32_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_rhs_cuda<double, std::uint32_t>(double *, int, const double * const, const std::uint32_t * const, const Index, bool ign_nans);
 
-template <int BlockSize_, typename DT_, typename IT_>
-void UnitFilterBlocked::filter_def_cuda(DT_ * v, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
+template <typename DT_, typename IT_>
+void UnitFilterBlocked::filter_def_cuda(DT_ * v, int block_size, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
 {
   Index blocksize = Util::cuda_blocksize_misc;
   dim3 grid;
@@ -115,7 +188,7 @@ void UnitFilterBlocked::filter_def_cuda(DT_ * v, const DT_ * const sv_elements, 
   block.x = (unsigned)blocksize;
   grid.x = (unsigned)ceil((ue)/(double)(block.x));
 
-  FEAT::LAFEM::Intern::cuda_unit_filter_blocked_def<DT_, IT_, BlockSize_><<<grid, block>>>(v, sv_elements, sv_indices, ue, ign_nans);
+  FEAT::LAFEM::Intern::cuda_unit_filter_blocked_def<DT_, IT_><<<grid, block>>>(v, block_size, sv_elements, sv_indices, ue, ign_nans);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
@@ -125,21 +198,60 @@ void UnitFilterBlocked::filter_def_cuda(DT_ * v, const DT_ * const sv_elements, 
 #endif
 }
 
-template void UnitFilterBlocked::filter_def_cuda<1, float, std::uint64_t>(float *, const float* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<1, double, std::uint64_t>(double *, const double* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<1, float, std::uint32_t>(float *, const float* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<1, double, std::uint32_t>(double *, const double* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<2, float, std::uint64_t>(float *, const float* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<2, double, std::uint64_t>(double *, const double* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<2, float, std::uint32_t>(float *, const float* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<2, double, std::uint32_t>(double *, const double* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<3, float, std::uint64_t>(float *, const float* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<3, double, std::uint64_t>(double *, const double* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<3, float, std::uint32_t>(float *, const float* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<3, double, std::uint32_t>(double *, const double* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<4, float, std::uint64_t>(float *, const float* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<4, double, std::uint64_t>(double *, const double* const, const std::uint64_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<4, float, std::uint32_t>(float *, const float* const, const std::uint32_t * const, const Index, bool ign_nans);
-template void UnitFilterBlocked::filter_def_cuda<4, double, std::uint32_t>(double *, const double* const, const std::uint32_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint64_t>(float *, int, const float* const, const std::uint64_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint64_t>(double *, int, const double* const, const std::uint64_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_def_cuda<float, std::uint32_t>(float *, int, const float* const, const std::uint32_t * const, const Index, bool ign_nans);
+template void UnitFilterBlocked::filter_def_cuda<double, std::uint32_t>(double *, int, const double* const, const std::uint32_t * const, const Index, bool ign_nans);
 
+template<typename DT_, typename IT_>
+void UnitFilterBlocked::filter_unit_mat_cuda(DT_* mat, const IT_* const row_ptr, const IT_* const col_idx, int block_height, int block_width, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
+{
+  Index blocksize = Util::cuda_blocksize_misc;
+  dim3 grid;
+  dim3 block;
+  block.x = (unsigned)blocksize;
+  grid.x = (unsigned)ceil((ue)/(double)(block.x));
+
+  FEAT::LAFEM::Intern::cuda_filter_unit_mat<DT_, IT_><<<grid, block >>>(mat, row_ptr, col_idx, block_height, block_width, sv_elements, sv_indices, ue, ign_nans);
+}
+
+template void UnitFilterBlocked::filter_unit_mat_cuda<float, std::uint64_t>(float *, const std::uint64_t * const, const std::uint64_t * const, int, int, const float* const, const std::uint64_t * const, const Index, bool);
+template void UnitFilterBlocked::filter_unit_mat_cuda<float, std::uint32_t>(float *, const std::uint32_t * const, const std::uint32_t * const, int, int, const float* const, const std::uint32_t * const, const Index, bool);
+template void UnitFilterBlocked::filter_unit_mat_cuda<double, std::uint64_t>(double *, const std::uint64_t * const, const std::uint64_t * const, int, int, const double* const, const std::uint64_t * const, const Index, bool);
+template void UnitFilterBlocked::filter_unit_mat_cuda<double, std::uint32_t>(double *, const std::uint32_t * const, const std::uint32_t * const, int, int, const double* const, const std::uint32_t * const, const Index, bool);
+
+template<typename DT_, typename IT_>
+void UnitFilterBlocked::filter_offdiag_row_mat_cuda(DT_* mat, const IT_* const row_ptr, int block_height, int block_width, const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue, bool ign_nans)
+{
+  Index blocksize = Util::cuda_blocksize_misc;
+  dim3 grid;
+  dim3 block;
+  block.x = (unsigned)blocksize;
+  grid.x = (unsigned)ceil((ue)/(double)(block.x));
+
+  FEAT::LAFEM::Intern::cuda_filter_offdiag_row_mat<DT_, IT_><<<grid, block >>>(mat, row_ptr, block_height, block_width, sv_elements, sv_indices, ue, ign_nans);
+}
+
+template void UnitFilterBlocked::filter_offdiag_row_mat_cuda<float, std::uint64_t>(float *, const std::uint64_t * const, int, int, const float* const, const std::uint64_t * const, const Index, bool);
+template void UnitFilterBlocked::filter_offdiag_row_mat_cuda<float, std::uint32_t>(float *, const std::uint32_t * const, int, int, const float* const, const std::uint32_t * const, const Index, bool);
+template void UnitFilterBlocked::filter_offdiag_row_mat_cuda<double, std::uint64_t>(double *, const std::uint64_t * const, int, int, const double* const, const std::uint64_t * const, const Index, bool);
+template void UnitFilterBlocked::filter_offdiag_row_mat_cuda<double, std::uint32_t>(double *, const std::uint32_t * const, int, int, const double* const, const std::uint32_t * const, const Index, bool);
+
+template<typename DT_, typename IT_>
+void UnitFilterBlocked::filter_weak_matrix_rows_cuda(DT_* mat_a, const DT_ * const mat_m, const IT_* const row_ptr, int block_height, int block_width,
+                                                        const DT_ * const sv_elements, const IT_ * const sv_indices, const Index ue)
+{
+  Index blocksize = Util::cuda_blocksize_misc;
+  dim3 grid;
+  dim3 block;
+  block.x = (unsigned)blocksize;
+  grid.x = (unsigned)ceil((ue)/(double)(block.x));
+
+  FEAT::LAFEM::Intern::cuda_filter_weak_matrix_rows<DT_, IT_><<<grid, block >>>(mat_a, mat_m, row_ptr, block_height, block_width, sv_elements, sv_indices, ue);
+}
+
+template void UnitFilterBlocked::filter_weak_matrix_rows_cuda<float, std::uint64_t>(float *, const float* const, const std::uint64_t * const, int, int, const float* const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_weak_matrix_rows_cuda<float, std::uint32_t>(float *, const float* const, const std::uint32_t * const, int, int, const float* const, const std::uint32_t * const, const Index);
+template void UnitFilterBlocked::filter_weak_matrix_rows_cuda<double, std::uint64_t>(double *, const double* const, const std::uint64_t * const, int, int, const double* const, const std::uint64_t * const, const Index);
+template void UnitFilterBlocked::filter_weak_matrix_rows_cuda<double, std::uint32_t>(double *, const double* const, const std::uint32_t * const, int, int, const double* const, const std::uint32_t * const, const Index);
 /// \endcond
