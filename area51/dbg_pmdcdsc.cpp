@@ -371,7 +371,7 @@ namespace PoissonMixed
           {
             if(col_idx_s[j + 1] <= col_idx_s[j])
             {
-              std::cout << "WARNING: ADP Schur matrix row " <<  i << " is unsorted!" << "\n";
+              std::cout << "WARNING: ADP Schur matrix row " <<  i << " is unsorted!\n";
             }
           }
         }

@@ -53,7 +53,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   std::cout << "Ray = [ " << stringify(ray[0]);
   for(int i(1); i < world_dim; ++i)
     std::cout << " , " << stringify(ray[i]);
-  std::cout << " ]" << "\n";
+  std::cout << " ]\n";
 
   // create an empty atlas and a root mesh node
   auto atlas = Geometry::MeshAtlas<Mesh_>::make_unique();
@@ -64,7 +64,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   try
 #endif
   {
-    std::cout << "Parsing mesh files..." << "\n";
+    std::cout << "Parsing mesh files...\n";
     // Now parse the mesh file
     mesh_reader.parse(*node, *atlas, nullptr);
   }
@@ -76,7 +76,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   }
   catch(...)
   {
-    std::cerr << "ERROR: unknown exception" << "\n";
+    std::cerr << "ERROR: unknown exception\n";
     return 1;
   }
 #endif
@@ -89,7 +89,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   {
     if(lvl > 0)
     {
-      std::cout << "Refining up to level " << lvl << "..." << "\n";
+      std::cout << "Refining up to level " << lvl << "...\n";
       node = node->refine_unique();
     }
 
@@ -105,7 +105,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
     // Create a VTK exporter for our mesh
     FEAT::String vtkname = filename + "." + stringify(lvl);
-    std::cout << "Writing file '" << vtkname << ".vtu'..." << "\n";
+    std::cout << "Writing file '" << vtkname << ".vtu'...\n";
     Geometry::ExportVTK<Mesh_> exporter(mesh);
 
     std::vector<double> volume(mesh.get_num_elements(), 0.0);
@@ -156,7 +156,7 @@ int run(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
 
     return 1;
   }
@@ -164,7 +164,7 @@ int run(int argc, char* argv[])
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
   {
-    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>\n";
     return 1;
   }
 
@@ -194,7 +194,7 @@ int run(int argc, char* argv[])
   if(mtype == "conformal:simplex:2:2") return run_xml<S2M2D>(args, mesh_reader, vtk_name);
   if(mtype == "conformal:simplex:3:3") return run_xml<S3M3D>(args, mesh_reader, vtk_name);
 
-  std::cout << "ERROR: unsupported mesh type!" << "\n";
+  std::cout << "ERROR: unsupported mesh type!\n";
 
   return 1;
 }

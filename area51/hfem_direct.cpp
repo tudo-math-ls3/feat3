@@ -56,7 +56,7 @@ namespace HFEM_direct
   {
     (void)vref_orig; //disable unused warning
     Backend::set_preferred_backend(backend);
-    std::cout<<"========================================"<<"\n";
+    std::cout<<"========================================\n";
     std::cout<<"DataType: " << Type::Traits<DT_>::name()<<"\n";
     std::cout<<"nrhs: "<<nrhs<<"\n";
 
@@ -210,7 +210,7 @@ namespace HFEM_direct
     {
       std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       Runtime::abort();
     }
 
@@ -271,7 +271,7 @@ namespace HFEM_direct
     }
 
     std::cout<<"config basename: " << basename<<"\n";
-    std::cout<<"preloading Data..."<<"\n";
+    std::cout<<"preloading Data...\n";
     LAFEM::SparseMatrixCSR<double, Index> D_orig(LAFEM::FileMode::fm_csr, dir_path + "/" + basename + "_D.csr");
     LAFEM::SparseMatrixCSR<double, Index> Dt_orig(LAFEM::FileMode::fm_csr, dir_path + "/" + basename + "_Dt.csr");
     LAFEM::DenseMatrix<double, Index> Atttinvd_orig(LAFEM::FileMode::fm_dm, dir_path + "/" + basename + "_Atttinvd.dm");
@@ -287,7 +287,7 @@ namespace HFEM_direct
     LAFEM::DenseVector<double, Index> g_orig(LAFEM::FileMode::fm_dv, dir_path + "/" + basename + "_g.dv");
     LAFEM::DenseVector<double, Index> h_orig(LAFEM::FileMode::fm_dv, dir_path + "/" + basename + "_h.dv");
     LAFEM::DenseVector<double, Index> vref_orig;//(LAFEM::FileMode::fm_dv, dir_path + "/" + basename + "_vref.dv");
-    std::cout<<"finished"<<"\n";
+    std::cout<<"finished\n";
     std::cout<<"datatype selection: "<<sdatatype<<"\n";
     std::cout<<"cells: "<<distrib.size()<<"\n";
     std::cout<<"blocks: "<<distrib<<"\n";

@@ -164,7 +164,7 @@ namespace FEAT
           {
             if(_contains_common_element(_coloring_maps.at(std::size_t(i)), _coloring_maps.at(std::size_t(i))+_coloring_map_sizes.at(std::size_t(i)), _coloring_maps.at(std::size_t(j)), _coloring_maps.at(std::size_t(j))+_coloring_map_sizes.at(std::size_t(j))))
             {
-              std::cout << "Colors contain common element!" << "\n";
+              std::cout << "Colors contain common element!\n";
               XABORTM("I think you have misunderstood colors.");
             }
           }

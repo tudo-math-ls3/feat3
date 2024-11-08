@@ -130,14 +130,14 @@ namespace Stokes2Vtk
     // do we read in entire Stokes vectors?
     if(args.parse("stokes", stokes_name, index_first, index_last) < 0)
     {
-      std::cout << "ERROR: You have to specify the input Stokes filename sequence via '--stokes <pattern> [<first-number> [<last-number>]]'" << "\n";
-      std::cout << "If <pattern> does not contain any asterisks, then it is interpreted as the name of a single file." << "\n";
-      std::cout << "If <pattern> contains a block of one or more asterisks ('*'), then this block servres as a" << "\n";
-      std::cout << "placeholder for the sequence index, e.g. the pattern 'foo.***.bin' will expand to 'foo.000.bin'," << "\n";
-      std::cout << "'foo.001.bin.', 'foo.002.bin', etc." << "\n";
-      std::cout << "If given, <first-index> specifies the first index for the pattern, otherwise the first index is 0." << "\n";
-      std::cout << "If given, <last-index> specifies the last index for the pattern, otherwise this tool will stop at" << "\n";
-      std::cout << "the first index for which no input file was found anymore." << "\n" << "\n";
+      std::cout << "ERROR: You have to specify the input Stokes filename sequence via '--stokes <pattern> [<first-number> [<last-number>]]'\n";
+      std::cout << "If <pattern> does not contain any asterisks, then it is interpreted as the name of a single file.\n";
+      std::cout << "If <pattern> contains a block of one or more asterisks ('*'), then this block servres as a\n";
+      std::cout << "placeholder for the sequence index, e.g. the pattern 'foo.***.bin' will expand to 'foo.000.bin',\n";
+      std::cout << "'foo.001.bin.', 'foo.002.bin', etc.\n";
+      std::cout << "If given, <first-index> specifies the first index for the pattern, otherwise the first index is 0.\n";
+      std::cout << "If given, <last-index> specifies the last index for the pattern, otherwise this tool will stop at\n";
+      std::cout << "the first index for which no input file was found anymore.\n\n";
       return 1;
     }
     // do we read in only velocity vectors?
@@ -145,19 +145,19 @@ namespace Stokes2Vtk
     {
       if(args.parse("velo", velo_name, index_first, index_last) < 1)
       {
-        std::cout << "ERROR: You have to specify the input velocity filename sequence via '--velo <pattern> [<first-number> [<last-number>]]'" << "\n";
-        std::cout << "If <pattern> does not contain any asterisks, then it is interpreted as the name of a single file." << "\n";
-        std::cout << "If <pattern> contains a block of one or more asterisks ('*'), then this block servres as a" << "\n";
-        std::cout << "placeholder for the sequence index, e.g. the pattern 'foo.***.bin' will expand to 'foo.000.bin'," << "\n";
-        std::cout << "'foo.001.bin.', 'foo.002.bin', etc." << "\n";
-        std::cout << "If given, <first-index> specifies the first index for the pattern, otherwise the first index is 0." << "\n";
-        std::cout << "If given, <last-index> specifies the last index for the pattern, otherwise this tool will stop at" << "\n";
-        std::cout << "the first index for which no input file was found anymore." << "\n" << "\n";
+        std::cout << "ERROR: You have to specify the input velocity filename sequence via '--velo <pattern> [<first-number> [<last-number>]]'\n";
+        std::cout << "If <pattern> does not contain any asterisks, then it is interpreted as the name of a single file.\n";
+        std::cout << "If <pattern> contains a block of one or more asterisks ('*'), then this block servres as a\n";
+        std::cout << "placeholder for the sequence index, e.g. the pattern 'foo.***.bin' will expand to 'foo.000.bin',\n";
+        std::cout << "'foo.001.bin.', 'foo.002.bin', etc.\n";
+        std::cout << "If given, <first-index> specifies the first index for the pattern, otherwise the first index is 0.\n";
+        std::cout << "If given, <last-index> specifies the last index for the pattern, otherwise this tool will stop at\n";
+        std::cout << "the first index for which no input file was found anymore.\n\n";
         return 1;
       }
       /*if(args.parse("pres", pres_name) < 0)
       {
-        std::cout << "ERROR: pres" << "\n";;
+        std::cout << "ERROR: pres\n";;
         return 1;
       }*/
     }
@@ -207,9 +207,9 @@ namespace Stokes2Vtk
     const std::size_t pad_size = Math::max(std::size_t(4u), name_n);
     args.parse("vtk", vtk_name);
     if(name_n > 0u)
-      std::cout << "VTU output sequence: " << vtk_name + "." + String(pad_size, '*') + ".vtu" << "\n";
+      std::cout << "VTU output sequence: " << vtk_name + "." + String(pad_size, '*') + ".vtu\n";
     else
-      std::cout << "VTU output filename: " << vtk_name + ".vtu" << "\n";
+      std::cout << "VTU output filename: " << vtk_name + ".vtu\n";
 
     bool want_diff = (args.check("diff") >= 0);
     std::cout << "Compute difference: " << (want_diff ? "yes" : "no") << "\n";
@@ -229,7 +229,7 @@ namespace Stokes2Vtk
     try
   #endif
     {
-      std::cout << "Parsing mesh files..." << "\n";
+      std::cout << "Parsing mesh files...\n";
       // Now parse the mesh file
       mesh_reader.parse(*node, *atlas, nullptr);
     }
@@ -241,7 +241,7 @@ namespace Stokes2Vtk
     }
     catch(...)
     {
-      std::cerr << "ERROR: unknown exception" << "\n";
+      std::cerr << "ERROR: unknown exception\n";
       return 1;
     }
   #endif
@@ -250,7 +250,7 @@ namespace Stokes2Vtk
     node->adapt();
 
     // refine up to level + 1
-    std::cout << "Refining up to level " << level << " (+1)..." << "\n";
+    std::cout << "Refining up to level " << level << " (+1)...\n";
     for(Index l(0); l < level; ++l)
     {
       node = node->refine_unique(AdaptMode::chart);
@@ -324,12 +324,12 @@ namespace Stokes2Vtk
         if((name_n > 0u) && (index_last < 0))
         {
           // not an error if index_last == -1
-          std::cout << "\nVelocity file '" << filename << "' not found; so I assume that we're finished here" << "\n";
+          std::cout << "\nVelocity file '" << filename << "' not found; so I assume that we're finished here\n";
           break;
         }
         else
         {
-          std::cout << "\nERROR: Velocity file '" << filename << "' not found!" << "\n";
+          std::cout << "\nERROR: Velocity file '" << filename << "' not found!\n";
           return 1;
         }
       }
@@ -438,7 +438,7 @@ namespace Stokes2Vtk
       ofs << buffer;
       ofs << vtu_tail;
       ofs.close();
-      std::cout << " done!" << "\n";
+      std::cout << " done!\n";
       watch_vtk_out.stop();
 
       total_out += vtu_head.size() + vtu_tail.size() + buffer.size();
@@ -472,21 +472,21 @@ namespace Stokes2Vtk
     else
       std::cout << stringify_fp_fix(double(total_out) / (1024.0*1024.0*1024.0*1024.0), 3) << " TiB";
     std::cout << ", thus wasting " << stringify_fp_fix((double(total_out)/double(total_in) - 1.0)*100.0, 2);
-    std::cout << "% additional disk space -- good job!" << "\n" << "\n";
+    std::cout << "% additional disk space -- good job!\n\n";
 
     watch_total.stop();
     double time_total = watch_total.elapsed();
-    std::cout << "Total Runtime......: " << watch_total.elapsed_string().pad_front(8)  << " seconds" << "\n";
+    std::cout << "Total Runtime......: " << watch_total.elapsed_string().pad_front(8)  << " seconds\n";
     std::cout << "Mesh Refine Runtime: " << watch_mesh_in.elapsed_string().pad_front(8)     << " seconds ["
-      << stringify_fp_fix(100.0*watch_mesh_in.elapsed() / time_total, 2, 6) << "%]" << "\n";
+      << stringify_fp_fix(100.0*watch_mesh_in.elapsed() / time_total, 2, 6) << "%]\n";
     std::cout << "Mesh Format Runtime: " << watch_mesh_format.elapsed_string().pad_front(8) << " seconds ["
-      << stringify_fp_fix(100.0*watch_mesh_format.elapsed() / time_total, 2, 6) << "%]" << "\n";
+      << stringify_fp_fix(100.0*watch_mesh_format.elapsed() / time_total, 2, 6) << "%]\n";
     std::cout << "Vector Read Runtime: " << watch_vec_in.elapsed_string().pad_front(8)     << " seconds ["
-      << stringify_fp_fix(100.0*watch_vec_in.elapsed() / time_total, 2, 6) << "%]" << "\n";
+      << stringify_fp_fix(100.0*watch_vec_in.elapsed() / time_total, 2, 6) << "%]\n";
     std::cout << "Vec Format Runtime.: " << watch_vec_format.elapsed_string().pad_front(8) << " seconds ["
-      << stringify_fp_fix(100.0*watch_vec_format.elapsed() / time_total, 2, 6) << "%]" << "\n";
+      << stringify_fp_fix(100.0*watch_vec_format.elapsed() / time_total, 2, 6) << "%]\n";
     std::cout << "VTK Write Runtime..: " << watch_vtk_out.elapsed_string().pad_front(8)    << " seconds ["
-      << stringify_fp_fix(100.0*watch_vtk_out.elapsed() / time_total, 2, 6) << "%]" << "\n";
+      << stringify_fp_fix(100.0*watch_vtk_out.elapsed() / time_total, 2, 6) << "%]\n";
 
     return 0;
   }
@@ -506,35 +506,35 @@ namespace Stokes2Vtk
     // need help?
     if((argc < 2) || (args.check("help") > -1))
     {
-      std::cout << "\nUSAGE: stokes2vtu <options...>" << "\n";
-      std::cout << "\nMandatory Options:" << "\n";
-      std::cout <<   "------------------" << "\n";
-      std::cout << "--mesh <meshfiles...>" << "\n";
-      std::cout << "Specifies the mesh files to be read in." << "\n" << "\n";
-      std::cout << "--level <level>" << "\n";
-      std::cout << "Specifies the mesh refinement level of the velocity vectors." << "\n" << "\n";
-      std::cout << "--stokes <pattern> [<first-index> [<last-index>]]" << "\n";
-      std::cout << "Specifies the filename pattern and index bounds for the input Stokes vectors." << "\n";
-      std::cout << "If <pattern> contains a block of one or more asterisks ('*'), then this block servres as a" << "\n";
-      std::cout << "placeholder for the sequence index, e.g. the pattern 'foo.***.bin' will expand to 'foo.000.bin'," << "\n";
-      std::cout << "'foo.001.bin.', 'foo.002.bin', etc." << "\n";
-      std::cout << "If <pattern> does not contain any asterisks, then it is interpreted as the name of a single file." << "\n";
-      std::cout << "If given, <first-index> specifies the first index for the pattern, otherwise the first index is 0." << "\n";
-      std::cout << "If given, <last-index> specifies the last index for the pattern, otherwise this tool will stop at" << "\n";
-      std::cout << "the first index for which no input file was found anymore." << "\n" << "\n";
-      std::cout << "--velo <pattern> [<first-index> [<last-index>]]" << "\n";
-      std::cout << "Specifies the filename pattern and index bounds for the input Stokes vectors." << "\n";
-      std::cout << "This option is mutually exclusive with --stokes and allows to read in only velocity vectors rather" << "\n";
-      std::cout << "than Stokes vectors containing both velocity and pressure." << "\n" << "\n";
+      std::cout << "\nUSAGE: stokes2vtu <options...>\n";
+      std::cout << "\nMandatory Options:\n";
+      std::cout <<   "------------------\n";
+      std::cout << "--mesh <meshfiles...>\n";
+      std::cout << "Specifies the mesh files to be read in.\n\n";
+      std::cout << "--level <level>\n";
+      std::cout << "Specifies the mesh refinement level of the velocity vectors.\n\n";
+      std::cout << "--stokes <pattern> [<first-index> [<last-index>]]\n";
+      std::cout << "Specifies the filename pattern and index bounds for the input Stokes vectors.\n";
+      std::cout << "If <pattern> contains a block of one or more asterisks ('*'), then this block servres as a\n";
+      std::cout << "placeholder for the sequence index, e.g. the pattern 'foo.***.bin' will expand to 'foo.000.bin',\n";
+      std::cout << "'foo.001.bin.', 'foo.002.bin', etc.\n";
+      std::cout << "If <pattern> does not contain any asterisks, then it is interpreted as the name of a single file.\n";
+      std::cout << "If given, <first-index> specifies the first index for the pattern, otherwise the first index is 0.\n";
+      std::cout << "If given, <last-index> specifies the last index for the pattern, otherwise this tool will stop at\n";
+      std::cout << "the first index for which no input file was found anymore.\n\n";
+      std::cout << "--velo <pattern> [<first-index> [<last-index>]]\n";
+      std::cout << "Specifies the filename pattern and index bounds for the input Stokes vectors.\n";
+      std::cout << "This option is mutually exclusive with --stokes and allows to read in only velocity vectors rather\n";
+      std::cout << "than Stokes vectors containing both velocity and pressure.\n\n";
       //           "123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
-      std::cout << "Optional Options:" << "\n";
-      std::cout << "-----------------" << "\n";
-      std::cout << "--vtk <name-prefix>" << "\n";
-      std::cout << "Specifies the prefix for the VTK files; if not given, then the prefix (that's everything in front" << "\n";
-      std::cout << "of the first asterisk) of the velocity input filename pattern is used." << "\n" << "\n";
-      std::cout << "--diff" << "\n";
-      std::cout << "If specified, then the difference of the current velocity field and the previous time step is also" << "\n";
-      std::cout << "written to the VTK file as a separate variable named 'velocity_diff'." << "\n";
+      std::cout << "Optional Options:\n";
+      std::cout << "-----------------\n";
+      std::cout << "--vtk <name-prefix>\n";
+      std::cout << "Specifies the prefix for the VTK files; if not given, then the prefix (that's everything in front\n";
+      std::cout << "of the first asterisk) of the velocity input filename pattern is used.\n\n";
+      std::cout << "--diff\n";
+      std::cout << "If specified, then the difference of the current velocity field and the previous time step is also\n";
+      std::cout << "written to the VTK file as a separate variable named 'velocity_diff'.\n";
       return 0;
     }
 
@@ -544,7 +544,7 @@ namespace Stokes2Vtk
     {
       // print all unsupported options to cerr
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
 
       return 1;
     }
@@ -552,7 +552,7 @@ namespace Stokes2Vtk
     int num_mesh_files = args.check("mesh");
     if(num_mesh_files < 1)
     {
-      std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
+      std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>\n";
       return 1;
     }
 
@@ -581,7 +581,7 @@ namespace Stokes2Vtk
     if(mtype == "conformal:hypercube:3:3")
       return run_xml<H3M3D>(args, mesh_reader);
 
-    std::cout << "ERROR: unsupported mesh type!" << "\n";
+    std::cout << "ERROR: unsupported mesh type!\n";
 
     return 1;
   }

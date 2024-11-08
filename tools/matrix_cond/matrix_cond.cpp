@@ -199,13 +199,13 @@ namespace MatrixCond
 
     int calc_max_sv_spd(const MatrixType& matrix, VectorType& vec)
     {
-      std::cout << "Computing maximal singular value by powering A..." << "\n";
+      std::cout << "Computing maximal singular value by powering A...\n";
       return calc_max_sv(matrix, vec);
     }
 
     int calc_max_sv_ata(const MatrixType& matrix, const MatrixType& transpo, VectorType& vec)
     {
-      std::cout << "Computing maximal singular value by powering A^T*A..." << "\n";
+      std::cout << "Computing maximal singular value by powering A^T*A...\n";
       // create virtual A^T*A matrix
       MatrixATA mat_ata(matrix, transpo);
       int rtn = calc_max_sv(mat_ata, vec);
@@ -332,7 +332,7 @@ namespace MatrixCond
 
     int calc_min_sv_spd(const MatrixType& matrix, const FilterType& filter, VectorType& vec)
     {
-      std::cout << "Computing minimal singular value by powering PCG(A)..." << "\n";
+      std::cout << "Computing minimal singular value by powering PCG(A)...\n";
       auto precon = Solver::new_jacobi_precond(matrix, filter);
       int rtn = calc_min_sv(matrix, filter, precon, vec);
       if(rtn > 0)
@@ -342,7 +342,7 @@ namespace MatrixCond
 
     int calc_min_sv_ata(const MatrixType& matrix, const MatrixType& transpo, const FilterType& filter, VectorType& vec)
     {
-      std::cout << "Computing minimal singular value by powering PCD(A^T*A)..." << "\n";
+      std::cout << "Computing minimal singular value by powering PCD(A^T*A)...\n";
 
       // create virtual A^T*A matrix
       MatrixATA mat_ata(matrix, transpo);
@@ -369,61 +369,61 @@ namespace MatrixCond
   void print_help()
   {
     std::cout << "\n";
-    std::cout << "USAGE: matrix-cond <filename> [<format>] [options...]" << "\n";
+    std::cout << "USAGE: matrix-cond <filename> [<format>] [options...]\n";
     std::cout << "\n";
     //            123456789-123456789-123456789-123456789-123456789-123456789-
-    std::cout << "This tool can compute the extremal singular values and the" << "\n";
-    std::cout << "spectral condition number of a given matrix stored in the" << "\n";
-    std::cout << "file named <filename>." << "\n";
+    std::cout << "This tool can compute the extremal singular values and the\n";
+    std::cout << "spectral condition number of a given matrix stored in the\n";
+    std::cout << "file named <filename>.\n";
     std::cout << "\n";
-    std::cout << "WARNING: This tool is experimental; use at own risk!" << "\n";
+    std::cout << "WARNING: This tool is experimental; use at own risk!\n";
     std::cout << "\n";
-    std::cout << "The maximal singular value is computed iteratively by" << "\n";
-    std::cout << "applying the power method onto the normal system A^T * A." << "\n";
-    std::cout << "The minimal singular value is computed iteratively by" << "\n";
-    std::cout << "applying the power method onto a Jacobi-preconditioned" << "\n";
-    std::cout << "PCG solver applied onto the normal system A^T * A." << "\n";
+    std::cout << "The maximal singular value is computed iteratively by\n";
+    std::cout << "applying the power method onto the normal system A^T * A.\n";
+    std::cout << "The minimal singular value is computed iteratively by\n";
+    std::cout << "applying the power method onto a Jacobi-preconditioned\n";
+    std::cout << "PCG solver applied onto the normal system A^T * A.\n";
     std::cout << "\n";
     std::cout << "\n";
-    std::cout << "The following options are available for this tool:" << "\n";
+    std::cout << "The following options are available for this tool:\n";
     std::cout << "\n";
-    std::cout << "--spd" << "\n";
-    std::cout << "Assume that the matrix is symmetric and positive definite." << "\n";
-    std::cout << "In this case, the power method is applied onto the matrix A" << "\n";
-    std::cout << "itself rather than onto its normal system A^T * A." << "\n";
-    std::cout << "This usually speeds up the solution process." << "\n";
+    std::cout << "--spd\n";
+    std::cout << "Assume that the matrix is symmetric and positive definite.\n";
+    std::cout << "In this case, the power method is applied onto the matrix A\n";
+    std::cout << "itself rather than onto its normal system A^T * A.\n";
+    std::cout << "This usually speeds up the solution process.\n";
     std::cout << "\n";
-    std::cout << "--no-svmin / --no-svmax" << "\n";
-    std::cout << "Do not compute the minimal or maximal singular values, resp." << "\n";
+    std::cout << "--no-svmin / --no-svmax\n";
+    std::cout << "Do not compute the minimal or maximal singular values, resp.\n";
     std::cout << "\n";
-    std::cout << "--svmin-noplot / --svmax-noplot" << "\n";
-    std::cout << "Do not plot the power method iterations to cout." << "\n";
+    std::cout << "--svmin-noplot / --svmax-noplot\n";
+    std::cout << "Do not plot the power method iterations to cout.\n";
     std::cout << "\n";
-    std::cout << "--svmin-maxiter / --svmax-maxiter" << "\n";
-    std::cout << "Specifies the maximum number of iterations for the power" << "\n";
-    std::cout << "method for the computation the extremal singular values." << "\n";
-    std::cout << "If not specified, 10000 iterations are performed at most." << "\n";
+    std::cout << "--svmin-maxiter / --svmax-maxiter\n";
+    std::cout << "Specifies the maximum number of iterations for the power\n";
+    std::cout << "method for the computation the extremal singular values.\n";
+    std::cout << "If not specified, 10000 iterations are performed at most.\n";
     std::cout << "\n";
-    std::cout << "--svmin-tol / --svmax-tol" << "\n";
-    std::cout << "Specifies the tolerance for the stopping criterion of the" << "\n";
-    std::cout << "power method. If not specified, 1E-6 is used." << "\n";
+    std::cout << "--svmin-tol / --svmax-tol\n";
+    std::cout << "Specifies the tolerance for the stopping criterion of the\n";
+    std::cout << "power method. If not specified, 1E-6 is used.\n";
     std::cout << "\n";
-    std::cout << "--svmin-read-vector <filename> [<format>] /" << "\n";
-    std::cout << "--svmax-read-vector <filename> [<format>]" << "\n";
-    std::cout << "Specifies the filename of the vector that is to be used as" << "\n";
-    std::cout << "the initial vector for the power method. If not given, the" << "\n";
-    std::cout << "power method start with the vector whose entries are all 1." << "\n";
+    std::cout << "--svmin-read-vector <filename> [<format>] /\n";
+    std::cout << "--svmax-read-vector <filename> [<format>]\n";
+    std::cout << "Specifies the filename of the vector that is to be used as\n";
+    std::cout << "the initial vector for the power method. If not given, the\n";
+    std::cout << "power method start with the vector whose entries are all 1.\n";
     std::cout << "\n";
-    std::cout << "--svmin-write-vector <filename> [<format>] /" << "\n";
-    std::cout << "--svmax-write-vector <filename> [<format>]" << "\n";
-    std::cout << "Writes out the eigenvectors to the minimal and maximal" << "\n";
-    std::cout << "singular values if the power method converged." << "\n";
-    std::cout << "If not specified, the vectors are not written out." << "\n";
+    std::cout << "--svmin-write-vector <filename> [<format>] /\n";
+    std::cout << "--svmax-write-vector <filename> [<format>]\n";
+    std::cout << "Writes out the eigenvectors to the minimal and maximal\n";
+    std::cout << "singular values if the power method converged.\n";
+    std::cout << "If not specified, the vectors are not written out.\n";
     std::cout << "\n";
-    std::cout << "--pcg-maxiter" << "\n";
-    std::cout << "Specifies the maximum number of PCG iterations for the" << "\n";
-    std::cout << "power method for the computation of the minimal singular" << "\n";
-    std::cout << "value. If not given, 10000 iterations are performed at most." << "\n";
+    std::cout << "--pcg-maxiter\n";
+    std::cout << "Specifies the maximum number of PCG iterations for the\n";
+    std::cout << "power method for the computation of the minimal singular\n";
+    std::cout << "value. If not given, 10000 iterations are performed at most.\n";
   }
 
   int main(int argc, char* argv[])
@@ -466,7 +466,7 @@ namespace MatrixCond
     {
       // print all unsupported options to cerr
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
       return 1;
     }
 
@@ -529,21 +529,21 @@ namespace MatrixCond
     // try to map format
     if(!string_mapped_lookup(matrix_mode, mat_fm_map, mat_frm))
     {
-      std::cerr << "ERROR: Failed to determine matrix file format for '" << matrix_name << "'" << "\n";
+      std::cerr << "ERROR: Failed to determine matrix file format for '" << matrix_name << "'\n";
       return 1;
     }
 
-    std::cout << "Reading matrix '" << matrix_name << "'..." << "\n";
+    std::cout << "Reading matrix '" << matrix_name << "'...\n";
 
     // let's import the matrix
     MatrixType matrix;
     if(!import_matrix(matrix, matrix_name, matrix_mode))
     {
-      std::cerr << "ERROR: Failed to import matrix '" << matrix_name << "'" << "\n";
+      std::cerr << "ERROR: Failed to import matrix '" << matrix_name << "'\n";
       return 1;
     }
 
-    std::cout << "Computing matrix transpose..." << "\n";
+    std::cout << "Computing matrix transpose...\n";
 
     // now let's transpose the matrix
     MatrixType transpo = matrix.transpose();
@@ -565,7 +565,7 @@ namespace MatrixCond
       // read initial vector
       if(read_svmax_vec)
       {
-        std::cout << "Reading initial vector from '" << svmax_vec_read_name << "'..." << "\n";
+        std::cout << "Reading initial vector from '" << svmax_vec_read_name << "'...\n";
         vec_svmax.read_from(svmax_vec_read_fm, svmax_vec_read_name);
       }
 
@@ -579,16 +579,16 @@ namespace MatrixCond
       // everything okay?
       if(ret > 0)
       {
-        std::cout << "Power method converged after " << max_sv.num_iter << " iterations" << "\n";
+        std::cout << "Power method converged after " << max_sv.num_iter << " iterations\n";
         if(write_svmax_vec)
         {
-          std::cout << "Writing out vector to '" << svmax_vec_write_name << "'..." << "\n";
+          std::cout << "Writing out vector to '" << svmax_vec_write_name << "'...\n";
           vec_svmax.write_out(svmax_vec_write_fm, svmax_vec_write_name);
         }
       }
       else if(ret == -1)
       {
-        std::cout << "WARNING: Power method did not converge; maximal singular value may be garbage!" << "\n";
+        std::cout << "WARNING: Power method did not converge; maximal singular value may be garbage!\n";
       }
     }
 
@@ -603,7 +603,7 @@ namespace MatrixCond
       // read initial vector
       if(read_svmin_vec)
       {
-        std::cout << "Reading initial vector from '" << svmin_vec_read_name << "'..." << "\n";
+        std::cout << "Reading initial vector from '" << svmin_vec_read_name << "'...\n";
         vec_svmin.read_from(svmin_vec_read_fm, svmin_vec_read_name);
       }
 
@@ -617,24 +617,24 @@ namespace MatrixCond
       // everything okay?
       if(ret > 0)
       {
-        std::cout << "Power method converged after " << min_sv.num_iter << " iterations" << "\n";
+        std::cout << "Power method converged after " << min_sv.num_iter << " iterations\n";
         if(write_svmin_vec)
         {
-          std::cout << "Writing out vector to '" << svmin_vec_write_name << "'..." << "\n";
+          std::cout << "Writing out vector to '" << svmin_vec_write_name << "'...\n";
           vec_svmin.write_out(svmin_vec_write_fm, svmin_vec_write_name);
         }
       }
       else if(ret == -1)
       {
-        std::cout << "WARNING: Power method did not converge; minimal singular value may be garbage!" << "\n";
+        std::cout << "WARNING: Power method did not converge; minimal singular value may be garbage!\n";
       }
       else if(ret == -2)
       {
-        std::cout << "ERROR: PCG solver did not converge; minimal singular value may be garbage!" << "\n";
+        std::cout << "ERROR: PCG solver did not converge; minimal singular value may be garbage!\n";
       }
     }
 
-    std::cout << "\n" << "Summary:" << "\n";
+    std::cout << "\nSummary:\n";
     if(max_sv.want)
     {
       std::cout << "Max SV PM Iter....: " << max_sv.num_iter << "\n";

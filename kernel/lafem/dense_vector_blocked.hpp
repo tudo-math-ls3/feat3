@@ -763,7 +763,7 @@ namespace FEAT
           temp.convert(*this);
 
           const Index tsize(temp.template size<Perspective::pod>());
-          file << "%%MatrixMarket matrix array real general" << "\n";
+          file << "%%MatrixMarket matrix array real general\n";
           file << tsize << " " << 1 << "\n";
 
           const DT_ * pval(temp.template elements<Perspective::pod>());

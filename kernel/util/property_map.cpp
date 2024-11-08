@@ -479,14 +479,14 @@ namespace FEAT
     for( ; sit != send ; ++sit)
     {
       // section name and opening brace
-      os << prefix << "[" << (*sit).first << "]" << "\n";
-      os << prefix << "{" << "\n";
+      os << prefix << "[" << (*sit).first << "]\n";
+      os << prefix << "{\n";
 
       // dump subsection with increased indent
       (*sit).second->write(os, indent + 1);
 
       // closing brace, including section name as comment
-      os << prefix << "} # end of [" << (*sit).first << "]" << "\n";
+      os << prefix << "} # end of [" << (*sit).first << "]\n";
     }
   }
 } //namespace FEAT

@@ -132,12 +132,12 @@ namespace AnalyseMeshCGAL
     if(args.num_args() <= 2)
     {
       std::cout << "\n";
-      std::cout << "Info: For this application, you need to specify at least one" << "\n";
-      std::cout << "input mesh file via the '--mesh <filenames...>' option." << "\n";
-      std::cout << "and the off-file via the '--off <filename>' option" <<"\n";
+      std::cout << "Info: For this application, you need to specify at least one\n";
+      std::cout << "input mesh file via the '--mesh <filenames...>' option.\n";
+      std::cout << "and the off-file via the '--off <filename>' option\n";
       std::cout << "\n";
 
-      std::cout << "Supported Options:" << "\n";
+      std::cout << "Supported Options:\n";
       std::cout << args.get_supported_help();
       return;
     }
@@ -149,7 +149,7 @@ namespace AnalyseMeshCGAL
       // Print unsupported options
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
       {
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       }
 
       // And abort
@@ -162,7 +162,7 @@ namespace AnalyseMeshCGAL
     if(args.check("mesh") <= 0)
     {
       // This tool requires at least one mesh file...
-      std::cerr << "\n" << "ERROR: You have to specify at least one mesh file via '--mesh <files...>'" << "\n";
+      std::cerr << "\nERROR: You have to specify at least one mesh file via '--mesh <files...>'\n";
 
       // ...so we cannot continue without one.
       Runtime::abort();
@@ -170,7 +170,7 @@ namespace AnalyseMeshCGAL
     if(args.check("off") <= 0)
     {
       // This application requires at least one off file...
-      std::cerr << "\n" << "ERROR: You have to specify one off file via '--off <filename>'" << "\n";
+      std::cerr << "\nERROR: You have to specify one off file via '--off <filename>'\n";
 
       // ...so we cannot continue without one.
       Runtime::abort();
@@ -218,7 +218,7 @@ namespace AnalyseMeshCGAL
     catch(const std::exception& exc)
     {
       // Something went wrong; probably one of the files could not be opened...
-      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
+      std::cerr << "\nERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -241,7 +241,7 @@ namespace AnalyseMeshCGAL
     catch(const std::exception& exc)
     {
       // Oops...
-      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
+      std::cerr << "\nERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -258,9 +258,9 @@ namespace AnalyseMeshCGAL
     if(mesh_type.empty())
     {
       std::cout << "\n";
-      std::cout << "ERROR: Mesh file(s) did not provide a mesh-type!" << "\n";
+      std::cout << "ERROR: Mesh file(s) did not provide a mesh-type!\n";
       std::cout << "\n";
-      std::cout << "Did you supply all required mesh-files?" << "\n";
+      std::cout << "Did you supply all required mesh-files?\n";
       Runtime::abort();
     }
 
@@ -291,7 +291,7 @@ namespace AnalyseMeshCGAL
       // The mesh-type is either invalid or not supported. In fact, there are some
       // other valid mesh-type specifiers (e.g. sub-dimensional meshes), which this
       // (and most other) application does not support by construction.
-      std::cout << "\n" << "ERROR: unsupported mesh type!" << "\n";
+      std::cout << "\nERROR: unsupported mesh type!\n";
       Runtime::abort();
     }
 
@@ -339,7 +339,7 @@ namespace AnalyseMeshCGAL
     std::unique_ptr<RootMeshNodeType> mesh_node;
 
     // Okay, let the parsing begin:
-    std::cout << "Parsing mesh files..." << "\n";
+    std::cout << "Parsing mesh files...\n";
 
     // At this point, a lot of errors could occur if either one of the files is corrupt/invalid
     // or if the set of different input files is inconsistent/mismatching. Therefore, we enclose
@@ -354,7 +354,7 @@ namespace AnalyseMeshCGAL
     catch(const std::exception& exc)
     {
       // That's not good...
-      std::cerr << "\n" << "ERROR: " << exc.what() << "\n";
+      std::cerr << "\nERROR: " << exc.what() << "\n";
       Runtime::abort();
     }
 
@@ -380,7 +380,7 @@ namespace AnalyseMeshCGAL
     if(args.parse("level", level) < 0)
     {
       // That's not meant to happen...
-      std::cerr << "\n" << "ERROR: Failed to parse '--level' parameter" << "\n";
+      std::cerr << "\nERROR: Failed to parse '--level' parameter\n";
 
       // and abort our program
       Runtime::abort();
@@ -388,7 +388,7 @@ namespace AnalyseMeshCGAL
 
     // Did the user specify a level > 0?
     if(level > Index(0))
-      std::cout << "Refining Mesh to Level " << level << "..." << "\n";
+      std::cout << "Refining Mesh to Level " << level << "...\n";
 
     // Okay, so let's refine the mesh-node up to the desired level:
     for(Index lvl(0); lvl < level; ++lvl)
@@ -422,7 +422,7 @@ namespace AnalyseMeshCGAL
     DataType* in_out = inside_outside.elements();
 
     // load the off-file with the cgal-wrapper
-    std::cout<<"Loading the off-file"<<"\n";
+    std::cout<<"Loading the off-file\n";
     String off_file_name;
     args.parse("off",off_file_name);
     Geometry::CGALWrapper<DataType> cw(off_file_name, Geometry::CGALFileMode::fm_off);
@@ -468,7 +468,7 @@ namespace AnalyseMeshCGAL
     if(args.parse("vtk", vtk_name) > 0)
     {
       std::cout << "\n";
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -483,7 +483,7 @@ namespace AnalyseMeshCGAL
     }
 
     // That's it for today.
-    std::cout << "\n" << "Finished!" << "\n";
+    std::cout << "\nFinished!\n";
   } // void run<Shape_>(...)
 
 } // namespace
@@ -506,7 +506,7 @@ int main(int argc, char* argv[])
 int main(/*int argc, char* argv[]*/)
 {
   // Print a welcome message
-  std::cerr << "Not Compiled with CGAL. Cannot run without CGAL" << "\n";
+  std::cerr << "Not Compiled with CGAL. Cannot run without CGAL\n";
   return 1;
 }
 

@@ -1074,7 +1074,7 @@ namespace FEAT
           {
             if (symmetric)
             {
-              file << "%%MatrixMarket matrix coordinate real symmetric" << "\n";
+              file << "%%MatrixMarket matrix coordinate real symmetric\n";
               std::vector<IT_> rowv;
               std::vector<IT_> colv;
               std::vector<DT_> valv;
@@ -1100,7 +1100,7 @@ namespace FEAT
             }
             else
             {
-              file << "%%MatrixMarket matrix coordinate real general" << "\n";
+              file << "%%MatrixMarket matrix coordinate real general\n";
               file << this->rows() << " " << this->columns() << " " << this->used_elements() << "\n";
 
               // const int max_size = 3u*20u*3000u*(this->used_elements()/this->rows() + 1);
@@ -2690,7 +2690,7 @@ namespace FEAT
       friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixCSR & b)
       {
 
-        lhs << "[" << "\n";
+        lhs << "[\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           lhs << "[";
@@ -2698,9 +2698,9 @@ namespace FEAT
           {
             lhs << "  " << stringify(b(i, j));
           }
-          lhs << "]" << "\n";
+          lhs << "]\n";
         }
-        lhs << "]" << "\n";
+        lhs << "]\n";
 
         return lhs;
       }

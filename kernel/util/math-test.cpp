@@ -417,7 +417,7 @@ public:
         // only check result ifpivot quotient is normal
         if(!Math::isnormal(ret))
         {
-          std::cerr << "WARNING: pivot quotient is not normal!" << "\n";
+          std::cerr << "WARNING: pivot quotient is not normal!\n";
           continue;
         }
 

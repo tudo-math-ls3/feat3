@@ -20,64 +20,64 @@ using namespace FEAT::Geometry;
 static void display_help()
 {
   std::cout << "\n";
-  std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format" << "\n";
+  std::cout << "mesh2vtk: Converts a mesh from FEAT format to VTK format\n";
   std::cout << "\n";
-  std::cout << "Mandatory arguments:" << "\n";
-  std::cout << "--------------------" << "\n";
-  std::cout << " --mesh <path to mesh file(s)>" << "\n";
-  std::cout << "Specifies the sequence of input mesh files paths." << "\n";
+  std::cout << "Mandatory arguments:\n";
+  std::cout << "--------------------\n";
+  std::cout << " --mesh <path to mesh file(s)>\n";
+  std::cout << "Specifies the sequence of input mesh files paths.\n";
   std::cout << "\n";
-  std::cout << "Optional arguments:" << "\n";
-  std::cout << "-------------------" << "\n";
-  std::cout << " --vtk <path to vtk file>" << "\n";
-  std::cout << "Specifies the path of the output VTK file." << "\n";
-  std::cout << "If not given, the name of the first input mesh file is used." << "\n";
+  std::cout << "Optional arguments:\n";
+  std::cout << "-------------------\n";
+  std::cout << " --vtk <path to vtk file>\n";
+  std::cout << "Specifies the path of the output VTK file.\n";
+  std::cout << "If not given, the name of the first input mesh file is used.\n";
   std::cout << "\n";
-  std::cout << " --level [lvl_max [lvl_min]]" << "\n";
-  std::cout << "Specifies the minimum and maximum refinement levels." << "\n";
-  std::cout << "If not given, only level 0 is processed." << "\n";
+  std::cout << " --level [lvl_max [lvl_min]]\n";
+  std::cout << "Specifies the minimum and maximum refinement levels.\n";
+  std::cout << "If not given, only level 0 is processed.\n";
   std::cout << "\n";
-  std::cout << " --origin <x> [<y> [<z>]]" << "\n";
-  std::cout << "Specifies the translation origin." << "\n";
-  std::cout << "This translation is subtracted before applying the rotation." << "\n";
-  std::cout << "If not given, all origins are set to 0." << "\n";
+  std::cout << " --origin <x> [<y> [<z>]]\n";
+  std::cout << "Specifies the translation origin.\n";
+  std::cout << "This translation is subtracted before applying the rotation.\n";
+  std::cout << "If not given, all origins are set to 0.\n";
   std::cout << "\n";
-  std::cout << " --angles <angle>" << "\n";
-  std::cout << " --angles <yaw> <pitch> <roll>" << "\n";
-  std::cout << "Specifies the rotation angle (2D) or the yaw-pitch-roll angles (3D)." << "\n";
-  std::cout << "If not given, all angles are set to 0." << "\n";
-  std::cout << "Note: all angles are given in revolutions (full turns):" << "\n";
-  std::cout << "      1 revolution = 360 degrees = 2pi radians" << "\n";
+  std::cout << " --angles <angle>\n";
+  std::cout << " --angles <yaw> <pitch> <roll>\n";
+  std::cout << "Specifies the rotation angle (2D) or the yaw-pitch-roll angles (3D).\n";
+  std::cout << "If not given, all angles are set to 0.\n";
+  std::cout << "Note: all angles are given in revolutions (full turns):\n";
+  std::cout << "      1 revolution = 360 degrees = 2pi radians\n";
   std::cout << "\n";
-  std::cout << " --offset <x> [<y> [<z>]]" << "\n";
-  std::cout << "Specifies the translation offset." << "\n";
-  std::cout << "This translation is added after applying the rotation." << "\n";
-  std::cout << "If not given, all offsets are set to 0." << "\n";
+  std::cout << " --offset <x> [<y> [<z>]]\n";
+  std::cout << "Specifies the translation offset.\n";
+  std::cout << "This translation is added after applying the rotation.\n";
+  std::cout << "If not given, all offsets are set to 0.\n";
   std::cout << "\n";
-  std::cout << " --no-adapt" << "\n";
-  std::cout << "Do not adapt mesh after refinement." << "\n";
+  std::cout << " --no-adapt\n";
+  std::cout << "Do not adapt mesh after refinement.\n";
   std::cout << "\n";
-  std::cout << " --no-dist" << "\n";
-  std::cout << "Do not compute distance to charts." << "\n";
+  std::cout << " --no-dist\n";
+  std::cout << "Do not compute distance to charts.\n";
   std::cout << "\n";
-  std::cout << " --no-proj" << "\n";
-  std::cout << "Do not compute projection to charts" << "\n";
+  std::cout << " --no-proj\n";
+  std::cout << "Do not compute projection to charts\n";
   std::cout << "\n";
-  std::cout << " --no-volume" << "\n";
-  std::cout << "Do not compute cell volumes" << "\n";
+  std::cout << " --no-volume\n";
+  std::cout << "Do not compute cell volumes\n";
   std::cout << "\n";
-  std::cout << " --hit-test <name1> <formula1> [<name2> <formula2> ...]" << "\n";
-  std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts" << "\n";
-  std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair" << "\n";
-  std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula" << "\n";
-  std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part." << "\n";
-  std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates" << "\n";
-  std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively." << "\n";
-  std::cout << "Please note that this option can only be used if FEAT is configured and linked against" << "\n";
-  std::cout << "the 'fparser' third-party library." << "\n";
+  std::cout << " --hit-test <name1> <formula1> [<name2> <formula2> ...]\n";
+  std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts\n";
+  std::cout << "by using the Geometry::ParsedHitTestFactory class. The first component of each pair\n";
+  std::cout << "specifies the name for the mesh part, whereas the second component specifies the formula\n";
+  std::cout << "in x,y,z coordinates, which is to be used for the hit test of the mesh part.\n";
+  std::cout << "A vertex or edge/face/cell will be contained in the meshpart if the formula evaluates\n";
+  std::cout << "to a positive value in its coordinates or midpoint coordinates, respectively.\n";
+  std::cout << "Please note that this option can only be used if FEAT is configured and linked against\n";
+  std::cout << "the 'fparser' third-party library.\n";
   std::cout << "\n";
-  std::cout << " --help" << "\n";
-  std::cout << "Displays this message" << "\n";
+  std::cout << " --help\n";
+  std::cout << "Displays this message\n";
 }
 
 String get_file_title(const String& filename)
@@ -103,19 +103,19 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 1, 1>& offset, Tiny::V
   int nori = args.parse("origin", origin[0]);
   if(args.check("angles") >= 0)
   {
-    std::cerr << "ERROR: option '--angles' is invalid for 1D meshes" << "\n";
+    std::cerr << "ERROR: option '--angles' is invalid for 1D meshes\n";
     return -1;
   }
 
   // parse error?
   if(noff < 0)
   {
-    std::cerr << "ERROR: could not parse '--offset <x>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--offset <x>' parameters\n";
     return -1;
   }
   if(nori < 0)
   {
-    std::cerr << "ERROR: could not parse '--origin <x>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--origin <x>' parameters\n";
     return -1;
   }
 
@@ -132,34 +132,34 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 2, 2>& offset, Tiny::V
   // parse error?
   if(noff < 0)
   {
-    std::cerr << "ERROR: could not parse '--offset <x> <y>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--offset <x> <y>' parameters\n";
     return -1;
   }
   if(nori < 0)
   {
-    std::cerr << "ERROR: could not parse '--origin <x> <y>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--origin <x> <y>' parameters\n";
     return -1;
   }
   if(nang < 0)
   {
-    std::cerr << "ERROR: could not parse '--angles <angle>" << "\n";
+    std::cerr << "ERROR: could not parse '--angles <angle>\n";
     return -1;
   }
 
   // invalid argument count?
   if((noff > 0) && (noff != 2))
   {
-    std::cerr << "ERROR: invalid number of '--offset <x> <y>' parameters" << "\n";
+    std::cerr << "ERROR: invalid number of '--offset <x> <y>' parameters\n";
     return -1;
   }
   if((nori > 0) && (nori != 2))
   {
-    std::cerr << "ERROR: invalid number of '--origin <x> <y>' parameters" << "\n";
+    std::cerr << "ERROR: invalid number of '--origin <x> <y>' parameters\n";
     return -1;
   }
   if((nang > 0) && (nang != 1))
   {
-    std::cerr << "ERROR: invalid number of '--angles <angle>' parameters" << "\n";
+    std::cerr << "ERROR: invalid number of '--angles <angle>' parameters\n";
     return -1;
   }
 
@@ -176,34 +176,34 @@ int parse_trafo(SimpleArgParser& args, Tiny::Vector<Real, 3, 3>& offset, Tiny::V
   // parse error?
   if(noff < 0)
   {
-    std::cerr << "ERROR: could not parse '--offset <x> <y> <z>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--offset <x> <y> <z>' parameters\n";
     return -1;
   }
   if(nori < 0)
   {
-    std::cerr << "ERROR: could not parse '--origin <x> <y> <z>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--origin <x> <y> <z>' parameters\n";
     return -1;
   }
   if(nang < 0)
   {
-    std::cerr << "ERROR: could not parse '--angles <yaw> <pitch> <roll>' parameters" << "\n";
+    std::cerr << "ERROR: could not parse '--angles <yaw> <pitch> <roll>' parameters\n";
     return -1;
   }
 
   // invalid argument count?
   if((noff > 0) && (noff != 3))
   {
-    std::cerr << "ERROR: invalid number of '--offset <x> <y> <z>' parameters" << "\n";
+    std::cerr << "ERROR: invalid number of '--offset <x> <y> <z>' parameters\n";
     return -1;
   }
   if((nori > 0) && (nori != 3))
   {
-    std::cerr << "ERROR: invalid number of '--origin <x> <y> <z>' parameters" << "\n";
+    std::cerr << "ERROR: invalid number of '--origin <x> <y> <z>' parameters\n";
     return -1;
   }
   if((nang > 0) && (nang != 3))
   {
-    std::cerr << "ERROR: invalid number of '--angles <yaw> <pitch> <roll>' parameters" << "\n";
+    std::cerr << "ERROR: invalid number of '--angles <yaw> <pitch> <roll>' parameters\n";
     return -1;
   }
 
@@ -221,7 +221,7 @@ bool build_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node, const std::ma
     String name = it->first;
     String formula = it->second;
 
-    std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'..." << "\n";
+    std::cout << "Creating meshpart '" << name << "' by hit-test formula '" << formula << "'...\n";
 
     try
     {
@@ -242,7 +242,7 @@ bool build_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node, const std::ma
     }
     catch(std::exception& exc)
     {
-      std::cerr << "ERROR: in boundary function formula '" << formula << "'" << "\n";
+      std::cerr << "ERROR: in boundary function formula '" << formula << "'\n";
       std::cerr << exc.what() << "\n";
       return false;
     }
@@ -282,7 +282,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     std::deque<String> parts = args.query("hit-test")->second;
     if(parts.size() % 2u != 0u)
     {
-      std::cerr << "ERROR: invalid number of parameters for option --hit-test, expected an even count" << "\n";
+      std::cerr << "ERROR: invalid number of parameters for option --hit-test, expected an even count\n";
       return 1;
     }
 
@@ -292,7 +292,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 #else // no FEAT_HAVE_FPARSER
   if(args.check("hit-test") >= 0)
   {
-    std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts" << "\n";
+    std::cerr << "ERROR: you need to compile and link with 'fparser' to build mesh parts\n";
     return 1;
   }
 #endif // FEAT_HAVE_FPARSER
@@ -307,7 +307,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   try
 #endif
   {
-    std::cout << "Parsing mesh files..." << "\n";
+    std::cout << "Parsing mesh files...\n";
     // Now parse the mesh file
     mesh_reader.parse(*node, *atlas, &part_set);
   }
@@ -319,7 +319,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   }
   catch(...)
   {
-    std::cerr << "ERROR: unknown exception" << "\n";
+    std::cerr << "ERROR: unknown exception\n";
     return 1;
   }
 #endif
@@ -351,7 +351,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   {
     if(lvl > 0)
     {
-      std::cout << "Refining up to level " << lvl << "..." << "\n";
+      std::cout << "Refining up to level " << lvl << "...\n";
       node = node->refine_unique(adapt_mode);
     }
 
@@ -375,7 +375,7 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
     // Create a VTK exporter for our mesh
     FEAT::String vtkname = filename + "." + stringify(lvl);
-    std::cout << "Writing file '" << vtkname << ".vtu'..." << "\n";
+    std::cout << "Writing file '" << vtkname << ".vtu'...\n";
     Geometry::ExportVTK<Mesh_> exporter(mesh);
 
     std::vector<double> vtx_data(mesh.get_num_entities(0), 0.0);
@@ -543,7 +543,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
 
     display_help();
     return 1;
@@ -552,7 +552,7 @@ int main(int argc, char* argv[])
   int num_mesh_files = args.check("mesh");
   if(num_mesh_files < 1)
   {
-    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>" << "\n";
+    std::cerr << "ERROR: You have to specify at least one meshfile with --mesh <files...>\n";
     display_help();
     return 1;
   }
@@ -597,7 +597,7 @@ int main(int argc, char* argv[])
   if(mtype == "conformal:simplex:3:3")
     return run_xml<S3M3D>(args, mesh_reader, vtk_name);
 
-  std::cout << "ERROR: unsupported mesh type!" << "\n";
+  std::cout << "ERROR: unsupported mesh type!\n";
 
   return 1;
 }

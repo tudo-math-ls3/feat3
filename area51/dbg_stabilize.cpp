@@ -204,7 +204,7 @@ namespace Andicore
     {
       std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       Runtime::abort();
     }
 
@@ -294,7 +294,7 @@ namespace Andicore
 
 
     // unstabilized
-    std::cout << "Solving Unstabilized System..." << "\n";
+    std::cout << "Solving Unstabilized System...\n";
     burgers.nu = nu;
     burgers.beta = beta;
     burgers.theta = theta;
@@ -312,7 +312,7 @@ namespace Andicore
 
 
     // streamline diffusion
-    std::cout << "Solving Streamline Diffusion Stabilized System..." << "\n";
+    std::cout << "Solving Streamline Diffusion Stabilized System...\n";
     burgers.sd_delta = upsam;
     burgers.sd_nu = nu;
     burgers.set_sd_v_norm(vec_conv);
@@ -330,7 +330,7 @@ namespace Andicore
 
 
     // EOJ stabilization
-    std::cout << "Solving Jump Stabilized System..." << "\n";
+    std::cout << "Solving Jump Stabilized System...\n";
     burgers.nu = nu;
     burgers.beta = beta;
     burgers.theta = theta;
@@ -352,7 +352,7 @@ namespace Andicore
     solver->done_symbolic();
 
 #else // no UMFPACK
-    std::cout << "You need to compile with UMFPACK support." << "\n";
+    std::cout << "You need to compile with UMFPACK support.\n";
 #endif // FEAT_HAVE_UMFPACK
 
     if(args.check("vtk") >= 0)
@@ -360,7 +360,7 @@ namespace Andicore
       String vtk_name(String("./dbg-stabilize-lvl") + stringify(level));
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       Geometry::ExportVTK<MeshType> exporter(mesh);
       exporter.add_vertex_vector("conv", vec_conv);
@@ -371,7 +371,7 @@ namespace Andicore
       exporter.write(vtk_name);
     }
 
-    std::cout << "Finished!" << "\n";
+    std::cout << "Finished!\n";
   }
 } // namespace Andicore
 

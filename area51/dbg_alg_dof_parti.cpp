@@ -733,8 +733,8 @@ int main(int argc, char* argv[])
     if(!String(argv[1]).parse(ilevel) || (ilevel < 1))
     {
       // Failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[1] << "' as refinement level." << "\n";
-      std::cerr << "Note: The last argument must be a positive integer." << "\n";
+      std::cerr << "ERROR: Failed to parse '" << argv[1] << "' as refinement level.\n";
+      std::cerr << "Note: The last argument must be a positive integer.\n";
       // Abort our runtime environment
       Runtime::abort();
     }

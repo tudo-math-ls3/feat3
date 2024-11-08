@@ -107,7 +107,7 @@ public:
     std::shared_ptr<MeshType> mesh;
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
 
-    std::cout << "Q1: Gradient" << "\n";
+    std::cout << "Q1: Gradient\n";
     mesh = std::make_shared<MeshType>(mesh_factory);
     for(IT_ level = IT_(1); level < level_max; ++level)
     {
@@ -125,7 +125,7 @@ public:
     }
     std::cout << "\n";
 
-    std::cout << "Q2: Gradient" << "\n";
+    std::cout << "Q2: Gradient\n";
     mesh = std::make_shared<MeshType>(mesh_factory);
     for(IT_ level = IT_(1); level < level_max; ++level)
     {
@@ -143,7 +143,7 @@ public:
     }
     std::cout << "\n";
 
-    std::cout << "Q1~: Gradient" << "\n";
+    std::cout << "Q1~: Gradient\n";
     mesh = std::make_shared<MeshType>(mesh_factory);
     for(IT_ level = IT_(1); level < level_max; ++level)
     {

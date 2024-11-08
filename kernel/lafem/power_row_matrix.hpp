@@ -221,7 +221,7 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket powerrowmatrix coordinate real general" << "\n";
+        file << "%%MatrixMarket powerrowmatrix coordinate real general\n";
         for (Index i(1); i <= blocks_; ++i)
         {
           file << filename << "_pr" << i << suffix << "\n";
@@ -784,7 +784,7 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket powerrowmatrix coordinate real general" << "\n";
+        file << "%%MatrixMarket powerrowmatrix coordinate real general\n";
         file << filename << "_pr" << 1 << suffix << "\n";
 
         file.close();

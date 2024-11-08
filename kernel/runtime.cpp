@@ -50,13 +50,13 @@ void Runtime::initialize(int& argc, char**& argv)
 
   if (_initialized)
   {
-    std::cerr << "ERROR: Runtime::initialize called twice!" << "\n";
+    std::cerr << "ERROR: Runtime::initialize called twice!\n";
     std::cerr.flush();
     Runtime::abort();
   }
   if (_finalized)
   {
-    std::cerr << "ERROR: Runtime::initialize called after Runtime::finalize!" << "\n";
+    std::cerr << "ERROR: Runtime::initialize called after Runtime::finalize!\n";
     std::cerr.flush();
     Runtime::abort();
   }
@@ -64,7 +64,7 @@ void Runtime::initialize(int& argc, char**& argv)
   // initialize Dist operations
   if(!Dist::initialize(argc, argv))
   {
-    std::cerr << "ERROR: Failed to initialize Dist operations!" << "\n";
+    std::cerr << "ERROR: Failed to initialize Dist operations!\n";
     std::cerr.flush();
     Runtime::abort();
   }
@@ -413,13 +413,13 @@ int Runtime::finalize()
 {
   if (!_initialized)
   {
-    std::cerr << "ERROR: Runtime::finalize called before Runtime::initialize!" << "\n";
+    std::cerr << "ERROR: Runtime::finalize called before Runtime::initialize!\n";
     std::cerr.flush();
     Runtime::abort();
   }
   if (_finalized)
   {
-    std::cerr << "ERROR: Runtime::finalize called twice!" << "\n";
+    std::cerr << "ERROR: Runtime::finalize called twice!\n";
     std::cerr.flush();
     Runtime::abort();
   }

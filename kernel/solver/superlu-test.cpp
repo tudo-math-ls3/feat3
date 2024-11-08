@@ -185,7 +185,7 @@ public:
     const int np = int(Math::sqrt(double(comm.size())));
     if(np*np != comm.size())
     {
-      std::cout << "Comm size is " << comm.size() << " which is not a square number; exiting test" << "\n";
+      std::cout << "Comm size is " << comm.size() << " which is not a square number; exiting test\n";
       return; // number of procs is not square
     }
 

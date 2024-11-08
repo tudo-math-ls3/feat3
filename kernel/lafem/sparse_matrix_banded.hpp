@@ -731,7 +731,7 @@ namespace FEAT
         case FileMode::fm_bm:
         case FileMode::fm_binary:
           if (! std::is_same<DT_, double>::value)
-            std::cout<<"Warning: You are writing out a banded matrix that is not double precision!"<<"\n";
+            std::cout<<"Warning: You are writing out a banded matrix that is not double precision!\n";
 
         this->template _serialize<double, std::uint64_t>(FileMode::fm_bm, file);
           break;
@@ -1358,7 +1358,7 @@ namespace FEAT
        */
       friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBanded & b)
       {
-        lhs << "[" << "\n";
+        lhs << "[\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           lhs << "[";
@@ -1366,9 +1366,9 @@ namespace FEAT
           {
             lhs << "  " << stringify(b(i, j));
           }
-          lhs << "]" << "\n";
+          lhs << "]\n";
         }
-        lhs << "]" << "\n";
+        lhs << "]\n";
 
         return lhs;
       }

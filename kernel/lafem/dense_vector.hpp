@@ -696,7 +696,7 @@ namespace FEAT
           temp.convert(*this);
 
           const Index tsize(temp.size());
-          file << "%%MatrixMarket matrix array real general" << "\n";
+          file << "%%MatrixMarket matrix array real general\n";
           file << tsize << " " << 1 << "\n";
 
           const DT_ * pval(temp.elements());

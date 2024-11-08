@@ -1369,7 +1369,7 @@ namespace FEAT
 
         if(_strategy == ThreadingStrategy::layered)
         {
-          oss << "\n" << "Layers:" << "\n";
+          oss << "\nLayers:\n";
           for(std::size_t i(0); i+1u < this->_layer_elements.size(); ++i)
           {
             auto jb = this->_layer_elements.at(i);
@@ -1382,7 +1382,7 @@ namespace FEAT
 
           double desired = double(this->_element_indices.size()) / Math::max(double(this->_num_worker_threads), 1.0);
           oss << "Desired : " << stringify(desired) << "\n";
-          oss << "Threads:" << "\n";
+          oss << "Threads:\n";
           for(std::size_t i(0); i+1 < this->_thread_layers.size(); ++i)
           {
             auto jb = this->_thread_layers.at(i);
@@ -1395,7 +1395,7 @@ namespace FEAT
         }
         else
         {
-          oss << "\n" << "Colors:" << "\n";
+          oss << "\nColors:\n";
           for(std::size_t i(0); i+1u < this->_color_elements.size(); ++i)
             oss << stringify(i).pad_front(3) << ": "
               << stringify(this->_color_elements.at(i+1) - this->_color_elements.at(i)).pad_front(6)

@@ -60,12 +60,12 @@ namespace VoxelMapGenerator
     // loop over all filenames
     for(const String& filename : args.query("check")->second)
     {
-      std::cout << "Reading voxel map file '" << filename << "'..." << "\n";
+      std::cout << "Reading voxel map file '" << filename << "'...\n";
 
       std::ifstream ifs(filename, std::ios_base::in | std::ios_base::binary);
       if(!ifs.is_open() || !ifs.good())
       {
-        std::cout << "ERROR: Failed to open '" << filename << "'!" << "\n";
+        std::cout << "ERROR: Failed to open '" << filename << "'!\n";
         return 1;
       }
 
@@ -77,7 +77,7 @@ namespace VoxelMapGenerator
       // at the very least, we have to be able to read a header
       if(filesize < Geometry::VoxelMap::header_size)
       {
-        std::cout << "ERROR: File is too small to even contain the voxel map header!" << "\n";
+        std::cout << "ERROR: File is too small to even contain the voxel map header!\n";
         return 1;
       }
 
@@ -92,14 +92,14 @@ namespace VoxelMapGenerator
       // check magic number
       if(header.magic_number != Geometry::VoxelMap::magic_number)
       {
-        std::cout << "ERROR: File has incorrect magic number; this does not seem to be a valid voxel map file!" << "\n";
+        std::cout << "ERROR: File has incorrect magic number; this does not seem to be a valid voxel map file!\n";
         return 1;
       }
 
       // check header size
       if(header.header_size != Geometry::VoxelMap::header_size)
       {
-        std::cout << "ERROR: File has incorrect header size; maybe this file was created for a newer version?" << "\n";
+        std::cout << "ERROR: File has incorrect header size; maybe this file was created for a newer version?\n";
         std::cout << "Expected header size: " << Geometry::VoxelMap::header_size << " but found " << header.header_size << "\n";
         return 1;
       }
@@ -364,7 +364,7 @@ namespace VoxelMapGenerator
     Index render_xres(0u), render_yres(0u), render_zres(0u);
     if((iarg = args.parse("render", render_name, render_xres, render_yres, render_zres)) < 0)
     {
-      std::cerr << "ERROR: failed to parse --render parameter '" << args.get_arg(-iarg) << "' as resolution!" << "\n";
+      std::cerr << "ERROR: failed to parse --render parameter '" << args.get_arg(-iarg) << "' as resolution!\n";
       display_help(comm, args);
       return 1;
     }
@@ -418,12 +418,12 @@ namespace VoxelMapGenerator
         voxel_map.set_bounding_box_2d(bbox[0], bbox[1], bbox[2], bbox[3]);
       else if(iarg >= 0)
       {
-        std::cerr << "ERROR: invalid number of arguments for --box parameter: must be either 4 (2D) or 6 (3D)" << "\n";
+        std::cerr << "ERROR: invalid number of arguments for --box parameter: must be either 4 (2D) or 6 (3D)\n";
         return 1;
       }
       else
       {
-        std::cerr << "ERROR: failed to parse --box parameter '" << args.get_arg(-iarg) << "' as coordinate!" << "\n";
+        std::cerr << "ERROR: failed to parse --box parameter '" << args.get_arg(-iarg) << "' as coordinate!\n";
         return 1;
       }
 
@@ -437,7 +437,7 @@ namespace VoxelMapGenerator
         iarg = args.parse("num", num[0], num[1], num[2]);
         if(iarg < dimension)
         {
-          std::cerr << "ERROR: failed to parse --num parameter '" << args.get_arg(-iarg) << "' as count!" << "\n";
+          std::cerr << "ERROR: failed to parse --num parameter '" << args.get_arg(-iarg) << "' as count!\n";
           return 1;
         }
         voxel_map.set_num_slices(num[0], num[1], num[2]);
@@ -449,19 +449,19 @@ namespace VoxelMapGenerator
         iarg = args.parse("res", res);
         if(iarg < 1)
         {
-          std::cerr << "ERROR: failed to parse --res parameter '" << args.get_arg(-iarg) << "' as resolution!" << "\n";
+          std::cerr << "ERROR: failed to parse --res parameter '" << args.get_arg(-iarg) << "' as resolution!\n";
           return 1;
         }
         else if(res < 1e-6)
         {
-          std::cerr << "ERROR: invalid resolution '" << res << "'!" << "\n";
+          std::cerr << "ERROR: invalid resolution '" << res << "'!\n";
           return 1;
         }
         voxel_map.set_resolution(res);
       }
       else
       {
-        std::cerr << "ERROR: either '--num <num-x> <num-y> <num-z>' or '--res <delta>' mus be given!" << "\n";
+        std::cerr << "ERROR: either '--num <num-x> <num-y> <num-z>' or '--res <delta>' mus be given!\n";
         display_help(comm, args);
         return 1;
       }

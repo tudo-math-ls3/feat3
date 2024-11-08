@@ -69,7 +69,7 @@ namespace FEAT
     {
       if(_lines) std::cout << std::setw(5) << iline << ":";
       std::cout << std::string(_indent, ' ');
-      std::cout << "</" << _name << ">" << "\n";
+      std::cout << "</" << _name << ">\n";
     }
 
     std::shared_ptr<MarkupParser> DumpParser::markup(int, const String&, const String& name)

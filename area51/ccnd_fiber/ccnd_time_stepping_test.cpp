@@ -146,7 +146,7 @@ namespace CCND_FIBER
 //         comm.print("\nErrors for velocity:");
 //         comm.print(velo_errors.format_string());
       }
-//     std::cout << "?" << "\n";
+//     std::cout << "?\n";
 //     if(!Solver::status_success(status))
 //     {
 //       comm.print("\nERROR: OUTER SOLVER BREAKDOWN\n");
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
   }
   catch (...)
   {
-    std::cerr << "ERROR: unknown exception" << "\n";
+    std::cerr << "ERROR: unknown exception\n";
     FEAT::Runtime::abort();
   }
   return 0;

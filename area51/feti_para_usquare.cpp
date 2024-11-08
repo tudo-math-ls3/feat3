@@ -672,7 +672,7 @@ namespace FETI{
 
     void finalize(const bool verbose = false)
     {
-//       std::cout << "Finalizing Gate..." << "\n";
+//       std::cout << "Finalizing Gate...\n";
       // first of all we want to get the maximum number of neighbours over all domains
       // for this we will use iallreduce funtion from dist
       //init buffers, x snedbuf, r recvbuf

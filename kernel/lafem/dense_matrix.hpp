@@ -963,7 +963,7 @@ namespace FEAT
        */
       friend std::ostream & operator<< (std::ostream & lhs, const DenseMatrix & b)
       {
-        lhs << "[" << "\n";
+        lhs << "[\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           lhs << "[";
@@ -971,9 +971,9 @@ namespace FEAT
           {
             lhs << "  " << stringify(b(i, j));
           }
-          lhs << "]" << "\n";
+          lhs << "]\n";
         }
-        lhs << "]" << "\n";
+        lhs << "]\n";
 
         return lhs;
       }

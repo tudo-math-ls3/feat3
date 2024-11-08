@@ -38,7 +38,7 @@ namespace DbgMeshDistortion
 
   void main(Index level)
   {
-    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
+    std::cout << "Creating Mesh on Level " << level << "...\n";
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
 
     MeshType mesh_1(mesh_factory);
@@ -68,7 +68,7 @@ namespace DbgMeshDistortion
     mesh_distortion_3.distort_shortest_edge_local();
     exporter_3.write("./shortest_edge_local_dis");
 
-    std::cout << "Finished!\n" << "\n";
+    std::cout << "Finished!\n\n";
 
   } // void main(...)
 } // namespace DbgMeshDistortion
@@ -85,8 +85,8 @@ int main(int argc, char* argv[])
     if(!String(argv[argc-1]).parse(ilevel) || (ilevel < 1))
     {
       // Failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << "\n";
-      std::cerr << "Note: The last argument must be a positive integer." << "\n";
+      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level.\n";
+      std::cerr << "Note: The last argument must be a positive integer.\n";
       // Abort our runtime environment
       Runtime::abort();
     }

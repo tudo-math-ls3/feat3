@@ -125,7 +125,7 @@ namespace MatrixInfo
     {
       // print all unsupported options to cerr
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unknown option '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unknown option '--" << (*it).second << "'\n";
       return 1;
     }
 
@@ -134,7 +134,7 @@ namespace MatrixInfo
     int ia = args.parse("nztol", nz_tol);
     if(ia < 0)
     {
-      std::cerr << "ERROR: Failed to parse '" << args.get_arg(-ia) << "' as non-zero tolenance" << "\n";
+      std::cerr << "ERROR: Failed to parse '" << args.get_arg(-ia) << "' as non-zero tolenance\n";
       return 1;
     }
 
@@ -147,10 +147,10 @@ namespace MatrixInfo
     if(nsa <= 1)
     {
       // no skipped arguments
-      std::cout << "USAGE: matrix-info <filename> [<format>] [options...]" << "\n";
+      std::cout << "USAGE: matrix-info <filename> [<format>] [options...]\n";
       std::cout << "\n";
-      std::cout << "See the doxygen documentation for details about this tool's" << "\n";
-      std::cout << "options and its usage." << "\n";
+      std::cout << "See the doxygen documentation for details about this tool's\n";
+      std::cout << "options and its usage.\n";
       std::cout << "\n";
       return 0;
     }
@@ -171,7 +171,7 @@ namespace MatrixInfo
     // try to map format
     if(!string_mapped_lookup(matrix_mode, mat_fm_map, mat_frm))
     {
-      std::cerr << "ERROR: Failed to determine matrix file format for '" << matrix_name << "'" << "\n";
+      std::cerr << "ERROR: Failed to determine matrix file format for '" << matrix_name << "'\n";
       return 1;
     }
 
@@ -179,7 +179,7 @@ namespace MatrixInfo
     MatrixType matrix;
     if(!import_matrix(matrix, matrix_name, matrix_mode))
     {
-      std::cerr << "ERROR: Failed to import matrix '" << matrix_name << "'" << "\n";
+      std::cerr << "ERROR: Failed to import matrix '" << matrix_name << "'\n";
       return 1;
     }
 
@@ -496,12 +496,12 @@ namespace MatrixInfo
     std::cout << String("Non-Zero Tolerance").pad_back(pad_len, '.') << ": " << stringify_fp_sci(nz_tol) << "\n";
     std::cout << String("Number of Rows").pad_back(pad_len, '.') << ": " << nrows << "\n";
     std::cout << String("Number of Columns").pad_back(pad_len, '.') << ": " << ncols << "\n";
-    std::cout << String("Max Row Degree").pad_back(pad_len, '.') << ": " << row_degree << " (max in row " << row_degree_idx << ")" << "\n";
-    std::cout << String("Max Column Degree").pad_back(pad_len, '.') << ": " << col_degree << " (max in col " << col_degree_idx << ")" << "\n";
+    std::cout << String("Max Row Degree").pad_back(pad_len, '.') << ": " << row_degree << " (max in row " << row_degree_idx << ")\n";
+    std::cout << String("Max Column Degree").pad_back(pad_len, '.') << ": " << col_degree << " (max in col " << col_degree_idx << ")\n";
     std::cout << String("Row Degree Distribution").pad_back(pad_len, '.') << ": " << row_degree_distribution << "\n";
     std::cout << String("Average Row Degree").pad_back(pad_len, '.') << ": " << average_row_degree << "\n";
-    std::cout << String("Max Row Bandwidth").pad_back(pad_len, '.') << ": " << row_bandw << " (max in row " << row_bandw_idx << ")" << "\n";
-    std::cout << String("Max Column Bandwidth").pad_back(pad_len, '.') << ": " << col_bandw << " (max in col " << col_bandw_idx << ")" << "\n";
+    std::cout << String("Max Row Bandwidth").pad_back(pad_len, '.') << ": " << row_bandw << " (max in row " << row_bandw_idx << ")\n";
+    std::cout << String("Max Column Bandwidth").pad_back(pad_len, '.') << ": " << col_bandw << " (max in col " << col_bandw_idx << ")\n";
     std::cout << String("Symbolical Non-Zeros").pad_back(pad_len, '.') << ": " << nnze << "\n";
     std::cout << String("Numerical Non-Zeros").pad_back(pad_len, '.') << ": " << numerical_non_zero;
     if(nnze > 0)
@@ -510,12 +510,12 @@ namespace MatrixInfo
     std::cout << String("Has Main Diag Structure").pad_back(pad_len, '.') << ": " << (have_struct_diag ? "yes" : "no") << "\n";
     std::cout << String("Has Symmetric Structure").pad_back(pad_len, '.') << ": ";
     if(nrows != ncols)
-      std::cout << "no (matrix is not square)" << "\n";
+      std::cout << "no (matrix is not square)\n";
     else
       std::cout << (sym_symbolic ? "yes" : "no") << "\n";
     std::cout << String("Has Symmetric Data").pad_back(pad_len, '.') << ": ";
     if(nrows != ncols)
-      std::cout << "no (matrix is not square)" << "\n";
+      std::cout << "no (matrix is not square)\n";
     else
       std::cout << (sym_numeric ? "yes" : "no") << "\n";
 
@@ -528,23 +528,23 @@ namespace MatrixInfo
     // plot diagonal dominance factory
     std::cout << String("Row-Diag Dominance Factor").pad_back(pad_len, '.') << ": ";
     if(row_dom_idx >= nmin)
-      std::cout << "-NA-" << "\n";
+      std::cout << "-NA-\n";
     else
-      std::cout << stringify_fp_sci(row_dom) << " (in row " << row_dom_idx << ")" << "\n";
+      std::cout << stringify_fp_sci(row_dom) << " (in row " << row_dom_idx << ")\n";
     std::cout << String("Col-Diag Dominance Factor").pad_back(pad_len, '.') << ": ";
     if(col_dom_idx >= nmin)
-      std::cout << "-NA-" << "\n";
+      std::cout << "-NA-\n";
     else
-      std::cout << stringify_fp_sci(col_dom) << " (in col " << col_dom_idx << ")" << "\n";
+      std::cout << stringify_fp_sci(col_dom) << " (in col " << col_dom_idx << ")\n";
 
     // plot norms
     std::cout << String("Frobenius Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_frobenius) << "\n";
     std::cout << String("Col-Sum Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_col_sum)
-      << " (max in col " << norm_col_sum_idx << ")" << "\n";
+      << " (max in col " << norm_col_sum_idx << ")\n";
     std::cout << String("Row-Sum Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_row_sum)
-      << " (max in row " << norm_row_sum_idx << ")" << "\n";
+      << " (max in row " << norm_row_sum_idx << ")\n";
     std::cout << String("Maximum Norm").pad_back(pad_len, '.') << ": " << stringify_fp_sci(norm_max)
-      << " (max in row " << norm_max_row_idx << ", col " << norm_max_col_idx << ")" << "\n";
+      << " (max in row " << norm_max_row_idx << ", col " << norm_max_col_idx << ")\n";
 
     // okay
     return 0;

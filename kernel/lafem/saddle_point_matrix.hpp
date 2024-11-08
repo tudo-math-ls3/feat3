@@ -250,7 +250,7 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket saddlepointmatrix coordinate real general" << "\n";
+        file << "%%MatrixMarket saddlepointmatrix coordinate real general\n";
         file << filename << "_a" << suffix << "\n";
         file << filename << "_b" << suffix << "\n";
         file << filename << "_d" << suffix << "\n";

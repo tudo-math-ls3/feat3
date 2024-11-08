@@ -67,7 +67,7 @@ namespace FEAT
         {
           if (_pool.size() > 0)
           {
-            std::cout << stderr << " Error: MemoryPool still contains memory chunks on deconstructor call" << "\n";
+            std::cout << stderr << " Error: MemoryPool still contains memory chunks on deconstructor call\n";
             std::exit(1);
           }
 

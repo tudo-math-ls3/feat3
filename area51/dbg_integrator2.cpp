@@ -146,7 +146,7 @@ namespace Tutorial01
 
     std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << "\n";
 
-    //std::cout << dump_1 << "\n" << "\n";;
+    //std::cout << dump_1 << "\n\n";;
     //std::cout << dump_2 << "\n";
     std::cout << "Times:"
       << watch_1.elapsed_string().pad_front(10)

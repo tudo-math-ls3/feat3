@@ -16,10 +16,10 @@ int main (int /*argc*/, char** /*argv*/)
   cudaError_t error = cudaGetDeviceCount(&numDevices);
   if (error != cudaSuccess)
   {
-    std::cerr << "CUDA ERROR (cudaGetDeviceCount): " << cudaGetErrorString(error) << ". Exiting..." << "\n";
+    std::cerr << "CUDA ERROR (cudaGetDeviceCount): " << cudaGetErrorString(error) << ". Exiting...\n";
     return 1;
   }
-  std::cout << "Number of devices in this machine: " << numDevices << "\n" << "\n";
+  std::cout << "Number of devices in this machine: " << numDevices << "\n\n";
 
   //
   // manually treat the case that this is run on a system without a CUDA-capable
@@ -28,7 +28,7 @@ int main (int /*argc*/, char** /*argv*/)
   //
   if (numDevices == 0)
   {
-    std::cerr << "No CUDA-capable device found." << "\n";
+    std::cerr << "No CUDA-capable device found.\n";
     return 2;
   }
 
@@ -41,7 +41,7 @@ int main (int /*argc*/, char** /*argv*/)
     error = cudaSetDevice(idevice);
     if (error != cudaSuccess)
     {
-      std::cerr << "CUDA ERROR (cudaSetDevice): " << cudaGetErrorString(error) << ". Exiting..." << "\n";
+      std::cerr << "CUDA ERROR (cudaSetDevice): " << cudaGetErrorString(error) << ". Exiting...\n";
       return 3;
     }
     // get device properties
@@ -49,15 +49,15 @@ int main (int /*argc*/, char** /*argv*/)
     error = cudaGetDeviceProperties (&prop, idevice);
     if (error != cudaSuccess)
     {
-      std::cerr << "CUDA ERROR (cudaGetDeviceProperties): " << cudaGetErrorString(error) << ". Exiting..." << "\n";
+      std::cerr << "CUDA ERROR (cudaGetDeviceProperties): " << cudaGetErrorString(error) << ". Exiting...\n";
       return 4;
     }
     // print out device name and compute capabilities
     std::cout << "Device " << idevice << ": " << prop.name;
-    std::cout << " (cc " << prop.major << "." << prop.minor << ")" << "\n";
+    std::cout << " (cc " << prop.major << "." << prop.minor << ")\n";
     std::cout << "Managed Memory Support: " << ((prop.managedMemory == 1) ? "yes" : "no") << "\n";
     std::cout << "Important: configure all future builds with \" --cuda_arch=sm_";
-    std::cout << prop.major << prop.minor << "\" on this machine." << "\n";
+    std::cout << prop.major << prop.minor << "\" on this machine.\n";
 
     if (idevice + 1 < numDevices)
       std::cout<<"\n";

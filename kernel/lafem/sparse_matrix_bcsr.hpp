@@ -826,7 +826,7 @@ namespace FEAT
             break;
           case FileMode::fm_mtx:
           {
-            file << "%%MatrixMarket matrix coordinate real general" << "\n";
+            file << "%%MatrixMarket matrix coordinate real general\n";
             file << this->template rows<Perspective::pod>() << " " << this->template columns<Perspective::pod>() << " " << this->template used_elements<Perspective::pod>() << "\n";
 
             for (Index row(0) ; row < rows() ; ++row)
@@ -2711,7 +2711,7 @@ namespace FEAT
        */
       friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBCSR & b)
       {
-        lhs << "[" << "\n";
+        lhs << "[\n";
         for (Index i(0) ; i < b.rows() ; ++i)
         {
           for (int k(0) ; k < BlockHeight_ ; ++k)
@@ -2722,10 +2722,10 @@ namespace FEAT
               for (int l(0) ; l < BlockWidth_ ; ++l)
                 lhs << "  " << stringify(b(i, j).v[k][l]);
             }
-            lhs << "]" << "\n";
+            lhs << "]\n";
           }
         }
-        lhs << "]" << "\n";
+        lhs << "]\n";
 
         return lhs;
       }

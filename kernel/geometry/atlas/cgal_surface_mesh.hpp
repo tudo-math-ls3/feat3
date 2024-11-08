@@ -396,7 +396,7 @@ namespace FEAT
           // everything seems fine, let's create the chart then
           _chart.reset(new ChartType(filename, mode));
 #else
-          std::cout << "ERROR: Trying to parse a CGALMeshpart chart without CGAL enabled" << "\n";
+          std::cout << "ERROR: Trying to parse a CGALMeshpart chart without CGAL enabled\n";
           FEAT::Runtime::abort();
           //no unused warnings by casting to void:
           (void)iline;

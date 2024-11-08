@@ -159,7 +159,7 @@ class NLCGTest:
       if(solver->get_num_iter() > _max_iter)
       {
         ++failed_checks;
-        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << "\n";
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter\n";
       }
 
       // Check if we stayed in the functional evaluation number bound
@@ -167,14 +167,14 @@ class NLCGTest:
       {
         ++failed_checks;
         std::cout << "num_func_evals = "
-          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << "\n";
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals\n";
       }
 
       // Check if we found a valid minimum
       if(min_dist > _tol)
       {
         ++failed_checks;
-        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << "\n";
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol\n";
       }
 
       solver->done();
@@ -370,7 +370,7 @@ class NLSDTest:
       if(solver->get_num_iter() > _max_iter)
       {
         ++failed_checks;
-        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << "\n";
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter\n";
       }
 
       // Check if we stayed in the functional evaluation number bound
@@ -378,14 +378,14 @@ class NLSDTest:
       {
         ++failed_checks;
         std::cout << "num_func_evals = "
-          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << "\n";
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals\n";
       }
 
       // Check if we found a valid minimum
       if(min_dist > _tol)
       {
         ++failed_checks;
-        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << "\n";
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol\n";
       }
 
       solver->done();
@@ -507,7 +507,7 @@ class ALGLIBMinLBFGSTest:
       if(solver->get_num_iter() > _max_iter)
       {
         ++failed_checks;
-        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << "\n";
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter\n";
       }
 
       // Check if we stayed in the functional evaluation number bound
@@ -515,14 +515,14 @@ class ALGLIBMinLBFGSTest:
       {
         ++failed_checks;
         std::cout << "num_func_evals = "
-          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << "\n";
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals\n";
       }
 
       // Check if we found a valid minimum
       if(min_dist > _tol)
       {
         ++failed_checks;
-        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << "\n";
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol\n";
       }
 
       solver->done();
@@ -636,7 +636,7 @@ class ALGLIBMinCGTest:
       if(solver->get_num_iter() > _max_iter)
       {
         ++failed_checks;
-        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter" << "\n";
+        std::cout << "num_iter = "+stringify(solver->get_num_iter())+" > " +stringify(_max_iter)+" = max_iter\n";
       }
 
       // Check if we stayed in the functional evaluation number bound
@@ -644,14 +644,14 @@ class ALGLIBMinCGTest:
       {
         ++failed_checks;
         std::cout << "num_func_evals = "
-          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals" << "\n";
+          +stringify(my_functional.get_num_func_evals())+" > "+stringify(_max_func_evals)+" = max_func_evals\n";
       }
 
       // Check if we found a valid minimum
       if(min_dist > _tol)
       {
         ++failed_checks;
-        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol" << "\n";
+        std::cout << "min_dist = "+stringify_fp_sci(min_dist)+" > " +stringify_fp_sci(_tol)+" = tol\n";
       }
 
       solver->done();

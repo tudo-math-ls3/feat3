@@ -214,7 +214,7 @@ int main(int argc, char* argv [])
   }
   catch (...)
   {
-    std::cerr << "ERROR: unknown exception" << "\n";
+    std::cerr << "ERROR: unknown exception\n";
     FEAT::Runtime::abort();
   }
   return 0;

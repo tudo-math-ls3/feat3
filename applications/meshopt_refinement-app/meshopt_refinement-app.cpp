@@ -536,7 +536,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
   }
 
   if( args.check("test") >=0 )
@@ -679,27 +679,27 @@ static void read_test_application_config(std::stringstream& iss, const int test_
 {
   if(test_number == 1)
   {
-    iss << "[ApplicationSettings]" << "\n";
-    iss << "mesh_optimizer = HyperelasticityDefault" << "\n";
-    iss << "solver_config_file = ./solver_config.ini" << "\n";
+    iss << "[ApplicationSettings]\n";
+    iss << "mesh_optimizer = HyperelasticityDefault\n";
+    iss << "solver_config_file = ./solver_config.ini\n";
 
-    iss << "[DomainControlSettings]" << "\n";
-    iss << "refinement_adapt_mode = none" << "\n";
-    iss << "finest_adapt_mode = chart" << "\n";
-    iss << "lvl_min = 1" << "\n";
-    iss << "lvl_max = 3" << "\n";
+    iss << "[DomainControlSettings]\n";
+    iss << "refinement_adapt_mode = none\n";
+    iss << "finest_adapt_mode = chart\n";
+    iss << "lvl_min = 1\n";
+    iss << "lvl_max = 3\n";
   }
   else if(test_number == 2)
   {
-    iss << "[ApplicationSettings]" << "\n";
-    iss << "mesh_optimizer = HyperelasticityDefault" << "\n";
-    iss << "solver_config_file = ./solver_config.ini" << "\n";
+    iss << "[ApplicationSettings]\n";
+    iss << "mesh_optimizer = HyperelasticityDefault\n";
+    iss << "solver_config_file = ./solver_config.ini\n";
 
-    iss << "[DomainControlSettings]" << "\n";
-    iss << "refinement_adapt_mode = none" << "\n";
-    iss << "finest_adapt_mode = chart" << "\n";
-    iss << "lvl_min = 1" << "\n";
-    iss << "lvl_max = 3" << "\n";
+    iss << "[DomainControlSettings]\n";
+    iss << "refinement_adapt_mode = none\n";
+    iss << "finest_adapt_mode = chart\n";
+    iss << "lvl_min = 1\n";
+    iss << "lvl_max = 3\n";
   }
   else
   {
@@ -711,39 +711,39 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test_numb
 {
   if(test_number == 1)
   {
-    iss << "[HyperElasticityDefault]" << "\n";
-    iss << "type = Hyperelasticity" << "\n";
-    iss << "config_section = HyperelasticityDefaultParameters" << "\n";
-    iss << "dirichlet_boundaries = bnd:o" << "\n";
+    iss << "[HyperElasticityDefault]\n";
+    iss << "type = Hyperelasticity\n";
+    iss << "config_section = HyperelasticityDefaultParameters\n";
+    iss << "dirichlet_boundaries = bnd:o\n";
 
-    iss << "[HyperelasticityDefaultParameters]" << "\n";
-    iss << "global_functional = HyperelasticityFunctional" << "\n";
-    iss << "cell_functional = RumpfFunctional" << "\n";
-    iss << "solver_config = NLCG" << "\n";
-    iss << "fac_norm = 1.0" << "\n";
-    iss << "fac_det = 1.0" << "\n";
-    iss << "fac_cof = 0.0" << "\n";
-    iss << "fac_reg = 4e-8" << "\n";
-    iss << "exponent_det = 1" << "\n";
-    iss << "scale_computation = once_uniform" << "\n";
+    iss << "[HyperelasticityDefaultParameters]\n";
+    iss << "global_functional = HyperelasticityFunctional\n";
+    iss << "cell_functional = RumpfFunctional\n";
+    iss << "solver_config = NLCG\n";
+    iss << "fac_norm = 1.0\n";
+    iss << "fac_det = 1.0\n";
+    iss << "fac_cof = 0.0\n";
+    iss << "fac_reg = 4e-8\n";
+    iss << "exponent_det = 1\n";
+    iss << "scale_computation = once_uniform\n";
   }
   else if(test_number == 2)
   {
-    iss << "[HyperElasticityDefault]" << "\n";
-    iss << "type = Hyperelasticity" << "\n";
-    iss << "config_section = HyperelasticityDefaultParameters" << "\n";
-    iss << "slip_boundaries = bnd:o" << "\n";
+    iss << "[HyperElasticityDefault]\n";
+    iss << "type = Hyperelasticity\n";
+    iss << "config_section = HyperelasticityDefaultParameters\n";
+    iss << "slip_boundaries = bnd:o\n";
 
-    iss << "[HyperelasticityDefaultParameters]" << "\n";
-    iss << "global_functional = HyperelasticityFunctional" << "\n";
-    iss << "cell_functional = RumpfFunctional" << "\n";
-    iss << "solver_config = NLCG" << "\n";
-    iss << "fac_norm = 1.0" << "\n";
-    iss << "fac_det = 1.0" << "\n";
-    iss << "fac_cof = 0.0" << "\n";
-    iss << "fac_reg = 2e-8" << "\n";
-    iss << "exponent_det = 2" << "\n";
-    iss << "scale_computation = current_uniform" << "\n";
+    iss << "[HyperelasticityDefaultParameters]\n";
+    iss << "global_functional = HyperelasticityFunctional\n";
+    iss << "cell_functional = RumpfFunctional\n";
+    iss << "solver_config = NLCG\n";
+    iss << "fac_norm = 1.0\n";
+    iss << "fac_det = 1.0\n";
+    iss << "fac_cof = 0.0\n";
+    iss << "fac_reg = 2e-8\n";
+    iss << "exponent_det = 2\n";
+    iss << "scale_computation = current_uniform\n";
   }
   else
   {
@@ -755,179 +755,179 @@ static void read_test_solver_config(std::stringstream& iss, const int test_numbe
 {
   if(test_number == 1)
   {
-    iss << "[NLCG]" << "\n";
-    iss << "type = NLCG" << "\n";
-    iss << "precon = DuDvPrecon" << "\n";
-    iss << "plot_mode = all" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
-    iss << "max_iter = 1000" << "\n";
-    iss << "linesearch = MQCLinesearch" << "\n";
-    iss << "direction_update = DYHSHybrid" << "\n";
-    iss << "keep_iterates = 0" << "\n";
+    iss << "[NLCG]\n";
+    iss << "type = NLCG\n";
+    iss << "precon = DuDvPrecon\n";
+    iss << "plot_mode = all\n";
+    iss << "tol_rel = 1e-8\n";
+    iss << "max_iter = 1000\n";
+    iss << "linesearch = MQCLinesearch\n";
+    iss << "direction_update = DYHSHybrid\n";
+    iss << "keep_iterates = 0\n";
 
-    iss << "[MQCLinesearch]" << "\n";
-    iss << "type = MQCLinesearch" << "\n";
-    iss << "plot_mode = none" << "\n";
-    iss << "max_iter = 20" << "\n";
-    iss << "tol_decrease = 1e-3" << "\n";
-    iss << "tol_curvature = 0.3" << "\n";
-    iss << "keep_iterates = 0" << "\n";
+    iss << "[MQCLinesearch]\n";
+    iss << "type = MQCLinesearch\n";
+    iss << "plot_mode = none\n";
+    iss << "max_iter = 20\n";
+    iss << "tol_decrease = 1e-3\n";
+    iss << "tol_curvature = 0.3\n";
+    iss << "keep_iterates = 0\n";
 
-    iss << "[DuDvPrecon]" << "\n";
-    iss << "type = DuDvPrecon" << "\n";
-    iss << "dirichlet_boundaries = bnd:o" << "\n";
-    iss << "fixed_reference_domain = 1" << "\n";
-    iss << "linear_solver = DuDvLinearSolver" << "\n";
+    iss << "[DuDvPrecon]\n";
+    iss << "type = DuDvPrecon\n";
+    iss << "dirichlet_boundaries = bnd:o\n";
+    iss << "fixed_reference_domain = 1\n";
+    iss << "linear_solver = DuDvLinearSolver\n";
 
-    iss << "[DuDvLinearSolver]" << "\n";
-    iss << "max_iter = 3" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
-    iss << "plot_mode = summary" << "\n";
+    iss << "[DuDvLinearSolver]\n";
+    iss << "max_iter = 3\n";
+    iss << "tol_rel = 1e-8\n";
+    iss << "plot_mode = summary\n";
 
-    iss << "[DuDvMGSmoother]" << "\n";
-    iss << "steps = 4" << "\n";
-    iss << "omega = 0.5" << "\n";
+    iss << "[DuDvMGSmoother]\n";
+    iss << "steps = 4\n";
+    iss << "omega = 0.5\n";
 
-    iss << "[DuDvMGCoarseSolver]" << "\n";
-    iss << "max_iter = 10" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
+    iss << "[DuDvMGCoarseSolver]\n";
+    iss << "max_iter = 10\n";
+    iss << "tol_rel = 1e-8\n";
 
     // the rest of this code was used by the old SolverFactory; it is not used anymore
     /*
-    iss << "[PCG-JAC]" << "\n";
-    iss << "type = pcg" << "\n";
-    iss << "max_iter = 10" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
-    iss << "precon = jac" << "\n";
+    iss << "[PCG-JAC]\n";
+    iss << "type = pcg\n";
+    iss << "max_iter = 10\n";
+    iss << "tol_rel = 1e-8\n";
+    iss << "precon = jac\n";
 
-    iss << "[PCG-MG]" << "\n";
-    iss << "type = pcg" << "\n";
-    iss << "max_iter = 2" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
-    iss << "plot_mode = summary" << "\n";
-    iss << "precon = MG1" << "\n";
+    iss << "[PCG-MG]\n";
+    iss << "type = pcg\n";
+    iss << "max_iter = 2\n";
+    iss << "tol_rel = 1e-8\n";
+    iss << "plot_mode = summary\n";
+    iss << "precon = MG1\n";
 
-    iss << "[cg]" << "\n";
-    iss << "type = pcg" << "\n";
-    iss << "max_iter = 4" << "\n";
-    iss << "min_iter = 4" << "\n";
+    iss << "[cg]\n";
+    iss << "type = pcg\n";
+    iss << "max_iter = 4\n";
+    iss << "min_iter = 4\n";
 
-    iss << "[rich]" << "\n";
-    iss << "type = richardson" << "\n";
-    iss << "max_iter = 4" << "\n";
-    iss << "min_iter = 4" << "\n";
-    iss << "precon = jac" << "\n";
+    iss << "[rich]\n";
+    iss << "type = richardson\n";
+    iss << "max_iter = 4\n";
+    iss << "min_iter = 4\n";
+    iss << "precon = jac\n";
 
-    iss << "[jac]" << "\n";
-    iss << "type = jacobi" << "\n";
-    iss << "omega = 0.5" << "\n";
+    iss << "[jac]\n";
+    iss << "type = jacobi\n";
+    iss << "omega = 0.5\n";
 
-    iss << "[MG1]" << "\n";
-    iss << "type = mg" << "\n";
-    iss << "hierarchy = s:rich-c:pcg" << "\n";
-    iss << "lvl_min = -1" << "\n";
-    iss << "lvl_max = 0" << "\n";
-    iss << "cycle = w" << "\n";
+    iss << "[MG1]\n";
+    iss << "type = mg\n";
+    iss << "hierarchy = s:rich-c:pcg\n";
+    iss << "lvl_min = -1\n";
+    iss << "lvl_max = 0\n";
+    iss << "cycle = w\n";
 
-    iss << "[s:rich-c:pcg]" << "\n";
-    iss << "type = hierarchy" << "\n";
-    iss << "smoother = rich" << "\n";
-    iss << "coarse = PCG-JAC" << "\n";
+    iss << "[s:rich-c:pcg]\n";
+    iss << "type = hierarchy\n";
+    iss << "smoother = rich\n";
+    iss << "coarse = PCG-JAC\n";
     */
   }
   else if(test_number == 2)
   {
-    iss << "[NLCG]" << "\n";
-    iss << "type = NLCG" << "\n";
-    iss << "precon = DuDvPrecon" << "\n";
-    iss << "plot_mode = all" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
-    iss << "max_iter = 100" << "\n";
-    iss << "linesearch = MQCLinesearch" << "\n";
-    iss << "direction_update = DYHSHybrid" << "\n";
-    iss << "keep_iterates = 0" << "\n";
+    iss << "[NLCG]\n";
+    iss << "type = NLCG\n";
+    iss << "precon = DuDvPrecon\n";
+    iss << "plot_mode = all\n";
+    iss << "tol_rel = 1e-8\n";
+    iss << "max_iter = 100\n";
+    iss << "linesearch = MQCLinesearch\n";
+    iss << "direction_update = DYHSHybrid\n";
+    iss << "keep_iterates = 0\n";
 
-    iss << "[MQCLinesearch]" << "\n";
-    iss << "type = MQCLinesearch" << "\n";
-    iss << "plot_mode = none" << "\n";
-    iss << "max_iter = 20" << "\n";
-    iss << "tol_decrease = 1e-3" << "\n";
-    iss << "tol_curvature = 0.3" << "\n";
-    iss << "keep_iterates = 0" << "\n";
+    iss << "[MQCLinesearch]\n";
+    iss << "type = MQCLinesearch\n";
+    iss << "plot_mode = none\n";
+    iss << "max_iter = 20\n";
+    iss << "tol_decrease = 1e-3\n";
+    iss << "tol_curvature = 0.3\n";
+    iss << "keep_iterates = 0\n";
 
-    iss << "[DuDvPrecon]" << "\n";
-    iss << "type = DuDvPrecon" << "\n";
-    iss << "dirichlet_boundaries = bnd:o" << "\n";
-    iss << "fixed_reference_domain = 1" << "\n";
-    iss << "linear_solver = DuDvLinearSolver" << "\n";
+    iss << "[DuDvPrecon]\n";
+    iss << "type = DuDvPrecon\n";
+    iss << "dirichlet_boundaries = bnd:o\n";
+    iss << "fixed_reference_domain = 1\n";
+    iss << "linear_solver = DuDvLinearSolver\n";
 
-    iss << "[DuDvLinearSolver]" << "\n";
-    iss << "max_iter = 10" << "\n";
-    iss << "tol_rel = 1e-3" << "\n";
-    iss << "plot_mode = summary" << "\n";
+    iss << "[DuDvLinearSolver]\n";
+    iss << "max_iter = 10\n";
+    iss << "tol_rel = 1e-3\n";
+    iss << "plot_mode = summary\n";
 
-    iss << "[DuDvMGSmoother]" << "\n";
-    iss << "steps = 4" << "\n";
-    iss << "omega = 0.5" << "\n";
+    iss << "[DuDvMGSmoother]\n";
+    iss << "steps = 4\n";
+    iss << "omega = 0.5\n";
 
-    iss << "[DuDvMGCoarseSolver]" << "\n";
-    iss << "max_iter = 100" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
+    iss << "[DuDvMGCoarseSolver]\n";
+    iss << "max_iter = 100\n";
+    iss << "tol_rel = 1e-8\n";
 
     // the rest of this code was used by the old SolverFactory; it is not used anymore
     /*
-    iss << "[PCG-JAC]" << "\n";
-    iss << "type = pcg" << "\n";
-    iss << "max_iter = 100" << "\n";
-    iss << "tol_rel = 1e-8" << "\n";
-    iss << "precon = jac" << "\n";
+    iss << "[PCG-JAC]\n";
+    iss << "type = pcg\n";
+    iss << "max_iter = 100\n";
+    iss << "tol_rel = 1e-8\n";
+    iss << "precon = jac\n";
 
-    iss << "[PCG-MG]" << "\n";
-    iss << "type = pcg" << "\n";
-    iss << "max_iter = 10" << "\n";
-    iss << "tol_rel = 1e-3" << "\n";
-    iss << "plot_mode = summary" << "\n";
-    iss << "precon = MG1" << "\n";
+    iss << "[PCG-MG]\n";
+    iss << "type = pcg\n";
+    iss << "max_iter = 10\n";
+    iss << "tol_rel = 1e-3\n";
+    iss << "plot_mode = summary\n";
+    iss << "precon = MG1\n";
 
-    iss << "[MQCLinesearch]" << "\n";
-    iss << "type = MQCLinesearch" << "\n";
-    iss << "plot_mode = none" << "\n";
-    iss << "max_iter = 20" << "\n";
-    iss << "tol_decrease = 1e-3" << "\n";
-    iss << "tol_curvature = 0.3" << "\n";
-    iss << "keep_iterates = 0" << "\n";
+    iss << "[MQCLinesearch]\n";
+    iss << "type = MQCLinesearch\n";
+    iss << "plot_mode = none\n";
+    iss << "max_iter = 20\n";
+    iss << "tol_decrease = 1e-3\n";
+    iss << "tol_curvature = 0.3\n";
+    iss << "keep_iterates = 0\n";
 
-    iss << "[rich]" << "\n";
-    iss << "type = richardson" << "\n";
-    iss << "max_iter = 4" << "\n";
-    iss << "min_iter = 4" << "\n";
-    iss << "precon = jac" << "\n";
+    iss << "[rich]\n";
+    iss << "type = richardson\n";
+    iss << "max_iter = 4\n";
+    iss << "min_iter = 4\n";
+    iss << "precon = jac\n";
 
-    iss << "[cg]" << "\n";
-    iss << "type = pcg" << "\n";
-    iss << "max_iter = 4" << "\n";
-    iss << "min_iter = 4" << "\n";
+    iss << "[cg]\n";
+    iss << "type = pcg\n";
+    iss << "max_iter = 4\n";
+    iss << "min_iter = 4\n";
 
-    iss << "[jac]" << "\n";
-    iss << "type = jacobi" << "\n";
-    iss << "omega = 0.7" << "\n";
+    iss << "[jac]\n";
+    iss << "type = jacobi\n";
+    iss << "omega = 0.7\n";
 
-    iss << "[MG1]" << "\n";
-    iss << "type = mg" << "\n";
-    iss << "hierarchy = s:cg-c:pcg" << "\n";
-    iss << "lvl_min = -1" << "\n";
-    iss << "lvl_max = 0" << "\n";
-    iss << "cycle = v" << "\n";
+    iss << "[MG1]\n";
+    iss << "type = mg\n";
+    iss << "hierarchy = s:cg-c:pcg\n";
+    iss << "lvl_min = -1\n";
+    iss << "lvl_max = 0\n";
+    iss << "cycle = v\n";
 
-    iss << "[s:cg-c:pcg]" << "\n";
-    iss << "type = hierarchy" << "\n";
-    iss << "smoother = cg" << "\n";
-    iss << "coarse = PCG-JAC" << "\n";
+    iss << "[s:cg-c:pcg]\n";
+    iss << "type = hierarchy\n";
+    iss << "smoother = cg\n";
+    iss << "coarse = PCG-JAC\n";
 
-    iss << "[s:rich-c:pcg]" << "\n";
-    iss << "type = hierarchy" << "\n";
-    iss << "smoother = rich" << "\n";
-    iss << "coarse = PCG-JAC" << "\n";
+    iss << "[s:rich-c:pcg]\n";
+    iss << "type = hierarchy\n";
+    iss << "smoother = rich\n";
+    iss << "coarse = PCG-JAC\n";
     */
   }
   else
@@ -957,15 +957,15 @@ static void display_help(const Dist::Comm& comm)
   if(comm.rank() == 0)
   {
     std::cout << "meshopt_refinement-app: This refines a mesh without boundary adaption, then just adapts the" <<
-      " finest mesh and uses a mesh optimizer on this" << "\n";
-    std::cout << "Mandatory arguments:" << "\n";
-    std::cout << " --application_config: Path to the application configuration file" << "\n";
-    std::cout << " --mesh-path: Path to the mesh directory" << "\n";
-    std::cout << "Optional arguments:" << "\n";
-    std::cout << " --test: Run as a test. Ignores configuration files and uses hard coded settings." << "\n";
+      " finest mesh and uses a mesh optimizer on this\n";
+    std::cout << "Mandatory arguments:\n";
+    std::cout << " --application_config: Path to the application configuration file\n";
+    std::cout << " --mesh-path: Path to the mesh directory\n";
+    std::cout << "Optional arguments:\n";
+    std::cout << " --test: Run as a test. Ignores configuration files and uses hard coded settings.\n";
     std::cout << " --test [1 or 2]: Run as a test. Ignores configuration files and uses hard coded settings. " <<
-      "Test 1 is quadrilateral cells, test 2 is triangular cells" << "\n";
-    std::cout << " --vtk: If this is set, vtk files are written" << "\n";
-    std::cout << " --help: Displays this text" << "\n";
+      "Test 1 is quadrilateral cells, test 2 is triangular cells\n";
+    std::cout << " --vtk: If this is set, vtk files are written\n";
+    std::cout << " --help: Displays this text\n";
   }
 }

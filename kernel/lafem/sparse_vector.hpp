@@ -727,7 +727,7 @@ namespace FEAT
           case FileMode::fm_mtx:
           {
 
-            file << "%%MatrixMarket matrix coordinate real general" << "\n";
+            file << "%%MatrixMarket matrix coordinate real general\n";
             file << this->size() << " " << 1 << " " << this->used_elements() << "\n";
 
             const Index u_elem(this->used_elements());

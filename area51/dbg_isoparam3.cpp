@@ -388,7 +388,7 @@ namespace DbgIsoParam
     std::cout << String(80, '#') << "\n";
     std::cout << String(80, '#') << "\n";
 
-    std::cout << "H0 Errors" << "\n" << "     ";
+    std::cout << "H0 Errors\n     ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
     std::cout << "   ";
@@ -414,7 +414,7 @@ namespace DbgIsoParam
     std::cout << "\n";
 
 
-    std::cout << "H1 Errors" << "\n" << "     ";
+    std::cout << "H1 Errors\n     ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
     std::cout << "   ";
@@ -439,7 +439,7 @@ namespace DbgIsoParam
     }
     std::cout << "\n";
 
-    std::cout << "H2 Errors" << "\n" << "     ";
+    std::cout << "H2 Errors\n     ";
     for(int k(0); k < 12; ++k)
       std::cout << "T" << (k/3) << ":Q" << (1+k%3) << "       ";
     std::cout << "   ";

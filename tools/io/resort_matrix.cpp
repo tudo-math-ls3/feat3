@@ -18,7 +18,7 @@ int main(int argc, char ** argv)
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   if (argc != 3 && argc != 2)
   {
-    std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'"<<"\n";
+    std::cout<<"Usage: 'resort-csr csr-file [csr-file-resorted]'\n";
     FEAT::Runtime::abort();
   }
 

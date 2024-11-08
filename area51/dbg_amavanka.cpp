@@ -294,7 +294,7 @@ namespace DbgAmaVanka
     {
       std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       Runtime::abort();
     }
 
@@ -390,7 +390,7 @@ namespace DbgAmaVanka
     {
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       Geometry::ExportVTK<MeshType> exporter(mesh);
       exporter.add_vertex_scalar("sol", vec_sol.elements());
@@ -497,7 +497,7 @@ namespace DbgAmaVanka
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Symbolic Matrix Assembly" << "\n";
+    std::cout << "Symbolic Matrix Assembly\n";
 
     // As usual, we create first an empty matrix.
     SystemMatrixType matrix;
@@ -543,7 +543,7 @@ namespace DbgAmaVanka
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
-    std::cout << "Numeric Matrix Assembly" << "\n";
+    std::cout << "Numeric Matrix Assembly\n";
 
     Cubature::DynamicFactory cubature("auto-degree:7");
 
@@ -572,7 +572,7 @@ namespace DbgAmaVanka
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Filter Assembly" << "\n";
+    std::cout << "Filter Assembly\n";
 
     SystemFilterType filter;
 
@@ -612,7 +612,7 @@ namespace DbgAmaVanka
     new_solver->done();
 
 #ifdef FEAT_HAVE_CUDA
-    std::cout << "\n" << "Running this stuff on CUDA..." << "\n";
+    std::cout << "\nRunning this stuff on CUDA...\n";
     Backend::set_preferred_backend(PreferredBackend::cuda);
 
     auto cuda_vanka = Solver::new_amavanka(matrix, filter);
@@ -632,12 +632,12 @@ namespace DbgAmaVanka
     Backend::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
-    std::cout << "\n" << "New Vanka Summary:" << "\n";
+    std::cout << "\nNew Vanka Summary:\n";
     std::cout << new_solver->get_summary() << "\n";
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(new_vanka->time_apply(),3) << "\n";
 
 #ifdef FEAT_HAVE_CUDA
-    std::cout << "\n" << "CUDA Vanka Summary:" << "\n";
+    std::cout << "\nCUDA Vanka Summary:\n";
     std::cout << cuda_solver->get_summary() << "\n";
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << "\n";
     Backend::set_preferred_backend(PreferredBackend::generic);
@@ -646,7 +646,7 @@ namespace DbgAmaVanka
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Analyse velocity field
 
-    std::cout << "\n" << "Velocity Field Analysis" << "\n";
+    std::cout << "\nVelocity Field Analysis\n";
 
     Assembly::VelocityInfo<DataType, dim> velo_info = Assembly::VelocityAnalyser::compute(vec_sol_v, space_velo, cubature);
 
@@ -661,7 +661,7 @@ namespace DbgAmaVanka
     {
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -681,7 +681,7 @@ namespace DbgAmaVanka
     }
 
     // That's all, folks.
-    std::cout << "Finished!" << "\n";
+    std::cout << "Finished!\n";
   } // int main(...)
 
   /* *************************************************************************************************************** */
@@ -763,7 +763,7 @@ namespace DbgAmaVanka
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Symbolic Matrix Assembly" << "\n";
+    std::cout << "Symbolic Matrix Assembly\n";
 
     // As usual, we create first an empty matrix.
     SystemMatrixType matrix;
@@ -792,7 +792,7 @@ namespace DbgAmaVanka
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
-    std::cout << "Numeric Matrix Assembly" << "\n";
+    std::cout << "Numeric Matrix Assembly\n";
 
     Cubature::DynamicFactory cubature("auto-degree:7");
 
@@ -807,7 +807,7 @@ namespace DbgAmaVanka
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Filter Assembly" << "\n";
+    std::cout << "Filter Assembly\n";
 
     SystemFilterType filter;
 
@@ -861,7 +861,7 @@ namespace DbgAmaVanka
     old_solver->done();
 
 #ifdef FEAT_HAVE_CUDA
-    std::cout << "\n" << "Running this stuff on CUDA..." << "\n";
+    std::cout << "\nRunning this stuff on CUDA...\n";
     Backend::set_preferred_backend(PreferredBackend::cuda);
 
     auto cuda_vanka = Solver::new_amavanka(matrix, filter);
@@ -880,16 +880,16 @@ namespace DbgAmaVanka
     Backend::set_preferred_backend(PreferredBackend::generic);
 #endif // FEAT_HAVE_CUDA
 
-    std::cout << "\n" << "New Vanka Summary:" << "\n";
+    std::cout << "\nNew Vanka Summary:\n";
     std::cout << new_solver->get_summary() << "\n";
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(new_vanka->time_apply(),3) << "\n";
 
-    std::cout << "\n" << "Old Vanka Summary:" << "\n";
+    std::cout << "\nOld Vanka Summary:\n";
     std::cout << old_solver->get_summary() << "\n";
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(old_vanka->time_apply(),3) << "\n";
 
 #ifdef FEAT_HAVE_CUDA
-    std::cout << "\n" << "CUDA Vanka Summary:" << "\n";
+    std::cout << "\nCUDA Vanka Summary:\n";
     std::cout << cuda_solver->get_summary() << "\n";
     std::cout << "Vanka Apply Time: " << stringify_fp_fix(cuda_vanka->time_apply(),3) << "\n";
 #endif // FEAT_HAVE_CUDA
@@ -900,7 +900,7 @@ namespace DbgAmaVanka
 
     vec_sol.copy(vec_sol_1);
 
-    std::cout << "\n" << "Velocity Field Analysis" << "\n";
+    std::cout << "\nVelocity Field Analysis\n";
 
     Assembly::VelocityInfo<DataType, dim> velo_info = Assembly::VelocityAnalyser::compute(vec_sol_v, space_velo, cubature);
 
@@ -915,7 +915,7 @@ namespace DbgAmaVanka
     {
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -933,7 +933,7 @@ namespace DbgAmaVanka
     }
 
     // That's all, folks.
-    std::cout << "Finished!" << "\n";
+    std::cout << "Finished!\n";
   } // int main(...)
 } // namespace DbgAmaVanka
 

@@ -264,7 +264,7 @@ namespace DbgIsoParam
       merrs.at(lvl)[3] = calc_mean_dist(trafo_3, mpart, 5);
     }
 
-    std::cout << "Volume Errors" << "\n";
+    std::cout << "Volume Errors\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -281,7 +281,7 @@ namespace DbgIsoParam
     }
     std::cout << "\n";
 
-    std::cout << "Circumference Errors" << "\n";
+    std::cout << "Circumference Errors\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";
@@ -298,7 +298,7 @@ namespace DbgIsoParam
     }
     std::cout << "\n";
 
-    std::cout << "Mean Distance" << "\n";
+    std::cout << "Mean Distance\n";
     for(Index lvl(0); lvl <= lvl_max; ++lvl)
     {
       std::cout << stringify(lvl).pad_front(2) << ":";

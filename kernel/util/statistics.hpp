@@ -563,14 +563,14 @@ namespace FEAT
 
         file << "\n";
 
-        file << "#global time" << "\n";
+        file << "#global time\n";
         file << "partition " << stringify(toe_partition) << "\n";
         file << "assembly " << stringify(toe_assembly) << "\n";
         file << "solve " << stringify(toe_solve) << "\n";
 
         file << "\n";
 
-        file << "#solver time" << "\n";
+        file << "#solver time\n";
         file << "reduction " << stringify(get_time_reduction()) << "\n";
         file << "axpy " << stringify(get_time_axpy()) << "\n";
         file << "blas2 " << stringify(get_time_blas2()) << "\n";
@@ -581,65 +581,65 @@ namespace FEAT
 
         file << "\n";
 
-        file << "#global size" << "\n";
+        file << "#global size\n";
         file << "domain " << stringify(domain_bytes) << "\n";
         file << "mpi " << stringify(mpi_bytes) << "\n";
         file << "la " << stringify(la_bytes) << "\n";
 
         file << "\n";
 
-        file <<"#problem size" << "\n";
+        file <<"#problem size\n";
         file << "cells " << stringify(cells) << "\n";
         file << "dofs " << stringify(dofs) << "\n";
         file << "nzes " << stringify(nzes) << "\n";
 
         file << "\n";
 
-        file << "#solver statistics" << "\n";
+        file << "#solver statistics\n";
         for (auto stat : _solver_statistics)
         {
           file << stat.first << "\n";
 
-          file << "#defects" << "\n";
+          file << "#defects\n";
           for (Index i(0) ; i < stat.second.defect.size() ; ++i)
           {
             if (i == 0 && stat.second.defect.at(i) == double(-1))
               continue;
             if (stat.second.defect.at(i) == double(-1))
-              file << "-" << "\n";
+              file << "-\n";
             else
               file << stringify_fp_sci(stat.second.defect.at(i)) << "\n";
           }
 
-          file << "#toe" << "\n";
+          file << "#toe\n";
           for (Index i(0) ; i < stat.second.toe.size() ; ++i)
           {
             if (i == 0 && stat.second.toe.at(i) == double(-1))
               continue;
             if (stat.second.toe.at(i) == double(-1))
-              file << "-" << "\n";
+              file << "-\n";
             else
               file << stringify_fp_sci(stat.second.toe.at(i)) << "\n";
           }
 
-          file << "#mpi_execute" << "\n";
+          file << "#mpi_execute\n";
           for (Index i(0) ; i < stat.second.mpi_execute.size() ; ++i)
           {
             if (i == 0 && stat.second.mpi_execute.at(i) == double(-1))
               continue;
             if (stat.second.mpi_execute.at(i) == double(-1))
-              file << "-" << "\n";
+              file << "-\n";
             else
               file << stringify_fp_sci(stat.second.mpi_execute.at(i)) << "\n";
           }
 
-          file << "#mpi_wait" << "\n";
+          file << "#mpi_wait\n";
           for (Index i(0) ; i < stat.second.mpi_wait.size() ; ++i)
           {
             if (i == 0 && stat.second.mpi_wait.at(i) == double(-1))
               continue;
             if (stat.second.mpi_wait.at(i) == double(-1))
-              file << "-" << "\n";
+              file << "-\n";
             else
               file << stringify_fp_sci(stat.second.mpi_wait.at(i)) << "\n";
           }

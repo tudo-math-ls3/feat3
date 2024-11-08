@@ -170,22 +170,22 @@ namespace FEAT
             //add_grad_det_1_part(grad_det, x, h);
             //add_grad_rec_det_1_part(grad_rec_det, x, h);
 
-            //std::cout << "grad_frobenius"<< "\n" << grad_frobenius << "\n";
-            //std::cout << "grad_cof"<< "\n" << grad_cof << "\n";
-            //std::cout << "grad_cof1"<< "\n" << grad_cof1<< "\n";
-            //std::cout << "grad_cof2"<< "\n" << grad_cof-grad_cof1<< "\n";
-            //std::cout << "grad_det"<< "\n" << grad_det << "\n";
-            //std::cout << "grad_rec_det"<< "\n" << grad_rec_det << "\n";
+            //std::cout << "grad_frobenius\n" << grad_frobenius << "\n";
+            //std::cout << "grad_cof\n" << grad_cof << "\n";
+            //std::cout << "grad_cof1\n" << grad_cof1<< "\n";
+            //std::cout << "grad_cof2\n" << grad_cof-grad_cof1<< "\n";
+            //std::cout << "grad_det\n" << grad_det << "\n";
+            //std::cout << "grad_rec_det\n" << grad_rec_det << "\n";
             //
-            //std::cout << "x = " << "\n" << x << "\n";
-            //std::cout << "h = " << "\n" << h << "\n";
+            //std::cout << "x = \n" << x << "\n";
+            //std::cout << "h = \n" << h << "\n";
             //std::cout << "fval = " << stringify_fp_sci(fval) << ", "
             //<< stringify_fp_sci(fval_frobenius)<< ", "
             //<< stringify_fp_sci(fval_cof)<< ", "
             //<< stringify_fp_sci(fval_det) << ", "
             //<< stringify_fp_sci(fval_rec_det) << "\n";
 
-            //std::cout << "local grad " << "\n" << grad << "\n";
+            //std::cout << "local grad \n" << grad << "\n";
           }
 
           void eval_fval_cellwise(DataType& fval, const TgradR& DOXY(mat_tensor), const TrafoEvaluator& DOXY(trafo_eval), const SpaceEvaluator& DOXY(space_eval), const Tx& x, const DataType& h, DataType& fval_frobenius, DataType& fval_cof, DataType& fval_det)

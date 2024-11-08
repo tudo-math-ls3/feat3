@@ -115,19 +115,19 @@ namespace DbgTrace3
 
     //Index level = 0;
 
-    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
+    std::cout << "Creating Mesh on Level " << level << "...\n";
     MeshFactoryType mesh_factory(level);
     MeshType mesh(mesh_factory);
 
-    std::cout << "Creating Boundary..." << "\n";
+    std::cout << "Creating Boundary...\n";
     BoundaryFactoryType boundary_factory(mesh);
     BoundaryType boundary(boundary_factory);
 
-    std::cout << "Creating Trafo..." << "\n";
+    std::cout << "Creating Trafo...\n";
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     TrafoType trafo(mesh);
 
-    std::cout << "Creating Space..." << "\n";
+    std::cout << "Creating Space...\n";
     typedef Space::Discontinuous::ElementP0<TrafoType> SpaceType;
     SpaceType space(trafo);
 
@@ -135,7 +135,7 @@ namespace DbgTrace3
     typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BVectorType;
 
 
-    std::cout << "Allocating and initializing vectors and matrix..." << "\n";
+    std::cout << "Allocating and initializing vectors and matrix...\n";
     BVectorType vec_n(space.get_num_dofs());
     /*VectorType vec_x(space.get_num_dofs());
     VectorType vec_y(space.get_num_dofs());
@@ -176,7 +176,7 @@ namespace DbgTrace3
     // First of all, build the filename string
     String vtk_name(String("./dbg-trace-3-") + shape_name + "-lvl" + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
     Space::ExtVtkWriter<TrafoType> ext_vtk(trafo, 0);
 
@@ -203,7 +203,7 @@ namespace DbgTrace3
     */
 
     // That's all, folks.
-    std::cout << "Finished!" << "\n";
+    std::cout << "Finished!\n";
   }
   void main()
   {

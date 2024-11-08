@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   // Initialse FEAT runtime
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
-  std::cout << "CTEST_FULL_OUTPUT" << "\n";
+  std::cout << "CTEST_FULL_OUTPUT\n";
 
   int result(EXIT_SUCCESS);
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
         << "\n";
       Backend::set_preferred_backend((*i)->get_preferred_backend());
       (*i)->run();
-      std::cout << "PASSED" << "\n";
+      std::cout << "PASSED\n";
       ++tests_passed;
     }
     catch (TestFailedException & e)
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     }
     catch(...)
     {
-      std::cout << "CRASHED: " << (*i)->id() << "\n" << "caught unknown exception" << "\n";
+      std::cout << "CRASHED: " << (*i)->id() << "\ncaught unknown exception\n";
       result = EXIT_FAILURE;
       ++tests_failed;
     }
@@ -126,12 +126,12 @@ int main(int argc, char** argv)
 
   if(result == EXIT_SUCCESS)
   {
-    std::cout << "All " << list_size << " tests PASSED!" << "\n";
+    std::cout << "All " << list_size << " tests PASSED!\n";
   }
   else
   {
     std::cout << tests_passed << " of " << list_size << " tests PASSED, "
-      << tests_failed << " tests FAILED!" << "\n";
+      << tests_failed << " tests FAILED!\n";
   }
 
   return result;

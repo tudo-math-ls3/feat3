@@ -394,35 +394,35 @@ namespace FEAT
           switch(_report.terminationtype)
           {
             case(-8):
-              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << "\n";
+              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(-7):
-              //std::cout << "ALGLIB: Gradient verification failed." << "\n";
+              //std::cout << "ALGLIB: Gradient verification failed.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(1):
-              //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << "\n";
+              //std::cout << "ALGLIB: Function value improvement criterion fulfilled.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(2):
-              //std::cout << "ALGLIB: Update step size stagnated." << "\n";
+              //std::cout << "ALGLIB: Update step size stagnated.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(4):
-              //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << "\n";
+              //std::cout << "ALGLIB: Gradient norm criterion fulfilled.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(5):
-              //std::cout << "ALGLIB: Maximum number of iterations" << "\n";
+              //std::cout << "ALGLIB: Maximum number of iterations\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::max_iter, this->get_num_iter()));
               return Status::max_iter;
             case(7):
-              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << "\n";
+              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
               return Status::stagnated;
             case(8):
-              //std::cout << "ALGLIB: Stopped by user" << "\n";
+              //std::cout << "ALGLIB: Stopped by user\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             default:
@@ -919,35 +919,35 @@ namespace FEAT
           switch(_report.terminationtype)
           {
             case(-8):
-              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation." << "\n";
+              //std::cout << "ALGLIB: Got inf or NaN in function/gradient evaluation.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(-7):
-              //std::cout << "ALGLIB: Gradient verification failed." << "\n";
+              //std::cout << "ALGLIB: Gradient verification failed.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
               return Status::aborted;
             case(1):
-              //std::cout << "ALGLIB: Function value improvement criterion fulfilled." << "\n";
+              //std::cout << "ALGLIB: Function value improvement criterion fulfilled.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(2):
-              //std::cout << "ALGLIB: Update step size stagnated." << "\n";
+              //std::cout << "ALGLIB: Update step size stagnated.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(4):
-              //std::cout << "ALGLIB: Gradient norm criterion fulfilled." << "\n";
+              //std::cout << "ALGLIB: Gradient norm criterion fulfilled.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             case(5):
-              //std::cout << "ALGLIB: Maximum number of iterations" << "\n";
+              //std::cout << "ALGLIB: Maximum number of iterations\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::max_iter, this->get_num_iter()));
               return Status::max_iter;
             case(7):
-              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible." << "\n";
+              //std::cout << "ALGLIB: Stopping criteria too stringent, further improvement impossible.\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::stagnated, this->get_num_iter()));
               return Status::stagnated;
             case(8):
-              //std::cout << "ALGLIB: Stopped by user" << "\n";
+              //std::cout << "ALGLIB: Stopped by user\n";
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, this->get_num_iter()));
               return Status::success;
             default:

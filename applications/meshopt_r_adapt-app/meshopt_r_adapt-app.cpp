@@ -738,7 +738,7 @@ int main(int argc, char* argv[])
   {
     // print all unsupported options to cerr
     for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+      std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
   }
 
   if( args.check("test") >=0 )
@@ -883,33 +883,33 @@ static void display_help(const Dist::Comm& comm)
   {
     std::cout << "meshopt_r_adapt-app: Chart distance based r-adaptivity and surface alignment"
     << "\n";
-    std::cout << "Mandatory arguments:" << "\n";
-    std::cout << " --application_config: Path to the application configuration file" << "\n";
-    std::cout << " --mesh-path: Path to the mesh directory" << "\n";
-    std::cout << "Optional arguments:" << "\n";
+    std::cout << "Mandatory arguments:\n";
+    std::cout << " --application_config: Path to the application configuration file\n";
+    std::cout << " --mesh-path: Path to the mesh directory\n";
+    std::cout << "Optional arguments:\n";
     std::cout << " --test [1 or 2]: Run as a test. Ignores configuration files and uses hard coded settings. " <<
-      "Test 1 is r-adaptivity, test 2 is surface alignment" << "\n";
+      "Test 1 is r-adaptivity, test 2 is surface alignment\n";
     std::cout << " --vtk [freq]: If this is set, vtk files are written every freq time steps. freq defaults to 1" <<
       "\n";
-    std::cout << " --help: Displays this text" << "\n";
+    std::cout << " --help: Displays this text\n";
   }
 }
 
 static void read_test_application_config(std::stringstream& iss)
 {
-  iss << "[ApplicationSettings]" << "\n";
-  //iss << "mesh_file = ./unit-square-tria.xml" << "\n";
-  //iss << "chart_file = ./moving_circle_chart.xml" << "\n";
-  //iss << "meshopt_config_file = ./meshopt_config.ini" << "\n";
-  iss << "mesh_optimizer = HyperelasticityDefault" << "\n";
-  iss << "solver_config_file = ./solver_config.ini" << "\n";
-  iss << "delta_t = 1e-2" << "\n";
-  iss << "t_end = 2e-2" << "\n";
-  iss << "[DomainControlSettings]" << "\n";
-  //iss << "parti-type = fallback parmetis" << "\n";
-  //iss << "parti-rank-elems = 4" << "\n";
-  iss << "lvl_min = 3" << "\n";
-  iss << "lvl_max = 3" << "\n";
+  iss << "[ApplicationSettings]\n";
+  //iss << "mesh_file = ./unit-square-tria.xml\n";
+  //iss << "chart_file = ./moving_circle_chart.xml\n";
+  //iss << "meshopt_config_file = ./meshopt_config.ini\n";
+  iss << "mesh_optimizer = HyperelasticityDefault\n";
+  iss << "solver_config_file = ./solver_config.ini\n";
+  iss << "delta_t = 1e-2\n";
+  iss << "t_end = 2e-2\n";
+  iss << "[DomainControlSettings]\n";
+  //iss << "parti-type = fallback parmetis\n";
+  //iss << "parti-rank-elems = 4\n";
+  iss << "lvl_min = 3\n";
+  iss << "lvl_max = 3\n";
 
 }
 
@@ -917,57 +917,57 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
 {
   if(test == 1)
   {
-    iss << "[HyperElasticityDefault]" << "\n";
-    iss << "type = Hyperelasticity" << "\n";
-    iss << "config_section = HyperelasticityDefaultParameters" << "\n";
-    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << "\n";
+    iss << "[HyperElasticityDefault]\n";
+    iss << "type = Hyperelasticity\n";
+    iss << "config_section = HyperelasticityDefaultParameters\n";
+    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r\n";
 
-    iss << "[HyperelasticityDefaultParameters]" << "\n";
-    iss << "global_functional = HyperelasticityFunctional" << "\n";
-    iss << "cell_functional = RumpfFunctional" << "\n";
-    iss << "solver_config = NLCG" << "\n";
-    iss << "fac_norm = 1e-2" << "\n";
-    iss << "fac_det = 1.0" << "\n";
-    iss << "fac_cof = 0.0" << "\n";
-    iss << "fac_reg = 5e-8" << "\n";
-    iss << "exponent_det = 1" << "\n";
-    iss << "scale_computation = iter_concentration" << "\n";
-    iss << "conc_function = OuterDist" << "\n";
+    iss << "[HyperelasticityDefaultParameters]\n";
+    iss << "global_functional = HyperelasticityFunctional\n";
+    iss << "cell_functional = RumpfFunctional\n";
+    iss << "solver_config = NLCG\n";
+    iss << "fac_norm = 1e-2\n";
+    iss << "fac_det = 1.0\n";
+    iss << "fac_cof = 0.0\n";
+    iss << "fac_reg = 5e-8\n";
+    iss << "exponent_det = 1\n";
+    iss << "scale_computation = iter_concentration\n";
+    iss << "conc_function = OuterDist\n";
 
-    iss << "[OuterDist]" << "\n";
-    iss << "type = ChartDistance" << "\n";
-    iss << "chart_list = moving_circle" << "\n";
-    iss << "operation = min" << "\n";
-    iss << "function_type = PowOfDist" << "\n";
-    iss << "minval = 2e-2" << "\n";
-    iss << "exponent = 0.5" << "\n";
-    iss << "use_derivative = 1" << "\n";
+    iss << "[OuterDist]\n";
+    iss << "type = ChartDistance\n";
+    iss << "chart_list = moving_circle\n";
+    iss << "operation = min\n";
+    iss << "function_type = PowOfDist\n";
+    iss << "minval = 2e-2\n";
+    iss << "exponent = 0.5\n";
+    iss << "use_derivative = 1\n";
   }
   else if(test == 2)
   {
-    iss << "[HyperElasticityDefault]" << "\n";
-    iss << "type = Hyperelasticity" << "\n";
-    iss << "config_section = HyperelasticityDefaultParameters" << "\n";
-    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r" << "\n";
+    iss << "[HyperElasticityDefault]\n";
+    iss << "type = Hyperelasticity\n";
+    iss << "config_section = HyperelasticityDefaultParameters\n";
+    iss << "dirichlet_boundaries = bnd:b bnd:t bnd:l bnd:r\n";
 
-    iss << "[HyperelasticityDefaultParameters]" << "\n";
-    iss << "global_functional = HyperelasticityFunctional" << "\n";
-    iss << "cell_functional = RumpfFunctional" << "\n";
-    iss << "solver_config = QPenalty" << "\n";
-    iss << "fac_norm = 1.0" << "\n";
-    iss << "fac_det = 1.0" << "\n";
-    iss << "fac_cof = 0.0" << "\n";
-    iss << "fac_reg = 5e-8" << "\n";
-    iss << "exponent_det = 1" << "\n";
-    iss << "scale_computation = once_uniform" << "\n";
-    iss << "conc_function = OuterDist" << "\n";
-    iss << "align_mesh = 1" << "\n";
+    iss << "[HyperelasticityDefaultParameters]\n";
+    iss << "global_functional = HyperelasticityFunctional\n";
+    iss << "cell_functional = RumpfFunctional\n";
+    iss << "solver_config = QPenalty\n";
+    iss << "fac_norm = 1.0\n";
+    iss << "fac_det = 1.0\n";
+    iss << "fac_cof = 0.0\n";
+    iss << "fac_reg = 5e-8\n";
+    iss << "exponent_det = 1\n";
+    iss << "scale_computation = once_uniform\n";
+    iss << "conc_function = OuterDist\n";
+    iss << "align_mesh = 1\n";
 
-    iss << "[OuterDist]" << "\n";
-    iss << "type = ChartDistance" << "\n";
-    iss << "chart_list = moving_circle" << "\n";
-    iss << "operation = min" << "\n";
-    iss << "function_type = default" << "\n";
+    iss << "[OuterDist]\n";
+    iss << "type = ChartDistance\n";
+    iss << "chart_list = moving_circle\n";
+    iss << "operation = min\n";
+    iss << "function_type = default\n";
 
   }
   else
@@ -978,32 +978,32 @@ static void read_test_meshopt_config(std::stringstream& iss, const int test)
 
 static void read_test_solver_config(std::stringstream& iss)
 {
-  iss << "[NLCG]" << "\n";
-  iss << "type = NLCG" << "\n";
-  iss << "precon = none" << "\n";
-  iss << "plot_mode = iter" << "\n";
-  iss << "tol_rel = 1e-8" << "\n";
-  iss << "max_iter = 500" << "\n";
-  iss << "linesearch = MQCLinesearch" << "\n";
-  iss << "direction_update = DYHSHybrid" << "\n";
-  iss << "keep_iterates = 0" << "\n";
+  iss << "[NLCG]\n";
+  iss << "type = NLCG\n";
+  iss << "precon = none\n";
+  iss << "plot_mode = iter\n";
+  iss << "tol_rel = 1e-8\n";
+  iss << "max_iter = 500\n";
+  iss << "linesearch = MQCLinesearch\n";
+  iss << "direction_update = DYHSHybrid\n";
+  iss << "keep_iterates = 0\n";
 
-  iss << "[QPenalty]" << "\n";
-  iss << "type = QPenalty" << "\n";
-  iss << "max_iter = 10" << "\n";
-  iss << "tol_rel = 1e5" << "\n";
-  iss << "tol_abs = 1e-8" << "\n";
-  iss << "initial_penalty_param = 2e4" << "\n";
-  iss << "plot_mode = iter" << "\n";
-  iss << "inner_solver = NLCG" << "\n";
+  iss << "[QPenalty]\n";
+  iss << "type = QPenalty\n";
+  iss << "max_iter = 10\n";
+  iss << "tol_rel = 1e5\n";
+  iss << "tol_abs = 1e-8\n";
+  iss << "initial_penalty_param = 2e4\n";
+  iss << "plot_mode = iter\n";
+  iss << "inner_solver = NLCG\n";
 
-  iss << "[MQCLinesearch]" << "\n";
-  iss << "type = MQCLinesearch" << "\n";
-  iss << "plot_mode = none" << "\n";
-  iss << "max_iter = 20" << "\n";
-  iss << "tol_decrease = 1e-3" << "\n";
-  iss << "tol_curvature = 0.3" << "\n";
-  iss << "keep_iterates = 0" << "\n";
+  iss << "[MQCLinesearch]\n";
+  iss << "type = MQCLinesearch\n";
+  iss << "plot_mode = none\n";
+  iss << "max_iter = 20\n";
+  iss << "tol_decrease = 1e-3\n";
+  iss << "tol_curvature = 0.3\n";
+  iss << "keep_iterates = 0\n";
 }
 
 static void read_test_mesh_file_names(std::deque<String>& mesh_files, const int test_number)

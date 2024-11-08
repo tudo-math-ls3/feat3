@@ -2231,7 +2231,7 @@ Solver::Status solve_navier(GlobalSystemVector& vec_sol, const GlobalSystemVecto
   //         watch_nonlin_solver_init.stop();
   //         _solver->set_plot_mode(Solver::PlotMode::iter);
   //
-  //         std::cout << "Starting to solve" << "\n";
+  //         std::cout << "Starting to solve\n";
   //
   //         watch_nonlin_solver_apply.start();
   //         status = Solver::solve(*_solver, vec_sol, vec_rhs, matrix, filter);

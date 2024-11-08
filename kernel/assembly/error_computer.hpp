@@ -962,21 +962,21 @@ namespace FEAT
           os << "H0-Error: " << stringify_fp_sci(sei.norm_h0) << " [";
           for(int i(0); i < dim_; ++i)
             os << " " << stringify_fp_sci(sei.norm_h0_comp[i]);
-          os << " ]" << "\n";
+          os << " ]\n";
         }
         if(sei.have_h1)
         {
           os << "H1-Error: " << stringify_fp_sci(sei.norm_h1) << " [";
           for(int i(0); i < dim_; ++i)
             os << " " << stringify_fp_sci(sei.norm_h1_comp[i]);
-          os << " ]" << "\n";
+          os << " ]\n";
         }
         if(sei.have_h2)
         {
           os << "H2-Error: " << stringify_fp_sci(sei.norm_h2) << " [";
           for(int i(0); i < dim_; ++i)
             os << " " << stringify_fp_sci(sei.norm_h2_comp[i]);
-          os << " ]" << "\n";
+          os << " ]\n";
         }
         return os;
       }

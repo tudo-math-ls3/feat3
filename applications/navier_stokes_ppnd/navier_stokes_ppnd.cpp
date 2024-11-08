@@ -413,7 +413,7 @@ namespace NavierStokesPP
           setup_fb_c3d_03();
         else
         {
-          std::cerr << "ERROR: unknown setup '" << s << "'" << "\n";
+          std::cerr << "ERROR: unknown setup '" << s << "'\n";
           return false;
         }
       }
@@ -2735,7 +2735,7 @@ int main(int argc, char* argv[])
   }
   catch (...)
   {
-    std::cerr << "ERROR: unknown exception" << "\n";
+    std::cerr << "ERROR: unknown exception\n";
     FEAT::Runtime::abort();
   }
   return 0;

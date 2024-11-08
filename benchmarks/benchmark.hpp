@@ -63,7 +63,7 @@ namespace FEAT
       for (auto & time : times)
         mean += time;
       mean /= double(times.size());
-      std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs."<<"\n";
+      std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs.\n";
       std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<"\n";
       flops *= double(iters);
       flops /= mean;
@@ -77,7 +77,7 @@ namespace FEAT
       bytes /= 1024.; // mega
       bytes /= 1024.; // giga
       std::cout<<"GByte/s: "<<bytes<<"\n";
-      std::cout<<"=============================================="<<"\n";
+      std::cout<<"==============================================\n";
     }
   }
 }

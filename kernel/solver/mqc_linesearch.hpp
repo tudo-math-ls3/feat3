@@ -325,7 +325,7 @@ namespace FEAT
             // Stagnation due to rounding errors
             //if(min_in_interval && (alpha <= _alpha_soft_min || alpha >= _alpha_soft_max))
             //{
-            //  std::cout << "Rounding errors" << "\n";
+            //  std::cout << "Rounding errors\n";
             //  status = Status::stagnated;
             //}
             // This is not used at the moment because it is only relevant if there are constraints limiting the

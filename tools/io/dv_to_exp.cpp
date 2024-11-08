@@ -16,7 +16,7 @@ int main(int argc, char ** argv)
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   if (argc != 3)
   {
-    std::cout<<"Usage 'dv2exp dv-file exp-file'"<<"\n";
+    std::cout<<"Usage 'dv2exp dv-file exp-file'\n";
     FEAT::Runtime::abort();
   }
 

@@ -514,8 +514,8 @@ int main(int argc, char* argv[])
     if(!String(argv[3]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[3] << "' as maximum refinement level->" << "\n";
-      std::cerr << "Note: The first argument must be a positive integer." << "\n";
+      std::cerr << "ERROR: Failed to parse '" << argv[3] << "' as maximum refinement level->\n";
+      std::cerr << "Note: The first argument must be a positive integer.\n";
       Runtime::abort();
     }
     // parse successful
@@ -528,8 +528,8 @@ int main(int argc, char* argv[])
     if(!String(argv[4]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[4] << "' as minimum refinement level->" << "\n";
-      std::cerr << "Note: The second argument must be a positive integer." << "\n";
+      std::cerr << "ERROR: Failed to parse '" << argv[4] << "' as minimum refinement level->\n";
+      std::cerr << "Note: The second argument must be a positive integer.\n";
       Runtime::abort();
     }
     // parse successful
@@ -550,7 +550,7 @@ int main(int argc, char* argv[])
   if(level_max == level_min)
   {
     // minimum and maximum levels are equal
-    std::cout << "WARNING: Minimum and maximum levels are equal" << "\n";
+    std::cout << "WARNING: Minimum and maximum levels are equal\n";
   }
 
   String precs = prec_asm + ":" + prec_sol;

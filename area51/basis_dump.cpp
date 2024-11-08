@@ -206,7 +206,7 @@ void dump_basis(String vtk_name, Index num_refines)
   SpaceType space(trafo);
 
   // print a message
-  std::cout << "Writing '" << vtk_name << "'..." << "\n";
+  std::cout << "Writing '" << vtk_name << "'...\n";
 
   // create an extended VTK writer
   Space::ExtVtkWriter<TrafoType> vtk_writer(trafo, num_refines);

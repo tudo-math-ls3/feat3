@@ -283,7 +283,7 @@ namespace Stokes3Field
     {
       std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       Runtime::abort();
     }
 
@@ -291,12 +291,12 @@ namespace Stokes3Field
 
     if(asym_sigma)
     {
-      std::cout << "Running 4-component sigma version (asymmetric)" << "\n";
+      std::cout << "Running 4-component sigma version (asymmetric)\n";
       run<2, 4>(args);
     }
     else
     {
-      std::cout << "Running 3-component sigma version (symmetric)" << "\n";
+      std::cout << "Running 3-component sigma version (symmetric)\n";
       run<2, 3>(args);
     }
   }
@@ -391,7 +391,7 @@ namespace Stokes3Field
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Symbolic Matrix Assembly" << "\n";
+    std::cout << "Symbolic Matrix Assembly\n";
 
     // As usual, we create first an empty matrix.
     SystemMatrixType matrix;
@@ -435,7 +435,7 @@ namespace Stokes3Field
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Numerical assembly: matrix (bilinear forms)
 
-    std::cout << "Numeric Matrix Assembly" << "\n";
+    std::cout << "Numeric Matrix Assembly\n";
 
     Cubature::DynamicFactory cubature("auto-degree:7");
 
@@ -463,7 +463,7 @@ namespace Stokes3Field
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Filter Assembly" << "\n";
+    std::cout << "Filter Assembly\n";
 
     SystemFilterType filter;
 
@@ -492,9 +492,9 @@ namespace Stokes3Field
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #ifndef FEAT_HAVE_UMFPACK
-    std::cout << "UMFPACK not enabled; skipping solver step" << "\n";
+    std::cout << "UMFPACK not enabled; skipping solver step\n";
 #else
-    std::cout << "Solving System" << "\n";
+    std::cout << "Solving System\n";
 
     auto solver = Solver::new_generic_umfpack(matrix);
 
@@ -519,7 +519,7 @@ namespace Stokes3Field
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Analyse velocity field
 
-    std::cout << "\n" << "Velocity Field Analysis" << "\n";
+    std::cout << "\nVelocity Field Analysis\n";
 
     Assembly::VelocityInfo<DataType, dim> velo_info = Assembly::VelocityAnalyser::compute(vec_sol_v, space_velo, cubature);
 
@@ -534,7 +534,7 @@ namespace Stokes3Field
     {
       args.parse("vtk", vtk_name);
 
-      std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+      std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       // Create a VTK exporter for our mesh
       Geometry::ExportVTK<MeshType> exporter(mesh);
@@ -554,7 +554,7 @@ namespace Stokes3Field
     }
 
     // That's all, folks.
-    std::cout << "Finished!" << "\n";
+    std::cout << "Finished!\n";
   } // int main(...)
 } // namespace Stokes3Field
 

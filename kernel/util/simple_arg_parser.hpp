@@ -69,7 +69,7 @@ namespace FEAT
      {
        // print all unsupported options to cerr
        for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-         std::cerr << "ERROR: unsupported option '--" << (*it).second << "'" << "\n";
+         std::cerr << "ERROR: unsupported option '--" << (*it).second << "'\n";
 
        // abort program execution here, if you want to
      }

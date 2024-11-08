@@ -651,10 +651,10 @@ namespace FEAT
         XASSERT(Type::Traits<IT_>::is_signed == Type::Helper::extract_signedness(uiarray[3]));
 
         if (sizeof(DT_) > Type::Helper::extract_type_size(uiarray[2]))
-          std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!"<<"\n";
+          std::cerr<<"Warning: You are reading a container floating point in higher precision then it was saved before!\n";
 
         if (sizeof(IT_) > Type::Helper::extract_type_size(uiarray[3]))
-          std::cerr<<"Warning: You are reading a container integral type in higher precision then it was saved before!"<<"\n";
+          std::cerr<<"Warning: You are reading a container integral type in higher precision then it was saved before!\n";
 
         CompressionModes compress = (CompressionModes)uiarray[10];
         //test whether system has right third_party software loaded:

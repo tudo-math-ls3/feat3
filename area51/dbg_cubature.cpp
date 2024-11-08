@@ -282,7 +282,7 @@ namespace DbgCubature
     }
     catch(std::exception& e)
     {
-      std::cout << "ERROR: Failed to create cubature rule" << "\n";
+      std::cout << "ERROR: Failed to create cubature rule\n";
       std::cout << e.what() << "\n";
       return;
     }
@@ -328,7 +328,7 @@ namespace DbgCubature
     int max_degree = degree;
 
     std::cout << "  Monomial" << String(6*dim-8, ' ');
-    std::cout << "Deg   Cubature       Exact          Relative Error" << "\n";
+    std::cout << "Deg   Cubature       Exact          Relative Error\n";
 
     // loop over all monomials
     for(std::size_t imono(0u); imono < powers.size(); ++imono)
@@ -381,18 +381,18 @@ namespace DbgCubature
     {
       std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       return;
     }
 
     if(args.check("shape") <= 0)
     {
-      std::cout << "ERROR: mandatory shape parameter '--shape <shape>' is missing!" << "\n";
-      std::cout << "Valid shape parameters are:" << "\n";
-      std::cout << "s2         Simplex<2>" << "\n";
-      std::cout << "s3         Simplex<3>" << "\n";
-      std::cout << "h2         Hypercube<2>" << "\n";
-      std::cout << "h3         Hypercube<3>" << "\n";
+      std::cout << "ERROR: mandatory shape parameter '--shape <shape>' is missing!\n";
+      std::cout << "Valid shape parameters are:\n";
+      std::cout << "s2         Simplex<2>\n";
+      std::cout << "s3         Simplex<3>\n";
+      std::cout << "h2         Hypercube<2>\n";
+      std::cout << "h3         Hypercube<3>\n";
       return;
     }
 
@@ -403,12 +403,12 @@ namespace DbgCubature
     if(shape.compare_no_case("h2") == 0) run<Shape::Hypercube<2>>(args); else
     if(shape.compare_no_case("h3") == 0) run<Shape::Hypercube<3>>(args); else
     {
-      std::cout << "ERROR: Failed to parse '" << shape << "' as shape parameter" << "\n";
-      std::cout << "Valid shape parameters are:" << "\n";
-      std::cout << "s2         Simplex<2>" << "\n";
-      std::cout << "s3         Simplex<3>" << "\n";
-      std::cout << "h2         Hypercube<2>" << "\n";
-      std::cout << "h3         Hypercube<3>" << "\n";
+      std::cout << "ERROR: Failed to parse '" << shape << "' as shape parameter\n";
+      std::cout << "Valid shape parameters are:\n";
+      std::cout << "s2         Simplex<2>\n";
+      std::cout << "s3         Simplex<3>\n";
+      std::cout << "h2         Hypercube<2>\n";
+      std::cout << "h3         Hypercube<3>\n";
       return;
     }
   }

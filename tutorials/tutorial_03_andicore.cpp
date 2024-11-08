@@ -446,7 +446,7 @@ namespace Tutorial03
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Create Mesh, Boundary, Trafo and Space
 
-    std::cout << "Creating Mesh on Level " << level << "..." << "\n";
+    std::cout << "Creating Mesh on Level " << level << "...\n";
 
     // Create the mesh
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
@@ -458,7 +458,7 @@ namespace Tutorial03
 
     // Create Mesh, Boundary, Trafo and Space
 
-    std::cout << "Creating Trafo and Space..." << "\n";
+    std::cout << "Creating Trafo and Space...\n";
 
     // Let's create a trafo object now.
     TrafoType trafo(mesh);
@@ -469,7 +469,7 @@ namespace Tutorial03
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Symbolic linear system assembly
 
-    std::cout << "Allocating matrix and vectors..." << "\n";
+    std::cout << "Allocating matrix and vectors...\n";
 
     // Allocate matrix and assemble its structure
     MatrixType matrix;
@@ -489,7 +489,7 @@ namespace Tutorial03
     // Choose a cubature rule
     String cubature_name = "auto-degree:5";
 
-    std::cout << "Assembling system matrix..." << "\n";
+    std::cout << "Assembling system matrix...\n";
 
     // First of all, format the matrix entries to zero.
     matrix.format();
@@ -501,7 +501,7 @@ namespace Tutorial03
     Assembly::assemble_bilinear_operator_matrix_1(
       domain_assembler, matrix, andicore_operator, space, cubature_name);
 
-    std::cout << "Assembling right-hand-side vector..." << "\n";
+    std::cout << "Assembling right-hand-side vector...\n";
 
     // Format the right-hand-side vector entries to zero.
     vec_rhs.format();
@@ -525,7 +525,7 @@ namespace Tutorial03
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition assembly
 
-    std::cout << "Assembling boundary conditions..." << "\n";
+    std::cout << "Assembling boundary conditions...\n";
 
     // In this example, we assemble homogeneous Dirichlet boundary conditions:
     Assembly::UnitFilterAssembler<MeshType> unit_asm;
@@ -540,7 +540,7 @@ namespace Tutorial03
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Boundary Condition imposition
 
-    std::cout << "Imposing boundary conditions..." << "\n";
+    std::cout << "Imposing boundary conditions...\n";
 
     // Apply the filter onto the system matrix...
     filter.filter_mat(matrix);
@@ -554,7 +554,7 @@ namespace Tutorial03
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Solver set-up
 
-    std::cout << "Solving linear system..." << "\n";
+    std::cout << "Solving linear system...\n";
 
     // Create a SPAI preconditioner
     auto precond = Solver::new_jacobi_precond(matrix, filter);
@@ -577,14 +577,14 @@ namespace Tutorial03
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Computing L2/H1-Errors
 
-    std::cout << "Computing errors against reference solution..." << "\n";
+    std::cout << "Computing errors against reference solution...\n";
 
     // Compute the error norms:
     auto error_info = Assembly::integrate_error_function<1>(
       domain_assembler, sol_function, vec_sol, space, cubature_name);
 
     // Print the error norms to the console
-    std::cout << "Error Analysis:" << "\n";
+    std::cout << "Error Analysis:\n";
     std::cout << error_info.print_norms() << "\n";
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -595,7 +595,7 @@ namespace Tutorial03
     // First of all, build the filename string
     String vtk_name(String("./tutorial-03-andicore-lvl") + stringify(level));
 
-    std::cout << "Writing VTK file '" << vtk_name << ".vtu'..." << "\n";
+    std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
     // project solution and right-hand-side vectors
     VectorType vertex_sol, vertex_rhs;
@@ -613,7 +613,7 @@ namespace Tutorial03
     exporter.write(vtk_name);
 
     // That's it for today.
-    std::cout << "Finished!" << "\n";
+    std::cout << "Finished!\n";
   } // void main(...)
 } // namespace Tutorial03
 
@@ -624,7 +624,7 @@ int main(int argc, char* argv[])
   Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 
   // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #03: Andicore" << "\n";
+  std::cout << "Welcome to FEAT's tutorial #03: Andicore\n";
 
   // The desired mesh refinement level.
   Index level(3);
@@ -637,8 +637,8 @@ int main(int argc, char* argv[])
     if(!String(argv[argc-1]).parse(ilevel) || (ilevel < 1))
     {
       // failed to parse
-      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level." << "\n";
-      std::cerr << "Note: The last argument must be a positive integer." << "\n";
+      std::cerr << "ERROR: Failed to parse '" << argv[argc-1] << "' as refinement level.\n";
+      std::cerr << "Note: The last argument must be a positive integer.\n";
       // Abort our runtime environment
       Runtime::abort();
     }

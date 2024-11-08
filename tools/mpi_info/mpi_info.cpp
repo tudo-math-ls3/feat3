@@ -15,35 +15,35 @@ int main(int argc, char ** argv)
 {
   int required = MPI_THREAD_MULTIPLE;
   int provided = MPI_THREAD_SINGLE;
-  std::cout<<"Evaluating available thread support..."<<"\n";
+  std::cout<<"Evaluating available thread support...\n";
   if (::MPI_Init_thread(&argc, &argv, required, &provided) != MPI_SUCCESS)
   {
-    std::cerr<<"MPI_Init_thread failed!"<<"\n";
+    std::cerr<<"MPI_Init_thread failed!\n";
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
 
   switch (provided)
   {
     case MPI_THREAD_MULTIPLE:
-      std::cout<<"MPI_THREAD_MULTIPLE available"<<"\n";
-      std::cout<<"MPI_THREAD_SERIALIZED available"<<"\n";
-      std::cout<<"MPI_THREAD_FUNNELED available"<<"\n";
-      std::cout<<"MPI_THREAD_SINGLE available"<<"\n";
+      std::cout<<"MPI_THREAD_MULTIPLE available\n";
+      std::cout<<"MPI_THREAD_SERIALIZED available\n";
+      std::cout<<"MPI_THREAD_FUNNELED available\n";
+      std::cout<<"MPI_THREAD_SINGLE available\n";
       break;
     case MPI_THREAD_SERIALIZED:
-      std::cout<<"MPI_THREAD_SERIALIZED available"<<"\n";
-      std::cout<<"MPI_THREAD_FUNNELED available"<<"\n";
-      std::cout<<"MPI_THREAD_SINGLE available"<<"\n";
+      std::cout<<"MPI_THREAD_SERIALIZED available\n";
+      std::cout<<"MPI_THREAD_FUNNELED available\n";
+      std::cout<<"MPI_THREAD_SINGLE available\n";
       break;
     case MPI_THREAD_FUNNELED:
-      std::cout<<"MPI_THREAD_FUNNELED available"<<"\n";
-      std::cout<<"MPI_THREAD_SINGLE available"<<"\n";
+      std::cout<<"MPI_THREAD_FUNNELED available\n";
+      std::cout<<"MPI_THREAD_SINGLE available\n";
       break;
     case MPI_THREAD_SINGLE:
-      std::cout<<"MPI_THREAD_SINGLE available"<<"\n";
+      std::cout<<"MPI_THREAD_SINGLE available\n";
       break;
     default:
-      std::cerr<<"invalid mpi provided value!"<<"\n";
+      std::cerr<<"invalid mpi provided value!\n";
       break;
   }
 
@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
 #else
 int main(int , char **)
 {
-  std::cerr<<"no mpi support configured!"<<"\n";
+  std::cerr<<"no mpi support configured!\n";
   return 0;
 }
 #endif

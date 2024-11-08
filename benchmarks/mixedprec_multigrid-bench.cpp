@@ -366,7 +366,7 @@ namespace MixedPrecMultiGridBench
   // print memory usage
   void print_memory(const String& what, double bytes)
   {
-    std::cout << what.pad_back(25, '.') << ": " << stringify_fp_fix(bytes / (1024.0*1024.0*1024.0), 3, 7) << " GB" << "\n";
+    std::cout << what.pad_back(25, '.') << ": " << stringify_fp_fix(bytes / (1024.0*1024.0*1024.0), 3, 7) << " GB\n";
   }
 
   /**
@@ -431,7 +431,7 @@ namespace MixedPrecMultiGridBench
       std::cout << "Iter  " << String("Abs. Defect").pad_back(nps);
       std::cout << "   " << String("Rel. Defect").pad_back(nps);
       std::cout << "   " << String("Reduce").pad_back(7);
-      std::cout << "   " << "H0-Error" << "\n";
+      std::cout << "   " << "H0-Error\n";
     }
 
     // outer multigrid richardson loop
@@ -465,14 +465,14 @@ namespace MixedPrecMultiGridBench
       // divergence?
       if(def_norm > OFP_(1E+10))
       {
-        std::cout << "\n" << ">>> ERROR: solver diverged!" << "\n";
+        std::cout << "\n>>> ERROR: solver diverged!\n";
         return;
       }
 
       // check for stagnation
       if((iter >= 3) && (def_norm >= OFP_(0.95)*def_prev))
       {
-        std::cout << "\n" << ">>> Solver stagnated!" << "\n";
+        std::cout << "\n>>> Solver stagnated!\n";
         break;
       }
 
@@ -584,7 +584,7 @@ namespace MixedPrecMultiGridBench
     std::cout << "Final Error.: " << stringify_fp_sci(final_err) << "\n";
 
     // print timing summary
-    std::cout << "\n" << "Timing Statistics" << "\n";
+    std::cout << "\nTiming Statistics\n";
     print_time("Total Multigrid Time", watch_total.elapsed());
     print_time("Inner Multigrid Time", watch_inner.elapsed(), watch_total.elapsed());
     print_time("Smoothing Time", watch_smooth.elapsed(), watch_total.elapsed());
@@ -608,14 +608,14 @@ namespace MixedPrecMultiGridBench
     {
       std::cerr << "\n";
       for(auto it = unsupported.begin(); it != unsupported.end(); ++it)
-        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'" << "\n";
+        std::cerr << "ERROR: unsupported option #" << (*it).first << " '--" << (*it).second << "'\n";
       Runtime::abort();
     }
 
 #ifdef FEAT_HAVE_OMP
     std::cout << "OpenMP max threads: " << omp_get_max_threads() << "\n";
 #else
-    std::cout << "OpenMP not available in this build" << "\n";
+    std::cout << "OpenMP not available in this build\n";
 #endif
 
 

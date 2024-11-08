@@ -420,7 +420,7 @@ public:
 
     burgers_assembler.assemble_matrix1(matrix_new, dummy_conv, space, Cubature::DynamicFactory(cubature_name), alpha);
 
-    // std::cout << "Matrix ref " << matrix_ref << "\n" << "Matrix_new " << matrix_new << "\n";
+    // std::cout << "Matrix ref " << matrix_ref << "\nMatrix_new " << matrix_new << "\n";
 
     this->compare_matrices(matrix_new, matrix_ref);
 

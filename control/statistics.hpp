@@ -91,11 +91,11 @@ namespace FEAT
             std::cout << "\n" << FEAT::Statistics::get_formatted_solver_tree().trim() <<"\n";
 
             String flops = FEAT::Statistics::get_formatted_flops(solver_toe, nranks);
-            std::cout<<flops<<"\n"<<"\n";
-            std::cout<<op_timings<<"\n"<<"\n";
-            std::cout<<String("Domain size:").pad_back(20) << double(domain.bytes())  / (1024. * 1024.)  << " MByte" << "\n";
-            std::cout<<String("MPI size:").pad_back(20) << double(mpi_size) / (1024. * 1024.) << " MByte" << "\n";
-            std::cout<<String("LA size:").pad_back(20) << double(la_size) / (1024. * 1024.) << " MByte" << "\n" << "\n";
+            std::cout<<flops<<"\n\n";
+            std::cout<<op_timings<<"\n\n";
+            std::cout<<String("Domain size:").pad_back(20) << double(domain.bytes())  / (1024. * 1024.)  << " MByte\n";
+            std::cout<<String("MPI size:").pad_back(20) << double(mpi_size) / (1024. * 1024.) << " MByte\n";
+            std::cout<<String("LA size:").pad_back(20) << double(la_size) / (1024. * 1024.) << " MByte\n\n";
             MemoryUsage mu;
             std::cout<<mu.get_formatted_memory_usage()<<"\n";
             std::cout<<String("#Mesh cells:").pad_back(20) << "coarse " << cells_coarse_max << "/" << cells_coarse_min << ", fine " << cells_fine_max << "/" << cells_fine_min << "\n";

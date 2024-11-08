@@ -223,7 +223,7 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket tuplediagmatrix coordinate real general" << "\n";
+        file << "%%MatrixMarket tuplediagmatrix coordinate real general\n";
         for (Index i(1); i <= num_row_blocks; ++i)
         {
           file << filename << "_td" << i << suffix << "\n";
@@ -802,7 +802,7 @@ namespace FEAT
           filename.erase(0, found + 1);
         }
 
-        file << "%%MatrixMarket tuplediagmatrix coordinate real general" << "\n";
+        file << "%%MatrixMarket tuplediagmatrix coordinate real general\n";
         file << filename << "_td" << 1 << suffix << "\n";
 
         file.close();
