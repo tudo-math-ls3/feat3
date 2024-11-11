@@ -457,7 +457,7 @@ namespace CCNDSimple
   bool SteadySolver::solve_navier_stokes(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
   {
     // set plot mode to enable output
-    stokes_solver->set_plot_mode(plot_stokes ? Solver::PlotMode::iter : Solver::PlotMode::none);
+    stokes_solver->set_plot_mode(plot_navier ? Solver::PlotMode::iter : Solver::PlotMode::none);
 
     // create two vectors
     GlobalStokesVector vec_cor = create_vector();

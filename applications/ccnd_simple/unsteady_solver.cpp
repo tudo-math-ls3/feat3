@@ -201,7 +201,7 @@ namespace CCNDSimple
     if(full_plot)
     {
       comm.print(String(100u, '-') +
-        "Step " + stringify(time_step).pad_front(6) +
+        "\nStep " + stringify(time_step).pad_front(6) +
         "   Time " + stringify_fp_fix(cur_time, 10, 15) +
         "   [" + stringify_fp_fix(100.0*cur_time/t_max, 2, 6) + "%]" +
         "   Runtime " + watch_loop.elapsed_string().pad_front(12) +

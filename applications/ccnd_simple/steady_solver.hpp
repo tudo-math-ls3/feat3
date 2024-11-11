@@ -77,9 +77,9 @@ namespace CCNDSimple
     /// max. multigrid iterations
     Index max_mg_iter = Index(25);
     /// number of smoothing steps
-    Index smooth_steps = Index(16);
+    Index smooth_steps = Index(8);
     /// damping parameter for smoother
-    DataType smooth_damp = DataType(0.3);
+    DataType smooth_damp = DataType(0.5);
     /// relative tolerance for linear solver
     DataType mg_tol_rel = DataType(1E-3);
     /// absolute tolerance for nonlinear solver
