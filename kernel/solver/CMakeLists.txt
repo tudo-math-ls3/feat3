@@ -53,7 +53,7 @@ if (FEAT_HAVE_CUDA)
   if (FEAT_HAVE_CUDSS)
     set(CUDA_cudss_LIBRARY "-lcudss")
   endif (FEAT_HAVE_CUDSS)
-  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cudss_LIBRARY} kernel-util-cuda)
+  target_link_libraries(kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cudss_LIBRARY} kernel-util-cuda kernel-util)
   target_link_libraries(kernel-solver PRIVATE kernel-solver-cuda)
 endif (FEAT_HAVE_CUDA)
 

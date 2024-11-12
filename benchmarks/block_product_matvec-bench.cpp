@@ -20,6 +20,7 @@ using namespace FEAT::Benchmark;
 template <typename SM_, int dim, int Blockheight_, int Blockwidth_ = Blockheight_>
 void run(PreferredBackend backend)
 {
+
   Backend::set_preferred_backend(PreferredBackend::generic);
   typedef typename SM_::DataType DT_;
   typedef typename SM_::IndexType IT_;
@@ -64,12 +65,14 @@ void run(PreferredBackend backend)
 
     double bytes = double(used_elements);
     bytes *= DT_(sizeof(DT_));
-    bytes += DT_(used_elements * sizeof(IT_));
+    bytes += DT_(sys.template used_elements<Perspective::native>() * sizeof(IT_));
     bytes += DT_(size * Blockheight_ * sizeof(DT_));
 
     Backend::set_preferred_backend(backend);
     auto func = [&] () { sys.apply(b, x); };
+    FEAT_NVMARKER_START("bcsr-apply");
     run_bench(func, flops, bytes);
+    FEAT_NVMARKER_STOP("bcsr-apply");
 
     std::cout<<"control norm: "<<x.norm2()<<"\n";
   }
@@ -102,7 +105,9 @@ void run(PreferredBackend backend)
     Backend::set_preferred_backend(backend);
 
     auto func = [&] () { sys.apply(b, x); };
+    FEAT_NVMARKER_START("csr-apply");
     run_bench(func, flops, bytes);
+    FEAT_NVMARKER_STOP("csr-apply");
 
     std::cout<<"control norm: "<<x.norm2()<<"\n";
   }
@@ -110,6 +115,8 @@ void run(PreferredBackend backend)
 
 int main(int argc, char ** argv)
 {
+  FEAT_NVMARKER_REGISTER("bcsr-apply");
+  FEAT_NVMARKER_REGISTER("csr-apply");
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
 #ifdef FEAT_HAVE_CUDA
   run<SparseMatrixCSR<double, unsigned int>, 2, 2, 2 >(PreferredBackend::cuda);
