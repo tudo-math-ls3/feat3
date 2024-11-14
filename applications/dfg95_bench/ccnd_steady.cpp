@@ -278,6 +278,7 @@ namespace DFG95
         comm.print(String("Coarse Solver").pad_back(pl, pc) + ": UMFPACK");
       else
         comm.print(String("Coarse Solver").pad_back(pl, pc) + ": BiCGStab-AmaVanka");
+      comm.print_flush();
     }
 
     // enable solver expressions if extended statistics are desired
@@ -746,6 +747,8 @@ namespace DFG95
       }
     }
 
+    comm.print_flush();
+
     // Don't we solve Navier-Stokes?
     if(!navier)
     {
@@ -988,6 +991,7 @@ namespace DFG95
 
         FEAT::Statistics::compress_solver_expressions();
         // next non-linear iteration
+        comm.print_flush();
       }
 
       watch_nonlin_loop.stop();
@@ -1296,6 +1300,7 @@ namespace DFG95
           stringify_fp_fix(multigrid_hierarchy->get_time_coarse(i), 3, 10));
       }
     }
+    comm.print_flush();
 
     // print extended statistics if desired
     if(ext_stats)

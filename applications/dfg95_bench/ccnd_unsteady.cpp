@@ -473,6 +473,7 @@ namespace DFG95
         comm.print(String("Save Final Solution").pad_back(pl, pc) + ": '" + save_joined_sol_name + "'");
       else
         comm.print(String("Save Final Solution").pad_back(pl, pc) + ": N/A");
+      comm.print_flush();
     }
 
     // enable solver expressions if extended statistics are desired
@@ -1013,6 +1014,7 @@ namespace DFG95
     /* ***************************************************************************************** */
 
     comm.print("\nSolving unsteady Navier-Stokes system...");
+    comm.print_flush();
 
     // vector of all non-linear defect norms
     std::vector<DataType> nl_defs;
@@ -1146,6 +1148,7 @@ namespace DFG95
       comm.print(String(100, '='));
       watch_checkpoint.stop();
     }
+    comm.print_flush();
 
     // ============================================================================================
     // ============================================================================================
@@ -1753,6 +1756,8 @@ namespace DFG95
         break;
       }
 
+      comm.print_flush();
+
       // next time step
     }
 
@@ -1859,6 +1864,7 @@ namespace DFG95
 
     if(testmode)
       comm.print("\nTest-Mode: PASSED");
+    comm.print_flush();
   }
 
   template<int dim_>

@@ -119,6 +119,7 @@ namespace CCNDSimple
       print_pad(comm, "Save Joined Solution", "- N/A -");
     else
       print_pad(comm, "Save Joined Solution", save_joined_filename);
+    comm.print_flush();
   }
 
   void SteadySolver::create_levels()
@@ -577,6 +578,7 @@ namespace CCNDSimple
       // next non-linear iteration
     }
     // end of Navier-Stokes solve
+    comm.print_flush();
 
     return true;
   }

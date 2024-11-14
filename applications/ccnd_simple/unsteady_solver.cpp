@@ -256,8 +256,10 @@ namespace CCNDSimple
     if(t_max < cur_time + 1E-10)
     {
       comm.print("\nMaximum simulation time " + stringify_fp_fix(t_max) + " reached; finishing time step loop");
+      comm.print_flush();
       return false;
     }
+    comm.print_flush();
 
     return true;
 

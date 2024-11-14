@@ -3140,6 +3140,28 @@ namespace FEAT
         allprint(std::cout, msg, root);
       }
 
+      /**
+       * \brief Explicitly flushes the output stream
+       *
+       * \param[in] os
+       * The output stream to write to. Must be a valid stream on the root process.
+       *
+       * \param[in] root
+       * The root process that should collect the messages and perform the print.
+       */
+      void print_flush(std::ostream& os, int root = 0) const;
+
+      /**
+       * \brief Explicitly flushes \p cout
+       *
+       * \param[in] root
+       * The root process that should collect the messages and perform the print.
+       */
+      void print_flush(int root = 0) const
+      {
+        print_flush(std::cout, root);
+      }
+
       // end of extended comm group
       ///@}
     }; // class Comm

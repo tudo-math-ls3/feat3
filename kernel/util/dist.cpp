@@ -844,6 +844,13 @@ namespace FEAT
       }
     }
 
+    void Comm::print_flush(std::ostream& os, int root) const
+    {
+      XASSERTM((0 <= root) && (root < _size), "invalid root rank argument");
+      if(root == _rank)
+        os << std::flush;
+    }
+
     /* ######################################################################################### */
     /* ######################################################################################### */
     /* ######################################################################################### */
@@ -1283,6 +1290,11 @@ namespace FEAT
     void Comm::allprint(std::ostream& os, const String& msg, int) const
     {
       os << msg << "\n";
+    }
+
+    void Comm::print_flush(std::ostream& os, int root) const
+    {
+      os << std::flush;
     }
 #endif // FEAT_HAVE_MPI
   } // namespace Dist

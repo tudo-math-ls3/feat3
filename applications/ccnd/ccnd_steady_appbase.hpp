@@ -598,6 +598,7 @@ namespace CCND
         comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": FGMRES[" + stringify(smooth_gmres_dim) + "]-AmaVanka");
       else
         comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": Richardson-AmaVanka");
+      comm.print_flush();
     }
 
     virtual void create_domain()
@@ -1642,6 +1643,9 @@ namespace CCND
       if(!is_nonlinear)
         done_solver_numeric();
 
+      // force output
+      comm.print_flush();
+
       watch_nonlin_loop.stop();
 
       return result;
@@ -1825,6 +1829,8 @@ namespace CCND
 
       comm.print("\nTotal Runtime: " + watch_total_run.elapsed_string(TimeFormat::h_m_s_m)
         + " [" + watch_total_run.elapsed_string(TimeFormat::s_m) + " seconds]");
+
+      comm.print_flush();
 
     }
   }; // class SteadyAppBase
