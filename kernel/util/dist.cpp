@@ -1292,7 +1292,7 @@ namespace FEAT
       os << msg << "\n";
     }
 
-    void Comm::print_flush(std::ostream& os, int root) const
+    void Comm::print_flush(std::ostream& os, int) const
     {
       os << std::flush;
     }
