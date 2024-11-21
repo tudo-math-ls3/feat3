@@ -107,6 +107,9 @@ target_link_libraries(dbg-parti-domain-control feat)
 add_executable(hfem-direct hfem_direct.cpp)
 target_link_libraries(hfem-direct feat)
 
+add_executable(graph-tests graph_tests.cpp)
+target_link_libraries(graph-tests feat)
+
 if (FEAT_HAVE_UMFPACK)
    add_executable(feti-seq-usquare feti_seq_usquare.cpp)
    target_link_libraries(feti-seq-usquare feat)

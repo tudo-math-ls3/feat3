@@ -410,23 +410,30 @@ namespace FEAT
 
         // allocate pointer vector
         _domain_ptr = IndexVector(adj.get_num_nodes_domain() +1);
-
+        _domain_ptr[0] = 0;
         // count number of adjacencies and build pointer vector
-        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = num_indices_image;
+          Index num_indices_here = Index(0);
           AImIt cur(adj.image_begin(i));
           AImIt end(adj.image_end(i));
           for(; cur != end; ++cur)
           {
-            ++num_indices_image;
+            ++num_indices_here;
           }
+          _domain_ptr[i+1] = num_indices_here;
         }
-        _domain_ptr[adj.get_num_nodes_domain()] = num_indices_image;
+        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
+        {
+          _domain_ptr[i+1] += _domain_ptr[i];
+        }
+        num_indices_image = _domain_ptr[adj.get_num_nodes_domain()];
 
         // allocate and build index vector
         _image_idx = IndexVector(num_indices_image);
-        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
         {
           Index* idx = &_image_idx[_domain_ptr[i]];
           AImIt cur(adj.image_begin(i));
@@ -448,44 +455,60 @@ namespace FEAT
 
         // allocate pointer vector
         _domain_ptr = IndexVector(adj.get_num_nodes_domain() + 1);
+        _domain_ptr[0] = 0;
 
-        // allocate auxiliary mask vector
-        std::vector<char> vidx_mask(adj.get_num_nodes_image(),0);
-        char* idx_mask = vidx_mask.data();
+        FEAT_PRAGMA_OMP(parallel)
+        {
+          // allocate auxiliary mask vector
+          std::vector<char> vidx_mask(adj.get_num_nodes_image(),0);
+          char* idx_mask = vidx_mask.data();
 
-        // count number of adjacencies and build pointer vector
+          // count number of adjacencies and build pointer vector
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
+          {
+            Index num_indices_here = Index(0);
+            for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+            {
+              if(idx_mask[*it] == 0)
+              {
+                ++num_indices_here;
+                idx_mask[*it] = 1;
+              }
+            }
+            _domain_ptr[i+1] = num_indices_here;
+            for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+              idx_mask[*it] = 0;
+          }
+        }
         for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = num_indices_image;
-          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
-          {
-            if(idx_mask[*it] == 0)
-            {
-              ++num_indices_image;
-              idx_mask[*it] = 1;
-            }
-          }
-          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
-            idx_mask[*it] = 0;
+          _domain_ptr[i+1] += _domain_ptr[i];
         }
-        _domain_ptr[adj.get_num_nodes_domain()] = num_indices_image;
-
+        num_indices_image = _domain_ptr[adj.get_num_nodes_domain()];
         // allocate and build index vector
         _image_idx = IndexVector(num_indices_image);
-        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
+
+        FEAT_PRAGMA_OMP(parallel)
         {
-          Index k = _domain_ptr[i];
-          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+          std::vector<char> vidx_mask(adj.get_num_nodes_image(),0);
+          char* idx_mask = vidx_mask.data();
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
           {
-            if(idx_mask[*it] == 0)
+            Index k = _domain_ptr[i];
+            for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
             {
-              _image_idx[k] = *it;
-              ++k;
-              idx_mask[*it] = 1;
+              if(idx_mask[*it] == 0)
+              {
+                _image_idx[k] = *it;
+                ++k;
+                idx_mask[*it] = 1;
+              }
             }
+            for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
+              idx_mask[*it] = 0;
           }
-          for(auto it = adj.image_begin(i); it != adj.image_end(i); ++it)
-            idx_mask[*it] = 0;
         }
       }
 
@@ -610,7 +633,7 @@ namespace FEAT
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        // validate adjactor dimensions
+         // validate adjactor dimensions
         XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         typedef typename Adjactor1_::ImageIterator AImIt1;
@@ -622,11 +645,12 @@ namespace FEAT
 
         // allocate pointer vector
         _domain_ptr = IndexVector(adj1.get_num_nodes_domain() + 1);
-
+        _domain_ptr[0] = 0;
         // count number of adjacencies and build pointer vector
-        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
         {
-          _domain_ptr[i] = num_indices_image;
+          Index num_indices_here = Index(0);
           AImIt1 cur1(adj1.image_begin(i));
           AImIt1 end1(adj1.image_end(i));
           for(; cur1 != end1; ++cur1)
@@ -635,15 +659,23 @@ namespace FEAT
             AImIt2 end2(adj2.image_end(*cur1));
             for(; cur2 != end2; ++cur2)
             {
-              ++num_indices_image;
+              ++num_indices_here;
             }
           }
+          _domain_ptr[i+1] = num_indices_here;
         }
-        _domain_ptr[adj1.get_num_nodes_domain()] = num_indices_image;
+
+        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
+        {
+          _domain_ptr[i+1] += _domain_ptr[i];
+        }
+        num_indices_image = _domain_ptr[adj1.get_num_nodes_domain()];
 
         // allocate and build index vector
         _image_idx =IndexVector(num_indices_image);
-        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
+
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
         {
           Index* idx = &_image_idx[_domain_ptr[i]];
           AImIt1 cur1(adj1.image_begin(i));
@@ -668,7 +700,7 @@ namespace FEAT
         const Adjactor1_& adj1,
         const Adjactor2_& adj2)
       {
-        // validate adjactor dimensions
+         // validate adjactor dimensions
         XASSERTM(adj1.get_num_nodes_image() == adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
         // get counts
@@ -676,58 +708,72 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr =IndexVector(adj1.get_num_nodes_domain() + 1);
-
-        // allocate auxiliary mask vector
-        std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
-        char* idx_mask = vidx_mask.data();
-
-        // count number of adjacencies and build pointer vector
-        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
+        _domain_ptr = IndexVector(adj1.get_num_nodes_domain() + 1);
+        _domain_ptr[0] = Index(0);
+        FEAT_PRAGMA_OMP(parallel)
         {
-          _domain_ptr[i] = num_indices_image;
-          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+          // allocate auxiliary mask vector
+          std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
+          char* idx_mask = vidx_mask.data();
+
+          // count number of adjacencies and build pointer vector
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          for(Index i=0; i < adj1.get_num_nodes_domain(); ++i)
           {
-            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+            Index num_indices_here = Index(0);
+            for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
             {
-              if(idx_mask[*jt] == 0)
+              for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
               {
-                ++num_indices_image;
-                idx_mask[*jt] = 1;
+                if(idx_mask[*jt] == 0)
+                {
+                  ++num_indices_here;
+                  idx_mask[*jt] = 1;
+                }
               }
             }
+            _domain_ptr[i+1] = num_indices_here;
+            // reset mask
+            for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+              for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+                idx_mask[*jt] = 0;
           }
-          // reset mask
-          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
-            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
-              idx_mask[*jt] = 0;
         }
-        _domain_ptr[adj1.get_num_nodes_domain()] = num_indices_image;
 
-        // allocate and build index vector
-        _image_idx = IndexVector(num_indices_image);
         for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
         {
-          Index k = _domain_ptr[i];
-          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+          _domain_ptr[i+1] += _domain_ptr[i];
+        }
+        num_indices_image = _domain_ptr[adj1.get_num_nodes_domain()];
+        _image_idx = IndexVector(num_indices_image);
+
+        FEAT_PRAGMA_OMP(parallel)
+        {
+          std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
+          char* idx_mask = vidx_mask.data();
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
           {
-            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+            Index k = _domain_ptr[i];
+            for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
             {
-              if(idx_mask[*jt] == 0)
+              for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
               {
-                _image_idx[k] = *jt;
-                ++k;
-                idx_mask[*jt] = 1;
+                if(idx_mask[*jt] == 0)
+                {
+                  _image_idx[k] = *jt;
+                  ++k;
+                  idx_mask[*jt] = 1;
+                }
               }
             }
+            // reset mask
+            for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
+              for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
+                idx_mask[*jt] = 0;
           }
-          // reset mask
-          for(auto it = adj1.image_begin(i); it != adj1.image_end(i); ++it)
-            for(auto jt = adj2.image_begin(*it); jt != adj2.image_end(*it); ++jt)
-              idx_mask[*jt] = 0;
         }
       }
-
       /// renders transposed adjactor composition
       template<
         typename Adjactor1_,

@@ -41,11 +41,13 @@ namespace FEAT
       _domain_ptr(num_nodes_domain + 1),
       _image_idx(num_indices_image)
     {
-      for(Index i(0); i <= num_nodes_domain; ++i)
+      FEAT_PRAGMA_OMP(parallel for)
+      for(Index i = 0; i <= num_nodes_domain; ++i)
       {
         _domain_ptr[i] = domain_ptr[i];
       }
-      for(Index i(0); i < num_indices_image; ++i)
+      FEAT_PRAGMA_OMP(parallel for)
+      for(Index i = 0; i < num_indices_image; ++i)
       {
         _image_idx[i] = image_idx[i];
       }
@@ -183,7 +185,8 @@ namespace FEAT
     Index Graph::degree() const
     {
       Index deg = 0;
-      for(Index i(0); i+1 < _domain_ptr.size(); ++i)
+      FEAT_PRAGMA_OMP(parallel for reduction(max:deg))
+      for(Index i = 0; i < _domain_ptr.size()-1; ++i)
       {
         deg = std::max(deg, _domain_ptr[i+1] - _domain_ptr[i]);
       }
@@ -196,7 +199,8 @@ namespace FEAT
       XASSERTM(!_image_idx.empty(), "image index vector is missing");
 
       // loop over all domain nodes
-      for(Index i(0); i+1 < _domain_ptr.size(); ++i)
+      FEAT_PRAGMA_OMP(parallel for)
+      for(Index i=0; i < _domain_ptr.size()-1; ++i)
       {
         // let the STL do the sorting work
         std::sort(_image_idx.begin() + IndexVector::difference_type(_domain_ptr[i]),
@@ -210,8 +214,11 @@ namespace FEAT
       XASSERT(Index(_image_idx.size()) == inv_perm.size());
 
       // map all indices
-      for(Index& idx : _image_idx)
-        idx = inv_perm.map(idx);
+      FEAT_PRAGMA_OMP(parallel for)
+      for (Index i = 0; i < _image_idx.size(); ++i)
+      {
+        _image_idx[i] = inv_perm.map(_image_idx[i]);
+      }
     }
 
     std::vector<char> Graph::serialize() const
