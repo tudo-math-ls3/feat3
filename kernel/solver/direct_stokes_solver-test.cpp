@@ -17,15 +17,16 @@ class DirectStokesSolverTest :
   public TestSystem::UnitTest
 {
 public:
-  explicit DirectStokesSolverTest(PreferredBackend backend) :
-    TestSystem::UnitTest("DirectStokesSolverTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  const DT_ tol;
+
+  explicit DirectStokesSolverTest(PreferredBackend backend, DT_ tol_) :
+    TestSystem::UnitTest("DirectStokesSolverTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
+    tol(tol_)
   {
   }
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
-
     const IT_ m = 8;
     const IT_ num_cells = m*m;
     const IT_ num_edges = 2*m*(m+1);
@@ -181,14 +182,14 @@ public:
 };
 
 #ifdef FEAT_HAVE_UMFPACK
-DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_umfpack_double_u32(PreferredBackend::generic);
-DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_umfpack_double_u64(PreferredBackend::generic);
+DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_umfpack_double_u32(PreferredBackend::generic, 1e-12);
+DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_umfpack_double_u64(PreferredBackend::generic, 1e-12);
 #endif
 #ifdef FEAT_HAVE_MKL
-DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_mkldss_double_u32(PreferredBackend::mkl);
-DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_mkldss_double_u64(PreferredBackend::mkl);
+DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_mkldss_double_u32(PreferredBackend::mkl, 1e-8);
+DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_mkldss_double_u64(PreferredBackend::mkl, 1e-8);
 #endif
 #ifdef FEAT_HAVE_CUDSS
-DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_cudss_double_u32(PreferredBackend::cuda);
-DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_cudss_double_u64(PreferredBackend::cuda);
+DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_cudss_double_u32(PreferredBackend::cuda, 1e-10);
+DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_cudss_double_u64(PreferredBackend::cuda, 1e-10);
 #endif
