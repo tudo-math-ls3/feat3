@@ -10,31 +10,16 @@
  *
  * \brief Compiler detection header for GNU C++ compiler.
  *
- * \author Dirk Ribbrock
- * \author Dominik Goeddeke
+ * \author Dirk Ribbrock, Dominik Goeddeke, Peter Zajac
  */
 
 #if !defined(FEAT_COMPILER) && defined(__GNUC__)
 
-// calc linear sortable gcc version
-#  define FEAT_COMPILER_GNU (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+// compute linear sortable gcc version
+#define FEAT_COMPILER_GNU (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
-#if(__GNUC__ >= 9)
-#  define FEAT_COMPILER "GNU C++ compiler 9.x.x (or newer)"
-#elif(__GNUC__ >= 8)
-#  define FEAT_COMPILER "GNU C++ compiler 8.x.x"
-#elif(__GNUC__ >= 7)
-#  define FEAT_COMPILER "GNU C++ compiler 7.x.x"
-#elif(__GNUC__ >= 6)
-#  define FEAT_COMPILER "GNU C++ compiler 6.x.x"
-#elif(__GNUC__ >= 5)
-#  define FEAT_COMPILER "GNU C++ compiler 5.x.x"
-#elif(__GNUC__ >= 4)
-#  define FEAT_COMPILER "GNU C++ compiler 4.x.x"
-#else
-// too old to compile FEAT anyway...
-#  define FEAT_COMPILER "GNU C++ compiler"
-#endif
+// define compiler string
+#define FEAT_COMPILER ("g++ (GCC) " FEAT_STRINGIFY(__GNUC__) "." FEAT_STRINGIFY(__GNUC_MINOR__) "." FEAT_STRINGIFY(__GNUC_PATCHLEVEL__))
 
 #if(FEAT_COMPILER_GNU >= 40900)
 #  define FEAT_PRAGMA_IVDEP _Pragma("GCC ivdep")

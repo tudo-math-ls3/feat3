@@ -16,24 +16,10 @@
 #if !defined(FEAT_COMPILER) && defined(__INTEL_LLVM_COMPILER)
 
 // define FEAT_COMPILER_INTEL_ONEAPI macro
-#  define FEAT_COMPILER_INTEL_ONEAPI __INTEL_LLVM_COMPILER
+#define FEAT_COMPILER_INTEL_ONEAPI __INTEL_LLVM_COMPILER
 
-// map version to human-readable string
-#  if(__INTEL_LLVM_COMPILER >= 20250000)
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2025.x (or newer)"
-#  elif(__INTEL_LLVM_COMPILER >= 20240000)
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2024.x"
-#  elif(__INTEL_LLVM_COMPILER >= 20230000)
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2023.x"
-#  elif(__INTEL_LLVM_COMPILER >= 20220000)
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2022."
-#  elif(__INTEL_LLVM_COMPILER >= 20210000)
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2021."
-#  elif(__INTEL_LLVM_COMPILER >= 20200000)
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler 2020."
-#  else
-#    define FEAT_COMPILER "Intel OneAPI C/C++ compiler"
-#  endif
+// define compiler string
+#define FEAT_COMPILER __VERSION__
 
 // oneAPI compilers are based on clang, so use clang-style diagnostics
 

@@ -31,6 +31,12 @@
 #if defined(FEAT_DEBUG_MODE) && !defined(DEBUG)
 #  define DEBUG 1
 #endif
+
+// macro used by compiler detection headers to build compiler version string
+#ifndef FEAT_STRINGIFY
+#define FEAT_STRINGIFY_HELPER(x) #x
+#define FEAT_STRINGIFY(x) FEAT_STRINGIFY_HELPER(x)
+#endif
 /// \endcond
 
 // include compiler detection headers

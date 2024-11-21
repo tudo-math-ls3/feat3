@@ -15,10 +15,11 @@
 
 #if !defined(FEAT_COMPILER) && defined(__clang__)
 
-// calc linear sortable clang version
+// compute linear sortable clang version
 #define FEAT_COMPILER_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 
-#define FEAT_COMPILER "Clang Compiler" // __clang_version__ contains details
+// define compiler string
+#define FEAT_COMPILER ("clang " __clang_version__)
 
 #if(__clang_major__ >= 15)
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
