@@ -509,7 +509,7 @@ namespace DFG95
     const String cubature("gauss-legendre:3");
 
     // cubature for post-processing
-    Cubature::DynamicFactory cubature_postproc("gauss-legendre:5");
+    const String cubature_postproc("gauss-legendre:5");
 
     /* ***************************************************************************************** */
 

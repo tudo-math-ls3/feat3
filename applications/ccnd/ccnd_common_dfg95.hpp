@@ -627,9 +627,8 @@ namespace CCND
       virtual void compute_body_forces_surf(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const LocalPresVector& vec_sol_p,
         const SpaceVeloType& space_velo, const SpacePresType& space_pres, DataType nu, DataType v_max, int bench)
       {
-        Cubature::DynamicFactory cubature_factory(cubature_body_forces_surf);
         BenchBodyForceAccumulator body_force_accum;
-        body_force_asm->assemble_flow_accum(body_force_accum, vec_sol_v, vec_sol_p, space_velo, space_pres, cubature_factory);
+        body_force_asm->assemble_flow_accum(body_force_accum, vec_sol_v, vec_sol_p, space_velo, space_pres, cubature_body_forces_surf);
         body_force_accum.sync(comm);
 
         DataType bbf = bench_body_factor(bench, v_max);
@@ -695,12 +694,10 @@ namespace CCND
 
       virtual void compute_pressure_drop(const Dist::Comm& comm, const LocalPresVector& vec_sol_p, const SpacePresType& space_pres, int bench)
       {
-        Cubature::DynamicFactory cubature_factory(cubature_flux);
-
         DataType pv[2] =
         {
-          flux_asm_in->assemble_discrete_integral(vec_sol_p, space_pres, cubature_factory),
-          flux_asm_out->assemble_discrete_integral(vec_sol_p, space_pres, cubature_factory)
+          flux_asm_in->assemble_discrete_integral(vec_sol_p, space_pres, cubature_flux),
+          flux_asm_out->assemble_discrete_integral(vec_sol_p, space_pres, cubature_flux)
         };
 
         comm.allreduce(pv, pv, 2u, Dist::op_sum);
@@ -718,13 +715,11 @@ namespace CCND
 
       virtual void compute_fluxes(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const SpaceVeloType& space_velo)
       {
-        Cubature::DynamicFactory cubature_factory(cubature_flux);
-
         DataType fx[3] =
         {
-          flux_asm_u->assemble_discrete_integral(vec_sol_v, space_velo, cubature_factory)[0],
-          flux_asm_l->assemble_discrete_integral(vec_sol_v, space_velo, cubature_factory)[0],
-          flux_asm_out->assemble_discrete_integral(vec_sol_v, space_velo, cubature_factory)[0]
+          flux_asm_u->assemble_discrete_integral(vec_sol_v, space_velo, cubature_flux)[0],
+          flux_asm_l->assemble_discrete_integral(vec_sol_v, space_velo, cubature_flux)[0],
+          flux_asm_out->assemble_discrete_integral(vec_sol_v, space_velo, cubature_flux)[0]
         };
 
         comm.allreduce(fx, fx, 3u, Dist::op_sum);

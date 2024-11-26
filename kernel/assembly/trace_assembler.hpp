@@ -330,6 +330,92 @@ namespace FEAT
        * \param[in] space
        * A \transient reference to the finite-element test-/trial-space to be used.
        *
+       * \param[in] cubature_name
+       * The name of to the cubature rule to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
+       */
+      template<
+        typename Matrix_,
+        typename Operator_,
+        typename Space_>
+      void assemble_operator_matrix1(
+        Matrix_& matrix,
+        Operator_& operat,
+        const Space_& space,
+        const String& cubature_name,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
+      {
+        // call the version for 2 FE spaces for the sake of laziness
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_operator_matrix2(matrix, operat, space, space, cubature_factory, alpha);
+      }
+
+      /**
+       * \brief Assembles a bilinear operator into a matrix.
+       *
+       * This function is the version for different test- and trial-spaces.
+       *
+       * \note
+       * The assembler automatically computes the normal vectors in the cubature points of each
+       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
+       * during the <c>set_point()</c> function call of the operator's evaluator.
+       *
+       * \param[in,out] matrix
+       * The \transient matrix that is to be assembled.
+       *
+       * \param[in] operat
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
+       *
+       * \param[in] test_space
+       * A \transient reference to the finite-element test-space to be used.
+       *
+       * \param[in] trial_space
+       * A \transient reference to the finite-element trial-space to be used.
+       *
+       * \param[in] cubature_name
+       * The name of to the cubature rule to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
+       */
+      template<
+        typename Matrix_,
+        typename Operator_,
+        typename TestSpace_,
+        typename TrialSpace_>
+      void assemble_operator_matrix2(
+        Matrix_& matrix,
+        Operator_& operat,
+        const TestSpace_& test_space,
+        const TrialSpace_& trial_space,
+        const String& cubature_name,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_operator_matrix2(matrix, operat, test_space, trial_space, cubature_factory, alpha);
+      }
+
+      /**
+       * \brief Assembles a bilinear operator into a matrix.
+       *
+       * This function is the version for identical test- and trial-spaces.
+       *
+       * \note
+       * The assembler automatically computes the normal vectors in the cubature points of each
+       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
+       * during the <c>set_point()</c> function call of the operator's evaluator.
+       *
+       * \param[in,out] matrix
+       * The \transient matrix that is to be assembled.
+       *
+       * \param[in] operat
+       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
+       *
+       * \param[in] space
+       * A \transient reference to the finite-element test-/trial-space to be used.
+       *
        * \param[in] cubature_factory
        * A \transient reference to the cubature factory to be used for integration.
        *
@@ -599,6 +685,44 @@ namespace FEAT
        * \param[in] space
        * A \transient reference to the finite-element (test) space to be used.
        *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the linear functional.
+       */
+      template<
+        typename Vector_,
+        typename Functional_,
+        typename Space_>
+      void assemble_functional_vector(
+        Vector_& vector,
+        const Functional_& functional,
+        const Space_& space,
+        const String& cubature_name,
+        typename Vector_::DataType alpha = typename Vector_::DataType(1)) const
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_functional_vector(vector, functional, space, cubature_factory, alpha);
+      }
+
+      /**
+       * \brief Assembles a linear functional into a vector.
+       *
+       * \note
+       * The assembler automatically computes the normal vectors in the cubature points of each
+       * facet (even if the functional did not ask for this), which can be queried by <c>tau.normal</c>
+       * during the <c>set_point()</c> function call of the operator's evaluator.
+       *
+       * \param[in,out] vector
+       * A \transient reference to the vector that is to be assembled.
+       *
+       * \param[in] functional
+       * A \transient reference to the linear functional implementing the LinearFunctional interface to be assembled.
+       *
+       * \param[in] space
+       * A \transient reference to the finite-element (test) space to be used.
+       *
        * \param[in] cubature_factory
        * A \transient reference to the cubature factory to be used for integration.
        *
@@ -781,6 +905,62 @@ namespace FEAT
 
           // continue with next cell
         }
+      }
+
+      /**
+       * \brief Assembles a flow accumulator.
+       *
+       * This function assembles a so-called accumulator on a sub-dimensional
+       * mesh region, which can be used to assemble body forces on a boundary.
+       *
+       * \attention
+       * This assembly function is somewhat provisional - use at own risk!
+       *
+       * The accumulator that is assembled by this function has to provide
+       * an overloaded "operator()" with the following function parameters:
+       * - cubature weight (scalar)
+       * - mapped image point (Tiny::Vector)
+       * - jacobi matrix (Tiny::Matrix)
+       * - velocity value (Tiny::Vector)
+       * - velocity gradient (Tiny::Matrix)
+       * - pressure value (scalar)
+       *
+       * \param[inout] accum
+       * The accumulator to be assembled. The "operator()" of this object
+       * is called for each cubature point on each facet.
+       *
+       * \param[in] vector_v
+       * The velocity vector.
+       *
+       * \param[in] vector_p
+       * The pressure vector.
+       *
+       * \param[in] space_v
+       * The velocity space.
+       *
+       * \param[in] space_p
+       * The pressure space.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule that is to be used for integration.
+       */
+      template<
+        typename Accum_,
+        typename DataType_,
+        typename IndexType_,
+        int dim_,
+        typename SpaceV_,
+        typename SpaceP_>
+      void assemble_flow_accum(
+        Accum_& accum,
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector_v,
+        const LAFEM::DenseVector<DataType_, IndexType_>& vector_p,
+        const SpaceV_& space_v,
+        const SpaceP_& space_p,
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_flow_accum(accum, vector_v, vector_p, space_v, space_p, cubature_factory);
       }
 
       /**
@@ -1015,19 +1195,43 @@ namespace FEAT
       }
 
       /**
-      * \brief Assembles the surface integral of a discrete function
-      *
-      * \param[in] vector
-      * A \transient reference to the vector that represents the function to be integrated
-      *
-      * \param[in] space
-      * A \transient reference to the finite element space
-      *
-      * \param[in] cubature_factory
-      * The cubature factory
-      *
-      * \returns The surface integral of the discrete function
-      */
+       * \brief Assembles the surface integral of a discrete function
+       *
+       * \param[in] vector
+       * A \transient reference to the vector that represents the function to be integrated
+       *
+       * \param[in] space
+       * A \transient reference to the finite element space
+       *
+       * \param[in] cubature_nane
+       * The name of the cubature rule to be used for integration
+       *
+       * \returns The surface integral of the discrete function
+       */
+      template<typename DataType_, typename IndexType_, typename Space_>
+      DataType_ assemble_discrete_integral(
+        const LAFEM::DenseVector<DataType_, IndexType_>& vector,
+        const Space_& space,
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        return assemble_discrete_integral(vector, space, cubature_factory);
+      }
+
+      /**
+       * \brief Assembles the surface integral of a discrete function
+       *
+       * \param[in] vector
+       * A \transient reference to the vector that represents the function to be integrated
+       *
+       * \param[in] space
+       * A \transient reference to the finite element space
+       *
+       * \param[in] cubature_factory
+       * The cubature factory
+       *
+       * \returns The surface integral of the discrete function
+       */
       template<typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
       DataType_ assemble_discrete_integral(
         const LAFEM::DenseVector<DataType_, IndexType_>& vector,
@@ -1174,6 +1378,30 @@ namespace FEAT
 
         // done
         return flux;
+      }
+
+      /**
+       * \brief Assembles the surface integral of a discrete function
+       *
+       * \param[in] vector
+       * A \transient reference to the vector that represents the function to be integrated
+       *
+       * \param[in] space
+       * A \transient reference to the finite element space
+       *
+       * \param[in] cubature_nane
+       * The name of the cubature rule to be used for integration
+       *
+       * \returns The surface integral of the discrete function
+       */
+      template<typename DataType_, typename IndexType_, typename Space_, int dim_>
+      Tiny::Vector<DataType_, dim_> assemble_discrete_integral(
+        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
+        const Space_& space,
+        const String& cubature_name)
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        return assemble_discrete_integral(vector, space, cubature_factory);
       }
 
       /**
@@ -1337,6 +1565,49 @@ namespace FEAT
 
         // done
         return flux;
+      }
+
+      /**
+       * \brief Assembles the jump-stabilization operator onto a matrix.
+       *
+       * This function assembles the jump stabilization operator:
+       *   \f[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\f]
+       *
+       * \attention
+       * The matrix must have an extended stencil, which must have been assembled by calling
+       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
+       *
+       * \param[inout] matrix
+       * The matrix that is to be assembled.
+       *
+       * \param[in] space
+       * The finite element space to be used.
+       *
+       * \param[in] cubature_name
+       * The cubature for integration. Note that this is a cubature rule on the facets.
+       *
+       * \param[in] gamma
+       * The scaling factor gamma for the jump stabilization operator.
+       *
+       * \param[in] jacdet_scal
+       * The scaling factor \e s for the Jacobian determinant factor.
+       *
+       * \param[in] jacdet_expo
+       * The exponent \e p for the Jacobian determinant factor.
+       */
+      template<
+        typename Matrix_,
+        typename Space_>
+      void assemble_jump_stabil_operator_matrix(
+        Matrix_& matrix,
+        const Space_& space,
+        const String& cubature_name,
+        typename Matrix_::DataType gamma = typename Matrix_::DataType(1),
+        typename Matrix_::DataType jacdet_scal = typename Matrix_::DataType(2),
+        typename Matrix_::DataType jacdet_expo = typename Matrix_::DataType(2)) const
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_jump_stabil_operator_matrix(matrix, space, cubature_factory, gamma, jacdet_scal, jacdet_expo);
       }
 
       /**
@@ -1594,8 +1865,43 @@ namespace FEAT
        * \param[in] space
        * The finite element space to be used.
        *
+       * \param[in] cubature_name
+       * The cubature rule for integration. Note that this is a cubature rule on the facets.
+       *
+       * \param[in] alpha
+       * The scaling factor alpha for the jump operator.
+       */
+      template<
+        typename Matrix_,
+        typename Space_>
+      void assemble_jump_operator_matrix(
+        Matrix_& matrix,
+        const Space_& space,
+        const String& cubature_name,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
+      {
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        assemble_jump_operator_matrix(matrix, space, cubature_name, alpha);
+      }
+
+      /**
+       * \brief Assembles the jump operator onto a matrix.
+       *
+       * This function assembles the jump operator:
+       *   \f[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\f]
+       *
+       * \attention
+       * The matrix must have an extended stencil, which must have been assembled by calling
+       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
+       *
+       * \param[inout] matrix
+       * The matrix that is to be assembled.
+       *
+       * \param[in] space
+       * The finite element space to be used.
+       *
        * \param[in] cubature_factory
-       * The cubature for integration. Note that this is a cubature rule on the facets.
+       * The cubature rule for integration. Note that this is a cubature rule on the facets.
        *
        * \param[in] alpha
        * The scaling factor alpha for the jump operator.
