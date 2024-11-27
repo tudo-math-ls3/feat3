@@ -202,7 +202,7 @@ namespace VoxelMapGenerator
           seems_valid = false;
         }
       }
-      else // 3D case
+      else if(header.num_blocks > 0u) // 3D case
       {
         if(header.num_blocks > header.num_z)
         {
@@ -221,7 +221,7 @@ namespace VoxelMapGenerator
         }
       }
 
-      // check minimum filesize
+      // check minimum file size
       u64 total_head_size = Geometry::VoxelMap::header_size + header.num_blocks * sizeof(u64);
       if(filesize < total_head_size)
       {
