@@ -1102,7 +1102,8 @@ namespace FEAT
         header.num_z = _num_slices[2];
         header.stride_volume = _stride_plane * _num_slices[2];
 
-        XASSERT(_voxel_map.size() == header.stride_volume);
+        // _voxel_map may contain trailing padding bytes
+        XASSERT(header.stride_volume <= _voxel_map.size());
 
         // do we have to compress the map?
 #ifdef FEAT_HAVE_ZLIB
