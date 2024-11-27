@@ -473,11 +473,17 @@ namespace VoxelMapGenerator
     // query compression settings
     Index compress_size = 128u;
     int compress_level = 9;
-    bool compress_map = (args.parse("compress", compress_size, compress_level) >= 0);
+    bool compress_map = (args.check("compress") >= 0);
+    if(args.parse("compress", compress_size, compress_level) < 0)
+    {
+      comm.print(std::cerr, "ERROR: failed to parse compression size/level");
+      return 1;
+    }
     // technically 0 is also a valid compression level
     if((compress_level < 1) || (compress_level > 9))
     {
       comm.print(std::cerr, "ERROR: invalid compression level " + stringify(compress_level));
+      return 1;
     }
     if(!compress_map)
     {
