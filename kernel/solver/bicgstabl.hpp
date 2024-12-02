@@ -326,6 +326,7 @@ namespace FEAT
 
           //choose  vec_r0_tilde as vec_r0_hat (vec_rj_hat[0])
           _vec_r0_tilde.copy(_vec_rj_hat.at(0));
+          _vec_uj_hat.at(0).format();
 
           std::vector<DataType>  tau               ( Index( l*(l-1) ) , DataType(0));             //vector for tau_ij (j from 0 to l-1 , i from 0 to j-1, so LESS THAN HALF of the vector gets used)
                                                                                                   //tau_ij = tau[j*(l-1) + i] (column major ordering)
@@ -372,7 +373,7 @@ namespace FEAT
               for ( int i(0) ; i <= j ; i++)
               {
                 _vec_uj_hat.at(Index(i)).scale(_vec_uj_hat.at(Index(i)), -beta);
-                _vec_uj_hat.at( Index(i)).axpy(_vec_rj_hat.at( Index(i)));/// \todo use axpby here
+                _vec_uj_hat.at(Index(i)).axpy(_vec_rj_hat.at( Index(i)));/// \todo use axpby here
               }
 
 
