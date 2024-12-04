@@ -822,7 +822,7 @@ public:
       DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> z(size, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
-      DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
+      //DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
       DT_ alpha = DT_(3);
       DT_ beta = DT_(1.5);
 
@@ -853,12 +853,12 @@ public:
         }
       }
 
-      result.multiply(x, y, z, alpha, beta);
+      z.multiply(x, y, alpha, beta);
 
-      for (Index i(0); i < result.rows(); ++i)
+      for (Index i(0); i < z.rows(); ++i)
       {
-        for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
+        for (Index j(0); j < z.columns(); ++j)
+          TEST_CHECK_RELATIVE(z(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
       if (typeid(DT_) == typeid(Half))

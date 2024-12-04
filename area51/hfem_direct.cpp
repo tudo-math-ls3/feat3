@@ -122,7 +122,7 @@ namespace HFEM_direct
       //LAFEM::Arch::Apply::dense(v.elements(), DT_(-1.), DT_(-1.), v.elements(), Btd.elements(),
       //                           f.elements(), Btd.rows(), Btd.columns());
       //LAFEM::Arch::ProductMatMat::dense(v.elements(), DT_(-1.), DT_(-1.), Btd.elements(), f.elements(), v.elements(), Btd.rows(), Btd.columns(), Btd.columns());
-      v.multiply(Btd, f, v, DT_(-1.), DT_(-1.));
+      v.multiply(Btd, f, DT_(-1.), DT_(-1.));
 
       //axpy(T(1.0), g, v);                            // v = g + v
       v.axpy(g);
@@ -146,7 +146,7 @@ namespace HFEM_direct
       //axpy(T(-1.0), B, v, T(1.0), u);                // u = -B * v + u
       //Bd.apply(u, v, u, DT_(-1.));
       //LAFEM::Arch::ProductMatMat::dense(u.elements(), DT_(-1.), DT_(1.), Bd.elements(), v.elements(), u.elements(), Btd.rows(), Btd.columns(), Bd.columns());
-      u.multiply(Bd, v, u, DT_(-1));
+      u.multiply(Bd, v, DT_(-1));
 
       // STEP 3: w = C^-1 * (h - D^t * v)
       // note: htmp is equal to h

@@ -755,31 +755,28 @@ namespace FEAT
       }
 
       /**
-       * \brief Calculate \f$this \leftarrow \alpha~ x y + \beta~ z\f$
+       * \brief Calculate \f$this \leftarrow \alpha~ x y + \beta~ this\f$
        *
        * \param[in] x The first matrix to be scaled with alpha.
        * \param[in] y The second matrix to be multiplied with x.
-       * \param[in] z A summand matrix to be scaled with beta.
        * \param[in] alpha A scalar to multiply x with.
        * \param[in] beta A scalar to multiply z with.
        */
       void multiply(
         const DenseMatrix & x,
         const DenseMatrix & y,
-        const DenseMatrix & z,
         const DT_ alpha = DT_(1),
         const DT_ beta = DT_(1))
       {
         XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
         XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
         XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
-        XASSERTM(this->rows() == z.rows(), "dimension mismatch!");
 
         TimeStamp ts_start;
 
         Statistics::add_flops(this->size() * 2);
         Arch::ProductMatMat::dense(this->elements(), alpha, beta, x.elements(),
-                                         y.elements(), z.elements(), this->rows(), this->columns(), x.columns());
+                                         y.elements(), this->elements(), this->rows(), this->columns(), x.columns());
 
         TimeStamp ts_stop;
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
