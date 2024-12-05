@@ -16,18 +16,19 @@ namespace FEAT
       _num_nodes_image(0),
       _domain_ptr(),
       _image_idx()
-    {}
+    {
+    }
 
     // allocation constructor
     Graph::Graph(
       Index num_nodes_domain,
       Index num_nodes_image,
-      Index num_indices_image)
-        :
+      Index num_indices_image) :
       _num_nodes_image(num_nodes_image),
       _domain_ptr(num_nodes_domain + 1),
       _image_idx(num_indices_image)
-    {}
+    {
+    }
 
     // "Copy-Array" Constructor
     Graph::Graph(
@@ -35,8 +36,7 @@ namespace FEAT
       Index num_nodes_image,
       Index num_indices_image,
       const Index* domain_ptr,
-      const Index* image_idx)
-        :
+      const Index* image_idx) :
       _num_nodes_image(num_nodes_image),
       _domain_ptr(num_nodes_domain + 1),
       _image_idx(num_indices_image)
@@ -52,18 +52,17 @@ namespace FEAT
         _image_idx[i] = image_idx[i];
       }
     }
+
     // "Copy-Vector" Constructor
     Graph::Graph(
       Index num_nodes_image,
       const IndexVector& domain_ptr,
-      const IndexVector& image_idx)
-      :
+      const IndexVector& image_idx) :
       _num_nodes_image(num_nodes_image),
       _domain_ptr(domain_ptr),
       _image_idx(image_idx)
-
-    {}
-
+    {
+    }
 
     // move ctor
     Graph::Graph(Graph&& other) :
@@ -108,8 +107,8 @@ namespace FEAT
       for(Index i(0); i < other.get_num_nodes_domain(); ++i)
       {
         _domain_ptr[i+1] = other._domain_ptr[domain_perm_pos[i]+1]
-                        - other._domain_ptr[domain_perm_pos[i]]
-                        + _domain_ptr[i];
+                         - other._domain_ptr[domain_perm_pos[i]]
+                         + _domain_ptr[i];
       }
 
       // get image permutation
@@ -134,7 +133,6 @@ namespace FEAT
       _domain_ptr(),
       _image_idx()
     {
-
       // 40 bytes required by header only
       XASSERTM(buffer.size() >= std::size_t(40u), "invalid buffer size");
 
@@ -147,9 +145,9 @@ namespace FEAT
       // check buffer size
       XASSERTM(v[1] == u64(buffer.size()), "invalid buffer size");
 
-     Index domain_ptr_size  = Index(v[2]);
-     this->_num_nodes_image = Index(v[3]);
-     Index num_indices_image = Index(v[4]);
+      Index domain_ptr_size  = Index(v[2]);
+      this->_num_nodes_image = Index(v[3]);
+      Index num_indices_image = Index(v[4]);
 
       const u64* x = &v[5];
 
@@ -173,7 +171,8 @@ namespace FEAT
 
     // destructor
     Graph::~Graph()
-    {}
+    {
+    }
 
     void Graph::clear()
     {
@@ -236,7 +235,6 @@ namespace FEAT
       v[2] = u64(this->_domain_ptr.size()-1);
       v[3] = u64(this->_num_nodes_image);
       v[4] = u64(this->_image_idx.size());
-
 
       // empty graph?
       if(this->_domain_ptr.size() <= Index(1))

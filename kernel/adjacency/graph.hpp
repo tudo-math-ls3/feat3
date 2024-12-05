@@ -32,7 +32,8 @@ namespace FEAT
     class Graph
     {
     public:
-      using IndexVector = std::vector < Index>;
+      /// index vector type
+      using IndexVector = std::vector<Index>;
 
       /**
        * \brief ImageIterator for Graph class
@@ -42,7 +43,7 @@ namespace FEAT
        */
       typedef IndexVector::const_iterator ImageIterator;
 
-      // magic number for Graph serialization
+      /// magic number for Graph serialization
       static constexpr std::uint64_t magic = 0x5052474A44413346ull; // "F3ADJGRP"
 
     protected:
@@ -63,9 +64,7 @@ namespace FEAT
        */
       IndexVector _image_idx;
 
-
     public:
-
       /**
        * \brief Default constructor.
        *
@@ -209,7 +208,7 @@ namespace FEAT
       explicit Graph(RenderType render_type, const Adjactor1_& adjactor1, const Adjactor2_& adjactor2) :
         _num_nodes_image(0),
         _domain_ptr(),
-       _image_idx()
+        _image_idx()
       {
         switch(render_type)
         {
@@ -409,7 +408,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj.get_num_nodes_domain() +1);
+        _domain_ptr = IndexVector(adj.get_num_nodes_domain() + 1);
         _domain_ptr[0] = 0;
         // count number of adjacencies and build pointer vector
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
@@ -460,7 +459,7 @@ namespace FEAT
         FEAT_PRAGMA_OMP(parallel)
         {
           // allocate auxiliary mask vector
-          std::vector<char> vidx_mask(adj.get_num_nodes_image(),0);
+          std::vector<char> vidx_mask(adj.get_num_nodes_image(), 0);
           char* idx_mask = vidx_mask.data();
 
           // count number of adjacencies and build pointer vector
@@ -491,7 +490,7 @@ namespace FEAT
 
         FEAT_PRAGMA_OMP(parallel)
         {
-          std::vector<char> vidx_mask(adj.get_num_nodes_image(),0);
+          std::vector<char> vidx_mask(adj.get_num_nodes_image(), 0);
           char* idx_mask = vidx_mask.data();
           FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
           for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
@@ -523,7 +522,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate and format pointer vector
-        _domain_ptr = IndexVector(adj.get_num_nodes_image() + 1,Index(0));
+        _domain_ptr = IndexVector(adj.get_num_nodes_image() + 1, Index(0));
 
         // count number of adjacencies
         for(Index j(0); j < adj.get_num_nodes_domain(); ++j)
@@ -575,7 +574,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr =IndexVector(adj.get_num_nodes_image() + 1,0);
+        _domain_ptr = IndexVector(adj.get_num_nodes_image() + 1, Index(0));
         // allocate auxiliary mask vector
         std::vector<char> vidx_mask(adj.get_num_nodes_image(), 0);
         char* idx_mask = vidx_mask.data();
@@ -774,6 +773,7 @@ namespace FEAT
           }
         }
       }
+
       /// renders transposed adjactor composition
       template<
         typename Adjactor1_,
@@ -793,7 +793,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate and format pointer vector
-        _domain_ptr =IndexVector(adj2.get_num_nodes_image() + 1,Index(0));
+        _domain_ptr =IndexVector(adj2.get_num_nodes_image() + 1, Index(0));
 
         // count number of adjacencies
         for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
@@ -863,8 +863,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-
-        _domain_ptr = IndexVector(adj2.get_num_nodes_image() +1,Index(0));
+        _domain_ptr = IndexVector(adj2.get_num_nodes_image() + 1, Index(0));
 
         // allocate auxiliary mask vector
         std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
@@ -932,19 +931,15 @@ namespace FEAT
       /* ******************************************************************* */
     public:
 
-
       inline Index get_num_nodes_domain() const
       {
         return (_domain_ptr.empty() ? Index(0) : Index(_domain_ptr.size() - 1));
-
       }
-
 
       inline Index get_num_nodes_image() const
       {
         return _num_nodes_image;
       }
-
 
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
