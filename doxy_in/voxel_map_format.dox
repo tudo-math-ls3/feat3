@@ -33,12 +33,12 @@ The above formula can also be slightly rewritten by using bit-wise operators (ya
 - <b>stride_line := (((num_x + 7) >> 3) + 15) & ~15)</b>
 
 The plane stride specifies the length of a single XY-plane of voxels in bytes. Let \b num_y denote the Y-dimension of
-a voxel map, then the smallest legal line stride is given by
+a voxel map, then the smallest legal plane stride is given by
 
 - <b>stride_plane := num_y * stride_line</b>
 
 The volume stide specifies the total size of the XYZ-volume of voxels in bytes. Let \b num_z denote the Z-dimension
-of a voxel map, then the smallest legal line stride is given by
+of a voxel map, then the smallest legal volume stride is given by
 
 - <b>stride_volume := num_z * stride_plane</b>
 
@@ -49,6 +49,10 @@ then the bit of the corresponding voxel can be extracted by the following formul
 
 - <b>(voxel_map[k*plane_stride + j*line_stride + i/8] >> (i%8)) & 1</b>
 
+The above formula can also be slightly rewritten by using bit-wise operators (yay!):
+
+- <b>(voxel_map[k*plane_stride + j*line_stride + (i>>3)] >> (i & 7)) & 1</b>
+
 \subsection voxel_map_file_coords Voxel Coordinates
 
 To avoid storing floating point values in the voxel map file, the choice was made to convert the coordinates to signed
@@ -56,14 +60,14 @@ integer values by first multiplying the floating point values by 1E+9 and then c
 signed 64-bit integer type.
 
 Furthermore, the domain discretized by the voxel map  with a given resolution is represented by the minimum and maximum
-X/Y/Z coordinates of the domain's bounding box stored as i64 values, so to obtain the floating point values
-one has to cast the integer values to the floating point format and then multiply these values by 1E-9.
+X/Y/Z coordinates of the domain's bounding box stored as 64-bit signed integer values, so to obtain the floating point
+values one has to cast the integer values to the floating point format and then multiply these values by 1E-9.
 
-Voxels are evaluated in their barycenter coordinates, so if \b x_min and \b x_max are the minimum and maximum X-coordinates
+Voxels are represented as point values, so if \b x_min and \b x_max are the minimum and maximum X-coordinates
 (in floating point format) of the bounding box and the voxel map has \b num_x voxels in X-dimension, then the X-coordinate
 of the i-th voxel is given by the formula
 
-- <b>x_i := x_min + (x_max - x_min) * DT_(2*i + 1) / DT_(2*num_x)</b>
+- <b>x_i := x_min + (x_max - x_min) * Real(i) / Real(num_x - 1)</b>
 
 where DT_ represents the floating point format, e.g. double. The Y- and Z-coordinates are computed analogously.
 
@@ -71,7 +75,7 @@ where DT_ represents the floating point format, e.g. double. The Y- and Z-coordi
 
 A voxel map file consist of three sections:
 
-- file header
+- 128-byte file header
 - compression block size array (only if compressed)
 - (compressed) voxel map data
 
@@ -88,15 +92,15 @@ Offset | Type | Name | Entry
   8 | u64 | header_size | must be equal to 128
  16 | i64 | min_x | minimum X-coordinate of bounding box
  24 | i64 | max_x | maximum X-coordinate of bounding box
- 32 | u64 | num_x | number of voxels in X-dimension
+ 32 | u64 | num_x | number of points in X-dimension
  40 | u64 | stride_line | X-line stride: see \ref voxel_map_strides
  48 | i64 | min_y | minimum Y-coordinate of bounding box
  56 | i64 | max_y | maximum Y-coordinate of bounding box
- 64 | u64 | num_y | number of voxels in Y-dimension
+ 64 | u64 | num_y | number of points in Y-dimension
  72 | u64 | stride_plane | XY-plane stride: see \ref voxel_map_strides
  80 | i64 | min_z | minimum Z-coordinate of bounding box
  88 | i64 | max_z | maximum Z-coordinate of bounding box
- 96 | u64 | num_z | number of voxels in Z-dimension (0 for a 2D voxel map)
+ 96 | u64 | num_z | number of points in Z-dimension (0 for a 2D voxel map)
 104 | u64 | stride_volume | XYZ-volume stride: see \ref voxel_map_strides
 112 | u64 | planes_per_block | number of planes per compression block (0 if uncompressed)
 120 | u64 | num_blocks | total number of compression blocks (0 if uncompressed)
@@ -107,8 +111,8 @@ Voxel maps may (and actually \e should) be compressed by utilizing the ZLIB comp
 easily reduce the overall file size of a voxel map file by over 95%. Since compression can be a quite resource-hungry
 task, the voxel map file format offers the possibility to compress the voxel map in disjoint plane blocks rather than
 requiring that the entire voxel map, which may be sereval GB in size, has to be compressed as a single block.
-The drawback is that the file has to contain an array of sizes ofthe indiviual compressed blocks, which is a small price
-to pay.
+The drawback is that the file has to contain an array of sizes of the indiviual compressed blocks, which is a small
+price to pay.
 
 To reduce code complexity, a compression block can only contain entire XY-planes, i.e. a XY-plane must be contained
 in its entirety in a single compression block and so in consequence, the size of a compression block is given as the

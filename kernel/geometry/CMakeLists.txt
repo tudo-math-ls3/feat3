@@ -9,6 +9,7 @@ set(kernel-geometry-list
   cgal.cpp
   parti_parmetis.cpp
   parti_zoltan.cpp
+  voxel_map.cpp
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

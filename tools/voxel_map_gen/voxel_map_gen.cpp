@@ -113,15 +113,15 @@ namespace VoxelMapGenerator
       std::cout << "Minimum X coord....: " << stringify_fp_fix(double(header.min_x) * unit_scale, 6, 12) << "\n";
       std::cout << "Maximum X coord....: " << stringify_fp_fix(double(header.max_x) * unit_scale, 6, 12) << "\n";
       std::cout << "Resolution X.......: " << stringify_fp_fix(header.num_x > 0u ? double(header.max_x - header.min_x) / double(header.num_x) * unit_scale : 0.0, 6, 12) << "\n";
-      std::cout << "Number of Slices X.: " << stringify(header.num_x).pad_front(12) << "\n";
+      std::cout << "Number of Points X.: " << stringify(header.num_x).pad_front(12) << "\n";
       std::cout << "Minimum Y coord....: " << stringify_fp_fix(double(header.min_y) * unit_scale, 6, 12) << "\n";
       std::cout << "Maximum Y coord....: " << stringify_fp_fix(double(header.max_y) * unit_scale, 6, 12) << "\n";
       std::cout << "Resolution Y.......: " << stringify_fp_fix(header.num_y > 0u ? double(header.max_y - header.min_y) / double(header.num_y) * unit_scale : 0.0, 6, 12) << "\n";
-      std::cout << "Number of Slices Y.: " << stringify(header.num_y).pad_front(12) << "\n";
+      std::cout << "Number of Points Y.: " << stringify(header.num_y).pad_front(12) << "\n";
       std::cout << "Minimum Z coord....: " << stringify_fp_fix(double(header.min_z) * unit_scale, 6, 12) << "\n";
       std::cout << "Maximum Z coord....: " << stringify_fp_fix(double(header.max_z) * unit_scale, 6, 12) << "\n";
       std::cout << "Resolution Z.......: " << stringify_fp_fix(header.num_z > 0u ? double(header.max_z - header.min_z) / double(header.num_z) * 1E-6 : 0.0, 6, 12) << "\n";
-      std::cout << "Number of Slices Z.: " << stringify(header.num_z).pad_front(12) << "\n";
+      std::cout << "Number of Points Z.: " << stringify(header.num_z).pad_front(12) << "\n";
       std::cout << "Number of Voxels...: " << stringify(header.num_x * Math::max(header.num_y, u64(1)) * Math::max(header.num_z, u64(1))).pad_front(12) << "\n";
       std::cout << "Stride Line........: " << stringify(header.stride_line).pad_front(12) << " Bytes\n";
       std::cout << "Stride Plane.......: " << stringify(header.stride_plane).pad_front(12) << " Bytes\n";
@@ -310,7 +310,7 @@ namespace VoxelMapGenerator
     args.support("box", "<x-min> <x-max> <y-min> <y-max> [<z-min> <z-max>]\n"
       "Specifies the minimum and maximum X-, Y- and Z-coordinates.");
     args.support("num", "<num-x> <num-y> [<num-z>]\n"
-      "Specifies the number of slices in X-, Y- and Z-dimension. Mutually exclusive with --res.");
+      "Specifies the number of points in X-, Y- and Z-dimension. Mutually exclusive with --res.");
     args.support("res", "<delta>\n"
       "Specifies the maximum voxel resolution in all dimensions. Mutually exclusive with --num.");
     args.support("render", "<bmp-fileprefix> <x-res> <y-res> <z-res>\n"
@@ -391,7 +391,7 @@ namespace VoxelMapGenerator
       // read voxel map from file
       comm.print("\nReading voxel map from file '" + in_name + "'...");
       read_result = voxel_map.read(comm, in_name);
-      dimension = (voxel_map.get_num_slices(2) > 0u ? 3 : 2);
+      dimension = (voxel_map.get_num_points(2) > 0u ? 3 : 2);
     }
     else // create voxel map somehow
     {
@@ -430,7 +430,7 @@ namespace VoxelMapGenerator
       // remember what dimension we're dealing with
       dimension = iarg / 2; // either 2 or 3
 
-      // set number of slices
+      // set number of points
       if(args.check("num") > 0)
       {
         Index num[3];
@@ -440,7 +440,7 @@ namespace VoxelMapGenerator
           std::cerr << "ERROR: failed to parse --num parameter '" << args.get_arg(-iarg) << "' as count!\n";
           return 1;
         }
-        voxel_map.set_num_slices(num[0], num[1], num[2]);
+        voxel_map.set_num_points(num[0], num[1], num[2]);
       }
       else if(args.check("res") > 0)
       {
@@ -525,19 +525,19 @@ namespace VoxelMapGenerator
     comm.print("Render BMP File Prefix..: " + (!render_name.empty() ? render_name : String("-N/A-")));
     comm.print("Minimum X coord.........: " + stringify_fp_fix(voxel_map.get_bounding_box_min(0), 6, 12));
     comm.print("Maximum X coord.........: " + stringify_fp_fix(voxel_map.get_bounding_box_max(0), 6, 12));
-    comm.print("Resolution X............: " + stringify_fp_fix(voxel_map.get_num_slices(0) > 0u ?
-      (voxel_map.get_bounding_box_max(0) - voxel_map.get_bounding_box_min(0)) / double(voxel_map.get_num_slices(0)) : 0.0, 6, 12));
-    comm.print("Number of Slices X......: " + stringify(voxel_map.get_num_slices(0)).pad_front(12));
+    comm.print("Resolution X............: " + stringify_fp_fix(voxel_map.get_num_points(0) > 0u ?
+      (voxel_map.get_bounding_box_max(0) - voxel_map.get_bounding_box_min(0)) / double(voxel_map.get_num_points(0)) : 0.0, 6, 12));
+    comm.print("Number of Points X......: " + stringify(voxel_map.get_num_points(0)).pad_front(12));
     comm.print("Minimum Y coord.........: " + stringify_fp_fix(voxel_map.get_bounding_box_min(1), 6, 12));
     comm.print("Maximum Y coord.........: " + stringify_fp_fix(voxel_map.get_bounding_box_max(1), 6, 12));
-    comm.print("Resolution Y............: " + stringify_fp_fix(voxel_map.get_num_slices(1) > 0u ?
-      (voxel_map.get_bounding_box_max(1) - voxel_map.get_bounding_box_min(0)) / double(voxel_map.get_num_slices(1)) : 0.0, 6, 12));
-    comm.print("Number of Slices Y......: " + stringify(voxel_map.get_num_slices(1)).pad_front(12));
+    comm.print("Resolution Y............: " + stringify_fp_fix(voxel_map.get_num_points(1) > 0u ?
+      (voxel_map.get_bounding_box_max(1) - voxel_map.get_bounding_box_min(0)) / double(voxel_map.get_num_points(1)) : 0.0, 6, 12));
+    comm.print("Number of Points Y......: " + stringify(voxel_map.get_num_points(1)).pad_front(12));
     comm.print("Minimum Z coord.........: " + stringify_fp_fix(voxel_map.get_bounding_box_min(2), 6, 12));
     comm.print("Maximum Z coord.........: " + stringify_fp_fix(voxel_map.get_bounding_box_max(2), 6, 12));
-    comm.print("Resolution Z............: " + stringify_fp_fix(voxel_map.get_num_slices(2) ?
-      (voxel_map.get_bounding_box_max(2) - voxel_map.get_bounding_box_min(2)) / double(voxel_map.get_num_slices(2)): 0.0, 6, 12));
-    comm.print("Number of Slices Z......: " + stringify(voxel_map.get_num_slices(2)).pad_front(12));
+    comm.print("Resolution Z............: " + stringify_fp_fix(voxel_map.get_num_points(2) ?
+      (voxel_map.get_bounding_box_max(2) - voxel_map.get_bounding_box_min(2)) / double(voxel_map.get_num_points(2)): 0.0, 6, 12));
+    comm.print("Number of Points Z......: " + stringify(voxel_map.get_num_points(2)).pad_front(12));
     comm.print("Number of Voxels........: " + stringify(voxel_map.get_num_voxels()).pad_front(12));
     comm.print("Stride Line.............: " + stringify(voxel_map.get_stride_line()).pad_front(12) + " Bytes");
     comm.print("Stride Plane............: " + stringify(voxel_map.get_stride_plane()).pad_front(12) + " Bytes");

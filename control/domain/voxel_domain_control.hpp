@@ -674,7 +674,7 @@ namespace FEAT
           std::vector<int> mask(nv, 0);
 
           for(Index i(0); i < nv; ++i)
-            mask[i] = this->_voxel_map->check_point(vtx[i]);
+            mask[i] = this->_voxel_map->check_point_nearest(vtx[i]);
 
           return mask;
         }

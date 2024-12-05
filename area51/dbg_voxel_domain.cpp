@@ -17,28 +17,30 @@ namespace DbgVoxelDomain
 {
   using namespace FEAT;
 
+  template<int dim_>
   class RingDropper :
-    public Geometry::VoxelMasker<double, 2>
+    public Geometry::VoxelMasker<double, dim_>
   {
   public:
-    typedef Geometry::VoxelMasker<double, 2> BaseClass;
+    typedef Geometry::VoxelMasker<double, dim_> BaseClass;
 
-    virtual void mask_line(std::vector<int>& mask, const double x_min, const double x_max, const Tiny::Vector<double, 2>& point) override
+    virtual void mask_line(std::vector<int>& mask, const double x_min, const double x_max, const Tiny::Vector<double, dim_>& point) override
     {
       const std::size_t nv = mask.size();
-      Tiny::Vector<double, 2> midpoint(0.5);
-      Tiny::Vector<double, 2> pt(point);
+      Tiny::Vector<double, dim_> midpoint(0.0);
+      Tiny::Vector<double, dim_> pt(point);
 
       for(std::size_t i(0); i < nv; ++i)
       {
         pt[0] = BaseClass::x_coord(x_min, x_max, i, nv);
-        double r = (pt - midpoint).norm_euclid();
-        mask[i] = ((r > 0.2) && (r < 0.4) ? 1 : 0);
+        double r = (pt - midpoint).template size_cast<2>().norm_euclid();
+        mask[i] = ((r > 1.1) && (r < 2.1) ? 1 : 0);
       }
     }
   };
 
-  typedef Shape::Quadrilateral ShapeType;
+  //typedef Shape::Quadrilateral ShapeType;
+  typedef Shape::Hexahedron ShapeType;
 
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
 
@@ -75,14 +77,16 @@ int main(int argc, char** argv)
   Control::Domain::VoxelDomainControl<DomainLevelType> domain(comm, true);
 
   // create base mesh node
-  /*MeshNodeType& base_mesh_node =*/ domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
-  //domain.create_base_mesh_2d(2, 2, -1.0, 1.0, -1.0, 1.0);
+  //domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
+  //domain.create_base_mesh_2d(6, 6, -3.0*15./16., 3.0*15./16., -3.0*15./16., 3.0*15./16.);
+  domain.create_base_mesh_3d(6, 6, 3, -3.0*13./16., 3.0*13./16., -3.0*13./16., 3.0*13./16., 0., 3.);
+  //domain.create_base_mesh_2d(6, 6, -3.0*13./16., 3.0*13./16., -3.0*13./16., 3.0*13./16.);
 
   // todo: add base mesh meshparts
 
   domain.parse_args(args);
-  domain.set_desired_levels(args.query("level")->second);
-  //domain.set_desired_levels("2 1");
+  //domain.set_desired_levels(args.query("level")->second);
+  domain.set_desired_levels("4 0");
   //domain.set_desired_levels("3 1:2 0");
   //domain.set_desired_levels("4 2:4 0");
   //domain.set_desired_levels("6 4:2 2:1 0");
@@ -90,8 +94,8 @@ int main(int argc, char** argv)
   //domain.set_desired_levels(5, 2, 0);
 
   domain.keep_voxel_map();
-  //domain.create_voxel_map(*std::make_unique<RingDropper>(), Real(0));
-  domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, Real(0));
+  domain.create_voxel_map(*std::make_unique<RingDropper<ShapeType::dimension>>(), 0.1);
+  //domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, Real(0));
   domain.create_hierarchy();
 
   comm.print("Desired Levels: " + domain.format_desired_levels());

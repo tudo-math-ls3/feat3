@@ -21,10 +21,6 @@
 #include <cstring>
 
 // includes, thirdparty
-#ifdef FEAT_HAVE_ZLIB
-#include <zlib.h>
-#endif // FEAT_HAVE_ZLIB
-
 #ifdef FEAT_HAVE_FPARSER
 #include <fparser.hh>
 #endif // FEAT_HAVE_FPARSER
@@ -104,7 +100,7 @@ namespace FEAT
        */
       static CoordType x_coord(const CoordType x_min, const CoordType x_max, const std::size_t i, const std::size_t n)
       {
-        return x_min + (x_max - x_min) * CoordType(2u*i + 1u) / CoordType(2u*n);
+        return x_min + (x_max - x_min) * CoordType(i) / CoordType(n - 1u);
       }
 
       /**
@@ -391,9 +387,9 @@ namespace FEAT
      * -# Specify the bounding box for the voxel map by calling one of the following functions:
      *    - #set_bounding_box_2d for a 2D voxel map
      *    - #set_bounding_box_3d for a 3D voxel map
-     * -# Specify the number of slices for the voxel map in each dimension by calling one of the following functions:
-     *    - #set_num_slices to explicitly specify the number of slices for each dimension
-     *    - #set_resolution to compute the number of slices for a maximum voxel resolution
+     * -# Specify the number of points for the voxel map in each dimension by calling one of the following functions:
+     *    - #set_num_points to explicitly specify the number of points for each dimension
+     *    - #set_resolution to compute the number of points for a maximum voxel resolution
      * -# Compute the voxel map contents by calling one of the following functions:
      *    - #compute_map to compute the entries from an object implementing the VoxelMasker interface
      *    - #compute_map_from_lambda_2d to compute the entries from a 2D lambda expression
@@ -534,15 +530,15 @@ namespace FEAT
       int _create_stage;
       /// bounding box dimensions of domain
       std::array<i64, 3u> _bbox_min, _bbox_max;
-      /// number of voxels in each dimension
-      std::array<u64, 3u> _num_slices;
+      /// number of points in each dimension
+      std::array<u64, 3u> _num_points;
       /// stride of a single voxel line in X dimension
       u64 _stride_line;
       /// stride of a single plane in XY dimensions
       u64 _stride_plane;
-      /// number of lines; 2D = num_voxels[2]; 3D: = num_voxels[2] * num_voxels[3]
+      /// number of lines; 2D = num_points[2]; 3D: = num_points[2] * num_points[3]
       u64 _num_lines;
-      /// number of planes; 2D = 1; 3D = num_voxels[3]
+      /// number of planes; 2D = 1; 3D = num_points[3]
       u64 _num_planes;
       /// the actual voxel map; its size may be larger than necessary due to padding
       std::vector<char> _voxel_map;
@@ -551,63 +547,20 @@ namespace FEAT
 
     public:
       /// standard constructor
-      VoxelMap() :
-        _create_stage(0),
-        _bbox_min(),
-        _bbox_max(),
-        _num_slices(),
-        _stride_line(0u),
-        _stride_plane(0u),
-        _num_lines(0u),
-        _num_planes(0u),
-        _voxel_map(),
-        _out_of_bounds_value(true)
-      {
-      }
+      VoxelMap();
 
       /// no copies, no problems
       VoxelMap(const VoxelMap&) = delete;
       VoxelMap& operator=(const VoxelMap&) = delete;
 
       /// move constructor
-      VoxelMap(VoxelMap&& other) :
-        _create_stage(other._create_stage),
-        _bbox_min(other._bbox_min),
-        _bbox_max(other._bbox_max),
-        _num_slices(other._num_slices),
-        _stride_line(other._stride_line),
-        _stride_plane(other._stride_plane),
-        _num_lines(other._num_lines),
-        _num_planes(other._num_planes),
-        _voxel_map(std::forward<std::vector<char>>(other._voxel_map)),
-        _out_of_bounds_value(other._out_of_bounds_value)
-      {
-      }
+      VoxelMap(VoxelMap&& other);
 
       /// move assign operator
-      VoxelMap& operator=(VoxelMap&& other)
-      {
-        if(this == &other)
-          return *this;
-
-        _create_stage = other._create_stage;
-        _bbox_min = other._bbox_min;
-        _bbox_max = other._bbox_max;
-        _num_slices = other._num_slices;
-        _stride_line = other._stride_line;
-        _stride_plane = other._stride_plane;
-        _num_lines = other._num_lines;
-        _num_planes = other._num_planes;
-        _voxel_map = std::forward<std::vector<char>>(other._voxel_map);
-        _out_of_bounds_value = other._out_of_bounds_value;
-
-        return *this;
-      }
+      VoxelMap& operator=(VoxelMap&& other);
 
       /// virtual destructor
-      virtual ~VoxelMap()
-      {
-      }
+      virtual ~VoxelMap();
 
       /**
        * \brief Sets the bounding box for a 2D voxel map
@@ -618,16 +571,7 @@ namespace FEAT
        * \param[in] y_min, y_max
        * The range of the voxel map in Y dimension
        */
-      void set_bounding_box_2d(Real x_min, Real x_max, Real y_min, Real y_max)
-      {
-        XASSERTM(x_min < x_max, "invalid X dimensions for voxel map bounding box");
-        XASSERTM(y_min < y_max, "invalid Y dimensions for voxel map bounding box");
-        _bbox_min[0u] = i64(x_min * Real(unit_size));
-        _bbox_max[0u] = i64(x_max * Real(unit_size));
-        _bbox_min[1u] = i64(y_min * Real(unit_size));
-        _bbox_max[1u] = i64(y_max * Real(unit_size));
-        _bbox_min[2u] = _bbox_max[2u] = i64(0);
-      }
+      void set_bounding_box_2d(Real x_min, Real x_max, Real y_min, Real y_max);
 
       /**
        * \brief Sets the bounding box for a 3D voxel map
@@ -641,18 +585,7 @@ namespace FEAT
        * \param[in] z_min, z_max
        * The range of the voxel map in Z dimension
        */
-      void set_bounding_box_3d(Real x_min, Real x_max, Real y_min, Real y_max, Real z_min, Real z_max)
-      {
-        XASSERTM(x_min < x_max, "invalid X dimensions for voxel map bounding box");
-        XASSERTM(y_min < y_max, "invalid Y dimensions for voxel map bounding box");
-        XASSERTM(z_min < z_max, "invalid Z dimensions for voxel map bounding box");
-        _bbox_min[0u] = i64(x_min * Real(unit_size));
-        _bbox_max[0u] = i64(x_max * Real(unit_size));
-        _bbox_min[1u] = i64(y_min * Real(unit_size));
-        _bbox_max[1u] = i64(y_max * Real(unit_size));
-        _bbox_min[2u] = i64(z_min * Real(unit_size));
-        _bbox_max[2u] = i64(z_max * Real(unit_size));
-      }
+      void set_bounding_box_3d(Real x_min, Real x_max, Real y_min, Real y_max, Real z_min, Real z_max);
 
       /// Returns the minimum bounding box coordinate for a given dimensions
       Real get_bounding_box_min(int dim) const
@@ -691,58 +624,34 @@ namespace FEAT
       }
 
       /**
-       * \brief Sets the number of slices of the voxel map in each dimension
+       * \brief Sets the number of points of the voxel map in each dimension
        *
        * \param[in] num_x, num_y, num_z
-       * The number of slices in each dimension
+       * The number of points in each dimension
        */
-      void set_num_slices(Index num_x, Index num_y, Index num_z = 0u)
+      void set_num_points(Index num_x, Index num_y, Index num_z = 0u);
+
+      /// Returns the number of points of the voxel map in each dimension
+      Index get_num_points(int dim) const
       {
-        XASSERT(num_x > 0ull);
-        XASSERT(num_y > 0ull);
-        XASSERT((num_z > 0ull) || (_bbox_min[2u] == _bbox_max[2u]));
-        _num_slices[0] = num_x;
-        _num_slices[1] = num_y;
-        _num_slices[2] = (num_z > 0u ? num_z : u64(1));
-
-        // compute other quantities
-        _stride_line = calc_line_stride(_num_slices[0]);
-        _stride_plane = _stride_line * _num_slices[1];
-        _num_planes = _num_slices[2];
-        _num_lines = _num_slices[1] * _num_planes;
-
-        // allocate voxel map
-        _voxel_map.resize(_num_planes * _stride_plane, 0u);
-      }
-
-      /// Returns the number of slices of the voxel map in each dimension
-      Index get_num_slices(int dim) const
-      {
-        return Index(this->_num_slices.at(Index(dim)));
+        return Index(this->_num_points.at(Index(dim)));
       }
 
       /**
        * \brief Sets the resolution for the voxel map, i.e. the maximum voxel size in each dimension
        *
-       * This function computes the number of slices in each dimension to ensure that the size
+       * This function computes the number of points in each dimension to ensure that the size
        * of a voxel is less or equal to max_res in any dimension.
        *
        * \param[in] max_res
        * The maximum voxel size; must be > 0.
        */
-      void set_resolution(Real max_res)
-      {
-        XASSERTM(max_res > 1E-12, "invalid resolution for voxel map");
-        set_num_slices(
-          u64(_bbox_max[0u] - _bbox_min[0u]) / u64(max_res * Real(unit_size)),
-          u64(_bbox_max[1u] - _bbox_min[1u]) / u64(max_res * Real(unit_size)),
-          u64(_bbox_max[2u] - _bbox_min[2u]) / u64(max_res * Real(unit_size)));
-      }
+      void set_resolution(Real max_res);
 
       /// Returns the total number of voxels in the voxel map
       Index get_num_voxels() const
       {
-        return Index(this->_num_slices[0] * this->_num_slices[1] * this->_num_slices[2]);
+        return Index(this->_num_points[0] * this->_num_points[1] * this->_num_points[2]);
       }
 
       /// Returns the line stride, i.e. the size of a single X-line in bytes
@@ -778,7 +687,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -806,7 +715,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -838,7 +747,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -868,7 +777,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -898,7 +807,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -911,18 +820,7 @@ namespace FEAT
        * Specifies whether the voxel map is to be gathered on all processes in the communicator.
        * The only reason to set this to \b false is when the map is only required on rank 0 for file output.
        */
-      void compute_map_from_formula_2d(const Dist::Comm& comm, const String& formula, bool gather_to_all = true)
-      {
-#ifdef FEAT_HAVE_FPARSER
-        VoxelFormulaMasker<2> masker(formula);
-        this->_compute_voxel_map(comm, masker, gather_to_all);
-#else
-        XABORTM("FEAT is not build and lined against FPARSER third-party library!");
-        (void)comm;
-        (void)formula;
-        (void)gather_to_all;
-#endif
-      }
+      void compute_map_from_formula_2d(const Dist::Comm& comm, const String& formula, bool gather_to_all = true);
 
       /**
        * \brief Creates the voxel map based on a 3D formula by utilizing MPI parallelization
@@ -933,7 +831,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -946,18 +844,7 @@ namespace FEAT
        * Specifies whether the voxel map is to be gathered on all processes in the communicator.
        * The only reason to set this to \b false is when the map is only required on rank 0 for file output.
        */
-      void compute_map_from_formula_3d(const Dist::Comm& comm, const String& formula, bool gather_to_all = true)
-      {
-#ifdef FEAT_HAVE_FPARSER
-        VoxelFormulaMasker<3> masker(formula);
-        this->_compute_voxel_map(comm, masker, gather_to_all);
-#else
-        XABORTM("FEAT is not build and lined against FPARSER third-party library!");
-        (void)comm;
-        (void)formula;
-        (void)gather_to_all;
-#endif
-      }
+      void compute_map_from_formula_3d(const Dist::Comm& comm, const String& formula, bool gather_to_all = true);
 
       /**
        * \brief Creates the voxel map based on a 3D OFF model handled by CGAL by utilizing MPI parallelization
@@ -968,7 +855,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -984,13 +871,7 @@ namespace FEAT
        * Specifies whether the voxel map is to be gathered on all processes in the communicator.
        * The only reason to set this to \b false is when the map is only required on rank 0 for file output.
        */
-      void compute_map_from_off_3d(const Dist::Comm& comm, const String& filename, bool invert, bool gather_to_all = true)
-      {
-        XASSERTM(_bbox_min[2u] < _bbox_max[2u], "CGAL OFF voxel map creation is only available in 3D");
-        std::stringstream sstr;
-        DistFileIO::read_common(sstr, filename, comm);
-        this->compute_map_from_off_3d(comm, sstr, invert, gather_to_all);
-      }
+      void compute_map_from_off_3d(const Dist::Comm& comm, const String& filename, bool invert, bool gather_to_all = true);
 
       /**
        * \brief Creates the voxel map based on a 3D OFF model handled by CGAL by utilizing MPI parallelization
@@ -1001,7 +882,7 @@ namespace FEAT
        *
        * \attention
        * This function can only be called once the bounding box dimensions as well as the number
-       * of slices or the resolution have been set.
+       * of points or the resolution have been set.
        *
        * \param[in] comm
        * A \transient reference to the communicator to use
@@ -1017,21 +898,7 @@ namespace FEAT
        * Specifies whether the voxel map is to be gathered on all processes in the communicator.
        * The only reason to set this to \b false is when the map is only required on rank 0 for file output.
        */
-      void compute_map_from_off_3d(const Dist::Comm& comm, std::istream& is, bool invert, bool gather_to_all = true)
-      {
-        XASSERTM(_bbox_min[2u] < _bbox_max[2u], "CGAL OFF voxel map creation is only available in 3D");
-#ifdef FEAT_HAVE_CGAL
-        Geometry::CGALWrapper<double> cgal_wrapper(is, Geometry::CGALFileMode::fm_off);
-        VoxelCGALMasker<double> cgal_masker(cgal_wrapper, invert);
-        this->_compute_voxel_map(comm, cgal_masker, gather_to_all);
-#else
-        XABORTM("FEAT is not build and linked against CGAL third-party library!");
-        (void)comm;
-        (void)is;
-        (void)invert;
-        (void)gather_to_all;
-#endif
-      }
+      void compute_map_from_off_3d(const Dist::Comm& comm, std::istream& is, bool invert, bool gather_to_all = true);
 
       /**
        * \brief Writes the voxel map into a file that can later be read in
@@ -1052,14 +919,7 @@ namespace FEAT
        * A WriteResult object that contains more detailed information about the output file, including bytes
        * written and total compression buffer size. Can be cast to bool to check whether the write was successful.
        */
-      WriteResult write(const String& filename, const u64 compress_block_size = 128u, const int compress_level = 9) const
-      {
-        std::ofstream ofs(filename, std::ios_base::out | std::ios_base::binary);
-        if(!ofs.is_open() || !ofs.good())
-          throw FileNotCreated(filename);
-
-        return write(ofs, compress_block_size, compress_level);
-      }
+      WriteResult write(const String& filename, const u64 compress_block_size = 128u, const int compress_level = 9) const;
 
       /**
        * \brief Writes the voxel map into a binary output stream
@@ -1080,131 +940,7 @@ namespace FEAT
        * A WriteResult object that contains more detailed information about the output file, including bytes
        * written and total compression buffer size. Can be cast to bool to check whether the write was successful.
        */
-      WriteResult write(std::ostream& os, const u64 compress_block_size = 128u, const int compress_level = 9) const
-      {
-        std::size_t written = 0u;
-
-        // set up file header
-        FileHeader header;
-        memset(&header, 0, sizeof(header));
-        header.magic_number = magic_number;
-        header.header_size = sizeof(header);
-        header.min_x = _bbox_min[0];
-        header.max_x = _bbox_max[0];
-        header.num_x = _num_slices[0];
-        header.stride_line = _stride_line;
-        header.min_y = _bbox_min[1];
-        header.max_y = _bbox_max[1];
-        header.num_y = _num_slices[1];
-        header.stride_plane = _stride_plane;
-        header.min_z = _bbox_min[2];
-        header.max_z = _bbox_max[2];
-        header.num_z = _num_slices[2];
-        header.stride_volume = _stride_plane * _num_slices[2];
-
-        // _voxel_map may contain trailing padding bytes
-        XASSERT(header.stride_volume <= _voxel_map.size());
-
-        // do we have to compress the map?
-#ifdef FEAT_HAVE_ZLIB
-        if(compress_block_size > 0u)
-        {
-          XASSERTM(compress_block_size < 1024u, "maximum compression block size is 1024 MB");
-
-          // compute number of planes per compression block
-          header.planes_per_block = (compress_block_size*1024ull*1024ull) / _stride_plane;
-          XASSERTM(header.planes_per_block > 0ull, "compression block size is to small to hold a single plane!");
-
-          header.num_blocks = (_num_planes + header.planes_per_block - 1u) / header.planes_per_block;
-          XASSERTM(header.num_blocks > 0ull, "invalid number of compression blocks!");
-        }
-#endif // FEAT_HAVE_ZLIB
-
-        // write header
-        os.write(reinterpret_cast<char*>(&header), sizeof(header));
-        written += sizeof(header);
-
-        // write uncompressed voxel map data
-        if(header.num_blocks == 0ull)
-        {
-          // write uncompressed voxel map data
-          os.write(reinterpret_cast<const char*>(_voxel_map.data()), std::streamsize(header.stride_volume));
-          return WriteResult(written + header.stride_volume);
-        }
-
-#ifdef FEAT_HAVE_ZLIB
-        // ensure that a compression block is not larger than 1 GB
-        XASSERTM(header.planes_per_block * _stride_plane < 1073741824ull, "voxel map plane compression block size is too big");
-
-        // compression buffers
-        std::vector<std::vector<char>> compress_buffers(header.num_blocks);
-
-        // compression block entries
-        std::vector<u64> compress_blocks(header.num_blocks, 0u);
-
-        // get compression level
-        const int cmp_lvl = Math::max(Math::min(compress_level, 9), 0);
-
-        // accumulated ZLIB results
-        int failures = 0;
-
-        // loop over all compression blocks
-        #pragma omp parallel for schedule(dynamic,1) reduction(+:failures)
-        for(u64 iblock = 0; iblock < header.num_blocks; ++iblock)
-        {
-          // compute first and last planes
-          u64 first_plane = iblock * header.planes_per_block;
-          u64 block_bytes = Math::min(header.planes_per_block, _num_planes - first_plane) * _stride_plane;
-
-          // estimate compression buffer size
-          u64 buffer_size = u64(::compressBound(uLong(block_bytes)));
-
-          // allocate compression buffer
-          compress_buffers[iblock].resize(buffer_size);
-
-          // compression buffer size
-          uLongf dest_size = uLongf(buffer_size);
-
-          // compress via ZLIB
-          int rtn = ::compress2(reinterpret_cast<Bytef*>(compress_buffers[iblock].data()), &dest_size,
-            reinterpret_cast<const Bytef*>(&_voxel_map[first_plane * _stride_plane]), uLongf(block_bytes), cmp_lvl);
-
-          // failure?
-          if(rtn != Z_OK)
-          {
-            ++failures;
-            continue;
-          }
-
-          // save compression buffer size
-          compress_blocks[iblock] = u64(dest_size);
-        }
-
-        // did any compression fail?
-        XASSERTM(failures == 0, "ZLIB failed to compress at least one plane block!");
-
-        // write the compression block headers
-        os.write(reinterpret_cast<const char*>(compress_blocks.data()), std::streamsize(compress_blocks.size() * sizeof(u64)));
-        written += compress_blocks.size() * sizeof(u64);
-
-        // okay, loop over all compression blocks and write them out
-        u64 compress_size = 0u;
-        for(std::size_t i(0); i < compress_buffers.size(); ++i)
-        {
-          os.write(reinterpret_cast<const char*>(compress_buffers[i].data()), std::streamsize(compress_blocks[i]));
-          written += compress_blocks[i];
-          compress_size += compress_blocks[i];
-        }
-
-        // return result
-        return WriteResult(written, compress_block_size, u64(compress_level), compress_buffers.size(), compress_size);
-#else
-        // we should never arrive in this #else case even if compiling without zlib
-        (void)compress_block_size;
-        (void)compress_level;
-        XABORTM("INTERNAL ERROR");
-#endif // FEAT_HAVE_ZLIB
-      }
+      WriteResult write(std::ostream& os, const u64 compress_block_size = 128u, const int compress_level = 9) const;
 
       /**
        * \brief Reads a voxel map from a file
@@ -1219,12 +955,7 @@ namespace FEAT
        * A ReadResult object that contains more detailed information about the input file, including bytes
        * read and total compression buffer size. Can be cast to bool to check whether the read was successful.
        */
-      ReadResult read(const Dist::Comm& comm, const String& filename)
-      {
-        BinaryStream stream;
-        DistFileIO::read_common(stream, filename, comm);
-        return read(stream, filename);
-      }
+      ReadResult read(const Dist::Comm& comm, const String& filename);
 
       /**
        * \brief Reads a voxel map from a binary input stream
@@ -1235,130 +966,23 @@ namespace FEAT
        * \param[in] filename
        * The filename of the voxel map file to be read in. This is just used for error output.
        */
-      ReadResult read(std::istream& is, const String& filename = "")
+      ReadResult read(std::istream& is, const String& filename = "");
+
+      /**
+       * \brief Returns the value of a specific voxel point in the voxel map
+       *
+       * \param[in] ix, iy, iz
+       * The X/Y/Z indices of the point in the voxel map; each must be in range {0, ..., num_points[dim]-1}.
+       *
+       * \returns
+       * The value of the point at the desired voxel map position.
+       */
+      bool check_point(u64 ix, u64 iy = 0u, u64 iz = 0u) const
       {
-        // set up file header
-        FileHeader header;
-        memset(&header, 0, sizeof(header));
-
-        // try to read header
-        if(!is.read(reinterpret_cast<char*>(&header), sizeof(header)).good())
-          throw VoxelMapFileError(filename, "Failed to read voxel map header");
-
-        u64 bytes_read = sizeof(header);
-
-        // check magic number
-        if(header.magic_number != magic_number)
-          throw VoxelMapFileError(filename, "File does not seems to be a voxel map file");
-
-        // check header size
-        if(header.header_size != header_size)
-          throw VoxelMapFileError(filename, String("invalid header size; expected ") + stringify(header_size) + " but got " + stringify(header.header_size));
-
-        // perform some sanity checks
-        if((header.num_x > 0u) && (header.max_x <= header.min_x))
-          throw VoxelMapFileError(filename, String("invalid X dimensions: x_max <= x_min"));
-        if((header.num_y > 0u) && (header.max_y <= header.min_y))
-          throw VoxelMapFileError(filename, String("invalid Y dimensions: y_max <= y_min"));
-        if((header.num_z > 0u) && (header.max_z <= header.min_z))
-          throw VoxelMapFileError(filename, String("invalid Z dimensions: z_max <= z_min"));
-        if((header.num_x == 0u) && (header.max_x != header.min_x))
-          throw VoxelMapFileError(filename, String("invalid X dimensions: x_max != x_min for num_x = 0"));
-        if((header.num_y == 0u) && (header.max_y != header.min_y))
-          throw VoxelMapFileError(filename, String("invalid Y dimensions: y_max != y_min for num_y = 0"));
-        if((header.num_z == 0u) && (header.max_z != header.min_z))
-          throw VoxelMapFileError(filename, String("invalid Z dimensions: z_max != z_min for num_z = 0"));
-        if(header.stride_line*8u < header.num_x)
-          throw VoxelMapFileError(filename, String("invalid line stride: too small for a single X-line"));
-        if((header.stride_line & 0xF) != 0)
-          throw VoxelMapFileError(filename, String("invalid line stride: not a multiple of 16"));
-        if(header.stride_plane < header.num_y * header.stride_line)
-          throw VoxelMapFileError(filename, String("invalid plane stride: too small for a single XY-plane"));
-        if((header.stride_plane & 0xF) != 0)
-          throw VoxelMapFileError(filename, String("invalid plane stride: not a multiple of 16"));
-        if(header.stride_volume < header.num_z * header.stride_plane)
-          throw VoxelMapFileError(filename, String("invalid volume stride: too small for a single XYZ-volume"));
-        if((header.stride_volume & 0xF) != 0)
-          throw VoxelMapFileError(filename, String("invalid plane stride: not a multiple of 16"));
-
-        // ok, extract the vital data
-        _bbox_min[0u] = header.min_x;
-        _bbox_max[0u] = header.max_x;
-        _bbox_min[1u] = header.min_y;
-        _bbox_max[1u] = header.max_y;
-        _bbox_min[2u] = header.min_z;
-        _bbox_max[2u] = header.max_z;
-        _num_slices[0u] = header.num_x;
-        _num_slices[1u] = header.num_y;
-        _num_slices[2u] = header.num_z;
-        _stride_line = header.stride_line;
-        _stride_plane = header.stride_plane;
-        _num_planes = _num_slices[2];
-        _num_lines = _num_slices[1] * _num_planes;
-
-        // allocate voxel map
-        _voxel_map.resize(header.stride_volume);
-
-        // don't we have compression blocks?
-        if(header.num_blocks == 0u)
-        {
-          // just read the raw map data
-          if(!is.read(_voxel_map.data(), std::streamsize(header.stride_volume)).good())
-            throw VoxelMapFileError(filename, "Failed to read uncompressed voxel map buffer");
-          bytes_read += u64(is.gcount());
-          return ReadResult(bytes_read);
-        }
-
-        // we're dealing with a ZLIB compressed voxel map
-
-#ifdef FEAT_HAVE_ZLIB
-        // read compression blocks
-        std::vector<u64> blocks(header.num_blocks);
-        if(!is.read(reinterpret_cast<char*>(blocks.data()), std::streamsize(header.num_blocks * sizeof(u64))).good())
-          throw VoxelMapFileError(filename, "Failed to read voxel map compression blocks");
-        bytes_read += u64(is.gcount());
-
-        // compute buffer offsets and total buffer size
-        std::vector<std::size_t> buffer_offset(header.num_blocks + 1u);
-        buffer_offset[0u] = 0u;
-        for(std::size_t i(0); i < blocks.size(); ++i)
-          buffer_offset[i+1u] = buffer_offset[i] + blocks[i];
-
-        // read compression buffer
-        std::vector<char> compression_buffer(buffer_offset.back());
-        if(!is.read(compression_buffer.data(), std::streamsize(compression_buffer.size())).good())
-          throw VoxelMapFileError(filename, "Failed to read compressed voxel map buffer");
-        bytes_read += u64(is.gcount());
-
-        // accumulated ZLIB results
-        int failures = 0;
-
-        // loop over all compression blocks
-        #pragma omp parallel for schedule(dynamic,1) reduction(+:failures)
-        for(u64 iblock = 0; iblock < header.num_blocks; ++iblock)
-        {
-          u64 first_plane = iblock * header.planes_per_block;
-          u64 block_bytes = Math::min(header.planes_per_block, _num_planes - first_plane) * _stride_plane;
-          u64 compress_size = blocks[iblock];
-
-          // decompress
-          uLongf dest_size = uLongf(block_bytes);
-          int rtn = ::uncompress(reinterpret_cast<Bytef*>(&_voxel_map[first_plane * _stride_plane]), &dest_size,
-            reinterpret_cast<const Bytef*>(&compression_buffer[buffer_offset[iblock]]), uLong(compress_size));
-
-          if(rtn != Z_OK)
-          {
-            ++failures;
-            continue;
-          }
-        }
-
-        // did any compression fail?
-        XASSERTM(failures == 0, "ZLIB failed to decompress at least one plane block!");
-        return ReadResult(bytes_read, header.num_blocks, compression_buffer.size());
-#else
-        XABORTM("Cannot read compressed voxel map file, because FEAT was compiled without the ZLIB third-party library");
-#endif // FEAT_HAVE_ZLIB
+        ASSERT((ix < this->_num_points[0]) || ((this->_num_points[0] == 0u) && (ix == 0u)));
+        ASSERT((iy < this->_num_points[1]) || ((this->_num_points[1] == 0u) && (iy == 0u)));
+        ASSERT((iz < this->_num_points[2]) || ((this->_num_points[2] == 0u) && (iz == 0u)));
+        return this->_check_point(i64(ix), i64(iy), i64(iz));
       }
 
       /**
@@ -1372,13 +996,32 @@ namespace FEAT
        * voxel map bounding box, otherwise returns the out-of-bounds-value.
        */
       template<typename Coord_, int dim_>
-      bool check_point(const Tiny::Vector<Coord_, dim_>& point) const
+      bool check_point_nearest(const Tiny::Vector<Coord_, dim_>& point) const
       {
         // convert point to internal units
         std::array<i64, dim_> ipt;
         for(int i(0); i < dim_; ++i)
-          ipt[std::size_t(i)] = i64(point[i] * Coord_(unit_size) + 0.5);
-        return _check_voxel_map(ipt);
+          ipt[std::size_t(i)] = i64(point[i] * Coord_(unit_size));
+        return this->_check_point_nearest(ipt);
+      }
+
+      /**
+       * \brief Samples the voxel map entry for a given point by multi-linear interpolation
+       *
+       * \param[in] point
+       * The point whose voxel map entry is to be samples.
+       *
+       * \returns
+       * The multi-linearly interpolated value of the voxel map in the position represented by point.
+       */
+      template<typename Coord_, int dim_>
+      Real sample_point(const Tiny::Vector<Coord_, dim_>& point) const
+      {
+        // convert point to internal units
+        std::array<i64, dim_> ipt;
+        for(int i(0); i < dim_; ++i)
+          ipt[std::size_t(i)] = i64(point[i] * Coord_(unit_size));
+        return this->_sample_point(ipt);
       }
 
       /**
@@ -1400,7 +1043,33 @@ namespace FEAT
       template<typename Coord_, int dim_>
       bool check_box(const Tiny::Vector<Coord_, dim_>& box_min, const Tiny::Vector<Coord_, dim_>& box_max) const
       {
-        return sample_box(box_min, box_max) > Real(0);
+        // convert coordinates to map indices
+        std::array<u64, dim_> ibox_min, ibox_max;
+        for(std::size_t i(0); i < std::size_t(dim_); ++i)
+        {
+          // make sure the map indices do not exceed the bounding box of the voxel map
+          i64 imin = _map_coord_idx_lower(i64(box_min[int(i)] * Coord_(unit_size)), i);
+          if(imin < i64(0))
+          {
+            if(this->_out_of_bounds_value)
+              return true;
+            ibox_min[i] = u64(0);
+          }
+          else
+            ibox_min[i] = u64(imin);
+
+          i64 imax = _map_coord_idx_upper(i64(box_max[int(i)] * Coord_(unit_size)), i);
+          if(i64(this->_num_points[i]) < imax + 1)
+          {
+            if(this->_out_of_bounds_value)
+              return true;
+            ibox_max[i] = i64(this->_num_points[i]) - 1;
+          }
+          else
+            ibox_max[i] = u64(imax);
+        }
+
+        return this->_check_box(ibox_min, ibox_max);
       }
 
       /**
@@ -1426,22 +1095,13 @@ namespace FEAT
       template<typename Coord_, int dim_>
       Real sample_box(const Tiny::Vector<Coord_, dim_>& box_min, const Tiny::Vector<Coord_, dim_>& box_max) const
       {
-        // convert coordinates to map indices
-        std::array<Index, dim_> ibox_min, ibox_max;
+        std::array<i64, dim_> ibox_min, ibox_max;
         for(std::size_t i(0); i < std::size_t(dim_); ++i)
         {
-          ibox_min[i] = _map_coord_idx(i64(box_min[int(i)] * Coord_(unit_size) + Coord_(0.5)), i);
-          ibox_max[i] = _map_coord_idx(i64(box_max[int(i)] * Coord_(unit_size) + Coord_(0.5)), i);
-
-          // make sure the map indices do not exceed the bounding box of the voxel map
-          if(ibox_min[i] == ~Index(0))
-            ibox_min[i] = Index(0);
-          if(ibox_max[i] == ~Index(0))
-            ibox_max[i] = Math::max(Index(this->_num_slices[i]), Index(1)) - Index(1);
+          ibox_min[i] = i64(box_min[int(i)] * Coord_(unit_size));
+          ibox_max[i] = i64(box_max[int(i)] * Coord_(unit_size));
         }
-
-        // gather weight of all selected voxels
-        return _gather_voxel_map_weight(ibox_min, ibox_max);
+        return this->_sample_box(ibox_min, ibox_max);
       }
 
       /**
@@ -1458,18 +1118,7 @@ namespace FEAT
        * \param[in] filename_prefix
        * The filename prefix for the image file sequence.
        */
-      void export_to_bmp(const String& filename_prefix) const
-      {
-        XASSERTM(_num_slices[2] < 20000, "voxel map is too big for BMP export!");
-
-        for(u64 iplane(0); iplane < _num_planes; ++iplane)
-        {
-          String filename = filename_prefix + "." + stringify(iplane).pad_front(5, '0') + ".bmp";
-          std::ofstream ofs(filename, std::ios_base::binary);
-          _export_plane_to_bmp(ofs, iplane);
-          ofs.close();
-        }
-      }
+      void export_to_bmp(const String& filename_prefix) const;
 
       /**
        * \brief Exports a single plane of the voxel map to a monochrome BMP image file
@@ -1487,12 +1136,7 @@ namespace FEAT
        * \param[in] z_coord
        * The Z-coordinate of the plane that is to be exported.
        */
-      void export_plane_to_bmp(const String& filename, Real z_coord) const
-      {
-        std::ofstream ofs(filename, std::ios_base::binary);
-        export_plane_to_bmp(ofs, z_coord);
-        ofs.close();
-      }
+      void export_plane_to_bmp(const String& filename, Real z_coord) const;
 
       /**
        * \brief Exports a single plane of the voxel map to a monochrome BMP image file
@@ -1510,10 +1154,7 @@ namespace FEAT
        * \param[in] z_coord
        * The Z-coordinate of the plane that is to be exported.
        */
-      void export_plane_to_bmp(std::ostream& os, Real z_coord) const
-      {
-        _export_plane_to_bmp(os, _map_coord_idx(i64(z_coord * Real(unit_size) + 0.5), 2u));
-      }
+      void export_plane_to_bmp(std::ostream& os, Real z_coord) const;
 
       /**
        * \brief Renders the voxel map to a sequence of gray-scale BMP image files
@@ -1523,34 +1164,18 @@ namespace FEAT
        * have been reduced to it.
        *
        * \param[in] filename_prefix
-       * The filename prefix for the image file sequence.
+       * The filename prefix for the image file sequence
        *
        * \param[in] width
-       * The desired bitmap width; must be less than or equal to the number of slices in X-dimension.
+       * The desired bitmap width
        *
        * \param[in] height
-       * The desired bitmap height; must be less than or equal to the number of slices in Y-dimension.
+       * The desired bitmap height
        *
        * \param[in] depth
-       * The desired number of bitmap images in the sequence; must be less than or equal to the
-       * number of slices in Z-dimension.
+       * The desired number of bitmap images in the sequence
        */
-      void render_to_bmp(const String& filename_prefix, Index width, Index height, Index depth) const
-      {
-        XASSERTM(width <= _num_slices[0u], "render width is too big!");
-        XASSERTM(height <= _num_slices[1u], "render height is too big!");
-        XASSERTM(depth <= _num_slices[2u], "render depth is too big!");
-        u64 ndig = Math::ilog10(depth);
-        for(u64 iplane(0); iplane < depth; ++iplane)
-        {
-          String filename = filename_prefix + "." + stringify(iplane).pad_front(ndig, '0') + ".bmp";
-          std::ofstream ofs(filename, std::ios_base::binary);
-          Index z_min = (iplane * _num_slices[2u]) / depth;
-          Index z_max = ((iplane+1u) * _num_slices[2u]) / depth;
-          _render_plane_to_bmp(ofs, width, height, z_min, Math::max(z_min+1u, z_max) - 1u);
-          ofs.close();
-        }
-      }
+      void render_to_bmp(const String& filename_prefix, Index width, Index height, Index depth) const;
 
       /**
        * \brief Renders a plane range of voxel map to a single gray-scale BMP image file
@@ -1563,22 +1188,15 @@ namespace FEAT
        * The filename for the BMP image
        *
        * \param[in] width
-       * The desired bitmap width; must be less than or equal to the number of slices in X-dimension.
+       * The desired bitmap width
        *
        * \param[in] height
-       * The desired bitmap height; must be less than or equal to the number of slices in Y-dimension.
+       * The desired bitmap height
        *
        * \param[in] z_min, z_max
-       * The Z-coordinates of the plane range that has to be sampled into a single output plane.
+       * The Z-coordinates of the plane range that has to be sampled into a single output plane
        */
-      void render_plane_to_bmp(const String& filename, Index width, Index height, Real z_min, Real z_max) const
-      {
-        XASSERTM(width <= _num_slices[0u], "render width is too big!");
-        XASSERTM(height <= _num_slices[1u], "render height is too big!");
-        std::ofstream ofs(filename, std::ios_base::binary);
-        render_plane_to_bmp(ofs, width, height, z_min, z_max);
-        ofs.close();
-      }
+      void render_plane_to_bmp(const String& filename, Index width, Index height, Real z_min, Real z_max) const;
 
       /**
        * \brief Renders a plane range of voxel map to a single gray-scale BMP image file stream
@@ -1591,23 +1209,246 @@ namespace FEAT
        * The output stream to write to
        *
        * \param[in] width
-       * The desired bitmap width; must be less than or equal to the number of slices in X-dimension.
+       * The desired bitmap width
        *
        * \param[in] height
-       * The desired bitmap height; must be less than or equal to the number of slices in Y-dimension.
+       * The desired bitmap height
        *
        * \param[in] z_min, z_max
-       * The Z-coordinates of the plane range that has to be sampled into a single output plane.
+       * The Z-coordinates of the plane range that has to be sampled into a single output plane
        */
-      void render_plane_to_bmp(std::ostream& os, Index width, Index height, Real z_min, Real z_max) const
-      {
-        XASSERTM(width <= _num_slices[0u], "render width is too big!");
-        XASSERTM(height <= _num_slices[1u], "render height is too big!");
-        _render_plane_to_bmp(os, width, height, _map_coord_idx(i64(z_min * Real(unit_size) + 0.5), 2u),
-          _map_coord_idx(i64(z_max * Real(unit_size) + 0.5), 2u));
-      }
+      void render_plane_to_bmp(std::ostream& os, Index width, Index height, Real z_min, Real z_max) const;
 
     protected:
+      /**
+       * \brief Maps a unit coordinate to a X-/Y-/Z-index of the closest voxel in the voxel map
+       *
+       * \param[in] xyz
+       * The X-/Y-/Z unit coordinate that is to be mapped
+       *
+       * \param[in] sdim
+       * Specifies which dimension is to be mapped: 0=X, 1=Y, 2=Z
+       *
+       * \returns
+       * The index of the closest voxel to the given unit coordinate or ~u64(0),
+       * if the unit coordinate was outside of the voxel map bounding box.
+       */
+      u64 _map_coord_idx_nearest(i64 xyz, std::size_t sdim) const;
+
+      /**
+       * \brief Maps a unit coordinate to a X-/Y-/Z-index of the lower voxel in the voxel map
+       *
+       * \attention
+       * This function intentionally does not check the point against the valid voxel map bounding box, i.e.
+       * the returned index may be outside of the interval {0, ..., num_points[sdim]-1}.
+       *
+       * \param[in] xyz
+       * The X-/Y-/Z unit coordinate that is to be mapped
+       *
+       * \param[in] sdim
+       * Specifies which dimension is to be mapped: 0=X, 1=Y, 2=Z
+       *
+       * \returns
+       * The index of the lower voxel to the given unit coordinate, i.e. the voxel whose unit coordinate
+       * is less than or equal to the given point unit coordinate \p xyz.
+       */
+      i64 _map_coord_idx_lower(i64 xyz, std::size_t sdim) const;
+
+      /**
+       * \brief Maps a unit coordinate to a X-/Y-/Z-index of the upper voxel in the voxel map
+       *
+       * \attention
+       * This function intentionally does not check the point against the valid voxel map bounding box, i.e.
+       * the returned index may be outside of the interval {0, ..., num_points[sdim]-1}.
+       *
+       * \param[in] xyz
+       * The X-/Y-/Z unit coordinate that is to be mapped
+       *
+       * \param[in] sdim
+       * Specifies which dimension is to be mapped: 0=X, 1=Y, 2=Z
+       *
+       * \returns
+       * The index of the upper voxel to the given unit coordinate, i.e. the voxel whose unit coordinate
+       * is greater than or equal to the given point unit coordinate \p xyz.
+       */
+      i64 _map_coord_idx_upper(i64 xyz, std::size_t sdim) const;
+
+      /**
+       * \brief Helper function for _sample_voxel_map_Xd: compute the sample rate in a given dimension
+       *
+       * The sample rate of a point xyz with respect to the voxel v(idx) is defined as being equal to 1 if xyz = V(idx)
+       * and to fall linearly to 0 for xyz = V(idx-1) and xyz = V(idx+1), which can be achieved by the formula
+       *
+       *                        sr(xyz,idx) :=  1 - |xyz - V(idx)| / |V(idx+1) - V(idx)|
+       *
+       * note that the denominator |V(idx+1) - V(idx)| := 1/h is identical for all idx
+       *
+       * \param[in] xyz
+       * The X-/Y-/Z unit coordinate of the point for which the sample rate is to be computed
+       *
+       * \param[in] idx
+       * The voxel index for the coordinate \p xyz as returned by _map_coord_idx_lower
+       *
+       * \returns The sample rate of the point \p xyz w.r.t. the voxel V(idx)
+       */
+      Real _calc_sample_rate(i64 xyz, i64 idx, std::size_t sdim) const;
+
+      /// Helper function for _sample_point: checks a single voxel point value
+      bool _check_point(i64 xidx, i64 yidx, i64 zidx) const;
+
+      /**
+       * \brief Checks the nearest voxel map entry for a given 1D point
+       *
+       * \param[in] p
+       * The unit coordinates of the point whose closest voxel in the voxel map is to be checked.
+       *
+       * \returns
+       * \c true, if the closest voxel to the point is inside the voxel map domain (i.e. the voxel map entry is 1),
+       * or \c false, if the closest voxel is outside of the voxel map domain.
+       */
+      bool _check_point_nearest(const std::array<i64, 1>& p) const;
+
+      /**
+       * \brief Checks the nearest voxel map entry for a given 2D point
+       *
+       * \param[in] p
+       * The unit coordinates of the point whose closest voxel in the voxel map is to be checked.
+       *
+       * \returns
+       * \c true, if the closest voxel to the point is inside the voxel map domain (i.e. the voxel map entry is 1),
+       * or \c false, if the closest voxel is outside of the voxel map domain.
+       */
+      bool _check_point_nearest(const std::array<i64, 2>& p) const;
+
+      /**
+       * \brief Checks the nearest voxel map entry for a given 3D point
+       *
+       * \param[in] p
+       * The unit coordinates of the point whose closest voxel in the voxel map is to be checked.
+       *
+       * \returns
+       * \c true, if the closest voxel to the point is inside the voxel map domain (i.e. the voxel map entry is 1),
+       * or \c false, if the closest voxel is outside of the voxel map domain.
+       */
+      bool _check_point_nearest(const std::array<i64, 3>& p) const;
+
+      /**
+       * \brief Checks whether a 1D box contains at least one active voxel
+       *
+       * \param[in] box_min, box_max
+       * The minimum and maximum X indices that make up the box to be checked
+       *
+       * \returns \c true, if at least one voxel in the given box is set to \c true, otherwise \c false.
+       */
+      bool _check_box(const std::array<u64, 1>& box_min, const std::array<u64, 1>& box_max) const;
+
+      /**
+       * \brief Checks whether a 2D box contains at least one active voxel
+       *
+       * \param[in] box_min, box_max
+       * The minimum and maximum X/Y indices that make up the box to be checked
+       *
+       * \returns \c true, if at least one voxel in the given box is set to \c true, otherwise \c false.
+       */
+      bool _check_box(const std::array<u64, 2>& box_min, const std::array<u64, 2>& box_max) const;
+
+      /**
+       * \brief Checks whether a 3D box contains at least one active voxel
+       *
+       * \param[in] box_min, box_max
+       * The minimum and maximum X/Y/Z indices that make up the box to be checked
+       *
+       * \returns \c true, if at least one voxel in the given box is set to \c true, otherwise \c false.
+       */
+      bool _check_box(const std::array<u64, 3>& box_min, const std::array<u64, 3>& box_max) const;
+
+      /// Helper function for _sample_point: samples a 1D edge in X-parallel line
+      Real _sample_point_1d_x(i64 px, i64 xidx, i64 yidx = i64(0), i64 zidx = i64(0)) const;
+
+      /// Helper function for _sample_point: samples a 1D edge in Y-parallel line
+      Real _sample_point_1d_y(i64 py, i64 xidx, i64 yidx, i64 zidx = i64(0)) const;
+
+      /// Helper function for _sample_point: samples a 1D edge in Z-parallel line
+      Real _sample_point_1d_z(i64 pz, i64 xidx, i64 yidx, i64 zidx) const;
+
+      /// Helper function for _sample_point: samples a 2D square in XY-parallel plane
+      Real _sample_point_2d(i64 px, i64 py, i64 xidx, i64 yidx, i64 zidx = i64(0)) const;
+
+      /// Helper function for _sample_point: samples a 3D cube in XYZ volume
+      Real _sample_point_3d(i64 px, i64 py, i64 pz, i64 xidx, i64 yidx, i64 zidx) const;
+
+      /**
+       * \brief Samples the voxel map for a given 1D point by multi-linear interpolation
+       *
+       * \param[in] p
+       * The unit coordinates of the point whose voxel map value is to be sampled.
+       *
+       * \returns
+       * The multi-linearly interpolated value of the eight voxels surrounding the point
+       */
+      Real _sample_point(const std::array<i64, 1>& p) const;
+
+      /**
+       * \brief Samples the voxel map for a given 2D point by multi-linear interpolation
+       *
+       * \param[in] p
+       * The unit coordinates of the point whose voxel map value is to be sampled.
+       *
+       * \returns
+       * The multi-linearly interpolated value of the eight voxels surrounding the point
+       */
+      Real _sample_point(const std::array<i64, 2>& p) const;
+
+      /**
+       * \brief Samples the voxel map for a given 3D point by multi-linear interpolation
+       *
+       * \param[in] p
+       * The unit coordinates of the point whose voxel map value is to be sampled.
+       *
+       * \returns
+       * The multi-linearly interpolated value of the eight voxels surrounding the point
+       */
+      Real _sample_point(const std::array<i64, 3>& p) const;
+
+      /// Helper function for _sample_box: samples a 1D edge in X line
+      Real _sample_box_1d(i64 px0, i64 px1, i64 xidx0, i64 xidx1, i64 yidx = i64(0), i64 zidx = i64(0)) const;
+
+      /// Helper function for _sample_box: samples a 2D rectangle in XY plane
+      Real _sample_box_2d(i64 px0, i64 px1, i64 py0, i64 py1, i64 xidx0, i64 xidx1, i64 yidx0, i64 yidx1, i64 zidx = i64(0)) const;
+
+      /// Helper function for _sample_box: samples a 3D cuboid in XYZ volume
+      Real _sample_box_3d(i64 px0, i64 px1, i64 py0, i64 py1, i64 pz0, i64 pz1, i64 xidx0, i64 xidx1, i64 yidx0, i64 yidx1, i64 zidx0, i64 zidx1) const;
+
+      /**
+       * \brief Samples a 1D box of the voxel map
+       *
+       * \param[in] box_min, box_max
+       * The minimum and maximum X unit coordinates that make up the box to be sampled
+       *
+       * \returns The average voxel map value of the sample box
+       */
+      Real _sample_box(const std::array<i64, 1>& box_min, const std::array<i64, 1>& box_max) const;
+
+      /**
+       * \brief Samples a 2D box of the voxel map
+       *
+       * \param[in] box_min, box_max
+       * The minimum and maximum X/Y unit coordinates that make up the box to be sampled
+       *
+       * \returns The average voxel map value of the sample box
+       */
+      Real _sample_box(const std::array<i64, 2>& box_min, const std::array<i64, 2>& box_max) const;
+
+      /**
+       * \brief Samples a 3D box of the voxel map
+       *
+       * \param[in] box_min, box_max
+       * The minimum and maximum X/Y/Z unit coordinates that make up the box to be sampled
+       *
+       * \returns The average voxel map value of the sample box
+       */
+      Real _sample_box(const std::array<i64, 3>& box_min, const std::array<i64, 3>& box_max) const;
+
       /**
        * \brief Compresses a voxel map line into the voxel map.
        *
@@ -1617,140 +1458,34 @@ namespace FEAT
        * \param[in] line
        * The index of the line that is to be compressed.
        */
-      void _compress_voxel_map_line(const std::vector<int>& mask, const Index line)
-      {
-        ASSERTM(line < this->_num_lines, "invalid voxel map line");
-        const Index n = Index(mask.size());
-        const Index off = line * this->_stride_line;
-        for(Index i(0); i < n; ++i)
-        {
-          _voxel_map[off + (i >> 3)] |= char(mask[i] != 0) << (i & 0x7);
-        }
-      }
+      void _compress_voxel_map_line(const std::vector<int>& mask, const u64 line);
 
       /**
-       * \brief Maps a unit coordinate to a X-/Y-/Z-index in the voxel map
-       *
-       * \param[in] xyz
-       * The X-/Y-/Z unit coordinate that is to be mapped
-       *
-       * \param[in] sdim
-       * Specifies which dimension is to be mapped: 0=X, 1=Y, 2=Z
-       *
-       * \returns
-       * The index of the given unit coordinate or ~Index(0), if the unit coordinate was outside of the bounding box
-       */
-      Index _map_coord_idx(i64 xyz, std::size_t sdim) const
-      {
-        i64 idx = (2*i64(_num_slices[sdim]) * (xyz - _bbox_min[sdim]) + _bbox_min[sdim] - _bbox_max[sdim])  / (2*_bbox_max[sdim] - 2*_bbox_min[sdim]);
-        //ASSERTM(idx >= 0, "tested vertex coordinate is not inside voxel map bounding box");
-        //ASSERTM(idx <= i64(this->_num_slices[Index(dim)]), "tested vertex coordinate is not inside voxel map bounding box");
-        return (0 <= idx) && (idx < i64(this->_num_slices[sdim])) ? Index(idx) : ~Index(0);
-      }
-
-      /**
-       * \brief Checks the voxel map entry for a 3D vertex
-       *
-       * \param[in] vtx
-       * The unit coordinates of the vertex whose entry in the voxel map is to be checked.
-       *
-       * \returns
-       * \c true, if the vertex is inside the voxel map domain (i.e. the voxel map entry is 1),
-       * or \c false, if the vertex is outside of the voxel map domain.
-       */
-      bool _check_voxel_map(const std::array<i64, 3>& vtx) const
-      {
-        Index xidx = _map_coord_idx(vtx[0], 0u);
-        Index yidx = _map_coord_idx(vtx[1], 1u);
-        Index zidx = _map_coord_idx(vtx[2], 2u);
-        // out of bounds?
-        if((xidx|yidx|zidx) == ~Index(0))
-          return _out_of_bounds_value;
-        Index line = zidx * this->_num_slices[1] + yidx;
-        return (this->_voxel_map[line * this->_stride_line + (xidx >> 3)] >> (xidx & 0x7)) & 0x1;
-      }
-
-      /**
-       * \brief Checks the voxel map entry for a 2D vertex
-       *
-       * \param[in] vtx
-       * The unit coordinates of the vertex whose entry in the voxel map is to be checked.
-       *
-       * \returns
-       * \c true, if the vertex is inside the voxel map domain (i.e. the voxel map entry is 1),
-       * or \c false, if the vertex is outside of the voxel map domain.
-       */
-      bool _check_voxel_map(const std::array<i64, 2>& vtx) const
-      {
-        Index xidx = _map_coord_idx(vtx[0], 0u);
-        Index yidx = _map_coord_idx(vtx[1], 1u);
-        // out of bounds?
-        if((xidx|yidx) == ~Index(0))
-          return _out_of_bounds_value;
-        return (this->_voxel_map[yidx * this->_stride_line + (xidx >> 3)] >> (xidx & 0x7)) & 0x1;
-      }
-
-      /**
-       * \brief Checks the voxel map entry for a 1D vertex
-       *
-       * \param[in] vtx
-       * The unit coordinates of the vertex whose entry in the voxel map is to be checked.
-       *
-       * \returns
-       * \c true, if the vertex is inside the voxel map domain (i.e. the voxel map entry is 1),
-       * or \c false, if the vertex is outside of the voxel map domain.
-       */
-      bool _check_voxel_map(const std::array<i64, 1>& vtx) const
-      {
-        Index xidx = _map_coord_idx(vtx[0], 0u);
-        // out of bounds?
-        if(xidx == ~Index(0))
-          return _out_of_bounds_value;
-        return (this->_voxel_map[(xidx >> 3)] >> (xidx & 0x7)) & 0x1;
-      }
-
-      /**
-       * \brief Computes a range of voxel map lines for a 3D domain
+       * \brief Computes a range of voxel map lines for a 1D domain
        *
        * \param[in] masker
        * A \transient reference to the masker that is to be used to compute the mask
        *
        * \param[in] beg
-       * The index of the first voxel map line that is to be computed.
+       * The index of the first voxel map line that is to be computed. Must be equal to 0 in 1D.
        *
        * \param[in] end
-       * The index of the last voxel map line that is to be computed plus one.
+       * The index of the last voxel map line that is to be computed plus one. Must be equal to 1 in 1D.
        *
        * \param[in] offset
-       * The offset of the first voxel map line that is to be computed; this is typically equal to 0,
-       * unless we are only computing a sub-map that is going to be gathered on the root later on,
-       * in which case it may be set equal to \p beg.
+       * The offset of the first voxel map line that is to be computed; Must be equal to 0 in 1D.
        */
       template<typename CoordType_>
-      void _compute_voxel_map_lines(VoxelMasker<CoordType_, 3>& masker, Index beg, Index end, Index offset)
+      void _compute_voxel_map_lines(VoxelMasker<CoordType_, 1>& masker, u64 DOXY(beg), u64 DOXY(end), u64 DOXY(offset))
       {
+        XASSERTM(_num_points[1] == 1ull, "cannot use a 1D VoxelMasker to create a 2D/3D voxel mask");
+        XASSERTM(_num_points[2] == 1ull, "cannot use a 1D VoxelMasker to create a 2D/3D voxel mask");
         const CoordType_ x_min = CoordType_(_bbox_min[0]) / CoordType_(unit_size);
         const CoordType_ x_max = CoordType_(_bbox_max[0]) / CoordType_(unit_size);
-        const CoordType_ y_min = CoordType_(_bbox_min[1]) / CoordType_(unit_size);
-        const CoordType_ y_max = CoordType_(_bbox_max[1]) / CoordType_(unit_size);
-        const CoordType_ z_min = CoordType_(_bbox_min[2]) / CoordType_(unit_size);
-        const CoordType_ z_max = CoordType_(_bbox_max[2]) / CoordType_(unit_size);
-
-        #pragma omp parallel
-        {
-          std::vector<int> line_mask(this->_num_slices[0], 0);
-          Tiny::Vector<CoordType_, 3> coords;
-
-          #pragma omp for schedule(dynamic, 16)
-          for(i64 i = i64(beg); i < i64(end); ++i)
-          {
-            // line = iz * this->_num_slices[1] + iy
-            coords[1] = y_min + (y_max - y_min) * CoordType_(2u*(u64(i) % this->_num_slices[1]) + 1u) / CoordType_(2ull*this->_num_slices[1]);
-            coords[2] = z_min + (z_max - z_min) * CoordType_(2u*(u64(i) / this->_num_slices[1]) + 1u) / CoordType_(2ull*this->_num_slices[2]);
-            masker.mask_line(line_mask, x_min, x_max, coords);
-            this->_compress_voxel_map_line(line_mask, Index(i) - offset);
-          }
-        }
+        std::vector<int> line_mask(this->_num_points[0], 0);
+        Tiny::Vector<CoordType_, 1> coords;
+        masker.mask_line(line_mask, x_min, x_max, coords);
+        this->_compress_voxel_map_line(line_mask, 0);
       }
 
       /**
@@ -1771,108 +1506,66 @@ namespace FEAT
        * in which case it may be set equal to \p beg.
        */
       template<typename CoordType_>
-      void _compute_voxel_map_lines(VoxelMasker<CoordType_, 2>& masker, Index beg, Index end, Index offset)
+      void _compute_voxel_map_lines(VoxelMasker<CoordType_, 2>& masker, u64 beg, u64 end, u64 offset)
       {
-        XASSERTM(_num_slices[2] == 1ull, "cannot use a 2D VoxelMasker to create a 3D voxel mask");
+        XASSERTM(_num_points[2] == 1ull, "cannot use a 2D VoxelMasker to create a 3D voxel mask");
         const CoordType_ x_min = CoordType_(_bbox_min[0]) / CoordType_(unit_size);
         const CoordType_ x_max = CoordType_(_bbox_max[0]) / CoordType_(unit_size);
         const CoordType_ y_min = CoordType_(_bbox_min[1]) / CoordType_(unit_size);
         const CoordType_ y_max = CoordType_(_bbox_max[1]) / CoordType_(unit_size);
-        std::vector<int> line_mask(this->_num_slices[0], 0);
+        std::vector<int> line_mask(this->_num_points[0], 0);
         Tiny::Vector<CoordType_, 2> coords;
 
-        for(Index i(beg); i < end; ++i)
+        for(u64 i = beg; i < end; ++i)
         {
-          coords[1] = y_min + (y_max - y_min) * CoordType_(2u*(i % this->_num_slices[1]) + 1u) / CoordType_(2ull*this->_num_slices[1]);
+          coords[1] = y_min + (y_max - y_min) * CoordType_(i % this->_num_points[1]) / CoordType_(this->_num_points[1] - 1u);
           masker.mask_line(line_mask, x_min, x_max, coords);
           this->_compress_voxel_map_line(line_mask, i - offset);
         }
       }
 
       /**
-       * \brief Computes a range of voxel map lines for a 1D domain
+       * \brief Computes a range of voxel map lines for a 3D domain
        *
        * \param[in] masker
        * A \transient reference to the masker that is to be used to compute the mask
        *
        * \param[in] beg
-       * The index of the first voxel map line that is to be computed. Must be equal to 0 in 1D.
+       * The index of the first voxel map line that is to be computed.
        *
        * \param[in] end
-       * The index of the last voxel map line that is to be computed plus one. Must be equal to 1 in 1D.
+       * The index of the last voxel map line that is to be computed plus one.
        *
        * \param[in] offset
-       * The offset of the first voxel map line that is to be computed; Must be equal to 0 in 1D.
+       * The offset of the first voxel map line that is to be computed; this is typically equal to 0,
+       * unless we are only computing a sub-map that is going to be gathered on the root later on,
+       * in which case it may be set equal to \p beg.
        */
       template<typename CoordType_>
-      void _compute_voxel_map_lines(VoxelMasker<CoordType_, 1>& masker, Index DOXY(beg), Index DOXY(end), Index DOXY(offset))
+      void _compute_voxel_map_lines(VoxelMasker<CoordType_, 3>& masker, u64 beg, u64 end, u64 offset)
       {
-        XASSERTM(_num_slices[1] == 1ull, "cannot use a 1D VoxelMasker to create a 2D/3D voxel mask");
-        XASSERTM(_num_slices[2] == 1ull, "cannot use a 1D VoxelMasker to create a 2D/3D voxel mask");
         const CoordType_ x_min = CoordType_(_bbox_min[0]) / CoordType_(unit_size);
         const CoordType_ x_max = CoordType_(_bbox_max[0]) / CoordType_(unit_size);
-        std::vector<int> line_mask(this->_num_slices[0], 0);
-        Tiny::Vector<CoordType_, 1> coords;
-        masker.mask_line(line_mask, x_min, x_max, coords);
-        this->_compress_voxel_map_line(line_mask, 0);
-      }
+        const CoordType_ y_min = CoordType_(_bbox_min[1]) / CoordType_(unit_size);
+        const CoordType_ y_max = CoordType_(_bbox_max[1]) / CoordType_(unit_size);
+        const CoordType_ z_min = CoordType_(_bbox_min[2]) / CoordType_(unit_size);
+        const CoordType_ z_max = CoordType_(_bbox_max[2]) / CoordType_(unit_size);
 
-      /**
-       * \brief Gathers the voxel map weight for a 3D bounding box cuboid
-       *
-       * \param[in] box_min, box_max
-       * The minimum and maximum X/Y/Z indices that make up the bounding box
-       *
-       * \returns The averaged voxel map weight for the bounding box.
-       */
-      Real _gather_voxel_map_weight(const std::array<Index, 3>& box_min, const std::array<Index, 3>& box_max) const
-      {
-        Index count = 0u;
-        for(Index zidx(box_min[2]); zidx <= box_max[2]; ++zidx)
+        #pragma omp parallel
         {
-          for(Index yidx(box_min[1]); yidx <= box_max[1]; ++yidx)
+          std::vector<int> line_mask(this->_num_points[0], 0);
+          Tiny::Vector<CoordType_, 3> coords;
+
+          #pragma omp for schedule(dynamic, 16)
+          for(u64 i = beg; i < end; ++i)
           {
-            Index line = zidx * this->_num_slices[1] + yidx;
-            for(Index xidx(box_min[0]); xidx <= box_max[0]; ++xidx)
-              count += (this->_voxel_map[line * this->_stride_line + (xidx >> 3)] >> (xidx & 0x7)) & 0x1;
+            // line = iz * this->_num_points[1] + iy
+            coords[1] = y_min + (y_max - y_min) * CoordType_(i % this->_num_points[1]) / CoordType_(this->_num_points[1] - 1u);
+            coords[2] = z_min + (z_max - z_min) * CoordType_(i / this->_num_points[1]) / CoordType_(this->_num_points[2] - 1u);
+            masker.mask_line(line_mask, x_min, x_max, coords);
+            this->_compress_voxel_map_line(line_mask, i - offset);
           }
         }
-        return Real(count) / Real((box_max[2] - box_min[2] + 1u) * (box_max[1] - box_min[1] + 1u) * (box_max[0] - box_min[0] + 1u));
-      }
-
-      /**
-       * \brief Gathers the voxel map weight for a 2D bounding box rectangle
-       *
-       * \param[in] box_min, box_max
-       * The minimum and maximum X/Y indices that make up the bounding box
-       *
-       * \returns The averaged voxel map weight for the bounding box.
-       */
-      Real _gather_voxel_map_weight(const std::array<Index, 2>& box_min, const std::array<Index, 2>& box_max) const
-      {
-        Index count = 0u;
-        for(Index yidx(box_min[1]); yidx <= box_max[1]; ++yidx)
-        {
-          for(Index xidx(box_min[0]); xidx <= box_max[0]; ++xidx)
-            count += (this->_voxel_map[yidx * this->_stride_line + (xidx >> 3)] >> (xidx & 0x7)) & 0x1;
-        }
-        return Real(count) / Real((box_max[1] - box_min[1] + 1u) * (box_max[0] - box_min[0] + 1u));
-      }
-
-      /**
-       * \brief Gathers the voxel map weight for a 1D bounding box interval
-       *
-       * \param[in] box_min, box_max
-       * The minimum and maximum X index that make up the bounding box
-       *
-       * \returns The averaged voxel map weight for the bounding box.
-       */
-      Real _gather_voxel_map_weight(const std::array<Index, 1>& box_min, const std::array<Index, 1>& box_max) const
-      {
-        Index count = 0u;
-        for(Index xidx(box_min[0]); xidx <= box_max[0]; ++xidx)
-          count += (this->_voxel_map[(xidx >> 3)] >> (xidx & 0x7)) & 0x1;
-        return Real(count) / Real(box_max[0] - box_min[0] + 1u);
       }
 
       /**
@@ -1908,30 +1601,30 @@ namespace FEAT
         {
           // there are at least as many lines in the voxel map as there are MPI processes; this is the usual case
           // we can use the entire communicator (usually MPI_COMM_WORLD) for the voxel map computation
-          Index comm_rank = Index(comm.rank());
-          Index comm_size = Index(comm.size());
+          u64 comm_rank = u64(comm.rank());
+          u64 comm_size = u64(comm.size());
 
           // compute line count for a single process and round up; this may be bigger than _num_lines,
           // so the last process may have less lines to chew through than all other processes
-          Index line_count = (this->_num_lines + comm_size - 1u) / comm_size;
+          u64 line_count = (this->_num_lines + comm_size - 1u) / comm_size;
           std::size_t block_len = this->_stride_line * line_count;
 
           // allocate voxel map and format to zero
           std::size_t vmap_size = block_len;
           // do we need the entire map on this process?
           if(gather_to_all || (comm_rank == 0))
-            vmap_size *= Index(comm_size);
+            vmap_size *= u64(comm_size);
           this->_voxel_map.resize(vmap_size, 0u);
 
           // compute first and last+1 line of this process; make sure the last process doesn't go beyond the total count
-          Index line_beg = comm_rank * line_count;
-          Index line_end = Math::min((comm_rank + 1u) * line_count, Index(this->_num_lines));
+          u64 line_beg = comm_rank * line_count;
+          u64 line_end = Math::min((comm_rank + 1u) * line_count, this->_num_lines);
 
           // debug output
           //this->_comm.allprint(String(">>>") + stringify(line_beg).pad_front(6) + ":" + stringify(line_count) + ">" + stringify(line_end).pad_front(6));
 
           // compute lines for this process
-          this->_compute_voxel_map_lines(masker, line_beg, line_end, gather_to_all ? Index(0) : line_beg);
+          this->_compute_voxel_map_lines(masker, line_beg, line_end, gather_to_all ? u64(0) : line_beg);
 
           // perform an in-place allgather to synchronize the voxel map over all processes
           if(gather_to_all)
@@ -1939,7 +1632,7 @@ namespace FEAT
           else
             comm.gather(this->_voxel_map.data(), block_len, this->_voxel_map.data(), block_len, 0);
         }
-        else if(this->_num_lines < Index(comm.size()))
+        else if(this->_num_lines < u64(comm.size()))
         {
           // more processes than slag lines; this is a borderline scenario, but we have to support it anyways
           // create a sub-communicator and then compute mask on that sub-communicator
@@ -1949,30 +1642,30 @@ namespace FEAT
           if(!sub_comm.is_null())
           {
             // get sub-communicator rank and size
-            Index comm_rank = Index(sub_comm.rank());
-            Index comm_size = Index(sub_comm.size());
+            u64 comm_rank = u64(sub_comm.rank());
+            u64 comm_size = u64(sub_comm.size());
 
             // compute line count for a single process and round up; this may be bigger than _num_lines,
             // so the last process may have less lines to chew through than all other processes
-            Index line_count = (this->_num_lines + comm_size - 1u) / comm_size;
+            u64 line_count = (this->_num_lines + comm_size - 1u) / comm_size;
             std::size_t block_len = this->_stride_line * line_count;
 
             // allocate voxel map and format to zero
             std::size_t vmap_size = block_len;
             // do we need the entire map on this process?
             if(gather_to_all || (comm_rank == 0))
-              vmap_size *= Index(comm_size);
+              vmap_size *= u64(comm_size);
             this->_voxel_map.resize(vmap_size, 0u);
 
             // compute first and last+1 line of this process; make sure the last process doesn't go beyond the total count
-            Index line_beg = comm_rank * line_count;
-            Index line_end = Math::min((comm_rank + 1u) * line_count, Index(this->_num_lines));
+            u64 line_beg = comm_rank * line_count;
+            u64 line_end = Math::min((comm_rank + 1u) * line_count, this->_num_lines);
 
             // debug output
             //this->_comm.allprint(String(">>>") + stringify(line_beg).pad_front(6) + ":" + stringify(line_count) + ">" + stringify(line_end).pad_front(6));
 
             // compute lines for this process
-            this->_compute_voxel_map_lines(masker, line_beg, line_end, gather_to_all ? Index(0) : line_beg);
+            this->_compute_voxel_map_lines(masker, line_beg, line_end, gather_to_all ? u64(0) : line_beg);
 
             // perform an in-place gather to synchronize the voxel map on rank 0
             sub_comm.gather(this->_voxel_map.data(), block_len, this->_voxel_map.data(), block_len, 0);
@@ -2004,84 +1697,7 @@ namespace FEAT
        * \param[in] plane
        * The index of the plane that is to be exported.
        */
-      void _export_plane_to_bmp(std::ostream& os, u64 plane) const
-      {
-        // maximum BMP resolutions seems to be around 30K, but we won't export more than 20K,
-        // which results in a file size of roughly 50 MB per image
-        XASSERTM(_num_slices[0] < 20000, "voxel map is too big for BMP export!");
-        XASSERTM(_num_slices[1] < 20000, "voxel map is too big for BMP export!");
-        XASSERTM(plane < _num_slices[2], "invalid plane index");
-
-        typedef std::uint16_t u16;
-        typedef std::uint32_t u32;
-
-        // get dimensions
-        u32 width = u32(this->_num_slices[0]);
-        u32 height = u32(this->_num_slices[1]);
-
-        // compute stride (multiple of 4 bytes)
-        u32 stride = ((width + 31u) & ~31u) >> 3;
-
-        // BITMAPFILEHEADER: 14 bytes
-        // write magic
-        u16 magic = 0x4D42;
-        os.write((char*)&magic, 2u);
-        // write file size
-        u32 filesize = 62u + height * stride;
-        os.write((char*)&filesize, 4u);
-        // write reserved bytes
-        u32 zeros = 0u;
-        os.write((char*)&zeros, 4u);
-        // wite bit offset
-        u32 offbits = 54u + 2u*4u;
-        os.write((char*)&offbits, 4u);
-
-        // BITMAPINFOHEADER: 40 bytes
-        // write header size
-        u32 bisize = 40u;
-        os.write((char*)&bisize, 4u);
-        // write width and height
-        os.write((char*)&width, 4u);
-        os.write((char*)&height, 4u);
-        // write plane count
-        u16 planes = 1;
-        os.write((char*)&planes, 2u);
-        // write bit count
-        u16 bitcount = 1;
-        os.write((char*)&bitcount, 2u);
-        // write compression
-        os.write((char*)&zeros, 4u);
-        // write image size
-        u32 size_image = height * stride;
-        os.write((char*)&size_image, 4u);
-        // write pixels per meter (X and Y)
-        u32 px_per_m = 3780;
-        os.write((char*)&px_per_m, 4u);
-        os.write((char*)&px_per_m, 4u);
-        // number of colors
-        u32 clr_used = 2u;
-        os.write((char*)&clr_used, 4u);
-        // number of important colors (WTF?)
-        os.write((char*)&zeros, 4u);
-
-        // write black and white colors
-        u32 clr_black = 0u, clr_white = ~u32(0);
-        os.write((char*)&clr_black, 4u);
-        os.write((char*)&clr_white, 4u);
-
-        std::vector<char> linebuffer(stride);
-        char* oline = linebuffer.data();
-
-        // okay, let's loop over all domain nodes
-        for(u32 i(0); i < height; ++i)
-        {
-          const char* iline = &_voxel_map.data()[plane*_stride_plane + i*_stride_line];
-          for(u32 j(0); j < stride; ++j)
-            for(int k(0); k < 8; ++k)
-              (oline[j] <<= 1) |= ((iline[j] >> k) & 1); // all hail to bitshift!
-          os.write(oline, stride);
-        }
-      }
+      void _export_plane_to_bmp(std::ostream& os, u64 plane) const;
 
       /**
        * \brief Renders a plane range of voxel map to a single gray-scale BMP image file
@@ -2094,107 +1710,15 @@ namespace FEAT
        * The binary output stream for the BMP image
        *
        * \param[in] width
-       * The desired bitmap width; must be less than or equal to the number of slices in X-dimension.
+       * The desired bitmap width; must be less than or equal to the number of points in X-dimension.
        *
        * \param[in] height
-       * The desired bitmap height; must be less than or equal to the number of slices in Y-dimension.
+       * The desired bitmap height; must be less than or equal to the number of points in Y-dimension.
        *
        * \param[in] box_min_z, box_max_z
        * The indices of the plane Z range that has to be sampled into a single output plane.
        */
-      void _render_plane_to_bmp(std::ostream& os, Index width, Index height, Index box_min_z, Index box_max_z) const
-      {
-        // maximum BMP resolutions seems to be around 30K, but we won't export more than 20K,
-        // which results in a file size of roughly 50 MB per image
-        XASSERTM(width < 20000, "voxel map is too big for BMP export!");
-        XASSERTM(height < 20000, "voxel map is too big for BMP export!");
-        XASSERTM(box_min_z <= box_max_z, "invalid depth for voxel map export!");
-        XASSERTM(box_max_z <= _num_slices[2], "invalid depth for voxel map export!");
-
-        typedef std::uint8_t u8;
-        typedef std::uint16_t u16;
-        typedef std::uint32_t u32;
-
-        // get dimensions
-        u32 width2 = u32(width);
-        u32 height2 = u32(height);
-
-        // compute stride (multiple of 4 bytes)
-        u32 stride = ((width2*8 + 31u) & ~31u) >> 3;
-
-        // BITMAPFILEHEADER: 14 bytes
-        // write magic
-        u16 magic = 0x4D42;
-        os.write((char*)&magic, 2u);
-        // write file size
-        u32 filesize = 54u + height2 * stride + 256u*4u;
-        os.write((char*)&filesize, 4u);
-        // write reserved bytes
-        u32 zeros = 0u;
-        os.write((char*)&zeros, 4u);
-        // wite bit offset
-        u32 offbits = 54u + 256u*4u;
-        os.write((char*)&offbits, 4u);
-
-        // BITMAPINFOHEADER: 40 bytes
-        // write header size
-        u32 bisize = 40u;
-        os.write((char*)&bisize, 4u);
-        // write width and height
-        os.write((char*)&width2, 4u);
-        os.write((char*)&height2, 4u);
-        // write plane count
-        u16 planes = 1;
-        os.write((char*)&planes, 2u);
-        // write bit count
-        u16 bitcount = 8;
-        os.write((char*)&bitcount, 2u);
-        // write compression
-        os.write((char*)&zeros, 4u);
-        // write image size
-        u32 size_image = height2 * stride;
-        os.write((char*)&size_image, 4u);
-        // write pixels per meter (X and Y)
-        u32 px_per_m = 3780;
-        os.write((char*)&px_per_m, 4u);
-        os.write((char*)&px_per_m, 4u);
-        // number of colors
-        u32 clr_used = 256u;
-        os.write((char*)&clr_used, 4u);
-        // number of important colors (WTF?)
-        os.write((char*)&zeros, 4u);
-
-        // write colors
-        std::vector<u32> colors(256);
-        for(u32 i = 0u; i < 256u; ++i)
-        {
-          colors[i] = i | (i << 8) | (i << 16) ;//| (i << 24);
-        }
-        os.write((char*)colors.data(), 256u*4u);
-
-        std::vector<u8> linebuffer(stride);
-        u8* oline = linebuffer.data();
-
-        // set up bounding box
-        std::array<Index, 3u> box_min, box_max;
-        box_min[2u] = box_min_z;
-        box_max[2u] = box_max_z;
-
-        // okay, let's loop over all domain nodes
-        for(Index i(0); i < height; ++i)
-        {
-          box_min[1u] = ( i     * _num_slices[1u]) / height;
-          box_max[1u] = ((i+1u) * _num_slices[1u]) / height - 1u;
-          for(Index j(0); j < width; ++j)
-          {
-            box_min[0u] = ( j     * _num_slices[0u]) / width;
-            box_max[0u] = ((j+1u) * _num_slices[0u]) / width - 1u;
-            Real w = _gather_voxel_map_weight(box_min, box_max) * 255.0;
-            oline[j] = u8(w <= 0.0 ? 0 : (w >= 255.0 ? 255 : w));
-          }
-          os.write((char*)oline, stride);
-        }
-      }
+      void _render_plane_to_bmp(std::ostream& os, Index width, Index height, i64 box_min_z, i64 box_max_z) const;
     }; // class VoxelMap
   } // namespace Geometry
 } // namespace FEAT

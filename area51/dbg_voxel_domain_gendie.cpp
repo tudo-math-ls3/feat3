@@ -55,11 +55,20 @@ int main(int argc, char** argv)
 
   SimpleArgParser args(argc, argv);
 
+  Real min_x(0), max_x(0), min_y(0), max_y(0), min_z(0), max_z(0);
+  Index num_x(0), num_y(0), num_z(0);
+  if(args.parse("base", num_x, num_y, num_z, min_x, max_x, min_y, max_y, min_z, max_z) < 9)
+  {
+    comm.print("ERROR: your must specify 3D bounding box via  '--box ...'");
+    Runtime::abort();
+  }
+
   // create base mesh node
   //domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
   //domain.create_base_mesh_3d(4, 4, 4, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
   //domain.create_base_mesh_3d(6, 7, 8, -96.0, 96.0, -164.0, 60.0, 0.0, 256.0);
-  domain.create_base_mesh_3d(6, 7, 9, -96.0, 96.0, -164.0, 60.0, 0.0, 288.0);
+  //domain.create_base_mesh_3d(6, 7, 9, -96.0, 96.0, -164.0, 60.0, 0.0, 288.0);
+  domain.create_base_mesh_3d(num_x, num_y, num_z, min_x, max_x, min_y, max_y, min_z, max_z);
   domain.parse_args(args);
 
   // todo: add base mesh meshparts
@@ -71,12 +80,15 @@ int main(int argc, char** argv)
   //domain.set_desired_levels(5, 2, 0);
   domain.set_desired_levels(args.query("level")->second);
 
+  Real res = 0.0;
+  args.parse("res", res);
+
   // create slag mask from OFF file
   if(args.check("off") > 0)
   {
     String off_name = args.query("off")->second.front();
     comm.print("Creating voxel map from OFF file '" + off_name + "'...");
-    domain.create_voxel_map_from_off(off_name, false, 0.0);
+    domain.create_voxel_map_from_off(off_name, false, res);
   }
   if(args.check("vxl") > 0)
   {
