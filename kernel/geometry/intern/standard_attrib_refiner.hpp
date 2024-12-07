@@ -46,7 +46,8 @@ namespace FEAT
           XASSERT(attrib_set_out.get_num_values() >= offset + num_values);
 
           // loop over all attributes
-          for(Index i(0); i < num_values; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_values; ++i)
           {
             for(int j(0); j < dim_attrib; ++j)
             {
@@ -92,7 +93,8 @@ namespace FEAT
           XASSERT(attrib_set_out.get_num_values() >= offset + num_cells);
 
           // loop over all cells
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // get input index tuple
             const auto& idx_in = index_set_in[i];
@@ -151,7 +153,8 @@ namespace FEAT
           XASSERT(attrib_set_out.get_num_values() >= offset + num_cells);
 
           // loop over all cells
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // get input index tuple
             const auto& idx_in = index_set_in[i];

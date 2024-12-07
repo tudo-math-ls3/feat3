@@ -67,7 +67,8 @@ namespace FEAT
           const Index num_edges = index_set_e_v.get_num_entities();
 
           // loop over all coarse mesh edges
-          for(Index i(0); i < num_edges; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_edges; ++i)
           {
             // fetch coarse mesh vertices-at-edge index vector
             const IndexTupleTypeEV& e_v = index_set_e_v[i];
@@ -150,7 +151,8 @@ namespace FEAT
           */
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh edges-at-triangle index vector
             const IndexTupleTypeSE& s_e = index_set_s_e[i];
@@ -237,7 +239,8 @@ namespace FEAT
           */
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh vertices-at-triangle and edges-at-triangle index vectors
             const IndexTupleTypeSV& s_v = index_set_s_v[i];
@@ -338,7 +341,8 @@ namespace FEAT
           */
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh index vectors
             const IndexTupleTypeSV& s_v = index_set_s_v[i];
@@ -458,7 +462,8 @@ namespace FEAT
 
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh simplex-at-edge index vector
             const IndexTupleTypeSE& s_e = index_set_s_e[i];
@@ -574,7 +579,8 @@ namespace FEAT
           */
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh edges-at-simplex index vectors
             const IndexTupleTypeSE& s_e = index_set_s_e[i];
@@ -754,7 +760,8 @@ namespace FEAT
           */
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh index vectors
             const IndexTupleTypeSE& s_e = index_set_s_e[i];
@@ -900,7 +907,8 @@ namespace FEAT
           typedef Intern::SubIndexMapping<ShapeType, cell_dim, face_dim> SubIndexMappingType;
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh vertices-at-simplex and edges-at-simplex index vectors
             const IndexTupleTypeSV& s_v = index_set_s_v[i];
@@ -1065,7 +1073,8 @@ namespace FEAT
           typedef Intern::SubIndexMapping<ShapeType, face_dim, 0> EdgeIndexMappingType;
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh index vectors
             const IndexTupleTypeSV& s_v = index_set_s_v[i];
@@ -1239,7 +1248,8 @@ namespace FEAT
           typedef Intern::SubIndexMapping<ShapeType, face_dim, 0> SubIndexMappingType;
 
           // loop over all coarse mesh simplices
-          for(Index i(0); i < num_simps; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_simps; ++i)
           {
             // fetch coarse mesh vertices-at-simplex and triangle-at-simplex index vectors
             const IndexTupleTypeSV& s_v = index_set_s_v[i];
@@ -1378,7 +1388,8 @@ namespace FEAT
           const Index num_edges = index_set_e_v.get_num_entities();
 
           // loop over all coarse mesh edges
-          for(Index i(0); i < num_edges; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_edges; ++i)
           {
             // fetch coarse mesh vertices-at-edge index vector
             const IndexTupleTypeEV& e_v = index_set_e_v[i];
@@ -1465,7 +1476,8 @@ namespace FEAT
 
 
           // loop over all coarse mesh edges
-          for(Index i(0); i < num_quads; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_quads; ++i)
           {
             // fetch coarse mesh edges-at-quad index vector
             const IndexTupleTypeQE& q_e = index_set_q_e[i];
@@ -1560,7 +1572,8 @@ namespace FEAT
           // v_0-----------e_0-----------v_1
 
           // loop over all coarse mesh quads
-          for(Index i(0); i < num_quads; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_quads; ++i)
           {
             // fetch coarse mesh vertices-at-quad and edges-at-quad index vectors
             const IndexTupleTypeQV& q_v = index_set_q_v[i];
@@ -1666,7 +1679,8 @@ namespace FEAT
           //   +----e_0_0----+----e_0_1----+
 
           // loop over all coarse mesh quads
-          for(Index i(0); i < num_quads; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_quads; ++i)
           {
             // fetch coarse mesh vertices-at-quad and edges-at-quad index vectors
             const IndexTupleTypeQV& q_v = index_set_q_v[i];
@@ -1771,7 +1785,8 @@ namespace FEAT
 
 
           // loop over all coarse mesh cubes
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh quad-at-cube index vector
             const IndexTupleTypeCQ& c_q = index_set_c_q[i];
@@ -1910,7 +1925,8 @@ namespace FEAT
           //
 
           // loop over all coarse mesh cubes
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh quad-at-cube and edges-at-cube index vectors
             const IndexTupleTypeCQ& c_q = index_set_c_q[i];
@@ -2075,7 +2091,8 @@ namespace FEAT
           //
 
           // loop over all coarse mesh cubes
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh index vectors
             const IndexTupleTypeCQ& c_q = index_set_c_q[i];
@@ -2277,7 +2294,8 @@ namespace FEAT
           //
 
           // loop over all coarse mesh cubes
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh vertices-at-quad and edges-at-quad index vectors
             const IndexTupleTypeCV& c_v = index_set_c_v[i];
@@ -2452,7 +2470,8 @@ namespace FEAT
           //
 
           // loop over all coarse mesh cubes
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh index vectors
             const IndexTupleTypeCV& c_v = index_set_c_v[i];
@@ -2667,7 +2686,8 @@ namespace FEAT
           //
 
           // loop over all coarse mesh cubes
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh vertices-at-cube and quads-at-cube index vectors
             const IndexTupleTypeCV& c_v = index_set_c_v[i];

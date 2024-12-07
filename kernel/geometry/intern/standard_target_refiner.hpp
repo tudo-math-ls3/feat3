@@ -38,7 +38,8 @@ namespace FEAT
           const Index num_verts = target_set_holder_in.get_num_entities(0);
           const TargetSetType& target_set_in = target_set_holder_in.get_target_set<0>();
 
-          for(Index i(0); i < num_verts; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_verts; ++i)
           {
             target_set_out[i] = index_offsets[0] + target_set_in[offset + i];
           }
@@ -73,7 +74,8 @@ namespace FEAT
           Index num_cells = target_set_in.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             target_set_out[offset + i] = index_offsets[shape_dim_] + target_set_in[i];
           }
@@ -124,7 +126,8 @@ namespace FEAT
           Index num_cells = target_set_e.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // fetch edge target index
             const Index trg_e = target_set_e[i];
@@ -217,7 +220,8 @@ namespace FEAT
           Index num_cells = target_set_t.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // fetch tria target index
             const Index trg_t = target_set_t[i];
@@ -287,7 +291,8 @@ namespace FEAT
           Index num_cells = target_set_t.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // fetch tria target index
             const Index trg_t = target_set_t[i];
@@ -404,7 +409,8 @@ namespace FEAT
           Index num_cells = target_set_in.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             target_set_out[offset + i] = index_offsets[shape_dim_] + target_set_in[i];
           }
@@ -455,7 +461,8 @@ namespace FEAT
           Index num_cells = target_set_e.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // fetch edge target index
             const Index trg_e = target_set_e[i];
@@ -525,7 +532,8 @@ namespace FEAT
           Index num_cells = target_set_q.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // fetch quad target index
             const Index trg_q = target_set_q[i];
@@ -598,7 +606,8 @@ namespace FEAT
           Index num_cells = target_set_q.get_num_entities();
 
           // set target indices
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // fetch quad target index
             const Index trg_q = target_set_q[i];

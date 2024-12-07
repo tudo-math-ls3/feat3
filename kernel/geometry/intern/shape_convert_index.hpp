@@ -69,7 +69,8 @@ namespace FEAT
           const Index num_edges = index_set_in.get_num_entities();
 
           // loop over all coarse mesh quads
-          for(Index i(0); i < num_edges; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_edges; ++i)
           {
             // fetch coarse mesh vertices-at-quad index vector
             const IndexTupleTypeIn& v_e = index_set_in[i];
@@ -147,7 +148,8 @@ namespace FEAT
 
 
           // loop over all coarse mesh quads
-          for(Index i(0); i < num_quads; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_quads; ++i)
           {
             // fetch coarse mesh vertices-at-quad index vector
             const IndexTupleTypeIn& v_q = index_set_in[i];
@@ -222,7 +224,8 @@ namespace FEAT
           const Index num_hexas = index_set_in_v_c.get_num_entities();
 
           // loop over all coarse mesh hexas
-          for(Index i(0); i < num_hexas; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_hexas; ++i)
           {
             // fetch coarse mesh vertices-at-hexa index vector
             const IndexTupleType_v_c& v_c = index_set_in_v_c[i];
@@ -357,7 +360,8 @@ namespace FEAT
 
 
           // loop over all coarse mesh quads
-          for(Index i(0); i < num_quads; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_quads; ++i)
           {
             // fetch coarse mesh vertices-at-quad index vector
             const IndexTupleTypeIn& v_q = index_set_in[i];
@@ -437,7 +441,8 @@ namespace FEAT
           const Index num_cubes = index_set_in_v_c.get_num_entities();
 
           // loop over all coarse mesh hexas
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh vertices-at-hexas and quad-at-hexa index vector
             const IndexTupleType_v_c& v_c = index_set_in_v_c[i];
@@ -688,7 +693,8 @@ namespace FEAT
           const Index num_cubes = index_set_in_v_c.get_num_entities();
 
           // loop over all coarse mesh hexas
-          for(Index i(0); i < num_cubes; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cubes; ++i)
           {
             // fetch coarse mesh vertices-at-hexas and quad-at-hexas index vector
             const IndexTupleType_v_c& v_c = index_set_in_v_c[i];
@@ -901,7 +907,8 @@ namespace FEAT
           const Index num_edges = index_set_in.get_num_entities();
 
           // loop over all coarse mesh edges
-          for(Index i(0); i < num_edges; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_edges; ++i)
           {
             // fetch coarse mesh vertices-at-edge index vector
             const IndexTupleTypeIn& v_e = index_set_in[i];
@@ -964,7 +971,8 @@ namespace FEAT
           const Index num_trias = index_set_in.get_num_entities();
 
           // loop over all coarse mesh triangle
-          for(Index i(0); i < num_trias; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_trias; ++i)
           {
             // fetch coarse mesh edge-at-triangle index vector
             const IndexTupleTypeIn& e_t = index_set_in[i];
@@ -1032,7 +1040,8 @@ namespace FEAT
           const Index num_tetras = index_set_in_t_tet.get_num_entities();
 
           // loop over all coarse mesh tetras
-          for(Index i(0); i < num_tetras; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_tetras; ++i)
           {
             // fetch coarse mesh triangle-at-tetra index vector
             const IndexTupleType_t_tet& t_tet = index_set_in_t_tet[i];
@@ -1110,7 +1119,8 @@ namespace FEAT
           const Index num_trias = index_set_in_e_t.get_num_entities();
 
          // loop over all coarse mesh triangles
-          for(Index i(0); i < num_trias; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_trias; ++i)
           {
             // fetch coarse mesh vertices-at-triangle and edge-at-triangle index vector
             const IndexTupleType_v_t& v_t = index_set_in_v_t[i];
@@ -1191,7 +1201,8 @@ namespace FEAT
           const Index num_tetras = index_set_in_e_tet.get_num_entities();
 
           // loop over all coarse mesh tetras
-          for(Index i(0); i < num_tetras; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_tetras; ++i)
           {
             // fetch coarse mesh edge-at-tetra and triangle-at-tetra index vector
             const IndexTupleType_e_tet& e_tet = index_set_in_e_tet[i];
@@ -1295,7 +1306,8 @@ namespace FEAT
           const Index num_tetras = index_set_in_e_tet.get_num_entities();
 
           // loop over all coarse mesh tetras
-          for(Index i(0); i < num_tetras; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_tetras; ++i)
           {
             // fetch coarse mesh vertices-at-tetra, edge-at-tetra and triangle-at-tetra index vector
             const IndexTupleType_v_tet& v_tet = index_set_in_v_tet[i];

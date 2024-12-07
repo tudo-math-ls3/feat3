@@ -49,7 +49,8 @@ namespace FEAT
           Index num_cells = index_set_in.get_num_entities();
 
           // loop over all cells
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             // get input index vector
             const IndexTupleType& idx_in = index_set_in[i];
@@ -92,7 +93,8 @@ namespace FEAT
           XASSERT(vertex_set_out.get_num_vertices() >= num_verts);
 
           // loop over all vertices
-          for(Index i(0); i < num_verts; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_verts; ++i)
           {
             // copy source vertex
             vertex_set_out[offset + i] = vertex_set_in[i];

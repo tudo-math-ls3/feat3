@@ -93,7 +93,8 @@ namespace FEAT
           }
 
           // loop over all rows
-          for(Index j(0); j < n; ++j)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index j = 0; j < n; ++j)
           {
             // calculate offsets
             Index k0 =      j *(m + 1);     // lower-left coarse mesh vertex
@@ -167,7 +168,8 @@ namespace FEAT
           }
 
           // loop over all Y-slices
-          for(Index j(0); j < n; ++j)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index j = 0; j < n; ++j)
           {
             // calculate offsets
             const Index k0 =      j *(m + 1);     // lower-left coarse mesh vertex
@@ -204,7 +206,8 @@ namespace FEAT
           // indices of the bottom face done
 
           // loop over all Z-slices of the coarse mesh
-          for(Index k(0); k < l; ++k)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index k = 0; k < l; ++k)
           {
             // coarse and fine mesh index of the left front vertex of the current slice (= offsets)
             const Index oc = (k+1)*(m+1)*(n+1);

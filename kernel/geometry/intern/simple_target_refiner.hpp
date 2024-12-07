@@ -36,7 +36,8 @@ namespace FEAT
           static constexpr int shape_dim = ShapeType::dimension;
           static constexpr int num_children = StandardRefinementTraits<ShapeType,cell_dim_>::count;
 
-          for(Index i(0); i < num_cells; ++i)
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < num_cells; ++i)
           {
             for(int j(0); j < num_children; ++j)
             {
