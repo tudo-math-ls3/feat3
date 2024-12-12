@@ -146,6 +146,30 @@ namespace FEAT
           csrsb_generic<BlockSize_, DT_, IT_>(r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
         }
 
+        template <int BlockSize_>
+        static void csrsb(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          BACKEND_SKELETON_VOID_T1(BlockSize_, csrsb_cuda, csrsb_generic, csrsb_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+
+        template <int BlockSize_>
+        static void csrsb(double * r, const double a, const double * const x, const double b, const double * const y, const double * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          BACKEND_SKELETON_VOID_T1(BlockSize_, csrsb_cuda, csrsb_generic, csrsb_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+
+        template <int BlockSize_>
+        static void csrsb(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          BACKEND_SKELETON_VOID_T1(BlockSize_, csrsb_cuda, csrsb_generic, csrsb_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+
+        template <int BlockSize_>
+        static void csrsb(float * r, const float a, const float * const x, const float b, const float * const y, const float * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index rows, const Index columns, const Index used_elements)
+        {
+          BACKEND_SKELETON_VOID_T1(BlockSize_, csrsb_cuda, csrsb_generic, csrsb_generic, r, a, x, b, y, val, col_ind, row_ptr, rows, columns, used_elements);
+        }
+
         template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ beta, const DT_ * const y, const DT_ * const val, const IT_ * const offsets,  const Index num_of_offsets, const Index rows, const Index columns)
         {
