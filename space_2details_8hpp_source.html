@@ -104,75 +104,76 @@ $(document).ready(function(){initNavTree('space_2details_8hpp_source.html',''); 
   <div class="headertitle"><div class="title">details.hpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#ifndef KERNEL_SPACE_DETAILS_HPP</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#define KERNEL_SPACE_DETAILS_HPP 1</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;kernel/util/tiny_algebra.hpp&gt;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>{</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  <span class="keyword">namespace </span>Space</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  {</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html">   12</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html">ParametricEvalHelper</a></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    {</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_&gt;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> trans_values(SpaceData_&amp; space_data)</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>      {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="comment">// loop over all basis functions</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>          <span class="comment">// and copy the basis function value</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>          space_data.phi[i].value = space_data.phi[i].ref_value;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        }</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      }</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_, <span class="keyword">typename</span> JacInvType_&gt;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> trans_gradients(SpaceData_&amp; space_data, <span class="keyword">const</span> JacInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>)</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      {</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        <span class="comment">// loop over all basis functions</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        {</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>          <span class="comment">// and apply the first-order chain rule</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>          space_data.phi[i].grad.set_vec_mat_mult(space_data.phi[i].ref_grad, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>);</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        }</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      }</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_, <span class="keyword">typename</span> JacInvType_&gt;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> inplace_trans_gradients(SpaceData_&amp; space_data, <span class="keyword">const</span> JacInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>)</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>      {</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="keyword">typename</span> SpaceData_::EvalTraits::BasisReferenceGradientType tmp;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="comment">// loop over all basis functions</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        {</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>          tmp = space_data.phi[i].grad;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>          <span class="comment">// and apply the first-order chain rule</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>          space_data.phi[i].grad.set_vec_mat_mult(tmp, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>);</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        }</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>      }</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_, <span class="keyword">typename</span> JacInvType_, <span class="keyword">typename</span> HessInvType_&gt;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> trans_hessians(SpaceData_&amp; space_data, <span class="keyword">const</span> JacInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>, <span class="keyword">const</span> HessInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">hess_inv</a>)</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>      {</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="comment">// loop over all basis functions</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        {</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>          <span class="comment">// and apply the second-order chain rule</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>          space_data.phi[i].hess.set_double_mat_mult(space_data.phi[i].ref_hess, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>          space_data.phi[i].hess.add_vec_tensor_mult(space_data.phi[i].ref_grad, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">hess_inv</a>);</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        }</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>      }</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    };</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>  }</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>}</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;kernel/util/tiny_algebra.hpp&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  <span class="keyword">namespace </span>Space</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html">   15</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html">ParametricEvalHelper</a></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    {</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_&gt;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> trans_values(SpaceData_&amp; space_data)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>      {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="comment">// loop over all basis functions</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>          <span class="comment">// and copy the basis function value</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>          space_data.phi[i].value = space_data.phi[i].ref_value;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        }</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      }</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_, <span class="keyword">typename</span> JacInvType_&gt;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> trans_gradients(SpaceData_&amp; space_data, <span class="keyword">const</span> JacInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>)</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      {</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="comment">// loop over all basis functions</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>          <span class="comment">// and apply the first-order chain rule</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>          space_data.phi[i].grad.set_vec_mat_mult(space_data.phi[i].ref_grad, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        }</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>      }</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_, <span class="keyword">typename</span> JacInvType_&gt;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> inplace_trans_gradients(SpaceData_&amp; space_data, <span class="keyword">const</span> JacInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>)</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>      {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keyword">typename</span> SpaceData_::EvalTraits::BasisReferenceGradientType tmp;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="comment">// loop over all basis functions</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        {</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>          tmp = space_data.phi[i].grad;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>          <span class="comment">// and apply the first-order chain rule</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>          space_data.phi[i].grad.set_vec_mat_mult(tmp, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        }</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>      }</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SpaceData_, <span class="keyword">typename</span> JacInvType_, <span class="keyword">typename</span> HessInvType_&gt;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>      CUDA_HOST_DEVICE <span class="keyword">static</span> <span class="keywordtype">void</span> trans_hessians(SpaceData_&amp; space_data, <span class="keyword">const</span> JacInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>, <span class="keyword">const</span> HessInvType_&amp; <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">hess_inv</a>)</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>      {</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <span class="comment">// loop over all basis functions</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; SpaceData_::max_local_dofs; ++i)</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>          <span class="comment">// and apply the second-order chain rule</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>          space_data.phi[i].hess.set_double_mat_mult(space_data.phi[i].ref_hess, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">jac_inv</a>);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>          space_data.phi[i].hess.add_vec_tensor_mult(space_data.phi[i].ref_grad, <a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">hess_inv</a>);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        }</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>      }</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    };</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>  }</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>}</div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a3543891ff1ad9694a51bd1ff32e26c66">FEAT::TrafoTags::hess_inv</a></div><div class="ttdeci">@ hess_inv</div><div class="ttdoc">specifies whether the trafo should supply inverse hessian tensors</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca"><div class="ttname"><a href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a9bcec9b54f52546a14964dbc128e1fca">FEAT::TrafoTags::jac_inv</a></div><div class="ttdeci">@ jac_inv</div><div class="ttdoc">specifies whether the trafo should supply inverse jacobian matrices</div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_space_1_1_parametric_eval_helper_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html">FEAT::Space::ParametricEvalHelper</a></div><div class="ttdef"><b>Definition:</b> <a href="space_2details_8hpp_source.html#l00012">details.hpp:13</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_space_1_1_parametric_eval_helper_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_space_1_1_parametric_eval_helper.html">FEAT::Space::ParametricEvalHelper</a></div><div class="ttdef"><b>Definition:</b> <a href="space_2details_8hpp_source.html#l00015">details.hpp:16</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

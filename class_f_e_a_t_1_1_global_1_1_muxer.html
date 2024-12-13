@@ -247,7 +247,7 @@ class FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;</div><p ><a class="el" 
 <p >To perform the actual transition between two partitionings, the functions required to be called differ depending on the whether the calling process is a parent process, i.e. it is an active process in both the child and parent communicators, or whether it is only a simple child process, i.e. is only active in the child communicator. On each parent process, the caller has to call the <a class="el" href="class_f_e_a_t_1_1_global_1_1_muxer.html#ab5aeadc2994978aa8a82769a8a3c544f" title="Performs a join operation on the parent process.">join()</a> or <a class="el" href="class_f_e_a_t_1_1_global_1_1_muxer.html#af4b780c157ac6c8b48dfe48d04dbacd7" title="Performs a split operation on the parent process.">split()</a> functions, which require both the coarse and fine partitioning input/output vectors. On all other child processes, the caller has to call the <a class="el" href="class_f_e_a_t_1_1_global_1_1_muxer.html#a263b46dc9d38074614bcd71e6650bb63" title="Sends a join operation to the parent process.">join_send()</a> function, which only requires the fine partitioning input vector, or the <a class="el" href="class_f_e_a_t_1_1_global_1_1_muxer.html#aa8ea7b81978ba0ccc373c613c9fabca9" title="Receives a split operation from the parent process.">split_recv()</a> function, which only requires the fine partitioning output vector.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00069">69</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00067">67</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="af8d76a53029f1978cdb38ede3cc67f99" name="af8d76a53029f1978cdb38ede3cc67f99"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af8d76a53029f1978cdb38ede3cc67f99">&#9670;&#160;</a></span>BufferType</h2>
@@ -265,7 +265,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the internal buffer vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00081">81</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00079">79</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -285,7 +285,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the data type </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00073">73</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00071">71</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +305,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the index type </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00075">75</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00073">73</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -325,7 +325,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the local vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00077">77</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00075">75</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +345,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00079">79</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00077">77</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -367,7 +367,7 @@ template&lt;typename LocalVector2_ , typename Mirror2_ &gt; </div>
 
 <p>Our 'base' class type. </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00085">85</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00083">83</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +389,7 @@ template&lt;typename DataType2_ , typename IndexType2_ &gt; </div>
 
 <p>this typedef lets you create a gate container with new Data and Index types </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00089">89</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00087">87</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +421,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>standard constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00111">111</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00109">109</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -453,7 +453,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>move-constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00121">121</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00119">119</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -484,7 +484,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00131">131</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00129">129</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
 </div>
 </div>
@@ -516,11 +516,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>Returns the internal data size in bytes. </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00213">213</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00211">211</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, and <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, and <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="blocked__basic_8hpp_source.html#l00123">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="scalar__basic_8hpp_source.html#l00143">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="splitter_8hpp_source.html#l00165">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::bytes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="blocked__basic_8hpp_source.html#l00121">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="scalar__basic_8hpp_source.html#l00141">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="splitter_8hpp_source.html#l00163">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -558,11 +558,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00336">336</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00334">334</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dist_8cpp_source.html#l00541">FEAT::Dist::Comm::bcast()</a>, <a class="el" href="muxer_8hpp_source.html#l00227">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="math_8hpp_source.html#l00139">FEAT::Math::max()</a>, <a class="el" href="dist_8hpp_source.html#l01496">FEAT::Dist::Comm::rank()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dist_8cpp_source.html#l00541">FEAT::Dist::Comm::bcast()</a>, <a class="el" href="muxer_8hpp_source.html#l00225">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00255">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::compile()</a>, and <a class="el" href="muxer_8hpp_source.html#l00190">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::convert()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00253">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::compile()</a>, and <a class="el" href="muxer_8hpp_source.html#l00188">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::convert()</a>.</p>
 
 </div>
 </div>
@@ -621,9 +621,9 @@ template&lt;typename LVT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00190">190</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00188">188</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
 
 </div>
 </div>
@@ -663,9 +663,9 @@ template&lt;typename LVT2_ , typename MT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00157">157</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00155">155</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00126">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::convert()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00124">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::convert()</a>.</p>
 
 </div>
 </div>
@@ -697,9 +697,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns the child mirror vector. </p>
 <dl class="section return"><dt>Returns</dt><dd>The child mirror vector </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00325">325</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00323">323</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>.</p>
 
 </div>
 </div>
@@ -731,9 +731,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns the parent mirror. </p>
 <dl class="section return"><dt>Returns</dt><dd>The parent mirror </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00304">304</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00302">302</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>.</p>
 
 </div>
 </div>
@@ -765,9 +765,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns the parent rank. </p>
 <dl class="section return"><dt>Returns</dt><dd>The parent rank </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00294">294</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00292">292</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>.</p>
 
 </div>
 </div>
@@ -799,11 +799,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns the sibling communicator. </p>
 <dl class="section return"><dt>Returns</dt><dd>The sibling communicator. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00262">262</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00260">260</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00178">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_root()</a>, and <a class="el" href="splitter_8hpp_source.html#l00188">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_single()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00176">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_root()</a>, and <a class="el" href="splitter_8hpp_source.html#l00186">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_single()</a>.</p>
 
 </div>
 </div>
@@ -835,11 +835,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Specifies whether this process represents a child in the muxer. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if this process is a child, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00227">227</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00225">225</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, and <a class="el" href="dist_8hpp_source.html#l01508">FEAT::Dist::Comm::size()</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, and <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00252">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_ghost()</a>, <a class="el" href="splitter_8hpp_source.html#l00322">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00296">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00254">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, <a class="el" href="splitter_8hpp_source.html#l00380">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00212">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00250">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_ghost()</a>, <a class="el" href="splitter_8hpp_source.html#l00320">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, <a class="el" href="splitter_8hpp_source.html#l00378">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
 
 </div>
 </div>
@@ -872,11 +872,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>A ghost is a child process, which is not a parent process.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if this process is a ghost, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00252">252</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00250">250</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00227">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, and <a class="el" href="muxer_8hpp_source.html#l00238">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00225">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, and <a class="el" href="muxer_8hpp_source.html#l00236">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="global_2transfer_8hpp_source.html#l00196">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::is_ghost()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00327">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00276">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest_send()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00234">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc_send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="global_2transfer_8hpp_source.html#l00194">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::is_ghost()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00325">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00274">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest_send()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00232">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc_send()</a>.</p>
 
 </div>
 </div>
@@ -908,11 +908,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Specifies whether this process represents a parent in the muxer. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if this process is a parent, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00238">238</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00236">236</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, and <a class="el" href="dist_8hpp_source.html#l01496">FEAT::Dist::Comm::rank()</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, and <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00252">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_ghost()</a>, <a class="el" href="splitter_8hpp_source.html#l00178">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_root()</a>, <a class="el" href="splitter_8hpp_source.html#l00322">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00296">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00254">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, <a class="el" href="splitter_8hpp_source.html#l00380">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00212">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00250">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_ghost()</a>, <a class="el" href="splitter_8hpp_source.html#l00176">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_root()</a>, <a class="el" href="splitter_8hpp_source.html#l00320">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, <a class="el" href="splitter_8hpp_source.html#l00378">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
 
 </div>
 </div>
@@ -961,11 +961,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00403">403</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00401">401</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00101">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00738">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8cpp_source.html#l00553">FEAT::Dist::Comm::gather()</a>, <a class="el" href="dist_8hpp_source.html#l01496">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01508">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00099">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00736">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8cpp_source.html#l00553">FEAT::Dist::Comm::gather()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00322">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00254">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00212">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00320">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
 
 </div>
 </div>
@@ -1004,11 +1004,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function returns immediately after the parent process has gathered all contributions from its siblings and does not block or barrier any further. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00377">377</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00375">375</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00101">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00738">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8cpp_source.html#l00553">FEAT::Dist::Comm::gather()</a>, <a class="el" href="dist_8hpp_source.html#l01496">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01508">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00099">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00736">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8cpp_source.html#l00553">FEAT::Dist::Comm::gather()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00322">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00276">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest_send()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00234">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc_send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00320">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00274">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest_send()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00232">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc_send()</a>.</p>
 
 </div>
 </div>
@@ -1040,9 +1040,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>move-assignment operator </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00136">136</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00134">134</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00101">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, and <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00099">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, and <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>.</p>
 
 </div>
 </div>
@@ -1080,11 +1080,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00315">315</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00313">313</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00216">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::push_patch()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00214">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::push_patch()</a>.</p>
 
 </div>
 </div>
@@ -1140,11 +1140,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00279">279</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00277">277</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00205">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::set_root()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="splitter_8hpp_source.html#l00203">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::set_root()</a>.</p>
 
 </div>
 </div>
@@ -1193,11 +1193,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00478">478</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00476">476</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00101">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00107">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00738">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8hpp_source.html#l01496">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8cpp_source.html#l00571">FEAT::Dist::Comm::scatter()</a>, <a class="el" href="dist_8hpp_source.html#l01508">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00099">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00105">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_child_mirrors</a>, <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00736">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8cpp_source.html#l00571">FEAT::Dist::Comm::scatter()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="global_2transfer_8hpp_source.html#l00296">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, and <a class="el" href="splitter_8hpp_source.html#l00380">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, and <a class="el" href="splitter_8hpp_source.html#l00378">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>.</p>
 
 </div>
 </div>
@@ -1236,11 +1236,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function posts a blocking scatter which will only unblock once the parent process has scattered the data to all its siblings. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00451">451</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00449">449</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00101">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00104">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00098">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00095">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00738">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8hpp_source.html#l01496">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8cpp_source.html#l00571">FEAT::Dist::Comm::scatter()</a>, <a class="el" href="dist_8hpp_source.html#l01508">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="muxer_8hpp_source.html#l00099">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_buffer_size</a>, <a class="el" href="muxer_8hpp_source.html#l00102">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_mirror</a>, <a class="el" href="muxer_8hpp_source.html#l00096">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_parent_rank</a>, <a class="el" href="muxer_8hpp_source.html#l00093">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::_sibling_comm</a>, <a class="el" href="dense__vector_8hpp_source.html#l00736">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8cpp_source.html#l00571">FEAT::Dist::Comm::scatter()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="global_2transfer_8hpp_source.html#l00327">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, and <a class="el" href="splitter_8hpp_source.html#l00380">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="global_2transfer_8hpp_source.html#l00325">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, and <a class="el" href="splitter_8hpp_source.html#l00378">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>.</p>
 
 </div>
 </div>
@@ -1261,9 +1261,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>buffer size </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00101">101</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00099">99</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00136">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00134">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
 
 </div>
 </div>
@@ -1283,9 +1283,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>child mirrors (only on parent) </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00107">107</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00105">105</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00213">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00325">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_child_mirrors()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00136">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00315">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::push_child()</a>, and <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00211">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00323">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_child_mirrors()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00134">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00313">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::push_child()</a>, and <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>.</p>
 
 </div>
 </div>
@@ -1305,9 +1305,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>parent mirror (on all children) </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00104">104</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00102">102</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00213">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00304">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_parent_mirror()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00136">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00279">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::set_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00211">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00302">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_parent_mirror()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00134">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00277">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::set_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
 
 </div>
 </div>
@@ -1327,9 +1327,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the rank of the parent </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00098">98</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00096">96</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00294">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_parent_rank()</a>, <a class="el" href="muxer_8hpp_source.html#l00238">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00136">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00279">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::set_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00292">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_parent_rank()</a>, <a class="el" href="muxer_8hpp_source.html#l00236">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00134">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00277">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::set_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
 
 </div>
 </div>
@@ -1349,9 +1349,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the sibling communicator </p>
 
-<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00095">95</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="muxer_8hpp_source.html#l00093">93</a> of file <a class="el" href="muxer_8hpp_source.html">muxer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00262">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_sibling_comm()</a>, <a class="el" href="muxer_8hpp_source.html#l00227">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="muxer_8hpp_source.html#l00238">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00136">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00279">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::set_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="muxer_8hpp_source.html#l00260">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::get_sibling_comm()</a>, <a class="el" href="muxer_8hpp_source.html#l00225">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="muxer_8hpp_source.html#l00236">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="muxer_8hpp_source.html#l00134">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="muxer_8hpp_source.html#l00277">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::set_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
 
 </div>
 </div>

@@ -190,7 +190,7 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 <div class="line">  <a class="code hl_class" href="class_f_e_a_t_1_1_simple_arg_parser.html">SimpleArgParser</a> args(argc, argv);</div>
 <div class="line">  ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_simple_arg_parser_html"><div class="ttname"><a href="class_f_e_a_t_1_1_simple_arg_parser.html">FEAT::SimpleArgParser</a></div><div class="ttdoc">Simple argument parser implementation.</div><div class="ttdef"><b>Definition:</b> <a href="simple__arg__parser_8hpp_source.html#l00141">simple_arg_parser.hpp:142</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_simple_arg_parser_html"><div class="ttname"><a href="class_f_e_a_t_1_1_simple_arg_parser.html">FEAT::SimpleArgParser</a></div><div class="ttdoc">Simple argument parser implementation.</div><div class="ttdef"><b>Definition:</b> <a href="simple__arg__parser_8hpp_source.html#l00139">simple_arg_parser.hpp:140</a></div></div>
 </div><!-- fragment --><p >The first step, which is highly recommended, is to add all option names, which are supported by your application, to the argument parser by using the <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#ab36fc3ab39bbf957c5c75fdfe9d9b0ac" title="Adds an option to the set of supported options.">support()</a> function: </p><div class="fragment"><div class="line">args.support(<span class="stringliteral">&quot;level&quot;</span>);</div>
 <div class="line">args.support(<span class="stringliteral">&quot;precon&quot;</span>);</div>
 <div class="line">args.support(<span class="stringliteral">&quot;quiet&quot;</span>);</div>
@@ -199,7 +199,7 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 <div class="line">{</div>
 <div class="line">  <span class="comment">// print all unsupported options to cerr</span></div>
 <div class="line">  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = unsupported.begin(); it != unsupported.end(); ++it)</div>
-<div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: unsupported option &#39;--&quot;</span> &lt;&lt; (*it).second &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: unsupported option &#39;--&quot;</span> &lt;&lt; (*it).second &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// abort program execution here, if you want to</span></div>
 <div class="line">}</div>
@@ -231,12 +231,12 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 <div class="line"> </div>
 <div class="line">Precon precon1(Precon::none), precon2(Precon::none);</div>
 <div class="line">args.parse(<span class="stringliteral">&quot;precon&quot;</span>, <a class="code hl_function" href="namespace_f_e_a_t.html#a16e4fea104e6fd8d9995686ee5b3ca2c">string_mapped</a>(precon1, precon_map), <a class="code hl_function" href="namespace_f_e_a_t.html#a16e4fea104e6fd8d9995686ee5b3ca2c">string_mapped</a>(precon2, precon_map));</div>
-<div class="ttc" id="anamespace_f_e_a_t_html_a16e4fea104e6fd8d9995686ee5b3ca2c"><div class="ttname"><a href="namespace_f_e_a_t.html#a16e4fea104e6fd8d9995686ee5b3ca2c">FEAT::string_mapped</a></div><div class="ttdeci">StringMapped&lt; ValueType_ &gt; string_mapped(ValueType_ &amp;value, const std::map&lt; String, ValueType_ &gt; &amp;value_map)</div><div class="ttdoc">Creates a StringMapped object.</div><div class="ttdef"><b>Definition:</b> <a href="string__mapped_8hpp_source.html#l00164">string_mapped.hpp:164</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_a16e4fea104e6fd8d9995686ee5b3ca2c"><div class="ttname"><a href="namespace_f_e_a_t.html#a16e4fea104e6fd8d9995686ee5b3ca2c">FEAT::string_mapped</a></div><div class="ttdeci">StringMapped&lt; ValueType_ &gt; string_mapped(ValueType_ &amp;value, const std::map&lt; String, ValueType_ &gt; &amp;value_map)</div><div class="ttdoc">Creates a StringMapped object.</div><div class="ttdef"><b>Definition:</b> <a href="string__mapped_8hpp_source.html#l00162">string_mapped.hpp:162</a></div></div>
 </div><!-- fragment --><p> The above <code>parse</code> call will return the value 2 indicating that both parameters were parsed successfully and it will hold that <code>precon1 = Precon::spai</code> and <code>precon2 = Precon::jacobi</code>.</p>
 <p >Finally, this class contains a member function named <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#a99f09de8dec9e2cd253508bf975459b8" title="Query the parameters of an option.">query()</a>, which retrieves the argument index a particular option and the deque of all parameters for this option. This member function can be used for parsing custom and more complex parameter sets, which can not be covered by the <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#adceffc2956fd3bef48ea5a10df776418" title="Parses the parameters of an option.">parse()</a> function.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00141">141</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00139">139</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0975076dc12b65829226850bef1558a0" name="a0975076dc12b65829226850bef1558a0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0975076dc12b65829226850bef1558a0">&#9670;&#160;</a></span>SimpleArgParser()</h2>
@@ -281,9 +281,9 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00163">163</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00161">161</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_args</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">_args</a>.</p>
 
 </div>
 </div>
@@ -321,9 +321,9 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A value <em>n</em> &gt;= 0 specifying the number of parameters of the option if the option was given, or -1 if the option was not given at all. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00331">331</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00329">329</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_opts</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_opts</a>.</p>
 
 </div>
 </div>
@@ -360,9 +360,9 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <code>i-th</code> argument passed to the constructor or an empty string if <code>i</code> is out-of-bounds. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00202">202</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00200">200</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_args</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">_args</a>.</p>
 
 </div>
 </div>
@@ -405,9 +405,9 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00270">270</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00268">268</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00151">_supported</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_supported</a>.</p>
 
 </div>
 </div>
@@ -437,9 +437,9 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 <p>Returns the total number of arguments passed in the constructor. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of arguments passed in the constructor, including the command name (first argument). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00178">178</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00176">176</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_args</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">_args</a>.</p>
 
 </div>
 </div>
@@ -469,9 +469,9 @@ The command line call </p><pre class="fragment">   my_app foobar --quiet --level
 <p>Returns the number of arguments skipped by the parser. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of skipped arguments. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00188">188</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00186">186</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">_num_skipped_args</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00143">_num_skipped_args</a>.</p>
 
 </div>
 </div>
@@ -527,9 +527,9 @@ template&lt;typename... Prms_&gt; </div>
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00386">386</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00384">384</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_opts</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_opts</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>.</p>
 
@@ -570,11 +570,11 @@ template&lt;typename... Prms_&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A const pointer to the pair of argument index and parameter deque or <code>nullptr</code>, if the option was not given.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The returned pointer (if not null) points to an internal buffer of the <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html" title="Simple argument parser implementation.">SimpleArgParser</a> and therefore the returned object <b>must not</b> be deleted by the caller. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00358">358</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00356">356</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_opts</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_opts</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_args()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00133">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_args()</a>.</p>
 
 </div>
 </div>
@@ -605,9 +605,9 @@ template&lt;typename... Prms_&gt; </div>
 <p >This function loops over all options, which were given in the command line, and checks whether they have been added to the list of supported options by using the <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#ab36fc3ab39bbf957c5c75fdfe9d9b0ac" title="Adds an option to the set of supported options.">support()</a> function.</p>
 <dl class="section return"><dt>Returns</dt><dd>A deque of int-String pairs representing all unsupported options. The first (int) component is the index of the argument in the command line, whereas the second (<a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a>) component is the name of the unsupported option. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00294">294</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00292">292</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_opts</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00151">_supported</a>, and <a class="el" href="string_8hpp_source.html#l00733">FEAT::String::starts_with()</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_opts</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_supported</a>, and <a class="el" href="string_8hpp_source.html#l00731">FEAT::String::starts_with()</a>.</p>
 
 </div>
 </div>
@@ -636,9 +636,9 @@ template&lt;typename... Prms_&gt; </div>
 
 <p>Returns a deque of all arguments skipped by the parser. </p>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00212">212</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00210">210</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_args</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">_num_skipped_args</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">_args</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00143">_num_skipped_args</a>.</p>
 
 </div>
 </div>
@@ -687,11 +687,11 @@ template&lt;typename... Prms_&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function has no effect on the <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#a2f3fe2c2f05b25e13544a7d4814ac1e1" title="Checks whether an option was given.">check()</a>, <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#a99f09de8dec9e2cd253508bf975459b8" title="Query the parameters of an option.">query()</a> and <a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#adceffc2956fd3bef48ea5a10df776418" title="Parses the parameters of an option.">parse()</a> functions, i.e. you can use these functions to query options independently of whether they have been added to the set of supported options or not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00239">239</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00237">237</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00151">_supported</a>.</p>
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">_supported</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00033">FEAT::Control::Domain::add_supported_pdc_args()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00031">FEAT::Control::Domain::add_supported_pdc_args()</a>.</p>
 
 </div>
 </div>
@@ -718,9 +718,9 @@ template&lt;typename... Prms_&gt; </div>
 
 <p>command line arguments </p>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">147</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">145</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00163">SimpleArgParser()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00202">get_arg()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00178">num_args()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00212">skipped_args()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00161">SimpleArgParser()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00200">get_arg()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00176">num_args()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00210">skipped_args()</a>.</p>
 
 </div>
 </div>
@@ -746,9 +746,9 @@ template&lt;typename... Prms_&gt; </div>
 
 <p>number of skipped arguments </p>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00145">145</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00143">143</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00188">num_skipped_args()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00212">skipped_args()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00186">num_skipped_args()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00210">skipped_args()</a>.</p>
 
 </div>
 </div>
@@ -774,9 +774,9 @@ template&lt;typename... Prms_&gt; </div>
 
 <p>option-parameter map </p>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">149</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">147</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00331">check()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00386">parse()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00358">query()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00294">query_unsupported()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00329">check()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00384">parse()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00356">query()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00292">query_unsupported()</a>.</p>
 
 </div>
 </div>
@@ -802,9 +802,9 @@ template&lt;typename... Prms_&gt; </div>
 
 <p>supported option set </p>
 
-<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00151">151</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00149">149</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00270">get_supported_help()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00294">query_unsupported()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00239">support()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="simple__arg__parser_8hpp_source.html#l00268">get_supported_help()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00292">query_unsupported()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00237">support()</a>.</p>
 
 </div>
 </div>

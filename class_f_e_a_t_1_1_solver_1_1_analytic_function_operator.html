@@ -251,7 +251,7 @@ class FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;</div><
 <p>Since all solvers work on <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html" title="LAFEM namespace.">LAFEM</a> containers, this is hardwired to expect <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html" title="LAFEM namespace.">LAFEM</a> containers and just use the first entry, i.e. a scalar function with 3 input parameters results in a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html" title="Blocked Dense data vector class template.">LAFEM::DenseVectorBlocked</a> with one entry of BlockSize 3.</p>
 <p >Because AnalyticFunctions work in Mem::Main, setting Mem_ to anything else will greatly slow things down due to excessive up-/downloading. It's still here to provide a unified class interface for operators. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00039">39</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00037">37</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a41452af0d97c73342868bf5996d82c81" name="a41452af0d97c73342868bf5996d82c81"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a41452af0d97c73342868bf5996d82c81">&#9670;&#160;</a></span>DataType</h2>
@@ -270,7 +270,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 <p>Check if Function_ is scalar. </p>
 <p >Floating point type </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00047">47</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00045">45</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +290,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of Function_'s evaluator. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00062">62</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00060">60</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +310,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Class that knows what Function_ wants as input parameters for its evaluator etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00060">60</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00058">58</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -330,7 +330,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>The type of the underlying analytic function. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00052">52</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00050">50</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -350,7 +350,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Output vector for the operator's gradient. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00074">74</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00072">72</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +370,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Output matrix for the operator's hessian. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00076">76</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00074">74</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -390,7 +390,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Integer type. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00049">49</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00047">47</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -410,7 +410,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Input type for Function_. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00064">64</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00062">62</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -430,7 +430,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Output vector for the operator's gradient. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00072">72</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00070">70</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -450,7 +450,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Input vector for the operator and its gradient. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00070">70</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00068">68</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -489,7 +489,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00106">106</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00104">104</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -539,9 +539,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00244">244</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00242">242</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00082">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00089">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_hess</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00096">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00080">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00087">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_hess</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00083">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
 
 </div>
 </div>
@@ -574,9 +574,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 <p >For compatibility with linear operators represented by matrices, this is called columns.</p>
 <dl class="section return"><dt>Returns</dt><dd>The number of input variables the operator needs. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00150">150</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00148">148</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00067">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::dim</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00065">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::dim</a>.</p>
 
 </div>
 </div>
@@ -614,9 +614,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00269">269</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00267">267</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00082">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00096">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00080">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00083">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
 
 </div>
 </div>
@@ -654,9 +654,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00257">257</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00255">255</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00082">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00096">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00080">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00083">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
 
 </div>
 </div>
@@ -688,7 +688,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 <p>Creates an empty L-vector of appropriate size. </p>
 <dl class="section return"><dt>Returns</dt><dd>Empty L-vector of length 1 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00128">128</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00126">126</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -720,7 +720,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 <p>Creates an empty R-vector of appropriate size. </p>
 <dl class="section return"><dt>Returns</dt><dd>Empty R-vector of length 1 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00138">138</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00136">136</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -769,9 +769,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00226">226</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00224">224</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00082">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00087">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_grad</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_func_evals</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_grad_evals</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">FEAT::grad</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00080">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_func_eval</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_grad</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00083">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00090">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_func_evals</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_grad_evals</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">FEAT::grad</a>.</p>
 
 </div>
 </div>
@@ -801,9 +801,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of times the functional value was computed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00170">170</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00168">168</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_func_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00090">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_func_evals</a>.</p>
 
 </div>
 </div>
@@ -833,9 +833,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of times the gradient was computed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00178">178</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00176">176</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_grad_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_grad_evals</a>.</p>
 
 </div>
 </div>
@@ -865,9 +865,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of times the hessian was computed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00186">186</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00184">184</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00096">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
 
 </div>
 </div>
@@ -896,7 +896,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00118">118</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00116">116</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -947,9 +947,9 @@ template&lt;typename FilterType_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00212">212</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00210">210</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00083">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_my_state</a>.</p>
 
 </div>
 </div>
@@ -980,9 +980,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Resets all evaluation counts. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00194">194</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00192">192</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_func_evals</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_grad_evals</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00096">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00090">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_func_evals</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_grad_evals</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::_num_hess_evals</a>.</p>
 
 </div>
 </div>
@@ -1015,9 +1015,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 <p >For compatibility with linear operators represented by matrices, this is called rows.</p>
 <dl class="section return"><dt>Returns</dt><dd>The number of out variables the operator's gradient gives. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00162">162</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00160">160</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00067">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::dim</a>.</p>
+<p class="reference">References <a class="el" href="analytic__function__operator_8hpp_source.html#l00065">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::dim</a>.</p>
 
 </div>
 </div>
@@ -1046,9 +1046,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>_function's Evaluator </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00082">82</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00080">80</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00244">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00269">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_approx_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00257">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_hess()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00226">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00242">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00267">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_approx_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00255">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_hess()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00224">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>.</p>
 
 </div>
 </div>
@@ -1076,7 +1076,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>The <a class="el" href="class_f_e_a_t_1_1_analytic_1_1_function.html" title="Analytic Function interface.">Analytic::Function</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00080">80</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00078">78</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -1104,9 +1104,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Temporary variable to save the current gradient or other vectors. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00087">87</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">85</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00226">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00224">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>.</p>
 
 </div>
 </div>
@@ -1134,9 +1134,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Temporary variable to save the current hessian or other matrices. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00089">89</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00087">87</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00244">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00242">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>.</p>
 
 </div>
 </div>
@@ -1164,9 +1164,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>The current point, the function and its gradient/hessian are evaluated here. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00085">85</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00083">83</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00244">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00269">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_approx_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00257">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00226">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00212">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00242">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00267">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_approx_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00255">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00224">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00210">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>
@@ -1194,9 +1194,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Counter for number of function evaluations. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">92</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00090">90</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00226">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00170">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::get_num_func_evals()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00194">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::reset_num_evals()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00224">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00168">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::get_num_func_evals()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00192">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::reset_num_evals()</a>.</p>
 
 </div>
 </div>
@@ -1224,9 +1224,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Counter for number of gradient evaluations. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">94</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00092">92</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00226">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00178">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::get_num_grad_evals()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00194">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::reset_num_evals()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00224">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::eval_fval_grad()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00176">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::get_num_grad_evals()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00192">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::reset_num_evals()</a>.</p>
 
 </div>
 </div>
@@ -1254,9 +1254,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Counter for number of hessian evaluations. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00096">96</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00094">94</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00244">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00269">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_approx_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00257">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00186">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::get_num_hess_evals()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00194">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::reset_num_evals()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00242">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::apply_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00267">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_approx_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00255">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::compute_hess()</a>, <a class="el" href="analytic__function__operator_8hpp_source.html#l00184">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::get_num_hess_evals()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00192">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::reset_num_evals()</a>.</p>
 
 </div>
 </div>
@@ -1284,7 +1284,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Can the operator compute the diagonal of its Hessian? </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00057">57</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00055">55</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -1312,7 +1312,7 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Can the operator compute its full Hessian? </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00055">55</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00053">53</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
 </div>
 </div>
@@ -1340,9 +1340,9 @@ template&lt;typename DT_ , typename IT_ , typename Function_ &gt; </div>
 
 <p>Dimension each variable is from. </p>
 
-<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00067">67</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="analytic__function__operator_8hpp_source.html#l00065">65</a> of file <a class="el" href="analytic__function__operator_8hpp_source.html">analytic_function_operator.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00150">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::columns()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00162">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::rows()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="analytic__function__operator_8hpp_source.html#l00148">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::columns()</a>, and <a class="el" href="analytic__function__operator_8hpp_source.html#l00160">FEAT::Solver::AnalyticFunctionOperator&lt; DT_, IT_, Function_ &gt;::rows()</a>.</p>
 
 </div>
 </div>

@@ -11,6 +11,7 @@ var dir_db5a6010996256d141ba9905bf0e6601 =
     [ "conformal_mesh-eickt.cpp", "conformal__mesh-eickt_8cpp_source.html", null ],
     [ "conformal_mesh.hpp", "conformal__mesh_8hpp_source.html", null ],
     [ "export_eps.hpp", "export__eps_8hpp_source.html", null ],
+    [ "export_svg.hpp", "export__svg_8hpp_source.html", null ],
     [ "export_vtk.hpp", "export__vtk_8hpp_source.html", null ],
     [ "facet_flipper.hpp", "facet__flipper_8hpp_source.html", null ],
     [ "factory.hpp", "factory_8hpp_source.html", null ],

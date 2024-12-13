@@ -207,7 +207,7 @@ Static Private Attributes</h2></td></tr>
 <div class="textblock"><p >ParMETIS mesh/graph partitioner backend. </p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00027">27</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00025">25</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2cf0a9154bc497e5fc142c29d7893369" name="a2cf0a9154bc497e5fc142c29d7893369"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2cf0a9154bc497e5fc142c29d7893369">&#9670;&#160;</a></span>PartiParMETIS()</h2>
@@ -283,11 +283,11 @@ template&lt;int nv_, typename VertexSet_ &gt; </div>
 
 <p>auxiliary function: compute element midpoints from vertex coordinates </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00133">133</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00131">131</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00050">_midpoints</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00046">_num_local_elems</a>, and <a class="el" href="index__set_8hpp_source.html#l00089">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00048">_midpoints</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00044">_num_local_elems</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00102">execute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00100">execute()</a>.</p>
 
 </div>
 </div>
@@ -316,9 +316,9 @@ template&lt;int nv_, typename VertexSet_ &gt; </div>
 
 <p>Builds and returns the elements-at-rank graph representing the partitioning. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00115">115</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00113">113</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00056">_coloring</a>, and <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00054">_coloring</a>, and <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01391">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>.</p>
 
@@ -391,9 +391,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the partitioning was successful, or <code>false</code>, if some error occurred. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00102">102</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00100">100</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00133">_compute_midpoints()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a787e4c4104ed889a743a6ed1c1d22130">_create_subgraph()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a49b6bb57d5306aff0de58c8c9d03c7b4">_execute()</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00052">_weights</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00131">_compute_midpoints()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a787e4c4104ed889a743a6ed1c1d22130">_create_subgraph()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a49b6bb57d5306aff0de58c8c9d03c7b4">_execute()</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00050">_weights</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01391">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>.</p>
 
@@ -422,9 +422,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the element coloring </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00056">56</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00054">54</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00115">build_elems_at_rank()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00113">build_elems_at_rank()</a>.</p>
 
 </div>
 </div>
@@ -450,7 +450,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>our main communicator </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00036">36</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00034">34</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -476,7 +476,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>first element for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00044">44</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00042">42</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -502,9 +502,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>element midpoints </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00050">50</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00048">48</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00133">_compute_midpoints()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00131">_compute_midpoints()</a>.</p>
 
 </div>
 </div>
@@ -530,7 +530,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the total number of elements </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00040">40</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00038">38</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -556,9 +556,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>number of elements for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00046">46</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00044">44</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00133">_compute_midpoints()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00131">_compute_midpoints()</a>.</p>
 
 </div>
 </div>
@@ -584,7 +584,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the desired number of partitions </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00042">42</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00040">40</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -610,7 +610,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>element partitioning </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00054">54</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00052">52</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -636,7 +636,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>a sub-communicator for the partitioner </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00038">38</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00036">36</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -662,7 +662,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the adjacency sub-graph for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00048">48</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00046">46</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -688,9 +688,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>elements weights; empty if not weighted </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00052">52</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00050">50</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00102">execute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00100">execute()</a>.</p>
 
 </div>
 </div>
@@ -714,7 +714,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00030">30</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00028">28</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -738,7 +738,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00032">32</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00030">30</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>

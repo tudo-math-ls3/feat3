@@ -105,138 +105,134 @@ $(document).ready(function(){initNavTree('sparse__layout_8hpp_source.html',''); 
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef KERNEL_LAFEM_SPARSE_LAYOUT_HPP</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define KERNEL_LAFEM_SPARSE_LAYOUT_HPP 1</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">// includes, FEAT</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;kernel/util/memory_pool.hpp&gt;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;kernel/lafem/forward.hpp&gt;</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;<a class="code" href="kernel_2lafem_2base_8hpp.html">kernel/lafem/base.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// includes, FEAT</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;kernel/util/memory_pool.hpp&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;kernel/lafem/forward.hpp&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;<a class="code" href="kernel_2lafem_2base_8hpp.html">kernel/lafem/base.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>{</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keyword">namespace </span>LAFEM</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  {</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keyword">namespace </span>Intern</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    {</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>      <span class="keyword">template</span> &lt;SparseLayoutId LT_&gt;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      <span class="keyword">struct </span>LayoutId;</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>      <span class="keyword">template</span> &lt;&gt;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      <span class="keyword">struct </span>LayoutId&lt;<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">SparseLayoutId</a>::<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a2b574af1e77683ec89ad7272eca992e2">lt_csr</a>&gt;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>      {</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="keyword">using </span>MatrixType = SparseMatrixCSR&lt;DT_, IT_&gt;;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      };</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>      <span class="keyword">template</span> &lt;&gt;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>      <span class="keyword">struct </span>LayoutId&lt;<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">SparseLayoutId</a>::<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a6e9aed08b64acac485b5a158adfadc4f">lt_cscr</a>&gt;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>      {</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="keyword">using </span>MatrixType = SparseMatrixCSCR&lt;DT_, IT_&gt;;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>      };</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      <span class="keyword">template</span> &lt;&gt;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>      <span class="keyword">struct </span>LayoutId&lt;<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">SparseLayoutId</a>::<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a72009b0b5bf8c72b50704b44e42a37b1">lt_banded</a>&gt;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>      {</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keyword">using </span>MatrixType = SparseMatrixBanded&lt;DT_, IT_&gt;;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>      };</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    } <span class="comment">// namespace Intern</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"></span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> IT_, SparseLayoutId Layout_&gt;</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">   66</a></span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    {</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      std::vector&lt;IT_*&gt; _indices;</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>      std::vector&lt;Index&gt; _indices_size;</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      std::vector&lt;Index&gt; _scalar_index;</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      <span class="keyword">using </span>MatrixType = <span class="keyword">typename</span> Intern::LayoutId&lt;Layout_&gt;::template MatrixType&lt;DT_, IT_&gt;;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a>() :</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        _indices(),</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        _indices_size(),</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        _scalar_index()</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>      {</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      }</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>      <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a>(<span class="keyword">const</span> std::vector&lt;IT_ *&gt; &amp; indices, <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; indices_size, <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; scalar_index) :</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        _indices(indices),</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        _indices_size(indices_size),</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        _scalar_index(scalar_index)</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>      {</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> i : this-&gt;_indices)</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          <a class="code hl_function" href="class_f_e_a_t_1_1_memory_pool.html#affe7a6e1cdebc0db275b120b2fe1f352">MemoryPool::increase_memory</a>(i);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      }</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a7c7e7dc2d3932dbd08dcad7488fca08f">   93</a></span>      <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a7c7e7dc2d3932dbd08dcad7488fca08f">SparseLayout</a>(<a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a> &amp;&amp; other) :</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        _indices(std::move(other._indices)),</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        _indices_size(std::move(other._indices_size)),</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        _scalar_index(std::move(other._scalar_index))</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      {</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>      }</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a269ed46b7c483563e09f592398be8ace">  101</a></span>      <span class="keyword">virtual</span> <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a269ed46b7c483563e09f592398be8ace">~SparseLayout</a>()</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>      {</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> i : this-&gt;_indices)</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          <a class="code hl_function" href="class_f_e_a_t_1_1_memory_pool.html#afbaee3fd03f103b0e913fe7d3dbc4ce0">MemoryPool::release_memory</a>(i);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>      }</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a62261cb057c760ef9fbac210c86fe4bd">  108</a></span>      <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a> &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a62261cb057c760ef9fbac210c86fe4bd">operator= </a>(<a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a> &amp;&amp; other)</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>      {</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        _indices = std::move(other._indices);</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        _indices_size = std::move(other._indices_size);</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        _scalar_index = std::move(other._scalar_index);</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      }</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ae71aef40de68c5dde5925bd209fb6937">  122</a></span>      <span class="keyword">const</span> std::vector&lt;IT_*&gt; &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ae71aef40de68c5dde5925bd209fb6937">get_indices</a>()<span class="keyword"> const</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="keyword">      </span>{</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="keywordflow">return</span> _indices;</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>      }</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ab8bc75bc5295e4787bfff3f4ae36e9f8">  132</a></span>      <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ab8bc75bc5295e4787bfff3f4ae36e9f8">get_indices_size</a>()<span class="keyword"> const</span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="keyword">      </span>{</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        <span class="keywordflow">return</span> _indices_size;</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>      }</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#acac3933e3f6a5dd80c021d2bed30d0d2">  142</a></span>      <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#acac3933e3f6a5dd80c021d2bed30d0d2">get_scalar_index</a>()<span class="keyword"> const</span></div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="keyword">      </span>{</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>        <span class="keywordflow">return</span> _scalar_index;</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>      }</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    };</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  } <span class="comment">// namespace LAFEM</span></div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_LAFEM_SPARSE_LAYOUT_HPP</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>{</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  <span class="keyword">namespace </span>LAFEM</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keyword">namespace </span>Intern</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    {</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      <span class="keyword">template</span> &lt;SparseLayoutId LT_&gt;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>      <span class="keyword">struct </span>LayoutId;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      <span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      <span class="keyword">struct </span>LayoutId&lt;<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">SparseLayoutId</a>::<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a2b574af1e77683ec89ad7272eca992e2">lt_csr</a>&gt;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>      {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keyword">using </span>MatrixType = SparseMatrixCSR&lt;DT_, IT_&gt;;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>      };</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      <span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      <span class="keyword">struct </span>LayoutId&lt;<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">SparseLayoutId</a>::<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a6e9aed08b64acac485b5a158adfadc4f">lt_cscr</a>&gt;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>      {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="keyword">using </span>MatrixType = SparseMatrixCSCR&lt;DT_, IT_&gt;;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>      };</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>      <span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>      <span class="keyword">struct </span>LayoutId&lt;<a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">SparseLayoutId</a>::<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a72009b0b5bf8c72b50704b44e42a37b1">lt_banded</a>&gt;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keyword">using </span>MatrixType = SparseMatrixBanded&lt;DT_, IT_&gt;;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>      };</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    } <span class="comment">// namespace Intern</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment"></span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> IT_, SparseLayoutId Layout_&gt;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">   64</a></span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      std::vector&lt;IT_*&gt; _indices;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>      std::vector&lt;Index&gt; _indices_size;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      std::vector&lt;Index&gt; _scalar_index;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>      <span class="keyword">using </span>MatrixType = <span class="keyword">typename</span> Intern::LayoutId&lt;Layout_&gt;::template MatrixType&lt;DT_, IT_&gt;;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a>() :</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        _indices(),</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        _indices_size(),</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        _scalar_index()</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>      }</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a>(<span class="keyword">const</span> std::vector&lt;IT_ *&gt; &amp; indices, <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; indices_size, <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; scalar_index) :</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        _indices(indices),</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        _indices_size(indices_size),</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        _scalar_index(scalar_index)</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>      {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> i : this-&gt;_indices)</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>          <a class="code hl_function" href="class_f_e_a_t_1_1_memory_pool.html#affe7a6e1cdebc0db275b120b2fe1f352">MemoryPool::increase_memory</a>(i);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>      }</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a7c7e7dc2d3932dbd08dcad7488fca08f">   91</a></span>      <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a7c7e7dc2d3932dbd08dcad7488fca08f">SparseLayout</a>(<a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a> &amp;&amp; other) :</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        _indices(std::move(other._indices)),</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        _indices_size(std::move(other._indices_size)),</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        _scalar_index(std::move(other._scalar_index))</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      {</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>      }</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a269ed46b7c483563e09f592398be8ace">   99</a></span>      <span class="keyword">virtual</span> <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a269ed46b7c483563e09f592398be8ace">~SparseLayout</a>()</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>      {</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keywordflow">for</span>(<span class="keyword">auto</span> i : this-&gt;_indices)</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>          <a class="code hl_function" href="class_f_e_a_t_1_1_memory_pool.html#afbaee3fd03f103b0e913fe7d3dbc4ce0">MemoryPool::release_memory</a>(i);</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>      }</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a62261cb057c760ef9fbac210c86fe4bd">  106</a></span>      <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a> &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a62261cb057c760ef9fbac210c86fe4bd">operator= </a>(<a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">SparseLayout</a> &amp;&amp; other)</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>      {</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        _indices = std::move(other._indices);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        _indices_size = std::move(other._indices_size);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        _scalar_index = std::move(other._scalar_index);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      }</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ae71aef40de68c5dde5925bd209fb6937">  120</a></span>      <span class="keyword">const</span> std::vector&lt;IT_*&gt; &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ae71aef40de68c5dde5925bd209fb6937">get_indices</a>()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="keyword">      </span>{</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">return</span> _indices;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>      }</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ab8bc75bc5295e4787bfff3f4ae36e9f8">  130</a></span>      <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ab8bc75bc5295e4787bfff3f4ae36e9f8">get_indices_size</a>()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="keyword">      </span>{</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="keywordflow">return</span> _indices_size;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>      }</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#acac3933e3f6a5dd80c021d2bed30d0d2">  140</a></span>      <span class="keyword">const</span> std::vector&lt;Index&gt; &amp; <a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#acac3933e3f6a5dd80c021d2bed30d0d2">get_scalar_index</a>()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="keyword">      </span>{</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        <span class="keywordflow">return</span> _scalar_index;</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>      }</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    };</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>  } <span class="comment">// namespace LAFEM</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>} <span class="comment">// namespace FEAT</span></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">FEAT::LAFEM::SparseLayout</a></div><div class="ttdoc">Layout scheme for sparse matrix containers.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00066">sparse_layout.hpp:67</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_a269ed46b7c483563e09f592398be8ace"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a269ed46b7c483563e09f592398be8ace">FEAT::LAFEM::SparseLayout::~SparseLayout</a></div><div class="ttdeci">virtual ~SparseLayout()</div><div class="ttdoc">virtual destructor</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00101">sparse_layout.hpp:101</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_a62261cb057c760ef9fbac210c86fe4bd"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a62261cb057c760ef9fbac210c86fe4bd">FEAT::LAFEM::SparseLayout::operator=</a></div><div class="ttdeci">SparseLayout &amp; operator=(SparseLayout &amp;&amp;other)</div><div class="ttdoc">move operator=</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00108">sparse_layout.hpp:108</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_a7c7e7dc2d3932dbd08dcad7488fca08f"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a7c7e7dc2d3932dbd08dcad7488fca08f">FEAT::LAFEM::SparseLayout::SparseLayout</a></div><div class="ttdeci">SparseLayout(SparseLayout &amp;&amp;other)</div><div class="ttdoc">move constructor</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00093">sparse_layout.hpp:93</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_ab8bc75bc5295e4787bfff3f4ae36e9f8"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ab8bc75bc5295e4787bfff3f4ae36e9f8">FEAT::LAFEM::SparseLayout::get_indices_size</a></div><div class="ttdeci">const std::vector&lt; Index &gt; &amp; get_indices_size() const</div><div class="ttdoc">Returns a list of all Index array sizes.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00132">sparse_layout.hpp:132</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_acac3933e3f6a5dd80c021d2bed30d0d2"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#acac3933e3f6a5dd80c021d2bed30d0d2">FEAT::LAFEM::SparseLayout::get_scalar_index</a></div><div class="ttdeci">const std::vector&lt; Index &gt; &amp; get_scalar_index() const</div><div class="ttdoc">Returns a list of all scalar values with datatype index.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00142">sparse_layout.hpp:142</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_ae71aef40de68c5dde5925bd209fb6937"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ae71aef40de68c5dde5925bd209fb6937">FEAT::LAFEM::SparseLayout::get_indices</a></div><div class="ttdeci">const std::vector&lt; IT_ * &gt; &amp; get_indices() const</div><div class="ttdoc">Returns a list of all Index arrays.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00122">sparse_layout.hpp:122</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_memory_pool_html_afbaee3fd03f103b0e913fe7d3dbc4ce0"><div class="ttname"><a href="class_f_e_a_t_1_1_memory_pool.html#afbaee3fd03f103b0e913fe7d3dbc4ce0">FEAT::MemoryPool::release_memory</a></div><div class="ttdeci">static void release_memory(void *address)</div><div class="ttdoc">release memory or decrease reference counter</div><div class="ttdef"><b>Definition:</b> <a href="memory__pool_8hpp_source.html#l00125">memory_pool.hpp:125</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_memory_pool_html_affe7a6e1cdebc0db275b120b2fe1f352"><div class="ttname"><a href="class_f_e_a_t_1_1_memory_pool.html#affe7a6e1cdebc0db275b120b2fe1f352">FEAT::MemoryPool::increase_memory</a></div><div class="ttdeci">static void increase_memory(void *address)</div><div class="ttdoc">increase memory counter</div><div class="ttdef"><b>Definition:</b> <a href="memory__pool_8hpp_source.html#l00110">memory_pool.hpp:110</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html">FEAT::LAFEM::SparseLayout</a></div><div class="ttdoc">Layout scheme for sparse matrix containers.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00064">sparse_layout.hpp:65</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_a269ed46b7c483563e09f592398be8ace"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a269ed46b7c483563e09f592398be8ace">FEAT::LAFEM::SparseLayout::~SparseLayout</a></div><div class="ttdeci">virtual ~SparseLayout()</div><div class="ttdoc">virtual destructor</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00099">sparse_layout.hpp:99</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_a62261cb057c760ef9fbac210c86fe4bd"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a62261cb057c760ef9fbac210c86fe4bd">FEAT::LAFEM::SparseLayout::operator=</a></div><div class="ttdeci">SparseLayout &amp; operator=(SparseLayout &amp;&amp;other)</div><div class="ttdoc">move operator=</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00106">sparse_layout.hpp:106</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_a7c7e7dc2d3932dbd08dcad7488fca08f"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#a7c7e7dc2d3932dbd08dcad7488fca08f">FEAT::LAFEM::SparseLayout::SparseLayout</a></div><div class="ttdeci">SparseLayout(SparseLayout &amp;&amp;other)</div><div class="ttdoc">move constructor</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00091">sparse_layout.hpp:91</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_ab8bc75bc5295e4787bfff3f4ae36e9f8"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ab8bc75bc5295e4787bfff3f4ae36e9f8">FEAT::LAFEM::SparseLayout::get_indices_size</a></div><div class="ttdeci">const std::vector&lt; Index &gt; &amp; get_indices_size() const</div><div class="ttdoc">Returns a list of all Index array sizes.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00130">sparse_layout.hpp:130</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_acac3933e3f6a5dd80c021d2bed30d0d2"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#acac3933e3f6a5dd80c021d2bed30d0d2">FEAT::LAFEM::SparseLayout::get_scalar_index</a></div><div class="ttdeci">const std::vector&lt; Index &gt; &amp; get_scalar_index() const</div><div class="ttdoc">Returns a list of all scalar values with datatype index.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00140">sparse_layout.hpp:140</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout_html_ae71aef40de68c5dde5925bd209fb6937"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_layout.html#ae71aef40de68c5dde5925bd209fb6937">FEAT::LAFEM::SparseLayout::get_indices</a></div><div class="ttdeci">const std::vector&lt; IT_ * &gt; &amp; get_indices() const</div><div class="ttdoc">Returns a list of all Index arrays.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__layout_8hpp_source.html#l00120">sparse_layout.hpp:120</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_memory_pool_html_afbaee3fd03f103b0e913fe7d3dbc4ce0"><div class="ttname"><a href="class_f_e_a_t_1_1_memory_pool.html#afbaee3fd03f103b0e913fe7d3dbc4ce0">FEAT::MemoryPool::release_memory</a></div><div class="ttdeci">static void release_memory(void *address)</div><div class="ttdoc">release memory or decrease reference counter</div><div class="ttdef"><b>Definition:</b> <a href="memory__pool_8hpp_source.html#l00123">memory_pool.hpp:123</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_memory_pool_html_affe7a6e1cdebc0db275b120b2fe1f352"><div class="ttname"><a href="class_f_e_a_t_1_1_memory_pool.html#affe7a6e1cdebc0db275b120b2fe1f352">FEAT::MemoryPool::increase_memory</a></div><div class="ttdeci">static void increase_memory(void *address)</div><div class="ttdoc">increase memory counter</div><div class="ttdef"><b>Definition:</b> <a href="memory__pool_8hpp_source.html#l00108">memory_pool.hpp:108</a></div></div>
 <div class="ttc" id="akernel_2lafem_2base_8hpp_html"><div class="ttname"><a href="kernel_2lafem_2base_8hpp.html">base.hpp</a></div><div class="ttdoc">LAFEM common type definitions.</div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_aabefea13a94890ded77e859eecd6a638"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">FEAT::LAFEM::SparseLayoutId</a></div><div class="ttdeci">SparseLayoutId</div><div class="ttdef"><b>Definition:</b> <a href="kernel_2lafem_2base_8hpp_source.html#l00064">base.hpp:65</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_aabefea13a94890ded77e859eecd6a638"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638">FEAT::LAFEM::SparseLayoutId</a></div><div class="ttdeci">SparseLayoutId</div><div class="ttdef"><b>Definition:</b> <a href="kernel_2lafem_2base_8hpp_source.html#l00062">base.hpp:63</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_aabefea13a94890ded77e859eecd6a638a2b574af1e77683ec89ad7272eca992e2"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a2b574af1e77683ec89ad7272eca992e2">FEAT::LAFEM::SparseLayoutId::lt_csr</a></div><div class="ttdeci">@ lt_csr</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_aabefea13a94890ded77e859eecd6a638a6e9aed08b64acac485b5a158adfadc4f"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a6e9aed08b64acac485b5a158adfadc4f">FEAT::LAFEM::SparseLayoutId::lt_cscr</a></div><div class="ttdeci">@ lt_cscr</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_aabefea13a94890ded77e859eecd6a638a72009b0b5bf8c72b50704b44e42a37b1"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a72009b0b5bf8c72b50704b44e42a37b1">FEAT::LAFEM::SparseLayoutId::lt_banded</a></div><div class="ttdeci">@ lt_banded</div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

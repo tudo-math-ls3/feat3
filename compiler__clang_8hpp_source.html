@@ -105,92 +105,89 @@ $(document).ready(function(){initNavTree('compiler__clang_8hpp_source.html','');
 </div><!--header-->
 <div class="contents">
 <a href="compiler__clang_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef KERNEL_UTIL_COMPILER_CLANG_HPP</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define KERNEL_UTIL_COMPILER_CLANG_HPP 1</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#if !defined(FEAT_COMPILER) &amp;&amp; defined(__clang__)</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// calc linear sortable clang version</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#define FEAT_COMPILER_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#define FEAT_COMPILER &quot;Clang Compiler&quot;</span> <span class="comment">// __clang_version__ contains details</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#if(__clang_major__ &gt;= 15)</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wall\&quot;&quot;)</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wunused-parameter\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wsign-compare\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wcast-qual\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wdeprecated-declarations\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wshadow\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wundef\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wimplicit-fallthrough\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wcomma\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wextra-semi\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wextra-semi-stmt\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wc++98-compat-extra-semi\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wdeprecated-builtins\&quot;&quot;</span>) \</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wsign-conversion\&quot;&quot;</span>)</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#elif(__clang_major__ &gt;= 8)</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;) \</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-parameter\&quot;&quot;) \</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wsign-compare\&quot;&quot;) \</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;) \</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;) \</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;) \</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcast-qual\&quot;&quot;) \</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wdeprecated-declarations\&quot;&quot;) \</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wshadow\&quot;&quot;) \</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wundef\&quot;&quot;) \</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wimplicit-fallthrough\&quot;&quot;) \</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcomma\&quot;&quot;) \</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wextra-semi\&quot;&quot;) \</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wextra-semi-stmt\&quot;&quot;) \</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wc++98-compat-extra-semi\&quot;&quot;)</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#elif(__clang_major__ &gt;= 4)</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;) \</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-parameter\&quot;&quot;) \</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wsign-compare\&quot;&quot;) \</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;) \</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;) \</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;) \</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcast-qual\&quot;&quot;) \</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wdeprecated-declarations\&quot;&quot;) \</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wshadow\&quot;&quot;) \</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wundef\&quot;&quot;) \</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wimplicit-fallthrough\&quot;&quot;) \</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcomma\&quot;&quot;)</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;) \</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;) \</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;) \</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;)</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="preprocessor">#define FEAT_RESTORE_WARNINGS _Pragma(&quot;clang diagnostic pop&quot;</span>)</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="preprocessor">#define FEAT_PRAGMA_IVDEP _Pragma(&quot;omp simd&quot;</span>)</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment">// define the noinline specifier</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">#define NOINLINE __attribute__((noinline))</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#define FORCE_INLINE inline __attribute__((always_inline))</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">#endif </span><span class="comment">// !defined(FEAT_COMPILER) &amp;&amp; defined(__clang__)</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_UTIL_COMPILER_CLANG_HPP</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#if !defined(FEAT_COMPILER) &amp;&amp; defined(__clang__)</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// compute linear sortable clang version</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#define FEAT_COMPILER_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// define compiler string</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#define FEAT_COMPILER (&quot;clang &quot;</span> __clang_version__)</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#if(__clang_major__ &gt;= 15)</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wall\&quot;&quot;)</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wunused-parameter\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wsign-compare\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wcast-qual\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wdeprecated-declarations\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wshadow\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wundef\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wimplicit-fallthrough\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wcomma\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wextra-semi\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wextra-semi-stmt\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wc++98-compat-extra-semi\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wdeprecated-builtins\&quot;&quot;</span>) \</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  _Pragma(<span class="stringliteral">&quot;clang diagnostic ignored \&quot;-Wsign-conversion\&quot;&quot;</span>)</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#elif(__clang_major__ &gt;= 8)</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;) \</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-parameter\&quot;&quot;) \</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wsign-compare\&quot;&quot;) \</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;) \</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;) \</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;) \</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcast-qual\&quot;&quot;) \</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wdeprecated-declarations\&quot;&quot;) \</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wshadow\&quot;&quot;) \</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wundef\&quot;&quot;) \</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wimplicit-fallthrough\&quot;&quot;) \</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcomma\&quot;&quot;) \</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wextra-semi\&quot;&quot;) \</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wextra-semi-stmt\&quot;&quot;) \</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wc++98-compat-extra-semi\&quot;&quot;)</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">#elif(__clang_major__ &gt;= 4)</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;) \</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-parameter\&quot;&quot;) \</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wsign-compare\&quot;&quot;) \</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;) \</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;) \</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;) \</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcast-qual\&quot;&quot;) \</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wdeprecated-declarations\&quot;&quot;) \</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wshadow\&quot;&quot;) \</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wundef\&quot;&quot;) \</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wimplicit-fallthrough\&quot;&quot;) \</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wcomma\&quot;&quot;)</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#define FEAT_DISABLE_WARNINGS _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wunused-variable\&quot;&quot;) \</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wconversion\&quot;&quot;) \</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wmismatched-tags\&quot;&quot;) \</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  _Pragma(&quot;clang diagnostic ignored \&quot;-Wignored-qualifiers\&quot;&quot;)</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="preprocessor">#define FEAT_RESTORE_WARNINGS _Pragma(&quot;clang diagnostic pop&quot;</span>)</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="preprocessor">#define FEAT_PRAGMA_IVDEP _Pragma(&quot;omp simd&quot;</span>)</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment">// define the noinline specifier</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">#define NOINLINE __attribute__((noinline))</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">#define FORCE_INLINE inline __attribute__((always_inline))</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#endif </span><span class="comment">// !defined(FEAT_COMPILER) &amp;&amp; defined(__clang__)</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

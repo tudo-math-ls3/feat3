@@ -581,6 +581,7 @@ var hierarchy =
     [ "FEAT::Geometry::ConformalMesh< Shape_, num_coords_, Coord_ >::IndexSet< cell_dim_, face_dim_ >", "struct_f_e_a_t_1_1_geometry_1_1_conformal_mesh_1_1_index_set.html", null ],
     [ "FEAT::Geometry::DimensionalChartHelper< RootMesh_, world_dim >", "struct_f_e_a_t_1_1_geometry_1_1_dimensional_chart_helper.html", null ],
     [ "FEAT::Geometry::ExportEPS", "class_f_e_a_t_1_1_geometry_1_1_export_e_p_s.html", null ],
+    [ "FEAT::Geometry::ExportSVG", "class_f_e_a_t_1_1_geometry_1_1_export_s_v_g.html", null ],
     [ "FEAT::Geometry::ExportVTK< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html", null ],
     [ "FEAT::Geometry::FacetFlipper< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_facet_flipper.html", null ],
     [ "FEAT::Geometry::Factory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_factory.html", [

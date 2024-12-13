@@ -1,6 +1,7 @@
 var class_f_e_a_t_1_1_adjacency_1_1_graph =
 [
     [ "ImageIterator", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#abd442b8544f6512a066b4378ca5763f4", null ],
+    [ "IndexVector", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a22b9968b2062072df62b9e238332b2e2", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a389d79737bb22c24e873f3202bb95130", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a022a90aae42871eb0fb070150ffbca30", null ],
@@ -28,5 +29,6 @@ var class_f_e_a_t_1_1_adjacency_1_1_graph =
     [ "sort_indices", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a6f1048d48ed38f3c4c6d91e4b083916f", null ],
     [ "_domain_ptr", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974", null ],
     [ "_image_idx", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1", null ],
-    [ "_num_nodes_image", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ad690e602c68da269584e47117c44ab75", null ]
+    [ "_num_nodes_image", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ad690e602c68da269584e47117c44ab75", null ],
+    [ "magic", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a06ded8bd8b3c7e9689a3e623da556329", null ]
 ];

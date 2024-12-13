@@ -207,7 +207,7 @@ Static Public Member Functions</h2></td></tr>
 </ul>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00048">48</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00046">46</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a3baad7a9aff391059374c00047276462" name="a3baad7a9aff391059374c00047276462"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3baad7a9aff391059374c00047276462">&#9670;&#160;</a></span>assemble_graph_2lvl()</h2>
@@ -256,11 +256,11 @@ template&lt;typename FineTestSpace_ , typename CoarseTrialSpace_ &gt; </div>
 <dl class="section attention"><dt>Attention</dt><dd>This function silently assumes that <code>fine_space</code> is defined on the mesh that was obtained by applying the standard 2-level refinement algorithm on the underlying mesh of <code>coarse_space</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The standard Dof-Adjacency graph for the fine-test- and coarse-trial-space combination. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00396">396</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00394">394</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00318">assemble_graph_intermesh()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00316">assemble_graph_intermesh()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00572">assemble_matrix_2lvl()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00570">assemble_matrix_2lvl()</a>.</p>
 
 </div>
 </div>
@@ -299,11 +299,11 @@ template&lt;typename Space_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The diagonal Dof-Adjacency graph of the space. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00281">281</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00279">279</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="graph_8hpp_source.html#l00342">FEAT::Adjacency::Graph::get_domain_ptr()</a>, and <a class="el" href="graph_8hpp_source.html#l00357">FEAT::Adjacency::Graph::get_image_idx()</a>.</p>
+<p class="reference">References <a class="el" href="graph_8hpp_source.html#l00339">FEAT::Adjacency::Graph::get_domain_ptr()</a>, and <a class="el" href="graph_8hpp_source.html#l00354">FEAT::Adjacency::Graph::get_image_idx()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00530">assemble_matrix_diag()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00528">assemble_matrix_diag()</a>.</p>
 
 </div>
 </div>
@@ -342,11 +342,11 @@ template&lt;typename Space_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The extended-facet Dof-Adjacency graph of the space. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00160">160</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00158">158</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00484">assemble_matrix_ext_facet1()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00482">assemble_matrix_ext_facet1()</a>.</p>
 
 </div>
 </div>
@@ -395,11 +395,11 @@ template&lt;typename TestSpace_ , typename TrialSpace_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The extended-facet Dof-Adjacency graph of the test- and trial-space combination. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00115">115</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00113">113</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00468">assemble_matrix_ext_facet2()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00466">assemble_matrix_ext_facet2()</a>.</p>
 
 </div>
 </div>
@@ -438,11 +438,11 @@ template&lt;typename Space_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The extended-node Dof-Adjacency graph of the space. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00243">243</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00241">241</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00515">assemble_matrix_ext_node1()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00513">assemble_matrix_ext_node1()</a>.</p>
 
 </div>
 </div>
@@ -491,11 +491,11 @@ template&lt;typename TestSpace_ , typename TrialSpace_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The extended-node Dof-Adjacency graph of the test- and trial-space combination. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00198">198</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00196">196</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00499">assemble_matrix_ext_node2()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00497">assemble_matrix_ext_node2()</a>.</p>
 
 </div>
 </div>
@@ -552,11 +552,11 @@ template&lt;typename TestSpace_ , typename TrialSpace_ , typename TrialToTestAdj
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The inter-mesh Dof-Adjacency graph for the test- and trial-space combination defined on different meshes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00318">318</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00316">316</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>, <a class="el" href="permutation_8hpp_source.html#l00145">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaff483d1ff591898a9942916050d2ca3f">FEAT::Adjacency::Permutation::identity</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::injectify_transpose</a>, <a class="el" href="graph_8cpp_source.html#l00207">FEAT::Adjacency::Graph::permute_indices()</a>, and <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>, <a class="el" href="permutation_8hpp_source.html#l00143">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaff483d1ff591898a9942916050d2ca3f">FEAT::Adjacency::Permutation::identity</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::injectify_transpose</a>, <a class="el" href="graph_8cpp_source.html#l00210">FEAT::Adjacency::Graph::permute_indices()</a>, and <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00396">assemble_graph_2lvl()</a>, and <a class="el" href="symbolic__assembler_8hpp_source.html#l00550">assemble_matrix_intermesh()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00394">assemble_graph_2lvl()</a>, and <a class="el" href="symbolic__assembler_8hpp_source.html#l00548">assemble_matrix_intermesh()</a>.</p>
 
 </div>
 </div>
@@ -595,11 +595,11 @@ template&lt;typename Space_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The standard Dof-Adjacency graph of the space. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00090">90</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00088">88</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00444">assemble_matrix_std1()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00442">assemble_matrix_std1()</a>.</p>
 
 </div>
 </div>
@@ -648,11 +648,11 @@ template&lt;typename TestSpace_ , typename TrialSpace_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The standard Dof-Adjacency graph of the test- and trial-space combination. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00061">61</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00059">59</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00035">FEAT::Space::DofMappingRenderer::render()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::injectify_sorted</a>, <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gpdv__assembler_8hpp_source.html#l00094">FEAT::Assembly::GradPresDivVeloAssembler::assemble()</a>, <a class="el" href="grad__operator__assembler_8hpp_source.html#l00071">FEAT::Assembly::GradOperatorAssembler::assemble()</a>, and <a class="el" href="symbolic__assembler_8hpp_source.html#l00418">assemble_matrix_std2()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gpdv__assembler_8hpp_source.html#l00092">FEAT::Assembly::GradPresDivVeloAssembler::assemble()</a>, <a class="el" href="grad__operator__assembler_8hpp_source.html#l00069">FEAT::Assembly::GradOperatorAssembler::assemble()</a>, and <a class="el" href="symbolic__assembler_8hpp_source.html#l00416">assemble_matrix_std2()</a>.</p>
 
 </div>
 </div>
@@ -708,11 +708,11 @@ template&lt;typename MatrixType_ , typename FineSpace_ , typename CoarseSpace_ &
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function silently assumes that <code>fine_space</code> is defined on the mesh that was obtained by applying the standard 2-level refinement algorithm on the underlying mesh of <code>coarse_space</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00572">572</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00570">570</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00396">assemble_graph_2lvl()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00394">assemble_graph_2lvl()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="meshopt__control_8hpp_source.html#l00676">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>.</p>
 
 </div>
 </div>
@@ -761,9 +761,9 @@ template&lt;typename MatrixType_ , typename Space_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00530">530</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00528">528</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00281">assemble_graph_diag()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00279">assemble_graph_diag()</a>.</p>
 
 </div>
 </div>
@@ -812,9 +812,9 @@ template&lt;typename MatrixType_ , typename Space_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00484">484</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00482">482</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00160">assemble_graph_ext_facet1()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00158">assemble_graph_ext_facet1()</a>.</p>
 
 </div>
 </div>
@@ -869,9 +869,9 @@ template&lt;typename MatrixType_ , typename TestSpace_ , typename TrialSpace_ &g
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00468">468</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00466">466</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00115">assemble_graph_ext_facet2()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00113">assemble_graph_ext_facet2()</a>.</p>
 
 </div>
 </div>
@@ -920,9 +920,9 @@ template&lt;typename MatrixType_ , typename Space_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00515">515</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00513">513</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00243">assemble_graph_ext_node1()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00241">assemble_graph_ext_node1()</a>.</p>
 
 </div>
 </div>
@@ -977,9 +977,9 @@ template&lt;typename MatrixType_ , typename TestSpace_ , typename TrialSpace_ &g
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00499">499</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00497">497</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00198">assemble_graph_ext_node2()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00196">assemble_graph_ext_node2()</a>.</p>
 
 </div>
 </div>
@@ -1041,9 +1041,9 @@ template&lt;typename MatrixType_ , typename TestSpace_ , typename TrialSpace_ , 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00550">550</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00548">548</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00318">assemble_graph_intermesh()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00316">assemble_graph_intermesh()</a>.</p>
 
 </div>
 </div>
@@ -1085,9 +1085,9 @@ template&lt;typename DT_ , typename IT_ , int BH_, int BW_, typename Space_ &gt;
 
 <p>specialization for NullMatrix </p>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00451">451</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00449">449</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="null__matrix_8hpp_source.html#l00255">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::resize()</a>.</p>
+<p class="reference">References <a class="el" href="null__matrix_8hpp_source.html#l00253">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::resize()</a>.</p>
 
 </div>
 </div>
@@ -1136,11 +1136,11 @@ template&lt;typename MatrixType_ , typename Space_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00444">444</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00442">442</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00090">assemble_graph_std1()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00088">assemble_graph_std1()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00153">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>.</p>
 
 </div>
 </div>
@@ -1188,9 +1188,9 @@ template&lt;typename DT_ , typename IT_ , int BH_, int BW_, typename TestSpace_ 
 
 <p>specialization for NullMatrix </p>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00426">426</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00424">424</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="null__matrix_8hpp_source.html#l00255">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::resize()</a>.</p>
+<p class="reference">References <a class="el" href="null__matrix_8hpp_source.html#l00253">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::resize()</a>.</p>
 
 </div>
 </div>
@@ -1245,11 +1245,11 @@ template&lt;typename MatrixType_ , typename TestSpace_ , typename TrialSpace_ &g
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00418">418</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symbolic__assembler_8hpp_source.html#l00416">416</a> of file <a class="el" href="symbolic__assembler_8hpp_source.html">symbolic_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00061">assemble_graph_std2()</a>.</p>
+<p class="reference">References <a class="el" href="symbolic__assembler_8hpp_source.html#l00059">assemble_graph_std2()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00732">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_grad_div_matrices()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00730">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_grad_div_matrices()</a>.</p>
 
 </div>
 </div>

@@ -187,7 +187,7 @@ Each worker thread employed by the domain assembler will perform the following (
 Furthermore, the code lines between <code>domain_mutex.lock()</code> and <code>domain_mutex.unlock()</code> are executed in a (domain-) mutually exclusive fashion, i.e. it is guaranteed that this code (<code>task.combine()</code>) is never executed by two threads at the same time.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00243">243</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00241">241</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a720e1b6f35f6999414249ac3f0a23399" name="a720e1b6f35f6999414249ac3f0a23399"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a720e1b6f35f6999414249ac3f0a23399">&#9670;&#160;</a></span>Task()</h2>
@@ -363,7 +363,7 @@ Furthermore, the code lines between <code>domain_mutex.lock()</code> and <code>d
 
 <p>Specifies whether this task fas a <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_job_1_1_task.html#a39c463c5d4e1cf69b60ff25791b01d24" title="Finishes the overall assembly and combines all local results.">combine()</a> function, which is required to be called from within a critical section after the overall assembly is finished. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00256">256</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00254">254</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +389,7 @@ Furthermore, the code lines between <code>domain_mutex.lock()</code> and <code>d
 
 <p>Specifies whether this task has a <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_job_1_1_task.html#abb595bc13b8b96870cf565e60276324f" title="Scatters the local assembly into the global system.">scatter()</a> function, which is required to be called from within a critical section after the local assembly on each cell. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00250">250</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler_8hpp_source.html#l00248">248</a> of file <a class="el" href="domain__assembler_8hpp_source.html">domain_assembler.hpp</a>.</p>
 
 </div>
 </div>

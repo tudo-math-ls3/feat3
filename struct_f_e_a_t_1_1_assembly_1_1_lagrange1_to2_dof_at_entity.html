@@ -143,7 +143,7 @@ struct FEAT::Assembly::Lagrange1To2DofAtEntity&lt; Trafo_, shape_dim_ &gt;</div>
 <p>This is needed for the template recursion and applies the Lagrange2 node functionals for DoF associated with entities of shape_dim_ to a Lagrange1 function. (This means it does linear interpolation at the edge, face and cell midpoints if required by the shape type used).</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00060">60</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00058">58</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ab8cbdd086b330cf0a7f065c31798e597" name="ab8cbdd086b330cf0a7f065c31798e597"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab8cbdd086b330cf0a7f065c31798e597">&#9670;&#160;</a></span>FromSpace</h2>
@@ -161,7 +161,7 @@ template&lt;typename Trafo_ , int shape_dim_ = Trafo_::MeshType::shape_dim&gt; <
 
 <p>We map from Lagrange1. </p>
 
-<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00065">65</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00063">63</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
 
 </div>
 </div>
@@ -181,7 +181,7 @@ template&lt;typename Trafo_ , int shape_dim_ = Trafo_::MeshType::shape_dim&gt; <
 
 <p>We map to Lagrange2. </p>
 
-<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00063">63</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00061">61</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
 
 </div>
 </div>
@@ -247,11 +247,11 @@ template&lt;typename Vector_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This explicitly uses that the DoF for shape dim 0 are numbered like the mesh's vertices. Without this, it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00087">87</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fe__interpolator_8hpp_source.html#l00085">85</a> of file <a class="el" href="fe__interpolator_8hpp_source.html">fe_interpolator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="element__base_8hpp_source.html#l00175">FEAT::Space::ElementBase&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="fe__interpolator_8hpp_source.html#l00087">FEAT::Assembly::Lagrange1To2DofAtEntity&lt; Trafo_, shape_dim_ &gt;::recurse()</a>.</p>
+<p class="reference">References <a class="el" href="element__base_8hpp_source.html#l00173">FEAT::Space::ElementBase&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="fe__interpolator_8hpp_source.html#l00085">FEAT::Assembly::Lagrange1To2DofAtEntity&lt; Trafo_, shape_dim_ &gt;::recurse()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="fe__interpolator_8hpp_source.html#l00214">FEAT::Assembly::FEInterpolator&lt; Space::Lagrange2::Element&lt; Trafo_ &gt;, Space::Lagrange1::Element&lt; Trafo_ &gt; &gt;::interpolate()</a>, and <a class="el" href="fe__interpolator_8hpp_source.html#l00087">FEAT::Assembly::Lagrange1To2DofAtEntity&lt; Trafo_, shape_dim_ &gt;::recurse()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="fe__interpolator_8hpp_source.html#l00212">FEAT::Assembly::FEInterpolator&lt; Space::Lagrange2::Element&lt; Trafo_ &gt;, Space::Lagrange1::Element&lt; Trafo_ &gt; &gt;::interpolate()</a>, and <a class="el" href="fe__interpolator_8hpp_source.html#l00085">FEAT::Assembly::Lagrange1To2DofAtEntity&lt; Trafo_, shape_dim_ &gt;::recurse()</a>.</p>
 
 </div>
 </div>

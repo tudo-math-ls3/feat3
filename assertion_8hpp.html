@@ -128,8 +128,6 @@ Macros</h2></td></tr>
 <tr class="memitem:a6a403a52dc93f43184cb46da5a4c8354"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#a6a403a52dc93f43184cb46da5a4c8354">ASSERTM</a>(expr,  msg)&#160;&#160;&#160;void(0)</td></tr>
 <tr class="memdesc:a6a403a52dc93f43184cb46da5a4c8354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Debug-Assertion macro definition with custom message.  <a href="assertion_8hpp.html#a6a403a52dc93f43184cb46da5a4c8354">More...</a><br /></td></tr>
 <tr class="separator:a6a403a52dc93f43184cb46da5a4c8354"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae39d444734a6769c9dd40c721e8f5fc0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#ae39d444734a6769c9dd40c721e8f5fc0">KERNEL_UTIL_ASSERTION_HPP</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:ae39d444734a6769c9dd40c721e8f5fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33180af240360ec61a3968af89731f12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assertion_8hpp.html#a33180af240360ec61a3968af89731f12">XABORTM</a>(msg)&#160;&#160;&#160;<a class="el" href="namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6">FEAT::abortion</a>(__func__, __FILE__, __LINE__, msg)</td></tr>
 <tr class="memdesc:a33180af240360ec61a3968af89731f12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abortion macro definition with custom message.  <a href="assertion_8hpp.html#a33180af240360ec61a3968af89731f12">More...</a><br /></td></tr>
 <tr class="separator:a33180af240360ec61a3968af89731f12"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,7 +178,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This macro will only be compiled in debug mode; it is an empty macro in non-debug mode. Use the XASSERT macro if you want to use the assertion in both debug and non-debug modes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00231">231</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00229">229</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -221,23 +219,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This macro will only be compiled in debug mode; it is an empty macro in non-debug mode. Use the XASSERTM macro if you want to use the assertion in both debug and non-debug modes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00232">232</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ae39d444734a6769c9dd40c721e8f5fc0" name="ae39d444734a6769c9dd40c721e8f5fc0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae39d444734a6769c9dd40c721e8f5fc0">&#9670;&#160;</a></span>KERNEL_UTIL_ASSERTION_HPP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define KERNEL_UTIL_ASSERTION_HPP&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00008">8</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00230">230</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -268,7 +250,7 @@ Functions</h2></td></tr>
 <p>This macro will be compiled in both debug and non-debug mode builds.</p>
 <dl class="compilerhacks"><dt><b><a class="el" href="compilerhacks.html#_compilerhacks000006">Compiler Hack:</a></b></dt><dd>Intel C++ compiler is too dumb for [[noreturn]] attribute, so attach an additional call to std::abort() to silence warning 1011 that complains about missing return statements in non-void functions. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00194">194</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00192">192</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -298,7 +280,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This macro will be compiled in both debug and non-debug mode builds. Use the ASSERT macro if you want to use the assertion ony in debug builds. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00264">264</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00262">262</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +321,7 @@ Functions</h2></td></tr>
 </dl>
 <p>This macro will be compiled in both debug and non-debug mode builds. Use the ASSERTM macro if you want to use the assertion ony in debug builds. </p>
 
-<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00265">265</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00263">263</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
 </div>
 </div>

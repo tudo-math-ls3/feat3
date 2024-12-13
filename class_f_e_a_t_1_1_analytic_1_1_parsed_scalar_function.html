@@ -204,7 +204,7 @@ class FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;</div><p >Parsed scalar 
 The <code>FunctionParser</code> class, which is defined by the 'fparser' library, is actually just a typedef for the template class instance <code>FunctionParserBase&lt;double&gt;</code>. This may lead the reader to the (erroneous) conclusion, that one might easily templatize this ParsedFunction class in the datatype, thus adding support for other interesting floating point types like the <code>__float128</code> type of GCC's libquadmath. Unfortunately, most of the auxiliary function templates implemented in the depths of the 'fparser' library are only specialized for the common build-in types without offering any generic implementation. Therefore, trying to use the <code>FunctionParserBase</code> class template with a somewhat interesting type like <code>__float128</code> is unfortunately doomed to end in linker errors :(</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00104">104</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00102">102</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a574ac5564255b573f027bcc9dd844be2" name="a574ac5564255b573f027bcc9dd844be2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a574ac5564255b573f027bcc9dd844be2">&#9670;&#160;</a></span>ImageType</h2>
@@ -222,7 +222,7 @@ template&lt;int dim_&gt; </div>
 
 <p>This function is always scalar. </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00115">115</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00113">113</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
 </div>
 </div>
@@ -258,9 +258,9 @@ template&lt;int dim_&gt; </div>
 <li><code>eps</code> = ~1E-16 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00140">140</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00138">138</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00128">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_parser</a>.</p>
+<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00126">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_parser</a>.</p>
 
 </div>
 </div>
@@ -305,9 +305,9 @@ template&lt;int dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00163">163</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00161">161</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00231">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::parse()</a>.</p>
+<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00229">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::parse()</a>.</p>
 
 </div>
 </div>
@@ -357,9 +357,9 @@ template&lt;int dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00178">178</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00176">176</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00128">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_parser</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00126">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_parser</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>
@@ -409,9 +409,9 @@ template&lt;int dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00194">194</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00192">192</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00130">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_extra_vars</a>, <a class="el" href="string_8hpp_source.html#l00681">FEAT::String::compare_no_case()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00128">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_extra_vars</a>, <a class="el" href="string_8hpp_source.html#l00679">FEAT::String::compare_no_case()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -455,11 +455,11 @@ template&lt;int dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00231">231</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00229">229</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00130">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_extra_vars</a>, and <a class="el" href="parsed__function_8hpp_source.html#l00128">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_parser</a>.</p>
+<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00128">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_extra_vars</a>, and <a class="el" href="parsed__function_8hpp_source.html#l00126">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_parser</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parsed__function_8hpp_source.html#l00163">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::ParsedScalarFunction()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parsed__function_8hpp_source.html#l00161">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::ParsedScalarFunction()</a>.</p>
 
 </div>
 </div>
@@ -508,9 +508,9 @@ template&lt;int dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00212">212</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00210">210</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00130">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_extra_vars</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parsed__function_8hpp_source.html#l00128">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::_extra_vars</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -539,9 +539,9 @@ template&lt;int dim_&gt; </div>
 
 <p>our extra variable names </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00130">130</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00128">128</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parsed__function_8hpp_source.html#l00194">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::add_variable()</a>, <a class="el" href="parsed__function_8hpp_source.html#l00231">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::parse()</a>, and <a class="el" href="parsed__function_8hpp_source.html#l00212">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::set_variable()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parsed__function_8hpp_source.html#l00192">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::add_variable()</a>, <a class="el" href="parsed__function_8hpp_source.html#l00229">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::parse()</a>, and <a class="el" href="parsed__function_8hpp_source.html#l00210">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::set_variable()</a>.</p>
 
 </div>
 </div>
@@ -569,9 +569,9 @@ template&lt;int dim_&gt; </div>
 
 <p>the actual function parser object </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00128">128</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00126">126</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parsed__function_8hpp_source.html#l00140">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::ParsedScalarFunction()</a>, <a class="el" href="parsed__function_8hpp_source.html#l00178">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::add_constant()</a>, and <a class="el" href="parsed__function_8hpp_source.html#l00231">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::parse()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parsed__function_8hpp_source.html#l00138">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::ParsedScalarFunction()</a>, <a class="el" href="parsed__function_8hpp_source.html#l00176">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::add_constant()</a>, and <a class="el" href="parsed__function_8hpp_source.html#l00229">FEAT::Analytic::ParsedScalarFunction&lt; dim_ &gt;::parse()</a>.</p>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ template&lt;int dim_&gt; </div>
 
 <p>we cannot compute gradients </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00121">121</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00119">119</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
 </div>
 </div>
@@ -627,7 +627,7 @@ template&lt;int dim_&gt; </div>
 
 <p>we cannot compute hessians </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00124">124</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00122">122</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
 </div>
 </div>
@@ -655,7 +655,7 @@ template&lt;int dim_&gt; </div>
 
 <p>we can compute function values </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00118">118</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00116">116</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
 </div>
 </div>
@@ -684,7 +684,7 @@ template&lt;int dim_&gt; </div>
 <p>validate our dimension </p>
 <p >specify our domain dimension </p>
 
-<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00112">112</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parsed__function_8hpp_source.html#l00110">110</a> of file <a class="el" href="parsed__function_8hpp_source.html">parsed_function.hpp</a>.</p>
 
 </div>
 </div>

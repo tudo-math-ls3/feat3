@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('max__index__generic_8hpp_source.html',
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
@@ -147,31 +147,33 @@ $(document).ready(function(){initNavTree('max__index__generic_8hpp_source.html',
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>      ValueType_ MaxIndex::value_blocked_generic(<span class="keyword">const</span> ValueType_ * <span class="keyword">const</span> x, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> size)</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      {</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        ValueType_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>(0);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> max_i(0);</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j(0); j &lt; ValueType_::n; ++j)</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="keywordflow">if</span>(size &gt; 0)</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        {</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>          <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>[j] = x[0][j];</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0) ; i &lt; size ; ++i)</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>          {</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>            <span class="keywordflow">if</span>(x[i][j] &gt; x[max_i][j])</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>            {</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>              <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>[j] = x[i][j];</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>              max_i = i;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            }</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>          }</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>          max_i=<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        }</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>;</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>      }</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    } <span class="comment">// namespace Arch</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>  } <span class="comment">// namespace LAFEM</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_LAFEM_ARCH_MAX_INDEX_GENERIC_HPP</span></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_ae63636287332e32875ca28780966a810"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">FEAT::Math::max</a></div><div class="ttdeci">T_ max(T_ a, T_ b)</div><div class="ttdoc">Returns the maximum of two values.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00139">math.hpp:139</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00118">base_header.hpp:118</a></div></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>          <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a> = x[0];</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        }</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0) ; i &lt; size ; ++i)</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>          <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j(0); j &lt; ValueType_::n; ++j)</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>          {</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            <span class="keywordflow">if</span>(x[i][j] &gt; max[j])</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>            {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>              <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>[j] = x[i][j];</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            }</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>          }</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        }</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>      }</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    } <span class="comment">// namespace Arch</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>  } <span class="comment">// namespace LAFEM</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_LAFEM_ARCH_MAX_INDEX_GENERIC_HPP</span></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_ae63636287332e32875ca28780966a810"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">FEAT::Math::max</a></div><div class="ttdeci">T_ max(T_ a, T_ b)</div><div class="ttdoc">Returns the maximum of two values.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00137">math.hpp:137</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

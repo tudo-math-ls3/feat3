@@ -195,7 +195,7 @@ Private Attributes</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>The checkpoint control class object is used on a per rank basis. The contents of all ranks objects will be written into one single file. Later on, the loaded objects will, again, be local objects in every rank with distinct contents.</dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000071">Todo:</a></b></dt><dd>do we need extra handling for machines with no global acessible file servers? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00142">142</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00140">140</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a27f203afbdf4f00907e24535890605e5" name="a27f203afbdf4f00907e24535890605e5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a27f203afbdf4f00907e24535890605e5">&#9670;&#160;</a></span>CheckpointControl()</h2>
@@ -241,9 +241,9 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00282">282</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00280">280</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>.</p>
 
 </div>
 </div>
@@ -273,7 +273,7 @@ Private Attributes</h2></td></tr>
 <p>Destructor. </p>
 <p >Destroy the checkpoint control instance and delete the input array. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00294">294</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00292">292</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -312,11 +312,11 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the size of the buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00165">165</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00163">163</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_checkpointable_by_identifier</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00154">_config</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00144">_checkpointable_by_identifier</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00152">_config</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00242">_save()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00469">save()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00240">_save()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00467">save()</a>.</p>
 
 </div>
 </div>
@@ -355,11 +355,11 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Reading another input file / stream will overwrite values in _input_array and _offset_by_identifier </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00262">262</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00260">260</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00152">_comm</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00210">_restore_checkpoint_data()</a>, and <a class="el" href="dist__file__io_8cpp_source.html#l00490">FEAT::DistFileIO::read_combined()</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00150">_comm</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00208">_restore_checkpoint_data()</a>, and <a class="el" href="dist__file__io_8cpp_source.html#l00490">FEAT::DistFileIO::read_combined()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00442">load()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00440">load()</a>.</p>
 
 </div>
 </div>
@@ -389,11 +389,11 @@ Private Attributes</h2></td></tr>
 <p>Extract input buffer. </p>
 <p >Extract the identifier string and offset for its data in the input array for every object in the read checkpoint, and store this information for restoration in this checkpoint control object. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00210">210</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00208">208</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00150">_offset_by_identifier</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_offset_by_identifier</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00262">_load()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00490">load()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00260">_load()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00488">load()</a>.</p>
 
 </div>
 </div>
@@ -430,11 +430,11 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00242">242</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00240">240</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00165">_collect_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00152">_comm</a>, and <a class="el" href="dist__file__io_8cpp_source.html#l00541">FEAT::DistFileIO::write_combined()</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00163">_collect_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00150">_comm</a>, and <a class="el" href="dist__file__io_8cpp_source.html#l00541">FEAT::DistFileIO::write_combined()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00409">save()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00407">save()</a>.</p>
 
 </div>
 </div>
@@ -485,11 +485,11 @@ template&lt;typename OT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00348">348</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00346">346</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_checkpointable_by_identifier</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00144">_checkpointable_by_identifier</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00382">restore_object()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00380">restore_object()</a>.</p>
 
 </div>
 </div>
@@ -519,9 +519,9 @@ template&lt;typename OT_ &gt; </div>
 <p>Delete all read input. </p>
 <p >Clear the input read before from this checkpoint control object. Does not touch the map holding the pointers to the checkpointable objects included into the following written checkpoints. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00315">315</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00313">313</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00150">_offset_by_identifier</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_offset_by_identifier</a>.</p>
 
 </div>
 </div>
@@ -550,9 +550,9 @@ template&lt;typename OT_ &gt; </div>
 
 <p>Retrieve a list of all items stored in the checkpoint. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00322">322</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00320">320</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_checkpointable_by_identifier</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00144">_checkpointable_by_identifier</a>.</p>
 
 </div>
 </div>
@@ -591,9 +591,9 @@ template&lt;typename OT_ &gt; </div>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Reading another input file / stream will overwrite values in _input_array and _offset_by_identifier </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00490">490</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00488">488</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00210">_restore_checkpoint_data()</a>, <a class="el" href="binary__stream_8hpp_source.html#l00220">FEAT::BinaryStream::data()</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00208">_restore_checkpoint_data()</a>, <a class="el" href="binary__stream_8hpp_source.html#l00218">FEAT::BinaryStream::data()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -633,9 +633,9 @@ template&lt;typename OT_ &gt; </div>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Reading another input file / stream will overwrite values in _input_array and _offset_by_identifier </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00442">442</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00440">440</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00262">_load()</a>, <a class="el" href="assertion_8hpp_source.html#l00194">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00260">_load()</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -672,9 +672,9 @@ template&lt;typename OT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00363">363</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00361">361</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_checkpointable_by_identifier</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00144">_checkpointable_by_identifier</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -732,9 +732,9 @@ template&lt;typename OT_ &gt; </div>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>The user has to load an input file before and has to ensure proper size/data/whatsover type layout. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00382">382</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00380">380</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00150">_offset_by_identifier</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00348">add_object()</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00146">_input_array</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00148">_offset_by_identifier</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00346">add_object()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -771,9 +771,9 @@ template&lt;typename OT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00469">469</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00467">467</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00165">_collect_checkpoint_data()</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00163">_collect_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -810,9 +810,9 @@ template&lt;typename OT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00409">409</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00407">407</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00242">_save()</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00240">_save()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -849,9 +849,9 @@ template&lt;typename OT_ &gt; </div>
 </dl>
 <p>Set a new SerialConfig object. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00305">305</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00303">303</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00154">_config</a>.</p>
+<p class="reference">References <a class="el" href="checkpoint__control_8hpp_source.html#l00152">_config</a>.</p>
 
 </div>
 </div>
@@ -878,9 +878,9 @@ template&lt;typename OT_ &gt; </div>
 
 <p>Mapping of identifier string to pointer to the checkpointable object. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00146">146</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00144">144</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00165">_collect_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00348">add_object()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00322">get_identifier_list()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00363">remove_object()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00163">_collect_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00346">add_object()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00320">get_identifier_list()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00361">remove_object()</a>.</p>
 
 </div>
 </div>
@@ -906,9 +906,9 @@ template&lt;typename OT_ &gt; </div>
 
 <p>the mpi communicator identifying our mpi context </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00152">152</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00150">150</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00262">_load()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00242">_save()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00260">_load()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00240">_save()</a>.</p>
 
 </div>
 </div>
@@ -934,9 +934,9 @@ template&lt;typename OT_ &gt; </div>
 
 <p>The config class that controls the compression modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00154">154</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00152">152</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00165">_collect_checkpoint_data()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00305">set_config()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00163">_collect_checkpoint_data()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00303">set_config()</a>.</p>
 
 </div>
 </div>
@@ -962,9 +962,9 @@ template&lt;typename OT_ &gt; </div>
 
 <p>Vector holding the array read from the input file during restore. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00148">148</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00146">146</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00282">CheckpointControl()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00262">_load()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00210">_restore_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00315">clear_input()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00442">load()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00382">restore_object()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00280">CheckpointControl()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00260">_load()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00208">_restore_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00313">clear_input()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00440">load()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00380">restore_object()</a>.</p>
 
 </div>
 </div>
@@ -990,9 +990,9 @@ template&lt;typename OT_ &gt; </div>
 
 <p>Mapping of identifier string to the offset in the input file. </p>
 
-<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00150">150</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00148">148</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00210">_restore_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00315">clear_input()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00382">restore_object()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="checkpoint__control_8hpp_source.html#l00208">_restore_checkpoint_data()</a>, <a class="el" href="checkpoint__control_8hpp_source.html#l00313">clear_input()</a>, and <a class="el" href="checkpoint__control_8hpp_source.html#l00380">restore_object()</a>.</p>
 
 </div>
 </div>

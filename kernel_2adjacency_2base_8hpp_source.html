@@ -105,45 +105,41 @@ $(document).ready(function(){initNavTree('kernel_2adjacency_2base_8hpp_source.ht
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef KERNEL_ADJACENCY_BASE_HPP</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define KERNEL_ADJACENCY_BASE_HPP 1</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">// includes, FEAT</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>{</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keyword">namespace </span>Adjacency</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  {</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7">   27</a></span>    <span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7">RenderType</a></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    {</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">as_is</a> = 0,</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ae76496363b1788de189d5a6f5d63f80c">as_is_sorted</a> = 1,</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">injectify</a> = 2,</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">injectify_sorted</a> = 3,</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">transpose</a> = 4,</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7aa64cbf11a4a0dd8ce3b57b86d42ee06b">transpose_sorted</a> = 5,</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">injectify_transpose</a> = 6,</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a6b00d594d363cb0932fa34e1fc7c5b4c">injectify_transpose_sorted</a> = 7</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    }; <span class="comment">// enum class RenderType</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>  } <span class="comment">// namespace Adjacency</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_ADJACENCY_BASE_HPP</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// includes, FEAT</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  <span class="keyword">namespace </span>Adjacency</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7">   25</a></span>    <span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7">RenderType</a></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">as_is</a> = 0,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ae76496363b1788de189d5a6f5d63f80c">as_is_sorted</a> = 1,</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">injectify</a> = 2,</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">injectify_sorted</a> = 3,</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">transpose</a> = 4,</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7aa64cbf11a4a0dd8ce3b57b86d42ee06b">transpose_sorted</a> = 5,</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">injectify_transpose</a> = 6,</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a6b00d594d363cb0932fa34e1fc7c5b4c">injectify_transpose_sorted</a> = 7</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    }; <span class="comment">// enum class RenderType</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>  } <span class="comment">// namespace Adjacency</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>} <span class="comment">// namespace FEAT</span></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7">FEAT::Adjacency::RenderType</a></div><div class="ttdeci">RenderType</div><div class="ttdoc">Render type enumeration.</div><div class="ttdef"><b>Definition:</b> <a href="kernel_2adjacency_2base_8hpp_source.html#l00027">base.hpp:28</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7">FEAT::Adjacency::RenderType</a></div><div class="ttdeci">RenderType</div><div class="ttdoc">Render type enumeration.</div><div class="ttdef"><b>Definition:</b> <a href="kernel_2adjacency_2base_8hpp_source.html#l00025">base.hpp:26</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a1643ca58f467adb1a5dff48e854ef1bf">FEAT::Adjacency::RenderType::injectify_sorted</a></div><div class="ttdeci">@ injectify_sorted</div><div class="ttdoc">Render-Injectified mode, sort image indices.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::RenderType::transpose</a></div><div class="ttdeci">@ transpose</div><div class="ttdoc">Render-Transpose mode.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::RenderType::injectify_transpose</a></div><div class="ttdeci">@ injectify_transpose</div><div class="ttdoc">Render-Injectified-Transpose mode.</div></div>
@@ -152,7 +148,7 @@ $(document).ready(function(){initNavTree('kernel_2adjacency_2base_8hpp_source.ht
 <div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7aa64cbf11a4a0dd8ce3b57b86d42ee06b"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7aa64cbf11a4a0dd8ce3b57b86d42ee06b">FEAT::Adjacency::RenderType::transpose_sorted</a></div><div class="ttdeci">@ transpose_sorted</div><div class="ttdoc">Render-Transpose mode, sort image indices.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::RenderType::as_is</a></div><div class="ttdeci">@ as_is</div><div class="ttdoc">Render-As-Is mode.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_adjacency_html_a85fc833108471df98e28d6b06324f3e7ae76496363b1788de189d5a6f5d63f80c"><div class="ttname"><a href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ae76496363b1788de189d5a6f5d63f80c">FEAT::Adjacency::RenderType::as_is_sorted</a></div><div class="ttdeci">@ as_is_sorted</div><div class="ttdoc">Render-As-Is mode, sort image indices.</div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

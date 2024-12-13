@@ -356,6 +356,7 @@ var annotated_dup =
         [ "DimensionalChartHelper", "struct_f_e_a_t_1_1_geometry_1_1_dimensional_chart_helper.html", "struct_f_e_a_t_1_1_geometry_1_1_dimensional_chart_helper" ],
         [ "DistributedMeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion" ],
         [ "ExportEPS", "class_f_e_a_t_1_1_geometry_1_1_export_e_p_s.html", "class_f_e_a_t_1_1_geometry_1_1_export_e_p_s" ],
+        [ "ExportSVG", "class_f_e_a_t_1_1_geometry_1_1_export_s_v_g.html", "class_f_e_a_t_1_1_geometry_1_1_export_s_v_g" ],
         [ "ExportVTK", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k" ],
         [ "FacetFlipper", "class_f_e_a_t_1_1_geometry_1_1_facet_flipper.html", "class_f_e_a_t_1_1_geometry_1_1_facet_flipper" ],
         [ "Factory", "class_f_e_a_t_1_1_geometry_1_1_factory.html", null ],

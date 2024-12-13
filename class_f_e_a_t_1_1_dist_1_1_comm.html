@@ -367,6 +367,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad53b243a06aecf2296bfd27a0575034f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ad53b243a06aecf2296bfd27a0575034f">allprint</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;msg, int root=0) const</td></tr>
 <tr class="memdesc:ad53b243a06aecf2296bfd27a0575034f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the ordered messages of all processes to the standard output stream <code>cout</code>.  <a href="class_f_e_a_t_1_1_dist_1_1_comm.html#ad53b243a06aecf2296bfd27a0575034f">More...</a><br /></td></tr>
 <tr class="separator:ad53b243a06aecf2296bfd27a0575034f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0ded89c49ded10cbbc30cf7a4056a9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac0ded89c49ded10cbbc30cf7a4056a9e">print_flush</a> (std::ostream &amp;os, int root=0) const</td></tr>
+<tr class="memdesc:ac0ded89c49ded10cbbc30cf7a4056a9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicitly flushes the output stream.  <a href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac0ded89c49ded10cbbc30cf7a4056a9e">More...</a><br /></td></tr>
+<tr class="separator:ac0ded89c49ded10cbbc30cf7a4056a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63401131d6b7544e7e677835975a3ae7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a63401131d6b7544e7e677835975a3ae7">print_flush</a> (int root=0) const</td></tr>
+<tr class="memdesc:a63401131d6b7544e7e677835975a3ae7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicitly flushes <code>cout</code>.  <a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a63401131d6b7544e7e677835975a3ae7">More...</a><br /></td></tr>
+<tr class="separator:a63401131d6b7544e7e677835975a3ae7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -418,26 +424,26 @@ Protected Attributes</h2></td></tr>
 <p ><b>Examples:</b><br  />
 </p><ol type="1">
 <li>The blocking receive function has the following MPI prototype: <div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Recv(<span class="keywordtype">void</span>* buf, <span class="keywordtype">int</span> count, MPI_Datatype datatype, <span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag, MPI_Comm <a class="code hl_variable" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">comm</a>, MPI_Status *status)</div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_a79d67a074d3d01313be043e44ccf560f"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">FEAT::Dist::Comm::comm</a></div><div class="ttdeci">MPI_Comm comm</div><div class="ttdoc">our MPI communicator handle</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l01355">dist.hpp:1355</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_a79d67a074d3d01313be043e44ccf560f"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">FEAT::Dist::Comm::comm</a></div><div class="ttdeci">MPI_Comm comm</div><div class="ttdoc">our MPI communicator handle</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l01353">dist.hpp:1353</a></div></div>
 </div><!-- fragment --> The corresponding wrapper function for is the <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469" title="Blocking Receive.">Dist::Comm::recv()</a> member function: <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469">recv</a>(<span class="keywordtype">void</span>* buf, std::size_t count, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">Datatype</a>&amp; datatype, <span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag, <a class="code hl_class" href="class_f_e_a_t_1_1_dist_1_1_status.html">Status</a>&amp; status) <span class="keyword">const</span></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_a6f3fa27caec70f54672c4171809a2469"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469">FEAT::Dist::Comm::recv</a></div><div class="ttdeci">void recv(void *buffer, std::size_t count, const Datatype &amp;datatype, int source, int tag, Status &amp;status) const</div><div class="ttdoc">Blocking Receive.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8cpp_source.html#l00711">dist.cpp:711</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_status_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_status.html">FEAT::Dist::Status</a></div><div class="ttdoc">Communication Status class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00296">dist.hpp:297</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_dist_1_1_datatype_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">FEAT::Dist::Datatype</a></div><div class="ttdoc">Communication Datatype class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00076">dist.hpp:77</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_status_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_status.html">FEAT::Dist::Status</a></div><div class="ttdoc">Communication Status class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00294">dist.hpp:295</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_dist_1_1_datatype_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">FEAT::Dist::Datatype</a></div><div class="ttdoc">Communication Datatype class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00074">dist.hpp:75</a></div></div>
 </div><!-- fragment --> The overloaded wrapper function template with automatic type deduction is: <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
 <div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a6f3fa27caec70f54672c4171809a2469">recv</a>(T_* buffer, std::size_t count, <span class="keywordtype">int</span> source, <span class="keywordtype">int</span> tag, <a class="code hl_class" href="class_f_e_a_t_1_1_dist_1_1_status.html">Status</a>&amp; status) <span class="keyword">const</span></div>
 </div><!-- fragment --></li>
 <li>The nonblocking reduce function has the following MPI prototype: <div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Ireduce(<span class="keyword">const</span> <span class="keywordtype">void</span>* sendbuf, <span class="keywordtype">void</span>* recvbuf, <span class="keywordtype">int</span> count, MPI_Datatype datatype, MPI_Op op, <span class="keywordtype">int</span> root, MPI_Comm <a class="code hl_variable" href="class_f_e_a_t_1_1_dist_1_1_comm.html#a79d67a074d3d01313be043e44ccf560f">comm</a>, MPI_Request *request)</div>
 </div><!-- fragment --> The corresponding wrapper function for is the <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129" title="Nonblocking Reduce.">Dist::Comm::ireduce()</a> member function: <div class="fragment"><div class="line"><a class="code hl_class" href="class_f_e_a_t_1_1_dist_1_1_request.html">Request</a> <a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129">ireduce</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* sendbuf, <span class="keywordtype">void</span>* recvbuf, std::size_t count, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_datatype.html">Datatype</a>&amp; datatype, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_operation.html">Operation</a>&amp; op, <span class="keywordtype">int</span> root) <span class="keyword">const</span></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html_ac856663d919ddfcf0c3defe925633129"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129">FEAT::Dist::Comm::ireduce</a></div><div class="ttdeci">Request ireduce(const void *sendbuf, void *recvbuf, std::size_t count, const Datatype &amp;datatype, const Operation &amp;op, int root) const</div><div class="ttdoc">Nonblocking Reduce.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8cpp_source.html#l00647">dist.cpp:647</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_request_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_request.html">FEAT::Dist::Request</a></div><div class="ttdoc">Communication Request class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00424">dist.hpp:425</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_dist_1_1_operation_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_dist_1_1_operation.html">FEAT::Dist::Operation</a></div><div class="ttdoc">Communication Operation class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00238">dist.hpp:239</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_request_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_request.html">FEAT::Dist::Request</a></div><div class="ttdoc">Communication Request class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00422">dist.hpp:423</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_dist_1_1_operation_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_dist_1_1_operation.html">FEAT::Dist::Operation</a></div><div class="ttdoc">Communication Operation class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l00236">dist.hpp:237</a></div></div>
 </div><!-- fragment --> The overloaded wrapper function template with automatic type deduction is: <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
 <div class="line"><a class="code hl_class" href="class_f_e_a_t_1_1_dist_1_1_request.html">Request</a> <a class="code hl_function" href="class_f_e_a_t_1_1_dist_1_1_comm.html#ac856663d919ddfcf0c3defe925633129">ireduce</a>(<span class="keyword">const</span> T_* sendbuf, T_* recvbuf, std::size_t count, <span class="keyword">const</span> <a class="code hl_struct" href="struct_f_e_a_t_1_1_dist_1_1_operation.html">Operation</a>&amp; op, <span class="keywordtype">int</span> root) <span class="keyword">const</span></div>
 </div><!-- fragment --></li>
 </ol>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01350">1350</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01348">1348</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5aa2f4fc3c737f6c38101aca71952dfa" name="a5aa2f4fc3c737f6c38101aca71952dfa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5aa2f4fc3c737f6c38101aca71952dfa">&#9670;&#160;</a></span>Comm() <span class="overload">[1/3]</span></h2>
@@ -499,7 +505,7 @@ Protected Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00379">379</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, and <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01360">_size</a>, and <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -561,7 +567,7 @@ Protected Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00422">422</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -628,7 +634,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.7, page 165 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02323">2323</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02321">2321</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00589">allgather()</a>.</p>
 
@@ -701,9 +707,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00589">589</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="dist_8hpp_source.html#l02323">allgather()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00340">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, and <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="dist_8hpp_source.html#l02321">allgather()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, and <a class="el" href="parti__iterative_8hpp_source.html#l00558">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>.</p>
 
 </div>
 </div>
@@ -777,7 +783,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.7, page 166 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02461">2461</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02459">2459</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00607">allgatherv()</a>.</p>
 
@@ -858,9 +864,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00607">607</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02461">allgatherv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02459">allgatherv()</a>.</p>
 
 </div>
 </div>
@@ -907,7 +913,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03140">3140</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03138">3138</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>.</p>
 
@@ -957,9 +963,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00789">789</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="math_8hpp_source.html#l00233">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00394">FEAT::String::pad_front()</a>, <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00699">send()</a>, <a class="el" href="string_8hpp_source.html#l00469">FEAT::String::split_by_charset()</a>, <a class="el" href="string_8hpp_source.html#l00946">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01360">_size</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00699">send()</a>, <a class="el" href="string_8hpp_source.html#l00467">FEAT::String::split_by_charset()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l03140">allprint()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l03138">allprint()</a>.</p>
 
 </div>
 </div>
@@ -1025,7 +1031,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.9.6, page 187 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02856">2856</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02854">2854</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00655">allreduce()</a>.</p>
 
@@ -1091,9 +1097,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00655">655</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00240">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="global_2mean__filter_8hpp_source.html#l00074">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01599">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="dist_8hpp_source.html#l02856">allreduce()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00163">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="matrix_8hpp_source.html#l00267">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00276">FEAT::Control::Meshopt::MeshoptControlBase&lt; DomainControl_ &gt;::compute_mesh_quality()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00218">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00242">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, <a class="el" href="memory__usage_8hpp_source.html#l00229">FEAT::MemoryUsage::format_peak_physical_usage()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="gate_8hpp_source.html#l00345">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00086">FEAT::Assembly::ScalarDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00177">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00275">FEAT::Assembly::MatrixDiscreteEvalData&lt; DT_, dim_i_, dim_j_ &gt;::mean_value_dist()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="error__computer_8hpp_source.html#l00285">FEAT::Assembly::ScalarErrorInfo&lt; DataType_ &gt;::synchronize()</a>, <a class="el" href="error__computer_8hpp_source.html#l00861">FEAT::Assembly::VectorErrorInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00536">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="velocity__analyser_8hpp_source.html#l00109">FEAT::Assembly::VelocityInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, and <a class="el" href="matrix_8hpp_source.html#l00257">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="global_2mean__filter_8hpp_source.html#l00072">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00562">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01599">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="dist_8hpp_source.html#l02854">allreduce()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00712">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00361">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="matrix_8hpp_source.html#l00265">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00275">FEAT::Control::Meshopt::MeshoptControlBase&lt; DomainControl_ &gt;::compute_mesh_quality()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00216">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="global_2mean__filter_8hpp_source.html#l00240">FEAT::Global::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, <a class="el" href="memory__usage_8hpp_source.html#l00227">FEAT::MemoryUsage::format_peak_physical_usage()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00084">FEAT::Assembly::ScalarDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00175">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::mean_value_dist()</a>, <a class="el" href="discrete__evaluator_8hpp_source.html#l00273">FEAT::Assembly::MatrixDiscreteEvalData&lt; DT_, dim_i_, dim_j_ &gt;::mean_value_dist()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00032">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="error__computer_8hpp_source.html#l00283">FEAT::Assembly::ScalarErrorInfo&lt; DataType_ &gt;::synchronize()</a>, <a class="el" href="error__computer_8hpp_source.html#l00859">FEAT::Assembly::VectorErrorInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00534">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="velocity__analyser_8hpp_source.html#l00107">FEAT::Assembly::VelocityInfo&lt; DataType_, dim_ &gt;::synchronize()</a>, and <a class="el" href="matrix_8hpp_source.html#l00255">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>.</p>
 
 </div>
 </div>
@@ -1159,7 +1165,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.8, page 168 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02519">2519</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02517">2517</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00615">alltoall()</a>.</p>
 
@@ -1232,9 +1238,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00615">615</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02519">alltoall()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02517">alltoall()</a>.</p>
 
 </div>
 </div>
@@ -1315,7 +1321,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.8, page 170 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02663">2663</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02661">2661</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00633">alltoallv()</a>.</p>
 
@@ -1403,9 +1409,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00633">633</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02663">alltoallv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02661">alltoallv()</a>.</p>
 
 </div>
 </div>
@@ -1429,7 +1435,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00529">529</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -1487,7 +1493,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.4, page 148 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01938">1938</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01936">1936</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>.</p>
 
@@ -1545,9 +1551,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00541">541</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8hpp_source.html#l01938">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00757">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00723">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, and <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8hpp_source.html#l01936">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00757">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00723">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00558">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, and <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
 
 </div>
 </div>
@@ -1588,7 +1594,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00757">757</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="binary__stream_8hpp_source.html#l00238">FEAT::BinaryStream::container()</a>, and <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="binary__stream_8hpp_source.html#l00236">FEAT::BinaryStream::container()</a>, and <a class="el" href="dist_8hpp_source.html#l01494">rank()</a>.</p>
 
 </div>
 </div>
@@ -1629,7 +1635,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00723">723</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, and <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, and <a class="el" href="dist_8hpp_source.html#l01494">rank()</a>.</p>
 
 </div>
 </div>
@@ -1675,7 +1681,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00498">498</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1729,9 +1735,9 @@ The ranks, which are contained in the new sub-communicator, are given by <em>fir
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00472">472</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, <a class="el" href="dist_8hpp_source.html#l01360">_size</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>.</p>
 
 </div>
 </div>
@@ -1756,9 +1762,9 @@ The ranks, which are contained in the new sub-communicator, are given by <em>fir
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00459">459</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, and <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, and <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01480">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00403">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01402">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00456">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01480">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00401">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01402">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>.</p>
 
 </div>
 </div>
@@ -1802,7 +1808,7 @@ The ranks, which are contained in the new sub-communicator, are given by <em>fir
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00522">522</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, and <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>, and <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -1868,7 +1874,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.11.2, page 194 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03037">3037</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03035">3035</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00683">exscan()</a>.</p>
 
@@ -1934,9 +1940,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00683">683</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00240">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, and <a class="el" href="dist_8hpp_source.html#l03037">exscan()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00712">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00361">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, and <a class="el" href="dist_8hpp_source.html#l03035">exscan()</a>.</p>
 
 </div>
 </div>
@@ -2009,7 +2015,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.5, page 149 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02057">2057</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02055">2055</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>.</p>
 
@@ -2089,9 +2095,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00553">553</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8hpp_source.html#l02057">gather()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8hpp_source.html#l02055">gather()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>.</p>
 
 </div>
 </div>
@@ -2158,7 +2164,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.5, page 204 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02389">2389</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02387">2387</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00597">iallgather()</a>.</p>
 
@@ -2232,9 +2238,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00597">597</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02389">iallgather()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02387">iallgather()</a>.</p>
 
 </div>
 </div>
@@ -2301,7 +2307,7 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.8, page 210 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02919">2919</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02917">2917</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00660">iallreduce()</a>.</p>
 
@@ -2368,9 +2374,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00660">660</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00240">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00101">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, and <a class="el" href="dist_8hpp_source.html#l02919">iallreduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00099">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, and <a class="el" href="dist_8hpp_source.html#l02917">iallreduce()</a>.</p>
 
 </div>
 </div>
@@ -2437,7 +2443,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.6, page 206 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02585">2585</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02583">2583</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00623">ialltoall()</a>.</p>
 
@@ -2511,9 +2517,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00623">623</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02585">ialltoall()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02583">ialltoall()</a>.</p>
 
 </div>
 </div>
@@ -2538,7 +2544,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00534">534</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -2597,7 +2603,7 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.2, page 199 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01985">1985</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01983">1983</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00546">ibcast()</a>.</p>
 
@@ -2656,9 +2662,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00546">546</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l01985">ibcast()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l01983">ibcast()</a>.</p>
 
 </div>
 </div>
@@ -2732,7 +2738,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.3, page 200 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02129">2129</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02127">2127</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>.</p>
 
@@ -2813,9 +2819,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00561">561</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02129">igather()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02127">igather()</a>.</p>
 
 </div>
 </div>
@@ -2881,7 +2887,7 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.7.2, page 51 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01889">1889</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01887">1887</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00716">irecv()</a>.</p>
 
@@ -2947,9 +2953,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00716">716</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00085">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01450">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01342">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00391">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00366">FEAT::Geometry::GlobalMaskedBoundaryFactory&lt; ParentMesh_ &gt;::_sync_bnd_masks()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00819">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00228">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00126">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00607">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00425">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01889">irecv()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00192">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01141">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01448">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01340">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00389">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00364">FEAT::Geometry::GlobalMaskedBoundaryFactory&lt; ParentMesh_ &gt;::_sync_bnd_masks()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00493">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00712">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00361">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00817">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00226">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00124">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01887">irecv()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00190">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01139">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
 
 </div>
 </div>
@@ -3023,7 +3029,7 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.7, page 209 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02801">2801</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02799">2799</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>.</p>
 
@@ -3097,9 +3103,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00647">647</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00240">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02801">ireduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02799">ireduce()</a>.</p>
 
 </div>
 </div>
@@ -3123,9 +3129,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00454">454</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>.</p>
 
 </div>
 </div>
@@ -3149,7 +3155,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00449">449</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -3173,7 +3179,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00444">444</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -3247,7 +3253,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.12.4, page 202 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02265">2265</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02263">2263</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>.</p>
 
@@ -3328,9 +3334,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00579">579</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02265">iscatter()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02263">iscatter()</a>.</p>
 
 </div>
 </div>
@@ -3396,7 +3402,7 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A request object for the operation.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.7.2, page 49 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01836">1836</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01834">1834</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00704">isend()</a>.</p>
 
@@ -3462,9 +3468,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00704">704</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00085">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01450">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01342">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00391">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00366">FEAT::Geometry::GlobalMaskedBoundaryFactory&lt; ParentMesh_ &gt;::_sync_bnd_masks()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00819">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00228">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00126">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00607">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00425">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01836">isend()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00192">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01141">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01448">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::_apply()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01340">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00389">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="boundary__factory_8hpp_source.html#l00364">FEAT::Geometry::GlobalMaskedBoundaryFactory&lt; ParentMesh_ &gt;::_sync_bnd_masks()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00493">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00712">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00361">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00817">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00226">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00124">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="dist_8hpp_source.html#l01834">isend()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00190">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01139">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
 
 </div>
 </div>
@@ -3492,9 +3498,9 @@ template&lt;typename T_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>a reference to the internal <code>MPI_Comm</code> handle </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01447">1447</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01445">1445</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -3522,9 +3528,9 @@ template&lt;typename T_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>a const reference to the internal <code>MPI_Comm</code> handle </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01441">1441</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01439">1439</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>.</p>
 
 </div>
 </div>
@@ -3588,7 +3594,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00404">404</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01360">_size</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -3635,7 +3641,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03108">3108</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03106">3106</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00782">print()</a>.</p>
 
@@ -3685,9 +3691,90 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00782">782</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01362">_size</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01360">_size</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="iterative_8hpp_source.html#l00698">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_print_line()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00232">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, and <a class="el" href="dist_8hpp_source.html#l03108">print()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="iterative_8hpp_source.html#l00696">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_print_line()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00232">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, and <a class="el" href="dist_8hpp_source.html#l03106">print()</a>.</p>
+
+</div>
+</div>
+<a id="a63401131d6b7544e7e677835975a3ae7" name="a63401131d6b7544e7e677835975a3ae7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63401131d6b7544e7e677835975a3ae7">&#9670;&#160;</a></span>print_flush() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::Dist::Comm::print_flush </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>root</em> = <code>0</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Explicitly flushes <code>cout</code>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">root</td><td>The root process that should collect the messages and perform the print. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l03160">3160</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00847">print_flush()</a>.</p>
+
+</div>
+</div>
+<a id="ac0ded89c49ded10cbbc30cf7a4056a9e" name="ac0ded89c49ded10cbbc30cf7a4056a9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0ded89c49ded10cbbc30cf7a4056a9e">&#9670;&#160;</a></span>print_flush() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::Dist::Comm::print_flush </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>root</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Explicitly flushes the output stream. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">os</td><td>The output stream to write to. Must be a valid stream on the root process.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">root</td><td>The root process that should collect the messages and perform the print. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00847">847</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01360">_size</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l03160">print_flush()</a>.</p>
 
 </div>
 </div>
@@ -3718,11 +3805,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The rank of this process in this communicator.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 6.4.1, page 236 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01496">1496</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01494">1494</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__iterative_8hpp_source.html#l00499">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::PartiIterative()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00470">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01480">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00495">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00714">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00363">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="dist_8cpp_source.html#l00757">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00723">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00560">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, <a class="el" href="muxer_8hpp_source.html#l00336">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00345">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="runtime_8cpp_source.html#l00040">FEAT::Runtime::initialize()</a>, <a class="el" href="muxer_8hpp_source.html#l00238">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="property__map_8cpp_source.html#l00443">FEAT::PropertyMap::write()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00517">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__iterative_8hpp_source.html#l00497">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::PartiIterative()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00468">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00562">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00456">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01480">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00493">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00712">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::asm_adp_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00361">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_by_gate()</a>, <a class="el" href="dist_8cpp_source.html#l00757">bcast_binarystream()</a>, <a class="el" href="dist_8cpp_source.html#l00723">bcast_stringstream()</a>, <a class="el" href="parti__iterative_8hpp_source.html#l00558">FEAT::Geometry::PartiIterative&lt; ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt; &gt;::build_elems_at_rank()</a>, <a class="el" href="muxer_8hpp_source.html#l00334">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="runtime_8cpp_source.html#l00040">FEAT::Runtime::initialize()</a>, <a class="el" href="muxer_8hpp_source.html#l00236">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_parent()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00032">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="property__map_8cpp_source.html#l00443">FEAT::PropertyMap::write()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00515">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -3794,7 +3881,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.2.4, page 28 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01748">1748</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01746">1746</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>.</p>
 
@@ -3861,7 +3948,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.2.4, page 28 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01774">1774</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01772">1772</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>.</p>
 
@@ -3933,9 +4020,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00711">711</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00316">FEAT::Dist::Status::mpi_status()</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00314">FEAT::Dist::Status::mpi_status()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01719">recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01717">recv()</a>.</p>
 
 </div>
 </div>
@@ -4005,7 +4092,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.2.4, page 28 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01719">1719</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01717">1717</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>.</p>
 
@@ -4080,7 +4167,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.9.1, page 174 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02732">2732</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02730">2730</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>.</p>
 
@@ -4153,9 +4240,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00641">641</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00240">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02732">reduce()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02730">reduce()</a>.</p>
 
 </div>
 </div>
@@ -4221,7 +4308,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.11.1, page 193 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02974">2974</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02972">2972</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00667">scan()</a>.</p>
 
@@ -4287,9 +4374,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00667">667</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00242">FEAT::Dist::Operation::op</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>, and <a class="el" href="dist_8hpp_source.html#l00240">FEAT::Dist::Operation::op</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02974">scan()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02972">scan()</a>.</p>
 
 </div>
 </div>
@@ -4362,7 +4449,7 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 5.6, page 159 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02193">2193</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l02191">2191</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>.</p>
 
@@ -4442,9 +4529,9 @@ template&lt;typename ST_ , typename RT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00571">571</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01358">_rank</a>, <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02193">scatter()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8hpp_source.html#l02191">scatter()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, and <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>.</p>
 
 </div>
 </div>
@@ -4540,7 +4627,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 3.2.1, page 24 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01667">1667</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01665">1665</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00699">send()</a>.</p>
 
@@ -4605,9 +4692,9 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="dist_8cpp_source.html#l00699">699</a> of file <a class="el" href="dist_8cpp_source.html">dist.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01355">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00080">FEAT::Dist::Datatype::dt</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01353">comm</a>, and <a class="el" href="dist_8hpp_source.html#l00078">FEAT::Dist::Datatype::dt</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01667">send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, and <a class="el" href="dist_8hpp_source.html#l01665">send()</a>.</p>
 
 </div>
 </div>
@@ -4638,11 +4725,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The size of this communicator.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><b>[MPI31]</b> Section 6.4.1, page 235 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01508">1508</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01506">1506</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01362">_size</a>.</p>
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l01360">_size</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01900">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00348">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01599">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01480">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00340">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, <a class="el" href="matrix_8hpp_source.html#l00267">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00582">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="gate_8hpp_source.html#l00508">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00345">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l01316">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="muxer_8hpp_source.html#l00227">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="splitter_8hpp_source.html#l00188">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_single()</a>, <a class="el" href="muxer_8hpp_source.html#l00403">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00377">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="gate_8hpp_source.html#l00276">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00329">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, <a class="el" href="muxer_8hpp_source.html#l00478">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00451">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00536">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="matrix_8hpp_source.html#l00257">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00517">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__map_8hpp_source.html#l01899">FEAT::Geometry::VoxelMap::_compute_voxel_map()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00346">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00865">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00759">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_single()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00562">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01599">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00456">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01480">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::assemble_allgather()</a>, <a class="el" href="matrix_8hpp_source.html#l00265">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00582">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="gate_8hpp_source.html#l00506">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00343">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l01314">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="muxer_8hpp_source.html#l00225">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::is_child()</a>, <a class="el" href="splitter_8hpp_source.html#l00186">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::is_single()</a>, <a class="el" href="muxer_8hpp_source.html#l00401">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="muxer_8hpp_source.html#l00375">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::join_send()</a>, <a class="el" href="gate_8hpp_source.html#l00274">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00032">FEAT::Control::Statistics::report()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00614">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::serialize_partitioning()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00329">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, <a class="el" href="muxer_8hpp_source.html#l00476">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="muxer_8hpp_source.html#l00449">FEAT::Global::Muxer&lt; LocalVector_, Mirror_ &gt;::split_recv()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l00534">FEAT::Assembly::FunctionIntegralInfo&lt; DataType_, ValueType_, GradientType_, HessianType_ &gt;::synchronize()</a>, <a class="el" href="matrix_8hpp_source.html#l00255">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00515">FEAT::Geometry::ExportVTK&lt; Mesh_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -4675,7 +4762,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00372">Comm()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__file__reader_8hpp_source.html#l01510">FEAT::Geometry::MeshFileReader::add_mesh_file()</a>, <a class="el" href="mesh__file__reader_8hpp_source.html#l01482">FEAT::Geometry::MeshFileReader::add_mesh_files()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="random_8hpp_source.html#l00076">FEAT::Random::get_seed()</a>, <a class="el" href="runtime_8cpp_source.html#l00040">FEAT::Runtime::initialize()</a>, <a class="el" href="property__map_8hpp_source.html#l00392">FEAT::PropertyMap::read()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00153">FEAT::DistFileIO::read_common()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00312">FEAT::DistFileIO::read_ordered()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00206">FEAT::DistFileIO::read_sequence()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00034">FEAT::Control::Statistics::report()</a>, <a class="el" href="property__map_8hpp_source.html#l00436">FEAT::PropertyMap::write()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00344">FEAT::DistFileIO::write_ordered()</a>, and <a class="el" href="dist__file__io_8hpp_source.html#l00258">FEAT::DistFileIO::write_sequence()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__file__reader_8hpp_source.html#l01508">FEAT::Geometry::MeshFileReader::add_mesh_file()</a>, <a class="el" href="mesh__file__reader_8hpp_source.html#l01480">FEAT::Geometry::MeshFileReader::add_mesh_files()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="random_8hpp_source.html#l00074">FEAT::Random::get_seed()</a>, <a class="el" href="runtime_8cpp_source.html#l00040">FEAT::Runtime::initialize()</a>, <a class="el" href="property__map_8hpp_source.html#l00390">FEAT::PropertyMap::read()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00151">FEAT::DistFileIO::read_common()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00310">FEAT::DistFileIO::read_ordered()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00204">FEAT::DistFileIO::read_sequence()</a>, <a class="el" href="control_2statistics_8hpp_source.html#l00032">FEAT::Control::Statistics::report()</a>, <a class="el" href="property__map_8hpp_source.html#l00434">FEAT::PropertyMap::write()</a>, <a class="el" href="dist__file__io_8hpp_source.html#l00342">FEAT::DistFileIO::write_ordered()</a>, and <a class="el" href="dist__file__io_8hpp_source.html#l00256">FEAT::DistFileIO::write_sequence()</a>.</p>
 
 </div>
 </div>
@@ -4702,9 +4789,9 @@ template&lt;typename T_ &gt; </div>
 
 <p>our rank </p>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01360">1360</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01358">1358</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>, <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00782">print()</a>, <a class="el" href="dist_8hpp_source.html#l01496">rank()</a>, <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>, and <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>, <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00782">print()</a>, <a class="el" href="dist_8cpp_source.html#l00847">print_flush()</a>, <a class="el" href="dist_8hpp_source.html#l01494">rank()</a>, <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>, and <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>.</p>
 
 </div>
 </div>
@@ -4730,9 +4817,9 @@ template&lt;typename T_ &gt; </div>
 
 <p>the communicator size </p>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01362">1362</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01360">1360</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00782">print()</a>, and <a class="el" href="dist_8hpp_source.html#l01508">size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00789">allprint()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00782">print()</a>, <a class="el" href="dist_8cpp_source.html#l00847">print_flush()</a>, and <a class="el" href="dist_8hpp_source.html#l01506">size()</a>.</p>
 
 </div>
 </div>
@@ -4750,9 +4837,9 @@ template&lt;typename T_ &gt; </div>
 
 <p>our MPI communicator handle </p>
 
-<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01355">1355</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dist_8hpp_source.html#l01353">1353</a> of file <a class="el" href="dist_8hpp_source.html">dist.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00422">~Comm()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="dist_8cpp_source.html#l00589">allgather()</a>, <a class="el" href="dist_8cpp_source.html#l00607">allgatherv()</a>, <a class="el" href="dist_8cpp_source.html#l00655">allreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00615">alltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00633">alltoallv()</a>, <a class="el" href="dist_8cpp_source.html#l00529">barrier()</a>, <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00498">comm_create_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00459">comm_dup()</a>, <a class="el" href="dist_8cpp_source.html#l00522">comm_split()</a>, <a class="el" href="dist_8cpp_source.html#l00683">exscan()</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="dist_8cpp_source.html#l00597">iallgather()</a>, <a class="el" href="dist_8cpp_source.html#l00660">iallreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00623">ialltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00534">ibarrier()</a>, <a class="el" href="dist_8cpp_source.html#l00546">ibcast()</a>, <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>, <a class="el" href="dist_8cpp_source.html#l00716">irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00454">is_null()</a>, <a class="el" href="dist_8cpp_source.html#l00449">is_self()</a>, <a class="el" href="dist_8cpp_source.html#l00444">is_world()</a>, <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>, <a class="el" href="dist_8cpp_source.html#l00704">isend()</a>, <a class="el" href="dist_8hpp_source.html#l01441">mpi_comm()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>, <a class="el" href="dist_8cpp_source.html#l00667">scan()</a>, <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>, and <a class="el" href="dist_8cpp_source.html#l00699">send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dist_8cpp_source.html#l00379">Comm()</a>, <a class="el" href="dist_8cpp_source.html#l00422">~Comm()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00804">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_multi_layers_scattered()</a>, <a class="el" href="dist_8cpp_source.html#l00589">allgather()</a>, <a class="el" href="dist_8cpp_source.html#l00607">allgatherv()</a>, <a class="el" href="dist_8cpp_source.html#l00655">allreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00615">alltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00633">alltoallv()</a>, <a class="el" href="dist_8cpp_source.html#l00529">barrier()</a>, <a class="el" href="dist_8cpp_source.html#l00541">bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00498">comm_create_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00472">comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00459">comm_dup()</a>, <a class="el" href="dist_8cpp_source.html#l00522">comm_split()</a>, <a class="el" href="dist_8cpp_source.html#l00683">exscan()</a>, <a class="el" href="dist_8cpp_source.html#l00553">gather()</a>, <a class="el" href="dist_8cpp_source.html#l00597">iallgather()</a>, <a class="el" href="dist_8cpp_source.html#l00660">iallreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00623">ialltoall()</a>, <a class="el" href="dist_8cpp_source.html#l00534">ibarrier()</a>, <a class="el" href="dist_8cpp_source.html#l00546">ibcast()</a>, <a class="el" href="dist_8cpp_source.html#l00561">igather()</a>, <a class="el" href="dist_8cpp_source.html#l00716">irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00647">ireduce()</a>, <a class="el" href="dist_8cpp_source.html#l00454">is_null()</a>, <a class="el" href="dist_8cpp_source.html#l00449">is_self()</a>, <a class="el" href="dist_8cpp_source.html#l00444">is_world()</a>, <a class="el" href="dist_8cpp_source.html#l00579">iscatter()</a>, <a class="el" href="dist_8cpp_source.html#l00704">isend()</a>, <a class="el" href="dist_8hpp_source.html#l01439">mpi_comm()</a>, <a class="el" href="dist_8cpp_source.html#l00404">operator=()</a>, <a class="el" href="dist_8cpp_source.html#l00711">recv()</a>, <a class="el" href="dist_8cpp_source.html#l00641">reduce()</a>, <a class="el" href="dist_8cpp_source.html#l00667">scan()</a>, <a class="el" href="dist_8cpp_source.html#l00571">scatter()</a>, and <a class="el" href="dist_8cpp_source.html#l00699">send()</a>.</p>
 
 </div>
 </div>

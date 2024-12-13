@@ -213,7 +213,7 @@ class FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;</div><p >(distributed) <a 
 <dl class="section attention"><dt>Attention</dt><dd>Because this class only wraps around the SuperLU_DIST library, it is only available when <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> is configured and linked with MPI support, i.e. there exists no non-MPI version of this <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> class in serial builds. If you need a serial direct solver, look for UMFPACK.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00094">94</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00092">92</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ab52cfa7a8be01f137c4366528ce7cbfa" name="ab52cfa7a8be01f137c4366528ce7cbfa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab52cfa7a8be01f137c4366528ce7cbfa">&#9670;&#160;</a></span>BaseClass</h2>
@@ -231,7 +231,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00099">99</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00097">97</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +251,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00101">101</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00099">99</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
 </div>
 </div>
@@ -294,7 +294,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00111">111</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00109">109</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
 </div>
 </div>
@@ -326,7 +326,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>Downloads a correction vector. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00153">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00151">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
 
 </div>
 </div>
@@ -385,7 +385,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00175">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00122">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -415,7 +415,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The offset of the first global DOF index of this process. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00175">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00122">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -445,7 +445,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The column-index array of the matrix partition. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00175">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00122">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -503,7 +503,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The row-pointer array of the matrix partition. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00175">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00122">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -533,7 +533,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The value array of the matrix partition. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00197">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00151">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00195">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00149">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -563,7 +563,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of DOFs over all processes. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="superlu_8hpp_source.html#l00151">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00122">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="superlu_8hpp_source.html#l00149">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -593,7 +593,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of DOFs owned by this process. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00175">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00122">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -624,7 +624,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The data array of the owned correction vector. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00153">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00151">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
 
 </div>
 </div>
@@ -655,7 +655,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The data array of the owned defect vector. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00126">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00124">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>.</p>
 
 </div>
 </div>
@@ -744,7 +744,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>Uploads a defect vector. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00126">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00124">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>.</p>
 
 </div>
 </div>
@@ -799,7 +799,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p>Implemented in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_schwarz_precond_3_01_global_1_1_vector_3_01_local_vector___00_01_mic9e5dece21cb7735a0bc194fb3569eb4.html#a7abb7fdbfb63af0449380cfe00e64581">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u.html#ab48e96782fca46ce3f5402459dbc3ff7">FEAT::Solver::CuSolverLU</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html#a1e322f37ae5596b78e204839c4ff5e10">FEAT::Solver::CuSolverQR</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_scale_precond.html#a6863ca5947832845346c0055e0d92353">FEAT::Solver::ScalePrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html#aaccc117c2d4b9dc6258c031ae63d6d86">FEAT::Solver::DiagonalPrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_multi_grid.html#aabd170793f680bfac13c4d93a5cf61c2">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ad1cec9e45d8eade586876bba21c749af">FEAT::Solver::NLOptPrecond&lt; VectorType_, FilterType_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a3e590173c8ec33ae1b0c81a7b4bf4962">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond.html#a0206d9b5622a8d64e69fcca25eee6564">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html#acf7af73fe541769c7b1eca01984d3b48">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00349">FEAT::Solver::solve()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00347">FEAT::Solver::solve()</a>.</p>
 
 </div>
 </div>
@@ -839,7 +839,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00172">172</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00170">170</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
 </div>
 </div>
@@ -872,9 +872,9 @@ template&lt;typename Vector_ &gt; </div>
 <p >This function performs both the symbolic and numeric finalization, i.e. it simply performs </p><pre class="fragment">this-&gt;done_numeric();
 this-&gt;done_symbolic();
 </pre> 
-<p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00285">285</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00283">283</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00248">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_numeric()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00257">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_symbolic()</a>.</p>
+<p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_numeric()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00255">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -908,9 +908,9 @@ template&lt;typename Vector_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond.html#aa04fb62591a5379e3ca4088c0775d6a9">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html#aff7a31c149278bafa86ec295ba9f5b62">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html#a17d1c80bcc6ebd779590034eface823d">FEAT::Solver::CUDSS</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#a8388d19e14674e621f288b70bc3325fc">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a07d95da07461208435735ff2f5516316">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_para_sails_precond.html#a5b418f6ed0af7c8092a1e2109f8f99b4">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a0b4002ca7fea449e5e7184111d32fced">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#a8d8f0c00e06fd7b9f1d939209f5ddca0">FEAT::Solver::BoomerAMG&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html#a82061dfdc0313a9da082736c7c48559e">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html#a82061dfdc0313a9da082736c7c48559e">FEAT::Solver::PreconditionedIterativeSolver&lt; Matrix_::VectorTypeR &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html#a82061dfdc0313a9da082736c7c48559e">FEAT::Solver::PreconditionedIterativeSolver&lt; Functional_::VectorTypeR &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html#aefd52f3a0eb0b20c62dc780734722771">FEAT::Solver::MKLDSS</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_multi_grid.html#aaf9dbd1c338f831db8bb8de5369f2cad">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#ab10f76734c1e56b582a8f90b5bf618b6">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_schwarz_precond_3_01_global_1_1_vector_3_01_local_vector___00_01_mic9e5dece21cb7735a0bc194fb3569eb4.html#a8b74c70939b4d83430022c44b45e7ac7">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#acfeec5f3dad1c6ef0558c2a7617f319d">FEAT::Solver::Umfpack</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack_mean.html#a8f0b85739340a515f354b2eb6d25c810">FEAT::Solver::UmfpackMean</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_saddle_umfpack_mean.html#ae0852a882b528b3c014402cb55ece2f5">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a803cd1653739576cfab7090523f66063">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_uzawa_precond.html#ad6d7cb9a0f9b33278889705a66b0c94d">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300.html#abfd9e7706e59baaee13a664b9e0398c5">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00248">248</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">246</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00285">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00086">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00190">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::done_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00306">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01035">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01252">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::done_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00190">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00536">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00201">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, and <a class="el" href="uzawa__precond_8hpp_source.html#l00499">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00283">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00084">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00188">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::done_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00304">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01033">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01250">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::done_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00188">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00534">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00199">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, and <a class="el" href="uzawa__precond_8hpp_source.html#l00497">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>.</p>
 
 </div>
 </div>
@@ -944,9 +944,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a70018a5e4ca2cd3dfc0cac9db3df051e">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00141">141</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00139">139</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00257">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00255">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -979,9 +979,9 @@ template&lt;typename Vector_ &gt; </div>
 <p >This function performs both the symbolic and numeric initialization, i.e. it simply performs </p><pre class="fragment">this-&gt;init_symbolic();
 this-&gt;init_numeric();
 </pre> 
-<p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00270">270</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00268">268</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00239">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00229">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1016,9 +1016,9 @@ Before this function can be called, the symbolic initialization must be performe
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a3d2a6e135e4af6af6be0c0aaf3330b3a">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00151">151</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00149">149</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a1567b0a5c6f11440e58f02a0cd852f96">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_vals()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00239">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>, <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a1567b0a5c6f11440e58f02a0cd852f96">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_vals()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>, <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1052,9 +1052,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a394e71e99c87e99a5eda16c302df725e">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00122">122</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00120">120</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a37367c98f42d457dbfc34fb36bc8da7a">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_col_idx()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8c2248c533b58422b9cb1316f349f9f8">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_row_ptr()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00229">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a37367c98f42d457dbfc34fb36bc8da7a">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_col_idx()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8c2248c533b58422b9cb1316f349f9f8">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_row_ptr()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1088,7 +1088,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00117">117</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00115">115</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
 </div>
 </div>
@@ -1117,7 +1117,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>a pointer to our opaque <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> core object </p>
 
-<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00105">105</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="superlu_8hpp_source.html#l00103">103</a> of file <a class="el" href="superlu_8hpp_source.html">superlu.hpp</a>.</p>
 
 </div>
 </div>

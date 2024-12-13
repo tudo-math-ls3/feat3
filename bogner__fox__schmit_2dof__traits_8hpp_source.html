@@ -105,42 +105,38 @@ $(document).ready(function(){initNavTree('bogner__fox__schmit_2dof__traits_8hpp_
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef KERNEL_SPACE_BOGNER_FOX_SCHMIT_DOF_TRAITS_HPP</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define KERNEL_SPACE_BOGNER_FOX_SCHMIT_DOF_TRAITS_HPP 1</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">// includes, FEAT</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;kernel/shape.hpp&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>{</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  <span class="keyword">namespace </span>Space</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_space_1_1_bogner_fox_schmit.html">   17</a></span>    <span class="keyword">namespace </span>BognerFoxSchmit</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    {</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Shape_, <span class="keywordtype">int</span> dim_&gt;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">   25</a></span>      <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">DofTraits</a></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>      {</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">   28</a></span>        <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">count</a> = 0;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      };</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>      <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> shape_dim_&gt;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_010_01_4.html">   32</a></span>      <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">DofTraits</a>&lt;Shape::Hypercube&lt;shape_dim_&gt;, 0&gt;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      {</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_010_01_4.html#af309ee5d36291d86171a31cda6aad6d3">   35</a></span>        <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">count</a> = (1 &lt;&lt; shape_dim_);</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>      };</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    } <span class="comment">// namespace BognerFoxSchmit</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  } <span class="comment">// namespace Space</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_SPACE_BOGNER_FOX_SCHMIT_DOF_TRAITS_HPP</span></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">FEAT::Space::BognerFoxSchmit::DofTraits</a></div><div class="ttdoc">Bogner-Fox-Schmit Dof-Traits class template.</div><div class="ttdef"><b>Definition:</b> <a href="bogner__fox__schmit_2dof__traits_8hpp_source.html#l00025">dof_traits.hpp:26</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_html_aa04c4a26ecc4d0dfe647d0dc89814618"><div class="ttname"><a href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">FEAT::Space::BognerFoxSchmit::DofTraits::count</a></div><div class="ttdeci">static constexpr int count</div><div class="ttdoc">no dofs for any shape dimension &gt; 0</div><div class="ttdef"><b>Definition:</b> <a href="bogner__fox__schmit_2dof__traits_8hpp_source.html#l00028">dof_traits.hpp:28</a></div></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// includes, FEAT</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;kernel/shape.hpp&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  <span class="keyword">namespace </span>Space</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_space_1_1_bogner_fox_schmit.html">   15</a></span>    <span class="keyword">namespace </span>BognerFoxSchmit</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    {</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Shape_, <span class="keywordtype">int</span> dim_&gt;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">   23</a></span>      <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">DofTraits</a></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>      {</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">   26</a></span>        <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">count</a> = 0;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      };</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> shape_dim_&gt;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_010_01_4.html">   30</a></span>      <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">DofTraits</a>&lt;Shape::Hypercube&lt;shape_dim_&gt;, 0&gt;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>      {</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_3_01_shape_1_1_hypercube_3_01shape__dim___01_4_00_010_01_4.html#af309ee5d36291d86171a31cda6aad6d3">   33</a></span>        <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> <a class="code hl_variable" href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">count</a> = (1 &lt;&lt; shape_dim_);</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      };</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    } <span class="comment">// namespace BognerFoxSchmit</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  } <span class="comment">// namespace Space</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html">FEAT::Space::BognerFoxSchmit::DofTraits</a></div><div class="ttdoc">Bogner-Fox-Schmit Dof-Traits class template.</div><div class="ttdef"><b>Definition:</b> <a href="bogner__fox__schmit_2dof__traits_8hpp_source.html#l00023">dof_traits.hpp:24</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits_html_aa04c4a26ecc4d0dfe647d0dc89814618"><div class="ttname"><a href="struct_f_e_a_t_1_1_space_1_1_bogner_fox_schmit_1_1_dof_traits.html#aa04c4a26ecc4d0dfe647d0dc89814618">FEAT::Space::BognerFoxSchmit::DofTraits::count</a></div><div class="ttdeci">static constexpr int count</div><div class="ttdoc">no dofs for any shape dimension &gt; 0</div><div class="ttdef"><b>Definition:</b> <a href="bogner__fox__schmit_2dof__traits_8hpp_source.html#l00026">dof_traits.hpp:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

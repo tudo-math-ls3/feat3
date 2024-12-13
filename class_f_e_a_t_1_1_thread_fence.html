@@ -163,7 +163,7 @@ Private Attributes</h2></td></tr>
 <p >In addition to the above properties, this class also stores an additional internal boolean state variable, which is specified by the <a class="el" href="class_f_e_a_t_1_1_thread_fence.html#a579768061a4f1ea9199958a781e5f0a2" title="Open the fence and notify all waiting threads.">open()</a> function and is returned by the <a class="el" href="class_f_e_a_t_1_1_thread_fence.html#a745832e65ad92a15ad0642e9877be1a8" title="Wait for the fence to be opened.">wait()</a> function.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00037">37</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00035">35</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a1b1db2ea84da13f6a07350b5566f5606" name="a1b1db2ea84da13f6a07350b5566f5606"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b1db2ea84da13f6a07350b5566f5606">&#9670;&#160;</a></span>ThreadFence()</h2>
@@ -190,7 +190,7 @@ Private Attributes</h2></td></tr>
 
 <p>constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00051">51</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00049">49</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
 </div>
 </div>
@@ -220,9 +220,9 @@ Private Attributes</h2></td></tr>
 
 <p>Close the fence and reset internal state. </p>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00099">99</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00097">97</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="thread_8hpp_source.html#l00041">_mtx</a>, <a class="el" href="thread_8hpp_source.html#l00047">_okay</a>, and <a class="el" href="thread_8hpp_source.html#l00045">_open</a>.</p>
+<p class="reference">References <a class="el" href="thread_8hpp_source.html#l00039">_mtx</a>, <a class="el" href="thread_8hpp_source.html#l00045">_okay</a>, and <a class="el" href="thread_8hpp_source.html#l00043">_open</a>.</p>
 
 </div>
 </div>
@@ -259,9 +259,9 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00088">88</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00086">86</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="thread_8hpp_source.html#l00043">_cvar</a>, <a class="el" href="thread_8hpp_source.html#l00041">_mtx</a>, <a class="el" href="thread_8hpp_source.html#l00047">_okay</a>, and <a class="el" href="thread_8hpp_source.html#l00045">_open</a>.</p>
+<p class="reference">References <a class="el" href="thread_8hpp_source.html#l00041">_cvar</a>, <a class="el" href="thread_8hpp_source.html#l00039">_mtx</a>, <a class="el" href="thread_8hpp_source.html#l00045">_okay</a>, and <a class="el" href="thread_8hpp_source.html#l00043">_open</a>.</p>
 
 </div>
 </div>
@@ -292,9 +292,9 @@ Private Attributes</h2></td></tr>
 <p >This function causes the calling thread to wait for the fence to be opened by another thread. If the fence is already open at the time when this function is called, then this function returns immediately without blocking the calling thread.</p>
 <dl class="section return"><dt>Returns</dt><dd>The internal state as set by the <code><a class="el" href="class_f_e_a_t_1_1_thread_fence.html#a579768061a4f1ea9199958a781e5f0a2" title="Open the fence and notify all waiting threads.">open()</a></code> function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00070">70</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00068">68</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="thread_8hpp_source.html#l00043">_cvar</a>, <a class="el" href="thread_8hpp_source.html#l00041">_mtx</a>, <a class="el" href="thread_8hpp_source.html#l00047">_okay</a>, and <a class="el" href="thread_8hpp_source.html#l00045">_open</a>.</p>
+<p class="reference">References <a class="el" href="thread_8hpp_source.html#l00041">_cvar</a>, <a class="el" href="thread_8hpp_source.html#l00039">_mtx</a>, <a class="el" href="thread_8hpp_source.html#l00045">_okay</a>, and <a class="el" href="thread_8hpp_source.html#l00043">_open</a>.</p>
 
 </div>
 </div>
@@ -321,9 +321,9 @@ Private Attributes</h2></td></tr>
 
 <p>the internal condition variable </p>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00043">43</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00041">41</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00088">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00070">wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00086">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00068">wait()</a>.</p>
 
 </div>
 </div>
@@ -349,9 +349,9 @@ Private Attributes</h2></td></tr>
 
 <p>the internal mutex </p>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00041">41</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00039">39</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00099">close()</a>, <a class="el" href="thread_8hpp_source.html#l00088">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00070">wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00097">close()</a>, <a class="el" href="thread_8hpp_source.html#l00086">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00068">wait()</a>.</p>
 
 </div>
 </div>
@@ -377,9 +377,9 @@ Private Attributes</h2></td></tr>
 
 <p>additional state variable </p>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00047">47</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00045">45</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00099">close()</a>, <a class="el" href="thread_8hpp_source.html#l00088">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00070">wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00097">close()</a>, <a class="el" href="thread_8hpp_source.html#l00086">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00068">wait()</a>.</p>
 
 </div>
 </div>
@@ -405,9 +405,9 @@ Private Attributes</h2></td></tr>
 
 <p>current state of the fence: open or closed </p>
 
-<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00045">45</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="thread_8hpp_source.html#l00043">43</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00099">close()</a>, <a class="el" href="thread_8hpp_source.html#l00088">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00070">wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="thread_8hpp_source.html#l00097">close()</a>, <a class="el" href="thread_8hpp_source.html#l00086">open()</a>, and <a class="el" href="thread_8hpp_source.html#l00068">wait()</a>.</p>
 
 </div>
 </div>

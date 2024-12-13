@@ -105,147 +105,143 @@ $(document).ready(function(){initNavTree('pointstar__structure_8hpp_source.html'
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP 1</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;kernel/util/math.hpp&gt;</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;kernel/lafem/dense_vector.hpp&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;kernel/lafem/sparse_matrix_banded.hpp&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;kernel/util/math.hpp&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;kernel/lafem/dense_vector.hpp&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;kernel/lafem/sparse_matrix_banded.hpp&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;stack&gt;</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;stack&gt;</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>{</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  <span class="keyword">namespace </span>LAFEM</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  {</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html">   27</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html">PointstarStructureFE</a></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    {</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DataType_, <span class="keyword">typename</span> IndexType_&gt;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html#a24813a1c386e628cc5e7b6e44804734b">   43</a></span>      <span class="keyword">static</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a> <a class="code hl_function" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html#a24813a1c386e628cc5e7b6e44804734b">value</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> fe_degree,</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                                                                        <span class="keyword">const</span> std::vector&lt;IndexType_&gt; &amp; num_of_subintervalls)</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>      {</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keyword">const</span> IndexType_ * <span class="keyword">const</span> pnos(num_of_subintervalls.data());</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="comment">// get number of dimensions</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> d(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(num_of_subintervalls.size()));</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="comment">// output of errors if wrong input</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(d &gt;= IndexType_(1), <span class="stringliteral">&quot;You need at least 1 dimension&quot;</span>);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keywordflow">for</span> (IndexType_ i(0); i &lt; d; ++i)</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        {</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>          <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(pnos[i] &gt;= IndexType_(3), <span class="stringliteral">&quot;You need at least 3 subintervalls per dimension&quot;</span>);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        }</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="comment">// calculate size of matrix and number of offsets</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        IndexType_ size(1);</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> noo(1);</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="keywordflow">if</span> (fe_degree &gt; <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        {</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); i &lt; d; ++i)</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>          {</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>            size *= pnos[i] * IndexType_(fe_degree) + 1;</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            noo *=  2 * fe_degree + 1;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>          }</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        }</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        {</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); i &lt; d; ++i)</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          {</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            size *= pnos[i];</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>          }</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        }</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="comment">// allocate memory for vectors of matrix</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;IndexType_, IndexType_&gt;</a> vec_offsets(noo);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType_, IndexType_&gt;</a> vec_val(noo * <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size));</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="comment">// fill offsets-vector</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        IndexType_ * <span class="keyword">const</span> poffsets(vec_offsets.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a66872bcba3480ac2bbe7842332e2b5e1">elements</a>());</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> h_off((noo - 1) / 2);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="comment">// save position of main-diagonal</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        poffsets[h_off] = size - IndexType_(1);</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0), k(1), m(1); i &lt; d; ++i, k *= 2 * fe_degree + 1, m *= pnos[i - 1] * fe_degree + 1)</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        {</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> k1((k - 1) / 2);</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>          <span class="keywordflow">for</span> (IndexType_ j(1); j &lt;= fe_degree; ++j)</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>          {</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            <span class="keywordflow">for</span> (IndexType_ l(0); l &lt; k; ++l)</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            {</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + IndexType_(j * m);</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - IndexType_(j * m);</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>            }</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>          }</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        }</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="comment">// return the matrix</span></div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), vec_val, vec_offsets);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>      }</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    }; <span class="comment">// struct PointstarStructureFE</span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html">  115</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html">PointstarStructureFD</a></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    {</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DataType_, <span class="keyword">typename</span> IndexType_&gt;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html#ad19d04ade3768e7f2e0584d3fc5425e1">  127</a></span>      <span class="keyword">static</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a> <a class="code hl_function" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html#ad19d04ade3768e7f2e0584d3fc5425e1">value</a>(<span class="keyword">const</span> std::vector&lt;IndexType_&gt; &amp; num_of_subintervalls)</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>      {</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <span class="keyword">const</span> IndexType_ * <span class="keyword">const</span> pnos(num_of_subintervalls.data());</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>{</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <span class="keyword">namespace </span>LAFEM</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html">   25</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html">PointstarStructureFE</a></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DataType_, <span class="keyword">typename</span> IndexType_&gt;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html#a24813a1c386e628cc5e7b6e44804734b">   41</a></span>      <span class="keyword">static</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a> <a class="code hl_function" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html#a24813a1c386e628cc5e7b6e44804734b">value</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> fe_degree,</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>                                                                        <span class="keyword">const</span> std::vector&lt;IndexType_&gt; &amp; num_of_subintervalls)</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>      {</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keyword">const</span> IndexType_ * <span class="keyword">const</span> pnos(num_of_subintervalls.data());</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="comment">// get number of dimensions</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> d(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(num_of_subintervalls.size()));</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="comment">// output of errors if wrong input</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(d &gt;= IndexType_(1), <span class="stringliteral">&quot;You need at least 1 dimension&quot;</span>);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="keywordflow">for</span> (IndexType_ i(0); i &lt; d; ++i)</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        {</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>          <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(pnos[i] &gt;= IndexType_(3), <span class="stringliteral">&quot;You need at least 3 subintervalls per dimension&quot;</span>);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        }</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="comment">// calculate size of matrix and number of offsets</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        IndexType_ size(1);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> noo(1);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="keywordflow">if</span> (fe_degree &gt; <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); i &lt; d; ++i)</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>          {</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>            size *= pnos[i] * IndexType_(fe_degree) + 1;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>            noo *=  2 * fe_degree + 1;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>          }</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        }</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); i &lt; d; ++i)</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>          {</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>            size *= pnos[i];</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          }</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        }</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="comment">// allocate memory for vectors of matrix</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;IndexType_, IndexType_&gt;</a> vec_offsets(noo);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType_, IndexType_&gt;</a> vec_val(noo * <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size));</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        <span class="comment">// fill offsets-vector</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        IndexType_ * <span class="keyword">const</span> poffsets(vec_offsets.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a66872bcba3480ac2bbe7842332e2b5e1">elements</a>());</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> h_off((noo - 1) / 2);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="comment">// save position of main-diagonal</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        poffsets[h_off] = size - IndexType_(1);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0), k(1), m(1); i &lt; d; ++i, k *= 2 * fe_degree + 1, m *= pnos[i - 1] * fe_degree + 1)</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> k1((k - 1) / 2);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>          <span class="keywordflow">for</span> (IndexType_ j(1); j &lt;= fe_degree; ++j)</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>          {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>            <span class="keywordflow">for</span> (IndexType_ l(0); l &lt; k; ++l)</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>            {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + IndexType_(j * m);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - IndexType_(j * m);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>            }</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>          }</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        }</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="comment">// return the matrix</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), vec_val, vec_offsets);</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>      }</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    }; <span class="comment">// struct PointstarStructureFE</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html">  113</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html">PointstarStructureFD</a></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    {</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DataType_, <span class="keyword">typename</span> IndexType_&gt;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html#ad19d04ade3768e7f2e0584d3fc5425e1">  125</a></span>      <span class="keyword">static</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a> <a class="code hl_function" href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html#ad19d04ade3768e7f2e0584d3fc5425e1">value</a>(<span class="keyword">const</span> std::vector&lt;IndexType_&gt; &amp; num_of_subintervalls)</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      {</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <span class="keyword">const</span> IndexType_ * <span class="keyword">const</span> pnos(num_of_subintervalls.data());</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> d(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(num_of_subintervalls.size()) - 1);</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> d(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(num_of_subintervalls.size()) - 1);</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        <span class="comment">// calculate dimension of the matrix</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        IndexType_ size(1);</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1); i &lt;= d; ++i)</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        {</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>          size *= pnos[i] - 1;</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        }</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        <span class="comment">// calculate number of offsets</span></div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_of_offsets(2 * d + 1);</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        <span class="comment">// allocate memory for vectors of matrix</span></div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType_, IndexType_&gt;</a> vec_val(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size) * num_of_offsets);</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;IndexType_, IndexType_&gt;</a> vec_offsets(num_of_offsets);</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        <span class="comment">// fill vec_offsets</span></div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        IndexType_ * <span class="keyword">const</span> poffsets(vec_offsets.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a66872bcba3480ac2bbe7842332e2b5e1">elements</a>());</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <span class="comment">// calculate dimension of the matrix</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        IndexType_ size(1);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(1); i &lt;= d; ++i)</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        {</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>          size *= pnos[i] - 1;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        }</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        <span class="comment">// calculate number of offsets</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_of_offsets(2 * d + 1);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        <span class="comment">// allocate memory for vectors of matrix</span></div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType_, IndexType_&gt;</a> vec_val(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size) * num_of_offsets);</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;IndexType_, IndexType_&gt;</a> vec_offsets(num_of_offsets);</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <span class="comment">// fill vec_offsets</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        IndexType_ * <span class="keyword">const</span> poffsets(vec_offsets.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a66872bcba3480ac2bbe7842332e2b5e1">elements</a>());</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        poffsets[d] = IndexType_(size - 1);</div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span> </div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        poffsets[d] = IndexType_(size - 1);</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> tmp(1);</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); i &lt; d; ++i)</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        {</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>          tmp *= pnos[i] - 1;</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>          poffsets[d - 1 - i] = size - IndexType_(1 + tmp);</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>          poffsets[d + 1 + i] = size + IndexType_(tmp - 1);</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        }</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <span class="comment">// return the matrix</span></div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), vec_val, vec_offsets);</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>      }</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    }; <span class="comment">// struct PointstarStructureFD</span></div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>  } <span class="comment">// namespace LAFEM</span></div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_LAFEM_POINTSTAR_STRUCTURE_HPP</span></div>
-<div class="ttc" id="aassertion_8hpp_html_afa48e2beb6db8fae75edc24466481965"><div class="ttname"><a href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a></div><div class="ttdeci">#define XASSERTM(expr, msg)</div><div class="ttdoc">Assertion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00265">assertion.hpp:265</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">FEAT::LAFEM::DenseVector</a></div><div class="ttdoc">Dense data vector class template.</div><div class="ttdef"><b>Definition:</b> <a href="dense__vector_8hpp_source.html#l00058">dense_vector.hpp:59</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_html_a66872bcba3480ac2bbe7842332e2b5e1"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a66872bcba3480ac2bbe7842332e2b5e1">FEAT::LAFEM::DenseVector::elements</a></div><div class="ttdeci">DT_ * elements()</div><div class="ttdoc">Get a pointer to the data array.</div><div class="ttdef"><b>Definition:</b> <a href="dense__vector_8hpp_source.html#l00738">dense_vector.hpp:738</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">FEAT::LAFEM::SparseMatrixBanded</a></div><div class="ttdoc">sparse banded matrix</div><div class="ttdef"><b>Definition:</b> <a href="sparse__matrix__banded_8hpp_source.html#l00078">sparse_matrix_banded.hpp:79</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00118">base_header.hpp:118</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html">FEAT::LAFEM::PointstarStructureFD</a></div><div class="ttdoc">empty Finite-Differences pointstar matrix creator.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00115">pointstar_structure.hpp:116</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d_html_ad19d04ade3768e7f2e0584d3fc5425e1"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html#ad19d04ade3768e7f2e0584d3fc5425e1">FEAT::LAFEM::PointstarStructureFD::value</a></div><div class="ttdeci">static SparseMatrixBanded&lt; DataType_, IndexType_ &gt; value(const std::vector&lt; IndexType_ &gt; &amp;num_of_subintervalls)</div><div class="ttdoc">Generates an empty FD-style pointstar banded matrix.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00127">pointstar_structure.hpp:127</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html">FEAT::LAFEM::PointstarStructureFE</a></div><div class="ttdoc">empty Finite-Elements pointstar matrix creator.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00027">pointstar_structure.hpp:28</a></div></div>
-<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e_html_a24813a1c386e628cc5e7b6e44804734b"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html#a24813a1c386e628cc5e7b6e44804734b">FEAT::LAFEM::PointstarStructureFE::value</a></div><div class="ttdeci">static SparseMatrixBanded&lt; DataType_, IndexType_ &gt; value(const Index fe_degree, const std::vector&lt; IndexType_ &gt; &amp;num_of_subintervalls)</div><div class="ttdoc">Generates an empty FE-style pointstar banded matrix.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00043">pointstar_structure.hpp:43</a></div></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> tmp(1);</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); i &lt; d; ++i)</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        {</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>          tmp *= pnos[i] - 1;</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>          poffsets[d - 1 - i] = size - IndexType_(1 + tmp);</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>          poffsets[d + 1 + i] = size + IndexType_(tmp - 1);</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        }</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span> </div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        <span class="comment">// return the matrix</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">SparseMatrixBanded&lt;DataType_, IndexType_&gt;</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(size), vec_val, vec_offsets);</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>      }</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    }; <span class="comment">// struct PointstarStructureFD</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>  } <span class="comment">// namespace LAFEM</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="ttc" id="aassertion_8hpp_html_afa48e2beb6db8fae75edc24466481965"><div class="ttname"><a href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a></div><div class="ttdeci">#define XASSERTM(expr, msg)</div><div class="ttdoc">Assertion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00263">assertion.hpp:263</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">FEAT::LAFEM::DenseVector</a></div><div class="ttdoc">Dense data vector class template.</div><div class="ttdef"><b>Definition:</b> <a href="dense__vector_8hpp_source.html#l00056">dense_vector.hpp:57</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_html_a66872bcba3480ac2bbe7842332e2b5e1"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html#a66872bcba3480ac2bbe7842332e2b5e1">FEAT::LAFEM::DenseVector::elements</a></div><div class="ttdeci">DT_ * elements()</div><div class="ttdoc">Get a pointer to the data array.</div><div class="ttdef"><b>Definition:</b> <a href="dense__vector_8hpp_source.html#l00736">dense_vector.hpp:736</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_banded.html">FEAT::LAFEM::SparseMatrixBanded</a></div><div class="ttdoc">sparse banded matrix</div><div class="ttdef"><b>Definition:</b> <a href="sparse__matrix__banded_8hpp_source.html#l00076">sparse_matrix_banded.hpp:77</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html">FEAT::LAFEM::PointstarStructureFD</a></div><div class="ttdoc">empty Finite-Differences pointstar matrix creator.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00113">pointstar_structure.hpp:114</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d_html_ad19d04ade3768e7f2e0584d3fc5425e1"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_d.html#ad19d04ade3768e7f2e0584d3fc5425e1">FEAT::LAFEM::PointstarStructureFD::value</a></div><div class="ttdeci">static SparseMatrixBanded&lt; DataType_, IndexType_ &gt; value(const std::vector&lt; IndexType_ &gt; &amp;num_of_subintervalls)</div><div class="ttdoc">Generates an empty FD-style pointstar banded matrix.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00125">pointstar_structure.hpp:125</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html">FEAT::LAFEM::PointstarStructureFE</a></div><div class="ttdoc">empty Finite-Elements pointstar matrix creator.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00025">pointstar_structure.hpp:26</a></div></div>
+<div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e_html_a24813a1c386e628cc5e7b6e44804734b"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_pointstar_structure_f_e.html#a24813a1c386e628cc5e7b6e44804734b">FEAT::LAFEM::PointstarStructureFE::value</a></div><div class="ttdeci">static SparseMatrixBanded&lt; DataType_, IndexType_ &gt; value(const Index fe_degree, const std::vector&lt; IndexType_ &gt; &amp;num_of_subintervalls)</div><div class="ttdoc">Generates an empty FE-style pointstar banded matrix.</div><div class="ttdef"><b>Definition:</b> <a href="pointstar__structure_8hpp_source.html#l00041">pointstar_structure.hpp:41</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

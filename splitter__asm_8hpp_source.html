@@ -105,123 +105,119 @@ $(document).ready(function(){initNavTree('splitter__asm_8hpp_source.html',''); i
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2024 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef CONTROL_ASSEMBLY_SPLITTER_ASM_HPP</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define CONTROL_ASSEMBLY_SPLITTER_ASM_HPP 1</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;kernel/lafem/dense_vector.hpp&gt;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;kernel/lafem/dense_vector_blocked.hpp&gt;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;kernel/lafem/vector_mirror.hpp&gt;</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;kernel/global/splitter.hpp&gt;</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;kernel/assembly/mirror_assembler.hpp&gt;</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;control/domain/domain_control.hpp&gt;</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;control/asm/muxer_asm.hpp&gt;</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>{</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  <span class="keyword">namespace </span>Control</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  {</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keyword">namespace </span>Asm</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    {</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DomainLevel_, <span class="keyword">typename</span> SpaceLambda_, <span class="keyword">typename</span> BaseSplitter_&gt;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>      <span class="keywordtype">void</span> asm_splitter(<span class="keyword">const</span> Domain::VirtualLevel&lt;DomainLevel_&gt;&amp; virt_lvl,</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        SpaceLambda_&amp;&amp; space_lambda, BaseSplitter_&amp; base_splitter)</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>      {</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keyword">typedef</span> <span class="keyword">typename</span> BaseSplitter_::LocalVectorType VectorType;</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="keyword">typedef</span> <span class="keyword">typename</span> BaseSplitter_::MirrorType MirrorType;</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="comment">// get the layer</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; layer = virt_lvl.layer();</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="comment">// nothing to assemble?</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="keywordflow">if</span>(layer.comm().size() &lt;= 1)</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>          <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="comment">// ensure that this virtual level has a base-mesh</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(virt_lvl.has_base(), <span class="stringliteral">&quot;cannot assemble base splitter because level has no base&quot;</span>);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <span class="comment">// is this the root process?</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keywordflow">if</span>(layer.comm().rank() == 0)</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        {</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>          <span class="keyword">const</span> DomainLevel_&amp; level_b = virt_lvl.level_b();</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>          <span class="comment">// set parent vector template</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          base_splitter.set_base_vector_template(VectorType(space_lambda(level_b)-&gt;get_num_dofs()));</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          <span class="comment">// assemble patch mirrors on root process</span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; layer.comm().size(); ++i)</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>          {</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>            <span class="keyword">const</span> <span class="keyword">auto</span>* patch = level_b.find_patch_part(i);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            <a class="code hl_define" href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a>(patch != <span class="keyword">nullptr</span>);</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>            MirrorType patch_mirror;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>            <a class="code hl_function" href="class_f_e_a_t_1_1_assembly_1_1_mirror_assembler.html#ac2756197c9844243a1db308c9565f2f7">Assembly::MirrorAssembler::assemble_mirror</a>(patch_mirror, *space_lambda(level_b), *patch);</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>            base_splitter.push_patch(std::move(patch_mirror));</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>          }</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        }</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        <span class="comment">// assemble base splitter child</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keyword">const</span> DomainLevel_&amp; level = virt_lvl.level();</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;<a class="code" href="base__header_8hpp.html">kernel/base_header.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;kernel/lafem/dense_vector.hpp&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;kernel/lafem/dense_vector_blocked.hpp&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;kernel/lafem/vector_mirror.hpp&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;kernel/global/splitter.hpp&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;kernel/assembly/mirror_assembler.hpp&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;control/domain/domain_control.hpp&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;control/asm/muxer_asm.hpp&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespace_f_e_a_t.html">FEAT</a></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>{</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keyword">namespace </span>Control</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  {</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keyword">namespace </span>Asm</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    {</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DomainLevel_, <span class="keyword">typename</span> SpaceLambda_, <span class="keyword">typename</span> BaseSplitter_&gt;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>      <span class="keywordtype">void</span> asm_splitter(<span class="keyword">const</span> Domain::VirtualLevel&lt;DomainLevel_&gt;&amp; virt_lvl,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        SpaceLambda_&amp;&amp; space_lambda, BaseSplitter_&amp; base_splitter)</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>      {</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="keyword">typedef</span> <span class="keyword">typename</span> BaseSplitter_::LocalVectorType VectorType;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="keyword">typedef</span> <span class="keyword">typename</span> BaseSplitter_::MirrorType MirrorType;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <span class="comment">// get the layer</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; layer = virt_lvl.layer();</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <span class="comment">// nothing to assemble?</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordflow">if</span>(layer.comm().size() &lt;= 1)</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>          <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="comment">// ensure that this virtual level has a base-mesh</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(virt_lvl.has_base(), <span class="stringliteral">&quot;cannot assemble base splitter because level has no base&quot;</span>);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="comment">// is this the root process?</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="keywordflow">if</span>(layer.comm().rank() == 0)</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        {</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>          <span class="keyword">const</span> DomainLevel_&amp; level_b = virt_lvl.level_b();</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>          <span class="comment">// set parent vector template</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>          base_splitter.set_base_vector_template(VectorType(space_lambda(level_b)-&gt;get_num_dofs()));</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          <span class="comment">// assemble patch mirrors on root process</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>          <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i(0); i &lt; layer.comm().size(); ++i)</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>            <span class="keyword">const</span> <span class="keyword">auto</span>* patch = level_b.find_patch_part(i);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            <a class="code hl_define" href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a>(patch != <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>            MirrorType patch_mirror;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            <a class="code hl_function" href="class_f_e_a_t_1_1_assembly_1_1_mirror_assembler.html#ac2756197c9844243a1db308c9565f2f7">Assembly::MirrorAssembler::assemble_mirror</a>(patch_mirror, *space_lambda(level_b), *patch);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>            base_splitter.push_patch(std::move(patch_mirror));</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>          }</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        }</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="comment">// assemble base splitter child</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="keyword">const</span> DomainLevel_&amp; level = virt_lvl.level();</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_dofs = space_lambda(level)-&gt;get_num_dofs();</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_dofs = space_lambda(level)-&gt;get_num_dofs();</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="comment">// set parent and sibling comms</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        base_splitter.set_root(layer.comm_ptr(), 0, MirrorType::make_identity(num_dofs));</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        <span class="comment">// compile base splitter</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        base_splitter.compile(VectorType(num_dofs));</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      }</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SysSplitter_, <span class="keyword">typename</span> Splitter0_, <span class="keyword">typename</span> Splitter1_&gt;</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      <span class="keywordtype">void</span> build_splitter_tuple(SysSplitter_&amp; splitter_sys, <span class="keyword">const</span> <span class="keyword">typename</span> SysSplitter_::LocalVectorType&amp; tmpl_vec, <span class="keyword">const</span> Splitter0_&amp; splitter_0, <span class="keyword">const</span> Splitter1_&amp; splitter_1)</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      {</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="comment">// build the internal tuple muxer</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keyword">typename</span> SysSplitter_::MuxerType sys_muxer;</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        build_muxer_tuple(sys_muxer, tmpl_vec, splitter_0.get_muxer(), splitter_1.get_muxer());</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <span class="comment">// build the internal base vector template</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        <span class="keyword">typename</span> SysSplitter_::LocalVectorType base_vector_tmpl;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        base_vector_tmpl.template at&lt;0&gt;().clone(splitter_0.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        base_vector_tmpl.template at&lt;1&gt;().clone(splitter_1.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="comment">// create the splitter</span></div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        splitter_sys = SysSplitter_(std::move(sys_muxer), std::move(base_vector_tmpl));</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>      }</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SysSplitter_, <span class="keyword">typename</span> Splitter0_, <span class="keyword">typename</span> Splitter1_, <span class="keyword">typename</span> Splitter2_&gt;</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>      <span class="keywordtype">void</span> build_splitter_tuple(SysSplitter_&amp; splitter_sys, <span class="keyword">const</span> <span class="keyword">typename</span> SysSplitter_::LocalVectorType&amp; tmpl_vec,</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="keyword">const</span> Splitter0_&amp; splitter_0, <span class="keyword">const</span> Splitter1_&amp; splitter_1, <span class="keyword">const</span> Splitter2_&amp; splitter_2)</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>      {</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        <span class="comment">// build the internal tuple muxer</span></div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>        <span class="keyword">typename</span> SysSplitter_::MuxerType sys_muxer;</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>        build_muxer_tuple(sys_muxer, tmpl_vec, splitter_0.get_muxer(), splitter_1.get_muxer());</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        <span class="comment">// build the internal base vector template</span></div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>        <span class="keyword">typename</span> SysSplitter_::LocalVectorType base_vector_tmpl;</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        base_vector_tmpl.template at&lt;0&gt;().clone(splitter_0.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        base_vector_tmpl.template at&lt;1&gt;().clone(splitter_1.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        base_vector_tmpl.template at&lt;2&gt;().clone(splitter_2.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>        <span class="comment">// create the splitter</span></div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        splitter_sys = SysSplitter_(std::move(sys_muxer), std::move(base_vector_tmpl));</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>      }</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    } <span class="comment">// namespace Asm</span></div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>  } <span class="comment">// namespace Control</span></div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span> </div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="preprocessor">#endif </span><span class="comment">// CONTROL_ASSEMBLY_SPLITTER_ASM_HPP</span></div>
-<div class="ttc" id="aassertion_8hpp_html_af5c647b0786db55f57452bfc26726bde"><div class="ttname"><a href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a></div><div class="ttdeci">#define XASSERT(expr)</div><div class="ttdoc">Assertion macro definition.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00264">assertion.hpp:264</a></div></div>
-<div class="ttc" id="aassertion_8hpp_html_afa48e2beb6db8fae75edc24466481965"><div class="ttname"><a href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a></div><div class="ttdeci">#define XASSERTM(expr, msg)</div><div class="ttdoc">Assertion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00265">assertion.hpp:265</a></div></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="comment">// set parent and sibling comms</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        base_splitter.set_root(layer.comm_ptr(), 0, MirrorType::make_identity(num_dofs));</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="comment">// compile base splitter</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        base_splitter.compile(VectorType(num_dofs));</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      }</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SysSplitter_, <span class="keyword">typename</span> Splitter0_, <span class="keyword">typename</span> Splitter1_&gt;</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordtype">void</span> build_splitter_tuple(SysSplitter_&amp; splitter_sys, <span class="keyword">const</span> <span class="keyword">typename</span> SysSplitter_::LocalVectorType&amp; tmpl_vec, <span class="keyword">const</span> Splitter0_&amp; splitter_0, <span class="keyword">const</span> Splitter1_&amp; splitter_1)</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      {</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        <span class="comment">// build the internal tuple muxer</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keyword">typename</span> SysSplitter_::MuxerType sys_muxer;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        build_muxer_tuple(sys_muxer, tmpl_vec, splitter_0.get_muxer(), splitter_1.get_muxer());</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="comment">// build the internal base vector template</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="keyword">typename</span> SysSplitter_::LocalVectorType base_vector_tmpl;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        base_vector_tmpl.template at&lt;0&gt;().clone(splitter_0.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        base_vector_tmpl.template at&lt;1&gt;().clone(splitter_1.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <span class="comment">// create the splitter</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        splitter_sys = SysSplitter_(std::move(sys_muxer), std::move(base_vector_tmpl));</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>      }</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SysSplitter_, <span class="keyword">typename</span> Splitter0_, <span class="keyword">typename</span> Splitter1_, <span class="keyword">typename</span> Splitter2_&gt;</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>      <span class="keywordtype">void</span> build_splitter_tuple(SysSplitter_&amp; splitter_sys, <span class="keyword">const</span> <span class="keyword">typename</span> SysSplitter_::LocalVectorType&amp; tmpl_vec,</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <span class="keyword">const</span> Splitter0_&amp; splitter_0, <span class="keyword">const</span> Splitter1_&amp; splitter_1, <span class="keyword">const</span> Splitter2_&amp; splitter_2)</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>      {</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="comment">// build the internal tuple muxer</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        <span class="keyword">typename</span> SysSplitter_::MuxerType sys_muxer;</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        build_muxer_tuple(sys_muxer, tmpl_vec, splitter_0.get_muxer(), splitter_1.get_muxer());</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>        <span class="comment">// build the internal base vector template</span></div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        <span class="keyword">typename</span> SysSplitter_::LocalVectorType base_vector_tmpl;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        base_vector_tmpl.template at&lt;0&gt;().clone(splitter_0.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>        base_vector_tmpl.template at&lt;1&gt;().clone(splitter_1.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        base_vector_tmpl.template at&lt;2&gt;().clone(splitter_2.get_base_vector_template(), <a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">LAFEM::CloneMode::Shallow</a>);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        <span class="comment">// create the splitter</span></div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>        splitter_sys = SysSplitter_(std::move(sys_muxer), std::move(base_vector_tmpl));</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>      }</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    } <span class="comment">// namespace Asm</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>  } <span class="comment">// namespace Control</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="ttc" id="aassertion_8hpp_html_af5c647b0786db55f57452bfc26726bde"><div class="ttname"><a href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a></div><div class="ttdeci">#define XASSERT(expr)</div><div class="ttdoc">Assertion macro definition.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00262">assertion.hpp:262</a></div></div>
+<div class="ttc" id="aassertion_8hpp_html_afa48e2beb6db8fae75edc24466481965"><div class="ttname"><a href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a></div><div class="ttdeci">#define XASSERTM(expr, msg)</div><div class="ttdoc">Assertion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00263">assertion.hpp:263</a></div></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_assembly_1_1_mirror_assembler_html_ac2756197c9844243a1db308c9565f2f7"><div class="ttname"><a href="class_f_e_a_t_1_1_assembly_1_1_mirror_assembler.html#ac2756197c9844243a1db308c9565f2f7">FEAT::Assembly::MirrorAssembler::assemble_mirror</a></div><div class="ttdeci">static void assemble_mirror(LAFEM::VectorMirror&lt; DataType_, IndexType_ &gt; &amp;vec_mirror, const Space_ &amp;space, const MeshPart_ &amp;mesh_part)</div><div class="ttdoc">Assembles a VectorMirror from a space and a mesh-part.</div><div class="ttdef"><b>Definition:</b> <a href="mirror__assembler_8hpp_source.html#l00156">mirror_assembler.hpp:156</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_assembly_1_1_mirror_assembler_html_ac2756197c9844243a1db308c9565f2f7"><div class="ttname"><a href="class_f_e_a_t_1_1_assembly_1_1_mirror_assembler.html#ac2756197c9844243a1db308c9565f2f7">FEAT::Assembly::MirrorAssembler::assemble_mirror</a></div><div class="ttdeci">static void assemble_mirror(LAFEM::VectorMirror&lt; DataType_, IndexType_ &gt; &amp;vec_mirror, const Space_ &amp;space, const MeshPart_ &amp;mesh_part)</div><div class="ttdoc">Assembles a VectorMirror from a space and a mesh-part.</div><div class="ttdef"><b>Definition:</b> <a href="mirror__assembler_8hpp_source.html#l00154">mirror_assembler.hpp:154</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">FEAT::LAFEM::CloneMode::Shallow</a></div><div class="ttdeci">@ Shallow</div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00118">base_header.hpp:118</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

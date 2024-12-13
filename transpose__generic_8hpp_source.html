@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('transpose__generic_8hpp_source.html','
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// FEAT3: Finite Element Analysis Toolbox, Version 3</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 - 2023 by Stefan Turek &amp; the FEAT group</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// Copyright (C) 2010 by Stefan Turek &amp; the FEAT group</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">// FEAT3 is released under the GNU General Public License version 3,</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// see the file &#39;copyright.txt&#39; in the top level directory for details.</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
@@ -132,34 +132,36 @@ $(document).ready(function(){initNavTree('transpose__generic_8hpp_source.html','
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        {</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>          DT_* t= <span class="keyword">new</span> DT_[rows_x * columns_x];</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>          std::memcpy(t, x, rows_x * columns_x * <span class="keyword">sizeof</span>(DT_));</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0) ; i &lt; rows_x ; ++i)</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>          {</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>            <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j(0) ; j &lt; columns_x ; ++j)</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            {</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>              r[j * rows_x + i] = t[i * columns_x + j];</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>            }</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>          }</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>          <span class="keyword">delete</span>[] t;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        }</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        {</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0) ; i &lt; rows_x ; ++i)</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>          {</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>            <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j(0) ; j &lt; columns_x ; ++j)</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>            {</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>              r[j * rows_x + i] = x[i * columns_x + j];</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            }</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>          }</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        }</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>      }</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    } <span class="comment">// namespace Arch</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  } <span class="comment">// namespace LAFEM</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_LAFEM_ARCH_TRANSPOSE_GENERIC_HPP</span></div>
-<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00013">adjactor.hpp:14</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00118">base_header.hpp:118</a></div></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>          FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i = 0 ; i &lt; rows_x ; ++i)</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>          {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j = 0 ; j &lt; columns_x ; ++j)</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>            {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>              r[j * rows_x + i] = t[i * columns_x + j];</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>            }</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>          }</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>          <span class="keyword">delete</span>[] t;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        }</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>          FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>          <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i = 0 ; i &lt; rows_x ; ++i)</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>          {</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>            <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j = 0 ; j &lt; columns_x ; ++j)</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            {</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>              r[j * rows_x + i] = x[i * columns_x + j];</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>            }</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>          }</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        }</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>      }</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    } <span class="comment">// namespace Arch</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  } <span class="comment">// namespace LAFEM</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#endif </span><span class="comment">// KERNEL_LAFEM_ARCH_TRANSPOSE_GENERIC_HPP</span></div>
+<div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>
 <div class="ttc" id="astruct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_transpose_html_af2348d367cec5deef8e99f77ed9c76c1"><div class="ttname"><a href="struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_transpose.html#af2348d367cec5deef8e99f77ed9c76c1">FEAT::LAFEM::Arch::Transpose::value_generic</a></div><div class="ttdeci">static void value_generic(DT_ *r, const DT_ *const x, const Index rows_x, const Index columns_x)</div><div class="ttdef"><b>Definition:</b> <a href="transpose__generic_8hpp_source.html#l00024">transpose_generic.hpp:24</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

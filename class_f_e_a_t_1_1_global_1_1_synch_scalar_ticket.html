@@ -173,7 +173,7 @@ class FEAT::Global::SynchScalarTicket&lt; DT_ &gt;</div><p >Ticket class for asy
 <p >Internally a cpp thread is used to process the mpi call and ensure proper processing by calling MPI_Wait ahead of the actual tickets wait call.</p>
 <dl class="section author"><dt>Author</dt><dd>Dirk Ribbrock, Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00032">32</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00030">30</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a06508761a131cb98f197fcdcd714b416" name="a06508761a131cb98f197fcdcd714b416"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a06508761a131cb98f197fcdcd714b416">&#9670;&#160;</a></span>SynchScalarTicket() <span class="overload">[1/3]</span></h2>
@@ -202,7 +202,7 @@ template&lt;typename DT_ &gt; </div>
 
 <p>standard constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00065">65</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00063">63</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
 </div>
 </div>
@@ -265,9 +265,9 @@ template&lt;typename DT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00101">101</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00099">99</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00036">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_r</a>, <a class="el" href="synch__scal_8hpp_source.html#l00057">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_req</a>, <a class="el" href="synch__scal_8hpp_source.html#l00038">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_x</a>, <a class="el" href="time__stamp_8hpp_source.html#l00123">FEAT::TimeStamp::elapsed_now()</a>, and <a class="el" href="dist_8cpp_source.html#l00660">FEAT::Dist::Comm::iallreduce()</a>.</p>
+<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00034">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_r</a>, <a class="el" href="synch__scal_8hpp_source.html#l00055">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_req</a>, <a class="el" href="synch__scal_8hpp_source.html#l00036">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_x</a>, <a class="el" href="time__stamp_8hpp_source.html#l00121">FEAT::TimeStamp::elapsed_now()</a>, and <a class="el" href="dist_8cpp_source.html#l00660">FEAT::Dist::Comm::iallreduce()</a>.</p>
 
 </div>
 </div>
@@ -299,9 +299,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>move constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00141">141</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00139">139</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -332,9 +332,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00220">220</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00218">218</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00061">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_finished</a>, and <a class="el" href="assertion_8hpp_source.html#l00264">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00059">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_finished</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -367,9 +367,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>move-assign operator </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00167">167</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00165">165</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00061">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_finished</a>, <a class="el" href="synch__scal_8hpp_source.html#l00042">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_exec</a>, <a class="el" href="synch__scal_8hpp_source.html#l00044">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_wait</a>, <a class="el" href="synch__scal_8hpp_source.html#l00036">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_r</a>, <a class="el" href="synch__scal_8hpp_source.html#l00057">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_req</a>, <a class="el" href="synch__scal_8hpp_source.html#l00040">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_sqrt</a>, <a class="el" href="synch__scal_8hpp_source.html#l00038">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_x</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00059">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_finished</a>, <a class="el" href="synch__scal_8hpp_source.html#l00040">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_exec</a>, <a class="el" href="synch__scal_8hpp_source.html#l00042">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_wait</a>, <a class="el" href="synch__scal_8hpp_source.html#l00034">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_r</a>, <a class="el" href="synch__scal_8hpp_source.html#l00055">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_req</a>, <a class="el" href="synch__scal_8hpp_source.html#l00038">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_sqrt</a>, <a class="el" href="synch__scal_8hpp_source.html#l00036">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_x</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -402,11 +402,11 @@ template&lt;typename DT_ &gt; </div>
 <p >wait for completion barrier</p>
 <dl class="section return"><dt>Returns</dt><dd>the accumulated data </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00200">200</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00198">198</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00061">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_finished</a>, <a class="el" href="synch__scal_8hpp_source.html#l00042">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_exec</a>, <a class="el" href="synch__scal_8hpp_source.html#l00044">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_wait</a>, <a class="el" href="synch__scal_8hpp_source.html#l00036">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_r</a>, <a class="el" href="synch__scal_8hpp_source.html#l00057">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_req</a>, <a class="el" href="synch__scal_8hpp_source.html#l00040">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_sqrt</a>, <a class="el" href="time__stamp_8hpp_source.html#l00123">FEAT::TimeStamp::elapsed_now()</a>, <a class="el" href="math_8hpp_source.html#l00302">FEAT::Math::sqrt()</a>, <a class="el" href="dist_8cpp_source.html#l00269">FEAT::Dist::Request::wait()</a>, and <a class="el" href="assertion_8hpp_source.html#l00265">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="synch__scal_8hpp_source.html#l00059">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_finished</a>, <a class="el" href="synch__scal_8hpp_source.html#l00040">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_exec</a>, <a class="el" href="synch__scal_8hpp_source.html#l00042">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_mpi_wait</a>, <a class="el" href="synch__scal_8hpp_source.html#l00034">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_r</a>, <a class="el" href="synch__scal_8hpp_source.html#l00055">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_req</a>, <a class="el" href="synch__scal_8hpp_source.html#l00038">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::_sqrt</a>, <a class="el" href="time__stamp_8hpp_source.html#l00121">FEAT::TimeStamp::elapsed_now()</a>, <a class="el" href="math_8hpp_source.html#l00300">FEAT::Math::sqrt()</a>, <a class="el" href="dist_8cpp_source.html#l00269">FEAT::Dist::Request::wait()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00621">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>, <a class="el" href="gate_8hpp_source.html#l00588">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>, <a class="el" href="gate_8hpp_source.html#l00657">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2()</a>, and <a class="el" href="gate_8hpp_source.html#l00555">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00619">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>, <a class="el" href="gate_8hpp_source.html#l00586">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>, <a class="el" href="gate_8hpp_source.html#l00655">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2()</a>, and <a class="el" href="gate_8hpp_source.html#l00553">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum()</a>.</p>
 
 </div>
 </div>
@@ -435,9 +435,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>signals, whether wait was already called </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00061">61</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00059">59</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00220">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::~SynchScalarTicket()</a>, <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00200">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00218">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::~SynchScalarTicket()</a>, <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -465,9 +465,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>holds our mpi execution toe </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00042">42</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00040">40</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00200">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -495,9 +495,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>holds our mpi reduction wait toe </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00044">44</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00042">42</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00200">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -525,9 +525,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>buffer containing the received data </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00036">36</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00034">34</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00101">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00200">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00099">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -555,9 +555,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>Our request for the corresponding iallreduce mpi call. </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00057">57</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00055">55</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00101">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00200">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00099">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -585,9 +585,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>should we compute the sqrt of the result </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00040">40</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00038">38</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00200">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -615,9 +615,9 @@ template&lt;typename DT_ &gt; </div>
 
 <p>buffer containing the send data </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00038">38</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__scal_8hpp_source.html#l00036">36</a> of file <a class="el" href="synch__scal_8hpp_source.html">synch_scal.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00101">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00167">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__scal_8hpp_source.html#l00099">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::SynchScalarTicket()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00165">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>

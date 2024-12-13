@@ -59,6 +59,8 @@ var class_f_e_a_t_1_1_dist_1_1_comm =
     [ "operator=", "class_f_e_a_t_1_1_dist_1_1_comm.html#a05828152d2d65487e3d97cbb6f1cb83c", null ],
     [ "print", "class_f_e_a_t_1_1_dist_1_1_comm.html#a3d44784c8bd581ab4ecca4d6f23c439b", null ],
     [ "print", "class_f_e_a_t_1_1_dist_1_1_comm.html#af9257e4c46b3ea1fd3ccc71e46e02152", null ],
+    [ "print_flush", "class_f_e_a_t_1_1_dist_1_1_comm.html#a63401131d6b7544e7e677835975a3ae7", null ],
+    [ "print_flush", "class_f_e_a_t_1_1_dist_1_1_comm.html#ac0ded89c49ded10cbbc30cf7a4056a9e", null ],
     [ "rank", "class_f_e_a_t_1_1_dist_1_1_comm.html#ad7da25b2899eeb6824431b778fc16866", null ],
     [ "recv", "class_f_e_a_t_1_1_dist_1_1_comm.html#a699e9bbdf02df274d05defaf7551323e", null ],
     [ "recv", "class_f_e_a_t_1_1_dist_1_1_comm.html#a645056d0cfd78c88fb84d5f5c41313e8", null ],
