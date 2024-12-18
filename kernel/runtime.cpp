@@ -20,6 +20,8 @@
 #include <cstdlib>
 
 #if defined(__linux) || defined(__unix__)
+#include <sys/types.h>
+#include <unistd.h>
 #include <execinfo.h>
 #endif
 
@@ -331,6 +333,24 @@ void Runtime::initialize(int& argc, char**& argv)
       }
     }
 
+    if(strcmp(argv[iarg], "---print-pid") == 0)
+    {
+#ifdef FEAT_HAVE_MPI
+#if defined(_WIN32)
+      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << " runs rank " << my_rank << "\n";
+#elif defined(__linux) || defined(__unix__)
+      std::cout << "Process ID " << std::setw(6) << getpid() << " runs rank " << my_rank << "\n";
+#endif // defined(_WIN32)
+#else // no FEAT_HAVE_MPI
+#if defined(_WIN32)
+      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << "\n";
+#elif defined(__linux) || defined(__unix__)
+      std::cout << "Process ID " << std::setw(6) << getpid() << "\n";
+#endif // defined(_WIN32)
+#endif // FEAT_HAVE_MPI
+      std::cout.flush();
+    }
+
 #ifdef FEAT_COMPILER_MICROSOFT
     if(strcmp(argv[iarg], "---debug-break") == 0)
     {
@@ -360,18 +380,6 @@ void Runtime::initialize(int& argc, char**& argv)
       continue;
     }
 #endif // FEAT_COMPILER_MICROSOFT
-
-#if defined(_WIN32)
-    if(strcmp(argv[iarg], "---print-pid") == 0)
-    {
-#ifdef FEAT_HAVE_MPI
-      // in an MPI case, the ranks to debug have to be specified
-      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << " runs rank " << my_rank << "\n";
-#else // no FEAT_HAVE_MPI
-      std::cout << "Process ID " << std::setw(6) << Windows::get_current_process_id() << "\n";
-#endif // FEAT_HAVE_MPI
-    }
-#endif // defined(_WIN32)
   }
 
   _initialized = true;
