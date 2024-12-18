@@ -4,7 +4,7 @@
     The FBM boundary is described by a Bezier spline named 'ypipe:fbm'.
     This mesh consists of 6 quadrilateral cells.
   </Info>
-  <Chart name="ypipe:fbm">
+  <Chart name="fbm:ypipe">
     <Bezier dim="2" size="14" type="closed">
       <Points>
         0 -1.0 0

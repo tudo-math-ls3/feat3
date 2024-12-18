@@ -91,6 +91,10 @@
 // Specifies the maximum number of nonlinear (Newton/Picard) solver iterations per time step.
 // Defaults to 20.
 //
+// --mg-cycle <V|F|W>
+// Specifies the multigrid cyclte to use, must be either 'V', or 'F' or 'W'.
+// Defaults to 'V'.
+//
 // --min-mg-iter <N>
 // Specifies the minimum number of multigrid iterations per nonlinear solver iteration.
 // Defaults to 1.
@@ -294,6 +298,9 @@ namespace CCND
     /// specifies whether a Newton iteration should start with a single Picard step
     bool newton_starts_with_picard = true;
 
+    /// specifies the multigrid cycle to use
+    Solver::MultiGridCycle mg_cycle = Solver::MultiGridCycle::V;
+
     /// viscosity parameter nu
     DataType nu = DataType(1);
     /// streamline diffusion parameter (fixed)
@@ -402,6 +409,7 @@ namespace CCND
       args.support("smooth-gmres");
       args.support("solve-gmres");
       args.support("coarse-gmres");
+      args.support("mg-cycle");
       args.support("mg-tol-rel");
       args.support("nl-tol-abs");
       args.support("nl-stag-rate");
@@ -477,6 +485,7 @@ namespace CCND
       args.parse("nl-stag-rate", nl_stag_rate);
       args.parse("smooth-steps", smooth_steps);
       args.parse("smooth-damp", smooth_damp);
+      args.parse("mg-cycle", mg_cycle);
 
       // parse gmres dimensions
       if(args.check("smooth-gmres") == 0)
@@ -581,6 +590,7 @@ namespace CCND
       comm.print(String("Nonlinear Stagnation Rate").pad_back(pad_len, pad_char) + ": " + stringify_fp_fix(nl_stag_rate));
       comm.print(String("Min Nonlinear Iterations").pad_back(pad_len, pad_char) + ": " + stringify(min_nl_iter));
       comm.print(String("Max Nonlinear Iterations").pad_back(pad_len, pad_char) + ": " + stringify(max_nl_iter));
+      comm.print(String("Multigrid Cycle").pad_back(pad_len, pad_char) + ": " + stringify(mg_cycle));
       comm.print(String("Multigrid Relative Tol").pad_back(pad_len, pad_char) + ": " + (adapt_mg_tol ? String("adaptive") : stringify_fp_sci(mg_tol_rel)));
       comm.print(String("Min Multigrid Iterations").pad_back(pad_len, pad_char) + ": " + stringify(min_mg_iter));
       comm.print(String("Max Multigrid Iterations").pad_back(pad_len, pad_char) + ": " + stringify(max_mg_iter));

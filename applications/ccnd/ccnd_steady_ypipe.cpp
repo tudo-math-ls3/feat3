@@ -11,6 +11,11 @@
 // --v-max <vmax>
 // Specifies the maximum velocity of the inflow boundary condition. Defaults to 1.
 //
+// --problem <problem>
+// Specifies the problem; must be one of the following:
+// * 'ypipe'
+// * 'fork'
+//
 // --fbm
 // Enables the fictitious boundary method (FBM) to enforce the boundary conditions for the circular
 // or cylindrical obstacle.
@@ -53,11 +58,14 @@ namespace CCND
     /// our base class
     typedef SteadyAppBase BaseClass;
 
-    /// maximum inflow velocity: 0.3 for 2D bench 1, 0.45 for 3D bench 1; 1 for bench 7
+    /// maximum inflow velocity
     DataType v_max = DataType(1);
 
+    /// the selected problem
+    String problem;
+
     /// trace assemblers for inflow and outflows
-    std::unique_ptr<Assembly::TraceAssembler<TrafoType>> flux_asm_in, flux_asm_out_b, flux_asm_out_t;
+    std::unique_ptr<Assembly::TraceAssembler<TrafoType>> flux_asm_in, flux_asm_out, flux_asm_out_b, flux_asm_out_t;
 
 
     explicit Application(const Dist::Comm& comm_, SimpleArgParser& args_) :
@@ -65,6 +73,7 @@ namespace CCND
     {
       args.support("v-max");
       args.support("fbm");
+      args.support("problem");
 
       // this application always has homogeneous RHS
       homogeneous_rhs = true;
@@ -72,6 +81,20 @@ namespace CCND
 
     virtual void parse_args() override
     {
+      if(args.check("problem") < 1)
+      {
+        comm.print("ERROR: Mandatory option '--problem <type>' is missing!");
+        Runtime::abort();
+      }
+
+      // get the problem
+      args.parse("problem", problem);
+      if(!problem.is_one_of("ypipe fork"))
+      {
+        comm.print("ERROR: invalid problem type; must be either 'ypipe' or 'fork'");
+        Runtime::abort();
+      }
+
       // enable FBM if desired
       enable_fbm = (args.check("fbm") >= 0);
 
@@ -79,7 +102,7 @@ namespace CCND
       args.parse("v-max", v_max);
 
       // set default filename
-      default_filename = String("cc") + stringify(dim) + "d-steady-ypipe";
+      default_filename = String("cc") + stringify(dim) + "d-steady-" + problem;
       if(enable_fbm)
         default_filename += "-fbm";
 
@@ -90,7 +113,8 @@ namespace CCND
     virtual void print_problem() override
     {
       BaseClass::print_problem();
-      comm.print("\nY-Pipe Benchmark Parameters:");
+      comm.print("\nBenchmark Parameters:");
+      comm.print(String("Problem").pad_back(pad_len, pad_char) + ": " + problem);
       comm.print(String("V-Max").pad_back(pad_len, pad_char) + ": " + stringify(v_max));
     }
 
@@ -101,10 +125,10 @@ namespace CCND
       // create FBM meshpart?
       if(enable_fbm)
       {
-        ChartBaseType* chart = domain.get_atlas().find_mesh_chart("ypipe:fbm");
+        ChartBaseType* chart = domain.get_atlas().find_mesh_chart("fbm:" + problem);
         if(chart == nullptr)
         {
-          comm.print("ERROR: chart 'ypipe:fbm' not found in mesh!");
+          comm.print("ERROR: chart 'ypipe:" + problem + "' not found in mesh!");
           Runtime::abort();
         }
 
@@ -123,12 +147,15 @@ namespace CCND
       // create trace assemblers on finest level
       {
         flux_asm_in.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
+        flux_asm_out.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
         flux_asm_out_t.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
         flux_asm_out_b.reset(new Assembly::TraceAssembler<TrafoType>(domain.front()->trafo));
 
         const MeshNodeType& mesh_node = *domain.front()->get_mesh_node();
         const MeshPartType* mesh_part_bnd_l = mesh_node.find_mesh_part("bnd:l");
         const MeshPartType* mesh_part_bnd_in = mesh_node.find_mesh_part("bnd:in");
+        const MeshPartType* mesh_part_bnd_r = mesh_node.find_mesh_part("bnd:r");
+        const MeshPartType* mesh_part_bnd_out = mesh_node.find_mesh_part("bnd:out");
         const MeshPartType* mesh_part_bnd_out_t = mesh_node.find_mesh_part("bnd:out:t");
         const MeshPartType* mesh_part_bnd_out_b = mesh_node.find_mesh_part("bnd:out:b");
 
@@ -136,12 +163,17 @@ namespace CCND
           flux_asm_in->add_mesh_part(*mesh_part_bnd_l);
         if(mesh_part_bnd_in)
           flux_asm_in->add_mesh_part(*mesh_part_bnd_in);
+        if(mesh_part_bnd_r)
+          flux_asm_out->add_mesh_part(*mesh_part_bnd_r);
+        if(mesh_part_bnd_out)
+          flux_asm_out->add_mesh_part(*mesh_part_bnd_out);
         if(mesh_part_bnd_out_t)
           flux_asm_out_t->add_mesh_part(*mesh_part_bnd_out_t);
         if(mesh_part_bnd_out_b)
           flux_asm_out_b->add_mesh_part(*mesh_part_bnd_out_b);
 
         flux_asm_in->compile();
+        flux_asm_out->compile();
         flux_asm_out_t->compile();
         flux_asm_out_b->compile();
       }
@@ -150,7 +182,8 @@ namespace CCND
     virtual void assemble_filters()
     {
       // our inflow BC function
-      Analytic::Common::ParProfileVector<DataType> inflow_func(0.0, -0.45, 0.0, 0.45, v_max);
+      Analytic::Common::ParProfileVector<DataType> inflow_func_ypipe(0.0, -0.45, 0.0, 0.45, v_max);
+      Analytic::Common::ParProfileVector<DataType> inflow_func_fork(0.0, -0.15, 0.0, 0.15, v_max);
 
       // the names of the mesh parts on which to assemble
       std::deque<String> part_names = domain.front()->get_mesh_node()->get_mesh_part_names(true);
@@ -192,7 +225,10 @@ namespace CCND
         }
 
         // assemble the filters
-        unit_asm_inflow.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_func);
+        if(problem == "ypipe")
+          unit_asm_inflow.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_func_ypipe);
+        if(problem == "fork")
+          unit_asm_inflow.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_func_fork);
         unit_asm_noflow.assemble(filter_v_noflow, domain.at(i)->space_velo);
 
         // assemble FBM filters?
@@ -226,20 +262,23 @@ namespace CCND
       const LocalVeloVector& vec_sol_v = this->vec_sol.local().first();
       const SpaceVeloType& space_v = domain.front()->space_velo;
 
-      DataType fx[3] =
+      DataType fx[4] =
       {
         flux_asm_in->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
+        flux_asm_out->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
         flux_asm_out_t->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
         flux_asm_out_b->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0]
       };
 
-      comm.allreduce(fx, fx, 3u, Dist::op_sum);
+      comm.allreduce(fx, fx, 4u, Dist::op_sum);
 
       comm.print("Solution Analysis:");
       comm.print("Flux In...: " + stringify_fp_fix(fx[0], fp_num_digs));
-      comm.print("Flux Out T: " + stringify_fp_fix(fx[1], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[1]/fx[0],3,7) + "%]");
-      comm.print("Flux Out B: " + stringify_fp_fix(fx[2], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[2]/fx[0],3,7) + "%]");
-      comm.print("Mass Loss.: " + stringify_fp_fix(100.0*(1.0 - (fx[1]+fx[2])/fx[0]), 5) + "%\n");
+      comm.print("Flux Out..: " + stringify_fp_fix(fx[1], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[1]/fx[0],3,7) + "%]");
+      comm.print("Mass Loss.: " + stringify_fp_fix(100.0*(1.0 - fx[1]/fx[0]), 5) + "%");
+      comm.print("Flux Out T: " + stringify_fp_fix(fx[2], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[2]/fx[0],3,7) + "%]");
+      comm.print("Flux Out B: " + stringify_fp_fix(fx[3], fp_num_digs) + " [" + stringify_fp_fix(100.0*fx[3]/fx[0],3,7) + "%]");
+      comm.print("Mass Loss.: " + stringify_fp_fix(100.0*(1.0 - (fx[2]+fx[3])/fx[0]), 5) + "%\n");
 
       watch_sol_analysis.stop();
     }
