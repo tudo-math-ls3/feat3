@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 //
 // ------------------------------------------------------------------------------------------------
-// Steady CCnD solver for Y-Pipe Benchmark
+// Steady CCnD solver for Y-Pipe/Fork Benchmark
 // ------------------------------------------------------------------------------------------------
 // This application implements a parallel steady CCND solver, which is pre-configured to solve
 //
@@ -13,8 +13,12 @@
 //
 // --problem <problem>
 // Specifies the problem; must be one of the following:
-// * 'ypipe'
-// * 'fork'
+// * 'ypipe': solve on one of the Y-pipe domains represented by the following meshes:
+//          - ypipe_2d_quad_24.xml
+//          - ypipe_3vs5_2d_quad_32.xml
+//          - ypipe_2d_fbm_quad_6.xml
+// * 'fork' : solve one the fork domain represented by the following meshes:
+//          - fork_pipe_2d_fbm_quad_2.xml
 //
 // --fbm
 // Enables the fictitious boundary method (FBM) to enforce the boundary conditions for the circular
