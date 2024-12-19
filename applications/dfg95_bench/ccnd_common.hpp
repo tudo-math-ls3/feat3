@@ -703,8 +703,8 @@ namespace DFG95
   {
     static_assert(dim_ <= 3, "invalid forces size");
 
-    forces.format();
-    Tiny::Vector<DT_, dim_, 3>& frc = forces.template size_cast<dim_>();
+    Tiny::Vector<DT_, dim_, 3> frc;
+    frc.format();
 
     XASSERT(vec_def_v.size() == vec_char.size());
 
@@ -716,6 +716,9 @@ namespace DFG95
     {
       frc.axpy(vchr[i], vdef[i]);
     }
+
+    forces.format();
+    forces.template copy_n<dim_>(frc);
   }
 
   /**

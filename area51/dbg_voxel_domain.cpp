@@ -33,7 +33,7 @@ namespace DbgVoxelDomain
       for(std::size_t i(0); i < nv; ++i)
       {
         pt[0] = BaseClass::x_coord(x_min, x_max, i, nv);
-        double r = (pt - midpoint).template size_cast<2>().norm_euclid();
+        double r = (pt - midpoint).template norm_euclid_n<2>();
         mask[i] = ((r > 1.1) && (r < 2.1) ? 1 : 0);
       }
     }

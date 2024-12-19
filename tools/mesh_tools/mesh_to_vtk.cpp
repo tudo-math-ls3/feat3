@@ -441,9 +441,8 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
       std::vector<double> prj_y(vtx.get_num_vertices(), 0.0);
       std::vector<double> prj_z(vtx.get_num_vertices(), 0.0);
 
-      Tiny::Vector<double, 3> pt;
-      pt[0] = pt[1] = pt[2] = 0.0;
-      auto& wpt = pt.template size_cast<Mesh_::world_dim>();
+      Tiny::Vector<double, Mesh_::world_dim> pt;
+      pt.format();
 
       for(const auto& it : atlas->get_mesh_chart_map())
       {
@@ -456,13 +455,15 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
         for(Index i(0); i < vtx.get_num_vertices(); ++i)
         {
           // prject vertex
-          wpt = chart.project(vtx[i]);
+          pt = chart.project(vtx[i]);
           // subtract vertex
-          wpt -= vtx[i];
+          pt -= vtx[i];
           // copy data
           prj_x[i] = pt[0];
-          prj_y[i] = pt[1];
-          prj_z[i] = pt[2];
+          if constexpr(Mesh_::world_dim > 1)
+            prj_y[i] = pt[1];
+          if constexpr(Mesh_::world_dim > 2)
+            prj_z[i] = pt[2];
         }
 
         exporter.add_vertex_vector("proj:" + it.first, prj_x.data(), prj_y.data(), prj_z.data());

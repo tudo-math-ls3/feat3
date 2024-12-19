@@ -223,7 +223,7 @@ namespace DbgIsoParam
         trafo_eval(trafo_data, cubature_rule.get_point(k));
         img_point = trafo_data.img_point;
         // normalize in XY plane
-        img_point.template size_cast<2>().normalize();
+        img_point.template normalize_n<2>();
         img_point -= trafo_data.img_point;
         //err += img_point.norm_euclid_sqr();
         err += img_point.norm_euclid();

@@ -645,8 +645,7 @@ namespace CCND
 
       virtual void compute_body_forces_vol(const Dist::Comm& comm, const LocalVeloVector& vec_def_unsynced, DataType DOXY(nu), DataType v_max, int bench)
       {
-        Tiny::Vector<DataType, 3> forces(DataType(0));
-        Tiny::Vector<DataType, dim, 3>& frc = forces.template size_cast<dim>();
+        Tiny::Vector<DataType, dim> frc(DataType(0));
 
         XASSERT(vec_def_unsynced.size() == vec_char_obstacle.size());
 
@@ -658,6 +657,9 @@ namespace CCND
         {
           frc.axpy(vchr[i], vdef[i]);
         }
+
+        Tiny::Vector<DataType, 3> forces(DataType(0));
+        forces.template copy_n<dim>(frc);
 
         // sum up over all processes
         comm.allreduce(forces.v, forces.v, 3u, Dist::op_sum);

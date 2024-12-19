@@ -805,13 +805,13 @@ class InverseMappingTest
       // Number of points we check
       static constexpr int num_points = 5;
       static constexpr int world_dim = 2;
-      static constexpr int shape_dim = 1;
+
       // Tolerance
       DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.8)));
 
       Tiny::Vector<DT_, world_dim> coeffs(DT_(0));
       // The last column of coords will contain the orthogonal to the edge immersed in 2d
-      Tiny::Matrix<DT_, world_dim+1, world_dim > coords;
+      Tiny::Matrix<DT_, world_dim, world_dim > coords;
 
       coords(0,0) = -DT_(1);
       coords(0,1) = DT_(0.3);
@@ -826,8 +826,8 @@ class InverseMappingTest
           tmp_coords(i,j) = coords(j+1,i) - coords(0,i);
       }
 
-      coords[world_dim] = Tiny::orthogonal(tmp_coords);
-      coords[world_dim].normalize();
+      Tiny::Vector<DT_, world_dim> normal = Tiny::orthogonal(tmp_coords);
+      normal.normalize();
 
       Tiny::Matrix<DT_, num_points, world_dim> points(DT_(0));
       // Point inside
@@ -839,18 +839,17 @@ class InverseMappingTest
       // Nearly one of the vertices
       points[3] = (DT_(1)+ DT_(10)*tol)*coords[0] + ( - DT_(10)*tol )*coords[1] ;
       // Point with an orthogonal component, coordinates do not fulfill sum == 1
-      points[4] = -DT_(0.2)*coords[0] + DT_(0.11)*coords[1] + DT_(0.69)*coords[2];
+      points[4] = -DT_(0.2)*coords[0] + DT_(0.11)*coords[1] + DT_(0.69)*normal;
 
       for(int np(0); np < num_points; ++np)
       {
-        // We size-cast away the last column since it is just for result checking, so the correct version gets called
-        Trafo::Standard::inverse_mapping(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+        Trafo::Standard::inverse_mapping(coeffs, points[np], coords);
 
         Tiny::Vector<DT_, world_dim> test(coords[0]);
         for(int i(0); i < world_dim-1; ++i)
           test += coeffs(i)*(coords[i+1] - coords[0]);
 
-        test += coeffs(world_dim-1)*(coords[world_dim]);
+        test += coeffs(world_dim-1)*normal;
 
         for(int i(0); i < world_dim; ++i)
           TEST_CHECK_EQUAL_WITHIN_EPS(test(i), points[np](i), tol);
@@ -868,9 +867,7 @@ class InverseMappingTest
       DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.5)));
 
       Tiny::Vector<DT_, shape_dim+1> coeffs(DT_(0));
-      // The first two colums in coords are the points defining the edge. The third is something to define a plane,
-      // and the last will be the orthonormal to that plane, so we can check the distance of the point to the edge.
-      Tiny::Matrix<DT_, world_dim+1, world_dim > coords;
+      Tiny::Matrix<DT_, shape_dim+1, world_dim > coords;
 
       coords(0,0) = -DT_(1);
       coords(0,1) = -DT_(0.3);
@@ -881,20 +878,20 @@ class InverseMappingTest
       coords(1,2) = DT_(0.3);
 
       // This point is not part of the edge and is used solely for testing purposes
-      coords(2,0) = DT_(0);
-      coords(2,1) = DT_(0);
-      coords(2,2) = DT_(1);
+      //coords(2,0) = DT_(0);
+      //coords(2,1) = DT_(0);
+      //coords(2,2) = DT_(1);
 
       Tiny::Matrix<DT_, world_dim, world_dim-1> tmp_coords(DT_(0));
 
       for(int i(0); i < world_dim; ++i)
       {
-        for(int j(0); j < world_dim-1; ++j)
-          tmp_coords(i,j) = coords(j+1,i) - coords(0,i);
+        tmp_coords(i,0) = coords(1,i) - coords(0,i);
+        tmp_coords(i,1) = DT_(i == 2) - coords(0,i);
       }
 
-      coords[world_dim] = Tiny::orthogonal(tmp_coords);
-      coords[world_dim].normalize();
+      Tiny::Vector<DT_, world_dim> normal = Tiny::orthogonal(tmp_coords);
+      normal.normalize();
 
       Tiny::Matrix<DT_, num_points, world_dim> points(DT_(0));
       // Point inside
@@ -906,12 +903,12 @@ class InverseMappingTest
       // Nearly one of the vertices
       points[3] = (DT_(1)+DT_(10)*tol)*coords[0] + (-DT_(10)*tol)*coords[1];
       // Something with an orthogonal component
-      points[4] = DT_(1)*coords[0] - DT_(0.1)*tol*coords[1] + DT_(0.18)*coords[3];
+      points[4] = DT_(1)*coords[0] - DT_(0.1)*tol*coords[1] + DT_(0.18)*normal;
 
       for(int np(0); np < num_points-1; ++np)
       {
         // We size-cast away the last column since it is just for result checking, so the correct version gets called
-        Trafo::Standard::inverse_mapping(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+        Trafo::Standard::inverse_mapping(coeffs, points[np], coords);
 
         Tiny::Vector<DT_, world_dim> test(coords[0]);
         test += coeffs(0)*(coords[1] - coords[0]);
@@ -922,7 +919,7 @@ class InverseMappingTest
 
       // The last point is different because it is not in the edge and we cannot reconstruct it, but we can check if
       // the distance is correct
-      Trafo::Standard::inverse_mapping(coeffs, points[4], coords.template size_cast<shape_dim+1, world_dim>());
+      Trafo::Standard::inverse_mapping(coeffs, points[4], coords);
 
       TEST_CHECK_EQUAL_WITHIN_EPS(coeffs(shape_dim), DT_(0.18), tol);
 
@@ -939,7 +936,7 @@ class InverseMappingTest
 
       Tiny::Vector<DT_, world_dim> coeffs(DT_(0));
       // The last column of coords will contain the orthogonal to the triangle immersed in 3d
-      Tiny::Matrix<DT_, world_dim+1, world_dim > coords;
+      Tiny::Matrix<DT_, shape_dim+1, world_dim > coords;
 
       coords(0,0) = -DT_(1);
       coords(0,1) = -DT_(0.3);
@@ -961,8 +958,8 @@ class InverseMappingTest
           tmp_coords(i,j) = coords(j+1,i) - coords(0,i);
       }
 
-      coords[world_dim] = Tiny::orthogonal(tmp_coords);
-      coords[world_dim].normalize();
+      Tiny::Vector<DT_, world_dim> normal = Tiny::orthogonal(tmp_coords);
+      normal.normalize();
 
       Tiny::Matrix<DT_, num_points, world_dim> points(DT_(0));
       // Point inside
@@ -974,19 +971,19 @@ class InverseMappingTest
       // Nearly one of the vertices
       points[3] = (DT_(1)+DT_(10)*tol)*coords[1] + (-DT_(10)*tol)*coords[2];
       // With component in orthogonal direction
-      points[4] = DT_(0.1)*coords[0] - DT_(2.5)*coords[1] + DT_(0.2)*coords[2] + DT_(0.45)*coords[3];
+      points[4] = DT_(0.1)*coords[0] - DT_(2.5)*coords[1] + DT_(0.2)*coords[2] + DT_(0.45)*normal;
 
       for(int np(0); np < num_points; ++np)
       {
         // We size-cast away the last column since it is just for result checking, so the correct version gets called
-        Trafo::Standard::inverse_mapping(coeffs, points[np], coords.template size_cast<shape_dim+1, world_dim>());
+        Trafo::Standard::inverse_mapping(coeffs, points[np], coords);
 
         Tiny::Vector<DT_, world_dim> test(coords[0]);
         for(int i(0); i < world_dim-1; ++i)
           test+= coeffs(i)*(coords[i+1] - coords[0]);
 
         // The last column is different
-        test += coeffs(world_dim-1)*coords[world_dim];
+        test += coeffs(world_dim-1)*normal;
 
         for(int i(0); i < world_dim; ++i)
           TEST_CHECK_EQUAL_WITHIN_EPS(test(i), points[np](i), tol);

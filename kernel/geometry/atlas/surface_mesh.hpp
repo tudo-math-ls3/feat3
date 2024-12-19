@@ -869,7 +869,8 @@ namespace FEAT
           }
 
           // The last column is the additional direction for our augmented simplex and it is orthogonal to the rest
-          Tiny::Vector<DT_, 3> ortho = Tiny::orthogonal(A.template size_cast<3, 2>());
+          Tiny::Vector<DT_, 3> ortho;
+          Tiny::orthogonal_3x2(ortho, A);
           // Normalize this so the last coefficient is the signed distance
           ortho.normalize();
 

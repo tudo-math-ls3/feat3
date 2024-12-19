@@ -38,17 +38,16 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 {
   static constexpr int world_dim = Mesh_::world_dim;
 
-  Tiny::Vector<double, 3> ray_3(0.0);
-  ray_3[0] = 1.0;
+  Tiny::Vector<double, 3> ray(0.0);
+  ray[0] = 1.0;
 
   // parse levels
   Index lvl_min(0);
   Index lvl_max(0);
   args.parse("level", lvl_max, lvl_min);
-  args.parse("ray", ray_3[0], ray_3[1], ray_3[2]);
+  args.parse("ray", ray[0], ray[1], ray[2]);
 
-  Tiny::Vector<double, world_dim> ray(ray_3.template size_cast<world_dim>());
-  ray.normalize();
+  ray.template normalize_n<world_dim>();
 
   std::cout << "Ray = [ " << stringify(ray[0]);
   for(int i(1); i < world_dim; ++i)
@@ -111,12 +110,16 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
     std::vector<double> volume(mesh.get_num_elements(), 0.0);
     std::vector<double> width(mesh.get_num_elements(), 0.0);
 
+    Tiny::Vector<double, world_dim> ray_d;
+    ray_d.format();
+    ray_d.template copy_n<world_dim>(ray);
+
     for(Index i(0); i < mesh.get_num_elements(); ++i)
     {
       trafo_eval.prepare(i);
       volume[i] = trafo_eval.volume();
       //volume[i] = Math::pow(trafo_eval.volume(), 1.0 / double(world_dim));
-      width[i] = trafo_eval.width_directed(ray);
+      width[i] = trafo_eval.width_directed(ray_d);
       trafo_eval.finish();
     }
 

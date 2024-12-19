@@ -459,7 +459,8 @@ namespace FEAT
           WorldPoint wp;
           if constexpr(!is_explicit)
             wp = CoordType(0);
-          ParamPoint pp(param.template size_cast<param_dim>());
+          ParamPoint pp;
+          pp.template copy_n<param_dim>(param);
           Intern::ExplicitChartHelper<is_explicit>::map(cast(), wp, pp);
           return wp;
         }

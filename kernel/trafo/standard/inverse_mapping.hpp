@@ -64,11 +64,12 @@ namespace FEAT
        *
        * \author Jordi Paul
        */
-      template<typename DT_, int world_dim, int sc_, int sp_, int smx_, int snx_>
+      template<typename DT_, int helper_dim, int world_dim, int sc_, int sp_, int smx_, int snx_,
+        typename std::enable_if<helper_dim == world_dim+1, bool>::type = true>
       void inverse_mapping(
         Tiny::Vector<DT_, world_dim, sc_>& coeffs,
         const Tiny::Vector<DT_, world_dim, sp_>& point,
-        const Tiny::Matrix<DT_, world_dim+1, world_dim, smx_, snx_>& x)
+        const Tiny::Matrix<DT_, helper_dim, world_dim, smx_, snx_>& x)
         {
           // A will contain the transformation matrix
           Tiny::Matrix<DT_, world_dim, world_dim> A(DT_(0));
@@ -86,7 +87,6 @@ namespace FEAT
 
           // This is the solution of A u = point - x[0]
           coeffs = Ainv*(point - x[0]);
-
         }
 
       /**
@@ -220,7 +220,8 @@ namespace FEAT
           }
 
           // The last column is the additional direction for our augmented simplex and it is orthogonal to the rest
-          Tiny::Vector<DT_, world_dim> ortho = Tiny::orthogonal(A.template size_cast<world_dim, shape_dim>());
+          Tiny::Vector<DT_, world_dim> ortho;
+          Tiny::orthogonal_3x2(ortho, A);
 
           // In 3d, the 2-norm of ortho is the 2d volume of the parallelogram defined by A[0], A[1]. That makes this
           // axis badly scaled if the parallelogram is either very small or very large. So we rescale ortho to unity

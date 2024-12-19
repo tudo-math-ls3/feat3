@@ -350,29 +350,38 @@ namespace FEAT
       }
 
       /**
-       * \brief Size-cast function.
+       * \brief Copies a vector
        *
-       * This function casts this vector's reference to another size.
-       *
-       * \tparam nn_
-       * The length of the casted vector. Must be 0 < \p nn_ <= \p s_.
-       *
-       * \returns
-       * A casted (const) reference of \p *this.
+       * \param[in] x
+       * The source vector to copy
        */
-      template<int nn_>
-      CUDA_HOST_DEVICE Vector<T_, nn_, s_>& size_cast()
+      template<int snx_>
+      CUDA_HOST_DEVICE void copy(const Vector<T_, n_, snx_>& x)
       {
-        static_assert((nn_ > 0) && (nn_ <= s_), "invalid cast length");
-        return reinterpret_cast<Vector<T_, nn_, s_>&>(*this);
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] = x.v[i];
+        }
       }
 
-      /** \copydoc size_cast() */
-      template<int nn_>
-      CUDA_HOST_DEVICE const Vector<T_, nn_, s_>& size_cast() const
+      /**
+       * \brief Copies the first nn_ entries of a vector
+       *
+       * \tparam nn_
+       * The number of elements to copy; must be nn_ <= min(n_, nx_)
+       *
+       * \param[in] x
+       * The source vector to copy the elements from
+       */
+      template<int nn_, int nx_, int snx_>
+      CUDA_HOST_DEVICE void copy_n(const Vector<T_, nx_, snx_>& x)
       {
-        static_assert((nn_ > 0) && (nn_ <= s_), "invalid cast length");
-        return reinterpret_cast<const Vector<T_, nn_, s_>&>(*this);
+        static_assert(nn_ <= n_, "invalid copy_n size");
+        static_assert(nn_ <= nx_, "invalid copy_n size");
+        for(int i(0); i < nn_; ++i)
+        {
+          v[i] = x.v[i];
+        }
       }
 
       /// scalar-multiply operator
@@ -419,7 +428,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Format the vector.
+       * \brief Formats the vector.
        *
        * \param[in] alpha
        * The value that the vector is to be set to.
@@ -429,6 +438,58 @@ namespace FEAT
         for(int i(0); i < n_; ++i)
         {
           v[i] = alpha;
+        }
+      }
+
+      /**
+       * \brief Formats the first nn_ entries of the vector.
+       *
+       * \tparam nn_
+       * The number of elements to format; must be nn_ <= n_
+       *
+       * \param[in] alpha
+       * The value that the vector is to be set to.
+       */
+      template<int nn_>
+      CUDA_HOST_DEVICE void format_n(DataType alpha = DataType(0))
+      {
+        static_assert(nn_ <= n_, "invalid format_n size");
+        for(int i(0); i < nn_; ++i)
+        {
+          v[i] = alpha;
+        }
+      }
+
+      /**
+      * \brief Scales the vector.
+      *
+      * \param[in] alpha
+      * The value that the vector is to be scaled by
+      */
+      CUDA_HOST_DEVICE void scale(DataType alpha)
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] *= alpha;
+        }
+      }
+
+      /**
+      * \brief Scales the first nn_ entries of the vector.
+      *
+      * \tparam nn_
+      * The number of elements to scale; must be nn_ <= n_
+      *
+      * \param[in] alpha
+      * The value that the vector is to be scaled by
+      */
+      template<int nn_>
+      CUDA_HOST_DEVICE void scale_n(DataType alpha)
+      {
+        static_assert(nn_ <= n_, "invalid scale_n size");
+        for(int i(0); i < nn_; ++i)
+        {
+          v[i] *= alpha;
         }
       }
 
@@ -451,6 +512,31 @@ namespace FEAT
       }
 
       /**
+      * \brief Normalizes the first nn_ entries of this vector.
+      *
+      * \tparam nn_
+      * The number of elements to normalize; must be nn_ <= n_
+      *
+      * \returns \c *this
+      */
+      template<int nn_>
+      CUDA_HOST_DEVICE Vector& normalize_n()
+      {
+        static_assert(nn_ <= n_, "invalid normalize_n size");
+#ifndef __CUDACC__
+        const DataType norm2(this->template norm_euclid_n<nn_>());
+        ASSERTM(norm2 > Math::eps<DataType>(), "Trying to normalize a null vector!");
+        this->template scale_n<nn_>(DataType(1)/norm2);
+        return *this;
+#else
+        const DataType norm2_sqr(this->template norm_euclid_sqr_n<nn_>());
+        ASSERTM(norm2_sqr > CudaMath::cuda_get_eps<DataType>(), "Trying to normalize a null vector!");
+        this->template scale_n<nn_>(CudaMath::cuda_rsqrt(norm2_sqr));
+        return *this;
+#endif
+      }
+
+      /**
        * \brief Negates the vector, i.e. effectively multiplies all components by -1
        *
        * \returns \c *this
@@ -458,6 +544,23 @@ namespace FEAT
       CUDA_HOST_DEVICE Vector& negate()
       {
         for(int i(0); i < n_; ++i)
+          v[i] = -v[i];
+        return *this;
+      }
+
+      /**
+       * \brief Negates the first nn_ entries of this vector
+       *
+       * \tparam nn_
+       * The number of elements to negate; must be nn_ <= n_
+       *
+       * \returns \c *this
+       */
+      template<int nn_>
+      CUDA_HOST_DEVICE Vector& negate_n()
+      {
+        static_assert(nn_ <= n_, "invalid negate_n size");
+        for(int i(0); i < nn_; ++i)
           v[i] = -v[i];
         return *this;
       }
@@ -477,6 +580,30 @@ namespace FEAT
       CUDA_HOST_DEVICE Vector& axpy(DataType alpha, const Vector<T_, n_, snx_>& x)
       {
         for(int i(0); i < n_; ++i)
+          v[i] += alpha * x.v[i];
+        return *this;
+      }
+
+      /**
+       * \brief Adds the first nn_ entries of another scaled vector onto this vector.
+       *
+       * \tparam nn_
+       * The number of elements to axpy; must be nn_ <= min(n_, nx_)
+       *
+       * \param[in] x
+       * The vector to be added onto this vector.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the axpy.
+       *
+       * \returns \c *this
+       */
+      template<int nn_, int nx_, int snx_>
+      CUDA_HOST_DEVICE Vector& axpy_n(DataType alpha, const Vector<T_, nx_, snx_>& x)
+      {
+        static_assert(nn_ <= n_, "invalid negate_n size");
+        static_assert(nn_ <= nx_, "invalid negate_n size");
+        for(int i(0); i < nn_; ++i)
           v[i] += alpha * x.v[i];
         return *this;
       }
@@ -502,6 +629,37 @@ namespace FEAT
       CUDA_HOST_DEVICE Vector& set_convex(DataType alpha, const Vector<T_, n_, sna_>& a, const Vector<T_, n_, snb_>& b)
       {
         for(int i(0); i < n_; ++i)
+          v[i] = (T_(1) - alpha) * a.v[i] + alpha * b.v[i];
+        return *this;
+      }
+
+      /**
+       * \brief Sets the first nn_ entries of this vector to the convex combination of two other vectors.
+       *
+       * Let \e y denote \c this vector, then this function computes:
+       * \f[ y \leftarrow (1-\alpha)\cdot a + \alpha\cdot b \f]
+       *
+       * \tparam nn_
+       * The number of elements to combine; must be nn_ <= min(n_, na_, nb_)
+       *
+       * \param[in] alpha
+       * The interpolation parameter for the convex combination. Should be 0 <= alpha <= 1
+       *
+       * \param[in] a
+       * The first vector for the convex combination.
+       *
+       * \param[in] b
+       * The second vector for the convex combination.
+       *
+       * \returns \c *this
+       */
+      template<int nn_, int na_, int nb_, int sna_, int snb_>
+      CUDA_HOST_DEVICE Vector& set_convex_n(DataType alpha, const Vector<T_, na_, sna_>& a, const Vector<T_, nb_, snb_>& b)
+      {
+        static_assert(nn_ <= n_, "invalid set_convex_n size");
+        static_assert(nn_ <= na_, "invalid set_convex_n size");
+        static_assert(nn_ <= nb_, "invalid set_convex_n size");
+        for(int i(0); i < nn_; ++i)
           v[i] = (T_(1) - alpha) * a.v[i] + alpha * b.v[i];
         return *this;
       }
@@ -539,6 +697,47 @@ namespace FEAT
       }
 
       /**
+       * \brief Sets the first nn_ entries of this vector to the result of a matrix-vector product with the first mm_ entries of another vector
+       *
+       * This function effectively multiplies the upper left mm_ x nn_ block of the matrix a.
+       *
+       * \tparam mm_
+       * The number of matrix rows to multiply; must be mm_ <= min(n_, ma_)
+       *
+       * \tparam nn_
+       * The number of matrix columns to multiply; must be nn_ <= min(nx_, na_)
+       *
+       * \param[in] a
+       * The matrix for the product.
+       *
+       * \param[in] x
+       * The (right) multiplicand vector for the product.
+       *
+       * \returns \p *this
+       */
+      template<int mm_, int nn_, int ma_, int na_, int sna_, int sma_, int nx_, int sx_>
+      CUDA_HOST_DEVICE Vector& set_mat_vec_mult_n(const Matrix<T_, ma_, na_, sma_, sna_>& a, const Vector<T_, nx_, sx_>& x)
+      {
+        static_assert(mm_ <= n_, "invalid set_mat_vec_mult_n size");
+        static_assert(mm_ <= ma_, "invalid set_mat_vec_mult_n size");
+        static_assert(nn_ <= nx_, "invalid set_mat_vec_mult_n size");
+        static_assert(nn_ <= na_, "invalid set_mat_vec_mult_n size");
+
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
+        for(int i(0); i < mm_; ++i)
+        {
+          v[i] = T_(0);
+          for(int j(0); j < nn_; ++j)
+          {
+            v[i] += a.v[i][j] * x.v[j];
+          }
+        }
+        return *this;
+      }
+
+      /**
        * \brief Sets this vector to the result of a vector-matrix product.
        *
        * Let \e y denote \c this vector, and let \e x in the input vector and \e A denote the input matrix, then
@@ -563,6 +762,47 @@ namespace FEAT
         {
           v[j] = T_(0);
           for(int i(0); i < m_; ++i)
+          {
+            v[j] += a.v[i][j] * x.v[i];
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Sets the first mm_ entries of this vector to the result of a vector-matrix product with the first mm_ entries of another vector
+       *
+       * This function effectively multiplies the upper left mm_ x nn_ block of the matrix a.
+       *
+       * \tparam nn_
+       * The number of matrix columns to multiply; must be nn_ <= min(nx_, na_)
+       *
+       * \tparam mm_
+       * The number of matrix rows to multiply; must be mm_ <= min(n_, ma_)
+       *
+       * \param[in] x
+       * The (left) multiplicand vector for the product.
+       *
+       * \param[in] a
+       * The matrix for the product.
+       *
+       * \returns \p *this
+       */
+      template<int nn_, int mm_, int mx_, int smx_, int ma_, int na_, int sma_, int sna_>
+      CUDA_HOST_DEVICE Vector& set_vec_mat_mult_n(const Vector<T_, mx_, smx_>& x, const Matrix<T_, ma_, na_, sma_, sna_>& a)
+      {
+        static_assert(mm_ <= mx_, "invalid set_mat_vec_mult_n size");
+        static_assert(mm_ <= ma_, "invalid set_mat_vec_mult_n size");
+        static_assert(nn_ <= n_, "invalid set_mat_vec_mult_n size");
+        static_assert(nn_ <= na_, "invalid set_mat_vec_mult_n size");
+
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
+        for(int j(0); j < nn_; ++j)
+        {
+          v[j] = T_(0);
+          for(int i(0); i < mm_; ++i)
           {
             v[j] += a.v[i][j] * x.v[i];
           }
@@ -605,6 +845,51 @@ namespace FEAT
       }
 
       /**
+       * \brief Adds the result of a matrix-vector product onto this vector.
+       *
+       * Let \e y denote \c this vector, and let \e A denote the input matrix and \e x in the input vector, then
+       * this function computes:
+       * \f[ y \leftarrow y + \alpha\cdot A\cdot x \f]
+       *
+       * \tparam mm_
+       * The number of matrix rows to multiply; must be mm_ <= min(n_, ma_)
+       *
+       * \tparam nn_
+       * The number of matrix columns to multiply; must be nn_ <= min(nx_, na_)
+       *
+       * \param[in] a
+       * The matrix for the product.
+       *
+       * \param[in] x
+       * The (right) multiplicand vector for the product.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the product.
+       *
+       * \returns \p *this
+       */
+      template<int mm_, int nn_, int ma_, int na_, int sna_, int sma_, int nx_, int sx_>
+      CUDA_HOST_DEVICE Vector& add_mat_vec_mult_n(const Matrix<T_, ma_, na_, sma_, sna_>& a, const Vector<T_, nx_, sx_>& x, DataType alpha = DataType(1))
+      {
+        static_assert(mm_ <= n_, "invalid add_mat_vec_mult_n size");
+        static_assert(mm_ <= ma_, "invalid add_mat_vec_mult_n size");
+        static_assert(nn_ <= nx_, "invalid add_mat_vec_mult_n size");
+        static_assert(nn_ <= na_, "invalid add_mat_vec_mult_n size");
+
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
+        for(int i(0); i < mm_; ++i)
+        {
+          for(int j(0); j < nn_; ++j)
+          {
+            v[i] += alpha * a.v[i][j] * x.v[j];
+          }
+        }
+        return *this;
+      }
+
+      /**
        * \brief Adds the result of a vector-matrix product onto this vector.
        *
        * Let \e y denote \c this vector, and let \e x in the input vector and \e A denote the input matrix, then
@@ -639,53 +924,183 @@ namespace FEAT
       }
 
       /**
-       * \brief Computes the squared euclid norm of the vector.
+       * \brief Adds the result of a vector-matrix product onto this vector.
+       *
+       * Let \e y denote \c this vector, and let \e x in the input vector and \e A denote the input matrix, then
+       * this function computes:
+       * \f[ y^\top \leftarrow y^\top + \alpha\cdot x^\top \cdot A \Longleftrightarrow y \leftarrow y + \alpha\cdot A^\top\cdot x \f]
+       *
+       * \tparam nn_
+       * The number of matrix columns to multiply; must be nn_ <= min(nx_, na_)
+       *
+       * \tparam mm_
+       * The number of matrix rows to multiply; must be mm_ <= min(n_, ma_)
+       *
+       * \param[in] x
+       * The (left) multiplicand vector for the product.
+       *
+       * \param[in] a
+       * The matrix for the product.
+       *
+       * \param[in] alpha
+       * The scaling parameter for the product.
+       *
+       * \returns \p *this
+       */
+      template<int nn_, int mm_, int mx_, int smx_, int ma_, int na_, int sma_, int sna_>
+      CUDA_HOST_DEVICE Vector& add_vec_mat_mult_n(const Vector<T_, mx_, smx_>& x, const Matrix<T_, ma_, na_, sma_, sna_>& a, DataType alpha = DataType(1))
+      {
+        static_assert(mm_ <= mx_, "invalid add_vec_mat_mult_n size");
+        static_assert(mm_ <= ma_, "invalid add_vec_mat_mult_n size");
+        static_assert(nn_ <= n_, "invalid add_vec_mat_mult_n size");
+        static_assert(nn_ <= na_, "invalid add_vec_mat_mult_n size");
+
+        // we have to compare void* addresses here, because we might get a type mismatch error otherwise
+        ASSERTM((const void*)this != (const void*)&x, "result vector and multiplicand vector 'x' must be different objects");
+
+        for(int j(0); j < nn_; ++j)
+        {
+          for(int i(0); i < mm_; ++i)
+          {
+            v[j] += alpha * a.v[i][j] * x.v[i];
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Computes the squared euclid norm of this vector.
        *
        * \returns
-       * The squared euclid norm of the vector.
+       * The squared euclid norm of this vector.
        */
       CUDA_HOST_DEVICE DataType norm_euclid_sqr() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
+        {
           #ifndef __CUDACC__
           r += Math::sqr(v[i]);
           #else
           r += CudaMath::cuda_sqr(v[i]);
           #endif
+        }
         return r;
       }
 
       /**
-       * \brief Computes the euclid norm of the vector.
+       * \brief Computes the squared euclid norm of first nn_ entries of this vector
        *
        * \returns
-       * The euclid norm of the vector.
+       * The squared euclid norm of the vector.
        */
-      CUDA_HOST_DEVICE DataType norm_euclid() const
+      template<int nn_>
+      CUDA_HOST_DEVICE DataType norm_euclid_sqr_n() const
       {
-      #ifndef __CUDACC__
-        return Math::sqrt(norm_euclid_sqr());
-      #else
-        return CudaMath::cuda_sqrt(norm_euclid_sqr());
-      #endif
+        static_assert(nn_ <= n_, "invalid norm_euclid_sqr_n size");
+        DataType r(DataType(0));
+        for(int i(0); i < nn_; ++i)
+        {
+          #ifndef __CUDACC__
+          r += Math::sqr(v[i]);
+          #else
+          r += CudaMath::cuda_sqr(v[i]);
+          #endif
+        }
+        return r;
       }
 
       /**
-       * \brief Computes the l1-norm of the vector.
+       * \brief Computes the euclid norm of this vector
        *
        * \returns
-       * The l1-norm of the vector.
+       * The euclid norm of this vector
+       */
+      CUDA_HOST_DEVICE DataType norm_euclid() const
+      {
+        #ifndef __CUDACC__
+        return Math::sqrt(norm_euclid_sqr());
+        #else
+        return CudaMath::cuda_sqrt(norm_euclid_sqr());
+        #endif
+      }
+
+      /**
+      * \brief Computes the euclid norm of first nn_ entries of this vector
+      *
+      * \returns
+      * The euclid norm of the vector.
+      */
+      template<int nn_>
+      CUDA_HOST_DEVICE DataType norm_euclid_n() const
+      {
+        static_assert(nn_ <= n_, "invalid norm_euclid_n size");
+        #ifndef __CUDACC__
+        return Math::sqrt(this->template norm_euclid_sqr_n<nn_>());
+        #else
+        return CudaMath::cuda_sqrt(this->template norm_euclid_sqr_n<nn_>());
+        #endif
+      }
+
+      /**
+       * \brief Computes the l1-norm of this vector
+       *
+       * \returns
+       * The l1-norm of this vector
        */
       CUDA_HOST_DEVICE DataType norm_l1() const
       {
         DataType r(DataType(0));
         for(int i(0); i < n_; ++i)
+        {
           #ifndef __CUDACC__
           r += Math::abs(v[i]);
           #else
           r += CudaMath::cuda_abs(v[i]);
           #endif
+        }
+        return r;
+      }
+
+      /**
+       * \brief Computes the l1-norm of the first nn_ entries of this vector
+       *
+       * \returns
+       * The l1-norm of the vector
+       */
+      template<int nn_>
+      CUDA_HOST_DEVICE DataType norm_l1_n() const
+      {
+        static_assert(nn_ <= n_, "invalid norm_l1_n size");
+        DataType r(DataType(0));
+        for(int i(0); i < nn_; ++i)
+        {
+          #ifndef __CUDACC__
+          r += Math::abs(v[i]);
+          #else
+          r += CudaMath::cuda_abs(v[i]);
+          #endif
+        }
+        return r;
+      }
+
+      /**
+       * \brief Computes the max-norm of this vector
+       *
+       * \returns
+       * The max-norm of this vector
+       */
+      CUDA_HOST_DEVICE DataType norm_max() const
+      {
+        DataType r(DataType(0));
+        for(int i(0); i < n_; ++i)
+        {
+          #ifndef __CUDACC__
+          r = Math::max(r, Math::abs(v[i]));
+          #else
+          r = CudaMath::cuda_max(r, CudaMath::cuda_abs(v[i]));
+          #endif
+        }
         return r;
       }
 
@@ -695,15 +1110,19 @@ namespace FEAT
        * \returns
        * The max-norm of the vector.
        */
-      CUDA_HOST_DEVICE DataType norm_max() const
+      template<int nn_>
+      CUDA_HOST_DEVICE DataType norm_max_n() const
       {
+        static_assert(nn_ <= n_, "invalid norm_l1_n size");
         DataType r(DataType(0));
-        for(int i(0); i < n_; ++i)
-        #ifndef __CUDACC__
+        for(int i(0); i < nn_; ++i)
+        {
+          #ifndef __CUDACC__
           r = Math::max(r, Math::abs(v[i]));
-        #else
+          #else
           r = CudaMath::cuda_max(r, CudaMath::cuda_abs(v[i]));
-        #endif
+          #endif
+        }
         return r;
       }
 
@@ -785,21 +1204,22 @@ namespace FEAT
       return Vector<T_, n_>(a) -= b;
     }
 
-      /**
-       * \brief Calculates the counter-clockwise opening angle between two 2D vectors
-       *
-       * \param[in] x Vector x
-       * \param[in] y Vector y
-       */
-      template<typename T_>
-      CUDA_HOST inline T_ calculate_opening_angle(const Vector<T_,2>& x, const Vector<T_, 2>& y)
-      {
-        #ifdef __CUDACC__
-        return T_(0);
-        #else
-        return Math::calc_opening_angle(x[0], x[1], y[0], y[1]);
-        #endif
-      }
+    /**
+     * \brief Calculates the counter-clockwise opening angle between two 2D vectors
+     *
+     * \param[in] x Vector x
+     * \param[in] y Vector y
+     */
+    template<typename T_>
+    CUDA_HOST inline T_ calculate_opening_angle(const Vector<T_,2>& x, const Vector<T_, 2>& y)
+    {
+      #ifdef __CUDACC__
+      XABORTM("calculate_opening_angle not implemented for CUDA");
+      return T_(0);
+      #else
+      return Math::calc_opening_angle(x[0], x[1], y[0], y[1]);
+      #endif
+    }
 
 
     /* ************************************************************************************************************* */
@@ -1015,34 +1435,6 @@ namespace FEAT
         return v[i];
       }
 
-      /**
-       * \brief Size-cast function.
-       *
-       * This function casts this matrix's reference to another size.
-       *
-       * \tparam mm_, nn_
-       * The dimensions of the casted matrix. Must be 0 < \p mm_ <= \p sm_ and 0 < \p nn_ <= \p sn_.
-       *
-       * \returns
-       * A casted (const) reference of \p *this.
-       */
-      template<int mm_, int nn_>
-      CUDA_HOST_DEVICE Matrix<T_, mm_, nn_, sm_, sn_>& size_cast()
-      {
-        static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
-        static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
-        return reinterpret_cast<Matrix<T_, mm_, nn_, sm_, sn_>&>(*this);
-      }
-
-      /** \copydoc size_cast() */
-      template<int mm_, int nn_>
-      CUDA_HOST_DEVICE const Matrix<T_, mm_, nn_, sm_, sn_>& size_cast() const
-      {
-        static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
-        static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
-        return reinterpret_cast<const Matrix<T_, mm_, nn_, sm_, sn_>&>(*this);
-      }
-
       /// scalar-right-multiply-by operator
       CUDA_HOST_DEVICE Matrix& operator*=(DataType alpha)
       {
@@ -1073,6 +1465,44 @@ namespace FEAT
           v[i] -= a.v[i];
         }
         return *this;
+      }
+
+      /**
+       * \brief Copies a matrix
+       *
+       * \param[in] a
+       * The source matrix to copy
+       */
+      template<int sma_, int sna_>
+      CUDA_HOST_DEVICE void copy(const Matrix<T_, m_, n_, sma_, sna_>& a)
+      {
+        for(int i(0); i < m_; ++i)
+          for(int j(0); j < n_; ++j)
+            v[i][j] = a.v[i][j];
+      }
+
+      /**
+       * \brief Copies the upper left mm_ x nn_ entries of a matrix
+       *
+       * \tparam mm_
+       * The number of matrix rows to copy; must be mm_ <= min(m_, ma_)
+       *
+       * \tparam nn_
+       * The number of matrix columns to copy; must be nn_ <= min(n_, na_)
+       *
+       * \param[in] x
+       * The source vector to copy the elements from
+       */
+      template<int mm_, int nn_, int ma_, int na_, int sma_, int sna_>
+      CUDA_HOST_DEVICE void copy_n(const Matrix<T_, ma_, na_, sma_, sna_>& a)
+      {
+        static_assert(mm_ <= m_, "invalid copy_n size");
+        static_assert(mm_ <= ma_, "invalid copy_n size");
+        static_assert(nn_ <= n_, "invalid copy_n size");
+        static_assert(nn_ <= na_, "invalid copy_n size");
+        for(int i(0); i < mm_; ++i)
+          for(int j(0); j < nn_; ++j)
+            v[i][j] = a.v[i][j];
       }
 
       /**
@@ -1831,6 +2261,49 @@ namespace FEAT
       }
     }; // class Matrix
 
+    /**
+     * \brief Computes the positively oriented orthogonal vector to the columns of a 2x1 matrix
+     *
+     * \param[out] nu
+     * The vector whose first 2 components should receive the normal vector
+     *
+     * \param[in] tau
+     * The matrix whose upper left 2x1 block to compute the orthogonal vector from
+     */
+    template<typename T_, int mx_, int smx_, int ma_, int na_, int sm_, int sn_>
+    CUDA_HOST_DEVICE void orthogonal_2x1(Vector<T_, mx_, smx_>& nu, const Matrix<T_, ma_, na_, sm_, sn_>& tau)
+    {
+      static_assert(mx_ >= 2, "invalid nu vector size for orthogonal_2x1");
+      static_assert(ma_ >= 2, "invalid matrix row size for orthogonal_2x1");
+      static_assert(na_ >= 1, "invalid matrix column size for orthogonal_2x1");
+
+      // 2d "cross" product. The sign has to be on the second component so the input is rotated in negative direction
+      nu[0] =  tau[1][0];
+      nu[1] = -tau[0][0];
+    }
+
+    /**
+     * \brief Computes the positively oriented orthogonal vector to the columns of a 3x2 matrix
+     *
+     * \param[out] nu
+     * The vector whose first 3 components should receive the normal vector
+     *
+     * \param[in] tau
+     * The matrix whose upper left 3x2 block to compute the orthogonal vector from
+     */
+    template<typename T_, int mx_, int smx_, int ma_, int na_, int sm_, int sn_>
+    CUDA_HOST_DEVICE void orthogonal_3x2(Vector<T_, mx_, smx_>& nu, const Matrix<T_, ma_, na_, sm_, sn_>& tau)
+    {
+      static_assert(mx_ >= 3, "invalid nu vector size for orthogonal_3x2");
+      static_assert(ma_ >= 3, "invalid matrix row size for orthogonal_3x2");
+      static_assert(na_ >= 2, "invalid matrix column size for orthogonal_3x2");
+
+      // 3d cross product
+      nu[0] = tau[1][0]*tau[2][1] - tau[2][0]*tau[1][1];
+      nu[1] = tau[2][0]*tau[0][1] - tau[0][0]*tau[2][1];
+      nu[2] = tau[0][0]*tau[1][1] - tau[1][0]*tau[0][1];
+    }
+
 #ifdef DOXYGEN
     /**
      * \brief Computes the positively oriented orthogonal vector to the columns of a m_ x (m_-1) Matrix
@@ -1864,11 +2337,7 @@ namespace FEAT
     CUDA_HOST_DEVICE Vector<T_, 2> orthogonal(const Matrix<T_, 2, 1, sm_, sn_>& tau)
     {
       Vector<T_, 2, sm_> nu(T_(0));
-
-      // 2d "cross" product. The sign has to be on the second component so the input is rotated in negative direction
-      nu[0] =  tau[1][0];
-      nu[1] = -tau[0][0];
-
+      orthogonal_2x1(nu, tau);
       return nu;
     }
 
@@ -1876,12 +2345,7 @@ namespace FEAT
     CUDA_HOST_DEVICE Vector<T_, 3> orthogonal(const Matrix<T_, 3, 2, sm_, sn_>& tau)
     {
       Vector<T_, 3, sm_> nu(T_(0));
-
-      // 3d cross product
-      nu[0] = tau[1][0]*tau[2][1] - tau[2][0]*tau[1][1];
-      nu[1] = tau[2][0]*tau[0][1] - tau[0][0]*tau[2][1];
-      nu[2] = tau[0][0]*tau[1][1] - tau[1][0]*tau[0][1];
-
+      orthogonal_3x2(nu, tau);
       return nu;
     }
     /// \endcond
@@ -2126,37 +2590,6 @@ namespace FEAT
         return v[h];
       }
 
-      /**
-       * \brief Size-cast function.
-       *
-       * This function casts this tensor's reference to another size.
-       *
-       * \tparam ll_, mm_, nn_
-       * The dimensions of the casted matrix. Must be 0 < \p ll_ <= \p sl_, 0 < \p mm_ <= \p sm_
-       * and 0 < \p nn_ <= \p sn_.
-       *
-       * \returns
-       * A casted (const) reference of \p *this.
-       */
-      template<int ll_, int mm_, int nn_>
-      CUDA_HOST_DEVICE Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast()
-      {
-        static_assert((ll_ >= 0) && (ll_ <= sl_), "invalid cast tube count");
-        static_assert((mm_ >= 0) && (mm_ <= sm_), "invalid cast row count");
-        static_assert((nn_ >= 0) && (nn_ <= sn_), "invalid cast column count");
-        return reinterpret_cast<Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>&>(*this);
-      }
-
-      /** \copydoc size_cast() */
-      template<int ll_, int mm_, int nn_>
-      CUDA_HOST_DEVICE const Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast() const
-      {
-        static_assert((ll_ >= 0) && (ll_ <= sl_), "invalid cast tube count");
-        static_assert((mm_ >= 0) && (mm_ <= sm_), "invalid cast row count");
-        static_assert((nn_ >= 0) && (nn_ <= sn_), "invalid cast column count");
-        return reinterpret_cast<Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>&>(*this);
-      }
-
       /// scalar right-multiply-by operator
       CUDA_HOST_DEVICE Tensor3& operator*=(DataType alpha)
       {
@@ -2181,6 +2614,48 @@ namespace FEAT
         for(int i(0); i < l_; ++i)
           v[i] -= a.v[i];
         return *this;
+      }
+
+      /**
+      * \brief Copies a tensor3
+      *
+      * \param[in] a
+      * The source tensor3 to copy
+      */
+      template<int sla_, int sma_, int sna_>
+      CUDA_HOST_DEVICE void copy(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      {
+        for(int i(0); i < l_; ++i)
+          for(int j(0); j < m_; ++j)
+            for(int k(0); k < n_; ++k)
+              v[i][j][k] = a.v[i][j][k];
+      }
+
+      /**
+      * \brief Copies the upper left mm_ x nn_ entries of a matrix
+      *
+      * \tparam mm_
+      * The number of matrix rows to copy; must be mm_ <= min(m_, ma_)
+      *
+      * \tparam nn_
+      * The number of matrix columns to copy; must be nn_ <= min(n_, na_)
+      *
+      * \param[in] x
+      * The source vector to copy the elements from
+      */
+      template<int ll_,int mm_, int nn_, int la_, int ma_, int na_, int sla_, int sma_, int sna_>
+      CUDA_HOST_DEVICE void copy_n(const Tensor3<T_, la_, ma_, na_, sla_, sma_, sna_>& a)
+      {
+        static_assert(ll_ <= l_, "invalid copy_n size");
+        static_assert(ll_ <= la_, "invalid copy_n size");
+        static_assert(mm_ <= m_, "invalid copy_n size");
+        static_assert(mm_ <= ma_, "invalid copy_n size");
+        static_assert(nn_ <= n_, "invalid copy_n size");
+        static_assert(nn_ <= na_, "invalid copy_n size");
+        for(int i(0); i < ll_; ++i)
+          for(int j(0); j < mm_; ++j)
+            for(int k(0); k < nn_; ++k)
+              v[i][j][k] = a.v[i][j][k];
       }
 
       /// formats the tensor
@@ -2617,26 +3092,9 @@ namespace FEAT
         template<typename T_, int sma_, int sna_>
         CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, n_, n_, sma_, sna_>& a)
         {
-          // create temporary copy of a and a pivot array
-          T_ b[n_*n_];
-          int p[n_];
-
-          // copy matrix a to b
-          for (int i(0); i < n_; ++i)
-          {
-            for (int j(0); j < n_; ++j)
-            {
-              b[i*n_+j] = a(i, j);
-            }
-          }
-
           // perform matrix inversion which returns the determinant
-          #ifndef __CUDACC__
-          const T_ det = Math::invert_matrix(n_, n_, b, p);
-          #else
-          const T_ det = CudaMath::cuda_invert_matrix(n_, n_, b, p);
-          #endif
-
+          Tiny::Matrix<T_, n_, n_> b;
+          const T_ det = Intern::InverseHelper<n_, n_>::compute(b, a);
 
           // if the returned value is not normal, we can assume that the matrix is singular
           #ifndef __CUDACC__
