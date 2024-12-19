@@ -179,17 +179,22 @@ namespace FEAT
       };
 
       // forward declarations of helper classes
-      template<int m_, int n_, int sna_>
+      template<int m_, int n_>
       struct DetHelper;
 
-      template<int m_, int n_, int sna_>
+      template<int m_, int n_>
       struct VolHelper;
 
-      template<int m_, int n_, int sna_, int snb_>
+      template<int m_, int n_>
       struct InverseHelper;
 
-      template<int m_, int n_, int sna_, int snb_>
+      template<int m_, int n_>
       struct CofactorHelper;
+
+#ifdef __CUDACC__
+      template<int m_, int n_>
+      struct CudaGroupedInverseHelper;
+#endif
     } // namespace Intern
     /// \endcond
 
@@ -1218,7 +1223,7 @@ namespace FEAT
        */
       CUDA_HOST_DEVICE DataType det() const
       {
-        return Intern::DetHelper<m_, n_, sn_>::compute(&this->v[0].v[0]);
+        return Intern::DetHelper<m_, n_>::compute(*this);
       }
 
       /**
@@ -1234,7 +1239,7 @@ namespace FEAT
        */
       CUDA_HOST_DEVICE DataType vol() const
       {
-        return Intern::VolHelper<m_, n_, sn_>::compute(&this->v[0].v[0]);
+        return Intern::VolHelper<m_, n_>::compute(*this);
       }
 
       /**
@@ -1252,7 +1257,7 @@ namespace FEAT
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
-        Intern::InverseHelper<m_, n_, sn_, sna_>::compute(&this->v[0].v[0], &a.v[0].v[0]);
+        Intern::InverseHelper<m_, n_>::compute(*this, a);
         return *this;
       }
 
@@ -1277,7 +1282,7 @@ namespace FEAT
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
-        Intern::InverseHelper<m_, n_, sn_, sna_>::grouped_compute(tg, &this->v[0].v[0], &a.v[0].v[0], det);
+        Intern::CudaGroupedInverseHelper<m_, n_>::compute(tg, *this, a, det);
         return *this;
       }
       #endif
@@ -1304,7 +1309,7 @@ namespace FEAT
       {
         // we have to compare void* addresses here, because we might get a type mismatch error otherwise
         ASSERTM((const void*)this != (const void*)&a, "result matrix and input matrix 'a' must be different objects");
-        Intern::CofactorHelper<m_, n_, sn_, sna_>::compute(&this->v[0].v[0], &a.v[0].v[0]);
+        Intern::CofactorHelper<m_, n_>::compute(*this, a);
         return *this;
       }
 
@@ -2606,11 +2611,11 @@ namespace FEAT
     namespace Intern
     {
       // generic square matrix inversion:
-      template<int n_, int sna_>
-      struct DetHelper<n_,n_,sna_>
+      template<int n_>
+      struct DetHelper<n_,n_>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, n_, n_, sma_, sna_>& a)
         {
           // create temporary copy of a and a pivot array
           T_ b[n_*n_];
@@ -2621,7 +2626,7 @@ namespace FEAT
           {
             for (int j(0); j < n_; ++j)
             {
-              b[i*n_+j] = a[i*sna_+j];
+              b[i*n_+j] = a(i, j);
             }
           }
 
@@ -2642,180 +2647,181 @@ namespace FEAT
         }
       };
 
-      template<int sna_>
-      struct DetHelper<1,1,sna_>
+      template<>
+      struct DetHelper<1,1>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 1, 1, sma_, sna_>& a)
         {
-          return a[0];
+          return a(0,0);
         }
       };
 
-      template<int sna_>
-      struct DetHelper<2,2,sna_>
+
+      template<>
+      struct DetHelper<2,2>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 2, 2, sma_, sna_>& a)
         {
-          return a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0];
+          return a(0,0)*a(1,1) - a(0,1)*a(1,0);
         }
       };
 
-      template<int sna_>
-      struct DetHelper<3,3,sna_>
+      template<>
+      struct DetHelper<3,3>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 3, 3, sma_, sna_>& a)
         {
-          return  a[0*sna_+0]*(a[1*sna_+1]*a[2*sna_+2] - a[1*sna_+2]*a[2*sna_+1])
-                + a[0*sna_+1]*(a[1*sna_+2]*a[2*sna_+0] - a[1*sna_+0]*a[2*sna_+2])
-                + a[0*sna_+2]*(a[1*sna_+0]*a[2*sna_+1] - a[1*sna_+1]*a[2*sna_+0]);
+          return  a(0,0)*(a(1,1)*a(2,2) - a(1,2)*a(2,1))
+            + a(0,1)*(a(1,2)*a(2,0) - a(1,0)*a(2,2))
+            + a(0,2)*(a(1,0)*a(2,1) - a(1,1)*a(2,0));
         }
       };
 
-      template<int sna_>
-      struct DetHelper<4,4,sna_>
+      template<>
+      struct DetHelper<4,4>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 4, 4, sma_, sna_>& a)
         {
           // 2x2 determinants of rows 3-4
           T_ w[6] =
           {
-            a[2*sna_+0]*a[3*sna_+1] - a[2*sna_+1]*a[3*sna_+0],
-            a[2*sna_+0]*a[3*sna_+2] - a[2*sna_+2]*a[3*sna_+0],
-            a[2*sna_+0]*a[3*sna_+3] - a[2*sna_+3]*a[3*sna_+0],
-            a[2*sna_+1]*a[3*sna_+2] - a[2*sna_+2]*a[3*sna_+1],
-            a[2*sna_+1]*a[3*sna_+3] - a[2*sna_+3]*a[3*sna_+1],
-            a[2*sna_+2]*a[3*sna_+3] - a[2*sna_+3]*a[3*sna_+2]
+            a(2,0)*a(3,1) - a(2,1)*a(3,0),
+            a(2,0)*a(3,2) - a(2,2)*a(3,0),
+            a(2,0)*a(3,3) - a(2,3)*a(3,0),
+            a(2,1)*a(3,2) - a(2,2)*a(3,1),
+            a(2,1)*a(3,3) - a(2,3)*a(3,1),
+            a(2,2)*a(3,3) - a(2,3)*a(3,2)
           };
 
           return
-            + a[0*sna_+0] * (a[1*sna_+1]*w[5] - a[1*sna_+2]*w[4] + a[1*sna_+3]*w[3])
-            - a[0*sna_+1] * (a[1*sna_+0]*w[5] - a[1*sna_+2]*w[2] + a[1*sna_+3]*w[1])
-            + a[0*sna_+2] * (a[1*sna_+0]*w[4] - a[1*sna_+1]*w[2] + a[1*sna_+3]*w[0])
-            - a[0*sna_+3] * (a[1*sna_+0]*w[3] - a[1*sna_+1]*w[1] + a[1*sna_+2]*w[0]);
+            + a(0,0) * (a(1,1)*w[5] - a(1,2)*w[4] + a(1,3)*w[3])
+            - a(0,1) * (a(1,0)*w[5] - a(1,2)*w[2] + a(1,3)*w[1])
+            + a(0,2) * (a(1,0)*w[4] - a(1,1)*w[2] + a(1,3)*w[0])
+            - a(0,3) * (a(1,0)*w[3] - a(1,1)*w[1] + a(1,2)*w[0]);
         }
       };
 
-      template<int sna_>
-      struct DetHelper<5,5,sna_>
+      template<>
+      struct DetHelper<5,5>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 5, 5, sma_, sna_>& a)
         {
           // 2x2 determinants of rows 4-5
           T_ v[10] =
           {
-            a[3*sna_+0]*a[4*sna_+1] - a[3*sna_+1]*a[4*sna_+0],
-            a[3*sna_+0]*a[4*sna_+2] - a[3*sna_+2]*a[4*sna_+0],
-            a[3*sna_+0]*a[4*sna_+3] - a[3*sna_+3]*a[4*sna_+0],
-            a[3*sna_+0]*a[4*sna_+4] - a[3*sna_+4]*a[4*sna_+0],
-            a[3*sna_+1]*a[4*sna_+2] - a[3*sna_+2]*a[4*sna_+1],
-            a[3*sna_+1]*a[4*sna_+3] - a[3*sna_+3]*a[4*sna_+1],
-            a[3*sna_+1]*a[4*sna_+4] - a[3*sna_+4]*a[4*sna_+1],
-            a[3*sna_+2]*a[4*sna_+3] - a[3*sna_+3]*a[4*sna_+2],
-            a[3*sna_+2]*a[4*sna_+4] - a[3*sna_+4]*a[4*sna_+2],
-            a[3*sna_+3]*a[4*sna_+4] - a[3*sna_+4]*a[4*sna_+3]
+            a(3,0)*a(4,1) - a(3,1)*a(4,0),
+            a(3,0)*a(4,2) - a(3,2)*a(4,0),
+            a(3,0)*a(4,3) - a(3,3)*a(4,0),
+            a(3,0)*a(4,4) - a(3,4)*a(4,0),
+            a(3,1)*a(4,2) - a(3,2)*a(4,1),
+            a(3,1)*a(4,3) - a(3,3)*a(4,1),
+            a(3,1)*a(4,4) - a(3,4)*a(4,1),
+            a(3,2)*a(4,3) - a(3,3)*a(4,2),
+            a(3,2)*a(4,4) - a(3,4)*a(4,2),
+            a(3,3)*a(4,4) - a(3,4)*a(4,3)
           };
           // 3x3 determinants of rows 3-4-5
           T_ w[10] =
           {
-            a[2*sna_+0]*v[4] - a[2*sna_+1]*v[1] + a[2*sna_+2]*v[0],
-            a[2*sna_+0]*v[5] - a[2*sna_+1]*v[2] + a[2*sna_+3]*v[0],
-            a[2*sna_+0]*v[6] - a[2*sna_+1]*v[3] + a[2*sna_+4]*v[0],
-            a[2*sna_+0]*v[7] - a[2*sna_+2]*v[2] + a[2*sna_+3]*v[1],
-            a[2*sna_+0]*v[8] - a[2*sna_+2]*v[3] + a[2*sna_+4]*v[1],
-            a[2*sna_+0]*v[9] - a[2*sna_+3]*v[3] + a[2*sna_+4]*v[2],
-            a[2*sna_+1]*v[7] - a[2*sna_+2]*v[5] + a[2*sna_+3]*v[4],
-            a[2*sna_+1]*v[8] - a[2*sna_+2]*v[6] + a[2*sna_+4]*v[4],
-            a[2*sna_+1]*v[9] - a[2*sna_+3]*v[6] + a[2*sna_+4]*v[5],
-            a[2*sna_+2]*v[9] - a[2*sna_+3]*v[8] + a[2*sna_+4]*v[7]
+            a(2,0)*v[4] - a(2,1)*v[1] + a(2,2)*v[0],
+            a(2,0)*v[5] - a(2,1)*v[2] + a(2,3)*v[0],
+            a(2,0)*v[6] - a(2,1)*v[3] + a(2,4)*v[0],
+            a(2,0)*v[7] - a(2,2)*v[2] + a(2,3)*v[1],
+            a(2,0)*v[8] - a(2,2)*v[3] + a(2,4)*v[1],
+            a(2,0)*v[9] - a(2,3)*v[3] + a(2,4)*v[2],
+            a(2,1)*v[7] - a(2,2)*v[5] + a(2,3)*v[4],
+            a(2,1)*v[8] - a(2,2)*v[6] + a(2,4)*v[4],
+            a(2,1)*v[9] - a(2,3)*v[6] + a(2,4)*v[5],
+            a(2,2)*v[9] - a(2,3)*v[8] + a(2,4)*v[7]
           };
 
           return
-            + a[0*sna_+0]*(a[1*sna_+1]*w[9] - a[1*sna_+2]*w[8] + a[1*sna_+3]*w[7] - a[1*sna_+4]*w[6])
-            - a[0*sna_+1]*(a[1*sna_+0]*w[9] - a[1*sna_+2]*w[5] + a[1*sna_+3]*w[4] - a[1*sna_+4]*w[3])
-            + a[0*sna_+2]*(a[1*sna_+0]*w[8] - a[1*sna_+1]*w[5] + a[1*sna_+3]*w[2] - a[1*sna_+4]*w[1])
-            - a[0*sna_+3]*(a[1*sna_+0]*w[7] - a[1*sna_+1]*w[4] + a[1*sna_+2]*w[2] - a[1*sna_+4]*w[0])
-            + a[0*sna_+4]*(a[1*sna_+0]*w[6] - a[1*sna_+1]*w[3] + a[1*sna_+2]*w[1] - a[1*sna_+3]*w[0]);
+            + a(0,0)*(a(1,1)*w[9] - a(1,2)*w[8] + a(1,3)*w[7] - a(1,4)*w[6])
+            - a(0,1)*(a(1,0)*w[9] - a(1,2)*w[5] + a(1,3)*w[4] - a(1,4)*w[3])
+            + a(0,2)*(a(1,0)*w[8] - a(1,1)*w[5] + a(1,3)*w[2] - a(1,4)*w[1])
+            - a(0,3)*(a(1,0)*w[7] - a(1,1)*w[4] + a(1,2)*w[2] - a(1,4)*w[0])
+            + a(0,4)*(a(1,0)*w[6] - a(1,1)*w[3] + a(1,2)*w[1] - a(1,3)*w[0]);
         }
       };
 
-      template<int sna_>
-      struct DetHelper<6,6,sna_>
+      template<>
+      struct DetHelper<6,6>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 6, 6, sma_, sna_>& a)
         {
           // 2x2 determinants of rows 5-6
           T_ v[15] =
           {
-            a[4*sna_+0]*a[5*sna_+1] - a[4*sna_+1]*a[5*sna_+0],
-            a[4*sna_+0]*a[5*sna_+2] - a[4*sna_+2]*a[5*sna_+0],
-            a[4*sna_+0]*a[5*sna_+3] - a[4*sna_+3]*a[5*sna_+0],
-            a[4*sna_+0]*a[5*sna_+4] - a[4*sna_+4]*a[5*sna_+0],
-            a[4*sna_+0]*a[5*sna_+5] - a[4*sna_+5]*a[5*sna_+0],
-            a[4*sna_+1]*a[5*sna_+2] - a[4*sna_+2]*a[5*sna_+1],
-            a[4*sna_+1]*a[5*sna_+3] - a[4*sna_+3]*a[5*sna_+1],
-            a[4*sna_+1]*a[5*sna_+4] - a[4*sna_+4]*a[5*sna_+1],
-            a[4*sna_+1]*a[5*sna_+5] - a[4*sna_+5]*a[5*sna_+1],
-            a[4*sna_+2]*a[5*sna_+3] - a[4*sna_+3]*a[5*sna_+2],
-            a[4*sna_+2]*a[5*sna_+4] - a[4*sna_+4]*a[5*sna_+2],
-            a[4*sna_+2]*a[5*sna_+5] - a[4*sna_+5]*a[5*sna_+2],
-            a[4*sna_+3]*a[5*sna_+4] - a[4*sna_+4]*a[5*sna_+3],
-            a[4*sna_+3]*a[5*sna_+5] - a[4*sna_+5]*a[5*sna_+3],
-            a[4*sna_+4]*a[5*sna_+5] - a[4*sna_+5]*a[5*sna_+4]
+            a(4,0)*a(5,1) - a(4,1)*a(5,0),
+            a(4,0)*a(5,2) - a(4,2)*a(5,0),
+            a(4,0)*a(5,3) - a(4,3)*a(5,0),
+            a(4,0)*a(5,4) - a(4,4)*a(5,0),
+            a(4,0)*a(5,5) - a(4,5)*a(5,0),
+            a(4,1)*a(5,2) - a(4,2)*a(5,1),
+            a(4,1)*a(5,3) - a(4,3)*a(5,1),
+            a(4,1)*a(5,4) - a(4,4)*a(5,1),
+            a(4,1)*a(5,5) - a(4,5)*a(5,1),
+            a(4,2)*a(5,3) - a(4,3)*a(5,2),
+            a(4,2)*a(5,4) - a(4,4)*a(5,2),
+            a(4,2)*a(5,5) - a(4,5)*a(5,2),
+            a(4,3)*a(5,4) - a(4,4)*a(5,3),
+            a(4,3)*a(5,5) - a(4,5)*a(5,3),
+            a(4,4)*a(5,5) - a(4,5)*a(5,4)
           };
           // 3x3 determinants of rows 4-5-6
           T_ w[20] =
           {
-            a[3*sna_+0]*v[ 5] - a[3*sna_+1]*v[ 1] + a[3*sna_+2]*v[ 0],
-            a[3*sna_+0]*v[ 6] - a[3*sna_+1]*v[ 2] + a[3*sna_+3]*v[ 0],
-            a[3*sna_+0]*v[ 7] - a[3*sna_+1]*v[ 3] + a[3*sna_+4]*v[ 0],
-            a[3*sna_+0]*v[ 8] - a[3*sna_+1]*v[ 4] + a[3*sna_+5]*v[ 0],
-            a[3*sna_+0]*v[ 9] - a[3*sna_+2]*v[ 2] + a[3*sna_+3]*v[ 1],
-            a[3*sna_+0]*v[10] - a[3*sna_+2]*v[ 3] + a[3*sna_+4]*v[ 1],
-            a[3*sna_+0]*v[11] - a[3*sna_+2]*v[ 4] + a[3*sna_+5]*v[ 1],
-            a[3*sna_+0]*v[12] - a[3*sna_+3]*v[ 3] + a[3*sna_+4]*v[ 2],
-            a[3*sna_+0]*v[13] - a[3*sna_+3]*v[ 4] + a[3*sna_+5]*v[ 2],
-            a[3*sna_+0]*v[14] - a[3*sna_+4]*v[ 4] + a[3*sna_+5]*v[ 3],
-            a[3*sna_+1]*v[ 9] - a[3*sna_+2]*v[ 6] + a[3*sna_+3]*v[ 5],
-            a[3*sna_+1]*v[10] - a[3*sna_+2]*v[ 7] + a[3*sna_+4]*v[ 5],
-            a[3*sna_+1]*v[11] - a[3*sna_+2]*v[ 8] + a[3*sna_+5]*v[ 5],
-            a[3*sna_+1]*v[12] - a[3*sna_+3]*v[ 7] + a[3*sna_+4]*v[ 6],
-            a[3*sna_+1]*v[13] - a[3*sna_+3]*v[ 8] + a[3*sna_+5]*v[ 6],
-            a[3*sna_+1]*v[14] - a[3*sna_+4]*v[ 8] + a[3*sna_+5]*v[ 7],
-            a[3*sna_+2]*v[12] - a[3*sna_+3]*v[10] + a[3*sna_+4]*v[ 9],
-            a[3*sna_+2]*v[13] - a[3*sna_+3]*v[11] + a[3*sna_+5]*v[ 9],
-            a[3*sna_+2]*v[14] - a[3*sna_+4]*v[11] + a[3*sna_+5]*v[10],
-            a[3*sna_+3]*v[14] - a[3*sna_+4]*v[13] + a[3*sna_+5]*v[12]
+            a(3,0)*v[ 5] - a(3,1)*v[ 1] + a(3,2)*v[ 0],
+            a(3,0)*v[ 6] - a(3,1)*v[ 2] + a(3,3)*v[ 0],
+            a(3,0)*v[ 7] - a(3,1)*v[ 3] + a(3,4)*v[ 0],
+            a(3,0)*v[ 8] - a(3,1)*v[ 4] + a(3,5)*v[ 0],
+            a(3,0)*v[ 9] - a(3,2)*v[ 2] + a(3,3)*v[ 1],
+            a(3,0)*v[10] - a(3,2)*v[ 3] + a(3,4)*v[ 1],
+            a(3,0)*v[11] - a(3,2)*v[ 4] + a(3,5)*v[ 1],
+            a(3,0)*v[12] - a(3,3)*v[ 3] + a(3,4)*v[ 2],
+            a(3,0)*v[13] - a(3,3)*v[ 4] + a(3,5)*v[ 2],
+            a(3,0)*v[14] - a(3,4)*v[ 4] + a(3,5)*v[ 3],
+            a(3,1)*v[ 9] - a(3,2)*v[ 6] + a(3,3)*v[ 5],
+            a(3,1)*v[10] - a(3,2)*v[ 7] + a(3,4)*v[ 5],
+            a(3,1)*v[11] - a(3,2)*v[ 8] + a(3,5)*v[ 5],
+            a(3,1)*v[12] - a(3,3)*v[ 7] + a(3,4)*v[ 6],
+            a(3,1)*v[13] - a(3,3)*v[ 8] + a(3,5)*v[ 6],
+            a(3,1)*v[14] - a(3,4)*v[ 8] + a(3,5)*v[ 7],
+            a(3,2)*v[12] - a(3,3)*v[10] + a(3,4)*v[ 9],
+            a(3,2)*v[13] - a(3,3)*v[11] + a(3,5)*v[ 9],
+            a(3,2)*v[14] - a(3,4)*v[11] + a(3,5)*v[10],
+            a(3,3)*v[14] - a(3,4)*v[13] + a(3,5)*v[12]
           };
           // 4x4 determinants of rows 3-4-5-6
-          v[ 0] = a[2*sna_+0]*w[10] - a[2*sna_+1]*w[ 4] + a[2*sna_+2]*w[ 1] - a[2*sna_+3]*w[ 0];
-          v[ 1] = a[2*sna_+0]*w[11] - a[2*sna_+1]*w[ 5] + a[2*sna_+2]*w[ 2] - a[2*sna_+4]*w[ 0];
-          v[ 2] = a[2*sna_+0]*w[12] - a[2*sna_+1]*w[ 6] + a[2*sna_+2]*w[ 3] - a[2*sna_+5]*w[ 0];
-          v[ 3] = a[2*sna_+0]*w[13] - a[2*sna_+1]*w[ 7] + a[2*sna_+3]*w[ 2] - a[2*sna_+4]*w[ 1];
-          v[ 4] = a[2*sna_+0]*w[14] - a[2*sna_+1]*w[ 8] + a[2*sna_+3]*w[ 3] - a[2*sna_+5]*w[ 1];
-          v[ 5] = a[2*sna_+0]*w[15] - a[2*sna_+1]*w[ 9] + a[2*sna_+4]*w[ 3] - a[2*sna_+5]*w[ 2];
-          v[ 6] = a[2*sna_+0]*w[16] - a[2*sna_+2]*w[ 7] + a[2*sna_+3]*w[ 5] - a[2*sna_+4]*w[ 4];
-          v[ 7] = a[2*sna_+0]*w[17] - a[2*sna_+2]*w[ 8] + a[2*sna_+3]*w[ 6] - a[2*sna_+5]*w[ 4];
-          v[ 8] = a[2*sna_+0]*w[18] - a[2*sna_+2]*w[ 9] + a[2*sna_+4]*w[ 6] - a[2*sna_+5]*w[ 5];
-          v[ 9] = a[2*sna_+0]*w[19] - a[2*sna_+3]*w[ 9] + a[2*sna_+4]*w[ 8] - a[2*sna_+5]*w[ 7];
-          v[10] = a[2*sna_+1]*w[16] - a[2*sna_+2]*w[13] + a[2*sna_+3]*w[11] - a[2*sna_+4]*w[10];
-          v[11] = a[2*sna_+1]*w[17] - a[2*sna_+2]*w[14] + a[2*sna_+3]*w[12] - a[2*sna_+5]*w[10];
-          v[12] = a[2*sna_+1]*w[18] - a[2*sna_+2]*w[15] + a[2*sna_+4]*w[12] - a[2*sna_+5]*w[11];
-          v[13] = a[2*sna_+1]*w[19] - a[2*sna_+3]*w[15] + a[2*sna_+4]*w[14] - a[2*sna_+5]*w[13];
-          v[14] = a[2*sna_+2]*w[19] - a[2*sna_+3]*w[18] + a[2*sna_+4]*w[17] - a[2*sna_+5]*w[16];
+          v[ 0] = a(2,0)*w[10] - a(2,1)*w[ 4] + a(2,2)*w[ 1] - a(2,3)*w[ 0];
+          v[ 1] = a(2,0)*w[11] - a(2,1)*w[ 5] + a(2,2)*w[ 2] - a(2,4)*w[ 0];
+          v[ 2] = a(2,0)*w[12] - a(2,1)*w[ 6] + a(2,2)*w[ 3] - a(2,5)*w[ 0];
+          v[ 3] = a(2,0)*w[13] - a(2,1)*w[ 7] + a(2,3)*w[ 2] - a(2,4)*w[ 1];
+          v[ 4] = a(2,0)*w[14] - a(2,1)*w[ 8] + a(2,3)*w[ 3] - a(2,5)*w[ 1];
+          v[ 5] = a(2,0)*w[15] - a(2,1)*w[ 9] + a(2,4)*w[ 3] - a(2,5)*w[ 2];
+          v[ 6] = a(2,0)*w[16] - a(2,2)*w[ 7] + a(2,3)*w[ 5] - a(2,4)*w[ 4];
+          v[ 7] = a(2,0)*w[17] - a(2,2)*w[ 8] + a(2,3)*w[ 6] - a(2,5)*w[ 4];
+          v[ 8] = a(2,0)*w[18] - a(2,2)*w[ 9] + a(2,4)*w[ 6] - a(2,5)*w[ 5];
+          v[ 9] = a(2,0)*w[19] - a(2,3)*w[ 9] + a(2,4)*w[ 8] - a(2,5)*w[ 7];
+          v[10] = a(2,1)*w[16] - a(2,2)*w[13] + a(2,3)*w[11] - a(2,4)*w[10];
+          v[11] = a(2,1)*w[17] - a(2,2)*w[14] + a(2,3)*w[12] - a(2,5)*w[10];
+          v[12] = a(2,1)*w[18] - a(2,2)*w[15] + a(2,4)*w[12] - a(2,5)*w[11];
+          v[13] = a(2,1)*w[19] - a(2,3)*w[15] + a(2,4)*w[14] - a(2,5)*w[13];
+          v[14] = a(2,2)*w[19] - a(2,3)*w[18] + a(2,4)*w[17] - a(2,5)*w[16];
 
           return
-            + a[0*sna_+0]*(a[1*sna_+1]*v[14] - a[1*sna_+2]*v[13] + a[1*sna_+3]*v[12] - a[1*sna_+4]*v[11] + a[1*sna_+5]*v[10])
-            - a[0*sna_+1]*(a[1*sna_+0]*v[14] - a[1*sna_+2]*v[ 9] + a[1*sna_+3]*v[ 8] - a[1*sna_+4]*v[ 7] + a[1*sna_+5]*v[ 6])
-            + a[0*sna_+2]*(a[1*sna_+0]*v[13] - a[1*sna_+1]*v[ 9] + a[1*sna_+3]*v[ 5] - a[1*sna_+4]*v[ 4] + a[1*sna_+5]*v[ 3])
-            - a[0*sna_+3]*(a[1*sna_+0]*v[12] - a[1*sna_+1]*v[ 8] + a[1*sna_+2]*v[ 5] - a[1*sna_+4]*v[ 2] + a[1*sna_+5]*v[ 1])
-            + a[0*sna_+4]*(a[1*sna_+0]*v[11] - a[1*sna_+1]*v[ 7] + a[1*sna_+2]*v[ 4] - a[1*sna_+3]*v[ 2] + a[1*sna_+5]*v[ 0])
-            - a[0*sna_+5]*(a[1*sna_+0]*v[10] - a[1*sna_+1]*v[ 6] + a[1*sna_+2]*v[ 3] - a[1*sna_+3]*v[ 1] + a[1*sna_+4]*v[ 0]);
+            + a(0,0)*(a(1,1)*v[14] - a(1,2)*v[13] + a(1,3)*v[12] - a(1,4)*v[11] + a(1,5)*v[10])
+            - a(0,1)*(a(1,0)*v[14] - a(1,2)*v[ 9] + a(1,3)*v[ 8] - a(1,4)*v[ 7] + a(1,5)*v[ 6])
+            + a(0,2)*(a(1,0)*v[13] - a(1,1)*v[ 9] + a(1,3)*v[ 5] - a(1,4)*v[ 4] + a(1,5)*v[ 3])
+            - a(0,3)*(a(1,0)*v[12] - a(1,1)*v[ 8] + a(1,2)*v[ 5] - a(1,4)*v[ 2] + a(1,5)*v[ 1])
+            + a(0,4)*(a(1,0)*v[11] - a(1,1)*v[ 7] + a(1,2)*v[ 4] - a(1,3)*v[ 2] + a(1,5)*v[ 0])
+            - a(0,5)*(a(1,0)*v[10] - a(1,1)*v[ 6] + a(1,2)*v[ 3] - a(1,3)*v[ 1] + a(1,4)*v[ 0]);
         }
       };
 
@@ -2825,95 +2831,95 @@ namespace FEAT
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      template<int m_, int n_, int sna_>
+      template<int m_, int n_>
       struct VolHelper
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, n_, n_, sma_, sna_>& a)
         {
           // generic fallback implementation: compute b := a^T * a and return sqrt(det(b))
-          T_ b[n_*n_];
+          Tiny::Matrix<T_, n_, n_> b;
           for(int i(0); i < n_; ++i)
           {
             for(int j(0); j < n_; ++j)
             {
-              b[i*n_+j] = T_(0);
+              b(i,j) = T_(0);
               for(int k(0); k < m_; ++k)
               {
-                b[i*n_+j] += a[k*n_+i]*a[k*n_+j];
+                b(i,j) += a(k,i)*a(k,j);
               }
             }
           }
           #ifndef __CUDACC__
-          return Math::sqrt(DetHelper<n_,n_,n_>::compute(b));
+          return Math::sqrt(DetHelper<n_,n_>::compute(b));
           #else
-          return CudaMath::cuda_sqrt(DetHelper<n_,n_,n_>::compute(b));
+          return CudaMath::cuda_sqrt(DetHelper<n_,n_>::compute(b));
           #endif
         }
       };
 
-      template<int n_, int sna_>
-      struct VolHelper<n_,n_,sna_>
+      template<int n_>
+      struct VolHelper<n_,n_>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, n_, n_, sma_, sna_>& a)
         {
           // square matrix special case: vol(a) = abs(det(a))
           #ifndef __CUDACC__
-          return Math::abs(DetHelper<n_,n_,n_>::compute(a));
+          return Math::abs(DetHelper<n_,n_>::compute(a));
           #else
-          return CudaMath::cuda_abs(DetHelper<n_,n_,n_>::compute(a));
+          return CudaMath::cuda_abs(DetHelper<n_,n_>::compute(a));
           #endif
         }
       };
 
-      template<int sna_>
-      struct VolHelper<2,1,sna_>
+      template<>
+      struct VolHelper<2,1>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 2, 1, sma_, sna_>& a)
         {
           // This is the euclid norm of the only matrix column.
           #ifndef __CUDACC__
-          return Math::sqrt(Math::sqr(a[0*sna_]) + Math::sqr(a[1*sna_]));
+          return Math::sqrt(Math::sqr(a(0,0)) + Math::sqr(a(1,0)));
           #else
-          return CudaMath::cuda_sqrt(CudaMath::cuda_sqr(a[0*sna_]) + CudaMath::cuda_sqr(a[1*sna_]));
+          return CudaMath::cuda_sqrt(CudaMath::cuda_sqr(a(0,0)) + CudaMath::cuda_sqr(a(1,0)));
           #endif
         }
       };
 
-      template<int sna_>
-      struct VolHelper<3,1,sna_>
+      template<>
+      struct VolHelper<3,1>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 3, 1, sma_, sna_>& a)
         {
           // This is the euclid norm of the only matrix column.
           #ifndef __CUDACC__
-          return Math::sqrt(Math::sqr(a[0*sna_]) + Math::sqr(a[1*sna_]) + Math::sqr(a[2*sna_]));
+          return Math::sqrt(Math::sqr(a(0,0)) + Math::sqr(a(1,0)) + Math::sqr(a(2,0)));
           #else
-          return CudaMath::cuda_sqrt(CudaMath::cuda_sqr(a[0*sna_]) + CudaMath::cuda_sqr(a[1*sna_]) + CudaMath::cuda_sqr(a[2*sna_]));
+          return CudaMath::cuda_sqrt(CudaMath::cuda_sqr(a(0,0)) + CudaMath::cuda_sqr(a(1,0)) + CudaMath::cuda_sqr(a(2,0)));
           #endif
         }
       };
 
-      template<int sna_>
-      struct VolHelper<3,2,sna_>
+      template<>
+      struct VolHelper<3,2>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(const T_* a)
+        template<typename T_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(const Tiny::Matrix<T_, 3, 2, sma_, sna_>& a)
         {
           // This is the euclid norm of the 3D cross product of the two matrix columns.
           #ifndef __CUDACC__
           return Math::sqrt(
-            Math::sqr(a[1*sna_+0]*a[2*sna_+1] - a[2*sna_+0]*a[1*sna_+1]) +
-            Math::sqr(a[2*sna_+0]*a[0*sna_+1] - a[0*sna_+0]*a[2*sna_+1]) +
-            Math::sqr(a[0*sna_+0]*a[1*sna_+1] - a[1*sna_+0]*a[0*sna_+1]));
+            Math::sqr(a(1,0)*a(2,1) - a(2,0)*a(1,1)) +
+            Math::sqr(a(2,0)*a(0,1) - a(0,0)*a(2,1)) +
+            Math::sqr(a(0,0)*a(1,1) - a(1,0)*a(0,1)));
           #else
           return CudaMath::cuda_sqrt(
-            CudaMath::cuda_sqr(a[1*sna_+0]*a[2*sna_+1] - a[2*sna_+0]*a[1*sna_+1]) +
-            CudaMath::cuda_sqr(a[2*sna_+0]*a[0*sna_+1] - a[0*sna_+0]*a[2*sna_+1]) +
-            CudaMath::cuda_sqr(a[0*sna_+0]*a[1*sna_+1] - a[1*sna_+0]*a[0*sna_+1]));
+            CudaMath::cuda_sqr(a(1,0)*a(2,1) - a(2,0)*a(1,1)) +
+            CudaMath::cuda_sqr(a(2,0)*a(0,1) - a(0,0)*a(2,1)) +
+            CudaMath::cuda_sqr(a(0,0)*a(1,1) - a(1,0)*a(0,1)));
           #endif
         }
       };
@@ -2924,35 +2930,539 @@ namespace FEAT
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      template<int sna_, int snb_>
-      struct InverseHelper<1,1,sna_,snb_>
+      template<>
+      struct InverseHelper<1,1>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, 1, 1, smb_, snb_>& b, const Tiny::Matrix<T_, 1, 1, sma_, sna_>& a)
         {
-          b[0] = T_(1) / a[0];
-          return a[0];
+          b(0,0) = T_(1) / a(0,0);
+          return a(0,0);
         }
       };
 
-      template<int sna_, int snb_>
-      struct InverseHelper<2,2,sna_,snb_>
+      template<>
+      struct InverseHelper<2,2>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, 2, 2, smb_, snb_>& b, const Tiny::Matrix<T_, 2, 2, sma_, sna_>& a)
         {
-          T_ det = a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0];
+          T_ det = a(0,0)*a(1,1) - a(0,1)*a(1,0);
           T_ d = T_(1) / det;
-          b[0*snb_+0] =  d*a[1*sna_+1];
-          b[0*snb_+1] = -d*a[0*sna_+1];
-          b[1*snb_+0] = -d*a[1*sna_+0];
-          b[1*snb_+1] =  d*a[0*sna_+0];
+          b(0,0) =  d*a(1,1);
+          b(0,1) = -d*a(0,1);
+          b(1,0) = -d*a(1,0);
+          b(1,1) =  d*a(0,0);
           return det;
         }
+      };
 
-        #ifdef __CUDACC__
-        template<typename T_, typename ThreadGroup_>
-        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_& det)
+      template<>
+      struct InverseHelper<3,3>
+      {
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, 3, 3, smb_, snb_>& b, const Tiny::Matrix<T_, 3, 3, sma_, sna_>& a)
+        {
+          b(0,0) = a(1,1)*a(2,2) - a(1,2)*a(2,1);
+          b(1,0) = a(1,2)*a(2,0) - a(1,0)*a(2,2);
+          b(2,0) = a(1,0)*a(2,1) - a(1,1)*a(2,0);
+          T_ det = a(0,0)*b(0,0) + a(0,1)*b(1,0) + a(0,2)*b(2,0);
+          T_ d = T_(1) / det;
+          b(0,0) *= d;
+          b(1,0) *= d;
+          b(2,0) *= d;
+          b(0,1) = d*(a(0,2)*a(2,1) - a(0,1)*a(2,2));
+          b(1,1) = d*(a(0,0)*a(2,2) - a(0,2)*a(2,0));
+          b(2,1) = d*(a(0,1)*a(2,0) - a(0,0)*a(2,1));
+          b(0,2) = d*(a(0,1)*a(1,2) - a(0,2)*a(1,1));
+          b(1,2) = d*(a(0,2)*a(1,0) - a(0,0)*a(1,2));
+          b(2,2) = d*(a(0,0)*a(1,1) - a(0,1)*a(1,0));
+          return det;
+        }
+      };
+
+      template<>
+      struct InverseHelper<4,4>
+      {
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, 4, 4, smb_, snb_>& b, const Tiny::Matrix<T_, 4, 4, sma_, sna_>& a)
+        {
+          T_ w[6];
+          w[0] = a(2,0)*a(3,1)-a(2,1)*a(3,0);
+          w[1] = a(2,0)*a(3,2)-a(2,2)*a(3,0);
+          w[2] = a(2,0)*a(3,3)-a(2,3)*a(3,0);
+          w[3] = a(2,1)*a(3,2)-a(2,2)*a(3,1);
+          w[4] = a(2,1)*a(3,3)-a(2,3)*a(3,1);
+          w[5] = a(2,2)*a(3,3)-a(2,3)*a(3,2);
+          b(0,0) = a(1,1)*w[5]-a(1,2)*w[4]+a(1,3)*w[3];
+          b(1,0) =-a(1,0)*w[5]+a(1,2)*w[2]-a(1,3)*w[1];
+          b(2,0) = a(1,0)*w[4]-a(1,1)*w[2]+a(1,3)*w[0];
+          b(3,0) =-a(1,0)*w[3]+a(1,1)*w[1]-a(1,2)*w[0];
+          T_ det = a(0,0)*b(0,0)+a(0,1)*b(1,0)+a(0,2)*b(2,0)+a(0,3)*b(3,0);
+          T_ d = T_(1) / det;
+          b(0,0) *= d;
+          b(1,0) *= d;
+          b(2,0) *= d;
+          b(3,0) *= d;
+          b(0,1) = d*(-a(0,1)*w[5]+a(0,2)*w[4]-a(0,3)*w[3]);
+          b(1,1) = d*( a(0,0)*w[5]-a(0,2)*w[2]+a(0,3)*w[1]);
+          b(2,1) = d*(-a(0,0)*w[4]+a(0,1)*w[2]-a(0,3)*w[0]);
+          b(3,1) = d*( a(0,0)*w[3]-a(0,1)*w[1]+a(0,2)*w[0]);
+          w[0] = a(0,0)*a(1,1)-a(0,1)*a(1,0);
+          w[1] = a(0,0)*a(1,2)-a(0,2)*a(1,0);
+          w[2] = a(0,0)*a(1,3)-a(0,3)*a(1,0);
+          w[3] = a(0,1)*a(1,2)-a(0,2)*a(1,1);
+          w[4] = a(0,1)*a(1,3)-a(0,3)*a(1,1);
+          w[5] = a(0,2)*a(1,3)-a(0,3)*a(1,2);
+          b(0,2) = d*( a(3,1)*w[5]-a(3,2)*w[4]+a(3,3)*w[3]);
+          b(1,2) = d*(-a(3,0)*w[5]+a(3,2)*w[2]-a(3,3)*w[1]);
+          b(2,2) = d*( a(3,0)*w[4]-a(3,1)*w[2]+a(3,3)*w[0]);
+          b(3,2) = d*(-a(3,0)*w[3]+a(3,1)*w[1]-a(3,2)*w[0]);
+          b(0,3) = d*(-a(2,1)*w[5]+a(2,2)*w[4]-a(2,3)*w[3]);
+          b(1,3) = d*( a(2,0)*w[5]-a(2,2)*w[2]+a(2,3)*w[1]);
+          b(2,3) = d*(-a(2,0)*w[4]+a(2,1)*w[2]-a(2,3)*w[0]);
+          b(3,3) = d*( a(2,0)*w[3]-a(2,1)*w[1]+a(2,2)*w[0]);
+          return det;
+        }
+      };
+
+      template<>
+      struct InverseHelper<5,5>
+      {
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, 5, 5, smb_, snb_>& b, const Tiny::Matrix<T_, 5, 5, sma_, sna_>& a)
+        {
+          T_ w[20];
+          w[ 0] = a(3,0)*a(4,1)-a(3,1)*a(4,0);
+          w[ 1] = a(3,0)*a(4,2)-a(3,2)*a(4,0);
+          w[ 2] = a(3,0)*a(4,3)-a(3,3)*a(4,0);
+          w[ 3] = a(3,0)*a(4,4)-a(3,4)*a(4,0);
+          w[ 4] = a(3,1)*a(4,2)-a(3,2)*a(4,1);
+          w[ 5] = a(3,1)*a(4,3)-a(3,3)*a(4,1);
+          w[ 6] = a(3,1)*a(4,4)-a(3,4)*a(4,1);
+          w[ 7] = a(3,2)*a(4,3)-a(3,3)*a(4,2);
+          w[ 8] = a(3,2)*a(4,4)-a(3,4)*a(4,2);
+          w[ 9] = a(3,3)*a(4,4)-a(3,4)*a(4,3);
+          w[10] = a(2,0)*w[4]-a(2,1)*w[1]+a(2,2)*w[0];
+          w[11] = a(2,0)*w[5]-a(2,1)*w[2]+a(2,3)*w[0];
+          w[12] = a(2,0)*w[6]-a(2,1)*w[3]+a(2,4)*w[0];
+          w[13] = a(2,0)*w[7]-a(2,2)*w[2]+a(2,3)*w[1];
+          w[14] = a(2,0)*w[8]-a(2,2)*w[3]+a(2,4)*w[1];
+          w[15] = a(2,0)*w[9]-a(2,3)*w[3]+a(2,4)*w[2];
+          w[16] = a(2,1)*w[7]-a(2,2)*w[5]+a(2,3)*w[4];
+          w[17] = a(2,1)*w[8]-a(2,2)*w[6]+a(2,4)*w[4];
+          w[18] = a(2,1)*w[9]-a(2,3)*w[6]+a(2,4)*w[5];
+          w[19] = a(2,2)*w[9]-a(2,3)*w[8]+a(2,4)*w[7];
+          b(0,0) = a(1,1)*w[19]-a(1,2)*w[18]+a(1,3)*w[17]-a(1,4)*w[16];
+          b(1,0) =-a(1,0)*w[19]+a(1,2)*w[15]-a(1,3)*w[14]+a(1,4)*w[13];
+          b(2,0) = a(1,0)*w[18]-a(1,1)*w[15]+a(1,3)*w[12]-a(1,4)*w[11];
+          b(3,0) =-a(1,0)*w[17]+a(1,1)*w[14]-a(1,2)*w[12]+a(1,4)*w[10];
+          b(4,0) = a(1,0)*w[16]-a(1,1)*w[13]+a(1,2)*w[11]-a(1,3)*w[10];
+          T_ det = a(0,0)*b(0,0)+a(0,1)*b(1,0)+a(0,2)*b(2,0)+a(0,3)*b(3,0)+a(0,4)*b(4,0);
+          T_ d = T_(1) / det;
+          b(0,0) *= d;
+          b(1,0) *= d;
+          b(2,0) *= d;
+          b(3,0) *= d;
+          b(4,0) *= d;
+          b(0,1) = d*(-a(0,1)*w[19]+a(0,2)*w[18]-a(0,3)*w[17]+a(0,4)*w[16]);
+          b(1,1) = d*( a(0,0)*w[19]-a(0,2)*w[15]+a(0,3)*w[14]-a(0,4)*w[13]);
+          b(2,1) = d*(-a(0,0)*w[18]+a(0,1)*w[15]-a(0,3)*w[12]+a(0,4)*w[11]);
+          b(3,1) = d*( a(0,0)*w[17]-a(0,1)*w[14]+a(0,2)*w[12]-a(0,4)*w[10]);
+          b(4,1) = d*(-a(0,0)*w[16]+a(0,1)*w[13]-a(0,2)*w[11]+a(0,3)*w[10]);
+          w[10] = a(1,0)*w[4]-a(1,1)*w[1]+a(1,2)*w[0];
+          w[11] = a(1,0)*w[5]-a(1,1)*w[2]+a(1,3)*w[0];
+          w[12] = a(1,0)*w[6]-a(1,1)*w[3]+a(1,4)*w[0];
+          w[13] = a(1,0)*w[7]-a(1,2)*w[2]+a(1,3)*w[1];
+          w[14] = a(1,0)*w[8]-a(1,2)*w[3]+a(1,4)*w[1];
+          w[15] = a(1,0)*w[9]-a(1,3)*w[3]+a(1,4)*w[2];
+          w[16] = a(1,1)*w[7]-a(1,2)*w[5]+a(1,3)*w[4];
+          w[17] = a(1,1)*w[8]-a(1,2)*w[6]+a(1,4)*w[4];
+          w[18] = a(1,1)*w[9]-a(1,3)*w[6]+a(1,4)*w[5];
+          w[19] = a(1,2)*w[9]-a(1,3)*w[8]+a(1,4)*w[7];
+          b(0,2) = d*( a(0,1)*w[19]-a(0,2)*w[18]+a(0,3)*w[17]-a(0,4)*w[16]);
+          b(1,2) = d*(-a(0,0)*w[19]+a(0,2)*w[15]-a(0,3)*w[14]+a(0,4)*w[13]);
+          b(2,2) = d*( a(0,0)*w[18]-a(0,1)*w[15]+a(0,3)*w[12]-a(0,4)*w[11]);
+          b(3,2) = d*(-a(0,0)*w[17]+a(0,1)*w[14]-a(0,2)*w[12]+a(0,4)*w[10]);
+          b(4,2) = d*( a(0,0)*w[16]-a(0,1)*w[13]+a(0,2)*w[11]-a(0,3)*w[10]);
+          w[ 0] = a(0,0)*a(1,1)-a(0,1)*a(1,0);
+          w[ 1] = a(0,0)*a(1,2)-a(0,2)*a(1,0);
+          w[ 2] = a(0,0)*a(1,3)-a(0,3)*a(1,0);
+          w[ 3] = a(0,0)*a(1,4)-a(0,4)*a(1,0);
+          w[ 4] = a(0,1)*a(1,2)-a(0,2)*a(1,1);
+          w[ 5] = a(0,1)*a(1,3)-a(0,3)*a(1,1);
+          w[ 6] = a(0,1)*a(1,4)-a(0,4)*a(1,1);
+          w[ 7] = a(0,2)*a(1,3)-a(0,3)*a(1,2);
+          w[ 8] = a(0,2)*a(1,4)-a(0,4)*a(1,2);
+          w[ 9] = a(0,3)*a(1,4)-a(0,4)*a(1,3);
+          w[10] = a(2,0)*w[4]-a(2,1)*w[1]+a(2,2)*w[0];
+          w[11] = a(2,0)*w[5]-a(2,1)*w[2]+a(2,3)*w[0];
+          w[12] = a(2,0)*w[6]-a(2,1)*w[3]+a(2,4)*w[0];
+          w[13] = a(2,0)*w[7]-a(2,2)*w[2]+a(2,3)*w[1];
+          w[14] = a(2,0)*w[8]-a(2,2)*w[3]+a(2,4)*w[1];
+          w[15] = a(2,0)*w[9]-a(2,3)*w[3]+a(2,4)*w[2];
+          w[16] = a(2,1)*w[7]-a(2,2)*w[5]+a(2,3)*w[4];
+          w[17] = a(2,1)*w[8]-a(2,2)*w[6]+a(2,4)*w[4];
+          w[18] = a(2,1)*w[9]-a(2,3)*w[6]+a(2,4)*w[5];
+          w[19] = a(2,2)*w[9]-a(2,3)*w[8]+a(2,4)*w[7];
+          b(0,3) = d*( a(4,1)*w[19]-a(4,2)*w[18]+a(4,3)*w[17]-a(4,4)*w[16]);
+          b(1,3) = d*(-a(4,0)*w[19]+a(4,2)*w[15]-a(4,3)*w[14]+a(4,4)*w[13]);
+          b(2,3) = d*( a(4,0)*w[18]-a(4,1)*w[15]+a(4,3)*w[12]-a(4,4)*w[11]);
+          b(3,3) = d*(-a(4,0)*w[17]+a(4,1)*w[14]-a(4,2)*w[12]+a(4,4)*w[10]);
+          b(4,3) = d*( a(4,0)*w[16]-a(4,1)*w[13]+a(4,2)*w[11]-a(4,3)*w[10]);
+          b(0,4) = d*(-a(3,1)*w[19]+a(3,2)*w[18]-a(3,3)*w[17]+a(3,4)*w[16]);
+          b(1,4) = d*( a(3,0)*w[19]-a(3,2)*w[15]+a(3,3)*w[14]-a(3,4)*w[13]);
+          b(2,4) = d*(-a(3,0)*w[18]+a(3,1)*w[15]-a(3,3)*w[12]+a(3,4)*w[11]);
+          b(3,4) = d*( a(3,0)*w[17]-a(3,1)*w[14]+a(3,2)*w[12]-a(3,4)*w[10]);
+          b(4,4) = d*(-a(3,0)*w[16]+a(3,1)*w[13]-a(3,2)*w[11]+a(3,3)*w[10]);
+          return det;
+        }
+      };
+
+      template<>
+      struct InverseHelper<6,6>
+      {
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, 6, 6, smb_, snb_>& b, const Tiny::Matrix<T_, 6, 6, sma_, sna_>& a)
+        {
+          T_ w[35];
+          w[ 0] = a(4,0)*a(5,1)-a(4,1)*a(5,0);
+          w[ 1] = a(4,0)*a(5,2)-a(4,2)*a(5,0);
+          w[ 2] = a(4,0)*a(5,3)-a(4,3)*a(5,0);
+          w[ 3] = a(4,0)*a(5,4)-a(4,4)*a(5,0);
+          w[ 4] = a(4,0)*a(5,5)-a(4,5)*a(5,0);
+          w[ 5] = a(4,1)*a(5,2)-a(4,2)*a(5,1);
+          w[ 6] = a(4,1)*a(5,3)-a(4,3)*a(5,1);
+          w[ 7] = a(4,1)*a(5,4)-a(4,4)*a(5,1);
+          w[ 8] = a(4,1)*a(5,5)-a(4,5)*a(5,1);
+          w[ 9] = a(4,2)*a(5,3)-a(4,3)*a(5,2);
+          w[10] = a(4,2)*a(5,4)-a(4,4)*a(5,2);
+          w[11] = a(4,2)*a(5,5)-a(4,5)*a(5,2);
+          w[12] = a(4,3)*a(5,4)-a(4,4)*a(5,3);
+          w[13] = a(4,3)*a(5,5)-a(4,5)*a(5,3);
+          w[14] = a(4,4)*a(5,5)-a(4,5)*a(5,4);
+          w[15] = a(3,0)*w[5]-a(3,1)*w[1]+a(3,2)*w[0];
+          w[16] = a(3,0)*w[6]-a(3,1)*w[2]+a(3,3)*w[0];
+          w[17] = a(3,0)*w[7]-a(3,1)*w[3]+a(3,4)*w[0];
+          w[18] = a(3,0)*w[8]-a(3,1)*w[4]+a(3,5)*w[0];
+          w[19] = a(3,0)*w[9]-a(3,2)*w[2]+a(3,3)*w[1];
+          w[20] = a(3,0)*w[10]-a(3,2)*w[3]+a(3,4)*w[1];
+          w[21] = a(3,0)*w[11]-a(3,2)*w[4]+a(3,5)*w[1];
+          w[22] = a(3,0)*w[12]-a(3,3)*w[3]+a(3,4)*w[2];
+          w[23] = a(3,0)*w[13]-a(3,3)*w[4]+a(3,5)*w[2];
+          w[24] = a(3,0)*w[14]-a(3,4)*w[4]+a(3,5)*w[3];
+          w[25] = a(3,1)*w[9]-a(3,2)*w[6]+a(3,3)*w[5];
+          w[26] = a(3,1)*w[10]-a(3,2)*w[7]+a(3,4)*w[5];
+          w[27] = a(3,1)*w[11]-a(3,2)*w[8]+a(3,5)*w[5];
+          w[28] = a(3,1)*w[12]-a(3,3)*w[7]+a(3,4)*w[6];
+          w[29] = a(3,1)*w[13]-a(3,3)*w[8]+a(3,5)*w[6];
+          w[30] = a(3,1)*w[14]-a(3,4)*w[8]+a(3,5)*w[7];
+          w[31] = a(3,2)*w[12]-a(3,3)*w[10]+a(3,4)*w[9];
+          w[32] = a(3,2)*w[13]-a(3,3)*w[11]+a(3,5)*w[9];
+          w[33] = a(3,2)*w[14]-a(3,4)*w[11]+a(3,5)*w[10];
+          w[34] = a(3,3)*w[14]-a(3,4)*w[13]+a(3,5)*w[12];
+          w[ 0] = a(2,0)*w[25]-a(2,1)*w[19]+a(2,2)*w[16]-a(2,3)*w[15];
+          w[ 1] = a(2,0)*w[26]-a(2,1)*w[20]+a(2,2)*w[17]-a(2,4)*w[15];
+          w[ 2] = a(2,0)*w[27]-a(2,1)*w[21]+a(2,2)*w[18]-a(2,5)*w[15];
+          w[ 3] = a(2,0)*w[28]-a(2,1)*w[22]+a(2,3)*w[17]-a(2,4)*w[16];
+          w[ 4] = a(2,0)*w[29]-a(2,1)*w[23]+a(2,3)*w[18]-a(2,5)*w[16];
+          w[ 5] = a(2,0)*w[30]-a(2,1)*w[24]+a(2,4)*w[18]-a(2,5)*w[17];
+          w[ 6] = a(2,0)*w[31]-a(2,2)*w[22]+a(2,3)*w[20]-a(2,4)*w[19];
+          w[ 7] = a(2,0)*w[32]-a(2,2)*w[23]+a(2,3)*w[21]-a(2,5)*w[19];
+          w[ 8] = a(2,0)*w[33]-a(2,2)*w[24]+a(2,4)*w[21]-a(2,5)*w[20];
+          w[ 9] = a(2,0)*w[34]-a(2,3)*w[24]+a(2,4)*w[23]-a(2,5)*w[22];
+          w[10] = a(2,1)*w[31]-a(2,2)*w[28]+a(2,3)*w[26]-a(2,4)*w[25];
+          w[11] = a(2,1)*w[32]-a(2,2)*w[29]+a(2,3)*w[27]-a(2,5)*w[25];
+          w[12] = a(2,1)*w[33]-a(2,2)*w[30]+a(2,4)*w[27]-a(2,5)*w[26];
+          w[13] = a(2,1)*w[34]-a(2,3)*w[30]+a(2,4)*w[29]-a(2,5)*w[28];
+          w[14] = a(2,2)*w[34]-a(2,3)*w[33]+a(2,4)*w[32]-a(2,5)*w[31];
+          b(0,0) =  a(1,1)*w[14]-a(1,2)*w[13]+a(1,3)*w[12]-a(1,4)*w[11]+a(1,5)*w[10];
+          b(1,0) = -a(1,0)*w[14]+a(1,2)*w[9]-a(1,3)*w[8]+a(1,4)*w[7]-a(1,5)*w[6];
+          b(2,0) =  a(1,0)*w[13]-a(1,1)*w[9]+a(1,3)*w[5]-a(1,4)*w[4]+a(1,5)*w[3];
+          b(3,0) = -a(1,0)*w[12]+a(1,1)*w[8]-a(1,2)*w[5]+a(1,4)*w[2]-a(1,5)*w[1];
+          b(4,0) =  a(1,0)*w[11]-a(1,1)*w[7]+a(1,2)*w[4]-a(1,3)*w[2]+a(1,5)*w[0];
+          b(5,0) = -a(1,0)*w[10]+a(1,1)*w[6]-a(1,2)*w[3]+a(1,3)*w[1]-a(1,4)*w[0];
+          T_ det = a(0,0)*b(0,0) + a(0,1)*b(1,0) + a(0,2)*b(2,0)
+            + a(0,3)*b(3,0) + a(0,4)*b(4,0) + a(0,5)*b(5,0);
+          T_ d = T_(1) / det;
+          b(0,0) *= d;
+          b(1,0) *= d;
+          b(2,0) *= d;
+          b(3,0) *= d;
+          b(4,0) *= d;
+          b(5,0) *= d;
+          b(0,1) = d*(-a(0,1)*w[14]+a(0,2)*w[13]-a(0,3)*w[12]+a(0,4)*w[11]-a(0,5)*w[10]);
+          b(1,1) = d*( a(0,0)*w[14]-a(0,2)*w[9]+a(0,3)*w[8]-a(0,4)*w[7]+a(0,5)*w[6]);
+          b(2,1) = d*(-a(0,0)*w[13]+a(0,1)*w[9]-a(0,3)*w[5]+a(0,4)*w[4]-a(0,5)*w[3]);
+          b(3,1) = d*( a(0,0)*w[12]-a(0,1)*w[8]+a(0,2)*w[5]-a(0,4)*w[2]+a(0,5)*w[1]);
+          b(4,1) = d*(-a(0,0)*w[11]+a(0,1)*w[7]-a(0,2)*w[4]+a(0,3)*w[2]-a(0,5)*w[0]);
+          b(5,1) = d*( a(0,0)*w[10]-a(0,1)*w[6]+a(0,2)*w[3]-a(0,3)*w[1]+a(0,4)*w[0]);
+          w[ 0] = a(4,0)*a(5,1)-a(4,1)*a(5,0);
+          w[ 1] = a(4,0)*a(5,2)-a(4,2)*a(5,0);
+          w[ 2] = a(4,0)*a(5,3)-a(4,3)*a(5,0);
+          w[ 3] = a(4,0)*a(5,4)-a(4,4)*a(5,0);
+          w[ 4] = a(4,0)*a(5,5)-a(4,5)*a(5,0);
+          w[ 5] = a(4,1)*a(5,2)-a(4,2)*a(5,1);
+          w[ 6] = a(4,1)*a(5,3)-a(4,3)*a(5,1);
+          w[ 7] = a(4,1)*a(5,4)-a(4,4)*a(5,1);
+          w[ 8] = a(4,1)*a(5,5)-a(4,5)*a(5,1);
+          w[ 9] = a(4,2)*a(5,3)-a(4,3)*a(5,2);
+          w[10] = a(4,2)*a(5,4)-a(4,4)*a(5,2);
+          w[11] = a(4,2)*a(5,5)-a(4,5)*a(5,2);
+          w[12] = a(4,3)*a(5,4)-a(4,4)*a(5,3);
+          w[13] = a(4,3)*a(5,5)-a(4,5)*a(5,3);
+          w[14] = a(4,4)*a(5,5)-a(4,5)*a(5,4);
+          w[15] = a(1,0)*w[5]-a(1,1)*w[1]+a(1,2)*w[0];
+          w[16] = a(1,0)*w[6]-a(1,1)*w[2]+a(1,3)*w[0];
+          w[17] = a(1,0)*w[7]-a(1,1)*w[3]+a(1,4)*w[0];
+          w[18] = a(1,0)*w[8]-a(1,1)*w[4]+a(1,5)*w[0];
+          w[19] = a(1,0)*w[9]-a(1,2)*w[2]+a(1,3)*w[1];
+          w[20] = a(1,0)*w[10]-a(1,2)*w[3]+a(1,4)*w[1];
+          w[21] = a(1,0)*w[11]-a(1,2)*w[4]+a(1,5)*w[1];
+          w[22] = a(1,0)*w[12]-a(1,3)*w[3]+a(1,4)*w[2];
+          w[23] = a(1,0)*w[13]-a(1,3)*w[4]+a(1,5)*w[2];
+          w[24] = a(1,0)*w[14]-a(1,4)*w[4]+a(1,5)*w[3];
+          w[25] = a(1,1)*w[9]-a(1,2)*w[6]+a(1,3)*w[5];
+          w[26] = a(1,1)*w[10]-a(1,2)*w[7]+a(1,4)*w[5];
+          w[27] = a(1,1)*w[11]-a(1,2)*w[8]+a(1,5)*w[5];
+          w[28] = a(1,1)*w[12]-a(1,3)*w[7]+a(1,4)*w[6];
+          w[29] = a(1,1)*w[13]-a(1,3)*w[8]+a(1,5)*w[6];
+          w[30] = a(1,1)*w[14]-a(1,4)*w[8]+a(1,5)*w[7];
+          w[31] = a(1,2)*w[12]-a(1,3)*w[10]+a(1,4)*w[9];
+          w[32] = a(1,2)*w[13]-a(1,3)*w[11]+a(1,5)*w[9];
+          w[33] = a(1,2)*w[14]-a(1,4)*w[11]+a(1,5)*w[10];
+          w[34] = a(1,3)*w[14]-a(1,4)*w[13]+a(1,5)*w[12];
+          w[ 0] = a(0,0)*w[25]-a(0,1)*w[19]+a(0,2)*w[16]-a(0,3)*w[15];
+          w[ 1] = a(0,0)*w[26]-a(0,1)*w[20]+a(0,2)*w[17]-a(0,4)*w[15];
+          w[ 2] = a(0,0)*w[27]-a(0,1)*w[21]+a(0,2)*w[18]-a(0,5)*w[15];
+          w[ 3] = a(0,0)*w[28]-a(0,1)*w[22]+a(0,3)*w[17]-a(0,4)*w[16];
+          w[ 4] = a(0,0)*w[29]-a(0,1)*w[23]+a(0,3)*w[18]-a(0,5)*w[16];
+          w[ 5] = a(0,0)*w[30]-a(0,1)*w[24]+a(0,4)*w[18]-a(0,5)*w[17];
+          w[ 6] = a(0,0)*w[31]-a(0,2)*w[22]+a(0,3)*w[20]-a(0,4)*w[19];
+          w[ 7] = a(0,0)*w[32]-a(0,2)*w[23]+a(0,3)*w[21]-a(0,5)*w[19];
+          w[ 8] = a(0,0)*w[33]-a(0,2)*w[24]+a(0,4)*w[21]-a(0,5)*w[20];
+          w[ 9] = a(0,0)*w[34]-a(0,3)*w[24]+a(0,4)*w[23]-a(0,5)*w[22];
+          w[10] = a(0,1)*w[31]-a(0,2)*w[28]+a(0,3)*w[26]-a(0,4)*w[25];
+          w[11] = a(0,1)*w[32]-a(0,2)*w[29]+a(0,3)*w[27]-a(0,5)*w[25];
+          w[12] = a(0,1)*w[33]-a(0,2)*w[30]+a(0,4)*w[27]-a(0,5)*w[26];
+          w[13] = a(0,1)*w[34]-a(0,3)*w[30]+a(0,4)*w[29]-a(0,5)*w[28];
+          w[14] = a(0,2)*w[34]-a(0,3)*w[33]+a(0,4)*w[32]-a(0,5)*w[31];
+          b(0,2) = d*( a(3,1)*w[14]-a(3,2)*w[13]+a(3,3)*w[12]-a(3,4)*w[11]+a(3,5)*w[10]);
+          b(1,2) = d*(-a(3,0)*w[14]+a(3,2)*w[9]-a(3,3)*w[8]+a(3,4)*w[7]-a(3,5)*w[6]);
+          b(2,2) = d*( a(3,0)*w[13]-a(3,1)*w[9]+a(3,3)*w[5]-a(3,4)*w[4]+a(3,5)*w[3]);
+          b(3,2) = d*(-a(3,0)*w[12]+a(3,1)*w[8]-a(3,2)*w[5]+a(3,4)*w[2]-a(3,5)*w[1]);
+          b(4,2) = d*( a(3,0)*w[11]-a(3,1)*w[7]+a(3,2)*w[4]-a(3,3)*w[2]+a(3,5)*w[0]);
+          b(5,2) = d*(-a(3,0)*w[10]+a(3,1)*w[6]-a(3,2)*w[3]+a(3,3)*w[1]-a(3,4)*w[0]);
+          b(0,3) = d*(-a(2,1)*w[14]+a(2,2)*w[13]-a(2,3)*w[12]+a(2,4)*w[11]-a(2,5)*w[10]);
+          b(1,3) = d*( a(2,0)*w[14]-a(2,2)*w[9]+a(2,3)*w[8]-a(2,4)*w[7]+a(2,5)*w[6]);
+          b(2,3) = d*(-a(2,0)*w[13]+a(2,1)*w[9]-a(2,3)*w[5]+a(2,4)*w[4]-a(2,5)*w[3]);
+          b(3,3) = d*( a(2,0)*w[12]-a(2,1)*w[8]+a(2,2)*w[5]-a(2,4)*w[2]+a(2,5)*w[1]);
+          b(4,3) = d*(-a(2,0)*w[11]+a(2,1)*w[7]-a(2,2)*w[4]+a(2,3)*w[2]-a(2,5)*w[0]);
+          b(5,3) = d*( a(2,0)*w[10]-a(2,1)*w[6]+a(2,2)*w[3]-a(2,3)*w[1]+a(2,4)*w[0]);
+          w[ 0] = a(2,0)*a(3,1)-a(2,1)*a(3,0);
+          w[ 1] = a(2,0)*a(3,2)-a(2,2)*a(3,0);
+          w[ 2] = a(2,0)*a(3,3)-a(2,3)*a(3,0);
+          w[ 3] = a(2,0)*a(3,4)-a(2,4)*a(3,0);
+          w[ 4] = a(2,0)*a(3,5)-a(2,5)*a(3,0);
+          w[ 5] = a(2,1)*a(3,2)-a(2,2)*a(3,1);
+          w[ 6] = a(2,1)*a(3,3)-a(2,3)*a(3,1);
+          w[ 7] = a(2,1)*a(3,4)-a(2,4)*a(3,1);
+          w[ 8] = a(2,1)*a(3,5)-a(2,5)*a(3,1);
+          w[ 9] = a(2,2)*a(3,3)-a(2,3)*a(3,2);
+          w[10] = a(2,2)*a(3,4)-a(2,4)*a(3,2);
+          w[11] = a(2,2)*a(3,5)-a(2,5)*a(3,2);
+          w[12] = a(2,3)*a(3,4)-a(2,4)*a(3,3);
+          w[13] = a(2,3)*a(3,5)-a(2,5)*a(3,3);
+          w[14] = a(2,4)*a(3,5)-a(2,5)*a(3,4);
+          w[15] = a(1,0)*w[5]-a(1,1)*w[1]+a(1,2)*w[0];
+          w[16] = a(1,0)*w[6]-a(1,1)*w[2]+a(1,3)*w[0];
+          w[17] = a(1,0)*w[7]-a(1,1)*w[3]+a(1,4)*w[0];
+          w[18] = a(1,0)*w[8]-a(1,1)*w[4]+a(1,5)*w[0];
+          w[19] = a(1,0)*w[9]-a(1,2)*w[2]+a(1,3)*w[1];
+          w[20] = a(1,0)*w[10]-a(1,2)*w[3]+a(1,4)*w[1];
+          w[21] = a(1,0)*w[11]-a(1,2)*w[4]+a(1,5)*w[1];
+          w[22] = a(1,0)*w[12]-a(1,3)*w[3]+a(1,4)*w[2];
+          w[23] = a(1,0)*w[13]-a(1,3)*w[4]+a(1,5)*w[2];
+          w[24] = a(1,0)*w[14]-a(1,4)*w[4]+a(1,5)*w[3];
+          w[25] = a(1,1)*w[9]-a(1,2)*w[6]+a(1,3)*w[5];
+          w[26] = a(1,1)*w[10]-a(1,2)*w[7]+a(1,4)*w[5];
+          w[27] = a(1,1)*w[11]-a(1,2)*w[8]+a(1,5)*w[5];
+          w[28] = a(1,1)*w[12]-a(1,3)*w[7]+a(1,4)*w[6];
+          w[29] = a(1,1)*w[13]-a(1,3)*w[8]+a(1,5)*w[6];
+          w[30] = a(1,1)*w[14]-a(1,4)*w[8]+a(1,5)*w[7];
+          w[31] = a(1,2)*w[12]-a(1,3)*w[10]+a(1,4)*w[9];
+          w[32] = a(1,2)*w[13]-a(1,3)*w[11]+a(1,5)*w[9];
+          w[33] = a(1,2)*w[14]-a(1,4)*w[11]+a(1,5)*w[10];
+          w[34] = a(1,3)*w[14]-a(1,4)*w[13]+a(1,5)*w[12];
+          w[ 0] = a(0,0)*w[25]-a(0,1)*w[19]+a(0,2)*w[16]-a(0,3)*w[15];
+          w[ 1] = a(0,0)*w[26]-a(0,1)*w[20]+a(0,2)*w[17]-a(0,4)*w[15];
+          w[ 2] = a(0,0)*w[27]-a(0,1)*w[21]+a(0,2)*w[18]-a(0,5)*w[15];
+          w[ 3] = a(0,0)*w[28]-a(0,1)*w[22]+a(0,3)*w[17]-a(0,4)*w[16];
+          w[ 4] = a(0,0)*w[29]-a(0,1)*w[23]+a(0,3)*w[18]-a(0,5)*w[16];
+          w[ 5] = a(0,0)*w[30]-a(0,1)*w[24]+a(0,4)*w[18]-a(0,5)*w[17];
+          w[ 6] = a(0,0)*w[31]-a(0,2)*w[22]+a(0,3)*w[20]-a(0,4)*w[19];
+          w[ 7] = a(0,0)*w[32]-a(0,2)*w[23]+a(0,3)*w[21]-a(0,5)*w[19];
+          w[ 8] = a(0,0)*w[33]-a(0,2)*w[24]+a(0,4)*w[21]-a(0,5)*w[20];
+          w[ 9] = a(0,0)*w[34]-a(0,3)*w[24]+a(0,4)*w[23]-a(0,5)*w[22];
+          w[10] = a(0,1)*w[31]-a(0,2)*w[28]+a(0,3)*w[26]-a(0,4)*w[25];
+          w[11] = a(0,1)*w[32]-a(0,2)*w[29]+a(0,3)*w[27]-a(0,5)*w[25];
+          w[12] = a(0,1)*w[33]-a(0,2)*w[30]+a(0,4)*w[27]-a(0,5)*w[26];
+          w[13] = a(0,1)*w[34]-a(0,3)*w[30]+a(0,4)*w[29]-a(0,5)*w[28];
+          w[14] = a(0,2)*w[34]-a(0,3)*w[33]+a(0,4)*w[32]-a(0,5)*w[31];
+          b(0,4) = d*( a(5,1)*w[14]-a(5,2)*w[13]+a(5,3)*w[12]-a(5,4)*w[11]+a(5,5)*w[10]);
+          b(1,4) = d*(-a(5,0)*w[14]+a(5,2)*w[9]-a(5,3)*w[8]+a(5,4)*w[7]-a(5,5)*w[6]);
+          b(2,4) = d*( a(5,0)*w[13]-a(5,1)*w[9]+a(5,3)*w[5]-a(5,4)*w[4]+a(5,5)*w[3]);
+          b(3,4) = d*(-a(5,0)*w[12]+a(5,1)*w[8]-a(5,2)*w[5]+a(5,4)*w[2]-a(5,5)*w[1]);
+          b(4,4) = d*( a(5,0)*w[11]-a(5,1)*w[7]+a(5,2)*w[4]-a(5,3)*w[2]+a(5,5)*w[0]);
+          b(5,4) = d*(-a(5,0)*w[10]+a(5,1)*w[6]-a(5,2)*w[3]+a(5,3)*w[1]-a(5,4)*w[0]);
+          b(0,5) = d*(-a(4,1)*w[14]+a(4,2)*w[13]-a(4,3)*w[12]+a(4,4)*w[11]-a(4,5)*w[10]);
+          b(1,5) = d*( a(4,0)*w[14]-a(4,2)*w[9]+a(4,3)*w[8]-a(4,4)*w[7]+a(4,5)*w[6]);
+          b(2,5) = d*(-a(4,0)*w[13]+a(4,1)*w[9]-a(4,3)*w[5]+a(4,4)*w[4]-a(4,5)*w[3]);
+          b(3,5) = d*( a(4,0)*w[12]-a(4,1)*w[8]+a(4,2)*w[5]-a(4,4)*w[2]+a(4,5)*w[1]);
+          b(4,5) = d*(-a(4,0)*w[11]+a(4,1)*w[7]-a(4,2)*w[4]+a(4,3)*w[2]-a(4,5)*w[0]);
+          b(5,5) = d*( a(4,0)*w[10]-a(4,1)*w[6]+a(4,2)*w[3]-a(4,3)*w[1]+a(4,4)*w[0]);
+          return det;
+        }
+      };
+
+      // generic square matrix inversion:
+      template<int n_>
+      struct InverseHelper<n_, n_>
+      {
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static T_ compute(Tiny::Matrix<T_, n_, n_, smb_, snb_>& b, const Tiny::Matrix<T_, n_, n_, sma_, sna_>& a)
+        {
+          // copy matrix a to b
+          for (int i(0); i < n_; ++i)
+          {
+            for (int j(0); j < n_; ++j)
+            {
+              b(i,j) = a(i,j);
+            }
+          }
+
+          // create pivot array
+          int p[n_];
+
+          // initialize identity permutation
+          for(int i(0); i < n_; ++i)
+          {
+            p[i] = i;
+          }
+
+          // initialize determinant to 1
+          T_ det = T_(1);
+
+          // primary column elimination loop
+          for(int k(0); k < n_; ++k)
+          {
+            // step 1: find a pivot for the elimination of column k
+            {
+              // for this, we only check the rows p[j] with j >= k, as all
+              // rows p[j] with j < k have already been eliminated and are
+              // therefore not candidates for pivoting
+              #ifdef __CUDACC__
+              T_ pivot = CudaMath::cuda_abs(b(p[k], p[k]));
+              #else
+              T_ pivot = Math::abs(b(p[k], p[k]));
+              #endif
+              int i = k;
+
+              // loop over all unprocessed rows
+              for(int j(k+1); j < n_; ++j)
+              {
+                // get our matrix value and check whether it can be a pivot
+                #ifdef __CUDACC__
+                T_ abs_val = CudaMath::cuda_abs(b(p[j], p[j]));
+                #else
+                T_ abs_val = Math::abs(b(p[j], p[j]));
+                #endif
+                if(abs_val > pivot)
+                {
+                  pivot = abs_val;
+                  i = j;
+                }
+              }
+
+              // do we have to swap rows i and k?
+              if(i > k)
+              {
+                // swap rows "virtually" by exchanging their permutation positions
+                int t = p[k];
+                p[k] = p[i];
+                p[i] = t;
+              }
+            }
+
+            // step 2: process pivot row
+            {
+              // update determinant by multiplying with the pivot element
+              det *= b(p[k], p[k]);
+
+              // get our inverted pivot element
+              const T_ pivot = T_(1) / b(p[k], p[k]);
+
+              // replace column entry by unit column entry
+              b(p[k], p[k]) = T_(1);
+
+              // divide the whole row by the inverted pivot
+              for(int j(0); j < n_; ++j)
+              {
+                b(p[k], j) *= pivot;
+              }
+            }
+
+            // step 3: eliminate pivot column
+
+            // loop over all rows of the matrix
+            for(int i(0); i < n_; ++i)
+            {
+              // skip the pivot row
+              if(i == p[k])
+                continue;
+
+              // fetch elimination factor
+              const T_ factor =  b(i, p[k]);
+
+              // replace by unit column entry
+              b(i, p[k]) = T_(0);
+
+              // process the row
+              for(int j(0); j < n_; ++j)
+              {
+                b(i, j) -= b(p[k], j) * factor;
+              }
+            }
+          }
+
+          // return determinant
+          return det;
+        }
+      };
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      #ifdef __CUDACC__
+      template<>
+      struct CudaGroupedInverseHelper<1,1>
+      {
+        template<typename T_, typename ThreadGroup_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_DEVICE static __forceinline__ void compute(const ThreadGroup_& tg,  Tiny::Matrix<T_, 1, 1, smb_, snb_>& b, const Tiny::Matrix<T_, 1, 1, sma_, sna_>&, const T_& det)
+        {
+          if(tg.thread_rank() == 0)
+            b(0,0) = T_(1) / det;
+        }
+      };
+
+      template<>
+      struct CudaGroupedInverseHelper<2,2>
+      {
+        template<typename T_, typename ThreadGroup_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_DEVICE static __forceinline__ void compute(const ThreadGroup_& tg,  Tiny::Matrix<T_, 2, 2, smb_, snb_>& b, const Tiny::Matrix<T_, 2, 2, sma_, sna_>& a, const T_& det)
         {
           //i think an if else cascade could do better than heavy modulo operations...
           T_ d = T_(1) / det;
@@ -2961,43 +3471,21 @@ namespace FEAT
           {
             const int i = idx /2;
             const int j = idx %2;
-            b[i*snb_+0] = ((i+j)==1 ? (-1) : (1)) * d * a[(1-j)*sna_+(1-i)];
+            b(i,0) = ((i+j)==1 ? (-1) : (1)) * d * a(1-j,1-i);
 
           }
-          b[0*snb_+0] =  d*a[1*sna_+1];
-          b[0*snb_+1] = -d*a[0*sna_+1];
-          b[1*snb_+0] = -d*a[1*sna_+0];
-          b[1*snb_+1] =  d*a[0*sna_+0];
+          b(0,0) =  d*a(1,1);
+          b(0,1) = -d*a(0,1);
+          b(1,0) = -d*a(1,0);
+          b(1,1) =  d*a(0,0);
         }
-        #endif
       };
 
-      template<int sna_, int snb_>
-      struct InverseHelper<3,3,sna_,snb_>
+      template<>
+      struct CudaGroupedInverseHelper<3,3>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
-        {
-          b[0*snb_+0] = a[1*sna_+1]*a[2*sna_+2] - a[1*sna_+2]*a[2*sna_+1];
-          b[1*snb_+0] = a[1*sna_+2]*a[2*sna_+0] - a[1*sna_+0]*a[2*sna_+2];
-          b[2*snb_+0] = a[1*sna_+0]*a[2*sna_+1] - a[1*sna_+1]*a[2*sna_+0];
-          T_ det = a[0*sna_+0]*b[0*snb_+0] + a[0*sna_+1]*b[1*snb_+0] + a[0*sna_+2]*b[2*snb_+0];
-          T_ d = T_(1) / det;
-          b[0*snb_+0] *= d;
-          b[1*snb_+0] *= d;
-          b[2*snb_+0] *= d;
-          b[0*snb_+1] = d*(a[0*sna_+2]*a[2*sna_+1] - a[0*sna_+1]*a[2*sna_+2]);
-          b[1*snb_+1] = d*(a[0*sna_+0]*a[2*sna_+2] - a[0*sna_+2]*a[2*sna_+0]);
-          b[2*snb_+1] = d*(a[0*sna_+1]*a[2*sna_+0] - a[0*sna_+0]*a[2*sna_+1]);
-          b[0*snb_+2] = d*(a[0*sna_+1]*a[1*sna_+2] - a[0*sna_+2]*a[1*sna_+1]);
-          b[1*snb_+2] = d*(a[0*sna_+2]*a[1*sna_+0] - a[0*sna_+0]*a[1*sna_+2]);
-          b[2*snb_+2] = d*(a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0]);
-          return det;
-        }
-
-        #ifdef __CUDACC__
-        template<typename T_, typename ThreadGroup_>
-        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_& det)
+        template<typename T_, typename ThreadGroup_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_DEVICE static __forceinline__ void compute(const ThreadGroup_& tg, Tiny::Matrix<T_, 3, 3, smb_, snb_>& b, const Tiny::Matrix<T_, 3, 3, sma_, sna_>& a, const T_& det)
         {
           // for(int i = tg.thread_rank(); i < 3; i += tg.num_threads())
           // {
@@ -3019,505 +3507,40 @@ namespace FEAT
           for(int idx = tg.thread_rank(); idx < 9; idx += tg.num_threads())
           {
             if(idx == 0)
-              b[0*snb_+0] = d*(a[1*sna_+1]*a[2*sna_+2] - a[1*sna_+2]*a[2*sna_+1]);
+              b(0,0) = d*(a(1,1)*a(2,2) - a(1,2)*a(2,1));
             else if(idx == 3)
-              b[1*snb_+0] = d*(a[1*sna_+2]*a[2*sna_+0] - a[1*sna_+0]*a[2*sna_+2]);
+              b(1,0) = d*(a(1,2)*a(2,0) - a(1,0)*a(2,2));
             else if(idx == 6)
-              b[2*snb_+0] = d*(a[1*sna_+0]*a[2*sna_+1] - a[1*sna_+1]*a[2*sna_+0]);
+              b(2,0) = d*(a(1,0)*a(2,1) - a(1,1)*a(2,0));
             else if(idx == 1)
-              b[0*snb_+1] = d*(a[0*sna_+2]*a[2*sna_+1] - a[0*sna_+1]*a[2*sna_+2]);
+              b(0,1) = d*(a(0,2)*a(2,1) - a(0,1)*a(2,2));
             else if(idx == 4)
-              b[1*snb_+1] = d*(a[0*sna_+0]*a[2*sna_+2] - a[0*sna_+2]*a[2*sna_+0]);
+              b(1,1) = d*(a(0,0)*a(2,2) - a(0,2)*a(2,0));
             else if(idx == 7)
-              b[2*snb_+1] = d*(a[0*sna_+1]*a[2*sna_+0] - a[0*sna_+0]*a[2*sna_+1]);
+              b(2,1) = d*(a(0,1)*a(2,0) - a(0,0)*a(2,1));
             else if(idx == 2)
-              b[0*snb_+2] = d*(a[0*sna_+1]*a[1*sna_+2] - a[0*sna_+2]*a[1*sna_+1]);
+              b(0,2) = d*(a(0,1)*a(1,2) - a(0,2)*a(1,1));
             else if(idx == 5)
-              b[1*snb_+2] = d*(a[0*sna_+2]*a[1*sna_+0] - a[0*sna_+0]*a[1*sna_+2]);
+              b(1,2) = d*(a(0,2)*a(1,0) - a(0,0)*a(1,2));
             else if(idx == 8)
-              b[2*snb_+2] = d*(a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0]);
+              b(2,2) = d*(a(0,0)*a(1,1) - a(0,1)*a(1,0));
           }
         }
-        #endif
-      };
-
-      template<int sna_, int snb_>
-      struct InverseHelper<4,4,sna_,snb_>
-      {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
-        {
-          T_ w[6];
-          w[0] = a[2*sna_+0]*a[3*sna_+1]-a[2*sna_+1]*a[3*sna_+0];
-          w[1] = a[2*sna_+0]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+0];
-          w[2] = a[2*sna_+0]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+0];
-          w[3] = a[2*sna_+1]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+1];
-          w[4] = a[2*sna_+1]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+1];
-          w[5] = a[2*sna_+2]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+2];
-          b[0*snb_+0] = a[1*sna_+1]*w[5]-a[1*sna_+2]*w[4]+a[1*sna_+3]*w[3];
-          b[1*snb_+0] =-a[1*sna_+0]*w[5]+a[1*sna_+2]*w[2]-a[1*sna_+3]*w[1];
-          b[2*snb_+0] = a[1*sna_+0]*w[4]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          b[3*snb_+0] =-a[1*sna_+0]*w[3]+a[1*sna_+1]*w[1]-a[1*sna_+2]*w[0];
-          T_ det = a[0*sna_+0]*b[0*snb_+0]+a[0*sna_+1]*b[1*snb_+0]+a[0*sna_+2]*b[2*snb_+0]+a[0*sna_+3]*b[3*snb_+0];
-          T_ d = T_(1) / det;
-          b[0*snb_+0] *= d;
-          b[1*snb_+0] *= d;
-          b[2*snb_+0] *= d;
-          b[3*snb_+0] *= d;
-          b[0*snb_+1] = d*(-a[0*sna_+1]*w[5]+a[0*sna_+2]*w[4]-a[0*sna_+3]*w[3]);
-          b[1*snb_+1] = d*( a[0*sna_+0]*w[5]-a[0*sna_+2]*w[2]+a[0*sna_+3]*w[1]);
-          b[2*snb_+1] = d*(-a[0*sna_+0]*w[4]+a[0*sna_+1]*w[2]-a[0*sna_+3]*w[0]);
-          b[3*snb_+1] = d*( a[0*sna_+0]*w[3]-a[0*sna_+1]*w[1]+a[0*sna_+2]*w[0]);
-          w[0] = a[0*sna_+0]*a[1*sna_+1]-a[0*sna_+1]*a[1*sna_+0];
-          w[1] = a[0*sna_+0]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+0];
-          w[2] = a[0*sna_+0]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+0];
-          w[3] = a[0*sna_+1]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+1];
-          w[4] = a[0*sna_+1]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+1];
-          w[5] = a[0*sna_+2]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+2];
-          b[0*snb_+2] = d*( a[3*sna_+1]*w[5]-a[3*sna_+2]*w[4]+a[3*sna_+3]*w[3]);
-          b[1*snb_+2] = d*(-a[3*sna_+0]*w[5]+a[3*sna_+2]*w[2]-a[3*sna_+3]*w[1]);
-          b[2*snb_+2] = d*( a[3*sna_+0]*w[4]-a[3*sna_+1]*w[2]+a[3*sna_+3]*w[0]);
-          b[3*snb_+2] = d*(-a[3*sna_+0]*w[3]+a[3*sna_+1]*w[1]-a[3*sna_+2]*w[0]);
-          b[0*snb_+3] = d*(-a[2*sna_+1]*w[5]+a[2*sna_+2]*w[4]-a[2*sna_+3]*w[3]);
-          b[1*snb_+3] = d*( a[2*sna_+0]*w[5]-a[2*sna_+2]*w[2]+a[2*sna_+3]*w[1]);
-          b[2*snb_+3] = d*(-a[2*sna_+0]*w[4]+a[2*sna_+1]*w[2]-a[2*sna_+3]*w[0]);
-          b[3*snb_+3] = d*( a[2*sna_+0]*w[3]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0]);
-          return det;
-        }
-
-        #ifdef __CUDACC__
-        template<typename T_, typename ThreadGroup_>
-        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
-        {
-          constexpr int n_ = 4;
-          // copy matrix a to b
-          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
-          {
-            const int row = i/n_;
-            const int col = i%n_;
-            b[row*snb_+col] = a[row*sna_+col];
-          }
-
-          // create shared pivot array
-          __shared__ int p[n_];
-          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
-          {
-            p[i] = 0;
-          }
-          tg.sync();
-          // call grouped invert from first warp subgroup
-          if(tg.thread_rank() < 32)
-          {
-            auto a_g = cg::coalesced_threads();
-
-            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
-          }
-          tg.sync();
-
-        }
-        #endif
-      };
-
-      template<int sna_, int snb_>
-      struct InverseHelper<5,5,sna_,snb_>
-      {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
-        {
-          T_ w[20];
-          w[ 0] = a[3*sna_+0]*a[4*sna_+1]-a[3*sna_+1]*a[4*sna_+0];
-          w[ 1] = a[3*sna_+0]*a[4*sna_+2]-a[3*sna_+2]*a[4*sna_+0];
-          w[ 2] = a[3*sna_+0]*a[4*sna_+3]-a[3*sna_+3]*a[4*sna_+0];
-          w[ 3] = a[3*sna_+0]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+0];
-          w[ 4] = a[3*sna_+1]*a[4*sna_+2]-a[3*sna_+2]*a[4*sna_+1];
-          w[ 5] = a[3*sna_+1]*a[4*sna_+3]-a[3*sna_+3]*a[4*sna_+1];
-          w[ 6] = a[3*sna_+1]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+1];
-          w[ 7] = a[3*sna_+2]*a[4*sna_+3]-a[3*sna_+3]*a[4*sna_+2];
-          w[ 8] = a[3*sna_+2]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+2];
-          w[ 9] = a[3*sna_+3]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+3];
-          w[10] = a[2*sna_+0]*w[4]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0];
-          w[11] = a[2*sna_+0]*w[5]-a[2*sna_+1]*w[2]+a[2*sna_+3]*w[0];
-          w[12] = a[2*sna_+0]*w[6]-a[2*sna_+1]*w[3]+a[2*sna_+4]*w[0];
-          w[13] = a[2*sna_+0]*w[7]-a[2*sna_+2]*w[2]+a[2*sna_+3]*w[1];
-          w[14] = a[2*sna_+0]*w[8]-a[2*sna_+2]*w[3]+a[2*sna_+4]*w[1];
-          w[15] = a[2*sna_+0]*w[9]-a[2*sna_+3]*w[3]+a[2*sna_+4]*w[2];
-          w[16] = a[2*sna_+1]*w[7]-a[2*sna_+2]*w[5]+a[2*sna_+3]*w[4];
-          w[17] = a[2*sna_+1]*w[8]-a[2*sna_+2]*w[6]+a[2*sna_+4]*w[4];
-          w[18] = a[2*sna_+1]*w[9]-a[2*sna_+3]*w[6]+a[2*sna_+4]*w[5];
-          w[19] = a[2*sna_+2]*w[9]-a[2*sna_+3]*w[8]+a[2*sna_+4]*w[7];
-          b[0*snb_+0] = a[1*sna_+1]*w[19]-a[1*sna_+2]*w[18]+a[1*sna_+3]*w[17]-a[1*sna_+4]*w[16];
-          b[1*snb_+0] =-a[1*sna_+0]*w[19]+a[1*sna_+2]*w[15]-a[1*sna_+3]*w[14]+a[1*sna_+4]*w[13];
-          b[2*snb_+0] = a[1*sna_+0]*w[18]-a[1*sna_+1]*w[15]+a[1*sna_+3]*w[12]-a[1*sna_+4]*w[11];
-          b[3*snb_+0] =-a[1*sna_+0]*w[17]+a[1*sna_+1]*w[14]-a[1*sna_+2]*w[12]+a[1*sna_+4]*w[10];
-          b[4*snb_+0] = a[1*sna_+0]*w[16]-a[1*sna_+1]*w[13]+a[1*sna_+2]*w[11]-a[1*sna_+3]*w[10];
-          T_ det = a[0*sna_+0]*b[0*snb_+0]+a[0*sna_+1]*b[1*snb_+0]+a[0*sna_+2]*b[2*snb_+0]+a[0*sna_+3]*b[3*snb_+0]+a[0*sna_+4]*b[4*snb_+0];
-          T_ d = T_(1) / det;
-          b[0*snb_+0] *= d;
-          b[1*snb_+0] *= d;
-          b[2*snb_+0] *= d;
-          b[3*snb_+0] *= d;
-          b[4*snb_+0] *= d;
-          b[0*snb_+1] = d*(-a[0*sna_+1]*w[19]+a[0*sna_+2]*w[18]-a[0*sna_+3]*w[17]+a[0*sna_+4]*w[16]);
-          b[1*snb_+1] = d*( a[0*sna_+0]*w[19]-a[0*sna_+2]*w[15]+a[0*sna_+3]*w[14]-a[0*sna_+4]*w[13]);
-          b[2*snb_+1] = d*(-a[0*sna_+0]*w[18]+a[0*sna_+1]*w[15]-a[0*sna_+3]*w[12]+a[0*sna_+4]*w[11]);
-          b[3*snb_+1] = d*( a[0*sna_+0]*w[17]-a[0*sna_+1]*w[14]+a[0*sna_+2]*w[12]-a[0*sna_+4]*w[10]);
-          b[4*snb_+1] = d*(-a[0*sna_+0]*w[16]+a[0*sna_+1]*w[13]-a[0*sna_+2]*w[11]+a[0*sna_+3]*w[10]);
-          w[10] = a[1*sna_+0]*w[4]-a[1*sna_+1]*w[1]+a[1*sna_+2]*w[0];
-          w[11] = a[1*sna_+0]*w[5]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          w[12] = a[1*sna_+0]*w[6]-a[1*sna_+1]*w[3]+a[1*sna_+4]*w[0];
-          w[13] = a[1*sna_+0]*w[7]-a[1*sna_+2]*w[2]+a[1*sna_+3]*w[1];
-          w[14] = a[1*sna_+0]*w[8]-a[1*sna_+2]*w[3]+a[1*sna_+4]*w[1];
-          w[15] = a[1*sna_+0]*w[9]-a[1*sna_+3]*w[3]+a[1*sna_+4]*w[2];
-          w[16] = a[1*sna_+1]*w[7]-a[1*sna_+2]*w[5]+a[1*sna_+3]*w[4];
-          w[17] = a[1*sna_+1]*w[8]-a[1*sna_+2]*w[6]+a[1*sna_+4]*w[4];
-          w[18] = a[1*sna_+1]*w[9]-a[1*sna_+3]*w[6]+a[1*sna_+4]*w[5];
-          w[19] = a[1*sna_+2]*w[9]-a[1*sna_+3]*w[8]+a[1*sna_+4]*w[7];
-          b[0*snb_+2] = d*( a[0*sna_+1]*w[19]-a[0*sna_+2]*w[18]+a[0*sna_+3]*w[17]-a[0*sna_+4]*w[16]);
-          b[1*snb_+2] = d*(-a[0*sna_+0]*w[19]+a[0*sna_+2]*w[15]-a[0*sna_+3]*w[14]+a[0*sna_+4]*w[13]);
-          b[2*snb_+2] = d*( a[0*sna_+0]*w[18]-a[0*sna_+1]*w[15]+a[0*sna_+3]*w[12]-a[0*sna_+4]*w[11]);
-          b[3*snb_+2] = d*(-a[0*sna_+0]*w[17]+a[0*sna_+1]*w[14]-a[0*sna_+2]*w[12]+a[0*sna_+4]*w[10]);
-          b[4*snb_+2] = d*( a[0*sna_+0]*w[16]-a[0*sna_+1]*w[13]+a[0*sna_+2]*w[11]-a[0*sna_+3]*w[10]);
-          w[ 0] = a[0*sna_+0]*a[1*sna_+1]-a[0*sna_+1]*a[1*sna_+0];
-          w[ 1] = a[0*sna_+0]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+0];
-          w[ 2] = a[0*sna_+0]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+0];
-          w[ 3] = a[0*sna_+0]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+0];
-          w[ 4] = a[0*sna_+1]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+1];
-          w[ 5] = a[0*sna_+1]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+1];
-          w[ 6] = a[0*sna_+1]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+1];
-          w[ 7] = a[0*sna_+2]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+2];
-          w[ 8] = a[0*sna_+2]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+2];
-          w[ 9] = a[0*sna_+3]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+3];
-          w[10] = a[2*sna_+0]*w[4]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0];
-          w[11] = a[2*sna_+0]*w[5]-a[2*sna_+1]*w[2]+a[2*sna_+3]*w[0];
-          w[12] = a[2*sna_+0]*w[6]-a[2*sna_+1]*w[3]+a[2*sna_+4]*w[0];
-          w[13] = a[2*sna_+0]*w[7]-a[2*sna_+2]*w[2]+a[2*sna_+3]*w[1];
-          w[14] = a[2*sna_+0]*w[8]-a[2*sna_+2]*w[3]+a[2*sna_+4]*w[1];
-          w[15] = a[2*sna_+0]*w[9]-a[2*sna_+3]*w[3]+a[2*sna_+4]*w[2];
-          w[16] = a[2*sna_+1]*w[7]-a[2*sna_+2]*w[5]+a[2*sna_+3]*w[4];
-          w[17] = a[2*sna_+1]*w[8]-a[2*sna_+2]*w[6]+a[2*sna_+4]*w[4];
-          w[18] = a[2*sna_+1]*w[9]-a[2*sna_+3]*w[6]+a[2*sna_+4]*w[5];
-          w[19] = a[2*sna_+2]*w[9]-a[2*sna_+3]*w[8]+a[2*sna_+4]*w[7];
-          b[0*snb_+3] = d*( a[4*sna_+1]*w[19]-a[4*sna_+2]*w[18]+a[4*sna_+3]*w[17]-a[4*sna_+4]*w[16]);
-          b[1*snb_+3] = d*(-a[4*sna_+0]*w[19]+a[4*sna_+2]*w[15]-a[4*sna_+3]*w[14]+a[4*sna_+4]*w[13]);
-          b[2*snb_+3] = d*( a[4*sna_+0]*w[18]-a[4*sna_+1]*w[15]+a[4*sna_+3]*w[12]-a[4*sna_+4]*w[11]);
-          b[3*snb_+3] = d*(-a[4*sna_+0]*w[17]+a[4*sna_+1]*w[14]-a[4*sna_+2]*w[12]+a[4*sna_+4]*w[10]);
-          b[4*snb_+3] = d*( a[4*sna_+0]*w[16]-a[4*sna_+1]*w[13]+a[4*sna_+2]*w[11]-a[4*sna_+3]*w[10]);
-          b[0*snb_+4] = d*(-a[3*sna_+1]*w[19]+a[3*sna_+2]*w[18]-a[3*sna_+3]*w[17]+a[3*sna_+4]*w[16]);
-          b[1*snb_+4] = d*( a[3*sna_+0]*w[19]-a[3*sna_+2]*w[15]+a[3*sna_+3]*w[14]-a[3*sna_+4]*w[13]);
-          b[2*snb_+4] = d*(-a[3*sna_+0]*w[18]+a[3*sna_+1]*w[15]-a[3*sna_+3]*w[12]+a[3*sna_+4]*w[11]);
-          b[3*snb_+4] = d*( a[3*sna_+0]*w[17]-a[3*sna_+1]*w[14]+a[3*sna_+2]*w[12]-a[3*sna_+4]*w[10]);
-          b[4*snb_+4] = d*(-a[3*sna_+0]*w[16]+a[3*sna_+1]*w[13]-a[3*sna_+2]*w[11]+a[3*sna_+3]*w[10]);
-          return det;
-        }
-
-        #ifdef __CUDACC__
-        template<typename T_, typename ThreadGroup_>
-        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
-        {
-          constexpr int n_ = 5;
-          // copy matrix a to b
-          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
-          {
-            const int row = i/n_;
-            const int col = i%n_;
-            b[row*snb_+col] = a[row*sna_+col];
-          }
-
-          // create shared pivot array
-          __shared__ int p[n_];
-          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
-          {
-            p[i] = 0;
-          }
-          tg.sync();
-          // call grouped invert from first warp subgroup
-          if(tg.thread_rank() < 32)
-          {
-            auto a_g = cg::coalesced_threads();
-
-            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
-          }
-          tg.sync();
-
-        }
-        #endif
-      };
-
-      template<int sna_, int snb_>
-      struct InverseHelper<6,6,sna_,snb_>
-      {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
-        {
-          T_ w[35];
-          w[ 0] = a[4*sna_+0]*a[5*sna_+1]-a[4*sna_+1]*a[5*sna_+0];
-          w[ 1] = a[4*sna_+0]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+0];
-          w[ 2] = a[4*sna_+0]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+0];
-          w[ 3] = a[4*sna_+0]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+0];
-          w[ 4] = a[4*sna_+0]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+0];
-          w[ 5] = a[4*sna_+1]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+1];
-          w[ 6] = a[4*sna_+1]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+1];
-          w[ 7] = a[4*sna_+1]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+1];
-          w[ 8] = a[4*sna_+1]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+1];
-          w[ 9] = a[4*sna_+2]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+2];
-          w[10] = a[4*sna_+2]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+2];
-          w[11] = a[4*sna_+2]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+2];
-          w[12] = a[4*sna_+3]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+3];
-          w[13] = a[4*sna_+3]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+3];
-          w[14] = a[4*sna_+4]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+4];
-          w[15] = a[3*sna_+0]*w[5]-a[3*sna_+1]*w[1]+a[3*sna_+2]*w[0];
-          w[16] = a[3*sna_+0]*w[6]-a[3*sna_+1]*w[2]+a[3*sna_+3]*w[0];
-          w[17] = a[3*sna_+0]*w[7]-a[3*sna_+1]*w[3]+a[3*sna_+4]*w[0];
-          w[18] = a[3*sna_+0]*w[8]-a[3*sna_+1]*w[4]+a[3*sna_+5]*w[0];
-          w[19] = a[3*sna_+0]*w[9]-a[3*sna_+2]*w[2]+a[3*sna_+3]*w[1];
-          w[20] = a[3*sna_+0]*w[10]-a[3*sna_+2]*w[3]+a[3*sna_+4]*w[1];
-          w[21] = a[3*sna_+0]*w[11]-a[3*sna_+2]*w[4]+a[3*sna_+5]*w[1];
-          w[22] = a[3*sna_+0]*w[12]-a[3*sna_+3]*w[3]+a[3*sna_+4]*w[2];
-          w[23] = a[3*sna_+0]*w[13]-a[3*sna_+3]*w[4]+a[3*sna_+5]*w[2];
-          w[24] = a[3*sna_+0]*w[14]-a[3*sna_+4]*w[4]+a[3*sna_+5]*w[3];
-          w[25] = a[3*sna_+1]*w[9]-a[3*sna_+2]*w[6]+a[3*sna_+3]*w[5];
-          w[26] = a[3*sna_+1]*w[10]-a[3*sna_+2]*w[7]+a[3*sna_+4]*w[5];
-          w[27] = a[3*sna_+1]*w[11]-a[3*sna_+2]*w[8]+a[3*sna_+5]*w[5];
-          w[28] = a[3*sna_+1]*w[12]-a[3*sna_+3]*w[7]+a[3*sna_+4]*w[6];
-          w[29] = a[3*sna_+1]*w[13]-a[3*sna_+3]*w[8]+a[3*sna_+5]*w[6];
-          w[30] = a[3*sna_+1]*w[14]-a[3*sna_+4]*w[8]+a[3*sna_+5]*w[7];
-          w[31] = a[3*sna_+2]*w[12]-a[3*sna_+3]*w[10]+a[3*sna_+4]*w[9];
-          w[32] = a[3*sna_+2]*w[13]-a[3*sna_+3]*w[11]+a[3*sna_+5]*w[9];
-          w[33] = a[3*sna_+2]*w[14]-a[3*sna_+4]*w[11]+a[3*sna_+5]*w[10];
-          w[34] = a[3*sna_+3]*w[14]-a[3*sna_+4]*w[13]+a[3*sna_+5]*w[12];
-          w[ 0] = a[2*sna_+0]*w[25]-a[2*sna_+1]*w[19]+a[2*sna_+2]*w[16]-a[2*sna_+3]*w[15];
-          w[ 1] = a[2*sna_+0]*w[26]-a[2*sna_+1]*w[20]+a[2*sna_+2]*w[17]-a[2*sna_+4]*w[15];
-          w[ 2] = a[2*sna_+0]*w[27]-a[2*sna_+1]*w[21]+a[2*sna_+2]*w[18]-a[2*sna_+5]*w[15];
-          w[ 3] = a[2*sna_+0]*w[28]-a[2*sna_+1]*w[22]+a[2*sna_+3]*w[17]-a[2*sna_+4]*w[16];
-          w[ 4] = a[2*sna_+0]*w[29]-a[2*sna_+1]*w[23]+a[2*sna_+3]*w[18]-a[2*sna_+5]*w[16];
-          w[ 5] = a[2*sna_+0]*w[30]-a[2*sna_+1]*w[24]+a[2*sna_+4]*w[18]-a[2*sna_+5]*w[17];
-          w[ 6] = a[2*sna_+0]*w[31]-a[2*sna_+2]*w[22]+a[2*sna_+3]*w[20]-a[2*sna_+4]*w[19];
-          w[ 7] = a[2*sna_+0]*w[32]-a[2*sna_+2]*w[23]+a[2*sna_+3]*w[21]-a[2*sna_+5]*w[19];
-          w[ 8] = a[2*sna_+0]*w[33]-a[2*sna_+2]*w[24]+a[2*sna_+4]*w[21]-a[2*sna_+5]*w[20];
-          w[ 9] = a[2*sna_+0]*w[34]-a[2*sna_+3]*w[24]+a[2*sna_+4]*w[23]-a[2*sna_+5]*w[22];
-          w[10] = a[2*sna_+1]*w[31]-a[2*sna_+2]*w[28]+a[2*sna_+3]*w[26]-a[2*sna_+4]*w[25];
-          w[11] = a[2*sna_+1]*w[32]-a[2*sna_+2]*w[29]+a[2*sna_+3]*w[27]-a[2*sna_+5]*w[25];
-          w[12] = a[2*sna_+1]*w[33]-a[2*sna_+2]*w[30]+a[2*sna_+4]*w[27]-a[2*sna_+5]*w[26];
-          w[13] = a[2*sna_+1]*w[34]-a[2*sna_+3]*w[30]+a[2*sna_+4]*w[29]-a[2*sna_+5]*w[28];
-          w[14] = a[2*sna_+2]*w[34]-a[2*sna_+3]*w[33]+a[2*sna_+4]*w[32]-a[2*sna_+5]*w[31];
-          b[0*snb_+0] =  a[1*sna_+1]*w[14]-a[1*sna_+2]*w[13]+a[1*sna_+3]*w[12]-a[1*sna_+4]*w[11]+a[1*sna_+5]*w[10];
-          b[1*snb_+0] = -a[1*sna_+0]*w[14]+a[1*sna_+2]*w[9]-a[1*sna_+3]*w[8]+a[1*sna_+4]*w[7]-a[1*sna_+5]*w[6];
-          b[2*snb_+0] =  a[1*sna_+0]*w[13]-a[1*sna_+1]*w[9]+a[1*sna_+3]*w[5]-a[1*sna_+4]*w[4]+a[1*sna_+5]*w[3];
-          b[3*snb_+0] = -a[1*sna_+0]*w[12]+a[1*sna_+1]*w[8]-a[1*sna_+2]*w[5]+a[1*sna_+4]*w[2]-a[1*sna_+5]*w[1];
-          b[4*snb_+0] =  a[1*sna_+0]*w[11]-a[1*sna_+1]*w[7]+a[1*sna_+2]*w[4]-a[1*sna_+3]*w[2]+a[1*sna_+5]*w[0];
-          b[5*snb_+0] = -a[1*sna_+0]*w[10]+a[1*sna_+1]*w[6]-a[1*sna_+2]*w[3]+a[1*sna_+3]*w[1]-a[1*sna_+4]*w[0];
-          T_ det = a[0*sna_+0]*b[0*snb_+0] + a[0*sna_+1]*b[1*snb_+0] + a[0*sna_+2]*b[2*snb_+0]
-                 + a[0*sna_+3]*b[3*snb_+0] + a[0*sna_+4]*b[4*snb_+0] + a[0*sna_+5]*b[5*snb_+0];
-          T_ d = T_(1) / det;
-          b[0*snb_+0] *= d;
-          b[1*snb_+0] *= d;
-          b[2*snb_+0] *= d;
-          b[3*snb_+0] *= d;
-          b[4*snb_+0] *= d;
-          b[5*snb_+0] *= d;
-          b[0*snb_+1] = d*(-a[0*sna_+1]*w[14]+a[0*sna_+2]*w[13]-a[0*sna_+3]*w[12]+a[0*sna_+4]*w[11]-a[0*sna_+5]*w[10]);
-          b[1*snb_+1] = d*( a[0*sna_+0]*w[14]-a[0*sna_+2]*w[9]+a[0*sna_+3]*w[8]-a[0*sna_+4]*w[7]+a[0*sna_+5]*w[6]);
-          b[2*snb_+1] = d*(-a[0*sna_+0]*w[13]+a[0*sna_+1]*w[9]-a[0*sna_+3]*w[5]+a[0*sna_+4]*w[4]-a[0*sna_+5]*w[3]);
-          b[3*snb_+1] = d*( a[0*sna_+0]*w[12]-a[0*sna_+1]*w[8]+a[0*sna_+2]*w[5]-a[0*sna_+4]*w[2]+a[0*sna_+5]*w[1]);
-          b[4*snb_+1] = d*(-a[0*sna_+0]*w[11]+a[0*sna_+1]*w[7]-a[0*sna_+2]*w[4]+a[0*sna_+3]*w[2]-a[0*sna_+5]*w[0]);
-          b[5*snb_+1] = d*( a[0*sna_+0]*w[10]-a[0*sna_+1]*w[6]+a[0*sna_+2]*w[3]-a[0*sna_+3]*w[1]+a[0*sna_+4]*w[0]);
-          w[ 0] = a[4*sna_+0]*a[5*sna_+1]-a[4*sna_+1]*a[5*sna_+0];
-          w[ 1] = a[4*sna_+0]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+0];
-          w[ 2] = a[4*sna_+0]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+0];
-          w[ 3] = a[4*sna_+0]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+0];
-          w[ 4] = a[4*sna_+0]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+0];
-          w[ 5] = a[4*sna_+1]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+1];
-          w[ 6] = a[4*sna_+1]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+1];
-          w[ 7] = a[4*sna_+1]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+1];
-          w[ 8] = a[4*sna_+1]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+1];
-          w[ 9] = a[4*sna_+2]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+2];
-          w[10] = a[4*sna_+2]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+2];
-          w[11] = a[4*sna_+2]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+2];
-          w[12] = a[4*sna_+3]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+3];
-          w[13] = a[4*sna_+3]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+3];
-          w[14] = a[4*sna_+4]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+4];
-          w[15] = a[1*sna_+0]*w[5]-a[1*sna_+1]*w[1]+a[1*sna_+2]*w[0];
-          w[16] = a[1*sna_+0]*w[6]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          w[17] = a[1*sna_+0]*w[7]-a[1*sna_+1]*w[3]+a[1*sna_+4]*w[0];
-          w[18] = a[1*sna_+0]*w[8]-a[1*sna_+1]*w[4]+a[1*sna_+5]*w[0];
-          w[19] = a[1*sna_+0]*w[9]-a[1*sna_+2]*w[2]+a[1*sna_+3]*w[1];
-          w[20] = a[1*sna_+0]*w[10]-a[1*sna_+2]*w[3]+a[1*sna_+4]*w[1];
-          w[21] = a[1*sna_+0]*w[11]-a[1*sna_+2]*w[4]+a[1*sna_+5]*w[1];
-          w[22] = a[1*sna_+0]*w[12]-a[1*sna_+3]*w[3]+a[1*sna_+4]*w[2];
-          w[23] = a[1*sna_+0]*w[13]-a[1*sna_+3]*w[4]+a[1*sna_+5]*w[2];
-          w[24] = a[1*sna_+0]*w[14]-a[1*sna_+4]*w[4]+a[1*sna_+5]*w[3];
-          w[25] = a[1*sna_+1]*w[9]-a[1*sna_+2]*w[6]+a[1*sna_+3]*w[5];
-          w[26] = a[1*sna_+1]*w[10]-a[1*sna_+2]*w[7]+a[1*sna_+4]*w[5];
-          w[27] = a[1*sna_+1]*w[11]-a[1*sna_+2]*w[8]+a[1*sna_+5]*w[5];
-          w[28] = a[1*sna_+1]*w[12]-a[1*sna_+3]*w[7]+a[1*sna_+4]*w[6];
-          w[29] = a[1*sna_+1]*w[13]-a[1*sna_+3]*w[8]+a[1*sna_+5]*w[6];
-          w[30] = a[1*sna_+1]*w[14]-a[1*sna_+4]*w[8]+a[1*sna_+5]*w[7];
-          w[31] = a[1*sna_+2]*w[12]-a[1*sna_+3]*w[10]+a[1*sna_+4]*w[9];
-          w[32] = a[1*sna_+2]*w[13]-a[1*sna_+3]*w[11]+a[1*sna_+5]*w[9];
-          w[33] = a[1*sna_+2]*w[14]-a[1*sna_+4]*w[11]+a[1*sna_+5]*w[10];
-          w[34] = a[1*sna_+3]*w[14]-a[1*sna_+4]*w[13]+a[1*sna_+5]*w[12];
-          w[ 0] = a[0*sna_+0]*w[25]-a[0*sna_+1]*w[19]+a[0*sna_+2]*w[16]-a[0*sna_+3]*w[15];
-          w[ 1] = a[0*sna_+0]*w[26]-a[0*sna_+1]*w[20]+a[0*sna_+2]*w[17]-a[0*sna_+4]*w[15];
-          w[ 2] = a[0*sna_+0]*w[27]-a[0*sna_+1]*w[21]+a[0*sna_+2]*w[18]-a[0*sna_+5]*w[15];
-          w[ 3] = a[0*sna_+0]*w[28]-a[0*sna_+1]*w[22]+a[0*sna_+3]*w[17]-a[0*sna_+4]*w[16];
-          w[ 4] = a[0*sna_+0]*w[29]-a[0*sna_+1]*w[23]+a[0*sna_+3]*w[18]-a[0*sna_+5]*w[16];
-          w[ 5] = a[0*sna_+0]*w[30]-a[0*sna_+1]*w[24]+a[0*sna_+4]*w[18]-a[0*sna_+5]*w[17];
-          w[ 6] = a[0*sna_+0]*w[31]-a[0*sna_+2]*w[22]+a[0*sna_+3]*w[20]-a[0*sna_+4]*w[19];
-          w[ 7] = a[0*sna_+0]*w[32]-a[0*sna_+2]*w[23]+a[0*sna_+3]*w[21]-a[0*sna_+5]*w[19];
-          w[ 8] = a[0*sna_+0]*w[33]-a[0*sna_+2]*w[24]+a[0*sna_+4]*w[21]-a[0*sna_+5]*w[20];
-          w[ 9] = a[0*sna_+0]*w[34]-a[0*sna_+3]*w[24]+a[0*sna_+4]*w[23]-a[0*sna_+5]*w[22];
-          w[10] = a[0*sna_+1]*w[31]-a[0*sna_+2]*w[28]+a[0*sna_+3]*w[26]-a[0*sna_+4]*w[25];
-          w[11] = a[0*sna_+1]*w[32]-a[0*sna_+2]*w[29]+a[0*sna_+3]*w[27]-a[0*sna_+5]*w[25];
-          w[12] = a[0*sna_+1]*w[33]-a[0*sna_+2]*w[30]+a[0*sna_+4]*w[27]-a[0*sna_+5]*w[26];
-          w[13] = a[0*sna_+1]*w[34]-a[0*sna_+3]*w[30]+a[0*sna_+4]*w[29]-a[0*sna_+5]*w[28];
-          w[14] = a[0*sna_+2]*w[34]-a[0*sna_+3]*w[33]+a[0*sna_+4]*w[32]-a[0*sna_+5]*w[31];
-          b[0*snb_+2] = d*( a[3*sna_+1]*w[14]-a[3*sna_+2]*w[13]+a[3*sna_+3]*w[12]-a[3*sna_+4]*w[11]+a[3*sna_+5]*w[10]);
-          b[1*snb_+2] = d*(-a[3*sna_+0]*w[14]+a[3*sna_+2]*w[9]-a[3*sna_+3]*w[8]+a[3*sna_+4]*w[7]-a[3*sna_+5]*w[6]);
-          b[2*snb_+2] = d*( a[3*sna_+0]*w[13]-a[3*sna_+1]*w[9]+a[3*sna_+3]*w[5]-a[3*sna_+4]*w[4]+a[3*sna_+5]*w[3]);
-          b[3*snb_+2] = d*(-a[3*sna_+0]*w[12]+a[3*sna_+1]*w[8]-a[3*sna_+2]*w[5]+a[3*sna_+4]*w[2]-a[3*sna_+5]*w[1]);
-          b[4*snb_+2] = d*( a[3*sna_+0]*w[11]-a[3*sna_+1]*w[7]+a[3*sna_+2]*w[4]-a[3*sna_+3]*w[2]+a[3*sna_+5]*w[0]);
-          b[5*snb_+2] = d*(-a[3*sna_+0]*w[10]+a[3*sna_+1]*w[6]-a[3*sna_+2]*w[3]+a[3*sna_+3]*w[1]-a[3*sna_+4]*w[0]);
-          b[0*snb_+3] = d*(-a[2*sna_+1]*w[14]+a[2*sna_+2]*w[13]-a[2*sna_+3]*w[12]+a[2*sna_+4]*w[11]-a[2*sna_+5]*w[10]);
-          b[1*snb_+3] = d*( a[2*sna_+0]*w[14]-a[2*sna_+2]*w[9]+a[2*sna_+3]*w[8]-a[2*sna_+4]*w[7]+a[2*sna_+5]*w[6]);
-          b[2*snb_+3] = d*(-a[2*sna_+0]*w[13]+a[2*sna_+1]*w[9]-a[2*sna_+3]*w[5]+a[2*sna_+4]*w[4]-a[2*sna_+5]*w[3]);
-          b[3*snb_+3] = d*( a[2*sna_+0]*w[12]-a[2*sna_+1]*w[8]+a[2*sna_+2]*w[5]-a[2*sna_+4]*w[2]+a[2*sna_+5]*w[1]);
-          b[4*snb_+3] = d*(-a[2*sna_+0]*w[11]+a[2*sna_+1]*w[7]-a[2*sna_+2]*w[4]+a[2*sna_+3]*w[2]-a[2*sna_+5]*w[0]);
-          b[5*snb_+3] = d*( a[2*sna_+0]*w[10]-a[2*sna_+1]*w[6]+a[2*sna_+2]*w[3]-a[2*sna_+3]*w[1]+a[2*sna_+4]*w[0]);
-          w[ 0] = a[2*sna_+0]*a[3*sna_+1]-a[2*sna_+1]*a[3*sna_+0];
-          w[ 1] = a[2*sna_+0]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+0];
-          w[ 2] = a[2*sna_+0]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+0];
-          w[ 3] = a[2*sna_+0]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+0];
-          w[ 4] = a[2*sna_+0]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+0];
-          w[ 5] = a[2*sna_+1]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+1];
-          w[ 6] = a[2*sna_+1]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+1];
-          w[ 7] = a[2*sna_+1]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+1];
-          w[ 8] = a[2*sna_+1]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+1];
-          w[ 9] = a[2*sna_+2]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+2];
-          w[10] = a[2*sna_+2]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+2];
-          w[11] = a[2*sna_+2]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+2];
-          w[12] = a[2*sna_+3]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+3];
-          w[13] = a[2*sna_+3]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+3];
-          w[14] = a[2*sna_+4]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+4];
-          w[15] = a[1*sna_+0]*w[5]-a[1*sna_+1]*w[1]+a[1*sna_+2]*w[0];
-          w[16] = a[1*sna_+0]*w[6]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          w[17] = a[1*sna_+0]*w[7]-a[1*sna_+1]*w[3]+a[1*sna_+4]*w[0];
-          w[18] = a[1*sna_+0]*w[8]-a[1*sna_+1]*w[4]+a[1*sna_+5]*w[0];
-          w[19] = a[1*sna_+0]*w[9]-a[1*sna_+2]*w[2]+a[1*sna_+3]*w[1];
-          w[20] = a[1*sna_+0]*w[10]-a[1*sna_+2]*w[3]+a[1*sna_+4]*w[1];
-          w[21] = a[1*sna_+0]*w[11]-a[1*sna_+2]*w[4]+a[1*sna_+5]*w[1];
-          w[22] = a[1*sna_+0]*w[12]-a[1*sna_+3]*w[3]+a[1*sna_+4]*w[2];
-          w[23] = a[1*sna_+0]*w[13]-a[1*sna_+3]*w[4]+a[1*sna_+5]*w[2];
-          w[24] = a[1*sna_+0]*w[14]-a[1*sna_+4]*w[4]+a[1*sna_+5]*w[3];
-          w[25] = a[1*sna_+1]*w[9]-a[1*sna_+2]*w[6]+a[1*sna_+3]*w[5];
-          w[26] = a[1*sna_+1]*w[10]-a[1*sna_+2]*w[7]+a[1*sna_+4]*w[5];
-          w[27] = a[1*sna_+1]*w[11]-a[1*sna_+2]*w[8]+a[1*sna_+5]*w[5];
-          w[28] = a[1*sna_+1]*w[12]-a[1*sna_+3]*w[7]+a[1*sna_+4]*w[6];
-          w[29] = a[1*sna_+1]*w[13]-a[1*sna_+3]*w[8]+a[1*sna_+5]*w[6];
-          w[30] = a[1*sna_+1]*w[14]-a[1*sna_+4]*w[8]+a[1*sna_+5]*w[7];
-          w[31] = a[1*sna_+2]*w[12]-a[1*sna_+3]*w[10]+a[1*sna_+4]*w[9];
-          w[32] = a[1*sna_+2]*w[13]-a[1*sna_+3]*w[11]+a[1*sna_+5]*w[9];
-          w[33] = a[1*sna_+2]*w[14]-a[1*sna_+4]*w[11]+a[1*sna_+5]*w[10];
-          w[34] = a[1*sna_+3]*w[14]-a[1*sna_+4]*w[13]+a[1*sna_+5]*w[12];
-          w[ 0] = a[0*sna_+0]*w[25]-a[0*sna_+1]*w[19]+a[0*sna_+2]*w[16]-a[0*sna_+3]*w[15];
-          w[ 1] = a[0*sna_+0]*w[26]-a[0*sna_+1]*w[20]+a[0*sna_+2]*w[17]-a[0*sna_+4]*w[15];
-          w[ 2] = a[0*sna_+0]*w[27]-a[0*sna_+1]*w[21]+a[0*sna_+2]*w[18]-a[0*sna_+5]*w[15];
-          w[ 3] = a[0*sna_+0]*w[28]-a[0*sna_+1]*w[22]+a[0*sna_+3]*w[17]-a[0*sna_+4]*w[16];
-          w[ 4] = a[0*sna_+0]*w[29]-a[0*sna_+1]*w[23]+a[0*sna_+3]*w[18]-a[0*sna_+5]*w[16];
-          w[ 5] = a[0*sna_+0]*w[30]-a[0*sna_+1]*w[24]+a[0*sna_+4]*w[18]-a[0*sna_+5]*w[17];
-          w[ 6] = a[0*sna_+0]*w[31]-a[0*sna_+2]*w[22]+a[0*sna_+3]*w[20]-a[0*sna_+4]*w[19];
-          w[ 7] = a[0*sna_+0]*w[32]-a[0*sna_+2]*w[23]+a[0*sna_+3]*w[21]-a[0*sna_+5]*w[19];
-          w[ 8] = a[0*sna_+0]*w[33]-a[0*sna_+2]*w[24]+a[0*sna_+4]*w[21]-a[0*sna_+5]*w[20];
-          w[ 9] = a[0*sna_+0]*w[34]-a[0*sna_+3]*w[24]+a[0*sna_+4]*w[23]-a[0*sna_+5]*w[22];
-          w[10] = a[0*sna_+1]*w[31]-a[0*sna_+2]*w[28]+a[0*sna_+3]*w[26]-a[0*sna_+4]*w[25];
-          w[11] = a[0*sna_+1]*w[32]-a[0*sna_+2]*w[29]+a[0*sna_+3]*w[27]-a[0*sna_+5]*w[25];
-          w[12] = a[0*sna_+1]*w[33]-a[0*sna_+2]*w[30]+a[0*sna_+4]*w[27]-a[0*sna_+5]*w[26];
-          w[13] = a[0*sna_+1]*w[34]-a[0*sna_+3]*w[30]+a[0*sna_+4]*w[29]-a[0*sna_+5]*w[28];
-          w[14] = a[0*sna_+2]*w[34]-a[0*sna_+3]*w[33]+a[0*sna_+4]*w[32]-a[0*sna_+5]*w[31];
-          b[0*snb_+4] = d*( a[5*sna_+1]*w[14]-a[5*sna_+2]*w[13]+a[5*sna_+3]*w[12]-a[5*sna_+4]*w[11]+a[5*sna_+5]*w[10]);
-          b[1*snb_+4] = d*(-a[5*sna_+0]*w[14]+a[5*sna_+2]*w[9]-a[5*sna_+3]*w[8]+a[5*sna_+4]*w[7]-a[5*sna_+5]*w[6]);
-          b[2*snb_+4] = d*( a[5*sna_+0]*w[13]-a[5*sna_+1]*w[9]+a[5*sna_+3]*w[5]-a[5*sna_+4]*w[4]+a[5*sna_+5]*w[3]);
-          b[3*snb_+4] = d*(-a[5*sna_+0]*w[12]+a[5*sna_+1]*w[8]-a[5*sna_+2]*w[5]+a[5*sna_+4]*w[2]-a[5*sna_+5]*w[1]);
-          b[4*snb_+4] = d*( a[5*sna_+0]*w[11]-a[5*sna_+1]*w[7]+a[5*sna_+2]*w[4]-a[5*sna_+3]*w[2]+a[5*sna_+5]*w[0]);
-          b[5*snb_+4] = d*(-a[5*sna_+0]*w[10]+a[5*sna_+1]*w[6]-a[5*sna_+2]*w[3]+a[5*sna_+3]*w[1]-a[5*sna_+4]*w[0]);
-          b[0*snb_+5] = d*(-a[4*sna_+1]*w[14]+a[4*sna_+2]*w[13]-a[4*sna_+3]*w[12]+a[4*sna_+4]*w[11]-a[4*sna_+5]*w[10]);
-          b[1*snb_+5] = d*( a[4*sna_+0]*w[14]-a[4*sna_+2]*w[9]+a[4*sna_+3]*w[8]-a[4*sna_+4]*w[7]+a[4*sna_+5]*w[6]);
-          b[2*snb_+5] = d*(-a[4*sna_+0]*w[13]+a[4*sna_+1]*w[9]-a[4*sna_+3]*w[5]+a[4*sna_+4]*w[4]-a[4*sna_+5]*w[3]);
-          b[3*snb_+5] = d*( a[4*sna_+0]*w[12]-a[4*sna_+1]*w[8]+a[4*sna_+2]*w[5]-a[4*sna_+4]*w[2]+a[4*sna_+5]*w[1]);
-          b[4*snb_+5] = d*(-a[4*sna_+0]*w[11]+a[4*sna_+1]*w[7]-a[4*sna_+2]*w[4]+a[4*sna_+3]*w[2]-a[4*sna_+5]*w[0]);
-          b[5*snb_+5] = d*( a[4*sna_+0]*w[10]-a[4*sna_+1]*w[6]+a[4*sna_+2]*w[3]-a[4*sna_+3]*w[1]+a[4*sna_+4]*w[0]);
-          return det;
-        }
-
-        #ifdef __CUDACC__
-        template<typename T_, typename ThreadGroup_>
-        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
-        {
-          constexpr int n_ = 6;
-          // copy matrix a to b
-          for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
-          {
-            const int row = i/n_;
-            const int col = i%n_;
-            b[row*snb_+col] = a[row*sna_+col];
-          }
-
-          // create shared pivot array
-          __shared__ int p[n_];
-          for (int i = tg.thread_rank(); i < n_; i += tg.num_threads())
-          {
-            p[i] = 0;
-          }
-          tg.sync();
-          // call grouped invert from first warp subgroup
-          if(tg.thread_rank() < 32)
-          {
-            auto a_g = cg::coalesced_threads();
-
-            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
-          }
-          tg.sync();
-
-        }
-        #endif
       };
 
       // generic square matrix inversion:
-      template<int n_, int sna_, int snb_>
-      struct InverseHelper<n_, n_, sna_, snb_>
+      template<int n_>
+      struct CudaGroupedInverseHelper<n_, n_>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static T_ compute(T_* b, const T_* a)
-        {
-          // copy matrix a to b
-          for (int i(0); i < n_; ++i)
-          {
-            for (int j(0); j < n_; ++j)
-            {
-              b[i*snb_+j] = a[i*sna_+j];
-            }
-          }
-
-          // create pivot array
-          int p[n_];
-
-          // perform matrix inversion
-          #ifndef __CUDACC__
-          return Math::invert_matrix(n_, snb_, b, p);
-          #else
-          return CudaMath::cuda_invert_matrix(n_, snb_, b, p);
-          #endif
-        }
-
-        #ifdef __CUDACC__
-        template<typename T_, typename ThreadGroup_>
-        CUDA_DEVICE static __forceinline__ void grouped_compute(const ThreadGroup_& tg, T_* b, const T_* a, const T_&)
+        template<typename T_, typename ThreadGroup_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_DEVICE static __forceinline__ void compute(const ThreadGroup_& tg, Tiny::Matrix<T_, n_, n_, smb_, snb_>& b, const Tiny::Matrix<T_, n_, n_, sma_, sna_>& a, const T_&)
         {
           // copy matrix a to b
           for (int i = tg.thread_rank(); i < n_*n_; i += tg.num_threads())
           {
             const int row = i/n_;
             const int col = i%n_;
-            b[row*snb_+col] = a[row*sna_+col];
+            b.v[row][col] = a.v[row][vol];
           }
 
           // create shared pivot array
@@ -3532,419 +3555,424 @@ namespace FEAT
           {
             auto a_g = cg::coalesced_threads();
 
-            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, b, p);
+            CudaMath::cuda_grouped_invert_matrix(a_g, n_, snb_, &b.v[0][0], p);
           }
           tg.sync();
-
         }
-        #endif
       };
+      #endif // __CUDACC__
 
-      template<int m_, int n_, int sna_, int snb_>
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      template<int m_, int n_>
       struct CofactorHelper
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, m_, n_, smb_, snb_>& b, const Tiny::Matrix<T_, m_, n_, sma_, sna_>& a)
         {
           static_assert(m_ == n_, "cofactor computation is only available for square matrices!");
 
           // compute inverse
-          const T_ det = Intern::InverseHelper<m_,n_,sna_,snb_>::compute(b, a);
+          const T_ det = Intern::InverseHelper<m_,n_>::compute(b, a);
 
           for(int i(0); i < m_; ++i)
           {
             for(int j(0); j <= i; ++j)
             {
-              b[i*n_+j] *= det;
+              b(i,j) *= det;
             }
             for(int j(i+1); j < n_; ++j)
             {
-              std::swap(b[i*n_+j], b[j*m_+i]);
-              b[i*n_+j] *= det;
+              std::swap(b(i,j), b(j,i));
+              b(i,j) *= det;
             }
           }
         }
       };
 
-      template<int sna_, int snb_>
-      struct CofactorHelper<1,1, sna_, snb_>
+      template<>
+      struct CofactorHelper<1,1>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_*)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, 1, 1, smb_, snb_>& b, const Tiny::Matrix<T_, 1, 1, sma_, sna_>&)
         {
           b[0] = T_(1);
         }
       };
 
-      template<int sna_, int snb_>
-      struct CofactorHelper<2,2, sna_, snb_>
+      template<>
+      struct CofactorHelper<2,2>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, 2, 2, smb_, snb_>& b, const Tiny::Matrix<T_, 2, 2, sma_, sna_>& a)
         {
-          b[0*snb_+0] =  a[1*sna_+1];
-          b[0*snb_+1] = -a[0*sna_+1];
-          b[1*snb_+0] = -a[1*sna_+0];
-          b[1*snb_+1] =  a[0*sna_+0];
+          b(0,0) =  a(1,1);
+          b(0,1) = -a(0,1);
+          b(1,0) = -a(1,0);
+          b(1,1) =  a(0,0);
         }
       };
 
-      template<int sna_, int snb_>
-      struct CofactorHelper<3,3, sna_, snb_>
+      template<>
+      struct CofactorHelper<3,3>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, 3, 3, smb_, snb_>& b, const Tiny::Matrix<T_, 3, 3, sma_, sna_>& a)
         {
-          b[0*snb_+0] = a[1*sna_+1]*a[2*sna_+2] - a[1*sna_+2]*a[2*sna_+1];
-          b[1*snb_+0] = a[1*sna_+2]*a[2*sna_+0] - a[1*sna_+0]*a[2*sna_+2];
-          b[2*snb_+0] = a[1*sna_+0]*a[2*sna_+1] - a[1*sna_+1]*a[2*sna_+0];
-          b[0*snb_+1] = a[0*sna_+2]*a[2*sna_+1] - a[0*sna_+1]*a[2*sna_+2];
-          b[1*snb_+1] = a[0*sna_+0]*a[2*sna_+2] - a[0*sna_+2]*a[2*sna_+0];
-          b[2*snb_+1] = a[0*sna_+1]*a[2*sna_+0] - a[0*sna_+0]*a[2*sna_+1];
-          b[0*snb_+2] = a[0*sna_+1]*a[1*sna_+2] - a[0*sna_+2]*a[1*sna_+1];
-          b[1*snb_+2] = a[0*sna_+2]*a[1*sna_+0] - a[0*sna_+0]*a[1*sna_+2];
-          b[2*snb_+2] = a[0*sna_+0]*a[1*sna_+1] - a[0*sna_+1]*a[1*sna_+0];
+          b(0,0) = a(1,1)*a(2,2) - a(1,2)*a(2,1);
+          b(1,0) = a(1,2)*a(2,0) - a(1,0)*a(2,2);
+          b(2,0) = a(1,0)*a(2,1) - a(1,1)*a(2,0);
+          b(0,1) = a(0,2)*a(2,1) - a(0,1)*a(2,2);
+          b(1,1) = a(0,0)*a(2,2) - a(0,2)*a(2,0);
+          b(2,1) = a(0,1)*a(2,0) - a(0,0)*a(2,1);
+          b(0,2) = a(0,1)*a(1,2) - a(0,2)*a(1,1);
+          b(1,2) = a(0,2)*a(1,0) - a(0,0)*a(1,2);
+          b(2,2) = a(0,0)*a(1,1) - a(0,1)*a(1,0);
         }
       };
 
-      template<int sna_, int snb_>
-      struct CofactorHelper<4,4, sna_, snb_>
+      template<>
+      struct CofactorHelper<4,4>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, 4, 4, smb_, snb_>& b, const Tiny::Matrix<T_, 4, 4, sma_, sna_>& a)
         {
           T_ w[6];
-          w[0] = a[2*sna_+0]*a[3*sna_+1]-a[2*sna_+1]*a[3*sna_+0];
-          w[1] = a[2*sna_+0]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+0];
-          w[2] = a[2*sna_+0]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+0];
-          w[3] = a[2*sna_+1]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+1];
-          w[4] = a[2*sna_+1]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+1];
-          w[5] = a[2*sna_+2]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+2];
+          w[0] = a(2,0)*a(3,1)-a(2,1)*a(3,0);
+          w[1] = a(2,0)*a(3,2)-a(2,2)*a(3,0);
+          w[2] = a(2,0)*a(3,3)-a(2,3)*a(3,0);
+          w[3] = a(2,1)*a(3,2)-a(2,2)*a(3,1);
+          w[4] = a(2,1)*a(3,3)-a(2,3)*a(3,1);
+          w[5] = a(2,2)*a(3,3)-a(2,3)*a(3,2);
 
-          b[0*snb_+0] = a[1*sna_+1]*w[5]-a[1*sna_+2]*w[4]+a[1*sna_+3]*w[3];
-          b[1*snb_+0] =-a[1*sna_+0]*w[5]+a[1*sna_+2]*w[2]-a[1*sna_+3]*w[1];
-          b[2*snb_+0] = a[1*sna_+0]*w[4]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          b[3*snb_+0] =-a[1*sna_+0]*w[3]+a[1*sna_+1]*w[1]-a[1*sna_+2]*w[0];
+          b(0,0) = a(1,1)*w[5]-a(1,2)*w[4]+a(1,3)*w[3];
+          b(1,0) =-a(1,0)*w[5]+a(1,2)*w[2]-a(1,3)*w[1];
+          b(2,0) = a(1,0)*w[4]-a(1,1)*w[2]+a(1,3)*w[0];
+          b(3,0) =-a(1,0)*w[3]+a(1,1)*w[1]-a(1,2)*w[0];
 
-          b[0*snb_+1] =-a[0*sna_+1]*w[5]+a[0*sna_+2]*w[4]-a[0*sna_+3]*w[3];
-          b[1*snb_+1] = a[0*sna_+0]*w[5]-a[0*sna_+2]*w[2]+a[0*sna_+3]*w[1];
-          b[2*snb_+1] =-a[0*sna_+0]*w[4]+a[0*sna_+1]*w[2]-a[0*sna_+3]*w[0];
-          b[3*snb_+1] = a[0*sna_+0]*w[3]-a[0*sna_+1]*w[1]+a[0*sna_+2]*w[0];
+          b(0,1) =-a(0,1)*w[5]+a(0,2)*w[4]-a(0,3)*w[3];
+          b(1,1) = a(0,0)*w[5]-a(0,2)*w[2]+a(0,3)*w[1];
+          b(2,1) =-a(0,0)*w[4]+a(0,1)*w[2]-a(0,3)*w[0];
+          b(3,1) = a(0,0)*w[3]-a(0,1)*w[1]+a(0,2)*w[0];
 
-          w[0] = a[0*sna_+0]*a[1*sna_+1]-a[0*sna_+1]*a[1*sna_+0];
-          w[1] = a[0*sna_+0]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+0];
-          w[2] = a[0*sna_+0]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+0];
-          w[3] = a[0*sna_+1]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+1];
-          w[4] = a[0*sna_+1]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+1];
-          w[5] = a[0*sna_+2]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+2];
+          w[0] = a(0,0)*a(1,1)-a(0,1)*a(1,0);
+          w[1] = a(0,0)*a(1,2)-a(0,2)*a(1,0);
+          w[2] = a(0,0)*a(1,3)-a(0,3)*a(1,0);
+          w[3] = a(0,1)*a(1,2)-a(0,2)*a(1,1);
+          w[4] = a(0,1)*a(1,3)-a(0,3)*a(1,1);
+          w[5] = a(0,2)*a(1,3)-a(0,3)*a(1,2);
 
-          b[0*snb_+2] = a[3*sna_+1]*w[5]-a[3*sna_+2]*w[4]+a[3*sna_+3]*w[3];
-          b[1*snb_+2] =-a[3*sna_+0]*w[5]+a[3*sna_+2]*w[2]-a[3*sna_+3]*w[1];
-          b[2*snb_+2] = a[3*sna_+0]*w[4]-a[3*sna_+1]*w[2]+a[3*sna_+3]*w[0];
-          b[3*snb_+2] =-a[3*sna_+0]*w[3]+a[3*sna_+1]*w[1]-a[3*sna_+2]*w[0];
+          b(0,2) = a(3,1)*w[5]-a(3,2)*w[4]+a(3,3)*w[3];
+          b(1,2) =-a(3,0)*w[5]+a(3,2)*w[2]-a(3,3)*w[1];
+          b(2,2) = a(3,0)*w[4]-a(3,1)*w[2]+a(3,3)*w[0];
+          b(3,2) =-a(3,0)*w[3]+a(3,1)*w[1]-a(3,2)*w[0];
 
-          b[0*snb_+3] =-a[2*sna_+1]*w[5]+a[2*sna_+2]*w[4]-a[2*sna_+3]*w[3];
-          b[1*snb_+3] = a[2*sna_+0]*w[5]-a[2*sna_+2]*w[2]+a[2*sna_+3]*w[1];
-          b[2*snb_+3] =-a[2*sna_+0]*w[4]+a[2*sna_+1]*w[2]-a[2*sna_+3]*w[0];
-          b[3*snb_+3] = a[2*sna_+0]*w[3]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0];
+          b(0,3) =-a(2,1)*w[5]+a(2,2)*w[4]-a(2,3)*w[3];
+          b(1,3) = a(2,0)*w[5]-a(2,2)*w[2]+a(2,3)*w[1];
+          b(2,3) =-a(2,0)*w[4]+a(2,1)*w[2]-a(2,3)*w[0];
+          b(3,3) = a(2,0)*w[3]-a(2,1)*w[1]+a(2,2)*w[0];
         }
       };
 
-      template<int sna_, int snb_>
-      struct CofactorHelper<5,5, sna_, snb_>
+      template<>
+      struct CofactorHelper<5,5>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, 5, 5, smb_, snb_>& b, const Tiny::Matrix<T_, 5, 5, sma_, sna_>& a)
         {
           T_ w[20];
-          w[ 0] = a[3*sna_+0]*a[4*sna_+1]-a[3*sna_+1]*a[4*sna_+0];
-          w[ 1] = a[3*sna_+0]*a[4*sna_+2]-a[3*sna_+2]*a[4*sna_+0];
-          w[ 2] = a[3*sna_+0]*a[4*sna_+3]-a[3*sna_+3]*a[4*sna_+0];
-          w[ 3] = a[3*sna_+0]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+0];
-          w[ 4] = a[3*sna_+1]*a[4*sna_+2]-a[3*sna_+2]*a[4*sna_+1];
-          w[ 5] = a[3*sna_+1]*a[4*sna_+3]-a[3*sna_+3]*a[4*sna_+1];
-          w[ 6] = a[3*sna_+1]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+1];
-          w[ 7] = a[3*sna_+2]*a[4*sna_+3]-a[3*sna_+3]*a[4*sna_+2];
-          w[ 8] = a[3*sna_+2]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+2];
-          w[ 9] = a[3*sna_+3]*a[4*sna_+4]-a[3*sna_+4]*a[4*sna_+3];
-          w[10] = a[2*sna_+0]*w[4]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0];
-          w[11] = a[2*sna_+0]*w[5]-a[2*sna_+1]*w[2]+a[2*sna_+3]*w[0];
-          w[12] = a[2*sna_+0]*w[6]-a[2*sna_+1]*w[3]+a[2*sna_+4]*w[0];
-          w[13] = a[2*sna_+0]*w[7]-a[2*sna_+2]*w[2]+a[2*sna_+3]*w[1];
-          w[14] = a[2*sna_+0]*w[8]-a[2*sna_+2]*w[3]+a[2*sna_+4]*w[1];
-          w[15] = a[2*sna_+0]*w[9]-a[2*sna_+3]*w[3]+a[2*sna_+4]*w[2];
-          w[16] = a[2*sna_+1]*w[7]-a[2*sna_+2]*w[5]+a[2*sna_+3]*w[4];
-          w[17] = a[2*sna_+1]*w[8]-a[2*sna_+2]*w[6]+a[2*sna_+4]*w[4];
-          w[18] = a[2*sna_+1]*w[9]-a[2*sna_+3]*w[6]+a[2*sna_+4]*w[5];
-          w[19] = a[2*sna_+2]*w[9]-a[2*sna_+3]*w[8]+a[2*sna_+4]*w[7];
+          w[ 0] = a(3,0)*a(4,1)-a(3,1)*a(4,0);
+          w[ 1] = a(3,0)*a(4,2)-a(3,2)*a(4,0);
+          w[ 2] = a(3,0)*a(4,3)-a(3,3)*a(4,0);
+          w[ 3] = a(3,0)*a(4,4)-a(3,4)*a(4,0);
+          w[ 4] = a(3,1)*a(4,2)-a(3,2)*a(4,1);
+          w[ 5] = a(3,1)*a(4,3)-a(3,3)*a(4,1);
+          w[ 6] = a(3,1)*a(4,4)-a(3,4)*a(4,1);
+          w[ 7] = a(3,2)*a(4,3)-a(3,3)*a(4,2);
+          w[ 8] = a(3,2)*a(4,4)-a(3,4)*a(4,2);
+          w[ 9] = a(3,3)*a(4,4)-a(3,4)*a(4,3);
+          w[10] = a(2,0)*w[4]-a(2,1)*w[1]+a(2,2)*w[0];
+          w[11] = a(2,0)*w[5]-a(2,1)*w[2]+a(2,3)*w[0];
+          w[12] = a(2,0)*w[6]-a(2,1)*w[3]+a(2,4)*w[0];
+          w[13] = a(2,0)*w[7]-a(2,2)*w[2]+a(2,3)*w[1];
+          w[14] = a(2,0)*w[8]-a(2,2)*w[3]+a(2,4)*w[1];
+          w[15] = a(2,0)*w[9]-a(2,3)*w[3]+a(2,4)*w[2];
+          w[16] = a(2,1)*w[7]-a(2,2)*w[5]+a(2,3)*w[4];
+          w[17] = a(2,1)*w[8]-a(2,2)*w[6]+a(2,4)*w[4];
+          w[18] = a(2,1)*w[9]-a(2,3)*w[6]+a(2,4)*w[5];
+          w[19] = a(2,2)*w[9]-a(2,3)*w[8]+a(2,4)*w[7];
 
-          b[0*snb_+0] = a[1*sna_+1]*w[19]-a[1*sna_+2]*w[18]+a[1*sna_+3]*w[17]-a[1*sna_+4]*w[16];
-          b[1*snb_+0] =-a[1*sna_+0]*w[19]+a[1*sna_+2]*w[15]-a[1*sna_+3]*w[14]+a[1*sna_+4]*w[13];
-          b[2*snb_+0] = a[1*sna_+0]*w[18]-a[1*sna_+1]*w[15]+a[1*sna_+3]*w[12]-a[1*sna_+4]*w[11];
-          b[3*snb_+0] =-a[1*sna_+0]*w[17]+a[1*sna_+1]*w[14]-a[1*sna_+2]*w[12]+a[1*sna_+4]*w[10];
-          b[4*snb_+0] = a[1*sna_+0]*w[16]-a[1*sna_+1]*w[13]+a[1*sna_+2]*w[11]-a[1*sna_+3]*w[10];
+          b(0,0) = a(1,1)*w[19]-a(1,2)*w[18]+a(1,3)*w[17]-a(1,4)*w[16];
+          b(1,0) =-a(1,0)*w[19]+a(1,2)*w[15]-a(1,3)*w[14]+a(1,4)*w[13];
+          b(2,0) = a(1,0)*w[18]-a(1,1)*w[15]+a(1,3)*w[12]-a(1,4)*w[11];
+          b(3,0) =-a(1,0)*w[17]+a(1,1)*w[14]-a(1,2)*w[12]+a(1,4)*w[10];
+          b(4,0) = a(1,0)*w[16]-a(1,1)*w[13]+a(1,2)*w[11]-a(1,3)*w[10];
 
-          b[0*snb_+1] =-a[0*sna_+1]*w[19]+a[0*sna_+2]*w[18]-a[0*sna_+3]*w[17]+a[0*sna_+4]*w[16];
-          b[1*snb_+1] = a[0*sna_+0]*w[19]-a[0*sna_+2]*w[15]+a[0*sna_+3]*w[14]-a[0*sna_+4]*w[13];
-          b[2*snb_+1] =-a[0*sna_+0]*w[18]+a[0*sna_+1]*w[15]-a[0*sna_+3]*w[12]+a[0*sna_+4]*w[11];
-          b[3*snb_+1] = a[0*sna_+0]*w[17]-a[0*sna_+1]*w[14]+a[0*sna_+2]*w[12]-a[0*sna_+4]*w[10];
-          b[4*snb_+1] =-a[0*sna_+0]*w[16]+a[0*sna_+1]*w[13]-a[0*sna_+2]*w[11]+a[0*sna_+3]*w[10];
+          b(0,1) =-a(0,1)*w[19]+a(0,2)*w[18]-a(0,3)*w[17]+a(0,4)*w[16];
+          b(1,1) = a(0,0)*w[19]-a(0,2)*w[15]+a(0,3)*w[14]-a(0,4)*w[13];
+          b(2,1) =-a(0,0)*w[18]+a(0,1)*w[15]-a(0,3)*w[12]+a(0,4)*w[11];
+          b(3,1) = a(0,0)*w[17]-a(0,1)*w[14]+a(0,2)*w[12]-a(0,4)*w[10];
+          b(4,1) =-a(0,0)*w[16]+a(0,1)*w[13]-a(0,2)*w[11]+a(0,3)*w[10];
 
-          w[10] = a[1*sna_+0]*w[4]-a[1*sna_+1]*w[1]+a[1*sna_+2]*w[0];
-          w[11] = a[1*sna_+0]*w[5]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          w[12] = a[1*sna_+0]*w[6]-a[1*sna_+1]*w[3]+a[1*sna_+4]*w[0];
-          w[13] = a[1*sna_+0]*w[7]-a[1*sna_+2]*w[2]+a[1*sna_+3]*w[1];
-          w[14] = a[1*sna_+0]*w[8]-a[1*sna_+2]*w[3]+a[1*sna_+4]*w[1];
-          w[15] = a[1*sna_+0]*w[9]-a[1*sna_+3]*w[3]+a[1*sna_+4]*w[2];
-          w[16] = a[1*sna_+1]*w[7]-a[1*sna_+2]*w[5]+a[1*sna_+3]*w[4];
-          w[17] = a[1*sna_+1]*w[8]-a[1*sna_+2]*w[6]+a[1*sna_+4]*w[4];
-          w[18] = a[1*sna_+1]*w[9]-a[1*sna_+3]*w[6]+a[1*sna_+4]*w[5];
-          w[19] = a[1*sna_+2]*w[9]-a[1*sna_+3]*w[8]+a[1*sna_+4]*w[7];
+          w[10] = a(1,0)*w[4]-a(1,1)*w[1]+a(1,2)*w[0];
+          w[11] = a(1,0)*w[5]-a(1,1)*w[2]+a(1,3)*w[0];
+          w[12] = a(1,0)*w[6]-a(1,1)*w[3]+a(1,4)*w[0];
+          w[13] = a(1,0)*w[7]-a(1,2)*w[2]+a(1,3)*w[1];
+          w[14] = a(1,0)*w[8]-a(1,2)*w[3]+a(1,4)*w[1];
+          w[15] = a(1,0)*w[9]-a(1,3)*w[3]+a(1,4)*w[2];
+          w[16] = a(1,1)*w[7]-a(1,2)*w[5]+a(1,3)*w[4];
+          w[17] = a(1,1)*w[8]-a(1,2)*w[6]+a(1,4)*w[4];
+          w[18] = a(1,1)*w[9]-a(1,3)*w[6]+a(1,4)*w[5];
+          w[19] = a(1,2)*w[9]-a(1,3)*w[8]+a(1,4)*w[7];
 
-          b[0*snb_+2] = a[0*sna_+1]*w[19]-a[0*sna_+2]*w[18]+a[0*sna_+3]*w[17]-a[0*sna_+4]*w[16];
-          b[1*snb_+2] =-a[0*sna_+0]*w[19]+a[0*sna_+2]*w[15]-a[0*sna_+3]*w[14]+a[0*sna_+4]*w[13];
-          b[2*snb_+2] = a[0*sna_+0]*w[18]-a[0*sna_+1]*w[15]+a[0*sna_+3]*w[12]-a[0*sna_+4]*w[11];
-          b[3*snb_+2] =-a[0*sna_+0]*w[17]+a[0*sna_+1]*w[14]-a[0*sna_+2]*w[12]+a[0*sna_+4]*w[10];
-          b[4*snb_+2] = a[0*sna_+0]*w[16]-a[0*sna_+1]*w[13]+a[0*sna_+2]*w[11]-a[0*sna_+3]*w[10];
+          b(0,2) = a(0,1)*w[19]-a(0,2)*w[18]+a(0,3)*w[17]-a(0,4)*w[16];
+          b(1,2) =-a(0,0)*w[19]+a(0,2)*w[15]-a(0,3)*w[14]+a(0,4)*w[13];
+          b(2,2) = a(0,0)*w[18]-a(0,1)*w[15]+a(0,3)*w[12]-a(0,4)*w[11];
+          b(3,2) =-a(0,0)*w[17]+a(0,1)*w[14]-a(0,2)*w[12]+a(0,4)*w[10];
+          b(4,2) = a(0,0)*w[16]-a(0,1)*w[13]+a(0,2)*w[11]-a(0,3)*w[10];
 
-          w[ 0] = a[0*sna_+0]*a[1*sna_+1]-a[0*sna_+1]*a[1*sna_+0];
-          w[ 1] = a[0*sna_+0]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+0];
-          w[ 2] = a[0*sna_+0]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+0];
-          w[ 3] = a[0*sna_+0]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+0];
-          w[ 4] = a[0*sna_+1]*a[1*sna_+2]-a[0*sna_+2]*a[1*sna_+1];
-          w[ 5] = a[0*sna_+1]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+1];
-          w[ 6] = a[0*sna_+1]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+1];
-          w[ 7] = a[0*sna_+2]*a[1*sna_+3]-a[0*sna_+3]*a[1*sna_+2];
-          w[ 8] = a[0*sna_+2]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+2];
-          w[ 9] = a[0*sna_+3]*a[1*sna_+4]-a[0*sna_+4]*a[1*sna_+3];
-          w[10] = a[2*sna_+0]*w[4]-a[2*sna_+1]*w[1]+a[2*sna_+2]*w[0];
-          w[11] = a[2*sna_+0]*w[5]-a[2*sna_+1]*w[2]+a[2*sna_+3]*w[0];
-          w[12] = a[2*sna_+0]*w[6]-a[2*sna_+1]*w[3]+a[2*sna_+4]*w[0];
-          w[13] = a[2*sna_+0]*w[7]-a[2*sna_+2]*w[2]+a[2*sna_+3]*w[1];
-          w[14] = a[2*sna_+0]*w[8]-a[2*sna_+2]*w[3]+a[2*sna_+4]*w[1];
-          w[15] = a[2*sna_+0]*w[9]-a[2*sna_+3]*w[3]+a[2*sna_+4]*w[2];
-          w[16] = a[2*sna_+1]*w[7]-a[2*sna_+2]*w[5]+a[2*sna_+3]*w[4];
-          w[17] = a[2*sna_+1]*w[8]-a[2*sna_+2]*w[6]+a[2*sna_+4]*w[4];
-          w[18] = a[2*sna_+1]*w[9]-a[2*sna_+3]*w[6]+a[2*sna_+4]*w[5];
-          w[19] = a[2*sna_+2]*w[9]-a[2*sna_+3]*w[8]+a[2*sna_+4]*w[7];
+          w[ 0] = a(0,0)*a(1,1)-a(0,1)*a(1,0);
+          w[ 1] = a(0,0)*a(1,2)-a(0,2)*a(1,0);
+          w[ 2] = a(0,0)*a(1,3)-a(0,3)*a(1,0);
+          w[ 3] = a(0,0)*a(1,4)-a(0,4)*a(1,0);
+          w[ 4] = a(0,1)*a(1,2)-a(0,2)*a(1,1);
+          w[ 5] = a(0,1)*a(1,3)-a(0,3)*a(1,1);
+          w[ 6] = a(0,1)*a(1,4)-a(0,4)*a(1,1);
+          w[ 7] = a(0,2)*a(1,3)-a(0,3)*a(1,2);
+          w[ 8] = a(0,2)*a(1,4)-a(0,4)*a(1,2);
+          w[ 9] = a(0,3)*a(1,4)-a(0,4)*a(1,3);
+          w[10] = a(2,0)*w[4]-a(2,1)*w[1]+a(2,2)*w[0];
+          w[11] = a(2,0)*w[5]-a(2,1)*w[2]+a(2,3)*w[0];
+          w[12] = a(2,0)*w[6]-a(2,1)*w[3]+a(2,4)*w[0];
+          w[13] = a(2,0)*w[7]-a(2,2)*w[2]+a(2,3)*w[1];
+          w[14] = a(2,0)*w[8]-a(2,2)*w[3]+a(2,4)*w[1];
+          w[15] = a(2,0)*w[9]-a(2,3)*w[3]+a(2,4)*w[2];
+          w[16] = a(2,1)*w[7]-a(2,2)*w[5]+a(2,3)*w[4];
+          w[17] = a(2,1)*w[8]-a(2,2)*w[6]+a(2,4)*w[4];
+          w[18] = a(2,1)*w[9]-a(2,3)*w[6]+a(2,4)*w[5];
+          w[19] = a(2,2)*w[9]-a(2,3)*w[8]+a(2,4)*w[7];
 
-          b[0*snb_+3] =  a[4*sna_+1]*w[19]-a[4*sna_+2]*w[18]+a[4*sna_+3]*w[17]-a[4*sna_+4]*w[16];
-          b[1*snb_+3] = -a[4*sna_+0]*w[19]+a[4*sna_+2]*w[15]-a[4*sna_+3]*w[14]+a[4*sna_+4]*w[13];
-          b[2*snb_+3] =  a[4*sna_+0]*w[18]-a[4*sna_+1]*w[15]+a[4*sna_+3]*w[12]-a[4*sna_+4]*w[11];
-          b[3*snb_+3] = -a[4*sna_+0]*w[17]+a[4*sna_+1]*w[14]-a[4*sna_+2]*w[12]+a[4*sna_+4]*w[10];
-          b[4*snb_+3] =  a[4*sna_+0]*w[16]-a[4*sna_+1]*w[13]+a[4*sna_+2]*w[11]-a[4*sna_+3]*w[10];
+          b(0,3) =  a(4,1)*w[19]-a(4,2)*w[18]+a(4,3)*w[17]-a(4,4)*w[16];
+          b(1,3) = -a(4,0)*w[19]+a(4,2)*w[15]-a(4,3)*w[14]+a(4,4)*w[13];
+          b(2,3) =  a(4,0)*w[18]-a(4,1)*w[15]+a(4,3)*w[12]-a(4,4)*w[11];
+          b(3,3) = -a(4,0)*w[17]+a(4,1)*w[14]-a(4,2)*w[12]+a(4,4)*w[10];
+          b(4,3) =  a(4,0)*w[16]-a(4,1)*w[13]+a(4,2)*w[11]-a(4,3)*w[10];
 
-          b[0*snb_+4] = -a[3*sna_+1]*w[19]+a[3*sna_+2]*w[18]-a[3*sna_+3]*w[17]+a[3*sna_+4]*w[16];
-          b[1*snb_+4] =  a[3*sna_+0]*w[19]-a[3*sna_+2]*w[15]+a[3*sna_+3]*w[14]-a[3*sna_+4]*w[13];
-          b[2*snb_+4] = -a[3*sna_+0]*w[18]+a[3*sna_+1]*w[15]-a[3*sna_+3]*w[12]+a[3*sna_+4]*w[11];
-          b[3*snb_+4] =  a[3*sna_+0]*w[17]-a[3*sna_+1]*w[14]+a[3*sna_+2]*w[12]-a[3*sna_+4]*w[10];
-          b[4*snb_+4] = -a[3*sna_+0]*w[16]+a[3*sna_+1]*w[13]-a[3*sna_+2]*w[11]+a[3*sna_+3]*w[10];
+          b(0,4) = -a(3,1)*w[19]+a(3,2)*w[18]-a(3,3)*w[17]+a(3,4)*w[16];
+          b(1,4) =  a(3,0)*w[19]-a(3,2)*w[15]+a(3,3)*w[14]-a(3,4)*w[13];
+          b(2,4) = -a(3,0)*w[18]+a(3,1)*w[15]-a(3,3)*w[12]+a(3,4)*w[11];
+          b(3,4) =  a(3,0)*w[17]-a(3,1)*w[14]+a(3,2)*w[12]-a(3,4)*w[10];
+          b(4,4) = -a(3,0)*w[16]+a(3,1)*w[13]-a(3,2)*w[11]+a(3,3)*w[10];
         }
       };
 
-      template<int sna_, int snb_>
-      struct CofactorHelper<6,6, sna_, snb_>
+      template<>
+      struct CofactorHelper<6,6>
       {
-        template<typename T_>
-        CUDA_HOST_DEVICE static void compute(T_* b, const T_* a)
+        template<typename T_, int smb_, int snb_, int sma_, int sna_>
+        CUDA_HOST_DEVICE static void compute(Tiny::Matrix<T_, 6, 6, smb_, snb_>& b, const Tiny::Matrix<T_, 6, 6, sma_, sna_>& a)
         {
           T_ w[35];
-          w[ 0] = a[4*sna_+0]*a[5*sna_+1]-a[4*sna_+1]*a[5*sna_+0];
-          w[ 1] = a[4*sna_+0]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+0];
-          w[ 2] = a[4*sna_+0]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+0];
-          w[ 3] = a[4*sna_+0]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+0];
-          w[ 4] = a[4*sna_+0]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+0];
-          w[ 5] = a[4*sna_+1]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+1];
-          w[ 6] = a[4*sna_+1]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+1];
-          w[ 7] = a[4*sna_+1]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+1];
-          w[ 8] = a[4*sna_+1]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+1];
-          w[ 9] = a[4*sna_+2]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+2];
-          w[10] = a[4*sna_+2]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+2];
-          w[11] = a[4*sna_+2]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+2];
-          w[12] = a[4*sna_+3]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+3];
-          w[13] = a[4*sna_+3]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+3];
-          w[14] = a[4*sna_+4]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+4];
-          w[15] = a[3*sna_+0]*w[5]-a[3*sna_+1]*w[1]+a[3*sna_+2]*w[0];
-          w[16] = a[3*sna_+0]*w[6]-a[3*sna_+1]*w[2]+a[3*sna_+3]*w[0];
-          w[17] = a[3*sna_+0]*w[7]-a[3*sna_+1]*w[3]+a[3*sna_+4]*w[0];
-          w[18] = a[3*sna_+0]*w[8]-a[3*sna_+1]*w[4]+a[3*sna_+5]*w[0];
-          w[19] = a[3*sna_+0]*w[9]-a[3*sna_+2]*w[2]+a[3*sna_+3]*w[1];
-          w[20] = a[3*sna_+0]*w[10]-a[3*sna_+2]*w[3]+a[3*sna_+4]*w[1];
-          w[21] = a[3*sna_+0]*w[11]-a[3*sna_+2]*w[4]+a[3*sna_+5]*w[1];
-          w[22] = a[3*sna_+0]*w[12]-a[3*sna_+3]*w[3]+a[3*sna_+4]*w[2];
-          w[23] = a[3*sna_+0]*w[13]-a[3*sna_+3]*w[4]+a[3*sna_+5]*w[2];
-          w[24] = a[3*sna_+0]*w[14]-a[3*sna_+4]*w[4]+a[3*sna_+5]*w[3];
-          w[25] = a[3*sna_+1]*w[9]-a[3*sna_+2]*w[6]+a[3*sna_+3]*w[5];
-          w[26] = a[3*sna_+1]*w[10]-a[3*sna_+2]*w[7]+a[3*sna_+4]*w[5];
-          w[27] = a[3*sna_+1]*w[11]-a[3*sna_+2]*w[8]+a[3*sna_+5]*w[5];
-          w[28] = a[3*sna_+1]*w[12]-a[3*sna_+3]*w[7]+a[3*sna_+4]*w[6];
-          w[29] = a[3*sna_+1]*w[13]-a[3*sna_+3]*w[8]+a[3*sna_+5]*w[6];
-          w[30] = a[3*sna_+1]*w[14]-a[3*sna_+4]*w[8]+a[3*sna_+5]*w[7];
-          w[31] = a[3*sna_+2]*w[12]-a[3*sna_+3]*w[10]+a[3*sna_+4]*w[9];
-          w[32] = a[3*sna_+2]*w[13]-a[3*sna_+3]*w[11]+a[3*sna_+5]*w[9];
-          w[33] = a[3*sna_+2]*w[14]-a[3*sna_+4]*w[11]+a[3*sna_+5]*w[10];
-          w[34] = a[3*sna_+3]*w[14]-a[3*sna_+4]*w[13]+a[3*sna_+5]*w[12];
+          w[ 0] = a(4,0)*a(5,1)-a(4,1)*a(5,0);
+          w[ 1] = a(4,0)*a(5,2)-a(4,2)*a(5,0);
+          w[ 2] = a(4,0)*a(5,3)-a(4,3)*a(5,0);
+          w[ 3] = a(4,0)*a(5,4)-a(4,4)*a(5,0);
+          w[ 4] = a(4,0)*a(5,5)-a(4,5)*a(5,0);
+          w[ 5] = a(4,1)*a(5,2)-a(4,2)*a(5,1);
+          w[ 6] = a(4,1)*a(5,3)-a(4,3)*a(5,1);
+          w[ 7] = a(4,1)*a(5,4)-a(4,4)*a(5,1);
+          w[ 8] = a(4,1)*a(5,5)-a(4,5)*a(5,1);
+          w[ 9] = a(4,2)*a(5,3)-a(4,3)*a(5,2);
+          w[10] = a(4,2)*a(5,4)-a(4,4)*a(5,2);
+          w[11] = a(4,2)*a(5,5)-a(4,5)*a(5,2);
+          w[12] = a(4,3)*a(5,4)-a(4,4)*a(5,3);
+          w[13] = a(4,3)*a(5,5)-a(4,5)*a(5,3);
+          w[14] = a(4,4)*a(5,5)-a(4,5)*a(5,4);
+          w[15] = a(3,0)*w[5]-a(3,1)*w[1]+a(3,2)*w[0];
+          w[16] = a(3,0)*w[6]-a(3,1)*w[2]+a(3,3)*w[0];
+          w[17] = a(3,0)*w[7]-a(3,1)*w[3]+a(3,4)*w[0];
+          w[18] = a(3,0)*w[8]-a(3,1)*w[4]+a(3,5)*w[0];
+          w[19] = a(3,0)*w[9]-a(3,2)*w[2]+a(3,3)*w[1];
+          w[20] = a(3,0)*w[10]-a(3,2)*w[3]+a(3,4)*w[1];
+          w[21] = a(3,0)*w[11]-a(3,2)*w[4]+a(3,5)*w[1];
+          w[22] = a(3,0)*w[12]-a(3,3)*w[3]+a(3,4)*w[2];
+          w[23] = a(3,0)*w[13]-a(3,3)*w[4]+a(3,5)*w[2];
+          w[24] = a(3,0)*w[14]-a(3,4)*w[4]+a(3,5)*w[3];
+          w[25] = a(3,1)*w[9]-a(3,2)*w[6]+a(3,3)*w[5];
+          w[26] = a(3,1)*w[10]-a(3,2)*w[7]+a(3,4)*w[5];
+          w[27] = a(3,1)*w[11]-a(3,2)*w[8]+a(3,5)*w[5];
+          w[28] = a(3,1)*w[12]-a(3,3)*w[7]+a(3,4)*w[6];
+          w[29] = a(3,1)*w[13]-a(3,3)*w[8]+a(3,5)*w[6];
+          w[30] = a(3,1)*w[14]-a(3,4)*w[8]+a(3,5)*w[7];
+          w[31] = a(3,2)*w[12]-a(3,3)*w[10]+a(3,4)*w[9];
+          w[32] = a(3,2)*w[13]-a(3,3)*w[11]+a(3,5)*w[9];
+          w[33] = a(3,2)*w[14]-a(3,4)*w[11]+a(3,5)*w[10];
+          w[34] = a(3,3)*w[14]-a(3,4)*w[13]+a(3,5)*w[12];
 
-          w[ 0] = a[2*sna_+0]*w[25]-a[2*sna_+1]*w[19]+a[2*sna_+2]*w[16]-a[2*sna_+3]*w[15];
-          w[ 1] = a[2*sna_+0]*w[26]-a[2*sna_+1]*w[20]+a[2*sna_+2]*w[17]-a[2*sna_+4]*w[15];
-          w[ 2] = a[2*sna_+0]*w[27]-a[2*sna_+1]*w[21]+a[2*sna_+2]*w[18]-a[2*sna_+5]*w[15];
-          w[ 3] = a[2*sna_+0]*w[28]-a[2*sna_+1]*w[22]+a[2*sna_+3]*w[17]-a[2*sna_+4]*w[16];
-          w[ 4] = a[2*sna_+0]*w[29]-a[2*sna_+1]*w[23]+a[2*sna_+3]*w[18]-a[2*sna_+5]*w[16];
-          w[ 5] = a[2*sna_+0]*w[30]-a[2*sna_+1]*w[24]+a[2*sna_+4]*w[18]-a[2*sna_+5]*w[17];
-          w[ 6] = a[2*sna_+0]*w[31]-a[2*sna_+2]*w[22]+a[2*sna_+3]*w[20]-a[2*sna_+4]*w[19];
-          w[ 7] = a[2*sna_+0]*w[32]-a[2*sna_+2]*w[23]+a[2*sna_+3]*w[21]-a[2*sna_+5]*w[19];
-          w[ 8] = a[2*sna_+0]*w[33]-a[2*sna_+2]*w[24]+a[2*sna_+4]*w[21]-a[2*sna_+5]*w[20];
-          w[ 9] = a[2*sna_+0]*w[34]-a[2*sna_+3]*w[24]+a[2*sna_+4]*w[23]-a[2*sna_+5]*w[22];
-          w[10] = a[2*sna_+1]*w[31]-a[2*sna_+2]*w[28]+a[2*sna_+3]*w[26]-a[2*sna_+4]*w[25];
-          w[11] = a[2*sna_+1]*w[32]-a[2*sna_+2]*w[29]+a[2*sna_+3]*w[27]-a[2*sna_+5]*w[25];
-          w[12] = a[2*sna_+1]*w[33]-a[2*sna_+2]*w[30]+a[2*sna_+4]*w[27]-a[2*sna_+5]*w[26];
-          w[13] = a[2*sna_+1]*w[34]-a[2*sna_+3]*w[30]+a[2*sna_+4]*w[29]-a[2*sna_+5]*w[28];
-          w[14] = a[2*sna_+2]*w[34]-a[2*sna_+3]*w[33]+a[2*sna_+4]*w[32]-a[2*sna_+5]*w[31];
+          w[ 0] = a(2,0)*w[25]-a(2,1)*w[19]+a(2,2)*w[16]-a(2,3)*w[15];
+          w[ 1] = a(2,0)*w[26]-a(2,1)*w[20]+a(2,2)*w[17]-a(2,4)*w[15];
+          w[ 2] = a(2,0)*w[27]-a(2,1)*w[21]+a(2,2)*w[18]-a(2,5)*w[15];
+          w[ 3] = a(2,0)*w[28]-a(2,1)*w[22]+a(2,3)*w[17]-a(2,4)*w[16];
+          w[ 4] = a(2,0)*w[29]-a(2,1)*w[23]+a(2,3)*w[18]-a(2,5)*w[16];
+          w[ 5] = a(2,0)*w[30]-a(2,1)*w[24]+a(2,4)*w[18]-a(2,5)*w[17];
+          w[ 6] = a(2,0)*w[31]-a(2,2)*w[22]+a(2,3)*w[20]-a(2,4)*w[19];
+          w[ 7] = a(2,0)*w[32]-a(2,2)*w[23]+a(2,3)*w[21]-a(2,5)*w[19];
+          w[ 8] = a(2,0)*w[33]-a(2,2)*w[24]+a(2,4)*w[21]-a(2,5)*w[20];
+          w[ 9] = a(2,0)*w[34]-a(2,3)*w[24]+a(2,4)*w[23]-a(2,5)*w[22];
+          w[10] = a(2,1)*w[31]-a(2,2)*w[28]+a(2,3)*w[26]-a(2,4)*w[25];
+          w[11] = a(2,1)*w[32]-a(2,2)*w[29]+a(2,3)*w[27]-a(2,5)*w[25];
+          w[12] = a(2,1)*w[33]-a(2,2)*w[30]+a(2,4)*w[27]-a(2,5)*w[26];
+          w[13] = a(2,1)*w[34]-a(2,3)*w[30]+a(2,4)*w[29]-a(2,5)*w[28];
+          w[14] = a(2,2)*w[34]-a(2,3)*w[33]+a(2,4)*w[32]-a(2,5)*w[31];
 
-          b[0*snb_+0] =  a[1*sna_+1]*w[14]-a[1*sna_+2]*w[13]+a[1*sna_+3]*w[12]-a[1*sna_+4]*w[11]+a[1*sna_+5]*w[10];
-          b[1*snb_+0] = -a[1*sna_+0]*w[14]+a[1*sna_+2]*w[9]-a[1*sna_+3]*w[8]+a[1*sna_+4]*w[7]-a[1*sna_+5]*w[6];
-          b[2*snb_+0] =  a[1*sna_+0]*w[13]-a[1*sna_+1]*w[9]+a[1*sna_+3]*w[5]-a[1*sna_+4]*w[4]+a[1*sna_+5]*w[3];
-          b[3*snb_+0] = -a[1*sna_+0]*w[12]+a[1*sna_+1]*w[8]-a[1*sna_+2]*w[5]+a[1*sna_+4]*w[2]-a[1*sna_+5]*w[1];
-          b[4*snb_+0] =  a[1*sna_+0]*w[11]-a[1*sna_+1]*w[7]+a[1*sna_+2]*w[4]-a[1*sna_+3]*w[2]+a[1*sna_+5]*w[0];
-          b[5*snb_+0] = -a[1*sna_+0]*w[10]+a[1*sna_+1]*w[6]-a[1*sna_+2]*w[3]+a[1*sna_+3]*w[1]-a[1*sna_+4]*w[0];
+          b(0,0) =  a(1,1)*w[14]-a(1,2)*w[13]+a(1,3)*w[12]-a(1,4)*w[11]+a(1,5)*w[10];
+          b(1,0) = -a(1,0)*w[14]+a(1,2)*w[9]-a(1,3)*w[8]+a(1,4)*w[7]-a(1,5)*w[6];
+          b(2,0) =  a(1,0)*w[13]-a(1,1)*w[9]+a(1,3)*w[5]-a(1,4)*w[4]+a(1,5)*w[3];
+          b(3,0) = -a(1,0)*w[12]+a(1,1)*w[8]-a(1,2)*w[5]+a(1,4)*w[2]-a(1,5)*w[1];
+          b(4,0) =  a(1,0)*w[11]-a(1,1)*w[7]+a(1,2)*w[4]-a(1,3)*w[2]+a(1,5)*w[0];
+          b(5,0) = -a(1,0)*w[10]+a(1,1)*w[6]-a(1,2)*w[3]+a(1,3)*w[1]-a(1,4)*w[0];
 
-          b[0*snb_+1] =-a[0*sna_+1]*w[14]+a[0*sna_+2]*w[13]-a[0*sna_+3]*w[12]+a[0*sna_+4]*w[11]-a[0*sna_+5]*w[10];
-          b[1*snb_+1] = a[0*sna_+0]*w[14]-a[0*sna_+2]*w[9]+a[0*sna_+3]*w[8]-a[0*sna_+4]*w[7]+a[0*sna_+5]*w[6];
-          b[2*snb_+1] =-a[0*sna_+0]*w[13]+a[0*sna_+1]*w[9]-a[0*sna_+3]*w[5]+a[0*sna_+4]*w[4]-a[0*sna_+5]*w[3];
-          b[3*snb_+1] = a[0*sna_+0]*w[12]-a[0*sna_+1]*w[8]+a[0*sna_+2]*w[5]-a[0*sna_+4]*w[2]+a[0*sna_+5]*w[1];
-          b[4*snb_+1] =-a[0*sna_+0]*w[11]+a[0*sna_+1]*w[7]-a[0*sna_+2]*w[4]+a[0*sna_+3]*w[2]-a[0*sna_+5]*w[0];
-          b[5*snb_+1] = a[0*sna_+0]*w[10]-a[0*sna_+1]*w[6]+a[0*sna_+2]*w[3]-a[0*sna_+3]*w[1]+a[0*sna_+4]*w[0];
+          b(0,1) =-a(0,1)*w[14]+a(0,2)*w[13]-a(0,3)*w[12]+a(0,4)*w[11]-a(0,5)*w[10];
+          b(1,1) = a(0,0)*w[14]-a(0,2)*w[9]+a(0,3)*w[8]-a(0,4)*w[7]+a(0,5)*w[6];
+          b(2,1) =-a(0,0)*w[13]+a(0,1)*w[9]-a(0,3)*w[5]+a(0,4)*w[4]-a(0,5)*w[3];
+          b(3,1) = a(0,0)*w[12]-a(0,1)*w[8]+a(0,2)*w[5]-a(0,4)*w[2]+a(0,5)*w[1];
+          b(4,1) =-a(0,0)*w[11]+a(0,1)*w[7]-a(0,2)*w[4]+a(0,3)*w[2]-a(0,5)*w[0];
+          b(5,1) = a(0,0)*w[10]-a(0,1)*w[6]+a(0,2)*w[3]-a(0,3)*w[1]+a(0,4)*w[0];
 
-          w[ 0] = a[4*sna_+0]*a[5*sna_+1]-a[4*sna_+1]*a[5*sna_+0];
-          w[ 1] = a[4*sna_+0]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+0];
-          w[ 2] = a[4*sna_+0]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+0];
-          w[ 3] = a[4*sna_+0]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+0];
-          w[ 4] = a[4*sna_+0]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+0];
-          w[ 5] = a[4*sna_+1]*a[5*sna_+2]-a[4*sna_+2]*a[5*sna_+1];
-          w[ 6] = a[4*sna_+1]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+1];
-          w[ 7] = a[4*sna_+1]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+1];
-          w[ 8] = a[4*sna_+1]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+1];
-          w[ 9] = a[4*sna_+2]*a[5*sna_+3]-a[4*sna_+3]*a[5*sna_+2];
-          w[10] = a[4*sna_+2]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+2];
-          w[11] = a[4*sna_+2]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+2];
-          w[12] = a[4*sna_+3]*a[5*sna_+4]-a[4*sna_+4]*a[5*sna_+3];
-          w[13] = a[4*sna_+3]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+3];
-          w[14] = a[4*sna_+4]*a[5*sna_+5]-a[4*sna_+5]*a[5*sna_+4];
-          w[15] = a[1*sna_+0]*w[5]-a[1*sna_+1]*w[1]+a[1*sna_+2]*w[0];
-          w[16] = a[1*sna_+0]*w[6]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          w[17] = a[1*sna_+0]*w[7]-a[1*sna_+1]*w[3]+a[1*sna_+4]*w[0];
-          w[18] = a[1*sna_+0]*w[8]-a[1*sna_+1]*w[4]+a[1*sna_+5]*w[0];
-          w[19] = a[1*sna_+0]*w[9]-a[1*sna_+2]*w[2]+a[1*sna_+3]*w[1];
-          w[20] = a[1*sna_+0]*w[10]-a[1*sna_+2]*w[3]+a[1*sna_+4]*w[1];
-          w[21] = a[1*sna_+0]*w[11]-a[1*sna_+2]*w[4]+a[1*sna_+5]*w[1];
-          w[22] = a[1*sna_+0]*w[12]-a[1*sna_+3]*w[3]+a[1*sna_+4]*w[2];
-          w[23] = a[1*sna_+0]*w[13]-a[1*sna_+3]*w[4]+a[1*sna_+5]*w[2];
-          w[24] = a[1*sna_+0]*w[14]-a[1*sna_+4]*w[4]+a[1*sna_+5]*w[3];
-          w[25] = a[1*sna_+1]*w[9]-a[1*sna_+2]*w[6]+a[1*sna_+3]*w[5];
-          w[26] = a[1*sna_+1]*w[10]-a[1*sna_+2]*w[7]+a[1*sna_+4]*w[5];
-          w[27] = a[1*sna_+1]*w[11]-a[1*sna_+2]*w[8]+a[1*sna_+5]*w[5];
-          w[28] = a[1*sna_+1]*w[12]-a[1*sna_+3]*w[7]+a[1*sna_+4]*w[6];
-          w[29] = a[1*sna_+1]*w[13]-a[1*sna_+3]*w[8]+a[1*sna_+5]*w[6];
-          w[30] = a[1*sna_+1]*w[14]-a[1*sna_+4]*w[8]+a[1*sna_+5]*w[7];
-          w[31] = a[1*sna_+2]*w[12]-a[1*sna_+3]*w[10]+a[1*sna_+4]*w[9];
-          w[32] = a[1*sna_+2]*w[13]-a[1*sna_+3]*w[11]+a[1*sna_+5]*w[9];
-          w[33] = a[1*sna_+2]*w[14]-a[1*sna_+4]*w[11]+a[1*sna_+5]*w[10];
-          w[34] = a[1*sna_+3]*w[14]-a[1*sna_+4]*w[13]+a[1*sna_+5]*w[12];
-          w[ 0] = a[0*sna_+0]*w[25]-a[0*sna_+1]*w[19]+a[0*sna_+2]*w[16]-a[0*sna_+3]*w[15];
-          w[ 1] = a[0*sna_+0]*w[26]-a[0*sna_+1]*w[20]+a[0*sna_+2]*w[17]-a[0*sna_+4]*w[15];
-          w[ 2] = a[0*sna_+0]*w[27]-a[0*sna_+1]*w[21]+a[0*sna_+2]*w[18]-a[0*sna_+5]*w[15];
-          w[ 3] = a[0*sna_+0]*w[28]-a[0*sna_+1]*w[22]+a[0*sna_+3]*w[17]-a[0*sna_+4]*w[16];
-          w[ 4] = a[0*sna_+0]*w[29]-a[0*sna_+1]*w[23]+a[0*sna_+3]*w[18]-a[0*sna_+5]*w[16];
-          w[ 5] = a[0*sna_+0]*w[30]-a[0*sna_+1]*w[24]+a[0*sna_+4]*w[18]-a[0*sna_+5]*w[17];
-          w[ 6] = a[0*sna_+0]*w[31]-a[0*sna_+2]*w[22]+a[0*sna_+3]*w[20]-a[0*sna_+4]*w[19];
-          w[ 7] = a[0*sna_+0]*w[32]-a[0*sna_+2]*w[23]+a[0*sna_+3]*w[21]-a[0*sna_+5]*w[19];
-          w[ 8] = a[0*sna_+0]*w[33]-a[0*sna_+2]*w[24]+a[0*sna_+4]*w[21]-a[0*sna_+5]*w[20];
-          w[ 9] = a[0*sna_+0]*w[34]-a[0*sna_+3]*w[24]+a[0*sna_+4]*w[23]-a[0*sna_+5]*w[22];
-          w[10] = a[0*sna_+1]*w[31]-a[0*sna_+2]*w[28]+a[0*sna_+3]*w[26]-a[0*sna_+4]*w[25];
-          w[11] = a[0*sna_+1]*w[32]-a[0*sna_+2]*w[29]+a[0*sna_+3]*w[27]-a[0*sna_+5]*w[25];
-          w[12] = a[0*sna_+1]*w[33]-a[0*sna_+2]*w[30]+a[0*sna_+4]*w[27]-a[0*sna_+5]*w[26];
-          w[13] = a[0*sna_+1]*w[34]-a[0*sna_+3]*w[30]+a[0*sna_+4]*w[29]-a[0*sna_+5]*w[28];
-          w[14] = a[0*sna_+2]*w[34]-a[0*sna_+3]*w[33]+a[0*sna_+4]*w[32]-a[0*sna_+5]*w[31];
+          w[ 0] = a(4,0)*a(5,1)-a(4,1)*a(5,0);
+          w[ 1] = a(4,0)*a(5,2)-a(4,2)*a(5,0);
+          w[ 2] = a(4,0)*a(5,3)-a(4,3)*a(5,0);
+          w[ 3] = a(4,0)*a(5,4)-a(4,4)*a(5,0);
+          w[ 4] = a(4,0)*a(5,5)-a(4,5)*a(5,0);
+          w[ 5] = a(4,1)*a(5,2)-a(4,2)*a(5,1);
+          w[ 6] = a(4,1)*a(5,3)-a(4,3)*a(5,1);
+          w[ 7] = a(4,1)*a(5,4)-a(4,4)*a(5,1);
+          w[ 8] = a(4,1)*a(5,5)-a(4,5)*a(5,1);
+          w[ 9] = a(4,2)*a(5,3)-a(4,3)*a(5,2);
+          w[10] = a(4,2)*a(5,4)-a(4,4)*a(5,2);
+          w[11] = a(4,2)*a(5,5)-a(4,5)*a(5,2);
+          w[12] = a(4,3)*a(5,4)-a(4,4)*a(5,3);
+          w[13] = a(4,3)*a(5,5)-a(4,5)*a(5,3);
+          w[14] = a(4,4)*a(5,5)-a(4,5)*a(5,4);
+          w[15] = a(1,0)*w[5]-a(1,1)*w[1]+a(1,2)*w[0];
+          w[16] = a(1,0)*w[6]-a(1,1)*w[2]+a(1,3)*w[0];
+          w[17] = a(1,0)*w[7]-a(1,1)*w[3]+a(1,4)*w[0];
+          w[18] = a(1,0)*w[8]-a(1,1)*w[4]+a(1,5)*w[0];
+          w[19] = a(1,0)*w[9]-a(1,2)*w[2]+a(1,3)*w[1];
+          w[20] = a(1,0)*w[10]-a(1,2)*w[3]+a(1,4)*w[1];
+          w[21] = a(1,0)*w[11]-a(1,2)*w[4]+a(1,5)*w[1];
+          w[22] = a(1,0)*w[12]-a(1,3)*w[3]+a(1,4)*w[2];
+          w[23] = a(1,0)*w[13]-a(1,3)*w[4]+a(1,5)*w[2];
+          w[24] = a(1,0)*w[14]-a(1,4)*w[4]+a(1,5)*w[3];
+          w[25] = a(1,1)*w[9]-a(1,2)*w[6]+a(1,3)*w[5];
+          w[26] = a(1,1)*w[10]-a(1,2)*w[7]+a(1,4)*w[5];
+          w[27] = a(1,1)*w[11]-a(1,2)*w[8]+a(1,5)*w[5];
+          w[28] = a(1,1)*w[12]-a(1,3)*w[7]+a(1,4)*w[6];
+          w[29] = a(1,1)*w[13]-a(1,3)*w[8]+a(1,5)*w[6];
+          w[30] = a(1,1)*w[14]-a(1,4)*w[8]+a(1,5)*w[7];
+          w[31] = a(1,2)*w[12]-a(1,3)*w[10]+a(1,4)*w[9];
+          w[32] = a(1,2)*w[13]-a(1,3)*w[11]+a(1,5)*w[9];
+          w[33] = a(1,2)*w[14]-a(1,4)*w[11]+a(1,5)*w[10];
+          w[34] = a(1,3)*w[14]-a(1,4)*w[13]+a(1,5)*w[12];
+          w[ 0] = a(0,0)*w[25]-a(0,1)*w[19]+a(0,2)*w[16]-a(0,3)*w[15];
+          w[ 1] = a(0,0)*w[26]-a(0,1)*w[20]+a(0,2)*w[17]-a(0,4)*w[15];
+          w[ 2] = a(0,0)*w[27]-a(0,1)*w[21]+a(0,2)*w[18]-a(0,5)*w[15];
+          w[ 3] = a(0,0)*w[28]-a(0,1)*w[22]+a(0,3)*w[17]-a(0,4)*w[16];
+          w[ 4] = a(0,0)*w[29]-a(0,1)*w[23]+a(0,3)*w[18]-a(0,5)*w[16];
+          w[ 5] = a(0,0)*w[30]-a(0,1)*w[24]+a(0,4)*w[18]-a(0,5)*w[17];
+          w[ 6] = a(0,0)*w[31]-a(0,2)*w[22]+a(0,3)*w[20]-a(0,4)*w[19];
+          w[ 7] = a(0,0)*w[32]-a(0,2)*w[23]+a(0,3)*w[21]-a(0,5)*w[19];
+          w[ 8] = a(0,0)*w[33]-a(0,2)*w[24]+a(0,4)*w[21]-a(0,5)*w[20];
+          w[ 9] = a(0,0)*w[34]-a(0,3)*w[24]+a(0,4)*w[23]-a(0,5)*w[22];
+          w[10] = a(0,1)*w[31]-a(0,2)*w[28]+a(0,3)*w[26]-a(0,4)*w[25];
+          w[11] = a(0,1)*w[32]-a(0,2)*w[29]+a(0,3)*w[27]-a(0,5)*w[25];
+          w[12] = a(0,1)*w[33]-a(0,2)*w[30]+a(0,4)*w[27]-a(0,5)*w[26];
+          w[13] = a(0,1)*w[34]-a(0,3)*w[30]+a(0,4)*w[29]-a(0,5)*w[28];
+          w[14] = a(0,2)*w[34]-a(0,3)*w[33]+a(0,4)*w[32]-a(0,5)*w[31];
 
-          b[0*snb_+2] = a[3*sna_+1]*w[14]-a[3*sna_+2]*w[13]+a[3*sna_+3]*w[12]-a[3*sna_+4]*w[11]+a[3*sna_+5]*w[10];
-          b[1*snb_+2] =-a[3*sna_+0]*w[14]+a[3*sna_+2]*w[9]-a[3*sna_+3]*w[8]+a[3*sna_+4]*w[7]-a[3*sna_+5]*w[6];
-          b[2*snb_+2] = a[3*sna_+0]*w[13]-a[3*sna_+1]*w[9]+a[3*sna_+3]*w[5]-a[3*sna_+4]*w[4]+a[3*sna_+5]*w[3];
-          b[3*snb_+2] =-a[3*sna_+0]*w[12]+a[3*sna_+1]*w[8]-a[3*sna_+2]*w[5]+a[3*sna_+4]*w[2]-a[3*sna_+5]*w[1];
-          b[4*snb_+2] = a[3*sna_+0]*w[11]-a[3*sna_+1]*w[7]+a[3*sna_+2]*w[4]-a[3*sna_+3]*w[2]+a[3*sna_+5]*w[0];
-          b[5*snb_+2] =-a[3*sna_+0]*w[10]+a[3*sna_+1]*w[6]-a[3*sna_+2]*w[3]+a[3*sna_+3]*w[1]-a[3*sna_+4]*w[0];
+          b(0,2) = a(3,1)*w[14]-a(3,2)*w[13]+a(3,3)*w[12]-a(3,4)*w[11]+a(3,5)*w[10];
+          b(1,2) =-a(3,0)*w[14]+a(3,2)*w[9]-a(3,3)*w[8]+a(3,4)*w[7]-a(3,5)*w[6];
+          b(2,2) = a(3,0)*w[13]-a(3,1)*w[9]+a(3,3)*w[5]-a(3,4)*w[4]+a(3,5)*w[3];
+          b(3,2) =-a(3,0)*w[12]+a(3,1)*w[8]-a(3,2)*w[5]+a(3,4)*w[2]-a(3,5)*w[1];
+          b(4,2) = a(3,0)*w[11]-a(3,1)*w[7]+a(3,2)*w[4]-a(3,3)*w[2]+a(3,5)*w[0];
+          b(5,2) =-a(3,0)*w[10]+a(3,1)*w[6]-a(3,2)*w[3]+a(3,3)*w[1]-a(3,4)*w[0];
 
-          b[0*snb_+3] =-a[2*sna_+1]*w[14]+a[2*sna_+2]*w[13]-a[2*sna_+3]*w[12]+a[2*sna_+4]*w[11]-a[2*sna_+5]*w[10];
-          b[1*snb_+3] = a[2*sna_+0]*w[14]-a[2*sna_+2]*w[9]+a[2*sna_+3]*w[8]-a[2*sna_+4]*w[7]+a[2*sna_+5]*w[6];
-          b[2*snb_+3] =-a[2*sna_+0]*w[13]+a[2*sna_+1]*w[9]-a[2*sna_+3]*w[5]+a[2*sna_+4]*w[4]-a[2*sna_+5]*w[3];
-          b[3*snb_+3] = a[2*sna_+0]*w[12]-a[2*sna_+1]*w[8]+a[2*sna_+2]*w[5]-a[2*sna_+4]*w[2]+a[2*sna_+5]*w[1];
-          b[4*snb_+3] =-a[2*sna_+0]*w[11]+a[2*sna_+1]*w[7]-a[2*sna_+2]*w[4]+a[2*sna_+3]*w[2]-a[2*sna_+5]*w[0];
-          b[5*snb_+3] = a[2*sna_+0]*w[10]-a[2*sna_+1]*w[6]+a[2*sna_+2]*w[3]-a[2*sna_+3]*w[1]+a[2*sna_+4]*w[0];
+          b(0,3) =-a(2,1)*w[14]+a(2,2)*w[13]-a(2,3)*w[12]+a(2,4)*w[11]-a(2,5)*w[10];
+          b(1,3) = a(2,0)*w[14]-a(2,2)*w[9]+a(2,3)*w[8]-a(2,4)*w[7]+a(2,5)*w[6];
+          b(2,3) =-a(2,0)*w[13]+a(2,1)*w[9]-a(2,3)*w[5]+a(2,4)*w[4]-a(2,5)*w[3];
+          b(3,3) = a(2,0)*w[12]-a(2,1)*w[8]+a(2,2)*w[5]-a(2,4)*w[2]+a(2,5)*w[1];
+          b(4,3) =-a(2,0)*w[11]+a(2,1)*w[7]-a(2,2)*w[4]+a(2,3)*w[2]-a(2,5)*w[0];
+          b(5,3) = a(2,0)*w[10]-a(2,1)*w[6]+a(2,2)*w[3]-a(2,3)*w[1]+a(2,4)*w[0];
 
-          w[ 0] = a[2*sna_+0]*a[3*sna_+1]-a[2*sna_+1]*a[3*sna_+0];
-          w[ 1] = a[2*sna_+0]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+0];
-          w[ 2] = a[2*sna_+0]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+0];
-          w[ 3] = a[2*sna_+0]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+0];
-          w[ 4] = a[2*sna_+0]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+0];
-          w[ 5] = a[2*sna_+1]*a[3*sna_+2]-a[2*sna_+2]*a[3*sna_+1];
-          w[ 6] = a[2*sna_+1]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+1];
-          w[ 7] = a[2*sna_+1]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+1];
-          w[ 8] = a[2*sna_+1]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+1];
-          w[ 9] = a[2*sna_+2]*a[3*sna_+3]-a[2*sna_+3]*a[3*sna_+2];
-          w[10] = a[2*sna_+2]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+2];
-          w[11] = a[2*sna_+2]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+2];
-          w[12] = a[2*sna_+3]*a[3*sna_+4]-a[2*sna_+4]*a[3*sna_+3];
-          w[13] = a[2*sna_+3]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+3];
-          w[14] = a[2*sna_+4]*a[3*sna_+5]-a[2*sna_+5]*a[3*sna_+4];
-          w[15] = a[1*sna_+0]*w[5]-a[1*sna_+1]*w[1]+a[1*sna_+2]*w[0];
-          w[16] = a[1*sna_+0]*w[6]-a[1*sna_+1]*w[2]+a[1*sna_+3]*w[0];
-          w[17] = a[1*sna_+0]*w[7]-a[1*sna_+1]*w[3]+a[1*sna_+4]*w[0];
-          w[18] = a[1*sna_+0]*w[8]-a[1*sna_+1]*w[4]+a[1*sna_+5]*w[0];
-          w[19] = a[1*sna_+0]*w[9]-a[1*sna_+2]*w[2]+a[1*sna_+3]*w[1];
-          w[20] = a[1*sna_+0]*w[10]-a[1*sna_+2]*w[3]+a[1*sna_+4]*w[1];
-          w[21] = a[1*sna_+0]*w[11]-a[1*sna_+2]*w[4]+a[1*sna_+5]*w[1];
-          w[22] = a[1*sna_+0]*w[12]-a[1*sna_+3]*w[3]+a[1*sna_+4]*w[2];
-          w[23] = a[1*sna_+0]*w[13]-a[1*sna_+3]*w[4]+a[1*sna_+5]*w[2];
-          w[24] = a[1*sna_+0]*w[14]-a[1*sna_+4]*w[4]+a[1*sna_+5]*w[3];
-          w[25] = a[1*sna_+1]*w[9]-a[1*sna_+2]*w[6]+a[1*sna_+3]*w[5];
-          w[26] = a[1*sna_+1]*w[10]-a[1*sna_+2]*w[7]+a[1*sna_+4]*w[5];
-          w[27] = a[1*sna_+1]*w[11]-a[1*sna_+2]*w[8]+a[1*sna_+5]*w[5];
-          w[28] = a[1*sna_+1]*w[12]-a[1*sna_+3]*w[7]+a[1*sna_+4]*w[6];
-          w[29] = a[1*sna_+1]*w[13]-a[1*sna_+3]*w[8]+a[1*sna_+5]*w[6];
-          w[30] = a[1*sna_+1]*w[14]-a[1*sna_+4]*w[8]+a[1*sna_+5]*w[7];
-          w[31] = a[1*sna_+2]*w[12]-a[1*sna_+3]*w[10]+a[1*sna_+4]*w[9];
-          w[32] = a[1*sna_+2]*w[13]-a[1*sna_+3]*w[11]+a[1*sna_+5]*w[9];
-          w[33] = a[1*sna_+2]*w[14]-a[1*sna_+4]*w[11]+a[1*sna_+5]*w[10];
-          w[34] = a[1*sna_+3]*w[14]-a[1*sna_+4]*w[13]+a[1*sna_+5]*w[12];
+          w[ 0] = a(2,0)*a(3,1)-a(2,1)*a(3,0);
+          w[ 1] = a(2,0)*a(3,2)-a(2,2)*a(3,0);
+          w[ 2] = a(2,0)*a(3,3)-a(2,3)*a(3,0);
+          w[ 3] = a(2,0)*a(3,4)-a(2,4)*a(3,0);
+          w[ 4] = a(2,0)*a(3,5)-a(2,5)*a(3,0);
+          w[ 5] = a(2,1)*a(3,2)-a(2,2)*a(3,1);
+          w[ 6] = a(2,1)*a(3,3)-a(2,3)*a(3,1);
+          w[ 7] = a(2,1)*a(3,4)-a(2,4)*a(3,1);
+          w[ 8] = a(2,1)*a(3,5)-a(2,5)*a(3,1);
+          w[ 9] = a(2,2)*a(3,3)-a(2,3)*a(3,2);
+          w[10] = a(2,2)*a(3,4)-a(2,4)*a(3,2);
+          w[11] = a(2,2)*a(3,5)-a(2,5)*a(3,2);
+          w[12] = a(2,3)*a(3,4)-a(2,4)*a(3,3);
+          w[13] = a(2,3)*a(3,5)-a(2,5)*a(3,3);
+          w[14] = a(2,4)*a(3,5)-a(2,5)*a(3,4);
+          w[15] = a(1,0)*w[5]-a(1,1)*w[1]+a(1,2)*w[0];
+          w[16] = a(1,0)*w[6]-a(1,1)*w[2]+a(1,3)*w[0];
+          w[17] = a(1,0)*w[7]-a(1,1)*w[3]+a(1,4)*w[0];
+          w[18] = a(1,0)*w[8]-a(1,1)*w[4]+a(1,5)*w[0];
+          w[19] = a(1,0)*w[9]-a(1,2)*w[2]+a(1,3)*w[1];
+          w[20] = a(1,0)*w[10]-a(1,2)*w[3]+a(1,4)*w[1];
+          w[21] = a(1,0)*w[11]-a(1,2)*w[4]+a(1,5)*w[1];
+          w[22] = a(1,0)*w[12]-a(1,3)*w[3]+a(1,4)*w[2];
+          w[23] = a(1,0)*w[13]-a(1,3)*w[4]+a(1,5)*w[2];
+          w[24] = a(1,0)*w[14]-a(1,4)*w[4]+a(1,5)*w[3];
+          w[25] = a(1,1)*w[9]-a(1,2)*w[6]+a(1,3)*w[5];
+          w[26] = a(1,1)*w[10]-a(1,2)*w[7]+a(1,4)*w[5];
+          w[27] = a(1,1)*w[11]-a(1,2)*w[8]+a(1,5)*w[5];
+          w[28] = a(1,1)*w[12]-a(1,3)*w[7]+a(1,4)*w[6];
+          w[29] = a(1,1)*w[13]-a(1,3)*w[8]+a(1,5)*w[6];
+          w[30] = a(1,1)*w[14]-a(1,4)*w[8]+a(1,5)*w[7];
+          w[31] = a(1,2)*w[12]-a(1,3)*w[10]+a(1,4)*w[9];
+          w[32] = a(1,2)*w[13]-a(1,3)*w[11]+a(1,5)*w[9];
+          w[33] = a(1,2)*w[14]-a(1,4)*w[11]+a(1,5)*w[10];
+          w[34] = a(1,3)*w[14]-a(1,4)*w[13]+a(1,5)*w[12];
 
-          w[ 0] = a[0*sna_+0]*w[25]-a[0*sna_+1]*w[19]+a[0*sna_+2]*w[16]-a[0*sna_+3]*w[15];
-          w[ 1] = a[0*sna_+0]*w[26]-a[0*sna_+1]*w[20]+a[0*sna_+2]*w[17]-a[0*sna_+4]*w[15];
-          w[ 2] = a[0*sna_+0]*w[27]-a[0*sna_+1]*w[21]+a[0*sna_+2]*w[18]-a[0*sna_+5]*w[15];
-          w[ 3] = a[0*sna_+0]*w[28]-a[0*sna_+1]*w[22]+a[0*sna_+3]*w[17]-a[0*sna_+4]*w[16];
-          w[ 4] = a[0*sna_+0]*w[29]-a[0*sna_+1]*w[23]+a[0*sna_+3]*w[18]-a[0*sna_+5]*w[16];
-          w[ 5] = a[0*sna_+0]*w[30]-a[0*sna_+1]*w[24]+a[0*sna_+4]*w[18]-a[0*sna_+5]*w[17];
-          w[ 6] = a[0*sna_+0]*w[31]-a[0*sna_+2]*w[22]+a[0*sna_+3]*w[20]-a[0*sna_+4]*w[19];
-          w[ 7] = a[0*sna_+0]*w[32]-a[0*sna_+2]*w[23]+a[0*sna_+3]*w[21]-a[0*sna_+5]*w[19];
-          w[ 8] = a[0*sna_+0]*w[33]-a[0*sna_+2]*w[24]+a[0*sna_+4]*w[21]-a[0*sna_+5]*w[20];
-          w[ 9] = a[0*sna_+0]*w[34]-a[0*sna_+3]*w[24]+a[0*sna_+4]*w[23]-a[0*sna_+5]*w[22];
-          w[10] = a[0*sna_+1]*w[31]-a[0*sna_+2]*w[28]+a[0*sna_+3]*w[26]-a[0*sna_+4]*w[25];
-          w[11] = a[0*sna_+1]*w[32]-a[0*sna_+2]*w[29]+a[0*sna_+3]*w[27]-a[0*sna_+5]*w[25];
-          w[12] = a[0*sna_+1]*w[33]-a[0*sna_+2]*w[30]+a[0*sna_+4]*w[27]-a[0*sna_+5]*w[26];
-          w[13] = a[0*sna_+1]*w[34]-a[0*sna_+3]*w[30]+a[0*sna_+4]*w[29]-a[0*sna_+5]*w[28];
-          w[14] = a[0*sna_+2]*w[34]-a[0*sna_+3]*w[33]+a[0*sna_+4]*w[32]-a[0*sna_+5]*w[31];
+          w[ 0] = a(0,0)*w[25]-a(0,1)*w[19]+a(0,2)*w[16]-a(0,3)*w[15];
+          w[ 1] = a(0,0)*w[26]-a(0,1)*w[20]+a(0,2)*w[17]-a(0,4)*w[15];
+          w[ 2] = a(0,0)*w[27]-a(0,1)*w[21]+a(0,2)*w[18]-a(0,5)*w[15];
+          w[ 3] = a(0,0)*w[28]-a(0,1)*w[22]+a(0,3)*w[17]-a(0,4)*w[16];
+          w[ 4] = a(0,0)*w[29]-a(0,1)*w[23]+a(0,3)*w[18]-a(0,5)*w[16];
+          w[ 5] = a(0,0)*w[30]-a(0,1)*w[24]+a(0,4)*w[18]-a(0,5)*w[17];
+          w[ 6] = a(0,0)*w[31]-a(0,2)*w[22]+a(0,3)*w[20]-a(0,4)*w[19];
+          w[ 7] = a(0,0)*w[32]-a(0,2)*w[23]+a(0,3)*w[21]-a(0,5)*w[19];
+          w[ 8] = a(0,0)*w[33]-a(0,2)*w[24]+a(0,4)*w[21]-a(0,5)*w[20];
+          w[ 9] = a(0,0)*w[34]-a(0,3)*w[24]+a(0,4)*w[23]-a(0,5)*w[22];
+          w[10] = a(0,1)*w[31]-a(0,2)*w[28]+a(0,3)*w[26]-a(0,4)*w[25];
+          w[11] = a(0,1)*w[32]-a(0,2)*w[29]+a(0,3)*w[27]-a(0,5)*w[25];
+          w[12] = a(0,1)*w[33]-a(0,2)*w[30]+a(0,4)*w[27]-a(0,5)*w[26];
+          w[13] = a(0,1)*w[34]-a(0,3)*w[30]+a(0,4)*w[29]-a(0,5)*w[28];
+          w[14] = a(0,2)*w[34]-a(0,3)*w[33]+a(0,4)*w[32]-a(0,5)*w[31];
 
-          b[0*snb_+4] = a[5*sna_+1]*w[14]-a[5*sna_+2]*w[13]+a[5*sna_+3]*w[12]-a[5*sna_+4]*w[11]+a[5*sna_+5]*w[10];
-          b[1*snb_+4] =-a[5*sna_+0]*w[14]+a[5*sna_+2]*w[9]-a[5*sna_+3]*w[8]+a[5*sna_+4]*w[7]-a[5*sna_+5]*w[6];
-          b[2*snb_+4] = a[5*sna_+0]*w[13]-a[5*sna_+1]*w[9]+a[5*sna_+3]*w[5]-a[5*sna_+4]*w[4]+a[5*sna_+5]*w[3];
-          b[3*snb_+4] =-a[5*sna_+0]*w[12]+a[5*sna_+1]*w[8]-a[5*sna_+2]*w[5]+a[5*sna_+4]*w[2]-a[5*sna_+5]*w[1];
-          b[4*snb_+4] = a[5*sna_+0]*w[11]-a[5*sna_+1]*w[7]+a[5*sna_+2]*w[4]-a[5*sna_+3]*w[2]+a[5*sna_+5]*w[0];
-          b[5*snb_+4] =-a[5*sna_+0]*w[10]+a[5*sna_+1]*w[6]-a[5*sna_+2]*w[3]+a[5*sna_+3]*w[1]-a[5*sna_+4]*w[0];
+          b(0,4) = a(5,1)*w[14]-a(5,2)*w[13]+a(5,3)*w[12]-a(5,4)*w[11]+a(5,5)*w[10];
+          b(1,4) =-a(5,0)*w[14]+a(5,2)*w[9]-a(5,3)*w[8]+a(5,4)*w[7]-a(5,5)*w[6];
+          b(2,4) = a(5,0)*w[13]-a(5,1)*w[9]+a(5,3)*w[5]-a(5,4)*w[4]+a(5,5)*w[3];
+          b(3,4) =-a(5,0)*w[12]+a(5,1)*w[8]-a(5,2)*w[5]+a(5,4)*w[2]-a(5,5)*w[1];
+          b(4,4) = a(5,0)*w[11]-a(5,1)*w[7]+a(5,2)*w[4]-a(5,3)*w[2]+a(5,5)*w[0];
+          b(5,4) =-a(5,0)*w[10]+a(5,1)*w[6]-a(5,2)*w[3]+a(5,3)*w[1]-a(5,4)*w[0];
 
-          b[0*snb_+5] =-a[4*sna_+1]*w[14]+a[4*sna_+2]*w[13]-a[4*sna_+3]*w[12]+a[4*sna_+4]*w[11]-a[4*sna_+5]*w[10];
-          b[1*snb_+5] = a[4*sna_+0]*w[14]-a[4*sna_+2]*w[9]+a[4*sna_+3]*w[8]-a[4*sna_+4]*w[7]+a[4*sna_+5]*w[6];
-          b[2*snb_+5] =-a[4*sna_+0]*w[13]+a[4*sna_+1]*w[9]-a[4*sna_+3]*w[5]+a[4*sna_+4]*w[4]-a[4*sna_+5]*w[3];
-          b[3*snb_+5] = a[4*sna_+0]*w[12]-a[4*sna_+1]*w[8]+a[4*sna_+2]*w[5]-a[4*sna_+4]*w[2]+a[4*sna_+5]*w[1];
-          b[4*snb_+5] =-a[4*sna_+0]*w[11]+a[4*sna_+1]*w[7]-a[4*sna_+2]*w[4]+a[4*sna_+3]*w[2]-a[4*sna_+5]*w[0];
-          b[5*snb_+5] = a[4*sna_+0]*w[10]-a[4*sna_+1]*w[6]+a[4*sna_+2]*w[3]-a[4*sna_+3]*w[1]+a[4*sna_+4]*w[0];
+          b(0,5) =-a(4,1)*w[14]+a(4,2)*w[13]-a(4,3)*w[12]+a(4,4)*w[11]-a(4,5)*w[10];
+          b(1,5) = a(4,0)*w[14]-a(4,2)*w[9]+a(4,3)*w[8]-a(4,4)*w[7]+a(4,5)*w[6];
+          b(2,5) =-a(4,0)*w[13]+a(4,1)*w[9]-a(4,3)*w[5]+a(4,4)*w[4]-a(4,5)*w[3];
+          b(3,5) = a(4,0)*w[12]-a(4,1)*w[8]+a(4,2)*w[5]-a(4,4)*w[2]+a(4,5)*w[1];
+          b(4,5) =-a(4,0)*w[11]+a(4,1)*w[7]-a(4,2)*w[4]+a(4,3)*w[2]-a(4,5)*w[0];
+          b(5,5) = a(4,0)*w[10]-a(4,1)*w[6]+a(4,2)*w[3]-a(4,3)*w[1]+a(4,4)*w[0];
         }
       };
     } // namespace Intern
