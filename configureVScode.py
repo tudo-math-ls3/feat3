@@ -341,8 +341,13 @@ if "mkl" in buildid:
   cmake_flags["FEAT_HAVE_MKL"] = "ON"
   cxxflags += " -DMKL_ILP64"
 
+if "omp" in buildid:
+  remove_string(unused_tokens, "omp")
+  cmake_flags["FEAT_HAVE_OMP"] = "ON"
+  cxxflags += " -DMKL_ILP64"
+
 # give cmake on macOS a hint to the openmp lib
-if platform.system() == "Darwin":
+if (platform.system() == "Darwin") and ("omp" in buildid):
   ldflags += " -L/usr/local/opt/libomp/lib" #-lomp
   cxxflags += " -I/usr/local/opt/libomp/include"
 

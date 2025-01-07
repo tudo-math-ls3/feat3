@@ -923,7 +923,7 @@ namespace FEAT
         int failed_points = 0;
 
         // we open a OpenMP section here since this is a quite expensive assembly
-        #pragma omp parallel reduction(+:failed_points)
+        FEAT_PRAGMA_OMP(parallel reduction(+:failed_points))
         {
           // create matrix scatter-axpy
           typename Matrix_::ScatterAxpy scatter_maxpy(matrix);
@@ -981,7 +981,7 @@ namespace FEAT
 
           // loop over all target mesh cells
           // note: OpenMP (sometimes) requires a signed iteration variable
-          #pragma omp for schedule(dynamic,16)
+          FEAT_PRAGMA_OMP(for schedule(dynamic,16))
           for(std::int64_t itrg_cell = 0ull; itrg_cell < std::int64_t(target_trafo_eval.get_num_cells()); ++itrg_cell)
           {
             // cast target cell index
@@ -1150,7 +1150,7 @@ namespace FEAT
             target_dof_mapping.prepare(trg_cell);
 
             // scattering is a potential data race
-            #pragma omp critical
+            FEAT_PRAGMA_OMP(critical)
             {
               // loop over all intersecting source cells
               for(std::size_t is = 0u; is < source_cells.size(); ++is)
@@ -1699,7 +1699,7 @@ namespace FEAT
         int failed_points = 0;
 
         // we open a OpenMP section here since this is a quite expensive assembly
-        #pragma omp parallel reduction(+:failed_points)
+        FEAT_PRAGMA_OMP(parallel reduction(+:failed_points))
         {
           // create gather/scatter-axpys
           typename Vector_::GatherAxpy gather_s(vector_source);
@@ -1753,7 +1753,7 @@ namespace FEAT
 
           // loop over all target mesh cells
           // note: OpenMP (sometimes) requires a signed iteration variable
-          #pragma omp for schedule(dynamic,16)
+          FEAT_PRAGMA_OMP(for schedule(dynamic,16))
           for(std::int64_t itrg_cell = 0ull; itrg_cell < std::int64_t(target_trafo_eval.get_num_cells()); ++itrg_cell)
           {
             // cast target cell index
@@ -1938,7 +1938,7 @@ namespace FEAT
             target_dof_mapping.prepare(trg_cell);
 
             // scattering is a potential data race
-#pragma omp critical
+            FEAT_PRAGMA_OMP(critical)
             {
               // update target weights
               scatter_t(loc_trg, target_dof_mapping);

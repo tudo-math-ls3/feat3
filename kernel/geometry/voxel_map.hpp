@@ -1551,12 +1551,12 @@ namespace FEAT
         const CoordType_ z_min = CoordType_(_bbox_min[2]) / CoordType_(unit_size);
         const CoordType_ z_max = CoordType_(_bbox_max[2]) / CoordType_(unit_size);
 
-        #pragma omp parallel
+        FEAT_PRAGMA_OMP(parallel)
         {
           std::vector<int> line_mask(this->_num_points[0], 0);
           Tiny::Vector<CoordType_, 3> coords;
 
-          #pragma omp for schedule(dynamic, 16)
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 16))
           for(u64 i = beg; i < end; ++i)
           {
             // line = iz * this->_num_points[1] + iy

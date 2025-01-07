@@ -21,7 +21,7 @@ namespace FEAT
         // typedef IT_ IndexType;
         if constexpr(skip_singular_)
         {
-          #pragma omp parallel
+          FEAT_PRAGMA_OMP(parallel)
           {
             // allocate arrays for local matrix
             std::unique_ptr<DataType[]> local(new DataType[stride*stride]);
@@ -30,7 +30,7 @@ namespace FEAT
             std::fill(local_t.get(), local_t.get() + stride*stride, DataType(0));
             std::unique_ptr<Index[]> pivot(new Index[stride]);
             std::fill(pivot.get(), pivot.get() + stride, Index(0));
-            #pragma omp for
+            FEAT_PRAGMA_OMP(for)
             for(int k = 0; k < int(color_size); ++k)
             {
               const int imacro = coloring_map[k];
@@ -90,7 +90,7 @@ namespace FEAT
         else
         {
           (void)eps;
-          #pragma omp parallel
+          FEAT_PRAGMA_OMP(parallel)
           {
             // #pragma master
             // {
@@ -101,7 +101,7 @@ namespace FEAT
             std::fill(local.get(), local.get() + stride*stride, DataType(0));
             std::unique_ptr<Index[]> pivot(new Index[stride]);
             std::fill(pivot.get(), pivot.get() + stride, Index(0));
-            #pragma omp for
+            FEAT_PRAGMA_OMP(for)
             for(int k = 0; k < int(color_size); ++k)
             {
               const int imacro = coloring_map[k];
@@ -141,7 +141,7 @@ namespace FEAT
             const int hb = vanka_wrap.blocksizes[j +1];
             const bool meta_diag = (i == j);
             // now do the actual inner openmp loop over each column of the sub matrix
-            #pragma omp parallel for
+            FEAT_PRAGMA_OMP(parallel for)
             for(int row = 0; row < num_rows; ++row)
             {
               // careful, num rows is counted against native elements, not raw elements

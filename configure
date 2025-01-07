@@ -69,6 +69,7 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  - 'mpi': enable MPI-based cluster parallelization")
   print ("  - 'cuda': enable Nvidia CUDA-based GPU parallelization")
   print ("  - 'mkl': enable Intel MKL-based thread parallelization")
+  print ("  - 'omp': enable OpenMP based thread parallelization")
   print ("")
   print ("* CMake generators:")
   print (" - 'unixmake': generate GNU make makefiles (default)")
@@ -670,6 +671,11 @@ if "mkl" in buildid:
   cmake_flags += " -DFEAT_HAVE_MKL:BOOL=ON"
   cxxflags += " -DMKL_ILP64"
 
+if "omp" in buildid:
+  remove_string(unused_tokens, "omp")
+  cmake_flags += " -DFEAT_HAVE_OMP:BOOL=ON"
+  cxxflags += " -DMKL_ILP64"
+
 if "valgrind" in buildid:
   if not is_found("valgrind"):
     print ("Error: Choosen debugger valgrind not found!")
@@ -729,7 +735,7 @@ if ("mpi" not in buildid) and ("zoltan" in buildid):
   sys.exit()
 
 # give cmake on macOS a hint to the openmp lib
-if platform.system() == "Darwin":
+if (platform.system() == "Darwin") and ("omp" in buildid):
   ldflags += " -L/usr/local/opt/libomp/lib" #-lomp
   cxxflags += " -I/usr/local/opt/libomp/include"
 

@@ -847,7 +847,7 @@ namespace FEAT
         typedef Tiny::Vector<VecValueType, num_loc_dofs> LocalVectorType;
         typedef Tiny::Matrix<MatValueType, num_loc_dofs, num_loc_dofs> LocalMatrixType;
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
@@ -913,7 +913,7 @@ namespace FEAT
         typedef Tiny::Vector<VecValueType, num_loc_dofs> LocalVectorType;
         typedef Tiny::Matrix<MatValueType, num_loc_dofs, num_loc_dofs> LocalMatrixType;
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           //define local array
@@ -965,24 +965,24 @@ namespace FEAT
       {
         #ifdef FEAT_HAVE_OMP
         DT_ max_val(DT_(0));
-        // since we potentially use Half values, we do the max reduction ourselfes
+        // since we potentially use Half values, we do the max reduction ourselfes TODO: half not with omp...
         //simply use a local array of size 128... if we have more available threads, we wont use them...
         // this is of course not future proof, maybe solve this with a compiletime variable?
         DT_ max_vals[128];
         // parallel region with at most 128 threads
-        #pragma omp parallel num_threads(128)
+        FEAT_PRAGMA_OMP(parallel num_threads(128))
         {
           const int num_threads = omp_get_num_threads();
           const int thread_id = omp_get_thread_num();
           max_vals[thread_id] = DT_(0);
-          #pragma omp for
+          FEAT_PRAGMA_OMP(for)
           for(int i = 0; i < int(vec_size); ++i)
           {
             //synchronize all threads in block, to guarentee that all values are written
             max_vals[thread_id] = CudaMath::cuda_max(convect[i].norm_euclid(), max_vals[thread_id]);
           }
 
-          #pragma omp single
+          FEAT_PRAGMA_OMP(single)
           max_val = std::reduce(max_vals, max_vals + num_threads, DT_(0), [](const DT_& a, const DT_& b){return CudaMath::cuda_max(a,b);});
 
         }

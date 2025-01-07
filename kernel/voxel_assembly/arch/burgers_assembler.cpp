@@ -57,7 +57,7 @@ namespace FEAT
         typedef Tiny::Vector<VecValueType, num_loc_dofs> LocalVectorType;
         typedef Tiny::Matrix<MatValueType, num_loc_dofs, num_loc_dofs> LocalMatrixType;
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
@@ -123,7 +123,7 @@ namespace FEAT
         typedef Tiny::Vector<VecValueType, num_loc_dofs> LocalVectorType;
         // typedef Tiny::Matrix<MatValueType, num_loc_dofs, num_loc_dofs> LocalMatrixType;
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           //define local array
@@ -175,7 +175,7 @@ namespace FEAT
       {
         DT_ max_val(DT_(0));
         // simply reduce over max_val
-        #pragma omp parallel for reduction(max : max_val)
+        FEAT_PRAGMA_OMP(parallel for reduction(max : max_val))
         for(int i = 0; i < int(vec_size); ++i)
         {
           //synchronize all threads in block, to guarentee that all values are written

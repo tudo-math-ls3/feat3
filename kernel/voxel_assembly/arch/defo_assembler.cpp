@@ -44,7 +44,7 @@ namespace FEAT
 
 
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
