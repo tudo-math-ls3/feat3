@@ -31,11 +31,11 @@ void run(PreferredBackend backend)
   DenseVector<DT_, Index> y(size);
   for (Index i(0) ; i < size ; ++i)
   {
-    y.elements()[i]= DT_(-(i%100) * DT_(0.1) * (i%10));
+    y.elements()[i]= -DT_(i%100) * DT_(0.1) * DT_(i%10);
   }
   for (Index i(0) ; i < size * size ; ++i)
   {
-    x.elements()[i] = DT_((i%100) * DT_(0.5) * (i%10));
+    x.elements()[i] = DT_(i%100) * DT_(0.5) * DT_(i%10);
   }
 
   DenseVector<DT_, Index> r(size, 4711.);
@@ -55,7 +55,7 @@ void run(PreferredBackend backend)
   run_bench(func, flops, bytes);
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm2()<<"\n";
+  std::cout<<"control norm: "<<double(r.norm2())<<"\n";
 }
 
 int main(int argc, char ** argv)

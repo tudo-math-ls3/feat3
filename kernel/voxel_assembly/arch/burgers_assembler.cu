@@ -1281,12 +1281,12 @@ template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixD
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
 template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// #endif
 
 template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
@@ -1296,12 +1296,12 @@ template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMa
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
 template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// #endif
 
 template void Arch::assemble_burgers_defect(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
@@ -1311,12 +1311,12 @@ template void Arch::assemble_burgers_defect(const Q2StandardQuad&, double*, cons
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
 template void Arch::assemble_burgers_defect(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-template void Arch::assemble_burgers_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// template void Arch::assemble_burgers_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// #endif
 
 template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
@@ -1326,48 +1326,48 @@ template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, double*,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
 template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// #endif
 
 template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<double, std::uint32_t, 2>&);
 template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<float, std::uint32_t, 2>&);
 template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<double, std::uint64_t, 2>&);
 template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<float, std::uint64_t, 2>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>&);
-template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>&);
+// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>&);
+// #endif
 
 template double Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint32_t, 2>, LAFEM::VectorMirror<double, std::uint32_t>>&);
 template float Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint32_t, 2>, LAFEM::VectorMirror<float, std::uint32_t>>&);
 template double Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint64_t, 2>, LAFEM::VectorMirror<double, std::uint64_t>>&);
 template float Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint64_t, 2>, LAFEM::VectorMirror<float, std::uint64_t>>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
-template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
+// template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
+// #endif
 
 template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<double, std::uint32_t, 2>&);
 template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<float, std::uint32_t, 2>&);
 template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<double, std::uint64_t, 2>&);
 template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<float, std::uint64_t, 2>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>&);
-template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>&);
+// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>&);
+// #endif
 
 template double Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint32_t, 2>, LAFEM::VectorMirror<double, std::uint32_t>>&);
 template float Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint32_t, 2>, LAFEM::VectorMirror<float, std::uint32_t>>&);
 template double Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint64_t, 2>, LAFEM::VectorMirror<double, std::uint64_t>>&);
 template float Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint64_t, 2>, LAFEM::VectorMirror<float, std::uint64_t>>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
-template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 2>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
+// template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 2>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
+// #endif
 
 /*********************************************************3D implementations**************************************************************************************/
 
@@ -1379,12 +1379,12 @@ template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixD
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
 template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// #endif
 
 template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
@@ -1394,12 +1394,12 @@ template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMa
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
 template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// #endif
 
 template void Arch::assemble_burgers_defect(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
@@ -1409,12 +1409,12 @@ template void Arch::assemble_burgers_defect(const Q2StandardHexa&, double*, cons
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
 template void Arch::assemble_burgers_defect(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-template void Arch::assemble_burgers_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// template void Arch::assemble_burgers_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+// #endif
 
 template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
@@ -1424,45 +1424,45 @@ template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, double*,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&);
 template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&);
+// #endif
 
 template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<double, std::uint32_t, 3>&);
 template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<float, std::uint32_t, 3>&);
 template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<double, std::uint64_t, 3>&);
 template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<float, std::uint64_t, 3>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>&);
-template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>&);
+// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>&);
+// #endif
 
 template double Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint32_t, 3>, LAFEM::VectorMirror<double, std::uint32_t>>&);
 template float Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint32_t, 3>, LAFEM::VectorMirror<float, std::uint32_t>>&);
 template double Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint64_t, 3>, LAFEM::VectorMirror<double, std::uint64_t>>&);
 template float Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint64_t, 3>, LAFEM::VectorMirror<float, std::uint64_t>>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
-template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
+// template Half Arch::get_sd_v_norm(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
+// #endif
 
 template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<double, std::uint32_t, 3>&);
 template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<float, std::uint32_t, 3>&);
 template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<double, std::uint64_t, 3>&);
 template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<float, std::uint64_t, 3>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>&);
-template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>&);
+// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>&);
+// #endif
 
 template double Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint32_t, 3>, LAFEM::VectorMirror<double, std::uint32_t>>&);
 template float Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint32_t, 3>, LAFEM::VectorMirror<float, std::uint32_t>>&);
 template double Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<double, std::uint64_t, 3>, LAFEM::VectorMirror<double, std::uint64_t>>&);
 template float Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<float, std::uint64_t, 3>, LAFEM::VectorMirror<float, std::uint64_t>>&);
-#ifdef FEAT_HAVE_HALFMATH
-template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
-template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint32_t, 3>, LAFEM::VectorMirror<Half, std::uint32_t>>&);
+// template Half Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorBlocked<Half, std::uint64_t, 3>, LAFEM::VectorMirror<Half, std::uint64_t>>&);
+// #endif

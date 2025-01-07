@@ -32,8 +32,8 @@ void run(PreferredBackend backend)
   {
     for (Index j(0) ; j < size ; ++j)
     {
-      x(i, j, DT_((i%100) * DT_(0.5) * (i%10)));
-      y(i, j, DT_(-(i%100) * DT_(0.1) * (i%10)));
+      x(i, j, DT_(i%100) * DT_(0.5) * DT_(i%10));
+      y(i, j, -DT_(i%100) * DT_(0.1) * DT_(i%10));
     }
   }
 
@@ -82,7 +82,7 @@ void run(PreferredBackend backend)
   }
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm_frobenius()<<"\n";
+  std::cout<<"control norm: "<<double(r.norm_frobenius())<<"\n";
 }
 
 int main(int argc, char ** argv)

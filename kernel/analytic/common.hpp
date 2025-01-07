@@ -3990,27 +3990,26 @@ namespace FEAT
           typedef typename Traits_::GradientType GradientType;
           typedef typename Traits_::HessianType HessianType;
 
-          static constexpr DataType a = DataType(a_);
           const DataType sa;
 
           explicit Evaluator(const SphereCapFunction&) :
-            sa(Math::sqrt(a - DataType(1)))
+            sa(Math::sqrt(DataType(a_) - DataType(1)))
           {
           }
 
           ValueType value(const PointType& point) const
           {
-            return Math::sqrt(a - point.norm_euclid_sqr()) - sa;
+            return Math::sqrt(DataType(a_) - point.norm_euclid_sqr()) - sa;
           }
 
           GradientType gradient(const PointType& point) const
           {
-            return (DataType(-1) / Math::sqrt(a - point.norm_euclid_sqr())) * point;
+            return (DataType(-1) / Math::sqrt(DataType(a_) - point.norm_euclid_sqr())) * point;
           }
 
           HessianType hessian(const PointType& point) const
           {
-            const DataType s = DataType(1) / Math::cub(Math::sqrt(a - point.norm_euclid_sqr()));
+            const DataType s = DataType(1) / Math::cub(Math::sqrt(DataType(a_) - point.norm_euclid_sqr()));
             //const DataType s = DataType(1) / Math::pow(a - point.norm_euclid_sqr(), DataType(1.5));
             HessianType hess;
             hess.format();
@@ -4022,7 +4021,7 @@ namespace FEAT
                 {
                   hess[i][j] = DataType(0);
                   for(int k = 0; k < dim_; ++k)
-                    hess[i][j] += (k == i ? -a : Math::sqr(point[k])) * s;
+                    hess[i][j] += (k == i ? DataType(-a_) : Math::sqr(point[k])) * s;
                 }
                 else
                 {
@@ -4124,7 +4123,7 @@ namespace FEAT
             //TODO: Set x_rel to zero if r is very small?? <- Better conditioning?
             const DataType x_rel = r > DataType(10.)* eps ? x/r : DataType(0);
             DataType phi = Math::acos(x_rel);
-            phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
+            phi = (y >= DataType(0)) ? phi : DataType(2)*Math::pi<DataType>()-phi;
             return alpha * Math::pow(r, k) * Math::sin(k * (phi - offset));
           }
 
@@ -4140,8 +4139,8 @@ namespace FEAT
             //for our base transformation, which are conveniently x_rel and y_rel
             //TODO: This could be badly conditioned for r -> 0, have to test this...
             DataType phi = Math::acos(x_rel);
-            phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
-            const DataType ex = k * Math::pow(r, k-1);
+            phi = (y >= DataType(0)) ? phi : DataType(2)*Math::pi<DataType>()-phi;
+            const DataType ex = k * Math::pow(r, k-DataType(1));
             const DataType sval = Math::sin(k * (phi - offset));
             const DataType cval = Math::cos(k * (phi - offset));
             GradientType grad;
@@ -4158,8 +4157,8 @@ namespace FEAT
             const DataType x_rel = r > DataType(10.)* eps ? x/r : DataType(0);
             const DataType y_rel = r > DataType(10.)* eps ? y/r : DataType(0);
             DataType phi = Math::acos(x_rel);
-            phi = (y >= 0) ? phi : DataType(2)*Math::pi<DataType>()-phi;
-            const DataType ex = k * (k - DataType(1)) * Math::pow(r, k-2);
+            phi = (y >= DataType(0)) ? phi : DataType(2)*Math::pi<DataType>()-phi;
+            const DataType ex = k * (k - DataType(1)) * Math::pow(r, k-DataType(2));
             const DataType sval = Math::sin(k * (phi - offset));
             const DataType cval = Math::cos(k * (phi - offset));
             HessianType hess;
@@ -4228,7 +4227,7 @@ namespace FEAT
 
           GradientType gradient(const PointType& point) const
           {
-            const DataType ex = k * Math::pow(point[0], k-1);
+            const DataType ex = k * Math::pow(point[0], k-DataType(1));
             const DataType sval = Math::sin(k * point[1]);
             const DataType cval = Math::cos(k * point[1]);
             GradientType grad;
@@ -4239,11 +4238,11 @@ namespace FEAT
 
           HessianType hessian(const PointType& point) const
           {
-            const DataType ex = k * Math::pow(point[0], k-2);
+            const DataType ex = k * Math::pow(point[0], k-DataType(2));
             const DataType sval = Math::sin(k * point[1]);
             const DataType cval = Math::cos(k * point[1]);
             HessianType hess;
-            hess[0][0] = alpha * ex * (k-1) * sval;
+            hess[0][0] = alpha * ex * (k-DataType(1)) * sval;
             hess[1][1] = - alpha * ex * Math::sqr(point[0]) * k * sval;
             hess[0][1] = hess[1][0] = alpha * ex * k * point[0] * cval;
             return hess;

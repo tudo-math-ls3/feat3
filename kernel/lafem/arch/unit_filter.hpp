@@ -26,12 +26,14 @@ namespace FEAT
           filter_rhs_generic(v, sv_elements, sv_indices, ue);
         }
 
-        static void filter_rhs(float * v, const float * const sv_elements, const std::uint64_t * const sv_indices, const Index ue)
+        template<typename IT_>
+        static void filter_rhs(float * v, const float * const sv_elements, const IT_* const sv_indices, const Index ue)
         {
           BACKEND_SKELETON_VOID(filter_rhs_cuda, filter_rhs_mkl, filter_rhs_generic, v, sv_elements, sv_indices, ue)
         }
 
-        static void filter_rhs(double * v, const double * const sv_elements, const std::uint64_t * const sv_indices, const Index ue)
+        template<typename IT_>
+        static void filter_rhs(double * v, const double * const sv_elements, const IT_ * const sv_indices, const Index ue)
         {
           BACKEND_SKELETON_VOID(filter_rhs_cuda, filter_rhs_mkl, filter_rhs_generic, v, sv_elements, sv_indices, ue)
         }

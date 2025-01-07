@@ -3929,7 +3929,7 @@ namespace FEAT
           {
             const int i = idx /2;
             const int j = idx %2;
-            b(i,0) = ((i+j)==1 ? (-1) : (1)) * d * a(1-j,1-i);
+            b(i,0) = ((i+j)==1 ? T_(-1) : T_(1)) * d * a(1-j,1-i);
 
           }
           b(0,0) =  d*a(1,1);

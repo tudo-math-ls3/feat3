@@ -57,7 +57,7 @@ void run(PreferredBackend backend)
   run_bench(func, flops, bytes);
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<x.norm2()<<"\n";
+  std::cout<<"control norm: "<<double(x.norm2())<<"\n";
 }
 
 int main(int argc, char ** argv)

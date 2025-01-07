@@ -72,7 +72,7 @@ void run(PreferredBackend backend, const String filename, bool transpose)
   }
 
   MemoryPool::synchronize();
-  std::cout<<"control norm: "<<r.norm_frobenius()<<"\n";
+  std::cout<<"control norm: "<<double(r.norm_frobenius())<<"\n";
 }
 
 int main(int argc, char ** argv)

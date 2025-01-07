@@ -212,12 +212,12 @@ template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData
                                           const std::vector<int*>&, const std::vector<Index>&, double, double);
 template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, float);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, Half);
-template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, Half);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+// template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+// #endif
 
 template void Arch::assemble_defo_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, double);
@@ -237,12 +237,12 @@ template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData
                                           const std::vector<int*>&, const std::vector<Index>&, double, double);
 template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, float);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, Half);
-template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, Half);
-#endif
+// #ifdef FEAT_HAVE_HALFMATH
+// template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+// template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
+//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+// #endif
 
 template void Arch::assemble_defo_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, double);
