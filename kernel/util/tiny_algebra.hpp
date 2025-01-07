@@ -3998,7 +3998,7 @@ namespace FEAT
           {
             const int row = i/n_;
             const int col = i%n_;
-            b.v[row][col] = a.v[row][vol];
+            b.v[row][col] = a.v[row][col];
           }
 
           // create shared pivot array
