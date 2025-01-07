@@ -261,8 +261,17 @@ namespace FEAT
                 vertex_set_out[l1 + 2*i + 2 + of] = vertex_set_in[k1 + i + 1 + oc];
               } // i-loop (cells)
             } // j-loop (Y-slices)
+          } // k-loop
 
-            // calculate indices of the layer between the original coarse mesh layers
+          // calculate indices of the layer between the original coarse mesh layers
+          // this must be a separate loop to avoid race conditions in the OpenMP parallel case
+
+          // loop over all Z-slices of the coarse mesh
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index k = 0; k < l; ++k)
+          {
+            // fine mesh index of the left front vertex of the current slice (= offsets)
+            const Index of = 2*(k+1)*(2*m+1)*(2*n+1);
 
             // loop over all Y-slices
             for(Index j(0); j < 2*n+1; ++j)
@@ -270,9 +279,8 @@ namespace FEAT
               // loop over all cells
               for(Index i(0); i < 2*m+1; ++i)
               {
-                // calculate midpoint
-                vertex_set_out[ i + j*(2*m+1) + of - (2*m+1)*(2*n+1)] = CoordType(0.5) * (
-                  vertex_set_out[i + j*(2*m+1) + of] + vertex_set_out[i + j*(2*m+1) + of - 2*(2*m+1)*(2*n+1)]);
+                vertex_set_out[i + j*(2*m+1) + of - (2*m+1)*(2*n+1)] = CoordType(0.5) *
+                  (vertex_set_out[i + j*(2*m+1) + of] + vertex_set_out[i + j*(2*m+1) + of - 2*(2*m+1)*(2*n+1)]);
               } // i-loop
             } // j-loop
           } // k-loop
