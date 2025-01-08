@@ -33,12 +33,14 @@ FEAT_DISABLE_WARNINGS
 FEAT_RESTORE_WARNINGS
 
 // check if cgal threading support is enabled
+#ifdef FEAT_HAVE_OMP
 #ifndef CGAL_HAS_THREADS
 static_assert(false, "No cgal multithreading support");
 #endif
 
 #ifndef BOOST_HAS_THREADS
 static_assert(false, "Boost has no threads");
+#endif
 #endif
 
 

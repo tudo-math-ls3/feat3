@@ -100,7 +100,7 @@ public:
 
       // now do a omp based loop
       std::vector<int> inside_test2(num_points);
-      #pragma omp parallel for
+      FEAT_PRAGMA_OMP(parallel for)
       for(std::size_t i = 0; i < num_points; ++i)
       {
         // #ifdef FEAT_HAVE_OMP
