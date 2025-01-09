@@ -258,7 +258,7 @@ namespace FEAT
       int failures = 0;
 
       // loop over all compression blocks
-      #pragma omp parallel for schedule(dynamic,1) reduction(+:failures)
+      FEAT_PRAGMA_OMP(parallel for schedule(dynamic,1) reduction(+:failures))
       for(u64 iblock = 0; iblock < header.num_blocks; ++iblock)
       {
         // compute first and last planes
@@ -421,7 +421,7 @@ namespace FEAT
       int failures = 0;
 
       // loop over all compression blocks
-      #pragma omp parallel for schedule(dynamic,1) reduction(+:failures)
+      FEAT_PRAGMA_OMP(parallel for schedule(dynamic,1) reduction(+:failures))
       for(u64 iblock = 0; iblock < header.num_blocks; ++iblock)
       {
         u64 first_plane = iblock * header.planes_per_block;
