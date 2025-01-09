@@ -14,7 +14,7 @@ class BOOST(ThirdpartyPackage):
     self.names = ["boost"]
     self.dirname = "boost_1_80_0"
     self.filename = "boost_1_80_0.tar.gz"
-    self.url = "https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/" + self.filename
+    self.url = "https://archives.boost.io/release/1.80.0/source/" + self.filename
     self.cmake_flags = " -DFEAT_HAVE_BOOST:BOOL=ON -DFEAT_DIRNAME_BOOST:STRING='" + self.dirname + "'"
     self.trunk_dirname = trunk_dirname
     self.target_dirname = trunk_dirname
