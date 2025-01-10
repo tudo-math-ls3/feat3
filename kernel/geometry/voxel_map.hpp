@@ -414,7 +414,7 @@ namespace FEAT
       static constexpr u64 magic_number = 0x70614D6C65786F56ull; // "VoxelMap"
 
       /// size of voxel map header in bytes
-      static constexpr u64 header_size = 128ull;
+      static constexpr u64 header_size = 136ull;
 
       /// size of a real unit (meter) in our internal units (nanometers)
       static constexpr i64 unit_size = 1'000'000'000;
@@ -423,7 +423,7 @@ namespace FEAT
       struct FileHeader
       {
         u64 magic_number;     //< "VoxelMap" = 0x70614D6C65786F56ll
-        u64 header_size;      //< 128 bytes
+        u64 header_size;      //< 136 bytes
         i64 min_x;            //< minimum X-coordinate in nanometer
         i64 max_x;            //< maximum X-coordinate in nanometer
         u64 num_x;            //< number of points in X dimension
@@ -436,9 +436,10 @@ namespace FEAT
         i64 max_z;            //< maximum Z-coordinate in nanometer
         u64 num_z;            //< number of points in Z dimension
         u64 stride_volume;    //< number of bytes for a single uncompressed XYZ-volume; a multiple of 16; usually stride_volume = stride_plane * num_z
+        u64 coverage;         //< coverage of domain in voxel map, relative to unit size
         u64 planes_per_block; //< number of planes per compression block (0 if uncompressed)
         u64 num_blocks;       //< total number of compression blocks (0 if uncompressed)
-      }; // struct FileHeader: 128 bytes
+      }; // struct FileHeader: 136 bytes
 
       /// ensure that we're not compiling on some freak architecture...
       static_assert(sizeof(FileHeader) == header_size, "invalid FileHeader size");
@@ -544,6 +545,8 @@ namespace FEAT
       std::vector<char> _voxel_map;
       /// the out-of-bounds-value for the voxel map
       bool _out_of_bounds_value;
+      /// the coverage of the domain, relative to unit size
+      u64 _coverage;
 
     public:
       /// standard constructor
@@ -600,6 +603,9 @@ namespace FEAT
         XASSERT((dim >= 0) && (dim < 3));
         return Real(this->_bbox_max[std::size_t(dim)]) / Real(unit_size);
       }
+
+      /// Returns the volume of the 1D/2D/3D voxel map bounding box
+      Real get_bounding_box_volume() const;
 
       /**
        * \brief Sets the out-of-bounds value for the voxel map
@@ -676,6 +682,26 @@ namespace FEAT
       const std::vector<char>& get_map() const
       {
         return this->_voxel_map;
+      }
+
+      /**
+       * \brief Returns the domain coverage of the voxel map
+       *
+       * The domain coverage of the voxel map is defined as the number of voxels of value 1 divided
+       * by the total number of voxels. The returned value is always in range [0,1].
+       *
+       * \returns The domain coverage of the voxel map
+       */
+      Real get_domain_coverage() const
+      {
+        // we store the coverage relative to unit size
+        return Real(this->_coverage) / Real(unit_size);
+      }
+
+      /// Returns the covered domain volume
+      Real get_domain_volume() const
+      {
+        return get_domain_coverage() * get_bounding_box_volume();
       }
 
       /**
@@ -1450,6 +1476,11 @@ namespace FEAT
       Real _sample_box(const std::array<i64, 3>& box_min, const std::array<i64, 3>& box_max) const;
 
       /**
+       * \brief Computes the domain coverage of the voxel map.
+       */
+      u64 _compute_domain_coverage() const;
+
+      /**
        * \brief Compresses a voxel map line into the voxel map.
        *
        * \param[in] mask
@@ -1681,6 +1712,13 @@ namespace FEAT
           if(gather_to_all)
             comm.bcast(this->_voxel_map.data(), this->_stride_line * this->_num_lines, 0);
         }
+
+        // compute domain coverage on rank 0
+        if(comm.rank() == 0)
+          this->_coverage = this->_compute_domain_coverage();
+
+        // broadcast domain coverage to all ranks
+        comm.bcast(&this->_coverage, std::size_t(1u), 0);
 
         // that's it
       }

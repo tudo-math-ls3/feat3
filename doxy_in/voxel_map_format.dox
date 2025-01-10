@@ -75,7 +75,7 @@ where DT_ represents the floating point format, e.g. double. The Y- and Z-coordi
 
 A voxel map file consist of three sections:
 
-- 128-byte file header
+- 136-byte file header
 - compression block size array (only if compressed)
 - (compressed) voxel map data
 
@@ -84,12 +84,12 @@ the 64-bit signed integer (i.e. <c>std::int64_t</c> ) stored in little-endian (I
 
 \subsection voxel_map_file_header Voxel Map File Header
 
-The 128-byte file header is defined in FEAT::Geometry::VoxelMap::FileHeader and its entries look like follows:
+The 136-byte file header is defined in FEAT::Geometry::VoxelMap::FileHeader and its entries look like follows:
 
 Offset | Type | Name | Entry
 ------:|-----:|------|------
   0 | u64 | magic_number | must be equal to 0x70614D6C65786F56 = "VoxelMap"
-  8 | u64 | header_size | must be equal to 128
+  8 | u64 | header_size | must be equal to 136
  16 | i64 | min_x | minimum X-coordinate of bounding box
  24 | i64 | max_x | maximum X-coordinate of bounding box
  32 | u64 | num_x | number of points in X-dimension
@@ -102,8 +102,9 @@ Offset | Type | Name | Entry
  88 | i64 | max_z | maximum Z-coordinate of bounding box
  96 | u64 | num_z | number of points in Z-dimension (0 for a 2D voxel map)
 104 | u64 | stride_volume | XYZ-volume stride: see \ref voxel_map_strides
-112 | u64 | planes_per_block | number of planes per compression block (0 if uncompressed)
-120 | u64 | num_blocks | total number of compression blocks (0 if uncompressed)
+112 | u64 | coverage | domain coverage multiplied by 1E+9
+120 | u64 | planes_per_block | number of planes per compression block (0 if uncompressed)
+128 | u64 | num_blocks | total number of compression blocks (0 if uncompressed)
 
 \subsection voxel_map_file_compression_blocks Voxel Map File Compression Blocks
 

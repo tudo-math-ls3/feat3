@@ -126,6 +126,17 @@ namespace VoxelMapGenerator
       std::cout << "Stride Line........: " << stringify(header.stride_line).pad_front(12) << " Bytes\n";
       std::cout << "Stride Plane.......: " << stringify(header.stride_plane).pad_front(12) << " Bytes\n";
       std::cout << "Stride Volume......: " << stringify(header.stride_volume).pad_front(12) << " Bytes\n";
+      double box_vol = 1.0;
+      if(header.num_x > 0u)
+        box_vol *= double(header.max_x - header.min_x) * unit_scale;
+      if(header.num_y > 0u)
+        box_vol *= double(header.max_y - header.min_y) * unit_scale;
+      if(header.num_z > 0u)
+        box_vol *= double(header.max_z - header.min_z) * unit_scale;
+      std::cout << "Bounding Box Volume: " << stringify_fp_sci(box_vol, 3, 12).pad_front(12) << "\n";
+      std::cout << "Domain Volume......: " << stringify_fp_sci(box_vol * double(header.coverage) * unit_scale, 3, 12) << "\n";
+      std::cout << "Domain Coverage....: " << stringify_fp_fix(double(header.coverage) * unit_scale, 6, 12) << "\n";
+
       //std::cout << "Out-Of-Bounds Value: " << (header.flags & Geometry::VoxelMap::file_header_flags_oob_value_true ? "true" : "false") << "\n";
       std::cout << "Planes per Block...: " << stringify(header.planes_per_block).pad_front(12) << "\n";
       std::cout << "Number of Blocks...: " << stringify(header.num_blocks).pad_front(12) << "\n";
@@ -196,11 +207,11 @@ namespace VoxelMapGenerator
           std::cout << "ERROR: num_blocks is > 1 but there is only 1 plane in 2D!\n";
           seems_valid = false;
         }
-        if(header.planes_per_block > 1u)
+        /*if(header.planes_per_block > 1u)
         {
           std::cout << "ERROR: planes_per_block is > 1 but there is only 1 plane in 2D!\n";
           seems_valid = false;
-        }
+        }*/
       }
       else if(header.num_blocks > 0u) // 3D case
       {
@@ -209,11 +220,11 @@ namespace VoxelMapGenerator
           std::cout << "ERROR: num_blocks is bigger than num_z!\n";
           seems_valid = false;
         }
-        if(header.planes_per_block > header.num_z)
+        /*if(header.planes_per_block > header.num_z)
         {
           std::cout << "ERROR: planes_per_block is bigger than num_z!\n";
           seems_valid = false;
-        }
+        }*/
         if(header.num_blocks*header.planes_per_block < header.num_z)
         {
           std::cout << "ERROR: num_blocks*planes_per_block is less than num_z!\n";
@@ -539,6 +550,7 @@ namespace VoxelMapGenerator
       (voxel_map.get_bounding_box_max(2) - voxel_map.get_bounding_box_min(2)) / double(voxel_map.get_num_points(2)): 0.0, 6, 12));
     comm.print("Number of Points Z......: " + stringify(voxel_map.get_num_points(2)).pad_front(12));
     comm.print("Number of Voxels........: " + stringify(voxel_map.get_num_voxels()).pad_front(12));
+    comm.print("Bounding Box Volume.....: " + stringify_fp_sci(voxel_map.get_bounding_box_volume(), 3, 12));
     comm.print("Stride Line.............: " + stringify(voxel_map.get_stride_line()).pad_front(12) + " Bytes");
     comm.print("Stride Plane............: " + stringify(voxel_map.get_stride_plane()).pad_front(12) + " Bytes");
     comm.print("Stride Volume...........: " + stringify(voxel_map.get_stride_volume()).pad_front(12) + " Bytes");
@@ -604,6 +616,9 @@ namespace VoxelMapGenerator
       comm.print("Done! Time for voxel map creation " + watch_create.elapsed_string() + " seconds");
     }
 
+    comm.print("\nDomain Volume...........: " + stringify_fp_sci(voxel_map.get_domain_volume(), 3, 12));
+    comm.print("Domain Coverage.........: " + stringify_fp_fix(voxel_map.get_domain_coverage(), 6, 12));
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -622,9 +637,9 @@ namespace VoxelMapGenerator
         result = voxel_map.write(out_name, compress_size, compress_level);
       comm.barrier();
       watch_write.stop();
-      comm.print("Done! Time for voxel map output " + watch_write.elapsed_string() + " seconds\n");
+      comm.print("Done! Time for voxel map output " + watch_write.elapsed_string() + " seconds");
 
-      comm.print("Total File Size.........: " + stringify_bytes(result.filesize, 3, 12));
+      comm.print("\nTotal File Size.........: " + stringify_bytes(result.filesize, 3, 12));
       if(result.compressed_size > 0u)
       {
         comm.print("Compressed Map Size.....: " + stringify_bytes(result.compressed_size, 3, 12));

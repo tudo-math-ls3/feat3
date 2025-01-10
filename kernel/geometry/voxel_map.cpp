@@ -30,7 +30,8 @@ namespace FEAT
       _num_lines(0u),
       _num_planes(0u),
       _voxel_map(),
-      _out_of_bounds_value(true)
+      _out_of_bounds_value(true),
+      _coverage(0u)
     {
     }
 
@@ -44,7 +45,8 @@ namespace FEAT
       _num_lines(other._num_lines),
       _num_planes(other._num_planes),
       _voxel_map(std::forward<std::vector<char>>(other._voxel_map)),
-      _out_of_bounds_value(other._out_of_bounds_value)
+      _out_of_bounds_value(other._out_of_bounds_value),
+      _coverage(other._coverage)
     {
     }
 
@@ -64,6 +66,7 @@ namespace FEAT
       _num_planes = other._num_planes;
       _voxel_map = std::forward<std::vector<char>>(other._voxel_map);
       _out_of_bounds_value = other._out_of_bounds_value;
+      _coverage = other._coverage;
 
       return *this;
     }
@@ -210,6 +213,7 @@ namespace FEAT
       header.max_z = _bbox_max[2];
       header.num_z = _num_points[2];
       header.stride_volume = _stride_plane * _num_points[2];
+      header.coverage = _coverage;
 
       // _voxel_map may contain trailing padding bytes
       XASSERT(header.stride_volume <= _voxel_map.size());
@@ -382,6 +386,7 @@ namespace FEAT
       _stride_plane = header.stride_plane;
       _num_planes = _num_points[2];
       _num_lines = _num_points[1] * _num_planes;
+      _coverage = header.coverage;
 
       // allocate voxel map
       _voxel_map.resize(header.stride_volume);
@@ -497,6 +502,34 @@ namespace FEAT
     void VoxelMap::render_plane_to_bmp(std::ostream& os, Index width, Index height, Real z_min, Real z_max) const
     {
       _render_plane_to_bmp(os, width, height, i64(z_min * Real(unit_size)), i64(z_max * Real(unit_size)));
+    }
+
+    Real VoxelMap::get_bounding_box_volume() const
+    {
+      if(_num_points[2] > 0u)
+        return Real(_bbox_max[2] - _bbox_min[2]) * Real(_bbox_max[1] - _bbox_min[1]) * Real(_bbox_max[0] - _bbox_min[0]) / Math::cub(Real(unit_size));
+      if(_num_points[1] > 0u)
+        return Real(_bbox_max[1] - _bbox_min[1]) * Real(_bbox_max[0] - _bbox_min[0]) / Math::sqr(Real(unit_size));
+      if(_num_points[0] > 0u)
+        return Real(_bbox_max[0] - _bbox_min[0]) / Real(unit_size);
+      return Real(0);
+    }
+
+    u64 VoxelMap::_compute_domain_coverage() const
+    {
+      if(_voxel_map.empty())
+        return u64(0);
+
+      u64 count(0u), n(_voxel_map.size()), nv(get_num_voxels());
+      FEAT_PRAGMA_OMP(parallel for reduction(+:count))
+      for(u64 i = 0u; i < n; ++i)
+      {
+        for(int k = 0; k < 8; ++k)
+          count += u64((_voxel_map[i] >> k) & 1);
+      }
+
+      // convert coverage relative to unit size
+      return (count*unit_size) / nv;
     }
 
     u64 VoxelMap::_map_coord_idx_nearest(i64 xyz, std::size_t sdim) const
