@@ -197,6 +197,34 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(point[1], spoint[1], tol);
       TEST_CHECK_EQUAL_WITHIN_EPS(point[2], spoint[2], tol);
     }
+
+    {
+      std::stringstream mts;
+      mts<<"OFF\n";
+      mts<<"4 4 6\n";
+      mts<<"0.0 0.0 2.0\n";
+      mts<<"1.632993 -0.942809 -0.666667\n";
+      mts<<"0.000000 1.885618 -0.666667\n";
+      mts<<"-1.632993 -0.942809 -0.666667\n";
+      mts<<"3 1 0 3\n";
+      mts<<"3 2 0 1\n";
+      mts<<"3 3 0 2\n";
+      mts<<"3 3 2 1\n";
+
+      CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+      // closest point is a vertex
+      DT_ d1 = cw.squared_distance(DT_(0.0), DT_(2.0), DT_(-0.666667));
+      TEST_CHECK_EQUAL_WITHIN_EPS(d1, DT_(0.013083241924), DT_(1E-3));
+
+      // closest point is on an edge
+      DT_ d2 = cw.squared_distance(DT_(0.4), DT_(-1.0), DT_(-1.0));
+      TEST_CHECK_EQUAL_WITHIN_EPS(d2, DT_(0.11438169937), DT_(1E-3));
+
+      // closest point is on a face
+      DT_ d3 = cw.squared_distance(DT_(0.0), DT_(0.0), DT_(-1.0));
+      TEST_CHECK_EQUAL_WITHIN_EPS(d3, DT_(0.111110888889), DT_(1E-3));
+    }
   }
 };
 
