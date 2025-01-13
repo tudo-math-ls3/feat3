@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('poisson__assembler_8cpp_source.html','
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="keyword">typedef</span> <a class="code hl_class" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix&lt;DataType, num_loc_dofs, num_loc_dofs&gt;</a> LocMatType;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">        #pragma omp parallel for</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idx = 0; idx &lt; coloring_size; ++idx)</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        {</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>          <span class="comment">// define local coefficients</span></div>

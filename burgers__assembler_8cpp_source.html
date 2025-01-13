@@ -163,7 +163,7 @@ $(document).ready(function(){initNavTree('burgers__assembler_8cpp_source.html','
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="keyword">typedef</span> <a class="code hl_class" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector&lt;VecValueType, num_loc_dofs&gt;</a> LocalVectorType;</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="keyword">typedef</span> <a class="code hl_class" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix&lt;MatValueType, num_loc_dofs, num_loc_dofs&gt;</a> LocalMatrixType;</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">        #pragma omp parallel for</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idx = 0; idx &lt; coloring_size; ++idx)</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        {</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>          <span class="comment">// define local coefficients</span></div>
@@ -229,7 +229,7 @@ $(document).ready(function(){initNavTree('burgers__assembler_8cpp_source.html','
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="keyword">typedef</span> <a class="code hl_class" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector&lt;VecValueType, num_loc_dofs&gt;</a> LocalVectorType;</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="comment">// typedef Tiny::Matrix&lt;MatValueType, num_loc_dofs, num_loc_dofs&gt; LocalMatrixType;</span></div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="preprocessor">        #pragma omp parallel for</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idx = 0; idx &lt; coloring_size; ++idx)</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        {</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>          <span class="comment">//define local array</span></div>
@@ -268,7 +268,7 @@ $(document).ready(function(){initNavTree('burgers__assembler_8cpp_source.html','
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>      {</div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        DT_ max_val(DT_(0));</div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <span class="comment">// simply reduce over max_val</span></div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="preprocessor">        #pragma omp parallel for reduction(max : max_val)</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span> reduction(max : max_val))</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; int(vec_size); ++i)</div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        {</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>          <span class="comment">//synchronize all threads in block, to guarentee that all values are written</span></div>

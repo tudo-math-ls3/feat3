@@ -353,26 +353,34 @@ $(document).ready(function(){initNavTree('structured__vertex__refiner_8hpp_sourc
 <div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>                vertex_set_out[l1 + 2*i + 2 + of] = vertex_set_in[k1 + i + 1 + oc];</div>
 <div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>              } <span class="comment">// i-loop (cells)</span></div>
 <div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>            } <span class="comment">// j-loop (Y-slices)</span></div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span> </div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>            <span class="comment">// calculate indices of the layer between the original coarse mesh layers</span></div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>            <span class="comment">// loop over all Y-slices</span></div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>            <span class="keywordflow">for</span>(Index j(0); j &lt; 2*n+1; ++j)</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            {</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>              <span class="comment">// loop over all cells</span></div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>              <span class="keywordflow">for</span>(Index i(0); i &lt; 2*m+1; ++i)</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>              {</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>                <span class="comment">// calculate midpoint</span></div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>                vertex_set_out[ i + j*(2*m+1) + of - (2*m+1)*(2*n+1)] = CoordType(0.5) * (</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>                  vertex_set_out[i + j*(2*m+1) + of] + vertex_set_out[i + j*(2*m+1) + of - 2*(2*m+1)*(2*n+1)]);</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>              } <span class="comment">// i-loop</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>            } <span class="comment">// j-loop</span></div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>          } <span class="comment">// k-loop</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        }</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>      }; <span class="comment">// class StructuredVertexRefiner&lt;Hypercube&lt;3&gt;,...&gt;</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    } <span class="comment">// namespace Intern</span></div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="comment"></span>  } <span class="comment">// namespace Geometry</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>          } <span class="comment">// k-loop</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>          <span class="comment">// calculate indices of the layer between the original coarse mesh layers</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>          <span class="comment">// this must be a separate loop to avoid race conditions in the OpenMP parallel case</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>          <span class="comment">// loop over all Z-slices of the coarse mesh</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>          FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>          <span class="keywordflow">for</span>(Index k = 0; k &lt; l; ++k)</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>          {</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>            <span class="comment">// fine mesh index of the left front vertex of the current slice (= offsets)</span></div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> of = 2*(k+1)*(2*m+1)*(2*n+1);</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>            <span class="comment">// loop over all Y-slices</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>            <span class="keywordflow">for</span>(Index j(0); j &lt; 2*n+1; ++j)</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>            {</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>              <span class="comment">// loop over all cells</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>              <span class="keywordflow">for</span>(Index i(0); i &lt; 2*m+1; ++i)</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>              {</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>                vertex_set_out[i + j*(2*m+1) + of - (2*m+1)*(2*n+1)] = CoordType(0.5) *</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>                  (vertex_set_out[i + j*(2*m+1) + of] + vertex_set_out[i + j*(2*m+1) + of - 2*(2*m+1)*(2*n+1)]);</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>              } <span class="comment">// i-loop</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>            } <span class="comment">// j-loop</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>          } <span class="comment">// k-loop</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        }</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>      }; <span class="comment">// class StructuredVertexRefiner&lt;Hypercube&lt;3&gt;,...&gt;</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    } <span class="comment">// namespace Intern</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="comment"></span>  } <span class="comment">// namespace Geometry</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>} <span class="comment">// namespace FEAT</span></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

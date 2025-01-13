@@ -30,5 +30,7 @@ var namespace_f_e_a_t_1_1_tiny =
     [ "operator+", "namespace_f_e_a_t_1_1_tiny.html#a1f0c9430126591bbe6bf1a7f29968199", null ],
     [ "operator-", "namespace_f_e_a_t_1_1_tiny.html#a7ee02310598f2def0c75343d4cf6752f", null ],
     [ "operator-", "namespace_f_e_a_t_1_1_tiny.html#adf6f10c8bf06b44e458c2d9db017dc2b", null ],
-    [ "orthogonal", "namespace_f_e_a_t_1_1_tiny.html#a9344efef35bf6a53de992d9390f7f3a1", null ]
+    [ "orthogonal", "namespace_f_e_a_t_1_1_tiny.html#a9344efef35bf6a53de992d9390f7f3a1", null ],
+    [ "orthogonal_2x1", "namespace_f_e_a_t_1_1_tiny.html#a71c5bd6fb57e66e9843e1c81f970355d", null ],
+    [ "orthogonal_3x2", "namespace_f_e_a_t_1_1_tiny.html#a2ac5fcc9e4f088cd8775aa38eb9abf2d", null ]
 ];

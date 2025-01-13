@@ -92,6 +92,8 @@ var namespace_f_e_a_t_1_1_geometry =
     [ "VoxelMapFileError", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_file_error.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_file_error" ],
     [ "VoxelMapFormulaParseError", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_formula_parse_error.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_formula_parse_error" ],
     [ "VoxelMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker" ],
+    [ "i64", "namespace_f_e_a_t_1_1_geometry.html#af3db3da9c05fffceb51e11c1ca9b858e", null ],
+    [ "u64", "namespace_f_e_a_t_1_1_geometry.html#a974fef8f8f837250e37e0e263385aae3", null ],
     [ "AdaptMode", "namespace_f_e_a_t_1_1_geometry.html#a797be214520f0316a0c7c0b5b57e61cb", [
       [ "none", "namespace_f_e_a_t_1_1_geometry.html#a797be214520f0316a0c7c0b5b57e61cba334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "chart", "namespace_f_e_a_t_1_1_geometry.html#a797be214520f0316a0c7c0b5b57e61cbab50951613bcd649dc2f9fe580866fe38", null ],

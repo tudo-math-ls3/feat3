@@ -51,5 +51,6 @@ var dir_db5a6010996256d141ba9905bf0e6601 =
     [ "target_set.hpp", "target__set_8hpp_source.html", null ],
     [ "unit_cube_patch_generator.hpp", "unit__cube__patch__generator_8hpp_source.html", null ],
     [ "vertex_set.hpp", "vertex__set_8hpp_source.html", null ],
+    [ "voxel_map.cpp", "voxel__map_8cpp_source.html", null ],
     [ "voxel_map.hpp", "voxel__map_8hpp_source.html", null ]
 ];

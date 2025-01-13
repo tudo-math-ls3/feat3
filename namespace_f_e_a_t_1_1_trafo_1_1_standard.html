@@ -148,10 +148,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a4753e53e2670882c652bacfe0b6b917d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html#a4753e53e2670882c652bacfe0b6b917d">inverse_mapping</a> (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, 3, sc_ &gt; &amp;coeffs, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, 3, sp_ &gt; &amp;point, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, 3, 3, smx_, snx_ &gt; &amp;x)</td></tr>
 <tr class="memdesc:a4753e53e2670882c652bacfe0b6b917d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the inverse coordinate mapping wrt. a Simplex&lt;2&gt; in 3d.  <a href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html#a4753e53e2670882c652bacfe0b6b917d">More...</a><br /></td></tr>
 <tr class="separator:a4753e53e2670882c652bacfe0b6b917d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f832b36e38432625a72fc8dafd03e39"><td class="memTemplParams" colspan="2">template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&gt; </td></tr>
-<tr class="memitem:a7f832b36e38432625a72fc8dafd03e39"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html#a7f832b36e38432625a72fc8dafd03e39">inverse_mapping</a> (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, world_dim, sc_ &gt; &amp;coeffs, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, world_dim, sp_ &gt; &amp;point, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, world_dim+1, world_dim, smx_, snx_ &gt; &amp;x)</td></tr>
-<tr class="memdesc:a7f832b36e38432625a72fc8dafd03e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the inverse coordinate mapping wrt. a full-dimensional Simplex.  <a href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html#a7f832b36e38432625a72fc8dafd03e39">More...</a><br /></td></tr>
-<tr class="separator:a7f832b36e38432625a72fc8dafd03e39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4915cedc3a24c8e238e5c6ae86ea6de1"><td class="memTemplParams" colspan="2">template&lt;typename DT_ , int helper_dim, int world_dim, int sc_, int sp_, int smx_, int snx_, typename std::enable_if&lt; helper_dim==world_dim+1, bool &gt;::type  = true&gt; </td></tr>
+<tr class="memitem:a4915cedc3a24c8e238e5c6ae86ea6de1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html#a4915cedc3a24c8e238e5c6ae86ea6de1">inverse_mapping</a> (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, world_dim, sc_ &gt; &amp;coeffs, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, world_dim, sp_ &gt; &amp;point, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, helper_dim, world_dim, smx_, snx_ &gt; &amp;x)</td></tr>
+<tr class="memdesc:a4915cedc3a24c8e238e5c6ae86ea6de1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the inverse coordinate mapping wrt. a full-dimensional Simplex.  <a href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html#a4915cedc3a24c8e238e5c6ae86ea6de1">More...</a><br /></td></tr>
+<tr class="separator:a4915cedc3a24c8e238e5c6ae86ea6de1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p ><a class="el" href="namespace_f_e_a_t_1_1_trafo_1_1_standard.html" title="Standard Transformation namespace.">Standard</a> Transformation namespace. </p>
@@ -227,7 +227,7 @@ template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&g
 
 <p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00141">141</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02373">FEAT::Tiny::dot()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00660">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid()</a>, and <a class="el" href="math_8hpp_source.html#l00095">FEAT::Math::sqr()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02853">FEAT::Tiny::dot()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01019">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid()</a>, and <a class="el" href="math_8hpp_source.html#l00095">FEAT::Math::sqr()</a>.</p>
 
 </div>
 </div>
@@ -295,17 +295,17 @@ template&lt;typename DT_ , int sc_, int sp_, int smx_, int snx_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00205">205</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00435">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::normalize()</a>, <a class="el" href="namespace_f_e_a_t_1_1_tiny.html#a9344efef35bf6a53de992d9390f7f3a1">FEAT::Tiny::orthogonal()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01251">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_inverse()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00501">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::normalize()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02295">FEAT::Tiny::orthogonal_3x2()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01686">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_inverse()</a>.</p>
 
 </div>
 </div>
-<a id="a7f832b36e38432625a72fc8dafd03e39" name="a7f832b36e38432625a72fc8dafd03e39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f832b36e38432625a72fc8dafd03e39">&#9670;&#160;</a></span>inverse_mapping() <span class="overload">[3/3]</span></h2>
+<a id="a4915cedc3a24c8e238e5c6ae86ea6de1" name="a4915cedc3a24c8e238e5c6ae86ea6de1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4915cedc3a24c8e238e5c6ae86ea6de1">&#9670;&#160;</a></span>inverse_mapping() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&gt; </div>
+template&lt;typename DT_ , int helper_dim, int world_dim, int sc_, int sp_, int smx_, int snx_, typename std::enable_if&lt; helper_dim==world_dim+1, bool &gt;::type  = true&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void FEAT::Trafo::Standard::inverse_mapping </td>
@@ -322,7 +322,7 @@ template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&g
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, world_dim+1, world_dim, smx_, snx_ &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, helper_dim, world_dim, smx_, snx_ &gt; &amp;&#160;</td>
           <td class="paramname"><em>x</em>&#160;</td>
         </tr>
         <tr>
@@ -371,9 +371,9 @@ template&lt;typename DT_ , int world_dim, int sc_, int sp_, int smx_, int snx_&g
 <p> If \( \exists j \in \{ 0, \dots, s \}: \lambda_j &lt; 0 \), then \( x \notin S \) and \( x \) lies on the far side of the plane defined by the facet opposite vertex \( j \). This makes the barycentric coordinates very handy for finding out in which direction of a given simplex a point lies.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00068">68</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00069">69</a> of file <a class="el" href="standard_2inverse__mapping_8hpp_source.html">inverse_mapping.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l01251">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_inverse()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l01686">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_inverse()</a>.</p>
 
 </div>
 </div>
