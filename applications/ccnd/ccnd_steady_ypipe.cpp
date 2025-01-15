@@ -18,6 +18,7 @@
 //          - ypipe_3vs5_2d_quad_32.xml
 //          - ypipe_2d_fbm_quad_6.xml
 // * 'fork' : solve one the fork domain represented by the following meshes:
+//          - fork_pipe_2d_quad_126.xml
 //          - fork_pipe_2d_fbm_quad_2.xml
 //
 // --fbm
