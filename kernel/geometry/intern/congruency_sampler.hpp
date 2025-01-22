@@ -78,12 +78,21 @@ namespace FEAT
           typename Target_>
         static int compare(const Source_& src, const Target_& trg)
         {
-          Index sv0 = src[0];
-          if(sv0 == trg[0])
+          return compare_with(src, trg, [](const auto& a, const auto& b) { return a == b; });
+        }
+
+        template<
+          typename Source_,
+          typename Target_,
+          typename Comparator_>
+        static int compare_with(const Source_& src, const Target_& trg, const Comparator_& comp)
+        {
+          auto sv0 = src[0];
+          if(comp(sv0, trg[0]))
           {
             return 0;
           }
-          else if(sv0 == trg[1])
+          else if(comp(sv0, trg[1]))
           {
             return 1;
           }
@@ -129,37 +138,46 @@ namespace FEAT
           typename Target_>
         static int compare(const Source_& src, const Target_& trg)
         {
-          Index sv0 = src[0];
-          Index sv1 = src[1];
-          if(sv0 == trg[0])
+          return compare_with(src, trg, [](const auto& a, const auto& b) { return a == b; });
+        }
+
+        template<
+          typename Source_,
+          typename Target_,
+          typename Comparator_>
+        static int compare_with(const Source_& src, const Target_& trg, const Comparator_& comp)
+        {
+          auto sv0 = src[0];
+          auto sv1 = src[1];
+          if(comp(sv0, trg[0]))
           {
-            if(sv1 == trg[1])
+            if(comp(sv1, trg[1]))
             {
               return 0;
             }
-            else if(sv1 == trg[2])
+            else if(comp(sv1, trg[2]))
             {
               return 4;
             }
           }
-          else if(sv0 == trg[1])
+          else if(comp(sv0, trg[1]))
           {
-            if(sv1 == trg[2])
+            if(comp(sv1, trg[2]))
             {
               return 1;
             }
-            else if(sv1 == trg[0])
+            else if(comp(sv1, trg[0]))
             {
               return 5;
             }
           }
-          else if(sv0 == trg[2])
+          else if(comp(sv0, trg[2]))
           {
-            if(sv1 == trg[0])
+            if(comp(sv1, trg[0]))
             {
               return 2;
             }
-            else if(sv1 == trg[1])
+            else if(comp(sv1, trg[1]))
             {
               return 6;
             }
@@ -198,12 +216,21 @@ namespace FEAT
           typename Target_>
         static int compare(const Source_& src, const Target_& trg)
         {
-          Index sv0 = src[0];
-          if(sv0 == trg[0])
+          return compare_with(src, trg, [](const auto& a, const auto& b) { return a == b; });
+        }
+
+        template<
+          typename Source_,
+          typename Target_,
+          typename Comparator_>
+        static int compare_with(const Source_& src, const Target_& trg, const Comparator_& comp)
+        {
+          auto sv0 = src[0];
+          if(comp(sv0, trg[0]))
           {
             return 0;
           }
-          else if(sv0 == trg[1])
+          else if(comp(sv0, trg[1]))
           {
             return 1;
           }
@@ -247,48 +274,57 @@ namespace FEAT
           typename Target_>
         static int compare(const Source_& src, const Target_& trg)
         {
-          Index sv0 = src[0];
-          Index sv1 = src[1];
-          if(sv0 == trg[0])
+          return compare_with(src, trg, [](const auto& a, const auto& b) { return a == b; });
+        }
+
+        template<
+          typename Source_,
+          typename Target_,
+          typename Comparator_>
+        static int compare_with(const Source_& src, const Target_& trg, const Comparator_& comp)
+        {
+          auto sv0 = src[0];
+          auto sv1 = src[1];
+          if(comp(sv0, trg[0]))
           {
-            if(sv1 == trg[1])
+            if(comp(sv1, trg[1]))
             {
               return 0;
             }
-            else if(sv1 == trg[2])
+            else if(comp(sv1, trg[2]))
             {
               return 4;
             }
           }
-          else if(sv0 == trg[1])
+          else if(comp(sv0, trg[1]))
           {
-            if(sv1 == trg[3])
+            if(comp(sv1, trg[3]))
             {
               return 1;
             }
-            else if(sv1 == trg[0])
+            else if(comp(sv1, trg[0]))
             {
               return 5;
             }
           }
-          else if(sv0 == trg[2])
+          else if(comp(sv0, trg[2]))
           {
-            if(sv1 == trg[0])
+            if(comp(sv1, trg[0]))
             {
               return 2;
             }
-            else if(sv1 == trg[3])
+            else if(comp(sv1, trg[3]))
             {
               return 6;
             }
           }
-          else if(sv0 == trg[3])
+          else if(comp(sv0, trg[3]))
           {
-            if(sv1 == trg[2])
+            if(comp(sv1, trg[2]))
             {
               return 3;
             }
-            else if(sv1 == trg[1])
+            else if(comp(sv1, trg[1]))
             {
               return 7;
             }

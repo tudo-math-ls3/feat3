@@ -118,6 +118,7 @@ set(test_list
   string_mapped-test
   tiny_algebra-test
   xml_scanner-test
+  slotmap-test
 )
 
 include(FEATKernelTests)

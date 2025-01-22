@@ -28,6 +28,9 @@ target_link_libraries(tutorial-07-stokes feat)
 add_executable(tutorial-08-meshfile tutorial_08_meshfile.cpp)
 target_link_libraries(tutorial-08-meshfile feat)
 
+add_executable(tutorial-09-adaptivemesh tutorial_09_adaptivemesh.cpp)
+target_link_libraries(tutorial-09-adaptivemesh feat)
+
 # tutorials target
 add_custom_target(tutorials DEPENDS
   tutorial-01-poisson
@@ -38,4 +41,5 @@ add_custom_target(tutorials DEPENDS
   tutorial-06-global
   tutorial-07-stokes
   tutorial-08-meshfile
+  tutorial-09-adaptivemesh
 )

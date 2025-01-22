@@ -72,6 +72,7 @@ PRIVATE
 
 # list of geometry tests
 set(test_list
+  adaptive_refinement-test
   boundary_factory-test
   cgal-test
   hit_test_factory-test
@@ -87,6 +88,7 @@ set(test_list
   standard_refinery-test-struct-hexa
   struct_index_mapping-test
   parsed_hit_test_factory-test
+  template_builder-test
 )
 
 include(FEATKernelTests)
