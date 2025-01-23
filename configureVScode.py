@@ -131,6 +131,9 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("--restrict_errors")
   print ("  Abort compilation after an error is encountered.")
   print ("")
+  print ("--allow_unsupported_compiler")
+  print ("  Adds a flag to allow for unsupported host compiler for nvcc.")
+  print ("")
   print ("Note that the first gcc(g++) in $PATH is choosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
@@ -336,6 +339,10 @@ for option in extra_options:
     unused_extra_options.remove(option)
     restrict_errors = True
 
+  if option.startswith("--allow_unsupported_compiler"):
+    unused_extra_options.remove(option)
+    cmake_flags += " -DFEAT_ALLOW_UNSUPPORTED_COMPILER:BOOL=ON"
+
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
   cmake_flags["FEAT_HAVE_MKL"] = "ON"
@@ -443,7 +450,7 @@ if "cuda" in buildid:
     cmake_flags["FEAT_CUDAMEMCHECK"] = "ON"
 
   if not cuda_host_compiler:
-    cuda_host_compiler = find_exe("g++")
+    cuda_host_compiler = find_exe(compiler_cxx)
   cmake_flags["FEAT_CUDA_HOST_COMPILER"] = cuda_host_compiler
   dic_json['cuda'] = {
     'default':'cuda',

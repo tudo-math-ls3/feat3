@@ -188,6 +188,9 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("--prefer_external_libraries")
   print ("  If available, prefer libraries included in system path and do not download thirdparties.")
   print ("")
+  print ("--allow_unsupported_compiler")
+  print ("  Adds a flag to allow for unsupported host compiler for nvcc.")
+  print ("")
   print ("Note that the first gcc(g++) in $PATH is chosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
@@ -457,6 +460,10 @@ for option in extra_options:
     prefer_external_libs = True
     cmake_flags += " -DFEAT_PREFER_EXTERNAL_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release"
 
+  if option.startswith("--allow_unsupported_compiler"):
+    unused_extra_options.remove(option)
+    cmake_flags += " -DFEAT_ALLOW_UNSUPPORTED_COMPILER:BOOL=ON"
+
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
 if is_subdirectory(os.getcwd(), sys.argv[0][:-9]):
@@ -658,8 +665,9 @@ if "cuda" in buildid:
     remove_string(unused_tokens, "cudamemcheck")
     cmake_flags += " -DFEAT_CUDAMEMCHECK:BOOL=ON"
 
+  # if no cuda_host compiler is explicitly picked, we default to our base compiler
   if not cuda_host_compiler:
-    cuda_host_compiler = find_exe("g++")
+    cuda_host_compiler = find_exe(compiler_cxx)
   cmake_flags += " -DFEAT_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
 
   if "cudss" in buildid:
