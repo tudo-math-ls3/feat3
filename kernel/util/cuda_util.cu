@@ -215,9 +215,6 @@ void FEAT::Util::cuda_finalize()
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "Pending cuda errors occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
-
-  if (cudaSuccess != cudaDeviceReset())
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceReset failed!");
 }
 
 void FEAT::Util::cuda_synchronize()

@@ -190,6 +190,14 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("")
   print ("--allow_unsupported_compiler")
   print ("  Adds a flag to allow for unsupported host compiler for nvcc.")
+  print (" Ignored if not linked against cuda.")
+  print ("")
+  print ("--finalize_resets_device")
+  print (" This option controls whether the cuda device is reset explicitly at the end of the finalize call")
+  print (" in the runtime. While resetting is generally not reuqired, this can help to mitigate false postive memory leaks")
+  print (" as well as allow for correct profiling. On the other hand, activating this by default can lead to cuda context errors in")
+  print (" in applications that link against FEAT, so this is optional.")
+  print (" Ignored if not linked against cuda.")
   print ("")
   print ("Note that the first gcc(g++) in $PATH is chosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
@@ -463,6 +471,10 @@ for option in extra_options:
   if option.startswith("--allow_unsupported_compiler"):
     unused_extra_options.remove(option)
     cmake_flags += " -DFEAT_ALLOW_UNSUPPORTED_COMPILER:BOOL=ON"
+
+  if option.startswith("--finalize_resets_device"):
+    unused_extra_options.remove(option)
+    cmake_flags += " -DFEAT_FINALIZE_RESETS_DEVICE:BOOL=ON"
 
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]

@@ -24,7 +24,9 @@ set(KERNEL_LIBRARY_FILES
 
 # add kernel-root library
 add_library(kernel-root STATIC ${KERNEL_LIBRARY_FILES})
-
+if (FEAT_FINALIZE_RESETS_DEVICE)
+  target_compile_definitions(kernel-root PRIVATE FEAT_FINALIZE_RESETS_DEVICE)
+endif (FEAT_FINALIZE_RESETS_DEVICE)
 # kernel-root and kernel-util have cyclic dependency
 target_link_libraries(kernel-root PRIVATE kernel-util)
 target_link_libraries(kernel-util PRIVATE kernel-root)

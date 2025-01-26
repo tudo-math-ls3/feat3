@@ -442,6 +442,13 @@ int Runtime::finalize()
   // finalize Likwid markerAPI
   FEAT_MARKER_CLOSE;
 
+  // reset device, which is/can be nesessary to have sanitizer and profiler work properly
+  // this should not be called, if there are other cuda contexts live while FEAT is finalized,
+  // for example if MPI is initilized by another library which shares the same process, or a feat app
+  // is called by another app without reinitializing the cuda device
+#if defined(FEAT_HAVE_CUDA) && defined(FEAT_FINALIZE_RESETS_DEVICE)
+  Util::cuda_reset_device();
+#endif
   _finalized = true;
 
   // return successful exit code
