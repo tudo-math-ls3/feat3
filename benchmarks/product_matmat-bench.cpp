@@ -59,7 +59,7 @@ void run(PreferredBackend backend)
         break;
       }
 
-#ifdef FEAT_HAVE_MKL
+#if defined(FEAT_HAVE_MKL) && !defined(FEAT_HAVE_HALF)
     case PreferredBackend::mkl :
       {
         auto func = [&] () { Arch::ProductMatMat::dense_mkl(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.rows(), r.columns(), x.columns()); };
