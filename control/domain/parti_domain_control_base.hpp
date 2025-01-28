@@ -353,6 +353,7 @@ namespace FEAT
             // first level index?
             if(i == std::size_t(0))
             {
+              // if the process count is given, it must match the communicator size
               if((nprocs >= 0) && (nprocs != this->_comm.size()))
                 throw ParseError("Invalid number of processes for global level: '" + slvls.at(i) +
                   "', expected " + stringify(this->_comm.size()) + " but got " + stringify(nprocs));
@@ -360,26 +361,25 @@ namespace FEAT
               continue;
             }
 
-            // make sure the level is non-ascending
+            // make sure the level parameter is non-ascending
             if(_desired_levels.back().first < ilvl)
               throw ParseError("Invalid non-descending level index: '" + slvls.at(i) +
                 "', expected <= " + stringify(_desired_levels.back().first) + " but got " + stringify(ilvl));
 
-            // make sure process count is valid
+            // ignore process count for last level
             if((i + 1) == slvls.size())
               nprocs = 0;
-            else
-            {
-              // the process count must be descending
-              if(_desired_levels.back().second <= nprocs)
-                throw ParseError("Invalid non-descending process count: '" + slvls.at(i) +
-                  "', expected < " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
-
-              // the previous process count must be a multiple
-              if(_desired_levels.back().second % nprocs != 0)
-                throw ParseError("Invalid indivisible process count: '" + slvls.at(i) +
-                  "', expected a divisor of " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
-            }
+            // if the number of processes is identical to the previous one, simply ignore this parameter
+            else if(_desired_levels.back().second == nprocs)
+              continue;
+            // the process count must not be ascending
+            else if(_desired_levels.back().second < nprocs)
+              throw ParseError("Invalid non-descending process count: '" + slvls.at(i) +
+                "', expected < " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
+            // the previous process count must be a multiple of the new one
+            else if(_desired_levels.back().second % nprocs != 0)
+              throw ParseError("Invalid indivisible process count: '" + slvls.at(i) +
+                "', expected a divisor of " + stringify(_desired_levels.back().second) + " but got " + stringify(nprocs));
 
             // push the level-proc pair
             _desired_levels.push_back(std::make_pair(ilvl, nprocs));
