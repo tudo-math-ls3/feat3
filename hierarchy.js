@@ -232,6 +232,7 @@ var hierarchy =
       [ "FEAT::Analytic::Common::ConstantVectorFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_constant_vector_function.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2D< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2DRadial< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial.html", null ],
+      [ "FEAT::Analytic::Common::DFG95SteadyInflowFunction< dim_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_d_f_g95_steady_inflow_function.html", null ],
       [ "FEAT::Analytic::Common::Frankes3DVariantFunction< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes3_d_variant_function.html", null ],
       [ "FEAT::Analytic::Common::FrankesFunction< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html", null ],
       [ "FEAT::Analytic::Common::GuermondStokesSol< DT_, dim_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html", null ],
@@ -281,6 +282,7 @@ var hierarchy =
       [ "FEAT::Analytic::AutoDerive< Function_, DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_auto_derive_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2D< DT_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::CornerSingularity2DRadial< DT_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::Common::DFG95SteadyInflowFunction< dim_, DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_d_f_g95_steady_inflow_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ParProfileScalar< DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_scalar_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::ParProfileVector< DataType_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_par_profile_vector_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Common::SphereCapFunction< dim_, a_ >::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sphere_cap_function_1_1_evaluator.html", null ],
@@ -902,6 +904,7 @@ var hierarchy =
         [ "FEAT::Solver::PreconditionedIterativeSolver< Matrix_::VectorTypeR >", "class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html", [
           [ "FEAT::Solver::BiCGStab< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html", null ],
           [ "FEAT::Solver::BiCGStabL< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab_l.html", null ],
+          [ "FEAT::Solver::Descent< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_descent.html", null ],
           [ "FEAT::Solver::FGMRES< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html", null ],
           [ "FEAT::Solver::GMRES< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html", null ],
           [ "FEAT::Solver::GroppPCG< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html", null ],

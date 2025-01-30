@@ -14,6 +14,7 @@ var class_f_e_a_t_1_1_tiny_1_1_matrix =
     [ "add_scalar_main_diag", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a1c34fdf3c13f041e4ce8ff4a1c4c245e", null ],
     [ "add_vec_tensor_mult", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a394c5387aa01f3bbada32a1063dfe85a", null ],
     [ "axpy", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a4b6d072a513dff3dc17f3fedc2bcd159", null ],
+    [ "convert", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#aaaff4536e41515c7e3e67e0f47b8e634", null ],
     [ "copy", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#af1befa65ef0877b7a5d31c7847b090cb", null ],
     [ "copy_n", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#acfefbf1f182f23a619b148e7970dab13", null ],
     [ "det", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a082da7f5cb19c491f51878da89edff89", null ],

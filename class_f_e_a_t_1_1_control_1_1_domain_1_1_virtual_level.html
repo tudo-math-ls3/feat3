@@ -134,6 +134,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a792f28aca153c8250caf4022ed260eef"><td class="memItemLeft" align="right" valign="top"><a id="a792f28aca153c8250caf4022ed260eef" name="a792f28aca153c8250caf4022ed260eef"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>VirtualLevel</b> (<a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">VirtualLevel</a> &amp;&amp;)=default</td></tr>
 <tr class="separator:a792f28aca153c8250caf4022ed260eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcd49aa9b7f423e7fc45aa7d5827ef3b"><td class="memTemplParams" colspan="2">template&lt;typename Lambda_ &gt; </td></tr>
+<tr class="memitem:afcd49aa9b7f423e7fc45aa7d5827ef3b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html#afcd49aa9b7f423e7fc45aa7d5827ef3b">apply_lambda</a> (Lambda_ &amp;&amp;lambda)</td></tr>
+<tr class="memdesc:afcd49aa9b7f423e7fc45aa7d5827ef3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies a lambda expression onto every level object in this virtual level.  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html#afcd49aa9b7f423e7fc45aa7d5827ef3b">More...</a><br /></td></tr>
+<tr class="separator:afcd49aa9b7f423e7fc45aa7d5827ef3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e7976152ead842f3ed2a29020767b81"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html#a0e7976152ead842f3ed2a29020767b81">bytes</a> () const</td></tr>
 <tr class="separator:a0e7976152ead842f3ed2a29020767b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9731b8c470dddc02731ee82d5edcaa1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html#ad9731b8c470dddc02731ee82d5edcaa1">has_base</a> () const</td></tr>
@@ -222,7 +226,7 @@ class FEAT::Control::Domain::VirtualLevel&lt; DomLvl_ &gt;</div><p >Virtual <a c
 </dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00194">194</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00212">212</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a928dbf5b4b4b2bd2d423da42bc492393" name="a928dbf5b4b4b2bd2d423da42bc492393"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a928dbf5b4b4b2bd2d423da42bc492393">&#9670;&#160;</a></span>LayerType</h2>
@@ -238,7 +242,7 @@ template&lt;typename DomLvl_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00197">197</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00215">215</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -256,7 +260,7 @@ template&lt;typename DomLvl_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00198">198</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00216">216</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +301,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00211">211</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00229">229</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,11 +353,54 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00223">223</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00241">241</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="afcd49aa9b7f423e7fc45aa7d5827ef3b" name="afcd49aa9b7f423e7fc45aa7d5827ef3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcd49aa9b7f423e7fc45aa7d5827ef3b">&#9670;&#160;</a></span>apply_lambda()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DomLvl_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename Lambda_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_virtual_level.html">FEAT::Control::Domain::VirtualLevel</a>&lt; DomLvl_ &gt;::apply_lambda </td>
+          <td>(</td>
+          <td class="paramtype">Lambda_ &amp;&amp;&#160;</td>
+          <td class="paramname"><em>lambda</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Applies a lambda expression onto every level object in this virtual level. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">lambda</td><td>The lambda expression that has to be applied onto each level object</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The lambda expression is expected to take 3 parameters, where the first one is a LevelType&amp; reference, the second one is a LayerType&amp; reference, which represents the layer corresponding to the level object, and the third parameter is a VirtualLevelLambda enumeration value which specifies whether the lambda is being applied onto a normal level, a parent level, a child level or a base level. </p>
+
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00421">421</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_control_1_1_domain.html#a26f4622eb76d3da5d2d2e40650ec744ca593616de15330c0fb2d55e55410bf994">FEAT::Control::Domain::base</a>, <a class="el" href="namespace_f_e_a_t_1_1_control_1_1_domain.html#a26f4622eb76d3da5d2d2e40650ec744ca1b7d5726533ab525a8760351e9b5e415">FEAT::Control::Domain::child</a>, <a class="el" href="namespace_f_e_a_t_1_1_control_1_1_domain.html#a26f4622eb76d3da5d2d2e40650ec744cafea087517c26fadd409bd4b9dc642555">FEAT::Control::Domain::normal</a>, and <a class="el" href="namespace_f_e_a_t_1_1_control_1_1_domain.html#a26f4622eb76d3da5d2d2e40650ec744cad0e45878043844ffc41aac437e86b602">FEAT::Control::Domain::parent</a>.</p>
+
+</div>
+</div>
 <a id="a0e7976152ead842f3ed2a29020767b81" name="a0e7976152ead842f3ed2a29020767b81"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0e7976152ead842f3ed2a29020767b81">&#9670;&#160;</a></span>bytes()</h2>
 
@@ -379,7 +426,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00390">390</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00433">433</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -408,7 +455,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00274">274</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00292">292</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -437,7 +484,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00259">259</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00277">277</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -466,7 +513,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00269">269</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00287">287</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -495,7 +542,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00264">264</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00282">282</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -524,7 +571,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00320">320</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00338">338</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -553,7 +600,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00325">325</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00343">343</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -582,7 +629,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00342">342</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00360">360</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -611,7 +658,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00348">348</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00366">366</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -640,7 +687,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00366">366</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00384">384</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +716,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00372">372</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00390">390</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -698,7 +745,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00310">310</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00328">328</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -727,7 +774,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00315">315</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00333">333</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -756,7 +803,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00378">378</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00396">396</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -785,7 +832,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00384">384</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00402">402</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -814,7 +861,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00330">330</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00348">348</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -843,7 +890,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00336">336</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00354">354</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -872,7 +919,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00354">354</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00372">372</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -901,7 +948,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00360">360</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00378">378</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -930,7 +977,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00290">290</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00308">308</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -959,7 +1006,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00295">295</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00313">313</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -988,7 +1035,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00300">300</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00318">318</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1017,7 +1064,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00305">305</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00323">323</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1046,7 +1093,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00285">285</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00303">303</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1076,7 +1123,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00279">279</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00297">297</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1103,7 +1150,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00208">208</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00226">226</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1129,7 +1176,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00205">205</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00223">223</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1155,7 +1202,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00206">206</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00224">224</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1181,7 +1228,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00207">207</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00225">225</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1207,7 +1254,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00201">201</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00219">219</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1233,7 +1280,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00204">204</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00222">222</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1259,7 +1306,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00202">202</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00220">220</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>
@@ -1285,7 +1332,7 @@ template&lt;typename DomLvl_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00203">203</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__control_8hpp_source.html#l00221">221</a> of file <a class="el" href="domain__control_8hpp_source.html">domain_control.hpp</a>.</p>
 
 </div>
 </div>

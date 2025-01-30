@@ -648,551 +648,559 @@ $(document).ready(function(){initNavTree('math_8hpp_source.html',''); initResiza
 <div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span>    <span class="keyword">template</span>&lt;&gt;</div>
 <div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> pi&lt;float&gt;()</div>
 <div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span>    {</div>
-<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span>      <span class="keywordflow">return</span> 4.0f * std::atan(1.0f);</div>
+<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span>      <span class="keywordflow">return</span> 3.141592654f;</div>
 <div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span>    }</div>
 <div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span> </div>
 <div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span>    <span class="keyword">template</span>&lt;&gt;</div>
 <div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> pi&lt;double&gt;()</div>
 <div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span>    {</div>
-<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span>      <span class="keywordflow">return</span> 4.0 * std::atan(1.0);</div>
+<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span>      <span class="keywordflow">return</span> 3.1415926535897932385;</div>
 <div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span>    }</div>
 <div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span> </div>
 <div class="line"><a id="l00760" name="l00760"></a><span class="lineno">  760</span>    <span class="keyword">template</span>&lt;&gt;</div>
 <div class="line"><a id="l00761" name="l00761"></a><span class="lineno">  761</span>    <span class="keyword">inline</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> pi&lt;long double&gt;()</div>
 <div class="line"><a id="l00762" name="l00762"></a><span class="lineno">  762</span>    {</div>
-<div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span>      <span class="keywordflow">return</span> 4.0l * std::atan(1.0l);</div>
+<div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span>      <span class="keywordflow">return</span> 3.141592653589793238462643383279502884197l;</div>
 <div class="line"><a id="l00764" name="l00764"></a><span class="lineno">  764</span>    }</div>
 <div class="line"><a id="l00765" name="l00765"></a><span class="lineno">  765</span> </div>
-<div class="line"><a id="l00766" name="l00766"></a><span class="lineno">  766</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00766" name="l00766"></a><span class="lineno">  766</span><span class="preprocessor">#ifdef FEAT_HAVE_QUADMATH</span></div>
 <div class="line"><a id="l00767" name="l00767"></a><span class="lineno">  767</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00768" name="l00768"></a><span class="lineno">  768</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> pi&lt;Half&gt;()</div>
+<div class="line"><a id="l00768" name="l00768"></a><span class="lineno">  768</span>    <span class="keyword">inline</span> __float128 pi&lt;__float128&gt;()</div>
 <div class="line"><a id="l00769" name="l00769"></a><span class="lineno">  769</span>    {</div>
-<div class="line"><a id="l00770" name="l00770"></a><span class="lineno">  770</span>      <span class="keywordflow">return</span> __float2half(pi&lt;float&gt;());</div>
+<div class="line"><a id="l00770" name="l00770"></a><span class="lineno">  770</span>      <span class="keywordflow">return</span> 3.141592653589793238462643383279502884197q;</div>
 <div class="line"><a id="l00771" name="l00771"></a><span class="lineno">  771</span>    }</div>
-<div class="line"><a id="l00772" name="l00772"></a><span class="lineno">  772</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><a id="l00774" name="l00774"></a><span class="lineno">  774</span> </div>
-<div class="line"><a id="l00778" name="l00778"></a><span class="lineno">  778</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00779" name="l00779"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf">  779</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf">eps</a>()</div>
-<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span>    {</div>
-<div class="line"><a id="l00781" name="l00781"></a><span class="lineno">  781</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_float</a>, <span class="stringliteral">&quot;eps can only be applied to floating point types&quot;</span>);</div>
+<div class="line"><a id="l00772" name="l00772"></a><span class="lineno">  772</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00773" name="l00773"></a><span class="lineno">  773</span> </div>
+<div class="line"><a id="l00774" name="l00774"></a><span class="lineno">  774</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00775" name="l00775"></a><span class="lineno">  775</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00776" name="l00776"></a><span class="lineno">  776</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> pi&lt;Half&gt;()</div>
+<div class="line"><a id="l00777" name="l00777"></a><span class="lineno">  777</span>    {</div>
+<div class="line"><a id="l00778" name="l00778"></a><span class="lineno">  778</span>      <span class="keywordflow">return</span> __float2half(3.141592654f);</div>
+<div class="line"><a id="l00779" name="l00779"></a><span class="lineno">  779</span>    }</div>
+<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span><span class="preprocessor">    #endif</span></div>
 <div class="line"><a id="l00782" name="l00782"></a><span class="lineno">  782</span> </div>
-<div class="line"><a id="l00783" name="l00783"></a><span class="lineno">  783</span>      <span class="keyword">const</span> T_ z(T_(1));</div>
-<div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span>      <span class="keyword">const</span> T_ t(T_(0.5));</div>
-<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>      T_ y(t), yl(t);</div>
-<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span>      <span class="keywordflow">do</span></div>
-<div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span>      {</div>
-<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>        yl = y;</div>
-<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span>        y *= t;</div>
-<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span>      } <span class="keywordflow">while</span>(z &lt; T_(z+y));</div>
-<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span>      <span class="keywordflow">return</span> yl;</div>
-<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span>    }</div>
-<div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span> </div>
-<div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> eps&lt;float&gt;()</div>
-<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>    {</div>
-<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;float&gt;::epsilon();</div>
-<div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>    }</div>
-<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> eps&lt;double&gt;()</div>
-<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span>    {</div>
-<div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;double&gt;::epsilon();</div>
-<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>    }</div>
-<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>    <span class="keyword">inline</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> eps&lt;long double&gt;()</div>
-<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>    {</div>
-<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;long double&gt;::epsilon();</div>
-<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span>    }</div>
-<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span> </div>
-<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span>    <span class="keyword">inline</span> __float128 eps&lt;__float128&gt;()</div>
-<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span>    {</div>
-<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span>      <span class="keywordflow">return</span> FLT128_EPSILON;</div>
-<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span>    }</div>
-<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00787" name="l00787"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf">  787</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf">eps</a>()</div>
+<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>    {</div>
+<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_float</a>, <span class="stringliteral">&quot;eps can only be applied to floating point types&quot;</span>);</div>
+<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span> </div>
+<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span>      <span class="keyword">const</span> T_ z(T_(1));</div>
+<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span>      <span class="keyword">const</span> T_ t(T_(0.5));</div>
+<div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span>      T_ y(t), yl(t);</div>
+<div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span>      <span class="keywordflow">do</span></div>
+<div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>      {</div>
+<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>        yl = y;</div>
+<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>        y *= t;</div>
+<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>      } <span class="keywordflow">while</span>(z &lt; T_(z+y));</div>
+<div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>      <span class="keywordflow">return</span> yl;</div>
+<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span>    }</div>
+<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span> </div>
+<div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> eps&lt;float&gt;()</div>
+<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span>    {</div>
+<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;float&gt;::epsilon();</div>
+<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>    }</div>
+<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> eps&lt;double&gt;()</div>
+<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span>    {</div>
+<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;double&gt;::epsilon();</div>
+<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span>    }</div>
+<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span>    <span class="keyword">inline</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> eps&lt;long double&gt;()</div>
+<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span>    {</div>
+<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;long double&gt;::epsilon();</div>
+<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span>    }</div>
 <div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span> </div>
-<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
 <div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> eps&lt;Half&gt;()</div>
+<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>    <span class="keyword">inline</span> __float128 eps&lt;__float128&gt;()</div>
 <div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span>    {</div>
-<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span>      <span class="keywordflow">return</span> CUDART_ONE_FP16 - <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a>(0.99951171);</div>
+<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span>      <span class="keywordflow">return</span> FLT128_EPSILON;</div>
 <div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span>    }</div>
-<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span> </div>
-<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00834" name="l00834"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4">  834</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4">huge</a>()</div>
-<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span>    {</div>
-<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;T_&gt;::max();</div>
-<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span>    }</div>
-<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span> </div>
-<div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00845" name="l00845"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2">  845</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2">tiny</a>()</div>
-<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span>    {</div>
-<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;T_&gt;::min();</div>
-<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span>    }</div>
-<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span> </div>
-<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span>    <span class="keyword">inline</span> __float128 huge&lt;__float128&gt;()</div>
+<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span> </div>
+<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00829" name="l00829"></a><span class="lineno">  829</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> eps&lt;Half&gt;()</div>
+<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span>    {</div>
+<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span>      <span class="keywordflow">return</span> CUDART_ONE_FP16 - <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a>(0.99951171);</div>
+<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span>    }</div>
+<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span> </div>
+<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00842" name="l00842"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4">  842</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4">huge</a>()</div>
+<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span>    {</div>
+<div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;T_&gt;::max();</div>
+<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span>    }</div>
+<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span> </div>
+<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00853" name="l00853"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2">  853</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2">tiny</a>()</div>
 <div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span>    {</div>
-<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span>      <span class="keywordflow">return</span> FLT128_MAX;</div>
+<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span>      <span class="keywordflow">return</span> std::numeric_limits&lt;T_&gt;::min();</div>
 <div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span>    }</div>
 <div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span> </div>
-<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span>    <span class="keyword">inline</span> __float128 tiny&lt;__float128&gt;()</div>
-<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>    {</div>
-<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span>      <span class="keywordflow">return</span> FLT128_MIN;</div>
-<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>    }</div>
-<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span> </div>
-<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span>    <span class="keyword">inline</span> __float128 huge&lt;__float128&gt;()</div>
+<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>    {</div>
+<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span>      <span class="keywordflow">return</span> FLT128_MAX;</div>
+<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span>    }</div>
+<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span> </div>
 <div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> huge&lt;Half&gt;()</div>
+<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span>    <span class="keyword">inline</span> __float128 tiny&lt;__float128&gt;()</div>
 <div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span>    {</div>
-<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span>      <span class="keywordflow">return</span> CUDART_MAX_NORMAL_FP16;</div>
+<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span>      <span class="keywordflow">return</span> FLT128_MIN;</div>
 <div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span>    }</div>
-<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span> </div>
-<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> tiny&lt;Half&gt;()</div>
-<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span>    {</div>
-<div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span>      <span class="keywordflow">return</span> CUDART_MIN_DENORM_FP16;</div>
-<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span>    }</div>
-<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span> </div>
+<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> huge&lt;Half&gt;()</div>
+<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span>    {</div>
+<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span>      <span class="keywordflow">return</span> CUDART_MAX_NORMAL_FP16;</div>
+<div class="line"><a id="l00878" name="l00878"></a><span class="lineno">  878</span>    }</div>
 <div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span> </div>
-<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00889" name="l00889"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a4b209734269857e165d0519f2c96f998">  889</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4b209734269857e165d0519f2c96f998">nan</a>()</div>
-<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>    {</div>
-<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span>      <span class="comment">// divide 0 by 0, which hopefully yields NaN</span></div>
-<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span>      <span class="keywordflow">return</span> T_(0) / T_(0);</div>
-<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span>    }</div>
-<div class="line"><a id="l00894" name="l00894"></a><span class="lineno">  894</span> </div>
-<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> nan&lt;float&gt;()</div>
+<div class="line"><a id="l00880" name="l00880"></a><span class="lineno">  880</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00881" name="l00881"></a><span class="lineno">  881</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> tiny&lt;Half&gt;()</div>
+<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span>    {</div>
+<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span>      <span class="keywordflow">return</span> CUDART_MIN_DENORM_FP16;</div>
+<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span>    }</div>
+<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><a id="l00887" name="l00887"></a><span class="lineno">  887</span> </div>
+<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00897" name="l00897"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a4b209734269857e165d0519f2c96f998">  897</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4b209734269857e165d0519f2c96f998">nan</a>()</div>
 <div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span>    {</div>
-<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span>      <span class="keywordflow">return</span> std::nanf(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span>    }</div>
-<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span> </div>
-<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> nan&lt;double&gt;()</div>
-<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>    {</div>
-<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>      <span class="keywordflow">return</span> std::nan(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span>    }</div>
-<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span> </div>
-<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span>    <span class="keyword">inline</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> nan&lt;long double&gt;()</div>
-<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span>    {</div>
-<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span>      <span class="keywordflow">return</span> std::nanl(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span>    }</div>
-<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span> </div>
-<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>    <span class="keyword">inline</span> __float128 nan&lt;__float128&gt;()</div>
-<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>    {</div>
-<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>      return ::nanq(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span>    }</div>
-<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span>      <span class="comment">// divide 0 by 0, which hopefully yields NaN</span></div>
+<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span>      <span class="keywordflow">return</span> T_(0) / T_(0);</div>
+<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span>    }</div>
+<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span> </div>
+<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> nan&lt;float&gt;()</div>
+<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span>    {</div>
+<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span>      <span class="keywordflow">return</span> std::nanf(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span>    }</div>
+<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span> </div>
+<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> nan&lt;double&gt;()</div>
+<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span>    {</div>
+<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span>      <span class="keywordflow">return</span> std::nan(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span>    }</div>
+<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span> </div>
+<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>    <span class="keyword">inline</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> nan&lt;long double&gt;()</div>
+<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>    {</div>
+<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span>      <span class="keywordflow">return</span> std::nanl(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span>    }</div>
 <div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span> </div>
-<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>    <span class="comment">/*template&lt;int exp_bits_, int sig_bits_, typename Backend_&gt;</span></div>
-<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span><span class="comment">    inline flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt; nan&lt;flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&gt;()</span></div>
-<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span><span class="comment">    {</span></div>
-<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span><span class="comment">      // FloatX doesn&#39;t offer its own nan implementation,</span></div>
-<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span><span class="comment">      // so create a backend type NaN and convert it to FloatX</span></div>
-<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span><span class="comment">      return flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;(Math::nan&lt;Backend_&gt;());</span></div>
-<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span><span class="comment">    }*/</span></div>
-<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span><span class="comment"></span> </div>
-<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00941" name="l00941"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">  941</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">asin</a>(T_ x)</div>
-<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span>    {</div>
-<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_float</a>, <span class="stringliteral">&quot;asin can only be applied to floating point types&quot;</span>);</div>
-<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span> </div>
-<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#aa4f403e0b9b13250f24ef2e0119dc038">signum</a>(x) * <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a175bb1b6448883c2535b9585b4572e0e">Math::atan</a>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">Math::sqrt</a>((x*x) / (T_(1) - x*x)));</div>
-<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span>    }</div>
-<div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span> </div>
-<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>    WRAP_STD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">asin</a>)</div>
-<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>    WRAP_QUAD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">asin</a>)</div>
-<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span> </div>
-<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>    </div>
-<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00959" name="l00959"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">  959</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">acos</a>(T_ x)</div>
-<div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span>    {</div>
-<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_float</a>, <span class="stringliteral">&quot;acos can only be applied to floating point types&quot;</span>);</div>
-<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span> </div>
-<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>      <span class="keywordflow">return</span> T_(0.5) * pi&lt;T_&gt;() - <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">Math::asin</a>(x);</div>
-<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span>    }</div>
-<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span> </div>
-<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>    WRAP_STD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">acos</a>)</div>
-<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>    WRAP_QUAD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">acos</a>)</div>
-<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span> </div>
-<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>    </div>
-<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l00981" name="l00981"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">  981</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(T_ x);</div>
-<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span> </div>
-<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>)</div>
-<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span> </div>
-<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(__float128 x)</div>
-<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span>    {</div>
-<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>      <span class="comment">// https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/finiteq.c</span></div>
-<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>      <span class="keywordflow">return</span> (::finiteq(x) != 0);</div>
-<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span>    }</div>
-<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span>    <span class="keyword">inline</span> __float128 nan&lt;__float128&gt;()</div>
+<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>    {</div>
+<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>      return ::nanq(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span>    }</div>
+<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span> </div>
+<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>    <span class="comment">/*template&lt;int exp_bits_, int sig_bits_, typename Backend_&gt;</span></div>
+<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span><span class="comment">    inline flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt; nan&lt;flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&gt;()</span></div>
+<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span><span class="comment">    {</span></div>
+<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span><span class="comment">      // FloatX doesn&#39;t offer its own nan implementation,</span></div>
+<div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span><span class="comment">      // so create a backend type NaN and convert it to FloatX</span></div>
+<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span><span class="comment">      return flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;(Math::nan&lt;Backend_&gt;());</span></div>
+<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span><span class="comment">    }*/</span></div>
+<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span><span class="comment"></span> </div>
+<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00949" name="l00949"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">  949</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">asin</a>(T_ x)</div>
+<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span>    {</div>
+<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_float</a>, <span class="stringliteral">&quot;asin can only be applied to floating point types&quot;</span>);</div>
+<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span> </div>
+<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#aa4f403e0b9b13250f24ef2e0119dc038">signum</a>(x) * <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a175bb1b6448883c2535b9585b4572e0e">Math::atan</a>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">Math::sqrt</a>((x*x) / (T_(1) - x*x)));</div>
+<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span>    }</div>
+<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span> </div>
+<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span>    WRAP_STD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">asin</a>)</div>
+<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span>    WRAP_QUAD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">asin</a>)</div>
+<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span> </div>
+<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span>    </div>
+<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00967" name="l00967"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">  967</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">acos</a>(T_ x)</div>
+<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>    {</div>
+<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_float</a>, <span class="stringliteral">&quot;acos can only be applied to floating point types&quot;</span>);</div>
+<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span> </div>
+<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span>      <span class="keywordflow">return</span> T_(0.5) * pi&lt;T_&gt;() - <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">Math::asin</a>(x);</div>
+<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>    }</div>
+<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span> </div>
+<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span>    WRAP_STD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">acos</a>)</div>
+<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>    WRAP_QUAD_MATH1(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">acos</a>)</div>
+<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span> </div>
+<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span>    </div>
+<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l00989" name="l00989"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">  989</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(T_ x);</div>
+<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span> </div>
+<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>)</div>
 <div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span> </div>
-<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
-<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
-<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>    {</div>
-<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>      <span class="comment">// FloatX doesn&#39;t offer its own isfinite implementation,</span></div>
-<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span>      <span class="comment">// so test its backend implementation instead</span></div>
-<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
-<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>    }</div>
-<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span> </div>
-<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
-<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
-<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>    {</div>
-<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span>      <span class="keywordflow">return</span> !(__hisinf(x) || __hisnan(x));</div>
-<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span>    }</div>
-<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span> </div>
-<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9"> 1020</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(T_ x);</div>
-<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span> </div>
-<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>)</div>
-<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span> </div>
-<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(__float128 x)</div>
-<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>    {</div>
-<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>      <span class="comment">// https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isinfq.c</span></div>
-<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span>      <span class="keywordflow">return</span> (::isinfq(x) != 0);</div>
-<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span>    }</div>
-<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(__float128 x)</div>
+<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>    {</div>
+<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>      <span class="comment">// https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/finiteq.c</span></div>
+<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>      <span class="keywordflow">return</span> (::finiteq(x) != 0);</div>
+<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span>    }</div>
+<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span> </div>
+<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
+<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
+<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>    {</div>
+<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>      <span class="comment">// FloatX doesn&#39;t offer its own isfinite implementation,</span></div>
+<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span>      <span class="comment">// so test its backend implementation instead</span></div>
+<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
+<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span>    }</div>
+<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span> </div>
+<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">isfinite</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
+<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>    {</div>
+<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span>      <span class="keywordflow">return</span> !(__hisinf(x) || __hisnan(x));</div>
+<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span>    }</div>
+<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span> </div>
+<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9"> 1028</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(T_ x);</div>
+<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span> </div>
+<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>)</div>
 <div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span> </div>
-<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
-<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>    {</div>
-<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>      <span class="comment">// FloatX doesn&#39;t offer its own isinf implementation,</span></div>
-<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>      <span class="comment">// so test its backend implementation instead</span></div>
-<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
-<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>    }</div>
-<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span> </div>
-<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
-<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
-<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>    {</div>
-<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span>      <span class="keywordflow">return</span> __hisinf(x);</div>
-<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>    }</div>
-<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span> </div>
-<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2"> 1059</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(T_ x);</div>
-<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span> </div>
-<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>)</div>
-<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span> </div>
-<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(__float128 x)</div>
-<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>    {</div>
-<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>      <span class="comment">// https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isnanq.c</span></div>
-<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>      <span class="keywordflow">return</span> (::isnanq(x) != 0);</div>
-<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>    }</div>
-<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(__float128 x)</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>    {</div>
+<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>      <span class="comment">// https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isinfq.c</span></div>
+<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>      <span class="keywordflow">return</span> (::isinfq(x) != 0);</div>
+<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>    }</div>
+<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span> </div>
+<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
+<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
+<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>    {</div>
+<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>      <span class="comment">// FloatX doesn&#39;t offer its own isinf implementation,</span></div>
+<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span>      <span class="comment">// so test its backend implementation instead</span></div>
+<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
+<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>    }</div>
+<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span> </div>
+<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">isinf</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
+<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>    {</div>
+<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>      <span class="keywordflow">return</span> __hisinf(x);</div>
+<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>    }</div>
+<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span> </div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2"> 1067</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(T_ x);</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span> </div>
+<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>)</div>
 <div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span> </div>
-<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
-<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
-<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>    {</div>
-<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>      <span class="comment">// FloatX doesn&#39;t offer its own isnan implementation,</span></div>
-<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>      <span class="comment">// so test its backend implementation instead</span></div>
-<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
-<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>    }</div>
-<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span> </div>
-<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
-<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
-<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>    {</div>
-<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>      <span class="keywordflow">return</span> __hisnan(x);</div>
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>    }</div>
-<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span> </div>
-<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c"> 1100</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(T_ x);</div>
-<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span> </div>
-<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>)</div>
-<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span> </div>
-<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(__float128 x)</div>
-<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>    {</div>
-<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>      <span class="comment">// check whether the value is finite</span></div>
-<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>      <span class="keywordflow">if</span>(::finiteq(x) == 0)</div>
-<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>      <span class="comment">// check whether the value is not below minimal normal value</span></div>
-<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>      <span class="keywordflow">return</span> !(::fabsq(x) &lt; FLT128_MIN);</div>
-<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span>    }</div>
-<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span> </div>
-<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
-<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
-<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span>    {</div>
-<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span>      <span class="comment">// FloatX doesn&#39;t offer its own isnormal implementation,</span></div>
-<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>      <span class="comment">// so test its backend implementation instead</span></div>
-<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
-<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span>    }</div>
-<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span> </div>
-<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
-<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
-<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>    {</div>
-<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span>      <span class="keywordflow">return</span> ((__hisinf(x) || __hisnan(x)) &amp;&amp; (__habs(x) &gt;= CUDART_MIN_DENORM_FP16));</div>
-<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>    }</div>
-<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span> </div>
-<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd"> 1156</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd">factorial</a>(T_ n, T_ m = T_(0))</div>
-<div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span>    {</div>
-<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_int</a>, <span class="stringliteral">&quot;factorial can only be applied to integral types&quot;</span>);</div>
-<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span> </div>
-<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span>      <span class="comment">// calculate the factorial</span></div>
-<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>      T_ k(T_(1));</div>
-<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>      <span class="keywordflow">for</span>(m = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>(T_(1), m); m &lt;= n; ++m)</div>
-<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>      {</div>
-<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span>        k *= m;</div>
-<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>      }</div>
-<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>      <span class="keywordflow">return</span> k;</div>
-<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>    }</div>
-<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span> </div>
-<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277"> 1188</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277">binomial</a>(T_ n, T_ k)</div>
-<div class="line"><a id="l01189" name="l01189"></a><span class="lineno"> 1189</span>    {</div>
-<div class="line"><a id="l01190" name="l01190"></a><span class="lineno"> 1190</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_int</a>, <span class="stringliteral">&quot;binomial can only be applied to integral types&quot;</span>);</div>
-<div class="line"><a id="l01191" name="l01191"></a><span class="lineno"> 1191</span> </div>
-<div class="line"><a id="l01192" name="l01192"></a><span class="lineno"> 1192</span>      <span class="keywordflow">if</span>(k &gt; n)</div>
-<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>      {</div>
-<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>        <span class="keywordflow">return</span> T_(0); <span class="comment">// by definition</span></div>
-<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>      }</div>
-<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span>      <span class="keywordflow">else</span> <span class="keywordflow">if</span>((k &lt;= T_(0)) || (k == n))</div>
-<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span>      {</div>
-<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>        <span class="keywordflow">return</span> T_(1); <span class="comment">// by definition</span></div>
-<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span>      }</div>
-<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span> </div>
-<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>      <span class="comment">// exploit symmetry: (n \choose k) = (n \choose n-k)</span></div>
-<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>      k = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a737d301e1e32f502778181d09b408407">min</a>(k, n-k);</div>
-<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span> </div>
-<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span>      <span class="comment">// use multiplicative formula: (n \choose k+1) = (n - k) * (n \choose k) / (k + 1)</span></div>
-<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>      T_ m = n;</div>
-<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span>      <span class="keywordflow">for</span>(T_ i(1); i &lt; k; ++i)</div>
-<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span>      {</div>
-<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span>        m *= (n - i);</div>
-<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>        m /= (i + 1);</div>
-<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>      }</div>
+<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(__float128 x)</div>
+<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>    {</div>
+<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>      <span class="comment">// https://chromium.googlesource.com/native_client/nacl-gcc/+/ng/master/libquadmath/math/isnanq.c</span></div>
+<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>      <span class="keywordflow">return</span> (::isnanq(x) != 0);</div>
+<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>    }</div>
+<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span> </div>
+<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>    {</div>
+<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>      <span class="comment">// FloatX doesn&#39;t offer its own isnan implementation,</span></div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>      <span class="comment">// so test its backend implementation instead</span></div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>    }</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span> </div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span><span class="preprocessor">    #ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#addaaff970e50abe9c20a2a01276454b2">isnan</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>    {</div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>      <span class="keywordflow">return</span> __hisnan(x);</div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>    }</div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span> </div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c"> 1108</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(T_ x);</div>
+<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span> </div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>    WRAP_STD_MATH1BRET(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>)</div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span> </div>
+<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(__float128 x)</div>
+<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span>    {</div>
+<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span>      <span class="comment">// check whether the value is finite</span></div>
+<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>      <span class="keywordflow">if</span>(::finiteq(x) == 0)</div>
+<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span>      <span class="comment">// check whether the value is not below minimal normal value</span></div>
+<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span>      <span class="keywordflow">return</span> !(::fabsq(x) &lt; FLT128_MIN);</div>
+<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>    }</div>
+<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span> </div>
+<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span><span class="preprocessor">#if defined(FEAT_HAVE_FLOATX) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span>    <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> exp_bits_, <span class="keywordtype">int</span> sig_bits_, <span class="keyword">typename</span> Backend_&gt;</div>
+<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(<span class="keyword">const</span> flx::floatx&lt;exp_bits_, sig_bits_, Backend_&gt;&amp; x)</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>    {</div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>      <span class="comment">// FloatX doesn&#39;t offer its own isnormal implementation,</span></div>
+<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span>      <span class="comment">// so test its backend implementation instead</span></div>
+<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(<span class="keyword">static_cast&lt;</span>Backend_<span class="keyword">&gt;</span>(x));</div>
+<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>    }</div>
+<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_FLOATX &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span> </div>
+<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">isnormal</a>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> x)</div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>    {</div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>      <span class="keywordflow">return</span> ((__hisinf(x) || __hisnan(x)) &amp;&amp; (__habs(x) &gt;= CUDART_MIN_DENORM_FP16));</div>
+<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>    }</div>
+<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span> </div>
+<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd"> 1164</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd">factorial</a>(T_ n, T_ m = T_(0))</div>
+<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>    {</div>
+<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_int</a>, <span class="stringliteral">&quot;factorial can only be applied to integral types&quot;</span>);</div>
+<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span> </div>
+<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span>      <span class="comment">// calculate the factorial</span></div>
+<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>      T_ k(T_(1));</div>
+<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>      <span class="keywordflow">for</span>(m = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>(T_(1), m); m &lt;= n; ++m)</div>
+<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span>      {</div>
+<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>        k *= m;</div>
+<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>      }</div>
+<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>      <span class="keywordflow">return</span> k;</div>
+<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span>    }</div>
+<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"> 1176</span> </div>
+<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277"> 1196</a></span>    <span class="keyword">inline</span> T_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277">binomial</a>(T_ n, T_ k)</div>
+<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span>    {</div>
+<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>      <span class="keyword">static_assert</span>(<a class="code hl_struct" href="struct_f_e_a_t_1_1_type_1_1_traits.html">Type::Traits&lt;T_&gt;::is_int</a>, <span class="stringliteral">&quot;binomial can only be applied to integral types&quot;</span>);</div>
+<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span> </div>
+<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span>      <span class="keywordflow">if</span>(k &gt; n)</div>
+<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>      {</div>
+<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>        <span class="keywordflow">return</span> T_(0); <span class="comment">// by definition</span></div>
+<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>      }</div>
+<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span>      <span class="keywordflow">else</span> <span class="keywordflow">if</span>((k &lt;= T_(0)) || (k == n))</div>
+<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>      {</div>
+<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span>        <span class="keywordflow">return</span> T_(1); <span class="comment">// by definition</span></div>
+<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span>      }</div>
+<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span> </div>
+<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>      <span class="comment">// exploit symmetry: (n \choose k) = (n \choose n-k)</span></div>
+<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>      k = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a737d301e1e32f502778181d09b408407">min</a>(k, n-k);</div>
 <div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span> </div>
-<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>      <span class="keywordflow">return</span> m;</div>
-<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>    }</div>
-<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span> </div>
-<div class="line"><a id="l01283" name="l01283"></a><span class="lineno"> 1283</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
-<div class="line"><a id="l01284" name="l01284"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3"> 1284</a></span>    DT_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3">invert_matrix</a>(<span class="keyword">const</span> IT_ n, <span class="keyword">const</span> IT_ stride, DT_ a[], IT_ p[])</div>
-<div class="line"><a id="l01285" name="l01285"></a><span class="lineno"> 1285</span>    {</div>
-<div class="line"><a id="l01286" name="l01286"></a><span class="lineno"> 1286</span>      <span class="comment">// make sure that the parameters are valid</span></div>
-<div class="line"><a id="l01287" name="l01287"></a><span class="lineno"> 1287</span>      <span class="keywordflow">if</span>((n &lt;= IT_(0)) || (stride &lt; n) || (a == <span class="keyword">nullptr</span>) || (p == <span class="keyword">nullptr</span>))</div>
-<div class="line"><a id="l01288" name="l01288"></a><span class="lineno"> 1288</span>        <span class="keywordflow">return</span> DT_(0);</div>
-<div class="line"><a id="l01289" name="l01289"></a><span class="lineno"> 1289</span> </div>
-<div class="line"><a id="l01290" name="l01290"></a><span class="lineno"> 1290</span>      <span class="comment">// invert 1x1 explicitly</span></div>
-<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span>      <span class="keywordflow">if</span>(n == IT_(1))</div>
-<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"> 1292</span>      {</div>
-<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"> 1293</span>        DT_ det = a[0];</div>
-<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span>        a[0] = DT_(1) / det;</div>
-<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>        <span class="keywordflow">return</span> det;</div>
-<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>      }</div>
+<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>      <span class="comment">// use multiplicative formula: (n \choose k+1) = (n - k) * (n \choose k) / (k + 1)</span></div>
+<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>      T_ m = n;</div>
+<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>      <span class="keywordflow">for</span>(T_ i(1); i &lt; k; ++i)</div>
+<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span>      {</div>
+<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span>        m *= (n - i);</div>
+<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>        m /= (i + 1);</div>
+<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span>      }</div>
+<div class="line"><a id="l01219" name="l01219"></a><span class="lineno"> 1219</span> </div>
+<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span>      <span class="keywordflow">return</span> m;</div>
+<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>    }</div>
+<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span> </div>
+<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
+<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3"> 1292</a></span>    DT_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3">invert_matrix</a>(<span class="keyword">const</span> IT_ n, <span class="keyword">const</span> IT_ stride, DT_ a[], IT_ p[])</div>
+<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"> 1293</span>    {</div>
+<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span>      <span class="comment">// make sure that the parameters are valid</span></div>
+<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>      <span class="keywordflow">if</span>((n &lt;= IT_(0)) || (stride &lt; n) || (a == <span class="keyword">nullptr</span>) || (p == <span class="keyword">nullptr</span>))</div>
+<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>        <span class="keywordflow">return</span> DT_(0);</div>
 <div class="line"><a id="l01297" name="l01297"></a><span class="lineno"> 1297</span> </div>
-<div class="line"><a id="l01298" name="l01298"></a><span class="lineno"> 1298</span>      <span class="comment">// initialize identity permutation</span></div>
-<div class="line"><a id="l01299" name="l01299"></a><span class="lineno"> 1299</span>      <span class="keywordflow">for</span>(IT_ i(0); i &lt; n; ++i)</div>
+<div class="line"><a id="l01298" name="l01298"></a><span class="lineno"> 1298</span>      <span class="comment">// invert 1x1 explicitly</span></div>
+<div class="line"><a id="l01299" name="l01299"></a><span class="lineno"> 1299</span>      <span class="keywordflow">if</span>(n == IT_(1))</div>
 <div class="line"><a id="l01300" name="l01300"></a><span class="lineno"> 1300</span>      {</div>
-<div class="line"><a id="l01301" name="l01301"></a><span class="lineno"> 1301</span>        p[i] = i;</div>
-<div class="line"><a id="l01302" name="l01302"></a><span class="lineno"> 1302</span>      }</div>
-<div class="line"><a id="l01303" name="l01303"></a><span class="lineno"> 1303</span> </div>
-<div class="line"><a id="l01304" name="l01304"></a><span class="lineno"> 1304</span>      <span class="comment">// initialize determinant to 1</span></div>
-<div class="line"><a id="l01305" name="l01305"></a><span class="lineno"> 1305</span>      DT_ det = DT_(1);</div>
-<div class="line"><a id="l01306" name="l01306"></a><span class="lineno"> 1306</span> </div>
-<div class="line"><a id="l01307" name="l01307"></a><span class="lineno"> 1307</span>      <span class="comment">// primary column elimination loop</span></div>
-<div class="line"><a id="l01308" name="l01308"></a><span class="lineno"> 1308</span>      <span class="keywordflow">for</span>(IT_ k(0); k &lt; n; ++k)</div>
-<div class="line"><a id="l01309" name="l01309"></a><span class="lineno"> 1309</span>      {</div>
-<div class="line"><a id="l01310" name="l01310"></a><span class="lineno"> 1310</span>        <span class="comment">// step 1: find a pivot for the elimination of column k</span></div>
-<div class="line"><a id="l01311" name="l01311"></a><span class="lineno"> 1311</span>        {</div>
-<div class="line"><a id="l01312" name="l01312"></a><span class="lineno"> 1312</span>          <span class="comment">// for this, we only check the rows p[j] with j &gt;= k, as all</span></div>
-<div class="line"><a id="l01313" name="l01313"></a><span class="lineno"> 1313</span>          <span class="comment">// rows p[j] with j &lt; k have already been eliminated and are</span></div>
-<div class="line"><a id="l01314" name="l01314"></a><span class="lineno"> 1314</span>          <span class="comment">// therefore not candidates for pivoting</span></div>
-<div class="line"><a id="l01315" name="l01315"></a><span class="lineno"> 1315</span>          DT_ pivot = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(a[p[k]*stride + p[k]]);</div>
-<div class="line"><a id="l01316" name="l01316"></a><span class="lineno"> 1316</span>          IT_ i = k;</div>
-<div class="line"><a id="l01317" name="l01317"></a><span class="lineno"> 1317</span> </div>
-<div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>          <span class="comment">// loop over all unprocessed rows</span></div>
-<div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>          <span class="keywordflow">for</span>(IT_ j(k+1); j &lt; n; ++j)</div>
-<div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>          {</div>
-<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>            <span class="comment">// get our matrix value and check whether it can be a pivot</span></div>
-<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>            DT_ abs_val = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(a[p[j]*stride + p[j]]);</div>
-<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>            <span class="keywordflow">if</span>(abs_val &gt; pivot)</div>
-<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>            {</div>
-<div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span>              pivot = abs_val;</div>
-<div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span>              i = j;</div>
-<div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span>            }</div>
-<div class="line"><a id="l01328" name="l01328"></a><span class="lineno"> 1328</span>          }</div>
-<div class="line"><a id="l01329" name="l01329"></a><span class="lineno"> 1329</span> </div>
-<div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>          <span class="comment">// do we have to swap rows i and k?</span></div>
-<div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>          <span class="keywordflow">if</span>(i &gt; k)</div>
-<div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span>          {</div>
-<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>            <span class="comment">// swap rows &quot;virtually&quot; by exchanging their permutation positions</span></div>
-<div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>            IT_ t = p[k];</div>
-<div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>            p[k] = p[i];</div>
-<div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>            p[i] = t;</div>
-<div class="line"><a id="l01337" name="l01337"></a><span class="lineno"> 1337</span>          }</div>
-<div class="line"><a id="l01338" name="l01338"></a><span class="lineno"> 1338</span>        }</div>
-<div class="line"><a id="l01339" name="l01339"></a><span class="lineno"> 1339</span> </div>
-<div class="line"><a id="l01340" name="l01340"></a><span class="lineno"> 1340</span>        <span class="comment">// compute pivot row offset</span></div>
-<div class="line"><a id="l01341" name="l01341"></a><span class="lineno"> 1341</span>        <span class="keyword">const</span> IT_ pk_off = p[k]*stride;</div>
-<div class="line"><a id="l01342" name="l01342"></a><span class="lineno"> 1342</span> </div>
-<div class="line"><a id="l01343" name="l01343"></a><span class="lineno"> 1343</span>        <span class="comment">// step 2: process pivot row</span></div>
-<div class="line"><a id="l01344" name="l01344"></a><span class="lineno"> 1344</span>        {</div>
-<div class="line"><a id="l01345" name="l01345"></a><span class="lineno"> 1345</span>          <span class="comment">// update determinant by multiplying with the pivot element</span></div>
-<div class="line"><a id="l01346" name="l01346"></a><span class="lineno"> 1346</span>          det *= a[pk_off + p[k]];</div>
+<div class="line"><a id="l01301" name="l01301"></a><span class="lineno"> 1301</span>        DT_ det = a[0];</div>
+<div class="line"><a id="l01302" name="l01302"></a><span class="lineno"> 1302</span>        a[0] = DT_(1) / det;</div>
+<div class="line"><a id="l01303" name="l01303"></a><span class="lineno"> 1303</span>        <span class="keywordflow">return</span> det;</div>
+<div class="line"><a id="l01304" name="l01304"></a><span class="lineno"> 1304</span>      }</div>
+<div class="line"><a id="l01305" name="l01305"></a><span class="lineno"> 1305</span> </div>
+<div class="line"><a id="l01306" name="l01306"></a><span class="lineno"> 1306</span>      <span class="comment">// initialize identity permutation</span></div>
+<div class="line"><a id="l01307" name="l01307"></a><span class="lineno"> 1307</span>      <span class="keywordflow">for</span>(IT_ i(0); i &lt; n; ++i)</div>
+<div class="line"><a id="l01308" name="l01308"></a><span class="lineno"> 1308</span>      {</div>
+<div class="line"><a id="l01309" name="l01309"></a><span class="lineno"> 1309</span>        p[i] = i;</div>
+<div class="line"><a id="l01310" name="l01310"></a><span class="lineno"> 1310</span>      }</div>
+<div class="line"><a id="l01311" name="l01311"></a><span class="lineno"> 1311</span> </div>
+<div class="line"><a id="l01312" name="l01312"></a><span class="lineno"> 1312</span>      <span class="comment">// initialize determinant to 1</span></div>
+<div class="line"><a id="l01313" name="l01313"></a><span class="lineno"> 1313</span>      DT_ det = DT_(1);</div>
+<div class="line"><a id="l01314" name="l01314"></a><span class="lineno"> 1314</span> </div>
+<div class="line"><a id="l01315" name="l01315"></a><span class="lineno"> 1315</span>      <span class="comment">// primary column elimination loop</span></div>
+<div class="line"><a id="l01316" name="l01316"></a><span class="lineno"> 1316</span>      <span class="keywordflow">for</span>(IT_ k(0); k &lt; n; ++k)</div>
+<div class="line"><a id="l01317" name="l01317"></a><span class="lineno"> 1317</span>      {</div>
+<div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>        <span class="comment">// step 1: find a pivot for the elimination of column k</span></div>
+<div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>        {</div>
+<div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>          <span class="comment">// for this, we only check the rows p[j] with j &gt;= k, as all</span></div>
+<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>          <span class="comment">// rows p[j] with j &lt; k have already been eliminated and are</span></div>
+<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>          <span class="comment">// therefore not candidates for pivoting</span></div>
+<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>          DT_ pivot = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(a[p[k]*stride + p[k]]);</div>
+<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>          IT_ i = k;</div>
+<div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span> </div>
+<div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span>          <span class="comment">// loop over all unprocessed rows</span></div>
+<div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span>          <span class="keywordflow">for</span>(IT_ j(k+1); j &lt; n; ++j)</div>
+<div class="line"><a id="l01328" name="l01328"></a><span class="lineno"> 1328</span>          {</div>
+<div class="line"><a id="l01329" name="l01329"></a><span class="lineno"> 1329</span>            <span class="comment">// get our matrix value and check whether it can be a pivot</span></div>
+<div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>            DT_ abs_val = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(a[p[j]*stride + p[j]]);</div>
+<div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>            <span class="keywordflow">if</span>(abs_val &gt; pivot)</div>
+<div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span>            {</div>
+<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>              pivot = abs_val;</div>
+<div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>              i = j;</div>
+<div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>            }</div>
+<div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>          }</div>
+<div class="line"><a id="l01337" name="l01337"></a><span class="lineno"> 1337</span> </div>
+<div class="line"><a id="l01338" name="l01338"></a><span class="lineno"> 1338</span>          <span class="comment">// do we have to swap rows i and k?</span></div>
+<div class="line"><a id="l01339" name="l01339"></a><span class="lineno"> 1339</span>          <span class="keywordflow">if</span>(i &gt; k)</div>
+<div class="line"><a id="l01340" name="l01340"></a><span class="lineno"> 1340</span>          {</div>
+<div class="line"><a id="l01341" name="l01341"></a><span class="lineno"> 1341</span>            <span class="comment">// swap rows &quot;virtually&quot; by exchanging their permutation positions</span></div>
+<div class="line"><a id="l01342" name="l01342"></a><span class="lineno"> 1342</span>            IT_ t = p[k];</div>
+<div class="line"><a id="l01343" name="l01343"></a><span class="lineno"> 1343</span>            p[k] = p[i];</div>
+<div class="line"><a id="l01344" name="l01344"></a><span class="lineno"> 1344</span>            p[i] = t;</div>
+<div class="line"><a id="l01345" name="l01345"></a><span class="lineno"> 1345</span>          }</div>
+<div class="line"><a id="l01346" name="l01346"></a><span class="lineno"> 1346</span>        }</div>
 <div class="line"><a id="l01347" name="l01347"></a><span class="lineno"> 1347</span> </div>
-<div class="line"><a id="l01348" name="l01348"></a><span class="lineno"> 1348</span>          <span class="comment">// get our inverted pivot element</span></div>
-<div class="line"><a id="l01349" name="l01349"></a><span class="lineno"> 1349</span>          <span class="keyword">const</span> DT_ pivot = DT_(1) / a[pk_off + p[k]];</div>
+<div class="line"><a id="l01348" name="l01348"></a><span class="lineno"> 1348</span>        <span class="comment">// compute pivot row offset</span></div>
+<div class="line"><a id="l01349" name="l01349"></a><span class="lineno"> 1349</span>        <span class="keyword">const</span> IT_ pk_off = p[k]*stride;</div>
 <div class="line"><a id="l01350" name="l01350"></a><span class="lineno"> 1350</span> </div>
-<div class="line"><a id="l01351" name="l01351"></a><span class="lineno"> 1351</span>          <span class="comment">// replace column entry by unit column entry</span></div>
-<div class="line"><a id="l01352" name="l01352"></a><span class="lineno"> 1352</span>          a[pk_off + p[k]] = DT_(1);</div>
-<div class="line"><a id="l01353" name="l01353"></a><span class="lineno"> 1353</span> </div>
-<div class="line"><a id="l01354" name="l01354"></a><span class="lineno"> 1354</span>          <span class="comment">// divide the whole row by the inverted pivot</span></div>
-<div class="line"><a id="l01355" name="l01355"></a><span class="lineno"> 1355</span>          <span class="keywordflow">for</span>(IT_ j(0); j &lt; n; ++j)</div>
-<div class="line"><a id="l01356" name="l01356"></a><span class="lineno"> 1356</span>          {</div>
-<div class="line"><a id="l01357" name="l01357"></a><span class="lineno"> 1357</span>            a[pk_off+j] *= pivot;</div>
-<div class="line"><a id="l01358" name="l01358"></a><span class="lineno"> 1358</span>          }</div>
-<div class="line"><a id="l01359" name="l01359"></a><span class="lineno"> 1359</span>        }</div>
-<div class="line"><a id="l01360" name="l01360"></a><span class="lineno"> 1360</span> </div>
-<div class="line"><a id="l01361" name="l01361"></a><span class="lineno"> 1361</span>        <span class="comment">// step 3: eliminate pivot column</span></div>
-<div class="line"><a id="l01362" name="l01362"></a><span class="lineno"> 1362</span> </div>
-<div class="line"><a id="l01363" name="l01363"></a><span class="lineno"> 1363</span>        <span class="comment">// loop over all rows of the matrix</span></div>
-<div class="line"><a id="l01364" name="l01364"></a><span class="lineno"> 1364</span>        <span class="keywordflow">for</span>(IT_ i(0); i &lt; n; ++i)</div>
-<div class="line"><a id="l01365" name="l01365"></a><span class="lineno"> 1365</span>        {</div>
-<div class="line"><a id="l01366" name="l01366"></a><span class="lineno"> 1366</span>          <span class="comment">// skip the pivot row</span></div>
-<div class="line"><a id="l01367" name="l01367"></a><span class="lineno"> 1367</span>          <span class="keywordflow">if</span>(i == p[k])</div>
-<div class="line"><a id="l01368" name="l01368"></a><span class="lineno"> 1368</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l01369" name="l01369"></a><span class="lineno"> 1369</span> </div>
-<div class="line"><a id="l01370" name="l01370"></a><span class="lineno"> 1370</span>          <span class="comment">// compute row and pivot offsets</span></div>
-<div class="line"><a id="l01371" name="l01371"></a><span class="lineno"> 1371</span>          <span class="keyword">const</span> IT_ row_off = i*stride;</div>
-<div class="line"><a id="l01372" name="l01372"></a><span class="lineno"> 1372</span> </div>
-<div class="line"><a id="l01373" name="l01373"></a><span class="lineno"> 1373</span>          <span class="comment">// fetch elimination factor</span></div>
-<div class="line"><a id="l01374" name="l01374"></a><span class="lineno"> 1374</span>          <span class="keyword">const</span> DT_ factor =  a[row_off + p[k]];</div>
-<div class="line"><a id="l01375" name="l01375"></a><span class="lineno"> 1375</span> </div>
-<div class="line"><a id="l01376" name="l01376"></a><span class="lineno"> 1376</span>          <span class="comment">// replace by unit column entry</span></div>
-<div class="line"><a id="l01377" name="l01377"></a><span class="lineno"> 1377</span>          a[row_off + p[k]] = DT_(0);</div>
-<div class="line"><a id="l01378" name="l01378"></a><span class="lineno"> 1378</span> </div>
-<div class="line"><a id="l01379" name="l01379"></a><span class="lineno"> 1379</span>          <span class="comment">// process the row</span></div>
-<div class="line"><a id="l01380" name="l01380"></a><span class="lineno"> 1380</span>          <span class="keywordflow">for</span>(IT_ j(0); j &lt; n; ++j)</div>
-<div class="line"><a id="l01381" name="l01381"></a><span class="lineno"> 1381</span>          {</div>
-<div class="line"><a id="l01382" name="l01382"></a><span class="lineno"> 1382</span>            a[row_off + j] -= a[pk_off + j] * factor;</div>
-<div class="line"><a id="l01383" name="l01383"></a><span class="lineno"> 1383</span>          }</div>
-<div class="line"><a id="l01384" name="l01384"></a><span class="lineno"> 1384</span>        }</div>
-<div class="line"><a id="l01385" name="l01385"></a><span class="lineno"> 1385</span>      }</div>
+<div class="line"><a id="l01351" name="l01351"></a><span class="lineno"> 1351</span>        <span class="comment">// step 2: process pivot row</span></div>
+<div class="line"><a id="l01352" name="l01352"></a><span class="lineno"> 1352</span>        {</div>
+<div class="line"><a id="l01353" name="l01353"></a><span class="lineno"> 1353</span>          <span class="comment">// update determinant by multiplying with the pivot element</span></div>
+<div class="line"><a id="l01354" name="l01354"></a><span class="lineno"> 1354</span>          det *= a[pk_off + p[k]];</div>
+<div class="line"><a id="l01355" name="l01355"></a><span class="lineno"> 1355</span> </div>
+<div class="line"><a id="l01356" name="l01356"></a><span class="lineno"> 1356</span>          <span class="comment">// get our inverted pivot element</span></div>
+<div class="line"><a id="l01357" name="l01357"></a><span class="lineno"> 1357</span>          <span class="keyword">const</span> DT_ pivot = DT_(1) / a[pk_off + p[k]];</div>
+<div class="line"><a id="l01358" name="l01358"></a><span class="lineno"> 1358</span> </div>
+<div class="line"><a id="l01359" name="l01359"></a><span class="lineno"> 1359</span>          <span class="comment">// replace column entry by unit column entry</span></div>
+<div class="line"><a id="l01360" name="l01360"></a><span class="lineno"> 1360</span>          a[pk_off + p[k]] = DT_(1);</div>
+<div class="line"><a id="l01361" name="l01361"></a><span class="lineno"> 1361</span> </div>
+<div class="line"><a id="l01362" name="l01362"></a><span class="lineno"> 1362</span>          <span class="comment">// divide the whole row by the inverted pivot</span></div>
+<div class="line"><a id="l01363" name="l01363"></a><span class="lineno"> 1363</span>          <span class="keywordflow">for</span>(IT_ j(0); j &lt; n; ++j)</div>
+<div class="line"><a id="l01364" name="l01364"></a><span class="lineno"> 1364</span>          {</div>
+<div class="line"><a id="l01365" name="l01365"></a><span class="lineno"> 1365</span>            a[pk_off+j] *= pivot;</div>
+<div class="line"><a id="l01366" name="l01366"></a><span class="lineno"> 1366</span>          }</div>
+<div class="line"><a id="l01367" name="l01367"></a><span class="lineno"> 1367</span>        }</div>
+<div class="line"><a id="l01368" name="l01368"></a><span class="lineno"> 1368</span> </div>
+<div class="line"><a id="l01369" name="l01369"></a><span class="lineno"> 1369</span>        <span class="comment">// step 3: eliminate pivot column</span></div>
+<div class="line"><a id="l01370" name="l01370"></a><span class="lineno"> 1370</span> </div>
+<div class="line"><a id="l01371" name="l01371"></a><span class="lineno"> 1371</span>        <span class="comment">// loop over all rows of the matrix</span></div>
+<div class="line"><a id="l01372" name="l01372"></a><span class="lineno"> 1372</span>        <span class="keywordflow">for</span>(IT_ i(0); i &lt; n; ++i)</div>
+<div class="line"><a id="l01373" name="l01373"></a><span class="lineno"> 1373</span>        {</div>
+<div class="line"><a id="l01374" name="l01374"></a><span class="lineno"> 1374</span>          <span class="comment">// skip the pivot row</span></div>
+<div class="line"><a id="l01375" name="l01375"></a><span class="lineno"> 1375</span>          <span class="keywordflow">if</span>(i == p[k])</div>
+<div class="line"><a id="l01376" name="l01376"></a><span class="lineno"> 1376</span>            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a id="l01377" name="l01377"></a><span class="lineno"> 1377</span> </div>
+<div class="line"><a id="l01378" name="l01378"></a><span class="lineno"> 1378</span>          <span class="comment">// compute row and pivot offsets</span></div>
+<div class="line"><a id="l01379" name="l01379"></a><span class="lineno"> 1379</span>          <span class="keyword">const</span> IT_ row_off = i*stride;</div>
+<div class="line"><a id="l01380" name="l01380"></a><span class="lineno"> 1380</span> </div>
+<div class="line"><a id="l01381" name="l01381"></a><span class="lineno"> 1381</span>          <span class="comment">// fetch elimination factor</span></div>
+<div class="line"><a id="l01382" name="l01382"></a><span class="lineno"> 1382</span>          <span class="keyword">const</span> DT_ factor =  a[row_off + p[k]];</div>
+<div class="line"><a id="l01383" name="l01383"></a><span class="lineno"> 1383</span> </div>
+<div class="line"><a id="l01384" name="l01384"></a><span class="lineno"> 1384</span>          <span class="comment">// replace by unit column entry</span></div>
+<div class="line"><a id="l01385" name="l01385"></a><span class="lineno"> 1385</span>          a[row_off + p[k]] = DT_(0);</div>
 <div class="line"><a id="l01386" name="l01386"></a><span class="lineno"> 1386</span> </div>
-<div class="line"><a id="l01387" name="l01387"></a><span class="lineno"> 1387</span>      <span class="comment">// return determinant</span></div>
-<div class="line"><a id="l01388" name="l01388"></a><span class="lineno"> 1388</span>      <span class="keywordflow">return</span> det;</div>
-<div class="line"><a id="l01389" name="l01389"></a><span class="lineno"> 1389</span>    }</div>
-<div class="line"><a id="l01390" name="l01390"></a><span class="lineno"> 1390</span> </div>
-<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
-<div class="line"><a id="l01406" name="l01406"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7"> 1406</a></span>    DT_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7">calc_opening_angle_intern</a>(DT_ cross_prod, DT_ dot_prod)</div>
-<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"> 1407</span>    {</div>
-<div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span>      DT_ theta;</div>
-<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>      <span class="comment">// We always want to use the version that uses values nearer to 1 for better conditioning</span></div>
-<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(cross_prod) &lt; DT_(0.5))</div>
-<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span>      {</div>
-<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span>        theta = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">Math::asin</a>(cross_prod);</div>
-<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>        <span class="comment">// Transform to [0,2pi]</span></div>
-<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>        <span class="keywordflow">if</span>(theta &gt;= DT_(0))</div>
-<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>          theta = (dot_prod &gt;= DT_(0)) ? theta : (Math::pi&lt;DT_&gt;() - theta);</div>
-<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>          theta = (dot_prod &gt;= DT_(0)) ? (DT_(2) * Math::pi&lt;DT_&gt;() + theta) : (Math::pi&lt;DT_&gt;() - theta);</div>
-<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>      }</div>
-<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>      <span class="keywordflow">else</span></div>
-<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>      {</div>
-<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>        theta = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">Math::acos</a>(dot_prod);</div>
-<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>        <span class="comment">//Transform to [0,2pi]</span></div>
-<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span>        theta = (cross_prod &gt;= DT_(0)) ? theta : (DT_(2) * Math::pi&lt;DT_&gt;() - theta);</div>
-<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>      }</div>
-<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>      <span class="keywordflow">return</span> theta;</div>
-<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span>    }</div>
-<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span> </div>
-<div class="line"><a id="l01441" name="l01441"></a><span class="lineno"> 1441</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
-<div class="line"><a id="l01442" name="l01442"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab"> 1442</a></span>    DT_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab">calc_opening_angle</a>(DT_ x1, DT_ x2, DT_ y1, DT_ y2)</div>
-<div class="line"><a id="l01443" name="l01443"></a><span class="lineno"> 1443</span>    {</div>
-<div class="line"><a id="l01444" name="l01444"></a><span class="lineno"> 1444</span>      DT_ norm_x = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">Math::sqrt</a>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(x1) + <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(x2));</div>
-<div class="line"><a id="l01445" name="l01445"></a><span class="lineno"> 1445</span>      DT_ norm_y = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">Math::sqrt</a>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(y1) + <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(y2));</div>
-<div class="line"><a id="l01446" name="l01446"></a><span class="lineno"> 1446</span>      x1 /= norm_x;</div>
-<div class="line"><a id="l01447" name="l01447"></a><span class="lineno"> 1447</span>      x2 /= norm_x;</div>
-<div class="line"><a id="l01448" name="l01448"></a><span class="lineno"> 1448</span>      y1 /= norm_y;</div>
-<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>      y2 /= norm_y;</div>
-<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"> 1450</span> </div>
-<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>      DT_ cross = x1*y2 - y1*x2;</div>
-<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>      DT_ dot = x1*y1 + x2*y2;</div>
-<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span> </div>
-<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7">calc_opening_angle_intern</a>(cross, dot);</div>
-<div class="line"><a id="l01455" name="l01455"></a><span class="lineno"> 1455</span>    }</div>
-<div class="line"><a id="l01456" name="l01456"></a><span class="lineno"> 1456</span> </div>
-<div class="line"><a id="l01457" name="l01457"></a><span class="lineno"> 1457</span> </div>
-<div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
-<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_math_1_1_limits.html"> 1465</a></span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_math_1_1_limits.html">Limits</a> :</div>
-<div class="line"><a id="l01466" name="l01466"></a><span class="lineno"> 1466</span>      <span class="keyword">public</span> std::numeric_limits&lt;T_&gt;</div>
-<div class="line"><a id="l01467" name="l01467"></a><span class="lineno"> 1467</span>    {</div>
-<div class="line"><a id="l01468" name="l01468"></a><span class="lineno"> 1468</span>    }; <span class="comment">// class Limits&lt;...&gt;</span></div>
-<div class="line"><a id="l01469" name="l01469"></a><span class="lineno"> 1469</span> </div>
-<div class="line"><a id="l01470" name="l01470"></a><span class="lineno"> 1470</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
-<div class="line"><a id="l01471" name="l01471"></a><span class="lineno"> 1471</span>    <span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a id="l01472" name="l01472"></a><span class="lineno"> 1472</span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_math_1_1_limits.html">Limits</a>&lt;__float128&gt;</div>
-<div class="line"><a id="l01473" name="l01473"></a><span class="lineno"> 1473</span>    {</div>
-<div class="line"><a id="l01474" name="l01474"></a><span class="lineno"> 1474</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l01475" name="l01475"></a><span class="lineno"> 1475</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_specialized = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01476" name="l01476"></a><span class="lineno"> 1476</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a737d301e1e32f502778181d09b408407">min</a>() noexcept { <span class="keywordflow">return</span> FLT128_MIN; }</div>
-<div class="line"><a id="l01477" name="l01477"></a><span class="lineno"> 1477</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>() noexcept { <span class="keywordflow">return</span> FLT128_MAX; }</div>
-<div class="line"><a id="l01478" name="l01478"></a><span class="lineno"> 1478</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 lowest() noexcept { <span class="keywordflow">return</span> -FLT128_MAX; }</div>
-<div class="line"><a id="l01479" name="l01479"></a><span class="lineno"> 1479</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> digits = FLT128_MANT_DIG;</div>
-<div class="line"><a id="l01480" name="l01480"></a><span class="lineno"> 1480</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> digits10 = FLT128_DIG;</div>
-<div class="line"><a id="l01481" name="l01481"></a><span class="lineno"> 1481</span>      <span class="comment">// Note: The following formula was taken from the MSC implementation...</span></div>
-<div class="line"><a id="l01482" name="l01482"></a><span class="lineno"> 1482</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> max_digits10 = (2 + FLT128_MANT_DIG * 301 / 1000);</div>
-<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_signed = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01484" name="l01484"></a><span class="lineno"> 1484</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_integer = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01485" name="l01485"></a><span class="lineno"> 1485</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_exact = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01486" name="l01486"></a><span class="lineno"> 1486</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> radix = 2;</div>
-<div class="line"><a id="l01487" name="l01487"></a><span class="lineno"> 1487</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 epsilon() noexcept { <span class="keywordflow">return</span> FLT128_EPSILON; }</div>
-<div class="line"><a id="l01488" name="l01488"></a><span class="lineno"> 1488</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> __float128 round_error() noexcept { <span class="keywordflow">return</span> __float128(0.5); }</div>
-<div class="line"><a id="l01489" name="l01489"></a><span class="lineno"> 1489</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> min_exponent = FLT128_MIN_EXP;</div>
-<div class="line"><a id="l01490" name="l01490"></a><span class="lineno"> 1490</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> min_exponent10 = FLT128_MIN_10_EXP;</div>
-<div class="line"><a id="l01491" name="l01491"></a><span class="lineno"> 1491</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> max_exponent = FLT128_MAX_EXP;</div>
-<div class="line"><a id="l01492" name="l01492"></a><span class="lineno"> 1492</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> max_exponent10 = FLT128_MAX_10_EXP;</div>
-<div class="line"><a id="l01493" name="l01493"></a><span class="lineno"> 1493</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_infinity = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01494" name="l01494"></a><span class="lineno"> 1494</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_quiet_NaN = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01495" name="l01495"></a><span class="lineno"> 1495</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_signaling_NaN = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01496" name="l01496"></a><span class="lineno"> 1496</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> std::float_denorm_style has_denorm = std::denorm_absent;</div>
-<div class="line"><a id="l01497" name="l01497"></a><span class="lineno"> 1497</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_denorm_loss = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01498" name="l01498"></a><span class="lineno"> 1498</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 infinity() noexcept { <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>()*<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>(); }</div>
-<div class="line"><a id="l01499" name="l01499"></a><span class="lineno"> 1499</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 quiet_NaN() noexcept { return ::nanq(<span class="keyword">nullptr</span>); }</div>
-<div class="line"><a id="l01500" name="l01500"></a><span class="lineno"> 1500</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 signaling_NaN() noexcept { return ::nanq(<span class="keyword">nullptr</span>); }</div>
-<div class="line"><a id="l01501" name="l01501"></a><span class="lineno"> 1501</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 denorm_min() noexcept { <span class="keywordflow">return</span> FLT128_DENORM_MIN; }</div>
-<div class="line"><a id="l01502" name="l01502"></a><span class="lineno"> 1502</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_iec559 = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01503" name="l01503"></a><span class="lineno"> 1503</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_bounded = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01504" name="l01504"></a><span class="lineno"> 1504</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_modulo = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l01505" name="l01505"></a><span class="lineno"> 1505</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> traps = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01506" name="l01506"></a><span class="lineno"> 1506</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> tinyness_before = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01507" name="l01507"></a><span class="lineno"> 1507</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> std::float_round_style round_style = std::round_to_nearest;</div>
-<div class="line"><a id="l01508" name="l01508"></a><span class="lineno"> 1508</span>    };</div>
-<div class="line"><a id="l01509" name="l01509"></a><span class="lineno"> 1509</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
-<div class="line"><a id="l01510" name="l01510"></a><span class="lineno"> 1510</span>  } <span class="comment">// namespace Math</span></div>
-<div class="line"><a id="l01511" name="l01511"></a><span class="lineno"> 1511</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_math_1_1_limits_html"><div class="ttname"><a href="class_f_e_a_t_1_1_math_1_1_limits.html">FEAT::Math::Limits</a></div><div class="ttdoc">Math Limits class template.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01465">math.hpp:1467</a></div></div>
+<div class="line"><a id="l01387" name="l01387"></a><span class="lineno"> 1387</span>          <span class="comment">// process the row</span></div>
+<div class="line"><a id="l01388" name="l01388"></a><span class="lineno"> 1388</span>          <span class="keywordflow">for</span>(IT_ j(0); j &lt; n; ++j)</div>
+<div class="line"><a id="l01389" name="l01389"></a><span class="lineno"> 1389</span>          {</div>
+<div class="line"><a id="l01390" name="l01390"></a><span class="lineno"> 1390</span>            a[row_off + j] -= a[pk_off + j] * factor;</div>
+<div class="line"><a id="l01391" name="l01391"></a><span class="lineno"> 1391</span>          }</div>
+<div class="line"><a id="l01392" name="l01392"></a><span class="lineno"> 1392</span>        }</div>
+<div class="line"><a id="l01393" name="l01393"></a><span class="lineno"> 1393</span>      }</div>
+<div class="line"><a id="l01394" name="l01394"></a><span class="lineno"> 1394</span> </div>
+<div class="line"><a id="l01395" name="l01395"></a><span class="lineno"> 1395</span>      <span class="comment">// return determinant</span></div>
+<div class="line"><a id="l01396" name="l01396"></a><span class="lineno"> 1396</span>      <span class="keywordflow">return</span> det;</div>
+<div class="line"><a id="l01397" name="l01397"></a><span class="lineno"> 1397</span>    }</div>
+<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span> </div>
+<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
+<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7"> 1414</a></span>    DT_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7">calc_opening_angle_intern</a>(DT_ cross_prod, DT_ dot_prod)</div>
+<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>    {</div>
+<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>      DT_ theta;</div>
+<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>      <span class="comment">// We always want to use the version that uses values nearer to 1 for better conditioning</span></div>
+<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(cross_prod) &lt; DT_(0.5))</div>
+<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>      {</div>
+<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>        theta = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">Math::asin</a>(cross_prod);</div>
+<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>        <span class="comment">// Transform to [0,2pi]</span></div>
+<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>        <span class="keywordflow">if</span>(theta &gt;= DT_(0))</div>
+<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span>          theta = (dot_prod &gt;= DT_(0)) ? theta : (Math::pi&lt;DT_&gt;() - theta);</div>
+<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>          theta = (dot_prod &gt;= DT_(0)) ? (DT_(2) * Math::pi&lt;DT_&gt;() + theta) : (Math::pi&lt;DT_&gt;() - theta);</div>
+<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span>      }</div>
+<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span>      <span class="keywordflow">else</span></div>
+<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"> 1428</span>      {</div>
+<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>        theta = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">Math::acos</a>(dot_prod);</div>
+<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span>        <span class="comment">//Transform to [0,2pi]</span></div>
+<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>        theta = (cross_prod &gt;= DT_(0)) ? theta : (DT_(2) * Math::pi&lt;DT_&gt;() - theta);</div>
+<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span>      }</div>
+<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span>      <span class="keywordflow">return</span> theta;</div>
+<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span>    }</div>
+<div class="line"><a id="l01435" name="l01435"></a><span class="lineno"> 1435</span> </div>
+<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
+<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab"> 1450</a></span>    DT_ <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab">calc_opening_angle</a>(DT_ x1, DT_ x2, DT_ y1, DT_ y2)</div>
+<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>    {</div>
+<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>      DT_ norm_x = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">Math::sqrt</a>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(x1) + <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(x2));</div>
+<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span>      DT_ norm_y = <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">Math::sqrt</a>(<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(y1) + <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">Math::sqr</a>(y2));</div>
+<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span>      x1 /= norm_x;</div>
+<div class="line"><a id="l01455" name="l01455"></a><span class="lineno"> 1455</span>      x2 /= norm_x;</div>
+<div class="line"><a id="l01456" name="l01456"></a><span class="lineno"> 1456</span>      y1 /= norm_y;</div>
+<div class="line"><a id="l01457" name="l01457"></a><span class="lineno"> 1457</span>      y2 /= norm_y;</div>
+<div class="line"><a id="l01458" name="l01458"></a><span class="lineno"> 1458</span> </div>
+<div class="line"><a id="l01459" name="l01459"></a><span class="lineno"> 1459</span>      DT_ cross = x1*y2 - y1*x2;</div>
+<div class="line"><a id="l01460" name="l01460"></a><span class="lineno"> 1460</span>      DT_ dot = x1*y1 + x2*y2;</div>
+<div class="line"><a id="l01461" name="l01461"></a><span class="lineno"> 1461</span> </div>
+<div class="line"><a id="l01462" name="l01462"></a><span class="lineno"> 1462</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7">calc_opening_angle_intern</a>(cross, dot);</div>
+<div class="line"><a id="l01463" name="l01463"></a><span class="lineno"> 1463</span>    }</div>
+<div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span> </div>
+<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span> </div>
+<div class="line"><a id="l01472" name="l01472"></a><span class="lineno"> 1472</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T_&gt;</div>
+<div class="line"><a id="l01473" name="l01473"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_math_1_1_limits.html"> 1473</a></span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_math_1_1_limits.html">Limits</a> :</div>
+<div class="line"><a id="l01474" name="l01474"></a><span class="lineno"> 1474</span>      <span class="keyword">public</span> std::numeric_limits&lt;T_&gt;</div>
+<div class="line"><a id="l01475" name="l01475"></a><span class="lineno"> 1475</span>    {</div>
+<div class="line"><a id="l01476" name="l01476"></a><span class="lineno"> 1476</span>    }; <span class="comment">// class Limits&lt;...&gt;</span></div>
+<div class="line"><a id="l01477" name="l01477"></a><span class="lineno"> 1477</span> </div>
+<div class="line"><a id="l01478" name="l01478"></a><span class="lineno"> 1478</span><span class="preprocessor">#if defined(FEAT_HAVE_QUADMATH) &amp;&amp; !defined(__CUDACC__)</span></div>
+<div class="line"><a id="l01479" name="l01479"></a><span class="lineno"> 1479</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l01480" name="l01480"></a><span class="lineno"> 1480</span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_math_1_1_limits.html">Limits</a>&lt;__float128&gt;</div>
+<div class="line"><a id="l01481" name="l01481"></a><span class="lineno"> 1481</span>    {</div>
+<div class="line"><a id="l01482" name="l01482"></a><span class="lineno"> 1482</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_specialized = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01484" name="l01484"></a><span class="lineno"> 1484</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a737d301e1e32f502778181d09b408407">min</a>() noexcept { <span class="keywordflow">return</span> FLT128_MIN; }</div>
+<div class="line"><a id="l01485" name="l01485"></a><span class="lineno"> 1485</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>() noexcept { <span class="keywordflow">return</span> FLT128_MAX; }</div>
+<div class="line"><a id="l01486" name="l01486"></a><span class="lineno"> 1486</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 lowest() noexcept { <span class="keywordflow">return</span> -FLT128_MAX; }</div>
+<div class="line"><a id="l01487" name="l01487"></a><span class="lineno"> 1487</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> digits = FLT128_MANT_DIG;</div>
+<div class="line"><a id="l01488" name="l01488"></a><span class="lineno"> 1488</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> digits10 = FLT128_DIG;</div>
+<div class="line"><a id="l01489" name="l01489"></a><span class="lineno"> 1489</span>      <span class="comment">// Note: The following formula was taken from the MSC implementation...</span></div>
+<div class="line"><a id="l01490" name="l01490"></a><span class="lineno"> 1490</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> max_digits10 = (2 + FLT128_MANT_DIG * 301 / 1000);</div>
+<div class="line"><a id="l01491" name="l01491"></a><span class="lineno"> 1491</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_signed = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01492" name="l01492"></a><span class="lineno"> 1492</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_integer = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01493" name="l01493"></a><span class="lineno"> 1493</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_exact = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01494" name="l01494"></a><span class="lineno"> 1494</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> radix = 2;</div>
+<div class="line"><a id="l01495" name="l01495"></a><span class="lineno"> 1495</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 epsilon() noexcept { <span class="keywordflow">return</span> FLT128_EPSILON; }</div>
+<div class="line"><a id="l01496" name="l01496"></a><span class="lineno"> 1496</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> __float128 round_error() noexcept { <span class="keywordflow">return</span> __float128(0.5); }</div>
+<div class="line"><a id="l01497" name="l01497"></a><span class="lineno"> 1497</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> min_exponent = FLT128_MIN_EXP;</div>
+<div class="line"><a id="l01498" name="l01498"></a><span class="lineno"> 1498</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> min_exponent10 = FLT128_MIN_10_EXP;</div>
+<div class="line"><a id="l01499" name="l01499"></a><span class="lineno"> 1499</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> max_exponent = FLT128_MAX_EXP;</div>
+<div class="line"><a id="l01500" name="l01500"></a><span class="lineno"> 1500</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">int</span> max_exponent10 = FLT128_MAX_10_EXP;</div>
+<div class="line"><a id="l01501" name="l01501"></a><span class="lineno"> 1501</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_infinity = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01502" name="l01502"></a><span class="lineno"> 1502</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_quiet_NaN = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01503" name="l01503"></a><span class="lineno"> 1503</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_signaling_NaN = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01504" name="l01504"></a><span class="lineno"> 1504</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> std::float_denorm_style has_denorm = std::denorm_absent;</div>
+<div class="line"><a id="l01505" name="l01505"></a><span class="lineno"> 1505</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> has_denorm_loss = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01506" name="l01506"></a><span class="lineno"> 1506</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 infinity() noexcept { <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>()*<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">max</a>(); }</div>
+<div class="line"><a id="l01507" name="l01507"></a><span class="lineno"> 1507</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 quiet_NaN() noexcept { return ::nanq(<span class="keyword">nullptr</span>); }</div>
+<div class="line"><a id="l01508" name="l01508"></a><span class="lineno"> 1508</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 signaling_NaN() noexcept { return ::nanq(<span class="keyword">nullptr</span>); }</div>
+<div class="line"><a id="l01509" name="l01509"></a><span class="lineno"> 1509</span>      <span class="keyword">static</span> <span class="comment">/*constexpr*/</span> __float128 denorm_min() noexcept { <span class="keywordflow">return</span> FLT128_DENORM_MIN; }</div>
+<div class="line"><a id="l01510" name="l01510"></a><span class="lineno"> 1510</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_iec559 = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01511" name="l01511"></a><span class="lineno"> 1511</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_bounded = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01512" name="l01512"></a><span class="lineno"> 1512</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> is_modulo = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l01513" name="l01513"></a><span class="lineno"> 1513</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> traps = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01514" name="l01514"></a><span class="lineno"> 1514</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">bool</span> tinyness_before = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01515" name="l01515"></a><span class="lineno"> 1515</span>      <span class="keyword">static</span> <span class="keyword">constexpr</span> std::float_round_style round_style = std::round_to_nearest;</div>
+<div class="line"><a id="l01516" name="l01516"></a><span class="lineno"> 1516</span>    };</div>
+<div class="line"><a id="l01517" name="l01517"></a><span class="lineno"> 1517</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_QUADMATH &amp;&amp; !__CUDA_CC__</span></div>
+<div class="line"><a id="l01518" name="l01518"></a><span class="lineno"> 1518</span>  } <span class="comment">// namespace Math</span></div>
+<div class="line"><a id="l01519" name="l01519"></a><span class="lineno"> 1519</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_math_1_1_limits_html"><div class="ttname"><a href="class_f_e_a_t_1_1_math_1_1_limits.html">FEAT::Math::Limits</a></div><div class="ttdoc">Math Limits class template.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01473">math.hpp:1475</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a00029dad195a1d46d7baa2c66595b0b5"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5">FEAT::Math::sqrt</a></div><div class="ttdeci">T_ sqrt(T_ x)</div><div class="ttdoc">Returns the square-root of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00300">math.hpp:300</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a03eee0b8c4c53e4b421935ae84a7b637"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a03eee0b8c4c53e4b421935ae84a7b637">FEAT::Math::sinh</a></div><div class="ttdeci">T_ sinh(T_ x)</div><div class="ttdoc">Returns the hyperbolic sine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00447">math.hpp:447</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a09c95e3b814ebb95af55d9ddec1570c7"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7">FEAT::Math::calc_opening_angle_intern</a></div><div class="ttdeci">DT_ calc_opening_angle_intern(DT_ cross_prod, DT_ dot_prod)</div><div class="ttdoc">Calculates the opening angle from the dot and cross product of two 2D vectors.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01406">math.hpp:1406</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a1244b118c18e265e79092bd3de1f8cb2"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2">FEAT::Math::tiny</a></div><div class="ttdeci">T_ tiny()</div><div class="ttdoc">Returns the minimum positive finite (full-precision) value for a data type.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00845">math.hpp:845</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a1546f1fe9d4fc7909256b43466cec3bd"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd">FEAT::Math::factorial</a></div><div class="ttdeci">T_ factorial(T_ n, T_ m=T_(0))</div><div class="ttdoc">Calculates the (partial) factorial.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01156">math.hpp:1156</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a09c95e3b814ebb95af55d9ddec1570c7"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a09c95e3b814ebb95af55d9ddec1570c7">FEAT::Math::calc_opening_angle_intern</a></div><div class="ttdeci">DT_ calc_opening_angle_intern(DT_ cross_prod, DT_ dot_prod)</div><div class="ttdoc">Calculates the opening angle from the dot and cross product of two 2D vectors.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01414">math.hpp:1414</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a1244b118c18e265e79092bd3de1f8cb2"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2">FEAT::Math::tiny</a></div><div class="ttdeci">T_ tiny()</div><div class="ttdoc">Returns the minimum positive finite (full-precision) value for a data type.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00853">math.hpp:853</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a1546f1fe9d4fc7909256b43466cec3bd"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd">FEAT::Math::factorial</a></div><div class="ttdeci">T_ factorial(T_ n, T_ m=T_(0))</div><div class="ttdoc">Calculates the (partial) factorial.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01164">math.hpp:1164</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a175bb1b6448883c2535b9585b4572e0e"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a175bb1b6448883c2535b9585b4572e0e">FEAT::Math::atan</a></div><div class="ttdeci">T_ atan(T_ x)</div><div class="ttdoc">Returns the arctangent of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00662">math.hpp:662</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a1c529b4cb9868b3ef793a7c7a32260e9"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a1c529b4cb9868b3ef793a7c7a32260e9">FEAT::Math::isinf</a></div><div class="ttdeci">bool isinf(T_ x)</div><div class="ttdoc">Checks whether a value is infinite.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a1d707c23de398006f44a1cd0ec8f2a5e"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a1d707c23de398006f44a1cd0ec8f2a5e">FEAT::Math::pi</a></div><div class="ttdeci">T_ pi()</div><div class="ttdoc">Returns the mathematical constant pi = 3.1415...</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00724">math.hpp:724</a></div></div>
@@ -1204,21 +1212,21 @@ $(document).ready(function(){initNavTree('math_8hpp_source.html',''); initResiza
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a38e9e1d477dd4245e77da893471e8a8e"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a38e9e1d477dd4245e77da893471e8a8e">FEAT::Math::mini</a></div><div class="ttdeci">void mini(T_ &amp;xmin, T_ x)</div><div class="ttdoc">Updates the minimum of a set of values.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00154">math.hpp:154</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a3c36741669d07b8bcd5102ecf5b663d7"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a3c36741669d07b8bcd5102ecf5b663d7">FEAT::Math::cosh</a></div><div class="ttdeci">T_ cosh(T_ x)</div><div class="ttdoc">Returns the hyperbolic cosine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00489">math.hpp:489</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a3e026735e16566f7c5e30d9faae4dd7f"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a3e026735e16566f7c5e30d9faae4dd7f">FEAT::Math::tanh</a></div><div class="ttdeci">T_ tanh(T_ x)</div><div class="ttdoc">Returns the hyperbolic tangent of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00531">math.hpp:531</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a4215f59d7df3791e02088af092635d30"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">FEAT::Math::acos</a></div><div class="ttdeci">T_ acos(T_ x)</div><div class="ttdoc">Returns the arccosine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00959">math.hpp:959</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a4b209734269857e165d0519f2c96f998"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a4b209734269857e165d0519f2c96f998">FEAT::Math::nan</a></div><div class="ttdeci">T_ nan()</div><div class="ttdoc">Returns a quiet Not-A-Number (NaN)</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00889">math.hpp:889</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a5139950a3d9b304b7d15419f353c1bab"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab">FEAT::Math::calc_opening_angle</a></div><div class="ttdeci">DT_ calc_opening_angle(DT_ x1, DT_ x2, DT_ y1, DT_ y2)</div><div class="ttdoc">Calculates the opening angle of two 2D vectors.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01442">math.hpp:1442</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a4215f59d7df3791e02088af092635d30"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a4215f59d7df3791e02088af092635d30">FEAT::Math::acos</a></div><div class="ttdeci">T_ acos(T_ x)</div><div class="ttdoc">Returns the arccosine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00967">math.hpp:967</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a4b209734269857e165d0519f2c96f998"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a4b209734269857e165d0519f2c96f998">FEAT::Math::nan</a></div><div class="ttdeci">T_ nan()</div><div class="ttdoc">Returns a quiet Not-A-Number (NaN)</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00897">math.hpp:897</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a5139950a3d9b304b7d15419f353c1bab"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a5139950a3d9b304b7d15419f353c1bab">FEAT::Math::calc_opening_angle</a></div><div class="ttdeci">DT_ calc_opening_angle(DT_ x1, DT_ x2, DT_ y1, DT_ y2)</div><div class="ttdoc">Calculates the opening angle of two 2D vectors.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01450">math.hpp:1450</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a564d69313ee91de438926de491613096"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">FEAT::Math::pow</a></div><div class="ttdeci">T_ pow(T_ x, T_ y)</div><div class="ttdoc">Returns x raised to the power of y.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00643">math.hpp:643</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a5c75d3492b66c7de156074b05db2d903"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">FEAT::Math::asin</a></div><div class="ttdeci">T_ asin(T_ x)</div><div class="ttdoc">Returns the arcsine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00941">math.hpp:941</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a61139d6ac642cd3298e36e4ad43fe277"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277">FEAT::Math::binomial</a></div><div class="ttdeci">T_ binomial(T_ n, T_ k)</div><div class="ttdoc">Calculates the binomial coefficient.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01188">math.hpp:1188</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a5c75d3492b66c7de156074b05db2d903"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a5c75d3492b66c7de156074b05db2d903">FEAT::Math::asin</a></div><div class="ttdeci">T_ asin(T_ x)</div><div class="ttdoc">Returns the arcsine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00949">math.hpp:949</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a61139d6ac642cd3298e36e4ad43fe277"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a61139d6ac642cd3298e36e4ad43fe277">FEAT::Math::binomial</a></div><div class="ttdeci">T_ binomial(T_ n, T_ k)</div><div class="ttdoc">Calculates the binomial coefficient.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01196">math.hpp:1196</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a626914ffab6906033ac45a08d8665dc1"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a626914ffab6906033ac45a08d8665dc1">FEAT::Math::minimax</a></div><div class="ttdeci">void minimax(T_ x, T_ &amp;a, T_ &amp;b)</div><div class="ttdoc">Updates the minimum and maximum.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00195">math.hpp:195</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a650ef78b9c0f2a22b52217cd1a4a9a42"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a650ef78b9c0f2a22b52217cd1a4a9a42">FEAT::Math::sin</a></div><div class="ttdeci">T_ sin(T_ x)</div><div class="ttdoc">Returns the sine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00344">math.hpp:344</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a6af449baf67aa23022a99f019ddb1053"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a6af449baf67aa23022a99f019ddb1053">FEAT::Math::sqr</a></div><div class="ttdeci">T_ sqr(T_ x)</div><div class="ttdoc">Returns the square of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00095">math.hpp:95</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a725744fd6557917b245e1f450c585c7a"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a725744fd6557917b245e1f450c585c7a">FEAT::Math::maxi</a></div><div class="ttdeci">void maxi(T_ &amp;xmax, T_ x)</div><div class="ttdoc">Updates the maximum of a set of values.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00172">math.hpp:172</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a737d301e1e32f502778181d09b408407"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a737d301e1e32f502778181d09b408407">FEAT::Math::min</a></div><div class="ttdeci">T_ min(T_ a, T_ b)</div><div class="ttdoc">Returns the minimum of two values.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00123">math.hpp:123</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a77b20ca6d54b5daf24897472b285e8bf"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a77b20ca6d54b5daf24897472b285e8bf">FEAT::Math::cub</a></div><div class="ttdeci">T_ cub(T_ x)</div><div class="ttdoc">Returns the cube of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00109">math.hpp:109</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a982e9ed1e36cccb7ab1857cb699114f4"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4">FEAT::Math::huge</a></div><div class="ttdeci">T_ huge()</div><div class="ttdoc">Returns the maximum positive finite (full-precision) value for a data type.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00834">math.hpp:834</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a982e9ed1e36cccb7ab1857cb699114f4"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4">FEAT::Math::huge</a></div><div class="ttdeci">T_ huge()</div><div class="ttdoc">Returns the maximum positive finite (full-precision) value for a data type.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00842">math.hpp:842</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a9c620aa12e1fae51ce83f77930822032"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a9c620aa12e1fae51ce83f77930822032">FEAT::Math::tan</a></div><div class="ttdeci">T_ tan(T_ x)</div><div class="ttdoc">Returns the tangent of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00428">math.hpp:428</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_aa3bd97ac1936a6eefda19f005d30ddb3"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3">FEAT::Math::invert_matrix</a></div><div class="ttdeci">DT_ invert_matrix(const IT_ n, const IT_ stride, DT_ a[], IT_ p[])</div><div class="ttdoc">Inverts a matrix and returns its determinant.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01284">math.hpp:1284</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_aa3bd97ac1936a6eefda19f005d30ddb3"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3">FEAT::Math::invert_matrix</a></div><div class="ttdeci">DT_ invert_matrix(const IT_ n, const IT_ stride, DT_ a[], IT_ p[])</div><div class="ttdoc">Inverts a matrix and returns its determinant.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l01292">math.hpp:1292</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_aa4f403e0b9b13250f24ef2e0119dc038"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#aa4f403e0b9b13250f24ef2e0119dc038">FEAT::Math::signum</a></div><div class="ttdeci">T_ signum(T_ x)</div><div class="ttdoc">Returns the sign of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00250">math.hpp:250</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_aa50cd429cb5c6eaec7a54ccf2ed12e55"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#aa50cd429cb5c6eaec7a54ccf2ed12e55">FEAT::Math::log10</a></div><div class="ttdeci">T_ log10(T_ x)</div><div class="ttdoc">Returns the logarithm to the base 10 of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00623">math.hpp:623</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_aabdd68b6d82aa1a5755b3e7391b474f5"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#aabdd68b6d82aa1a5755b3e7391b474f5">FEAT::Math::signbit</a></div><div class="ttdeci">bool signbit(T_ x)</div><div class="ttdoc">Returns the status of the sign bit.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00262">math.hpp:262</a></div></div>
@@ -1228,7 +1236,7 @@ $(document).ready(function(){initNavTree('math_8hpp_source.html',''); initResiza
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_ae2ecb430cf43fba96f9e8ed1a7f7dfad"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#ae2ecb430cf43fba96f9e8ed1a7f7dfad">FEAT::Math::cos</a></div><div class="ttdeci">T_ cos(T_ x)</div><div class="ttdoc">Returns the cosine of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00386">math.hpp:386</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_ae35931777fb4c398a17f6b615edef161"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#ae35931777fb4c398a17f6b615edef161">FEAT::Math::log</a></div><div class="ttdeci">T_ log(T_ x)</div><div class="ttdoc">Returns the natural logarithm of a value.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00580">math.hpp:580</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_ae63636287332e32875ca28780966a810"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#ae63636287332e32875ca28780966a810">FEAT::Math::max</a></div><div class="ttdeci">T_ max(T_ a, T_ b)</div><div class="ttdoc">Returns the maximum of two values.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00137">math.hpp:137</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_afec6f28efbe20fb1ec6ec53245ab6adf"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf">FEAT::Math::eps</a></div><div class="ttdeci">T_ eps()</div><div class="ttdoc">Returns the machine precision constant for a floating-point data type.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00779">math.hpp:779</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_afec6f28efbe20fb1ec6ec53245ab6adf"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf">FEAT::Math::eps</a></div><div class="ttdeci">T_ eps()</div><div class="ttdoc">Returns the machine precision constant for a floating-point data type.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00787">math.hpp:787</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_a8c47ff8b285a0bdc256ac0d394c06c7e"><div class="ttname"><a href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">FEAT::Half</a></div><div class="ttdeci">__half Half</div><div class="ttdoc">Half data type.</div><div class="ttdef"><b>Definition:</b> <a href="half_8hpp_source.html#l00025">half.hpp:25</a></div></div>
 <div class="ttc" id="astruct_f_e_a_t_1_1_type_1_1_traits_html"><div class="ttname"><a href="struct_f_e_a_t_1_1_type_1_1_traits.html">FEAT::Type::Traits</a></div><div class="ttdoc">basic Type Traits struct</div><div class="ttdef"><b>Definition:</b> <a href="type__traits_8hpp_source.html#l00072">type_traits.hpp:73</a></div></div>

@@ -138,6 +138,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adceffc2956fd3bef48ea5a10df776418"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#adceffc2956fd3bef48ea5a10df776418">parse</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;option, Prms_ &amp;&amp;... prms) const</td></tr>
 <tr class="memdesc:adceffc2956fd3bef48ea5a10df776418"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses the parameters of an option.  <a href="class_f_e_a_t_1_1_simple_arg_parser.html#adceffc2956fd3bef48ea5a10df776418">More...</a><br /></td></tr>
 <tr class="separator:adceffc2956fd3bef48ea5a10df776418"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40ef872367bc28132866ba5dd832e286"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
+<tr class="memitem:a40ef872367bc28132866ba5dd832e286"><td class="memTemplItemLeft" align="right" valign="top">T_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#a40ef872367bc28132866ba5dd832e286">parse_default</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;option, T_ default_value) const</td></tr>
+<tr class="memdesc:a40ef872367bc28132866ba5dd832e286"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a single parameter of an option and returns it or, if not given, a default value.  <a href="class_f_e_a_t_1_1_simple_arg_parser.html#a40ef872367bc28132866ba5dd832e286">More...</a><br /></td></tr>
+<tr class="separator:a40ef872367bc28132866ba5dd832e286"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99f09de8dec9e2cd253508bf975459b8"><td class="memItemLeft" align="right" valign="top">const std::pair&lt; int, std::deque&lt; <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &gt; &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_simple_arg_parser.html#a99f09de8dec9e2cd253508bf975459b8">query</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;option) const</td></tr>
 <tr class="memdesc:a99f09de8dec9e2cd253508bf975459b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query the parameters of an option.  <a href="class_f_e_a_t_1_1_simple_arg_parser.html#a99f09de8dec9e2cd253508bf975459b8">More...</a><br /></td></tr>
 <tr class="separator:a99f09de8dec9e2cd253508bf975459b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -531,7 +535,59 @@ template&lt;typename... Prms_&gt; </div>
 
 <p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00147">_opts</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00188">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="simple__arg__parser_8hpp_source.html#l00408">parse_default()</a>.</p>
+
+</div>
+</div>
+<a id="a40ef872367bc28132866ba5dd832e286" name="a40ef872367bc28132866ba5dd832e286"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40ef872367bc28132866ba5dd832e286">&#9670;&#160;</a></span>parse_default()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T_ FEAT::SimpleArgParser::parse_default </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>option</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T_&#160;</td>
+          <td class="paramname"><em>default_value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Parses a single parameter of an option and returns it or, if not given, a default value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">option</td><td>The name of the option (without the leading <code>--</code>) that is to be queried.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">default_value</td><td>A default value that is to be returned if the parameter parsing failed or the option was not given.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The parsed option parameter or the default_value if parsing failed or the option was not given. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="simple__arg__parser_8hpp_source.html#l00408">408</a> of file <a class="el" href="simple__arg__parser_8hpp_source.html">simple_arg_parser.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="simple__arg__parser_8hpp_source.html#l00384">parse()</a>.</p>
 
 </div>
 </div>

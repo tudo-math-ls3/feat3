@@ -7,6 +7,7 @@ var class_f_e_a_t_1_1_simple_arg_parser =
     [ "num_args", "class_f_e_a_t_1_1_simple_arg_parser.html#ae9d22cc3c13d544fb53d73ac71be7103", null ],
     [ "num_skipped_args", "class_f_e_a_t_1_1_simple_arg_parser.html#a2bf4d8799cf77bc4495e68d0a566b7d0", null ],
     [ "parse", "class_f_e_a_t_1_1_simple_arg_parser.html#adceffc2956fd3bef48ea5a10df776418", null ],
+    [ "parse_default", "class_f_e_a_t_1_1_simple_arg_parser.html#a40ef872367bc28132866ba5dd832e286", null ],
     [ "query", "class_f_e_a_t_1_1_simple_arg_parser.html#a99f09de8dec9e2cd253508bf975459b8", null ],
     [ "query_unsupported", "class_f_e_a_t_1_1_simple_arg_parser.html#a9e58f26bc37dadf95d953db3cd453d37", null ],
     [ "skipped_args", "class_f_e_a_t_1_1_simple_arg_parser.html#a92b99ecd71d2ff67374889be651ffb69", null ],

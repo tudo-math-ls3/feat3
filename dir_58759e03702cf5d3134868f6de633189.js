@@ -14,6 +14,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "cudss.hpp", "cudss_8hpp_source.html", null ],
     [ "cusolver.cu", "cusolver_8cu_source.html", null ],
     [ "cusolver.hpp", "cusolver_8hpp_source.html", null ],
+    [ "descent.hpp", "descent_8hpp_source.html", null ],
     [ "diagonal_precond.hpp", "diagonal__precond_8hpp_source.html", null ],
     [ "direct_stokes_solver.hpp", "direct__stokes__solver_8hpp_source.html", null ],
     [ "expression.hpp", "expression_8hpp_source.html", null ],

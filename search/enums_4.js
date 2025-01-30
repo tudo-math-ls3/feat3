@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['filemode_0',['FileMode',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646',1,'FEAT::LAFEM']]]
+  ['expressiontype_0',['ExpressionType',['../namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257c',1,'FEAT::Solver']]]
 ];

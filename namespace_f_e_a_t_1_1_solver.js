@@ -17,6 +17,7 @@ var namespace_f_e_a_t_1_1_solver =
     [ "CUDSS", "class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html", "class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s" ],
     [ "CuSolverLU", "class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u.html", "class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u" ],
     [ "CuSolverQR", "class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html", "class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r" ],
+    [ "Descent", "class_f_e_a_t_1_1_solver_1_1_descent.html", "class_f_e_a_t_1_1_solver_1_1_descent" ],
     [ "DiagonalPrecond", "class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html", "class_f_e_a_t_1_1_solver_1_1_diagonal_precond" ],
     [ "DirectStokesCore", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core.html", null ],
     [ "DirectStokesCore< SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, dim_ >, LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, 1 >, LAFEM::SparseMatrixBCSR< DT_, IT_, 1, dim_ >, LAFEM::SparseMatrixCSR< DT_, IT_ > >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core_3_01_solver_d_t___00_01_solver_i_t___00_01_l_a_fba3df488bc06c314d472100c65203e90.html", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core_3_01_solver_d_t___00_01_solver_i_t___00_01_l_a_fba3df488bc06c314d472100c65203e90" ],
@@ -125,6 +126,11 @@ var namespace_f_e_a_t_1_1_solver =
       [ "left", "namespace_f_e_a_t_1_1_solver.html#a84303e5a9eeeb8bd47fb8e76c3d3694ea811882fecd5c7618d7099ebbd39ea254", null ],
       [ "right", "namespace_f_e_a_t_1_1_solver.html#a84303e5a9eeeb8bd47fb8e76c3d3694ea7c4f29407893c334a6cb7a87bf045c0d", null ]
     ] ],
+    [ "DescentVariant", "namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7", [
+      [ "fixed", "namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149", null ],
+      [ "steepest", "namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7aa28d8f7ff8168d4aa740054357bcac61", null ],
+      [ "defect", "namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7a6475f0c19ab92149df68660d6be44562", null ]
+    ] ],
     [ "ExpressionType", "namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257c", [
       [ "start_solve", "namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257cadbb68c86754ccad2ee2908a92f34d3e4", null ],
       [ "end_solve", "namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257ca43355c9ca3b3625921863fbb1d7a6125", null ],
@@ -208,6 +214,7 @@ var namespace_f_e_a_t_1_1_solver =
     [ "new_convert_precond", "namespace_f_e_a_t_1_1_solver.html#aac0226c89d9b7912c73ec8ed13450c18", null ],
     [ "new_convert_precond", "namespace_f_e_a_t_1_1_solver.html#a52e33f7df9dd68f704b6186ca69e39b5", null ],
     [ "new_cudss", "namespace_f_e_a_t_1_1_solver.html#a63f2d4d8e173efce55b6c3538ce6dd8b", null ],
+    [ "new_descent", "namespace_f_e_a_t_1_1_solver.html#a944840c3164e9bc32129ff35566ff813", null ],
     [ "new_diagonal_precond", "namespace_f_e_a_t_1_1_solver.html#a59dbf0d9ce0d9135831f99f54ee6fd53", null ],
     [ "new_direct_stokes_solver", "namespace_f_e_a_t_1_1_solver.html#a1710fb7ef4e77aa3d2407b1b2c118d2e", null ],
     [ "new_euclid_precond", "namespace_f_e_a_t_1_1_solver.html#a0ed20d38330cb0b55f3a02ac3163002f", null ],
@@ -253,6 +260,7 @@ var namespace_f_e_a_t_1_1_solver =
     [ "new_pipepcg", "namespace_f_e_a_t_1_1_solver.html#afd5a6866b18ce17013639fb9f4647c80", null ],
     [ "new_pipepcg", "namespace_f_e_a_t_1_1_solver.html#a5efb59a44612597a86e127427644f4ab", null ],
     [ "new_pmr", "namespace_f_e_a_t_1_1_solver.html#a940b86c64e3f0422ea0c7c573bcda71a", null ],
+    [ "new_pmr", "namespace_f_e_a_t_1_1_solver.html#a6d3d7bb369cdae2f3598b07ebeaf907a", null ],
     [ "new_pmr", "namespace_f_e_a_t_1_1_solver.html#ad8fdbca4c863c6705484e2d4d34ecf64", null ],
     [ "new_polynomial_precond", "namespace_f_e_a_t_1_1_solver.html#aca8bd0716ea4730474e9b391d97819c0", null ],
     [ "new_polynomial_precond", "namespace_f_e_a_t_1_1_solver.html#a8f0d224e33f8ddbde5a0b02ead13f68f", null ],
@@ -287,5 +295,6 @@ var namespace_f_e_a_t_1_1_solver =
     [ "new_voxel_amavanka", "namespace_f_e_a_t_1_1_solver.html#a9c46ebafdde9ce5b47a825ae6943e7b5", null ],
     [ "solve", "namespace_f_e_a_t_1_1_solver.html#a8e6b79b11fc66593e4336d1259a158b7", null ],
     [ "solve", "namespace_f_e_a_t_1_1_solver.html#afaf7fb5797216195651b6d22eaadc8d2", null ],
-    [ "status_success", "namespace_f_e_a_t_1_1_solver.html#a06d657f3235d3857164ec176b6958d87", null ]
+    [ "status_success", "namespace_f_e_a_t_1_1_solver.html#a06d657f3235d3857164ec176b6958d87", null ],
+    [ "direct_stokes_solver_available", "namespace_f_e_a_t_1_1_solver.html#aab00c352abe48c34ba5f5b165bd3cd21", null ]
 ];

@@ -10,8 +10,7 @@ var searchData=
   ['non_5fempty_5frows_7',['non_empty_rows',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ae6c82e67b5da47ff7b10f3290c72b201',1,'FEAT::LAFEM']]],
   ['non_5fnegative_8',['non_negative',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ad0c0015a651861f606ba724bf9763435',1,'FEAT::LAFEM']]],
   ['non_5fzero_5fdiag_9',['non_zero_diag',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a232e0d8aadcf8b1f2f34dcc1744c0331',1,'FEAT::LAFEM']]],
-  ['none_10',['none',['../class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea334c4a4c42fdb79d7ebc3e73b517e6f8',1,'FEAT::Adjacency::Permutation']]],
+  ['none_10',['none',['../class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea334c4a4c42fdb79d7ebc3e73b517e6f8',1,'FEAT::Adjacency::Permutation::none()'],['../namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'FEAT::Geometry::none()'],['../namespace_f_e_a_t_1_1_solver.html#a892c0210316c5cb1cf89035147242c36a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'FEAT::Solver::none()']]],
   ['none_11',['None',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711a6adf97f83acf6453d4a6a4b1070f3754',1,'FEAT::LAFEM']]],
-  ['none_12',['none',['../namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'FEAT::Geometry::none()'],['../namespace_f_e_a_t_1_1_solver.html#a892c0210316c5cb1cf89035147242c36a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'FEAT::Solver::none()']]],
-  ['normal_13',['normal',['../namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428afea087517c26fadd409bd4b9dc642555',1,'FEAT']]]
+  ['normal_12',['normal',['../namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428afea087517c26fadd409bd4b9dc642555',1,'FEAT::normal()'],['../namespace_f_e_a_t_1_1_control_1_1_domain.html#a26f4622eb76d3da5d2d2e40650ec744cafea087517c26fadd409bd4b9dc642555',1,'FEAT::Control::Domain::normal()']]]
 ];

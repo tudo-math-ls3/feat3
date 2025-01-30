@@ -200,6 +200,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2ea63a60e19dc86adc2108433cd8dccf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a2ea63a60e19dc86adc2108433cd8dccf">filter_weak_matrix_rows</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">SparseMatrixBCSR</a>&lt; DT_, IT_, BlockSize_, BlockWidth_ &gt; &amp;matrix_a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">SparseMatrixBCSR</a>&lt; DT_, IT_, BlockSize_, BlockWidth_ &gt; &amp;matrix_m) const</td></tr>
 <tr class="memdesc:a2ea63a60e19dc86adc2108433cd8dccf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the rows of the system matrix by scaled rows of another matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a2ea63a60e19dc86adc2108433cd8dccf">More...</a><br /></td></tr>
 <tr class="separator:a2ea63a60e19dc86adc2108433cd8dccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b5f0a7863b3c446cad6611e96612fed"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a3b5f0a7863b3c446cad6611e96612fed">get_ignore_nans</a> () const</td></tr>
+<tr class="memdesc:a3b5f0a7863b3c446cad6611e96612fed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies whether the filter should ignore NaNs filter values.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a3b5f0a7863b3c446cad6611e96612fed">More...</a><br /></td></tr>
+<tr class="separator:a3b5f0a7863b3c446cad6611e96612fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad02a5f2c35d11450ae9a14c53a9d90ad"><td class="memItemLeft" align="right" valign="top">IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#ad02a5f2c35d11450ae9a14c53a9d90ad">get_indices</a> ()</td></tr>
 <tr class="separator:ad02a5f2c35d11450ae9a14c53a9d90ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcce0ced1e0c55127c8ccd1a1cdc1da1"><td class="memItemLeft" align="right" valign="top">const IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#abcce0ced1e0c55127c8ccd1a1cdc1da1">get_indices</a> () const</td></tr>
@@ -630,7 +633,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00206">206</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00212">212</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
 
@@ -852,9 +855,9 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00431">431</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00437">437</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00414">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>.</p>
+<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00420">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>.</p>
 
 </div>
 </div>
@@ -892,11 +895,11 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00414">414</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00420">420</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_ignore_nans</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00414">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00358">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_ignore_nans</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00420">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00358">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00431">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_cor()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00414">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00437">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_cor()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00420">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>.</p>
 
 </div>
 </div>
@@ -941,7 +944,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </dl>
 <p>The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's blocksize. </p>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00270">270</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00276">276</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -986,7 +989,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </dl>
 <p>The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's blocksize. </p>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00304">304</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00310">310</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -1031,7 +1034,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </dl>
 <p>The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's blocksize. </p>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00287">287</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00293">293</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -1069,11 +1072,11 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00385">385</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00391">391</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_ignore_nans</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00385">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00358">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_ignore_nans</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00391">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00358">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00385">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00402">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00391">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00408">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>.</p>
 
 </div>
 </div>
@@ -1111,9 +1114,9 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00402">402</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00408">408</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00385">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>.</p>
+<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00391">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
@@ -1165,9 +1168,42 @@ template&lt;int BlockWidth_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00356">356</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00362">362</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00942">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::col_ind()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00993">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00899">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::rows()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00358">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00969">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::val()</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a3b5f0a7863b3c446cad6611e96612fed" name="a3b5f0a7863b3c446cad6611e96612fed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b5f0a7863b3c446cad6611e96612fed">&#9670;&#160;</a></span>get_ignore_nans()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html">FEAT::LAFEM::UnitFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::get_ignore_nans </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Specifies whether the filter should ignore NaNs filter values. </p>
+
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00200">200</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_ignore_nans</a>.</p>
 
 </div>
 </div>
@@ -1197,7 +1233,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The index array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00224">224</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00230">230</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>.</p>
 
@@ -1229,7 +1265,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The index array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00230">230</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00236">236</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>.</p>
 
@@ -1261,7 +1297,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The value array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00236">236</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00242">242</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00303">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>.</p>
 
@@ -1293,7 +1329,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The value array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00242">242</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00248">248</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00303">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>.</p>
 
@@ -1361,7 +1397,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p>Permutate internal vector according to the given Permutation. </p>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00248">248</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00254">254</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00693">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>.</p>
 
@@ -1433,7 +1469,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total size of the filter. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00212">212</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00218">218</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00358">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>.</p>
 
@@ -1467,7 +1503,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of entries in the filter. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00218">218</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00224">224</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>.</p>
 
@@ -1500,7 +1536,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00079">79</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00151">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00159">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00414">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00385">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00127">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00194">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::set_ignore_nans()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00151">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00159">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00420">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00391">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00200">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::get_ignore_nans()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00127">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00194">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::set_ignore_nans()</a>.</p>
 
 </div>
 </div>
@@ -1530,7 +1566,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="unit__filter__blocked_8hpp_source.html#l00076">76</a> of file <a class="el" href="unit__filter__blocked_8hpp_source.html">unit_filter_blocked.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00206">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::add()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00172">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::bytes()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00166">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00151">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00159">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00414">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00385">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00356">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_weak_matrix_rows()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00224">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::get_indices()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00236">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::get_values()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00127">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00248">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00212">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00218">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="unit__filter__blocked_8hpp_source.html#l00212">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::add()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00172">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::bytes()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00166">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00151">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00159">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00420">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00391">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00362">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_weak_matrix_rows()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00230">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::get_indices()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00242">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::get_values()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00127">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00254">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00218">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, and <a class="el" href="unit__filter__blocked_8hpp_source.html#l00224">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>.</p>
 
 </div>
 </div>

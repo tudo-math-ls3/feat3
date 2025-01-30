@@ -25,6 +25,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked =
     [ "filter_rhs", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#ab9292d6bb5108b914b88002920272ed4", null ],
     [ "filter_sol", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a96accb107cb13dacf19de6b7fdb78a63", null ],
     [ "filter_weak_matrix_rows", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a2ea63a60e19dc86adc2108433cd8dccf", null ],
+    [ "get_ignore_nans", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a3b5f0a7863b3c446cad6611e96612fed", null ],
     [ "get_indices", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#ad02a5f2c35d11450ae9a14c53a9d90ad", null ],
     [ "get_indices", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#abcce0ced1e0c55127c8ccd1a1cdc1da1", null ],
     [ "get_values", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a436343ec6668118fc21957ad132d0ef5", null ],

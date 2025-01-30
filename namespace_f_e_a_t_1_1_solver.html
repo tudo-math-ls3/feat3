@@ -105,7 +105,8 @@ $(document).ready(function(){initNavTree('namespace_f_e_a_t_1_1_solver.html','')
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Solver Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -165,6 +166,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html">CuSolverQR</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html" title="CuSolverQR solver class.">CuSolverQR</a> solver class.  <a href="class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html">Descent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Preconditioned) <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> solver implementation  <a href="class_f_e_a_t_1_1_solver_1_1_descent.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html">DiagonalPrecond</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Diagonal preconditioner implementation.  <a href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html#details">More...</a><br /></td></tr>
@@ -305,7 +309,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstract base class for preconditioners for nonlinear optimization.  <a href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_s_d.html">NLSD</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nonlinear Steepest Descent method for finding a minimum of an functional's gradient.  <a href="class_f_e_a_t_1_1_solver_1_1_n_l_s_d.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nonlinear Steepest <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> method for finding a minimum of an functional's gradient.  <a href="class_f_e_a_t_1_1_solver_1_1_n_l_s_d.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_nonlinear_operator_precond_wrapper.html">NonlinearOperatorPrecondWrapper</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper class around a (potentially nonlinear) operator.  <a href="class_f_e_a_t_1_1_solver_1_1_nonlinear_operator_precond_wrapper.html#details">More...</a><br /></td></tr>
@@ -465,6 +469,11 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a84303e5a9eeeb8bd47fb8e76c3d3694e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum for different preconditioning variants for BiCGStab.  <a href="namespace_f_e_a_t_1_1_solver.html#a84303e5a9eeeb8bd47fb8e76c3d3694e">More...</a><br /></td></tr>
 <tr class="separator:a84303e5a9eeeb8bd47fb8e76c3d3694e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a289617fe7cdace66d3123dc0472c31d7"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">DescentVariant</a> { <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149">fixed</a>
+, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7aa28d8f7ff8168d4aa740054357bcac61">steepest</a>
+, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7a6475f0c19ab92149df68660d6be44562">defect</a>
+ }</td></tr>
+<tr class="separator:a289617fe7cdace66d3123dc0472c31d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3e1a0d5d6876f6d4fe16f71003b257c"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257c">ExpressionType</a> { <br />
 &#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257cadbb68c86754ccad2ee2908a92f34d3e4">start_solve</a> = 0
 , <a class="el" href="namespace_f_e_a_t_1_1_solver.html#aa3e1a0d5d6876f6d4fe16f71003b257ca43355c9ca3b3625921863fbb1d7a6125">end_solve</a>
@@ -623,6 +632,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a63f2d4d8e173efce55b6c3538ce6dd8b"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html">CUDSS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a63f2d4d8e173efce55b6c3538ce6dd8b">new_cudss</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; double, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;matrix)</td></tr>
 <tr class="memdesc:a63f2d4d8e173efce55b6c3538ce6dd8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html" title="Nvidia CUDA Direct Sparse Solver wrapper.">CUDSS</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#a63f2d4d8e173efce55b6c3538ce6dd8b">More...</a><br /></td></tr>
 <tr class="separator:a63f2d4d8e173efce55b6c3538ce6dd8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a944840c3164e9bc32129ff35566ff813"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
+<tr class="memitem:a944840c3164e9bc32129ff35566ff813"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html">Descent</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a944840c3164e9bc32129ff35566ff813">new_descent</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">DescentVariant</a> variant, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
+<tr class="memdesc:a944840c3164e9bc32129ff35566ff813"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#a944840c3164e9bc32129ff35566ff813">More...</a><br /></td></tr>
+<tr class="separator:a944840c3164e9bc32129ff35566ff813"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59dbf0d9ce0d9135831f99f54ee6fd53"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename Filter_ &gt; </td></tr>
 <tr class="memitem:a59dbf0d9ce0d9135831f99f54ee6fd53"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html">DiagonalPrecond</a>&lt; Vector_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a59dbf0d9ce0d9135831f99f54ee6fd53">new_diagonal_precond</a> (const Vector_ &amp;diag, const Filter_ &amp;filter)</td></tr>
 <tr class="memdesc:a59dbf0d9ce0d9135831f99f54ee6fd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html" title="Diagonal preconditioner implementation.">DiagonalPrecond</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#a59dbf0d9ce0d9135831f99f54ee6fd53">More...</a><br /></td></tr>
@@ -802,6 +815,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a940b86c64e3f0422ea0c7c573bcda71a"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html">PMR</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a940b86c64e3f0422ea0c7c573bcda71a">new_pmr</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
 <tr class="memdesc:a940b86c64e3f0422ea0c7c573bcda71a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html" title="(Preconditioned) Minimal-Residual-Iteration solver implementation">PMR</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#a940b86c64e3f0422ea0c7c573bcda71a">More...</a><br /></td></tr>
 <tr class="separator:a940b86c64e3f0422ea0c7c573bcda71a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d3d7bb369cdae2f3598b07ebeaf907a"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
+<tr class="memitem:a6d3d7bb369cdae2f3598b07ebeaf907a"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html">Descent</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a6d3d7bb369cdae2f3598b07ebeaf907a">new_pmr</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const Matrix_ &amp;matrix, const Filter_ &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
+<tr class="memdesc:a6d3d7bb369cdae2f3598b07ebeaf907a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> solver object using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="namespace_f_e_a_t_1_1_solver.html#a6d3d7bb369cdae2f3598b07ebeaf907a">More...</a><br /></td></tr>
+<tr class="separator:a6d3d7bb369cdae2f3598b07ebeaf907a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8fdbca4c863c6705484e2d4d34ecf64"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
 <tr class="memitem:ad8fdbca4c863c6705484e2d4d34ecf64"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html">PMR</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ad8fdbca4c863c6705484e2d4d34ecf64">new_pmr</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const Matrix_ &amp;matrix, const Filter_ &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr)</td></tr>
 <tr class="memdesc:ad8fdbca4c863c6705484e2d4d34ecf64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html" title="(Preconditioned) Minimal-Residual-Iteration solver implementation">PMR</a> solver object using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="namespace_f_e_a_t_1_1_solver.html#ad8fdbca4c863c6705484e2d4d34ecf64">More...</a><br /></td></tr>
@@ -927,6 +944,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9c46ebafdde9ce5b47a825ae6943e7b5">new_voxel_amavanka</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, const ColoringType_ &amp;coloring, typename Matrix_::DataType omega=typename Matrix_::DataType(1), <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_steps=<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(1))</td></tr>
 <tr class="memdesc:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">VoxelAmaVanka</a> smoother object.  <a href="namespace_f_e_a_t_1_1_solver.html#a9c46ebafdde9ce5b47a825ae6943e7b5">More...</a><br /></td></tr>
 <tr class="separator:a9c46ebafdde9ce5b47a825ae6943e7b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13f556c05b453629a211b3b569c6ffce"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a13f556c05b453629a211b3b569c6ffce">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">DescentVariant</a> dv)</td></tr>
+<tr class="separator:a13f556c05b453629a211b3b569c6ffce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e6b79b11fc66593e4336d1259a158b7"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename Matrix_ , typename Filter_ &gt; </td></tr>
 <tr class="memitem:a8e6b79b11fc66593e4336d1259a158b7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a8e6b79b11fc66593e4336d1259a158b7">solve</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">IterativeSolver</a>&lt; Vector_ &gt; &amp;solver, Vector_ &amp;vec_sol, const Vector_ &amp;vec_rhs, const Matrix_ &amp;matrix, const Filter_ &amp;filter)</td></tr>
 <tr class="memdesc:a8e6b79b11fc66593e4336d1259a158b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override of <a class="el" href="namespace_f_e_a_t_1_1_solver.html#afaf7fb5797216195651b6d22eaadc8d2" title="Solve linear system with initial solution guess.">solve()</a> for <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html" title="Abstract base-class for iterative solvers.">IterativeSolver</a> solvers.  <a href="namespace_f_e_a_t_1_1_solver.html#a8e6b79b11fc66593e4336d1259a158b7">More...</a><br /></td></tr>
@@ -938,6 +957,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a06d657f3235d3857164ec176b6958d87"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a06d657f3235d3857164ec176b6958d87">status_success</a> (<a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> status)</td></tr>
 <tr class="memdesc:a06d657f3235d3857164ec176b6958d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Status success check function.  <a href="namespace_f_e_a_t_1_1_solver.html#a06d657f3235d3857164ec176b6958d87">More...</a><br /></td></tr>
 <tr class="separator:a06d657f3235d3857164ec176b6958d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aab00c352abe48c34ba5f5b165bd3cd21"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#aab00c352abe48c34ba5f5b165bd3cd21">direct_stokes_solver_available</a></td></tr>
+<tr class="memdesc:aab00c352abe48c34ba5f5b165bd3cd21"><td class="mdescLeft">&#160;</td><td class="mdescRight">specifies whether at least one backend for the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html" title="Direct Stokes solver class template.">DirectStokesSolver</a> class is available  <a href="namespace_f_e_a_t_1_1_solver.html#aab00c352abe48c34ba5f5b165bd3cd21">More...</a><br /></td></tr>
+<tr class="separator:aab00c352abe48c34ba5f5b165bd3cd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p ><a class="el" href="namespace_f_e_a_t_1_1_solver.html" title="Solver namespace.">Solver</a> namespace. </p>
@@ -1064,6 +1089,38 @@ Functions</h2></td></tr>
 <p>Enum for different preconditioning variants for <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="bicgstab_8hpp_source.html#l00019">19</a> of file <a class="el" href="bicgstab_8hpp_source.html">bicgstab.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a289617fe7cdace66d3123dc0472c31d7" name="a289617fe7cdace66d3123dc0472c31d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a289617fe7cdace66d3123dc0472c31d7">&#9670;&#160;</a></span>DescentVariant</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">FEAT::Solver::DescentVariant</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149" name="a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149"></a>fixed&#160;</td><td class="fielddoc"><p >simple fixed <a class="el" href="class_f_e_a_t_1_1_solver_1_1_richardson.html" title="(Preconditioned) Richardson solver implementation">Richardson</a> iteration </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a289617fe7cdace66d3123dc0472c31d7aa28d8f7ff8168d4aa740054357bcac61" name="a289617fe7cdace66d3123dc0472c31d7aa28d8f7ff8168d4aa740054357bcac61"></a>steepest&#160;</td><td class="fielddoc"><p >symmetrically preconditioned steepest descent </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a289617fe7cdace66d3123dc0472c31d7a6475f0c19ab92149df68660d6be44562" name="a289617fe7cdace66d3123dc0472c31d7a6475f0c19ab92149df68660d6be44562"></a>defect&#160;</td><td class="fielddoc"><p >left-preconditioned defect minimization </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="descent_8hpp_source.html#l00017">17</a> of file <a class="el" href="descent_8hpp_source.html">descent.hpp</a>.</p>
 
 </div>
 </div>
@@ -2378,7 +2435,71 @@ template&lt;typename VectorOuter_ , typename VectorInner_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00105">105</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l01119">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;::DirectStokesSolver()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l01162">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;::DirectStokesSolver()</a>.</p>
+
+</div>
+</div>
+<a id="a944840c3164e9bc32129ff35566ff813" name="a944840c3164e9bc32129ff35566ff813"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a944840c3164e9bc32129ff35566ff813">&#9670;&#160;</a></span>new_descent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html">Descent</a>&lt; Matrix_, Filter_ &gt; &gt; FEAT::Solver::new_descent </td>
+          <td>(</td>
+          <td class="paramtype">const Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Filter_ &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">DescentVariant</a>&#160;</td>
+          <td class="paramname"><em>variant</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt;&#160;</td>
+          <td class="paramname"><em>precond</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> solver object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The system matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>The system filter.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">variant</td><td>The desired descent variant.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">precond</td><td>The preconditioner. May be <code>nullptr</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="descent_8hpp_source.html#l00335">335</a> of file <a class="el" href="descent_8hpp_source.html">descent.hpp</a>.</p>
 
 </div>
 </div>
@@ -2478,7 +2599,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html" title="Direct Stokes solver class template.">DirectStokesSolver</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01382">1382</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01447">1447</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -3707,7 +3828,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mkl__dss_8hpp_source.html#l00110">110</a> of file <a class="el" href="mkl__dss_8hpp_source.html">mkl_dss.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l01119">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;::DirectStokesSolver()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l01162">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;::DirectStokesSolver()</a>.</p>
 
 </div>
 </div>
@@ -5123,7 +5244,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div>
 </div>
 <a id="a940b86c64e3f0422ea0c7c573bcda71a" name="a940b86c64e3f0422ea0c7c573bcda71a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a940b86c64e3f0422ea0c7c573bcda71a">&#9670;&#160;</a></span>new_pmr() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a940b86c64e3f0422ea0c7c573bcda71a">&#9670;&#160;</a></span>new_pmr() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -5179,8 +5300,79 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 </div>
 </div>
+<a id="a6d3d7bb369cdae2f3598b07ebeaf907a" name="a6d3d7bb369cdae2f3598b07ebeaf907a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d3d7bb369cdae2f3598b07ebeaf907a">&#9670;&#160;</a></span>new_pmr() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html">Descent</a>&lt; Matrix_, Filter_ &gt; &gt; FEAT::Solver::new_pmr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>section_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramname"><em>section</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Matrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Filter_ &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt;&#160;</td>
+          <td class="paramname"><em>precond</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> solver object using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">section_name</td><td>The name of the config section, which it does not know by itself</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">section</td><td>A pointer to the <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a> section configuring this solver</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The system matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>The system filter.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">precond</td><td>The preconditioner. May be <code>nullptr</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html" title="(Preconditioned) Descent solver implementation">Descent</a> object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="descent_8hpp_source.html#l00364">364</a> of file <a class="el" href="descent_8hpp_source.html">descent.hpp</a>.</p>
+
+</div>
+</div>
 <a id="ad8fdbca4c863c6705484e2d4d34ecf64" name="ad8fdbca4c863c6705484e2d4d34ecf64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8fdbca4c863c6705484e2d4d34ecf64">&#9670;&#160;</a></span>new_pmr() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8fdbca4c863c6705484e2d4d34ecf64">&#9670;&#160;</a></span>new_pmr() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6825,7 +7017,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00116">116</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l01119">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;::DirectStokesSolver()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l01162">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;::DirectStokesSolver()</a>.</p>
 
 </div>
 </div>
@@ -7147,6 +7339,36 @@ template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT:
 
 </div>
 </div>
+<a id="a13f556c05b453629a211b3b569c6ffce" name="a13f556c05b453629a211b3b569c6ffce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13f556c05b453629a211b3b569c6ffce">&#9670;&#160;</a></span>operator&lt;&lt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; FEAT::Solver::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">DescentVariant</a>&#160;</td>
+          <td class="paramname"><em>dv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="descent_8hpp_source.html#l00029">29</a> of file <a class="el" href="descent_8hpp_source.html">descent.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a8e6b79b11fc66593e4336d1259a158b7" name="a8e6b79b11fc66593e4336d1259a158b7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8e6b79b11fc66593e4336d1259a158b7">&#9670;&#160;</a></span>solve() <span class="overload">[1/2]</span></h2>
 
@@ -7330,6 +7552,44 @@ template&lt;typename Vector_ , typename Matrix_ , typename Filter_ &gt; </div>
 <p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa520882cd714abbd1bf9f72d23990f0e">max_iter</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa3d1e0a7dd736bc430ba471d9dfdf3a2">stagnated</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076">success</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="multigrid_8hpp_source.html#l01524">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::_apply_coarse()</a>, <a class="el" href="iterative_8hpp_source.html#l01071">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00098">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00202">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::apply()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00347">solve()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aab00c352abe48c34ba5f5b165bd3cd21" name="aab00c352abe48c34ba5f5b165bd3cd21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab00c352abe48c34ba5f5b165bd3cd21">&#9670;&#160;</a></span>direct_stokes_solver_available</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr bool FEAT::Solver::direct_stokes_solver_available</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line">      <span class="keyword">false</span></div>
+</div><!-- fragment -->
+<p>specifies whether at least one backend for the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html" title="Direct Stokes solver class template.">DirectStokesSolver</a> class is available </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__stokes__solver_8hpp_source.html#l01036">1036</a> of file <a class="el" href="direct__stokes__solver_8hpp_source.html">direct_stokes_solver.hpp</a>.</p>
 
 </div>
 </div>

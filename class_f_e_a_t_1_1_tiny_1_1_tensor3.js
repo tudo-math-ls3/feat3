@@ -11,6 +11,7 @@ var class_f_e_a_t_1_1_tiny_1_1_tensor3 =
     [ "add_double_mat_mult", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a0e8df8b6e434b3be11baf3b129f025ac", null ],
     [ "add_mat_tensor_mult", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a988b07554b65c17e8801fd3721cabffa", null ],
     [ "add_vec_mat_outer_product", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a5eab64e8c5c5ecb9b0802a842a7de865", null ],
+    [ "convert", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#ab5b070331314c30fee2eb32357e5db51", null ],
     [ "copy", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#ae7251b9fab43bbd48275b4cf27a5caff", null ],
     [ "copy_n", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a162463300a77c7765b5ee5ecc39f9949", null ],
     [ "format", "class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a35363a283a24c68523cd7aadad9ba823", null ],

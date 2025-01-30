@@ -5,6 +5,7 @@ var namespace_f_e_a_t_1_1_analytic_1_1_common =
     [ "CornerSingularity2D", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d" ],
     [ "CornerSingularity2DRadial", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_corner_singularity2_d_radial" ],
     [ "CosineTensorStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static" ],
+    [ "DFG95SteadyInflowFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_d_f_g95_steady_inflow_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_d_f_g95_steady_inflow_function" ],
     [ "ExpBubbleScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static" ],
     [ "ExpScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static.html", null ],
     [ "Frankes3DVariantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes3_d_variant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes3_d_variant_function" ],

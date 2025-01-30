@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vankatype_0',['VankaType',['../namespace_f_e_a_t_1_1_solver.html#a56a1737a447bf0816faf68de552c2064',1,'FEAT::Solver']]]
+  ['uzawatype_0',['UzawaType',['../namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ff',1,'FEAT::Solver']]]
 ];
