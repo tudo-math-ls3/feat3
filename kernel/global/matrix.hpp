@@ -600,13 +600,13 @@ namespace FEAT
        * required for Schwarz-like solver approaches.
        *
        * \attention
-       * The resulting matrix may (and usually will) have a larger stencil than the original underlying
-       * patch-local LAFEM matrix, which is stored in this object's _matrix variable. The reason is that
-       * a neighbor process may have additional couplings between DOFs that this process does not have,
-       * and these additional coupling are also included in this process's type-1 matrix. However, the
-       * stencil of the returned matrix is never smaller than the original local matrix stencil, i.e.
-       * the stencil of the patch-local type-0 matrix is always a sub-stencil of the returned type-1
-       * matrix.
+       * Please note that in theory, the resulting matrix would often have a larger stencil than the
+       * original underlying patch-local LAFEM matrix, which is stored in this object's _matrix
+       * variable. The reason is that a neighbor process may have additional couplings between DOFs
+       * shared with this process on its patch that this process does not have in its own type-0
+       * stencil, which would then result in an increased stencil. However, this conversion function
+       * does \b not include these additional couplings (if any) and simply ignores them, so that
+       * the type-1 matrix always has the same stencil as the corresponding type-0 matrix.
        *
        * \returns
        * A new local matrix object containing the type-1 matrix for this process patch.
