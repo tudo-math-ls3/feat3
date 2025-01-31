@@ -179,7 +179,7 @@ namespace FEAT
         {
           br[col] = ba * br[col];
         }
-        FEAT_PRAGMA_OMP(parallel for)
+
         for (Index row = 0 ; row < rows ; ++row)
         {
           for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
