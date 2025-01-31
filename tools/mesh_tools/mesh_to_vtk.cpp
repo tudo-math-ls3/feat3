@@ -256,6 +256,7 @@ bool build_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node, const std::ma
 template<typename Mesh_>
 int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const String& filename)
 {
+  static constexpr int shape_dim = Mesh_::shape_dim;
   static constexpr int world_dim = Mesh_::world_dim;
 
   // parse levels
@@ -274,6 +275,9 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
 
   // compute cell volumes?
   bool calc_volume = (args.check("no-volume") < 0);
+
+  // compute edge ratios?
+  bool calc_edge_ratio = (args.check("no-edge-ratio") < 0);
 
 #ifdef FEAT_HAVE_FPARSER
   std::map<String, String> hit_formulae;
@@ -416,6 +420,33 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
       exporter.add_cell_scalar("volume", volume.data());
     }
 
+    // compute edge ratios?
+    if constexpr(shape_dim > 1) // edge ratios not available in 1D
+    {
+      if(calc_edge_ratio)
+      {
+        std::vector<double> edge_ratio(mesh.get_num_elements(), 0.0);
+
+        const auto& vtx = mesh.get_vertex_set();
+        const auto& verts_at_edge = mesh.template get_index_set<1,0>();
+        const auto& edges_at_elem = mesh.template get_index_set<shape_dim,1>();
+
+        for(Index i(0); i < mesh.get_num_elements(); ++i)
+        {
+          double rmax = 0.0;
+          double rmin = 1e+99;
+          for(int j(0); j < edges_at_elem.get_num_indices(); ++j)
+          {
+            Index k = edges_at_elem(i, j);
+            Math::minimax((vtx[verts_at_edge(k,0)] - vtx[verts_at_edge(k,1)]).norm_euclid_sqr(), rmin, rmax);
+          }
+          edge_ratio[i] = Math::sqrt(rmax/rmin);
+        }
+
+        exporter.add_cell_scalar("edge_ratio", edge_ratio.data());
+      }
+    }
+
     // For every chart in the atlas, compute the distance of every mesh vertex to it
     if(calc_dist)
     {
@@ -533,6 +564,7 @@ int main(int argc, char* argv[])
   args.support("no-dist");
   args.support("no-proj");
   args.support("no-volume");
+  args.support("no-edge-ratio");
   args.support("angles");
   args.support("offset");
   args.support("origin");

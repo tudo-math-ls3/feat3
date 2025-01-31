@@ -222,7 +222,6 @@ template<typename Mesh_>
 int run_xml(Geometry::MeshFileReader& mesh_reader)
 {
   typedef typename Mesh_::ShapeType ShapeType;
-  static constexpr int world_dim = Mesh_::world_dim;
 
   // create an empty atlas and a root mesh node
   Geometry::MeshAtlas<Mesh_> atlas;
