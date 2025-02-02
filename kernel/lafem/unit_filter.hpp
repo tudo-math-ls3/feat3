@@ -250,17 +250,7 @@ namespace FEAT
 
         const IndexType* row_ptr(matrix.row_ptr());
         const IndexType* col_idx(matrix.col_ind());
-        DT_* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          Index ix(_sv.indices()[i]);
-          // replace by unit row
-          for(IndexType j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
-          {
-            v[j] = (col_idx[j] == ix) ? DT_(1) : DT_(0);
-          }
-        }
+        Arch::UnitFilter::filter_unit_mat(matrix.val(), row_ptr, col_idx, _sv.indices(), _sv.used_elements());
       }
 
       void filter_offdiag_row_mat(SparseMatrixCSR<DT_, IT_> & matrix) const
@@ -271,17 +261,7 @@ namespace FEAT
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IndexType* row_ptr(matrix.row_ptr());
-        DT_* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          Index ix(_sv.indices()[i]);
-          // replace by null row
-          for(IndexType j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
-          {
-            v[j] = DT_(0);
-          }
-        }
+        Arch::UnitFilter::filter_offdiag_row_mat(matrix.val(), row_ptr, 1, _sv.indices(), _sv.used_elements());
       }
 
       void filter_offdiag_col_mat(SparseMatrixCSR<DT_, IT_> &) const
@@ -298,17 +278,7 @@ namespace FEAT
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
         const IndexType* row_ptr(matrix.row_ptr());
-        auto* v(matrix.val());
-
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          Index ix(_sv.indices()[i]);
-          // replace by null row
-          for(IndexType j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
-          {
-            v[j] = DT_(0);
-          }
-        }
+        Arch::UnitFilter::filter_offdiag_row_mat(matrix.template val<Perspective::pod>(), row_ptr, block_width_, _sv.indices(), _sv.used_elements());
       }
 
       template<int block_height_>
@@ -349,19 +319,7 @@ namespace FEAT
         DT_* val_a(matrix_a.val());
         const DT_* val_m(matrix_m.val());
 
-        const IT_* idx = get_indices();
-        const DT_* val = get_values();
-
-        // loop over all filter entries
-        for(Index i(0); i < _sv.used_elements(); ++i)
-        {
-          // replace row of A by scaled row of M
-          Index row(idx[i]);
-          for(IndexType j(row_ptr[row]); j < row_ptr[row + 1]; ++j)
-          {
-            val_a[j] = val[i] * val_m[j];
-          }
-        }
+        Arch::UnitFilter::filter_weak_matrix_rows(val_a, val_m, row_ptr, get_values(), get_indices(), _sv.used_elements());
       }
 
 

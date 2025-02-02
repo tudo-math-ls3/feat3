@@ -321,7 +321,9 @@ namespace FEAT
 
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
-        Arch::UnitFilterBlocked::template filter_unit_mat<DT_, IT_>(matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), BlockSize_, BlockWidth_, _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
+        Arch::UnitFilterBlocked::template filter_unit_mat
+          (matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), BlockSize_, BlockWidth_,
+          _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       template<int BlockWidth_>
@@ -332,7 +334,9 @@ namespace FEAT
 
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
-        Arch::UnitFilterBlocked::template filter_offdiag_row_mat<DT_, IT_>(matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), BlockSize_, BlockWidth_, _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
+        Arch::UnitFilterBlocked::template filter_offdiag_row_mat
+          (matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), BlockSize_, BlockWidth_,
+          _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
 
       template<int BlockWidth_>
@@ -378,7 +382,9 @@ namespace FEAT
         XASSERTM(row_ptr == matrix_m.row_ptr(), "matrix A and M must share their layout");
         XASSERTM(col_idx == matrix_m.col_ind(), "matrix A and M must share their layout");
 
-        Arch::UnitFilterBlocked::template filter_weak_matrix_rows<DT_, IT_>(matrix_a.template val<LAFEM::Perspective::pod>(), matrix_m.template val<LAFEM::Perspective::pod>(), row_ptr, BlockSize_, BlockWidth_, _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements());
+        Arch::UnitFilterBlocked::template filter_weak_matrix_rows
+          (matrix_a.template val<LAFEM::Perspective::pod>(), matrix_m.template val<LAFEM::Perspective::pod>(), row_ptr, BlockSize_, BlockWidth_,
+          _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements());
       }
 
 
