@@ -263,6 +263,8 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags += " -ffast-math -funsafe-math-optimizations -mcpu=cortex-a15 -mfpu=neon-vfpv4  -mfloat-abi=hard -mthumb"
     elif cpu == "cortexa53":
       cxxflags += " -ffast-math -funsafe-math-optimizations -mcpu=cortex-a53 -mfpu=neon-vfpv4  -mfloat-abi=hard -mthumb"
+    elif cpu == "cortexa76":
+      cxxflags += " -ffast-math -funsafe-math-optimizations -mcpu=cortex-a76+fp+aes+sha2"
     elif cpu == "armv8":
       cxxflags += " -ffast-math -funsafe-math-optimizations -march=armv8-a -mcpu=cortex-a57"
 

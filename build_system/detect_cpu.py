@@ -32,12 +32,14 @@ def detect_cpu():
 
       # ARM
       if cpu_implementer == "0x41":
-        if cpu_part == "0xc07":
+        if cpu_part == "0xc07":   # Raspberry Pi 2
           cputype = "cortexa7"
         elif cpu_part == "0xc0f":
           cputype = "cortexa15"
-        elif cpu_part == "0xd03":
+        elif cpu_part == "0xd03": # Raspberry Pi 3
           cputype = "cortexa53"
+        elif cpu_part == "0xd0b": # Raspberry Pi 5
+          cputype = "cortexa76"
       if cpu_implementer == "0x43": # Cavium/Marvell
         if cpu_part == "0x0af":
           cputype = "thunderx2"
