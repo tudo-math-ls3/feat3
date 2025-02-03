@@ -320,8 +320,9 @@ namespace DFG95
     static constexpr std::size_t nnze_b = 6u;           // number of non-zero blocks in matrix-block B
     static constexpr std::size_t nnze_total = 7u;       // total number of non-zero entries in matrix
     static constexpr std::size_t vanka_data = 8u;       // total number of data entries for Vanka
-    static constexpr std::size_t elements = 9u;         // total number of mesh elements
-    static constexpr std::size_t count = 10u;
+    static constexpr std::size_t fine_elements = 9u;    // total number of fine mesh elements
+    static constexpr std::size_t all_elements = 10u;    // total number of all mesh elements
+    static constexpr std::size_t count = 11u;
   };
 
   struct Times
@@ -436,14 +437,15 @@ namespace DFG95
   public:
     // timings (in seconds)
     double times[Times::count];     // of this process
+    double times_sum[Times::count]; // sum over all processes
     double times_min[Times::count]; // minimum over all processes
     double times_max[Times::count]; // maximum over all processes
 
     // counts
     unsigned long long counts[Counts::count];     // of this process
     unsigned long long counts_sum[Counts::count]; // summed up over all processes
-    //unsigned long long counts_min[Counts::count]; // minimum over all processes
-    //unsigned long long counts_max[Counts::count]; // maximum over all processes
+    unsigned long long counts_min[Counts::count]; // minimum over all processes
+    unsigned long long counts_max[Counts::count]; // maximum over all processes
 
     // sizes (in bytes)
     unsigned long long bytes[Bytes::count];     // of this process
@@ -451,14 +453,24 @@ namespace DFG95
     unsigned long long bytes_min[Bytes::count]; // minimum over all processes
     unsigned long long bytes_max[Bytes::count]; // maximum over all processes
 
+    // multigrid timings for each level
+    std::vector<double> mg_times_defect, mg_times_smooth, mg_times_transfer, mg_times_coarse;
+    std::vector<double> mg_times_defect_sum, mg_times_smooth_sum, mg_times_transfer_sum, mg_times_coarse_sum;
+    std::vector<double> mg_times_defect_min, mg_times_smooth_min, mg_times_transfer_min, mg_times_coarse_min;
+    std::vector<double> mg_times_defect_max, mg_times_smooth_max, mg_times_transfer_max, mg_times_coarse_max;
+
     // --------------------------------------------------------------
 
-    BenchmarkStats()
+    explicit BenchmarkStats(std::size_t sv) :
+      mg_times_defect(sv+1u, 0.0), mg_times_smooth(sv+1u, 0.0), mg_times_transfer(sv+1u, 0.0), mg_times_coarse(sv+1u, 0.0),
+      mg_times_defect_sum(sv+1u, 0.0), mg_times_smooth_sum(sv+1u, 0.0), mg_times_transfer_sum(sv+1u, 0.0), mg_times_coarse_sum(sv+1u, 0.0),
+      mg_times_defect_min(sv+1u, 0.0), mg_times_smooth_min(sv+1u, 0.0), mg_times_transfer_min(sv+1u, 0.0), mg_times_coarse_min(sv+1u, 0.0),
+      mg_times_defect_max(sv+1u, 0.0), mg_times_smooth_max(sv+1u, 0.0), mg_times_transfer_max(sv+1u, 0.0), mg_times_coarse_max(sv+1u, 0.0)
     {
       for(std::size_t i(0); i < Counts::count; ++i)
-        counts[i] = counts_sum[i] = std::size_t(0);
+        counts[i] = counts_sum[i] = counts_min[i] = counts_max[i] = std::size_t(0);
       for(std::size_t i(0); i < Times::count; ++i)
-        times[i] = times_min[i] = times_max[i] = std::size_t(0);
+        times[i] = times_sum[i] = times_min[i] = times_max[i] = std::size_t(0);
       for(std::size_t i(0); i < Bytes::count; ++i)
         bytes[i] = bytes_sum[i] = bytes_min[i] = bytes_max[i] = std::size_t(0);
     }
@@ -468,119 +480,154 @@ namespace DFG95
       String s;
       const char pc = '.';
 
-      s = "Basic Statistics:\n";
-      s += String("Mesh Elements").pad_back(padlen, pc) + ": " + stringify(counts_sum[Counts::elements]) + "\n";
-      s += String("Velocity Dof Nodes").pad_back(padlen, pc) + ": " + stringify(counts[Counts::velo_dofs]) + "\n";
-      s += String("Pressure Dofs").pad_back(padlen, pc) + ": " + stringify(counts[Counts::pres_dofs]) + "\n";
-      s += String("Total Dofs").pad_back(padlen, pc) + ": " + stringify(counts[Counts::total_dofs]) + "\n";
-      s += String("Nonzero Blocks A").pad_back(padlen, pc) + ": " + stringify(counts_sum[Counts::nnze_a]) + "\n";
-      s += String("Nonzero Blocks B").pad_back(padlen, pc) + ": " + stringify(counts_sum[Counts::nnze_b]) + "\n";
-      s += String("Total Nonzero Entries").pad_back(padlen, pc) + ": " + stringify(counts_sum[Counts::nnze_total]) + "\n";
-      s += String("Vanka Nonzero Entries").pad_back(padlen, pc) + ": " + stringify(counts_sum[Counts::vanka_data]) + "\n";
-
       // solver statistics
       s += "\nSolver Statistics:\n";
       s += String("Multigrid Iterations").pad_back(padlen, pc) + ": " + stringify(counts[Counts::linsol_iter]) + "\n";
       s += String("Nonlinear Iterations").pad_back(padlen, pc) + ": " + stringify(counts[Counts::nonlin_iter]) + "\n";
 
+      s += String("\nDiscretization Statistics:").pad_back(padlen+15) + String("Sum").pad_back(29)
+        + String("Min").pad_back(29) + String("Max").pad_back(22) + "Balance\n";
+      s += format_count("Fine Mesh Elements", Counts::fine_elements);
+      s += format_count("All Mesh Elements", Counts::all_elements);
+      s += format_count("Velocity Dof Nodes", Counts::velo_dofs);
+      s += format_count("Pressure Dofs", Counts::pres_dofs);
+      s += format_count("Total Dofs", Counts::total_dofs);
+      s += format_count("Nonzero Blocks A", Counts::nnze_a);
+      s += format_count("Nonzero Blocks B", Counts::nnze_b);
+      s += format_count("Total Nonzero Entries", Counts::nnze_total);
+      s += format_count("Vanka Nonzero Entries", Counts::vanka_data);
+
       // append timing info
-      s += String("\nTiming Statistics:\n");
-      s += String("Total Runtime").pad_back(padlen, pc) + ": " + stringify_fp_fix(times[Times::total_run], 3, 10) + " sec\n";
-      s += format_subtime("Nonlinear Solver Total", times[Times::nonlin_total]);
-      s += format_subtime("Nonlinear Defect Assembly", times[Times::nonlin_asm_def]);
-      s += format_subtime("Nonlinear Matrix Assembly", times[Times::nonlin_asm_mat]);
-      s += format_subtime("Multigrid Solver Initialize", times[Times::linsol_init]);
-      s += format_subtime("Multigrid Solver Apply", times[Times::linsol_apply]);
-      s += format_subtime("Multigrid Defect Compute", times[Times::mg_defect]);
-      s += format_subtime("Multigrid Smooth Apply", times[Times::mg_smooth]);
-      s += format_subtime("Multigrid Coarse Solve", times[Times::mg_coarse]);
-      s += format_subtime_mm("Multigrid Transfer Apply", times[Times::mg_transfer], times_min[Times::mg_transfer], times_max[Times::mg_transfer]);
-      s += format_subtime_mm("Vanka Symbolic Initialize", times[Times::vanka_init_sym], times_min[Times::vanka_init_sym], times_max[Times::vanka_init_sym]);
-      s += format_subtime_mm("Vanka Numeric Initialize", times[Times::vanka_init_num], times_min[Times::vanka_init_num], times_max[Times::vanka_init_num]);
-      s += format_subtime_mm("Vanka Local Apply", times[Times::vanka_apply], times_min[Times::vanka_apply], times_max[Times::vanka_apply]);
-      s += format_subtime("Checkpointing", times[Times::checkpoint]);
-      s += format_subtime("Solution Analysis", times[Times::sol_analysis]);
-      s += format_subtime("VTK Write", times[Times::vtk_write]);
+      s += String("\nTiming Statistics:").pad_back(padlen+15) + String("Sum").pad_back(29)
+        + String("Min").pad_back(29) + String("Max").pad_back(22) + "Balance\n";
+      s += format_runtime("Total Runtime", Times::total_run);
+      s += format_runtime("Nonlinear Solver Total", Times::nonlin_total);
+      s += format_runtime("Nonlinear Defect Assembly", Times::nonlin_asm_def);
+      s += format_runtime("Nonlinear Matrix Assembly", Times::nonlin_asm_mat);
+      s += format_runtime("Multigrid Solver Initialize", Times::linsol_init);
+      s += format_runtime("Multigrid Solver Apply", Times::linsol_apply);
+      s += format_runtime("Multigrid Defect Compute", Times::mg_defect);
+      s += format_runtime("Multigrid Smooth Apply", Times::mg_smooth);
+      s += format_runtime("Multigrid Coarse Solve", Times::mg_coarse);
+      s += format_runtime("Multigrid Transfer Apply", Times::mg_transfer);
+      s += format_runtime("Vanka Symbolic Initialize", Times::vanka_init_sym);
+      s += format_runtime("Vanka Numeric Initialize", Times::vanka_init_num);
+      s += format_runtime("Vanka Local Apply", Times::vanka_apply);
+      s += format_runtime("Checkpointing", Times::checkpoint);
+      s += format_runtime("Solution Analysis", Times::sol_analysis);
+      s += format_runtime("VTK Write", Times::vtk_write);
 
       // append memory info
-      s += String("\nMemory Statistics:\n");
-      s += String("Peak Physical Memory").pad_back(padlen,pc) + ": "
-        + stringify_fp_fix(double(bytes_sum[Bytes::peak_p]) / 1073741824.0, 3, 12) + " GB             { "
-        + stringify_fp_fix(double(bytes_min[Bytes::peak_p]) / 1073741824.0, 3, 12) + " GB / "
-        + stringify_fp_fix(double(bytes_max[Bytes::peak_p]) / 1073741824.0, 3, 12) + " GB }\n";
-      s += String("Peak Virtual Memory").pad_back(padlen,pc) + ": "
-        + stringify_fp_fix(double(bytes_sum[Bytes::peak_v]) / 1073741824.0, 3, 12) + " GB             { "
-        + stringify_fp_fix(double(bytes_min[Bytes::peak_v]) / 1073741824.0, 3, 12) + " GB / "
-        + stringify_fp_fix(double(bytes_max[Bytes::peak_v]) / 1073741824.0, 3, 12) + " GB }\n";
-      s += format_submemory_mm("Mesh-Node Size", bytes_sum[Bytes::mesh], bytes_min[Bytes::mesh], bytes_max[Bytes::mesh]);
-      s += format_submemory_mm("Gate Size", bytes_sum[Bytes::gate], bytes_min[Bytes::gate], bytes_max[Bytes::gate]);
-      s += format_submemory_mm("Muxer Size", bytes_sum[Bytes::muxer], bytes_min[Bytes::muxer], bytes_max[Bytes::muxer]);
-      s += format_submemory_mm("Matrix Total Size", bytes_sum[Bytes::matrix], bytes_min[Bytes::matrix], bytes_max[Bytes::matrix]);
-      s += format_submemory_mm("Matrix Struct Size", bytes_sum[Bytes::matrix_struct], bytes_min[Bytes::matrix_struct], bytes_max[Bytes::matrix_struct]);
-      s += format_submemory_mm("Matrix Values Size", bytes_sum[Bytes::matrix_values], bytes_min[Bytes::matrix_values], bytes_max[Bytes::matrix_values]);
-      s += format_submemory_mm("Transfer Size", bytes_sum[Bytes::transfer], bytes_min[Bytes::transfer], bytes_max[Bytes::transfer]);
-      s += format_submemory_mm("Vanka Size", bytes_sum[Bytes::vanka], bytes_min[Bytes::vanka], bytes_max[Bytes::vanka]);
+      s += String("\nMemory Statistics:").pad_back(padlen+15) + String("Sum").pad_back(29)
+        + String("Min").pad_back(29) + String("Max").pad_back(22) + "Balance\n";;
+      s += format_memuse("Peak Physical Memory", Bytes::peak_p);
+      s += format_memuse("Peak Virtual Memory", Bytes::peak_v);
+      s += format_memuse("Mesh-Node Size", Bytes::mesh);
+      s += format_memuse("Gate Size", Bytes::gate);
+      s += format_memuse("Muxer Size", Bytes::muxer);
+      s += format_memuse("Matrix Total Size", Bytes::matrix);
+      s += format_memuse("Matrix Struct Size", Bytes::matrix_struct);
+      s += format_memuse("Matrix Values Size", Bytes::matrix_values);
+      s += format_memuse("Transfer Size", Bytes::transfer);
+      s += format_memuse("Vanka Size", Bytes::vanka);
+      s += format_memuse("Vanka Size", Bytes::vanka);
+
+      // append multigrid timings
+      s += String("\nMultigrid Timings #1:").pad_back(40)
+        + String("Sum").pad_back(12) + String("Min").pad_back(12) + String("Max").pad_back(6) + String("Balance").pad_back(22)
+        + String("Sum").pad_back(12) + String("Min").pad_back(12) + String("Max").pad_back(6) + String("Balance") + "\n";
+        for(std::size_t i(0); i < mg_times_defect.size(); ++i)
+      {
+        if(i == 0u)
+          s += "Defect/Smooth   Level Sum:";
+        else
+          s += "Defect/Smooth   Level" + stringify(i-1u).pad_front(4) + ":";
+        s += stringify_fp_fix(mg_times_defect_sum[i], 3, 16) + " /";
+        s += stringify_fp_fix(mg_times_defect_min[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_defect_max[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_defect_max[i] > 0.0 ? mg_times_defect_min[i] / mg_times_defect_max[i] : 0.0, 5, 8) + " |";
+
+        s += stringify_fp_fix(mg_times_smooth_sum[i], 3, 16) + " /";
+        s += stringify_fp_fix(mg_times_smooth_min[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_smooth_max[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_smooth_max[i] > 0.0 ? mg_times_smooth_min[i] / mg_times_smooth_max[i] : 0.0, 5, 8) + "\n";
+      }
+
+      s += String("\nMultigrid Timings #2:").pad_back(40)
+        + String("Sum").pad_back(12) + String("Min").pad_back(12) + String("Max").pad_back(6) + String("Balance").pad_back(22)
+        + String("Sum").pad_back(12) + String("Min").pad_back(12) + String("Max").pad_back(6) + String("Balance") + "\n";
+      for(std::size_t i(0); i < mg_times_defect.size(); ++i)
+      {
+        if(i == 0u)
+          s += "Transfer/Coarse Level Sum:";
+        else
+          s += "Transfer/Coarse Level" + stringify(i-1u).pad_front(4) + ":";
+        s += stringify_fp_fix(mg_times_transfer_sum[i], 3, 16) + " /";
+        s += stringify_fp_fix(mg_times_transfer_min[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_transfer_max[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_transfer_max[i] > 0.0 ? mg_times_transfer_min[i] / mg_times_transfer_max[i] : 0.0, 5, 8) + " |";
+
+        s += stringify_fp_fix(mg_times_coarse_sum[i], 3, 16) + " /";
+        s += stringify_fp_fix(mg_times_coarse_min[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_coarse_max[i], 3, 10) + " /";
+        s += stringify_fp_fix(mg_times_coarse_max[i] > 0.0 ? mg_times_coarse_min[i] / mg_times_coarse_max[i] : 0.0, 5, 8) + "\n";
+      }
 
       return s;
     }
 
     void sync(const Dist::Comm& comm)
     {
+      comm.allreduce(times, times_sum, Times::count, Dist::op_sum);
       comm.allreduce(times, times_min, Times::count, Dist::op_min);
       comm.allreduce(times, times_max, Times::count, Dist::op_max);
       comm.allreduce(counts, counts_sum, Counts::count, Dist::op_sum);
-      //comm.allreduce(counts, counts_min, Counts::count, Dist::op_min);
-      //comm.allreduce(counts, counts_max, Counts::count, Dist::op_max);
+      comm.allreduce(counts, counts_min, Counts::count, Dist::op_min);
+      comm.allreduce(counts, counts_max, Counts::count, Dist::op_max);
       comm.allreduce(bytes, bytes_sum, Bytes::count, Dist::op_sum);
       comm.allreduce(bytes, bytes_min, Bytes::count, Dist::op_min);
       comm.allreduce(bytes, bytes_max, Bytes::count, Dist::op_max);
+      comm.allreduce(mg_times_defect.data(), mg_times_defect_sum.data(), mg_times_defect.size(), Dist::op_sum);
+      comm.allreduce(mg_times_defect.data(), mg_times_defect_min.data(), mg_times_defect.size(), Dist::op_min);
+      comm.allreduce(mg_times_defect.data(), mg_times_defect_max.data(), mg_times_defect.size(), Dist::op_max);
+      comm.allreduce(mg_times_smooth.data(), mg_times_smooth_sum.data(), mg_times_smooth.size(), Dist::op_sum);
+      comm.allreduce(mg_times_smooth.data(), mg_times_smooth_min.data(), mg_times_smooth.size(), Dist::op_min);
+      comm.allreduce(mg_times_smooth.data(), mg_times_smooth_max.data(), mg_times_smooth.size(), Dist::op_max);
+      comm.allreduce(mg_times_transfer.data(), mg_times_transfer_sum.data(), mg_times_transfer.size(), Dist::op_sum);
+      comm.allreduce(mg_times_transfer.data(), mg_times_transfer_min.data(), mg_times_transfer.size(), Dist::op_min);
+      comm.allreduce(mg_times_transfer.data(), mg_times_transfer_max.data(), mg_times_transfer.size(), Dist::op_max);
+      comm.allreduce(mg_times_coarse.data(), mg_times_coarse_sum.data(), mg_times_coarse.size(), Dist::op_sum);
+      comm.allreduce(mg_times_coarse.data(), mg_times_coarse_min.data(), mg_times_coarse.size(), Dist::op_min);
+      comm.allreduce(mg_times_coarse.data(), mg_times_coarse_max.data(), mg_times_coarse.size(), Dist::op_max);
     }
 
-    String format_submemory(String s, unsigned long long m) const
+    String format_count(String s, std::size_t cc) const
     {
-      return format_submemory(s, m, bytes_sum[Bytes::peak_p]);
+      return s.pad_back(padlen, '.') + ":"
+        + stringify_fp_fix(counts_sum[cc], 3, 16).pad_back(35)
+        + stringify_fp_fix(counts_min[cc], 3, 10).pad_back(29)
+        + stringify_fp_fix(counts_max[cc], 3, 10).pad_back(29)
+        + stringify_fp_fix(counts_max[cc] > 0u ? double(counts_min[cc]) / double(counts_max[cc]) : 0.0, 5, 7) + "\n";
     }
 
-    String format_submemory(String s, unsigned long long m, unsigned long long total) const
+    String format_runtime(String s, std::size_t tt) const
     {
-      double gb = double(m) / 1073741824.0;
-      return s.pad_back(padlen, '.') + ": " + stringify_fp_fix(gb, 3, 12) + " GB [" + stringify_fp_fix(100.0*double(m)/double(total), 3, 7) + "% ]\n";
+      return s.pad_back(padlen, '.') + ":"
+        + stringify_fp_fix(times_sum[tt], 3, 16) + " s  [" + stringify_fp_fix(100.0*times_sum[tt]/times_sum[Times::total_run], 3, 8) + "% ] / "
+        + stringify_fp_fix(times_min[tt], 3, 10) + " s  [" + stringify_fp_fix(100.0*times_min[tt]/times_max[Times::total_run], 3, 8) + "% ] / "
+        + stringify_fp_fix(times_max[tt], 3, 10) + " s  [" + stringify_fp_fix(100.0*times_max[tt]/times_max[Times::total_run], 3, 8) + "% ] / "
+        + stringify_fp_fix(times_max[tt] > 1e-9 ? times_min[tt] / times_max[tt] : 0.0, 5, 7) + "\n";
     }
 
-    String format_submemory_mm(String s, unsigned long long m, unsigned long long mmin, unsigned long long mmax) const
+    String format_memuse(String s, std::size_t mm) const
     {
-      return format_submemory_mm(s, m, bytes_sum[Bytes::peak_p], mmin, mmax);
+      return s.pad_back(padlen, '.') + ":"
+        + stringify_fp_fix(double(bytes_sum[mm]) / 1073741824.0, 3, 16) + " GB [" + stringify_fp_fix(100.0*double(bytes_sum[mm])/double(bytes_sum[Bytes::peak_p]), 3, 8) + "% ] / "
+        + stringify_fp_fix(double(bytes_min[mm]) / 1073741824.0, 3, 10) + " GB [" + stringify_fp_fix(100.0*double(bytes_min[mm])/double(bytes_max[Bytes::peak_p]), 3, 8) + "% ] / "
+        + stringify_fp_fix(double(bytes_max[mm]) / 1073741824.0, 3, 10) + " GB [" + stringify_fp_fix(100.0*double(bytes_max[mm])/double(bytes_max[Bytes::peak_p]), 3, 8) + "% ] / "
+        + stringify_fp_fix(bytes_max[mm] > 0u ? double(bytes_min[mm]) / double(bytes_max[mm]) : 0.0, 5, 7) + "\n";
     }
 
-    String format_submemory_mm(String s, unsigned long long m, unsigned long long total, unsigned long long mmin, unsigned long long mmax) const
-    {
-      double gb = double(m)     / 1073741824.0;
-      double mmi = double(mmin) / 1073741824.0;
-      double mma = double(mmax) / 1073741824.0;
-      return s.pad_back(padlen, '.') + ": " + stringify_fp_fix(gb, 3, 12) + " GB [" + stringify_fp_fix(100.0*double(m)/double(total), 3, 7)
-        + "% ] { " + stringify_fp_fix(mmi, 3, 12) + " GB / " + stringify_fp_fix(mma, 3, 12) + " GB }\n";
-    }
-
-    String format_subtime(String s, double t) const
-    {
-      return format_subtime(s, t, times[Times::total_run]);
-    }
-
-    String format_subtime(String s, double t, double total) const
-    {
-      return s.pad_back(padlen, '.') + ": " + stringify_fp_fix(t, 3, 10) + " sec [" + stringify_fp_fix(100.0*t/total, 3, 7) + "% ]\n";
-    }
-
-    String format_subtime_mm(String s, double t, double tmin, double tmax) const
-    {
-      return format_subtime_mm(s, t, times[Times::total_run], tmin, tmax);
-    }
-
-    String format_subtime_mm(String s, double t, double total, double tmin, double tmax) const
-    {
-      return s.pad_back(padlen, '.') + ": " + stringify_fp_fix(t, 3, 10) + " sec [" + stringify_fp_fix(100.0*t/total, 3, 7)
-        + "% ] { " + stringify_fp_fix(tmin, 3, 10) + " / " + stringify_fp_fix(tmax, 3, 10) + " }\n";
-    }
   }; // class BenchmarkSummary
 
   // accumulator for benchmark body forces (i.e. drag and lift)
@@ -805,7 +852,6 @@ int main(int argc, char* argv[])
 
   // print number of processes
   comm.print(String("Number of MPI Processes").pad_back(padlen, '.') + ": " + stringify(comm.size()));
-  comm.print(String("Floating Point Formats").pad_back(padlen, '.') + ": " + String(fp_typename));
 
   // create command line argument parser
   SimpleArgParser args(argc, argv);
@@ -872,6 +918,21 @@ int main(int argc, char* argv[])
     comm.print(std::cerr, "ERROR: Mandatory option '--level <levels>' is missing!");
     FEAT::Runtime::abort();
   }
+
+  int num_threads = 1;
+  if((args.parse("threads", num_threads) < 0) || (num_threads < 1))
+  {
+    comm.print(std::cerr, "ERROR: Failed to parse '--threads <n>' option!");
+    FEAT::Runtime::abort();
+  }
+  comm.print(String("Threads per Process").pad_back(padlen, '.') + ": " + stringify(num_threads));
+#ifdef FEAT_HAVE_OMP
+  omp_set_num_threads(num_threads);
+  comm.print(String("Maximum OpenMP Threads").pad_back(padlen, '.') + ": " + stringify(omp_get_max_threads()));
+#endif
+
+  comm.print(String("Total CPU Cores").pad_back(padlen, '.') + ": " + stringify(std::size_t(num_threads) * comm.size()));
+
   if(args.check("backend") > 0)
   {
     String sbackend;
@@ -888,20 +949,8 @@ int main(int argc, char* argv[])
       FEAT::Runtime::abort();
     }
   }
+  comm.print(String("Floating Point Formats").pad_back(padlen, '.') + ": " + String(fp_typename));
   comm.print(String("Chosen Backend").pad_back(padlen, '.') + ": " + stringify(Backend::get_preferred_backend()));
-  int num_threads = 1;
-  if((args.parse("threads", num_threads) < 0) || (num_threads < 1))
-  {
-    comm.print(std::cerr, "ERROR: Failed to parse '--threads <n>' option!");
-    FEAT::Runtime::abort();
-  }
-  comm.print(String("Threads per Process").pad_back(padlen, '.') + ": " + stringify(num_threads));
-#ifdef FEAT_HAVE_OMP
-  omp_set_num_threads(num_threads);
-  comm.print(String("Maximum OpenMP Threads").pad_back(padlen, '.') + ": " + stringify(omp_get_max_threads()));
-#endif
-
-  comm.print(String("Total CPU Cores").pad_back(padlen, '.') + ": " + stringify(std::size_t(num_threads) * comm.size()));
 
   // create our mesh file reader
   std::unique_ptr<Geometry::MeshFileReader> mesh_reader(new Geometry::MeshFileReader);
@@ -975,7 +1024,7 @@ int main(int argc, char* argv[])
   typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim, SolverDataType, IndexType> SolverLevelType;
 
   BenchmarkSummary summary;
-  BenchmarkStats statistics;
+  BenchmarkStats statistics(domain.size_virtual());
   StopWatch watch_total_run;
   watch_total_run.start();
 
@@ -1219,7 +1268,13 @@ int main(int argc, char* argv[])
     statistics.counts[Counts::velo_dofs] = velo_dofs/dim;
     statistics.counts[Counts::pres_dofs] = pres_dofs;
     statistics.counts[Counts::total_dofs] = velo_dofs+pres_dofs;
-    statistics.counts[Counts::elements] = domain.front()->get_mesh().get_num_elements();
+    statistics.counts[Counts::fine_elements] = domain.front()->get_mesh().get_num_elements();
+  }
+
+  // collect some all-level statistics
+  for (Index i(1); i < num_levels; ++i)
+  {
+    statistics.counts[Counts::all_elements] += domain.at(i)->get_mesh().get_num_elements();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2126,6 +2181,15 @@ int main(int argc, char* argv[])
     statistics.times[Times::vanka_apply] += v->time_apply();
   }
 
+  // get multigrid timings
+  for(Index i(0); i < multigrid_hierarchy->size_physical(); ++i)
+  {
+    statistics.mg_times_defect.front()   += statistics.mg_times_defect[i+1u]   = multigrid_hierarchy->get_time_defect(int(i));
+    statistics.mg_times_smooth.front()   += statistics.mg_times_smooth[i+1u]   = multigrid_hierarchy->get_time_smooth(int(i));
+    statistics.mg_times_transfer.front() += statistics.mg_times_transfer[i+1u] = multigrid_hierarchy->get_time_transfer(int(i));
+    statistics.mg_times_coarse.front()   += statistics.mg_times_coarse[i+1u]   = multigrid_hierarchy->get_time_coarse(int(i));
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2378,26 +2442,6 @@ int main(int argc, char* argv[])
     comm.print(summary.format());
   comm.print(statistics.format());
 
-  // print multigrid timings
-  if(comm.rank() == 0)
-  {
-    comm.print("Multigrid Timings:");
-    comm.print("              Defect /   Smoother /   Transfer /     Coarse");
-    comm.print("Overall : " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_defect(), 3, 10) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_smooth(), 3, 10) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_transfer(), 3, 10) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_coarse(), 3, 10));
-    for(int i(0); i < int(multigrid_hierarchy->size_physical()); ++i)
-    {
-      comm.print("Level " + stringify(i).pad_front(2) + ": " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_defect(i), 3, 10) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_smooth(i), 3, 10) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_transfer(i), 3, 10) + " / " +
-        stringify_fp_fix(multigrid_hierarchy->get_time_coarse(i), 3, 10));
-    }
-  }
-
   // print extended statistics if desired
   if(ext_stats)
   {
@@ -2413,6 +2457,6 @@ int main(int argc, char* argv[])
     comm.print("\nTest-Mode: PASSED");
 
   // print elapsed runtime
-  comm.print("\nTotal Runtime: " + time_stamp.elapsed_string_now(TimeFormat::s_m));
+  comm.print("\nTotal Wallclock Runtime: " + time_stamp.elapsed_string_now(TimeFormat::s_m) + " seconds");
   return 0;
 }
