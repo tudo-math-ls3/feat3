@@ -628,7 +628,7 @@ namespace FEAT
          */
         bool _work_single(std::unique_ptr<TaskType> task)
         {
-          XASSERTM(this->_my_id == std::size_t(0), "invalid threading strategy");
+          XASSERTM(this->_my_id <= std::size_t(1), "invalid threading strategy");
           XASSERTM(this->_num_workers <= std::size_t(1), "invalid threading strategy");
 
           Index elem_beg = Index(0);
