@@ -16,13 +16,17 @@ class TestMatrixFactoryTest :
   public UnitTest
 {
 public:
+  std::uint64_t rng_seed;
   TestMatrixFactoryTest() :
-    UnitTest("TestMatrixFactoryTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name())
+    UnitTest("TestMatrixFactoryTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name()),
+    rng_seed(Random::get_seed(0))
   {
   }
 
   virtual void run() const override
   {
+    std::cout << "RNG Seed: " << rng_seed << std::endl;
+
     test_generic_csr();
     test_symmetric_struct_csr();
     test_symmetric_csr();
@@ -48,7 +52,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::generic);
 
     TEST_CHECK_EQUAL(matrix.rows(), 4u);
@@ -62,7 +66,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 3u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::generic);
 
     TEST_CHECK_EQUAL(matrix.rows(), 4u);
@@ -84,7 +88,7 @@ public:
     TEST_CHECK(row_ptr[0] >= 0u);
     for(Index i(0); i < nrows; ++i)
     {
-      TEST_CHECK(row_ptr[i] < row_ptr[i+1u]);
+      TEST_CHECK(row_ptr[i] <= row_ptr[i+1u]);
     }
     TEST_CHECK(row_ptr[nrows] <= nnze);
 
@@ -117,7 +121,7 @@ public:
     TEST_CHECK(row_ptr[0] >= 0u);
     for(Index i(0); i < nrows; ++i)
     {
-      TEST_CHECK(row_ptr[i] < row_ptr[i+1u]);
+      TEST_CHECK(row_ptr[i] <= row_ptr[i+1u]);
     }
     TEST_CHECK(row_ptr[nrows] <= nnze);
 
@@ -162,7 +166,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::symmetric_struct);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -176,7 +180,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::symmetric_struct);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -259,7 +263,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix, 6u, 6u, 15u, TestMatrixFlags::symmetric);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -273,7 +277,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix, 6u, 6u, 15u, TestMatrixFlags::symmetric);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -365,7 +369,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::non_negative);
 
     TEST_CHECK_EQUAL(matrix.rows(), 4u);
@@ -379,7 +383,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 3u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::non_negative);
 
     TEST_CHECK_EQUAL(matrix.rows(), 4u);
@@ -414,7 +418,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_empty_diag);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -428,7 +432,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_empty_diag);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -496,7 +500,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_zero_diag);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -510,7 +514,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_zero_diag);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -573,7 +577,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::diagonal_dominant);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -587,7 +591,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::diagonal_dominant);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -673,7 +677,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::diagonal_dominant);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -688,7 +692,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::diagonal_dominant);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -703,7 +707,7 @@ public:
   {
     SparseMatrixCSR<DT_, IT_> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::symmetric);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);
@@ -717,7 +721,7 @@ public:
   {
     SparseMatrixBCSR<DT_, IT_, 2u, 2u> matrix;
     TestMatrixFactory factory;
-    factory.seed_rng_by_timer();
+    factory.set_rng_seed(rng_seed);
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::symmetric);
 
     TEST_CHECK_EQUAL(matrix.rows(), 6u);

@@ -434,12 +434,12 @@ namespace FEAT
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
         for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
         {
-          Index* idx = &_image_idx[_domain_ptr[i]];
+          Index k = _domain_ptr[i];
           AImIt cur(adj.image_begin(i));
           AImIt end(adj.image_end(i));
-          for(; cur != end; ++cur, ++idx)
+          for(; cur != end; ++cur, ++k)
           {
-            *idx = *cur;
+            _image_idx[k] = *cur;
           }
         }
       }
@@ -671,21 +671,21 @@ namespace FEAT
         num_indices_image = _domain_ptr[adj1.get_num_nodes_domain()];
 
         // allocate and build index vector
-        _image_idx =IndexVector(num_indices_image);
+        _image_idx = IndexVector(num_indices_image);
 
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
         for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
         {
-          Index* idx = &_image_idx[_domain_ptr[i]];
+          Index k = _domain_ptr[i];
           AImIt1 cur1(adj1.image_begin(i));
           AImIt1 end1(adj1.image_end(i));
           for(; cur1 != end1; ++cur1)
           {
             AImIt2 cur2(adj2.image_begin(*cur1));
             AImIt2 end2(adj2.image_end(*cur1));
-            for(; cur2 != end2; ++cur2, ++idx)
+            for(; cur2 != end2; ++cur2, ++k)
             {
-              *idx = *cur2;
+              _image_idx[k] = *cur2;
             }
           }
         }
@@ -793,7 +793,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate and format pointer vector
-        _domain_ptr =IndexVector(adj2.get_num_nodes_image() + 1, Index(0));
+        _domain_ptr = IndexVector(adj2.get_num_nodes_image() + 1, Index(0));
 
         // count number of adjacencies
         for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
@@ -819,7 +819,7 @@ namespace FEAT
         num_indices_image = _domain_ptr[adj2.get_num_nodes_image()];
 
         // allocate and build index vector
-        _image_idx =IndexVector(num_indices_image);
+        _image_idx = IndexVector(num_indices_image);
         std::vector<Index*> vimg_ptr(adj2.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
         Index* image_idx = _image_idx.data();
