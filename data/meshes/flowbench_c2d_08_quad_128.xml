@@ -1,4 +1,9 @@
 <FeatMeshFile version="1" mesh="conformal:hypercube:2:2">
+  <Info>
+    This is a mesh for the 2D "flow around a cylinder" benchmark.
+    This mesh consists of 128 quadrilateral cells and has a finer
+    resolution of the circle than the 64 cell mesh.
+  </Info>
   <Chart name="circle">
     <Circle radius="0.05" midpoint="0.2 0.2" domain="0.5 -0.5" />
   </Chart>
@@ -722,6 +727,40 @@
       281
       282
       283
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:l" parent="root" topology="none" size="6 5 0">
+    <Mapping dim="0">
+      2
+      10
+      18
+      26
+      39
+      50
+    </Mapping>
+    <Mapping dim="1">
+      6
+      22
+      38
+      55
+      81
+    </Mapping>
+  </MeshPart>
+  <MeshPart name="inner:u" parent="root" topology="none" size="6 5 0">
+    <Mapping dim="0">
+      6
+      14
+      22
+      30
+      40
+      54
+    </Mapping>
+    <Mapping dim="1">
+      14
+      30
+      46
+      65
+      83
     </Mapping>
   </MeshPart>
 </FeatMeshFile>
