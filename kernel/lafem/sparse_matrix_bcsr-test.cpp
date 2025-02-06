@@ -1170,9 +1170,8 @@ public:
 
     auto a_backup = a.clone(CloneMode::Deep);
 
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rng(seed);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     Adjacency::Permutation perm(a.rows(), rng);
 
     a.permute(perm, perm);

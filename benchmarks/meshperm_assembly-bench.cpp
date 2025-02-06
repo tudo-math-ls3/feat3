@@ -508,6 +508,7 @@ namespace MeshPermAssemblyBench
     }
 
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     // create an empty atlas and a root mesh node
     Geometry::MeshAtlas<Mesh_> atlas;

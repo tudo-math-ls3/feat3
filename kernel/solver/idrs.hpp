@@ -245,18 +245,7 @@ namespace FEAT
       void _set_shadow_space()
       {
         //select set of random vectors
-
-        Random::SeedType seed;
-        if (_random)
-        {
-          seed = Random::get_seed();
-        }
-        else
-        {
-          auto comm = Dist::Comm::world();
-          seed = Random::SeedType(comm.rank());
-        }
-        Random rng(seed);
+        Random rng;
 
         for (Index l(0); l<_krylov_dim; ++l)
           _vec_P.at(l).format(rng, DataType(0), DataType(1));

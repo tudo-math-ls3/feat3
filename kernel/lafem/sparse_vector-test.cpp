@@ -6,6 +6,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
+#include <kernel/util/binary_stream.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -55,9 +56,8 @@ public:
     TEST_CHECK_EQUAL(a(5), DT_(6));
     TEST_CHECK_EQUAL(a(6), DT_(8));
 
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rng(seed);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     Adjacency::Permutation prm_rnd(a.size(), rng);
     SparseVector<DT_, IT_> ap(a.clone());
     ap.permute(prm_rnd);

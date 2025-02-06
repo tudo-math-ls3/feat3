@@ -138,9 +138,8 @@ public:
     MatrixType d = a.clone();
 
     // fill a, b and d with random values
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rng(seed);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     for(Index i(0); i < a.used_elements(); ++i)
     {
       a.val()[i] = DT_(rng(0.0, 1.0));

@@ -81,6 +81,7 @@ public:
     Assembly::MeanFilterAssembler::assemble(filter, space, cubature_factory, DataType_(0.5));
 
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     VectorType vec_sol(rng, space.get_num_dofs(), DataType_(-2.0), DataType_(1.0));
     VectorType vec_rhs(rng, space.get_num_dofs(), DataType_(-2.0), DataType_(1.0));

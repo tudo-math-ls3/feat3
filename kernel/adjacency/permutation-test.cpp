@@ -125,6 +125,7 @@ public:
   {
     // create an rng
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     static constexpr Index N = 10;
     // create a random permutation

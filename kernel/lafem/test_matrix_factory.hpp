@@ -68,16 +68,9 @@ namespace FEAT
 
       TestMatrixFactory() = default;
 
-      void set_rng_seed(std::uint64_t seed)
+      Random::SeedType get_rng_seed() const
       {
-        rng = Random(seed);
-      }
-
-      std::uint64_t seed_rng_by_timer(int rank = 0)
-      {
-        std::uint64_t seed = Random::get_seed(rank);
-        rng = Random(seed);
-        return seed;
+        return rng.get_seed();
       }
 
       /**

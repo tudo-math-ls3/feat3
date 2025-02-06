@@ -7,6 +7,7 @@
 #include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_factory.hpp>
+#include <kernel/util/binary_stream.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;

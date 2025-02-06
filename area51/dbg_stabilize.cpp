@@ -66,6 +66,7 @@ namespace Andicore
     auto& vtx = mesh.get_vertex_set();
 
     Random rng;
+    std::cout << "Disturb Mesh RNG Seed: " << rng.get_seed() << "\n";
 
     for(Index i(0); i < vtx.get_num_vertices(); ++i)
     {

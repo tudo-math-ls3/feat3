@@ -7,7 +7,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_cscr.hpp>
 #include <kernel/util/binary_stream.hpp>
-#include <kernel/util/random.hpp>
 #include <kernel/lafem/sparse_matrix_factory.hpp>
 //#include <kernel/adjacency/cuthill_mckee.hpp>
 

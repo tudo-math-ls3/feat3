@@ -17,7 +17,6 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
-#include <kernel/util/random.hpp>
 
 using namespace FEAT;
 using namespace FEAT::TestSystem;

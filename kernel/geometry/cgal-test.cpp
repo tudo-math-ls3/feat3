@@ -75,6 +75,8 @@ public:
       // create rng object
 
       Random rng;
+      std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
       std::for_each(points.begin(), points.end(), [&rng](Tiny::Vector<DT_,3>& vec){vec = {DT_(rng.next())/DT_(3.14), -DT_(rng.next())/DT_(7.19), DT_(rng.next())/DT_(1.554)};});
       DT_ max_val = (*std::max_element(points.begin(), points.end(), [](Tiny::Vector<DT_, 3>& a, Tiny::Vector<DT_, 3>& b){return a.norm_euclid_sqr() < b.norm_euclid_sqr();})).norm_euclid();
       std::transform(points.begin(), points.end(), points.begin(), [&max_val](const Tiny::Vector<DT_, 3>& a){return a * (range/max_val);});

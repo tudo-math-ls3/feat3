@@ -500,8 +500,7 @@ namespace FEAT
         _comm(comm),
         _num_patches(num_patches)
       {
-        Random::SeedType seed(Random::SeedType(time(nullptr)));
-        Random rng(seed + Random::SeedType(comm.rank()));
+        Random rng;
 
         mesh.fill_neighbors();
 

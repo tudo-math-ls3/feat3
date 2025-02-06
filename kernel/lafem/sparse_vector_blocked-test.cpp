@@ -6,6 +6,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
+#include <kernel/util/binary_stream.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -70,9 +71,8 @@ public:
       c(c.size() - i, tv1);
     }
 
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rng(seed);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     Adjacency::Permutation prm_rnd(a.size(), rng);
     SparseVectorBlocked<DT_, IT_, 2> ap(a.clone());
     ap.permute(prm_rnd);

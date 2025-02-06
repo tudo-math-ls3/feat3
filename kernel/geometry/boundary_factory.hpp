@@ -9,6 +9,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/intern/boundary_computer.hpp>
+#include <kernel/util/dist.hpp>
 
 namespace FEAT
 {

@@ -6,14 +6,14 @@
 #pragma once
 
 // includes, FEAT
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
-#include <kernel/util/dist.hpp>
 
 // includes, system
 #include <algorithm>
 #include <limits>
 #include <cstdint>
-#include <time.h>
+#include <chrono>
 
 namespace FEAT
 {
@@ -56,42 +56,45 @@ namespace FEAT
     /// seed type
     typedef std::uint64_t SeedType;
 
-    /// default seed value
-    static constexpr SeedType def_seed = SeedType(28054777172512ull);
-
     /// internal multiplier
     static constexpr SeedType xor_mult = SeedType(2685821657736338717ull);
 
-    /**
-    * \brief Get different seed for each MPI rank.
-    *
-    * seed = time(nullptr) + multiplier * mpi_rank
-    * \note multiplier = 0 will not necessarily give you the same seed in every process.
-    *
-    * \param[in] multiplier
-    *
-    */
-    static SeedType get_seed(SeedType multiplier = 100)
-    {
-      auto comm = Dist::Comm::world();
-      return SeedType(time(nullptr))+multiplier*SeedType(comm.rank());
-    }
-
   private:
+    /// the rng's original seed
+    std::uint64_t _seed;
     /// the rng's working values
     std::uint64_t _x;
 
   public:
     /**
-     * \brief CTOR
+     * \brief Default constructor that seeds the RNG with the current high-resolution clock time
+     */
+    explicit Random() :
+      _seed(0),
+      _x(0)
+    {
+      // use the high-resolution clock from the standard library go get the epoch time in nanoseconds as the seed
+      auto now = std::chrono::high_resolution_clock::now();
+      _seed = _x = std::chrono::duration_cast<std::chrono::duration<SeedType, std::nano>>(now.time_since_epoch()).count() + SeedType(17u);
+    }
+
+    /**
+     * \brief Constructor
      *
      * \param[in] seed
-     * The seed for the random number generator.
+     * The seed for the random number generator; must not be 0.
      */
-    explicit Random(SeedType seed = SeedType(def_seed)) :
-      // The seed must be non-zero.
-      _x(seed != SeedType(0) ? seed : def_seed)
+    explicit Random(SeedType seed) :
+      _seed(seed),
+      _x(seed)
     {
+      XASSERTM(seed != SeedType(0), "Random seed must not be zero!");
+    }
+
+    /// \returns The original seed that was used to create this RNG object.
+    SeedType get_seed() const
+    {
+      return _seed;
     }
 
     /**

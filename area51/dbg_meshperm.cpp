@@ -226,6 +226,7 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
   node->adapt();
 
   Random rng;
+  std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
   // refine
   for(Index lvl(1); lvl <= lvl_max; ++lvl)

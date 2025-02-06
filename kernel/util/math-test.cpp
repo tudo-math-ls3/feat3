@@ -353,6 +353,7 @@ public:
 
     // create an RNG
     Random rng;
+    std::cout << "RNG Seed:" << rng.get_seed() << "\n";
 
     // choose minimum and maximum system size
     static constexpr IT_ n_min = 1;

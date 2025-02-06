@@ -144,7 +144,8 @@ public:
   void test_vector(const GateType& gate, const AlgDofPartiType& adp) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.9));
-    Random rng(257ull + 17ull * (unsigned long long)gate.get_comm()->rank());
+    Random rng;
+    std::cout << "test_vector RNG Seed: " << rng.get_seed() << "\n";
 
     // let's create two gate vectors
     GlobalVectorType glob_vec_x(&gate, gate._freqs.clone(LAFEM::CloneMode::Layout));
@@ -199,7 +200,8 @@ public:
   void test_matrix(/*const*/ GateType& gate, const AlgDofPartiType& adp, const IT_ m) const
   {
     const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.9));
-    Random rng(257ull + 17ull * (unsigned long long)gate.get_comm()->rank());
+    Random rng;
+    std::cout << "test_matrix RNG Seed: " << rng.get_seed() << "\n";
 
     // create global matrix
     GlobalMatrixType glob_mat(&gate, &gate);

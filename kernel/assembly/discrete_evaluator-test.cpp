@@ -89,6 +89,7 @@ public:
 
     // create an RNG
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     // test a few points
     for(int k(0); k < 10; ++k)

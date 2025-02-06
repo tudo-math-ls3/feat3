@@ -57,7 +57,7 @@ public:
   virtual void run() const override
   {
     test_unmap<Shape::Simplex<2>>(2, 0.05);
-    test_unmap<Shape::Simplex<3>>(1, 0.07);
+    test_unmap<Shape::Simplex<3>>(1, 0.03);
     test_unmap<Shape::Hypercube<2>>(3, 0.03);
     test_unmap<Shape::Hypercube<3>>(2, 0.06);
   }
@@ -118,6 +118,7 @@ public:
 
     // distort mesh
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     distort_mesh(mesh, rng, disto);
 
     // create a quad-trafo

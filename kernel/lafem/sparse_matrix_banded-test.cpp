@@ -48,25 +48,24 @@ public:
 
   virtual void run() const override
   {
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     // create random matrix
     const Index tsize(100);
-    const Index rows(tsize + random(Index(0), Index(20)));
-    const Index columns(tsize + random(Index(0), Index(20)));
+    const Index rows(tsize + rng(Index(0), Index(20)));
+    const Index columns(tsize + rng(Index(0), Index(20)));
 
-    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+    const Index num_of_offsets(5 + rng(Index(0), Index(10)));
 
     DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
     DenseVector<DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
     DenseVector<DT_, IT_> vec_val2(num_of_offsets * rows);
-    vec_val2.format(random, DT_(-49), DT_(187));
+    vec_val2.format(rng, DT_(-49), DT_(187));
 
     // create random vector of offsets
-    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, rng);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -203,22 +202,21 @@ public:
 
   virtual void run() const override
   {
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     // create random matrix
     const Index tsize(100);
-    const Index rows(tsize + random(Index(0), Index(20)));
-    const Index columns(tsize + random(Index(0), Index(20)));
+    const Index rows(tsize + rng(Index(0), Index(20)));
+    const Index columns(tsize + rng(Index(0), Index(20)));
 
-    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+    const Index num_of_offsets(5 + rng(Index(0), Index(10)));
 
     DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
     DenseVector<DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
-    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, rng);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -307,21 +305,19 @@ public:
   virtual void run() const override
   {
     DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
-
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     DT_ s(DT_(4.321));
 
     // create random matrix
     const Index tsize(100);
-    const Index rows(tsize + random(Index(0), Index(20)));
-    const Index columns(tsize + random(Index(0), Index(20)));
+    const Index rows(tsize + rng(Index(0), Index(20)));
+    const Index columns(tsize + rng(Index(0), Index(20)));
 
     Index num_of_offsets;
     if (_opt == 0)
-      num_of_offsets = 5 + random(Index(0), Index(10));
+      num_of_offsets = 5 + rng(Index(0), Index(10));
     else
       num_of_offsets = _opt;
 
@@ -330,7 +326,7 @@ public:
 
 
     // create random vector of offsets
-    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, rng);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -340,7 +336,7 @@ public:
     // fill data-array
     for (Index i(0); i < vec_val.size(); ++i)
     {
-      vec_val(i, random(DT_(0), DT_(10)));
+      vec_val(i, rng(DT_(0), DT_(10)));
     }
 
     // create test-matrix
@@ -353,7 +349,7 @@ public:
 
     for (Index i(0); i < x.size(); ++i)
     {
-      x(i, random(DT_(0.1), DT_(2.1)));
+      x(i, rng(DT_(0.1), DT_(2.1)));
     }
 
     for (Index i(0); i < ref1.size(); ++i)
@@ -453,25 +449,24 @@ public:
 
   virtual void run() const override
   {
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     DT_ s(DT_(4.321));
 
     // create random matrix
     const Index tsize(100);
-    const Index rows(tsize + random(Index(0), Index(20)));
-    const Index columns(tsize + random(Index(0), Index(20)));
+    const Index rows(tsize + rng(Index(0), Index(20)));
+    const Index columns(tsize + rng(Index(0), Index(20)));
 
-    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+    const Index num_of_offsets(5 + rng(Index(0), Index(10)));
 
     DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
     DenseVector<DT_, IT_> vec_val_a(num_of_offsets * rows);
     DenseVector<DT_, IT_> vec_val_ref(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
-    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, rng);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -481,7 +476,7 @@ public:
     // fill data-array
     for (Index i(0); i < vec_val_a.size(); ++i)
     {
-      vec_val_a(i, random(DT_(0), DT_(10)));
+      vec_val_a(i, rng(DT_(0), DT_(10)));
       vec_val_ref(i, vec_val_a(i) * s);
     }
 
@@ -543,18 +538,17 @@ public:
   virtual void run() const override
   {
     DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     DT_ s(DT_(4.321));
 
     // create random matrix
     const Index tsize(100);
-    const Index rows(tsize + random(Index(0), Index(20)));
-    const Index columns(tsize + random(Index(0), Index(20)));
+    const Index rows(tsize + rng(Index(0), Index(20)));
+    const Index columns(tsize + rng(Index(0), Index(20)));
 
-    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+    const Index num_of_offsets(5 + rng(Index(0), Index(10)));
 
     DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
     DenseVector<DT_, IT_> vec_val_a(num_of_offsets * rows);
@@ -564,7 +558,7 @@ public:
 
 
     // create random vector of offsets
-    FEAT::Adjacency::Permutation permutation(rows + columns - 1, random);
+    FEAT::Adjacency::Permutation permutation(rows + columns - 1, rng);
     for (Index i(0); i < num_of_offsets; ++i)
     {
       vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
@@ -574,8 +568,8 @@ public:
     // fill data-array
     for (Index i(0); i < vec_val_a.size(); ++i)
     {
-      vec_val_a(i, random(DT_(0), DT_(10)));
-      vec_val_b(i, random(DT_(0), DT_(10)));
+      vec_val_a(i, rng(DT_(0), DT_(10)));
+      vec_val_b(i, rng(DT_(0), DT_(10)));
       vec_val_ref(i, vec_val_a(i) + vec_val_b(i) * s);
       vec_val_ref2(i, vec_val_b(i) + vec_val_b(i) * s);
     }

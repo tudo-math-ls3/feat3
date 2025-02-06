@@ -29,6 +29,7 @@ namespace DbgCubature
 
     const DataType pi2 = DataType(2) * Math::pi<DataType>();
     Random rng;
+    std::cout << "Disturb Mesh RNG Seed: "  << rng.get_seed() << "\n";
 
     for(Index i(0); i < vtx.get_num_vertices(); ++i)
     {

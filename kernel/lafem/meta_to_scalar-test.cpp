@@ -200,13 +200,12 @@ public:
 
   virtual void run() const override
   {
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     DenseVector<DT_, IT_> dv11(18);
     for (Index i(0) ; i < dv11.size() ; ++i)
-      dv11(i, random(DT_(0), DT_(10)));
+      dv11(i, rng(DT_(0), DT_(10)));
     DenseVector<IT_, IT_> dv12(3);
     dv12(0, IT_(0));
     dv12(1, IT_(1));
@@ -219,7 +218,7 @@ public:
 
     DenseVector<DT_, IT_> dv21(24);
     for (Index i(0) ; i < dv21.size() ; ++i)
-      dv21(i, random(DT_(0), DT_(10)));
+      dv21(i, rng(DT_(0), DT_(10)));
     DenseVector<IT_, IT_> dv22(4);
     dv22(0, IT_(0));
     dv22(1, IT_(1));
@@ -331,18 +330,17 @@ public:
   {
     const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
 
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random random(seed);
-    std::cout << "seed: " << seed << "\n";
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     DenseVec dv[7];
     for (Index j(0); j < 7; ++j)
     {
-      DenseVec tdv(random(Index(10), Index(15)));
+      DenseVec tdv(rng(Index(10), Index(15)));
       dv[j].convert(tdv);
       for (Index i(0); i < dv[j].size(); ++i)
       {
-        dv[j](i, random(DT_(3.14), DT_(3456.2)));
+        dv[j](i, rng(DT_(3.14), DT_(3456.2)));
       }
     }
 

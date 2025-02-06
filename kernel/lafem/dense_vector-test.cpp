@@ -43,6 +43,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     DenseVector<DT_, IT_> zero1;
     DenseVector<DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
@@ -97,9 +100,6 @@ public:
     DenseVector<DT_, IT_> ap(a.clone());
     Adjacency::Permutation prm_nil;
     ap.permute(prm_nil);
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rng(seed);
     Adjacency::Permutation prm_rnd(a.size(), rng);
     ap.permute(prm_rnd);
     prm_rnd = prm_rnd.inverse();
@@ -810,6 +810,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<DT_, IT_> a(size);
@@ -818,9 +821,6 @@ public:
         a(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
       }
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
@@ -875,6 +875,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<DT_, IT_> a(size);
@@ -883,9 +886,6 @@ public:
         a(i, DT_(i) * (i%2 == 0 ? DT_(1) : DT_(-1)));
       }
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
@@ -940,6 +940,8 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     for (Index size(5) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<DT_, IT_> a(size);
@@ -949,9 +951,6 @@ public:
       }
       a(0, DT_(-5));
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
@@ -1006,6 +1005,8 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     for (Index size(5) ; size < Index(1e3) ; size*=2)
     {
       DenseVector<DT_, IT_> a(size);
@@ -1014,9 +1015,6 @@ public:
         a(i, DT_(DT_(i) - DT_(3)));
       }
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 

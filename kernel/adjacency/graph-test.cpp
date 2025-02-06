@@ -681,6 +681,7 @@ public:
 
     // create graphs and shuffle them
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     Graph g_ve(14, 9, 28, ve_ptr, ve_idx);    shuffle_indices(g_ve, rng);
     Graph g_vc(6, 9, 20, vc_ptr, vc_idx);     shuffle_indices(g_vc, rng);
     Graph g_ev(9, 14, 26, ev_ptr, ev_idx);    shuffle_indices(g_ev, rng);

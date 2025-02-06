@@ -378,8 +378,8 @@ public:
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_ref, space);
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_new, space);
 
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random rng(seed);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     VectorType dummy_conv = VectorType(rng, matrix_ref.rows(), DataType(-1), DataType(1));
 
@@ -443,8 +443,8 @@ public:
     TrafoType trafo(mesh);
     Lagrange2SpaceType space(trafo);
 
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    Random rng(seed);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     VectorType dummy_conv = VectorType(rng, space.get_num_dofs(), DataType(-1), DataType(1));
     VectorType vector_ref = dummy_conv.clone(LAFEM::CloneMode::Deep);

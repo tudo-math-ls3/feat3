@@ -247,6 +247,7 @@ public:
 
     // create a randomized coarse mesh vector
     Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     VectorType vec_c(rng, space_c.get_num_dofs(), -DataType_(1), DataType_(1));
 
     // assemble prolongated fine mesh vector

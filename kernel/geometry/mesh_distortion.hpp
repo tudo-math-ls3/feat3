@@ -65,12 +65,26 @@ namespace FEAT
        *
        * \param[in] _mesh
        * A reference to the mesh that is to be distorted
+       */
+      explicit MeshDistortion(MeshType_& mesh) :
+        _mesh(mesh),
+        _rand(),
+        _boundary_vertices(_mesh.get_num_vertices(), 0),
+        _boundary_facets(_mesh.get_num_entities(shape_dim - 1), 0),
+        _shortest_edge(_mesh.get_num_vertices(), Math::huge<CoordType>())
+      {
+      }
+      /**
+       * \brief Constructor
+       *
+       * \param[in] _mesh
+       * A reference to the mesh that is to be distorted
        *
        * \param[in] _seed
        * The seed for the random number generator
        *
        */
-      explicit MeshDistortion(MeshType_& mesh, Random::SeedType seed = Random::def_seed) :
+      explicit MeshDistortion(MeshType_& mesh, Random::SeedType seed) :
         _mesh(mesh),
         _rand(seed),
         _boundary_vertices(_mesh.get_num_vertices(), 0),
@@ -345,12 +359,27 @@ namespace FEAT
        *
        * \param[in] root_mesh_node
        * A \resident reference to the root mesh node containing the mesh that is to be distorted.
+       */
+      explicit DistributedMeshDistortion(const Dist::Comm& comm, RootMeshNodeType& root_mesh_node) :
+        BaseClass(*root_mesh_node.get_mesh()),
+        _comm(comm),
+        _root_mesh_node(root_mesh_node),
+        _vertex_owners()
+      {
+      }
+      /**
+       * \brief Constructor
+       *
+       * \param[in] comm
+       * A \resident reference to the communicator that was used for partitioning.
+       *
+       * \param[in] root_mesh_node
+       * A \resident reference to the root mesh node containing the mesh that is to be distorted.
        *
        * \param[in] seed
        * The seed for the internal random number generator.
        */
-      explicit DistributedMeshDistortion(const Dist::Comm& comm, RootMeshNodeType& root_mesh_node,
-        Random::SeedType seed = Random::def_seed) :
+      explicit DistributedMeshDistortion(const Dist::Comm& comm, RootMeshNodeType& root_mesh_node, Random::SeedType seed) :
         BaseClass(*root_mesh_node.get_mesh(), seed),
         _comm(comm),
         _root_mesh_node(root_mesh_node),

@@ -48,6 +48,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     DenseVectorBlocked<DT_, IT_, 2> zero1;
     DenseVectorBlocked<DT_, IT_, 2> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
@@ -123,9 +126,6 @@ public:
     TEST_CHECK_EQUAL((void*)g.template elements<Perspective::pod>(), (void*)f.template elements<Perspective::pod>());
 
     // random constructor check
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rng(seed);
     DT_ rnd_range[2];
     IT_ rnd_size = 3*1234;
     rnd_range[0] = DT_(-10);
@@ -908,6 +908,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
@@ -927,9 +930,6 @@ public:
       for(Index j(0); j < block_size_; ++j)
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
       DT_ max = a.max_abs_element();
@@ -980,6 +980,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
@@ -999,9 +1002,6 @@ public:
       for(Index j(0); j < block_size_; ++j)
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
@@ -1053,6 +1053,9 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
     for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
@@ -1072,9 +1075,6 @@ public:
       for(Index j(0); j < block_size_; ++j)
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
@@ -1126,6 +1126,8 @@ public:
 
   virtual void run() const override
   {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
     for (Index size(1) ; size < Index(1e4) ; size*=2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
@@ -1145,9 +1147,6 @@ public:
       for(Index j(0); j < block_size_; ++j)
         TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
@@ -1200,6 +1199,8 @@ public:
   virtual void run() const override
   {
     bool one_error(false);
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     for (Index size(10) ; size < Index(1e4) ; size*=2)
     {
@@ -1215,9 +1216,6 @@ public:
       DenseVectorBlocked<DT_, IT_, block_size_> ref(a.size());
       ref.copy(a);
 
-      Random::SeedType seed(Random::SeedType(time(nullptr)));
-      std::cout << "seed: " << seed << "\n";
-      Random rng(seed);
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 

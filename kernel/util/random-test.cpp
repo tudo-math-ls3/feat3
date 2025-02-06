@@ -72,8 +72,8 @@ public:
 
   virtual void run() const override
   {
-    // create an RNG
-    Random rng;
+    // create an RNG with explicit seed
+    Random rng(17);
 
     // test 10 times
     for(int i(0); i < 10; ++i)
@@ -100,9 +100,8 @@ public:
     }
 
     // create time seeded RNG
-    Random::SeedType seed(Random::SeedType(time(nullptr)));
-    std::cout << "seed: " << seed << "\n";
-    Random rngt(seed);
+    Random rngt;
+    std::cout << "RNGT Seed: " << rngt.get_seed() << "\n";
 
     // test 10 times
     for(int i(0); i < 10; ++i)

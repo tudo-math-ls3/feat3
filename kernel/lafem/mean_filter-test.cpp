@@ -37,31 +37,35 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.75));
     for(Index size(1); size < Index(1e3); size*=2)
     {
+      DT_ tol = eps * DT_(size);
+
       DenseVector<DT_, IT_> vec_prim(size, DT_(1));
       DenseVector<DT_, IT_> vec_dual(size, DT_(DT_(1)/DT_(size)));
 
       DT_ sol_mean = DT_(1.563);
 
-      Random rng;
       DenseVector<DT_, IT_> vec_test_prim(rng, size, DT_(0), DT_(1));
       DenseVector<DT_, IT_> vec_test_dual(rng, size, DT_(0), DT_(1));
 
       MeanFilter<DT_, IT_> filter(vec_prim.clone(), vec_dual.clone(), sol_mean);
 
       filter.filter_def(vec_test_dual);
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_dual.dot(vec_prim), DT_(0), eps*DT_(10));
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_dual.dot(vec_prim), DT_(0), tol);
 
       filter.filter_cor(vec_test_prim);
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_prim.dot(vec_dual), DT_(0), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_prim.dot(vec_dual), DT_(0), tol);
 
       filter.filter_rhs(vec_test_dual);
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_dual.dot(vec_prim), DT_(0), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_dual.dot(vec_prim), DT_(0), tol);
 
       filter.filter_sol(vec_test_prim);
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_prim.dot(vec_dual), sol_mean, eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_test_prim.dot(vec_dual), sol_mean, tol);
     }
   }
 };
