@@ -171,10 +171,8 @@ namespace FEAT
        */
       void from_1_to_0()
       {
-        if(_gate != nullptr)
-        {
-          _gate->from_1_to_0(this->_vector);
-        }
+        ASSERTM(_gate, "Gate is not set!");
+        _gate->from_1_to_0(this->_vector);
       }
 
       /**
@@ -188,8 +186,8 @@ namespace FEAT
        */
       void sync_0()
       {
-        if(_gate != nullptr)
-          _gate->sync_0(_vector);
+        ASSERTM(_gate, "Gate is not set!");
+        _gate->sync_0(_vector);
       }
 
       /**
@@ -206,6 +204,7 @@ namespace FEAT
       auto sync_0_async() -> decltype(_gate->sync_0_async(_vector))
       //decltype(_gate->sync_0(_vector)) sync_0_async()
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->sync_0_async(_vector);
       }
 
@@ -220,8 +219,8 @@ namespace FEAT
        */
       void sync_1()
       {
-        if(_gate != nullptr)
-          _gate->sync_1(_vector);
+        ASSERTM(_gate, "Gate is not set!");
+        _gate->sync_1(_vector);
       }
 
       /**
@@ -238,6 +237,7 @@ namespace FEAT
       auto sync_1_async() -> decltype(_gate->sync_1_async(_vector))
       //decltype(_gate->sync_1(_vector)) sync_1_async()
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->sync_1_async(_vector);
       }
 
@@ -254,6 +254,7 @@ namespace FEAT
       template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
       Index size() const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->template get_num_global_dofs<perspective_>();
       }
 
@@ -378,9 +379,8 @@ namespace FEAT
        */
       DataType dot(const Vector& x) const
       {
-        if(_gate != nullptr)
-          return _gate->dot(_vector, x.local());
-        return _vector.dot(x.local());
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->dot(_vector, x.local());
       }
 
       /**
@@ -396,6 +396,7 @@ namespace FEAT
        */
       SynchScalarTicket<DataType> dot_async(const Vector& x) const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->dot_async(_vector, x.local());
       }
 
@@ -448,6 +449,7 @@ namespace FEAT
        */
       SynchScalarTicket<DataType> norm2_async() const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->dot_async(_vector, _vector, true);
       }
 
@@ -490,9 +492,8 @@ namespace FEAT
        */
       DataType max_abs_element() const
       {
-        if (_gate != nullptr)
-          return _gate->max(_vector.max_abs_element());
-        return _vector.max_abs_element();
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->max(_vector.max_abs_element());
       }
 
       /**
@@ -505,6 +506,7 @@ namespace FEAT
        */
       SynchScalarTicket<DataType> max_abs_element_async() const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->max_async(_vector.max_abs_element());
       }
 
@@ -518,9 +520,8 @@ namespace FEAT
        */
       DataType min_abs_element() const
       {
-        if (_gate != nullptr)
-          return _gate->min(_vector.min_abs_element());
-        return _vector.min_abs_element();
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->min(_vector.min_abs_element());
       }
 
       /**
@@ -533,6 +534,7 @@ namespace FEAT
        */
       SynchScalarTicket<DataType> min_abs_element_async() const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->min_async(_vector.min_abs_element());
       }
 
@@ -546,9 +548,8 @@ namespace FEAT
        */
       DataType max_element() const
       {
-        if (_gate != nullptr)
-          return _gate->max_element(_vector);
-        return _vector.max_element();
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->max_async(_vector.max_element());
       }
 
       /**
@@ -561,6 +562,7 @@ namespace FEAT
        */
       SynchScalarTicket<DataType> max_element_async() const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->max_async(_vector.max_element());
       }
 
@@ -574,9 +576,8 @@ namespace FEAT
        */
       DataType min_element() const
       {
-        if (_gate != nullptr)
-          return _gate->min_element(_vector);
-        return _vector.min_element();
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->min(_vector.min_element());
       }
 
       /**
@@ -589,6 +590,7 @@ namespace FEAT
        */
       SynchScalarTicket<DataType> min_element_async() const
       {
+        ASSERTM(_gate, "Gate is not set!");
         return _gate->min_async(_vector.min_element());
       }
 

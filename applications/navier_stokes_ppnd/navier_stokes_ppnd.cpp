@@ -1101,6 +1101,7 @@ namespace NavierStokesPP
     GlobalSchurMatrix matrix_s;
 
     NavierStokesBlockedSystemLevel() :
+      matrix_mass_pres(&this->gate_pres, &this->gate_pres),
       inverse_lumped_mass_pres(&this->gate_pres),
       inverse_lumped_mass_velo(&this->gate_velo),
       matrix_s(this->inverse_lumped_mass_velo, this->matrix_b, this->matrix_d)

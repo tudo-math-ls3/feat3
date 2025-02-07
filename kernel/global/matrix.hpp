@@ -616,13 +616,12 @@ namespace FEAT
        */
       LocalMatrix_ convert_to_1() const
       {
+        ASSERTM(_col_gate, "Column gate is not set!");
+        ASSERTM(_row_gate, "Row gate is not set!");
         LocalMatrix_ locmat = _matrix.clone(LAFEM::CloneMode::Weak);
-        if((_row_gate != nullptr) && (_col_gate != nullptr))
-        {
-          SynchMatrix<LocalMatrix_, RowMirror_> synch(*_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
-          synch.init(locmat);
-          synch.exec(locmat);
-        }
+        SynchMatrix<LocalMatrix_, RowMirror_> synch(*_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
+        synch.init(locmat);
+        synch.exec(locmat);
         return locmat;
       }
 

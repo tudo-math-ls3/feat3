@@ -193,6 +193,7 @@ namespace FEAT
         lumped_matrix_a(&gate_velo),
         matrix_b(&gate_velo, &gate_pres),
         matrix_d(&gate_pres, &gate_velo),
+        matrix_sys(&gate_sys, &gate_sys),
         transfer_velo(&coarse_muxer_velo),
         transfer_pres(&coarse_muxer_pres),
         transfer_sys(&coarse_muxer_sys),
