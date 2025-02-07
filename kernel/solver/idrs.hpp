@@ -244,8 +244,12 @@ namespace FEAT
 
       void _set_shadow_space()
       {
-        //select set of random vectors
+        // select set of random vectors
         Random rng;
+
+        // use world comm rank as seed unless a truly random seed is desired
+        if(!_random)
+          rng = Random(Random::SeedType(Dist::Comm::world().rank()+1));
 
         for (Index l(0); l<_krylov_dim; ++l)
           _vec_P.at(l).format(rng, DataType(0), DataType(1));
