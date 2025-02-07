@@ -351,9 +351,10 @@ public:
   {
     const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
 
-    // create an RNG
-    Random rng;
-    std::cout << "RNG Seed:" << rng.get_seed() << "\n";
+    // create an RNG with a fixed seed; if we used a true random seed then we will
+    // get test failures due to singular input matrices every now and then...
+    Random rng(0xDEADBEEFC0DEBABEull);
+    //std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     // choose minimum and maximum system size
     static constexpr IT_ n_min = 1;
