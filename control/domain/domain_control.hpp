@@ -744,6 +744,18 @@ namespace FEAT
               // that's a standard virtual mesh level with exactly one physical mesh level
               _virt_levels.push_back(VirtLevelType(laylevs.back(), layer));
             }
+
+            // push base-levels? (only for front layer)
+            if(_keep_base_levels && (ilay == std::size_t(0)))
+            {
+              if(!_base_levels.empty())
+              {
+                XASSERT(laylevs.size() == _base_levels.size());
+                _virt_levels.back().set_base(_base_levels.back());
+              }
+              else
+                _virt_levels.back().set_base();
+            }
           }
 
           // get virtual size of this process
