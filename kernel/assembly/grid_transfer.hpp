@@ -157,59 +157,17 @@ namespace FEAT
         // typedefs for trafo data
         typedef typename FineTrafoEvaluator::template ConfigTraits<fine_trafo_config>::EvalDataType FineTrafoEvalData;
         typedef typename CoarseTrafoEvaluator::template ConfigTraits<coarse_trafo_config>::EvalDataType CoarseTrafoEvalData;
-        FineTrafoEvalData fine_trafo_data;
-        CoarseTrafoEvalData coarse_trafo_data;
 
         // typedef for space data
         typedef typename FineSpaceEvaluator::template ConfigTraits<SpaceTags::value>::EvalDataType FineSpaceEvalData;
         typedef typename CoarseSpaceEvaluator::template ConfigTraits<SpaceTags::value>::EvalDataType CoarseSpaceEvalData;
-        FineSpaceEvalData fine_space_data;
-        CoarseSpaceEvalData coarse_space_data;
 
         // typedefs for cubature rule and factory
         typedef typename Intern::CubatureTraits<FineTrafoEvaluator>::RuleType CubatureRuleType;
 
-        // create matrix scatter-axpy
-        typename Matrix_::ScatterAxpy scatter_maxpy(matrix);
-        typename Vector_::ScatterAxpy scatter_vaxpy(vector);
-
-        // create DOF-mappings
-        FineDofMapping fine_dof_mapping(fine_space);
-        CoarseDofMapping coarse_dof_mapping(coarse_space);
-
         // fetch the trafos
         const FineTrafoType& fine_trafo = fine_space.get_trafo();
         const CoarseTrafoType& coarse_trafo = coarse_space.get_trafo();
-
-        // create trafo evaluators
-        FineTrafoEvaluator fine_trafo_eval(fine_trafo);
-        CoarseTrafoEvaluator coarse_trafo_eval(coarse_trafo);
-
-        // create space evaluators
-        FineSpaceEvaluator fine_space_eval(fine_space);
-        CoarseSpaceEvaluator coarse_space_eval(coarse_space);
-
-        // create the cubature rules
-        CubatureRuleType fine_cubature(Cubature::ctor_factory, cubature_factory);
-        CubatureRuleType refine_cubature;
-        Cubature::RefineFactoryCore::create(refine_cubature, fine_cubature);
-
-        // allocate fine-mesh mass matrix
-        Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> mass;
-
-        // allocate local matrix data for interlevel-mesh mass matrix
-        Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> lmd, lid;
-
-        // allocate local vector data for weight vector
-        Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
-
-        // pivot array for factorization
-        int pivot[FineSpaceEvaluator::max_local_dofs];
-
-        // helper struct to calculate fine mesh cell index
-        const Geometry::Intern::CoarseFineCellMapping<
-          typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
-          cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
 
         // get fine mesh element inverse permutation
         const Adjacency::Permutation& coarse_perm =
@@ -217,135 +175,187 @@ namespace FEAT
         const Adjacency::Permutation& fine_perm =
           fine_trafo.get_mesh().get_mesh_permutation().get_inv_perm();
 
-        // loop over all coarse mesh cells
-        for(Index ccell(0); ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
+        // create the cubature rules
+        CubatureRuleType fine_cubature(Cubature::ctor_factory, cubature_factory);
+        CubatureRuleType refine_cubature;
+        Cubature::RefineFactoryCore::create(refine_cubature, fine_cubature);
+
+        // helper struct to calculate fine mesh cell index
+        const Geometry::Intern::CoarseFineCellMapping<
+          typename FineSpace_::MeshType, typename CoarseSpace_::MeshType>
+          cfmapping(fine_trafo.get_mesh(), coarse_trafo.get_mesh());
+
+        // OpenMP parallel region
+        FEAT_PRAGMA_OMP(parallel)
         {
-          // prepare coarse trafo evaluator
-          coarse_trafo_eval.prepare(ccell);
+          FineTrafoEvalData fine_trafo_data;
+          CoarseTrafoEvalData coarse_trafo_data;
 
-          // prepare coarse space evaluator
-          coarse_space_eval.prepare(coarse_trafo_eval);
+          FineSpaceEvalData fine_space_data;
+          CoarseSpaceEvalData coarse_space_data;
 
-          // fetch number of local coarse DOFs
-          const int coarse_num_loc_dofs = coarse_space_eval.get_num_local_dofs();
+          // create matrix scatter-axpy
+          typename Matrix_::ScatterAxpy scatter_maxpy(matrix);
+          typename Vector_::ScatterAxpy scatter_vaxpy(vector);
 
-          // prepare coarse mesh dof-mapping
-          coarse_dof_mapping.prepare(ccell);
+          // create DOF-mappings
+          FineDofMapping fine_dof_mapping(fine_space);
+          CoarseDofMapping coarse_dof_mapping(coarse_space);
 
-          // get coarse cell index with respect to 2-level ordering
-          const Index ccell_2lvl = (coarse_perm.empty() ? ccell : coarse_perm.map(ccell));
+          // create trafo evaluators
+          FineTrafoEvaluator fine_trafo_eval(fine_trafo);
+          CoarseTrafoEvaluator coarse_trafo_eval(coarse_trafo);
 
-          // loop over all child cells
-          for(Index child(0); child < cfmapping.get_num_children(); ++child)
+          // create space evaluators
+          FineSpaceEvaluator fine_space_eval(fine_space);
+          CoarseSpaceEvaluator coarse_space_eval(coarse_space);
+
+          // allocate fine-mesh mass matrix
+          Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> mass;
+
+          // allocate local matrix data for interlevel-mesh mass matrix
+          Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> lmd, lid;
+
+          // allocate local vector data for weight vector
+          Tiny::Vector<DataType, FineSpaceEvaluator::max_local_dofs> lvd;
+
+          // pivot array for factorization
+          int pivot[FineSpaceEvaluator::max_local_dofs];
+
+          // loop over all coarse mesh cells
+          FEAT_PRAGMA_OMP(for)
+          for(Index ccell = 0; ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
           {
-            // calculate fine mesh cell index with respect to 2 level ordering
-            const Index fcell_2lvl = cfmapping.calc_fcell(ccell_2lvl, child);
+            // prepare coarse trafo evaluator
+            coarse_trafo_eval.prepare(ccell);
 
-            // get fine cell index with respect to potential permutation
-            const Index fcell = (fine_perm.empty() ? fcell_2lvl : fine_perm.map(fcell_2lvl));
+            // prepare coarse space evaluator
+            coarse_space_eval.prepare(coarse_trafo_eval);
 
-            // prepare fine trafo evaluator
-            fine_trafo_eval.prepare(fcell);
+            // fetch number of local coarse DOFs
+            const int coarse_num_loc_dofs = coarse_space_eval.get_num_local_dofs();
 
-            // prepare fine space evaluator
-            fine_space_eval.prepare(fine_trafo_eval);
+            // prepare coarse mesh dof-mapping
+            coarse_dof_mapping.prepare(ccell);
 
-            // fetch number of local fine DOFs
-            const int fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
+            // get coarse cell index with respect to 2-level ordering
+            const Index ccell_2lvl = (coarse_perm.empty() ? ccell : coarse_perm.map(ccell));
 
-            // format local matrices
-            mass.format();
-            lmd.format();
-            lvd.format();
-
-            // loop over all cubature points and integrate
-            for(int k(0); k < fine_cubature.get_num_points(); ++k)
+            // loop over all child cells
+            for(Index child(0); child < cfmapping.get_num_children(); ++child)
             {
-              // compute coarse mesh cubature point index
-              const int l(int(child) * fine_cubature.get_num_points() + k);
+              // calculate fine mesh cell index with respect to 2 level ordering
+              const Index fcell_2lvl = cfmapping.calc_fcell(ccell_2lvl, child);
 
-              // compute trafo data
-              fine_trafo_eval(fine_trafo_data, fine_cubature.get_point(k));
-              coarse_trafo_eval(coarse_trafo_data, refine_cubature.get_point(l));
+              // get fine cell index with respect to potential permutation
+              const Index fcell = (fine_perm.empty() ? fcell_2lvl : fine_perm.map(fcell_2lvl));
 
-              // compute basis function data
-              fine_space_eval(fine_space_data, fine_trafo_data);
-              coarse_space_eval(coarse_space_data, coarse_trafo_data);
+              // prepare fine trafo evaluator
+              fine_trafo_eval.prepare(fcell);
 
-              // fine mesh test function loop
-              for(int i(0); i < fine_num_loc_dofs; ++i)
+              // prepare fine space evaluator
+              fine_space_eval.prepare(fine_trafo_eval);
+
+              // fetch number of local fine DOFs
+              const int fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
+
+              // format local matrices
+              mass.format();
+              lmd.format();
+              lvd.format();
+
+              // loop over all cubature points and integrate
+              for(int k(0); k < fine_cubature.get_num_points(); ++k)
               {
-                // fine mesh trial function loop
-                for(int j(0); j < fine_num_loc_dofs; ++j)
-                {
-                  mass(i,j) += fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
-                    fine_space_data.phi[i].value * fine_space_data.phi[j].value;
-                  // go for next fine mesh trial DOF
-                }
+                // compute coarse mesh cubature point index
+                const int l(int(child) * fine_cubature.get_num_points() + k);
 
-                // coarse mesh trial function loop
-                for(int j(0); j < coarse_num_loc_dofs; ++j)
+                // compute trafo data
+                fine_trafo_eval(fine_trafo_data, fine_cubature.get_point(k));
+                coarse_trafo_eval(coarse_trafo_data, refine_cubature.get_point(l));
+
+                // compute basis function data
+                fine_space_eval(fine_space_data, fine_trafo_data);
+                coarse_space_eval(coarse_space_data, coarse_trafo_data);
+
+                // fine mesh test function loop
+                for(int i(0); i < fine_num_loc_dofs; ++i)
                 {
-                  lmd(i,j) +=
-                    fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
-                    fine_space_data.phi[i].value * coarse_space_data.phi[j].value;
-                  // go for next fine mesh trial DOF
+                  // fine mesh trial function loop
+                  for(int j(0); j < fine_num_loc_dofs; ++j)
+                  {
+                    mass(i,j) += fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
+                      fine_space_data.phi[i].value * fine_space_data.phi[j].value;
+                    // go for next fine mesh trial DOF
+                  }
+
+                  // coarse mesh trial function loop
+                  for(int j(0); j < coarse_num_loc_dofs; ++j)
+                  {
+                    lmd(i,j) +=
+                      fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
+                      fine_space_data.phi[i].value * coarse_space_data.phi[j].value;
+                    // go for next fine mesh trial DOF
+                  }
+                  // go for next fine mesh test DOF
                 }
-                // go for next fine mesh test DOF
+                // go for next cubature point
               }
-              // go for next cubature point
+
+              // finish coarse mesh evaluators
+              fine_space_eval.finish();
+              fine_trafo_eval.finish();
+
+              // invert fine mesh mass matrix
+              Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
+
+              // Note:
+              // Usually, one would check whether the determinant returned by the invert_matrix
+              // function is normal. However, this can lead to false alerts when assembling in
+              // single precision, as the mass matrix entries are of magnitude h^2 (in 2D), i.e.
+              // the determinant can become subnormal or even (numerically) zero although the
+              // condition number of the matrix is still fine and the inversion was successful.
+              // Therefore, we first multiply the (hopefully) inverted mass matrix by the
+              // inter-level mass matrix and check whether the Frobenius norm of the result
+              // is normal. If our matrix inversion failed, the result is virtually guaranteed
+              // to be garbage, so this should serve well enough as a sanity check.
+
+              // compute X := M^{-1}*N
+              lid.set_mat_mat_mult(mass, lmd);
+
+              // sanity check for matrix inversion
+              if(!Math::isnormal(lid.norm_frobenius()))
+                throw LocalMassMatrixSingularException();
+
+              // prepare fine mesh dof-mapping
+              fine_dof_mapping.prepare(fcell);
+              lvd.format(DataType(1));
+
+              FEAT_PRAGMA_OMP(critical)
+              {
+                // incorporate local matrix
+                scatter_maxpy(lid, fine_dof_mapping, coarse_dof_mapping);
+
+                // update weights
+                scatter_vaxpy(lvd, fine_dof_mapping);
+              }
+
+              // finish fine mesh dof-mapping
+              fine_dof_mapping.finish();
+
+              // go for next child cell
             }
 
             // finish coarse mesh evaluators
-            fine_space_eval.finish();
-            fine_trafo_eval.finish();
+            coarse_space_eval.finish();
+            coarse_trafo_eval.finish();
 
-            // invert fine mesh mass matrix
-            Math::invert_matrix(fine_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
+            // finish coarse mesh dof-mapping
+            coarse_dof_mapping.finish();
 
-            // Note:
-            // Usually, one would check whether the determinant returned by the invert_matrix
-            // function is normal. However, this can lead to false alerts when assembling in
-            // single precision, as the mass matrix entries are of magnitude h^2 (in 2D), i.e.
-            // the determinant can become subnormal or even (numerically) zero although the
-            // condition number of the matrix is still fine and the inversion was successful.
-            // Therefore, we first multiply the (hopefully) inverted mass matrix by the
-            // inter-level mass matrix and check whether the Frobenius norm of the result
-            // is normal. If our matrix inversion failed, the result is virtually guaranteed
-            // to be garbage, so this should serve well enough as a sanity check.
-
-            // compute X := M^{-1}*N
-            lid.set_mat_mat_mult(mass, lmd);
-
-            // sanity check for matrix inversion
-            if(!Math::isnormal(lid.norm_frobenius()))
-              throw LocalMassMatrixSingularException();
-
-            // prepare fine mesh dof-mapping
-            fine_dof_mapping.prepare(fcell);
-
-            // incorporate local matrix
-            scatter_maxpy(lid, fine_dof_mapping, coarse_dof_mapping);
-
-            // update weights
-            lvd.format(DataType(1));
-            scatter_vaxpy(lvd, fine_dof_mapping);
-
-            // finish fine mesh dof-mapping
-            fine_dof_mapping.finish();
-
-            // go for next child cell
-          }
-
-          // finish coarse mesh evaluators
-          coarse_space_eval.finish();
-          coarse_trafo_eval.finish();
-
-          // finish coarse mesh dof-mapping
-          coarse_dof_mapping.finish();
-
-          // go for next coarse mesh cell
-        }
+            // go for next coarse mesh cell
+          } // FEAT_PRAGMA_OMP(for)
+        } // FEAT_PRAGMA_OMP(parallel)
       }
 
       /**
@@ -534,55 +544,17 @@ namespace FEAT
         // typedefs for trafo data
         typedef typename FineTrafoEvaluator::template ConfigTraits<fine_trafo_config>::EvalDataType FineTrafoEvalData;
         typedef typename CoarseTrafoEvaluator::template ConfigTraits<coarse_trafo_config>::EvalDataType CoarseTrafoEvalData;
-        FineTrafoEvalData fine_trafo_data;
-        CoarseTrafoEvalData coarse_trafo_data;
 
         // typedef for space data
         typedef typename FineSpaceEvaluator::template ConfigTraits<SpaceTags::value>::EvalDataType FineSpaceEvalData;
         typedef typename CoarseSpaceEvaluator::template ConfigTraits<SpaceTags::value>::EvalDataType CoarseSpaceEvalData;
-        FineSpaceEvalData fine_space_data;
-        CoarseSpaceEvalData coarse_space_data;
 
         // typedefs for cubature rule and factory
         typedef typename Intern::CubatureTraits<FineTrafoEvaluator>::RuleType CubatureRuleType;
 
-        // create matrix scatter-axpy
-        typename Matrix_::ScatterAxpy scatter_maxpy(matrix);
-        typename Vector_::ScatterAxpy scatter_vaxpy(vector);
-
-        // create DOF-mappings
-        FineDofMapping fine_dof_mapping(fine_space);
-        CoarseDofMapping coarse_dof_mapping(coarse_space);
-
         // fetch the trafos
         const FineTrafoType& fine_trafo = fine_space.get_trafo();
         const CoarseTrafoType& coarse_trafo = coarse_space.get_trafo();
-
-        // create trafo evaluators
-        FineTrafoEvaluator fine_trafo_eval(fine_trafo);
-        CoarseTrafoEvaluator coarse_trafo_eval(coarse_trafo);
-
-        // create space evaluators
-        FineSpaceEvaluator fine_space_eval(fine_space);
-        CoarseSpaceEvaluator coarse_space_eval(coarse_space);
-
-        // create the cubature rules
-        CubatureRuleType coarse_cubature(Cubature::ctor_factory, cubature_factory);
-        CubatureRuleType fine_cubature(Cubature::ctor_factory, cubature_factory);
-        CubatureRuleType refine_cubature;
-        Cubature::RefineFactoryCore::create(refine_cubature, fine_cubature);
-
-        // allocate fine-mesh mass matrix
-        Tiny::Matrix<DataType, CoarseSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> mass;
-
-        // allocate local matrix data for interlevel-mesh mass matrix
-        Tiny::Matrix<DataType, CoarseSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> lmd, lid;
-
-        // allocate local vector data for weight vector
-        Tiny::Vector<DataType, CoarseSpaceEvaluator::max_local_dofs> lvd;
-
-        // pivot array for factorization
-        int pivot[CoarseSpaceEvaluator::max_local_dofs];
 
         // helper struct to calculate fine mesh cell index
         const Geometry::Intern::CoarseFineCellMapping<
@@ -595,134 +567,183 @@ namespace FEAT
         const Adjacency::Permutation& fine_perm =
           fine_trafo.get_mesh().get_mesh_permutation().get_inv_perm();
 
-        // loop over all coarse mesh cells
-        for(Index ccell(0); ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
+        // create the cubature rules
+        CubatureRuleType coarse_cubature(Cubature::ctor_factory, cubature_factory);
+        CubatureRuleType fine_cubature(Cubature::ctor_factory, cubature_factory);
+        CubatureRuleType refine_cubature;
+        Cubature::RefineFactoryCore::create(refine_cubature, fine_cubature);
+
+        FEAT_PRAGMA_OMP(parallel)
         {
-          // prepare coarse trafo evaluator
-          coarse_trafo_eval.prepare(ccell);
+          FineTrafoEvalData fine_trafo_data;
+          CoarseTrafoEvalData coarse_trafo_data;
+          FineSpaceEvalData fine_space_data;
+          CoarseSpaceEvalData coarse_space_data;
 
-          // prepare coarse space evaluator
-          coarse_space_eval.prepare(coarse_trafo_eval);
+          // create matrix scatter-axpy
+          typename Matrix_::ScatterAxpy scatter_maxpy(matrix);
+          typename Vector_::ScatterAxpy scatter_vaxpy(vector);
 
-          // fetch number of local coarse DOFs
-          const int coarse_num_loc_dofs = coarse_space_eval.get_num_local_dofs();
+          // create DOF-mappings
+          FineDofMapping fine_dof_mapping(fine_space);
+          CoarseDofMapping coarse_dof_mapping(coarse_space);
 
-          // prepare coarse mesh dof-mapping
-          coarse_dof_mapping.prepare(ccell);
+          // create trafo evaluators
+          FineTrafoEvaluator fine_trafo_eval(fine_trafo);
+          CoarseTrafoEvaluator coarse_trafo_eval(coarse_trafo);
 
-          // Let's assemble the coarse-mesh mass matrix first
-          mass.format();
-          for(int k(0); k < coarse_cubature.get_num_points(); ++k)
+          // create space evaluators
+          FineSpaceEvaluator fine_space_eval(fine_space);
+          CoarseSpaceEvaluator coarse_space_eval(coarse_space);
+
+          // allocate fine-mesh mass matrix
+          Tiny::Matrix<DataType, CoarseSpaceEvaluator::max_local_dofs, CoarseSpaceEvaluator::max_local_dofs> mass;
+
+          // allocate local matrix data for interlevel-mesh mass matrix
+          Tiny::Matrix<DataType, CoarseSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> lmd, lid;
+
+          // allocate local vector data for weight vector
+          Tiny::Vector<DataType, CoarseSpaceEvaluator::max_local_dofs> lvd;
+
+          // pivot array for factorization
+          int pivot[CoarseSpaceEvaluator::max_local_dofs];
+
+          // loop over all coarse mesh cells
+          FEAT_PRAGMA_OMP(for)
+          for(Index ccell = 0; ccell < coarse_trafo_eval.get_num_cells(); ++ccell)
           {
-            // compute trafo and space data
-            coarse_trafo_eval(coarse_trafo_data, coarse_cubature.get_point(k));
-            coarse_space_eval(coarse_space_data, coarse_trafo_data);
+            // prepare coarse trafo evaluator
+            coarse_trafo_eval.prepare(ccell);
 
-            // coarse mesh test function loop
-            for(int i(0); i < coarse_num_loc_dofs; ++i)
+            // prepare coarse space evaluator
+            coarse_space_eval.prepare(coarse_trafo_eval);
+
+            // fetch number of local coarse DOFs
+            const int coarse_num_loc_dofs = coarse_space_eval.get_num_local_dofs();
+
+            // prepare coarse mesh dof-mapping
+            coarse_dof_mapping.prepare(ccell);
+
+            // Let's assemble the coarse-mesh mass matrix first
+            mass.format();
+            for(int k(0); k < coarse_cubature.get_num_points(); ++k)
             {
-              // coarse mesh trial function loop
-              for(int j(0); j < coarse_num_loc_dofs; ++j)
-              {
-                mass(i,j) += coarse_trafo_data.jac_det * coarse_cubature.get_weight(k) *
-                  coarse_space_data.phi[i].value * coarse_space_data.phi[j].value;
-              }
-            }
-          }
-
-          // invert coarse mesh mass matrix
-          Math::invert_matrix(coarse_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
-
-          // get coarse cell index with respect to 2-level ordering
-          const Index ccell_2lvl = (coarse_perm.empty() ? ccell : coarse_perm.map(ccell));
-
-          // loop over all child cells
-          for(Index child(0); child < cfmapping.get_num_children(); ++child)
-          {
-            // calculate fine mesh cell index with respect to 2 level ordering
-            const Index fcell_2lvl = cfmapping.calc_fcell(ccell_2lvl, child);
-
-            // get fine cell index with respect to potential permutation
-            const Index fcell = (fine_perm.empty() ? fcell_2lvl : fine_perm.map(fcell_2lvl));
-
-            // prepare fine trafo evaluator
-            fine_trafo_eval.prepare(fcell);
-
-            // prepare fine space evaluator
-            fine_space_eval.prepare(fine_trafo_eval);
-
-            // fetch number of local fine DOFs
-            const int fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
-
-            // format local matrices
-            lmd.format();
-
-            // loop over all cubature points and integrate
-            for(int k(0); k < fine_cubature.get_num_points(); ++k)
-            {
-              // compute coarse mesh cubature point index
-              const int l(int(child) * fine_cubature.get_num_points() + k);
-
-              // compute trafo data
-              fine_trafo_eval(fine_trafo_data, fine_cubature.get_point(k));
-              coarse_trafo_eval(coarse_trafo_data, refine_cubature.get_point(l));
-
-              // compute basis function data
-              fine_space_eval(fine_space_data, fine_trafo_data);
+              // compute trafo and space data
+              coarse_trafo_eval(coarse_trafo_data, coarse_cubature.get_point(k));
               coarse_space_eval(coarse_space_data, coarse_trafo_data);
 
               // coarse mesh test function loop
               for(int i(0); i < coarse_num_loc_dofs; ++i)
               {
-                // fine mesh trial function loop
-                for(int j(0); j < fine_num_loc_dofs; ++j)
+                // coarse mesh trial function loop
+                for(int j(0); j < coarse_num_loc_dofs; ++j)
                 {
-                  lmd(i,j) +=
-                    fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
-                    coarse_space_data.phi[i].value * fine_space_data.phi[j].value;
-                  // go for next fine mesh trial DOF
+                  mass(i,j) += coarse_trafo_data.jac_det * coarse_cubature.get_weight(k) *
+                    coarse_space_data.phi[i].value * coarse_space_data.phi[j].value;
                 }
-                // go for next coarse mesh test DOF
               }
-              // go for next cubature point
             }
 
+            // invert coarse mesh mass matrix
+            Math::invert_matrix(coarse_num_loc_dofs, mass.sn, &mass.v[0][0], pivot);
+
+            // get coarse cell index with respect to 2-level ordering
+            const Index ccell_2lvl = (coarse_perm.empty() ? ccell : coarse_perm.map(ccell));
+
+            // loop over all child cells
+            for(Index child(0); child < cfmapping.get_num_children(); ++child)
+            {
+              // calculate fine mesh cell index with respect to 2 level ordering
+              const Index fcell_2lvl = cfmapping.calc_fcell(ccell_2lvl, child);
+
+              // get fine cell index with respect to potential permutation
+              const Index fcell = (fine_perm.empty() ? fcell_2lvl : fine_perm.map(fcell_2lvl));
+
+              // prepare fine trafo evaluator
+              fine_trafo_eval.prepare(fcell);
+
+              // prepare fine space evaluator
+              fine_space_eval.prepare(fine_trafo_eval);
+
+              // fetch number of local fine DOFs
+              const int fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
+
+              // format local matrices
+              lmd.format();
+
+              // loop over all cubature points and integrate
+              for(int k(0); k < fine_cubature.get_num_points(); ++k)
+              {
+                // compute coarse mesh cubature point index
+                const int l(int(child) * fine_cubature.get_num_points() + k);
+
+                // compute trafo data
+                fine_trafo_eval(fine_trafo_data, fine_cubature.get_point(k));
+                coarse_trafo_eval(coarse_trafo_data, refine_cubature.get_point(l));
+
+                // compute basis function data
+                fine_space_eval(fine_space_data, fine_trafo_data);
+                coarse_space_eval(coarse_space_data, coarse_trafo_data);
+
+                // coarse mesh test function loop
+                for(int i(0); i < coarse_num_loc_dofs; ++i)
+                {
+                  // fine mesh trial function loop
+                  for(int j(0); j < fine_num_loc_dofs; ++j)
+                  {
+                    lmd(i,j) +=
+                      fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
+                      coarse_space_data.phi[i].value * fine_space_data.phi[j].value;
+                    // go for next fine mesh trial DOF
+                  }
+                  // go for next coarse mesh test DOF
+                }
+                // go for next cubature point
+              }
+
+              // finish coarse mesh evaluators
+              fine_space_eval.finish();
+              fine_trafo_eval.finish();
+
+              // compute X := M^{-1}*N
+              lid.set_mat_mat_mult(mass, lmd);
+
+              // sanity check for matrix inversion
+              if(!Math::isnormal(lid.norm_frobenius()))
+                throw LocalMassMatrixSingularException();
+
+              // prepare fine mesh dof-mapping
+              fine_dof_mapping.prepare(fcell);
+
+              // incorporate local matrix
+              FEAT_PRAGMA_OMP(critical)
+              {
+                scatter_maxpy(lid, coarse_dof_mapping, fine_dof_mapping);
+              }
+
+              // finish fine mesh dof-mapping
+              fine_dof_mapping.finish();
+
+              // go for next child cell
+            }
+
+            // update weights
+            lvd.format(DataType(1));
+            FEAT_PRAGMA_OMP(critical)
+            {
+              scatter_vaxpy(lvd, coarse_dof_mapping);
+            }
+
+            // finish coarse mesh dof-mapping
+            coarse_dof_mapping.finish();
+
             // finish coarse mesh evaluators
-            fine_space_eval.finish();
-            fine_trafo_eval.finish();
+            coarse_space_eval.finish();
+            coarse_trafo_eval.finish();
 
-            // compute X := M^{-1}*N
-            lid.set_mat_mat_mult(mass, lmd);
-
-            // sanity check for matrix inversion
-            if(!Math::isnormal(lid.norm_frobenius()))
-              throw LocalMassMatrixSingularException();
-
-            // prepare fine mesh dof-mapping
-            fine_dof_mapping.prepare(fcell);
-
-            // incorporate local matrix
-            scatter_maxpy(lid, coarse_dof_mapping, fine_dof_mapping);
-
-            // finish fine mesh dof-mapping
-            fine_dof_mapping.finish();
-
-            // go for next child cell
-          }
-
-          // update weights
-          lvd.format(DataType(1));
-          scatter_vaxpy(lvd, coarse_dof_mapping);
-
-          // finish coarse mesh dof-mapping
-          coarse_dof_mapping.finish();
-
-          // finish coarse mesh evaluators
-          coarse_space_eval.finish();
-          coarse_trafo_eval.finish();
-
-          // go for next coarse mesh cell
-        }
+            // go for next coarse mesh cell
+          } // FEAT_PRAGMA_OMP(for)
+        } // FEAT_PRAGMA_OMP(parallel)
       }
 
       /**
