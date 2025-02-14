@@ -7,42 +7,42 @@
   </Chart>
   <Mesh type="conformal:simplex:2:2" size="5 8 4">
     <Vertices>
-      1 0
-      0 1
-      -1 0
-      0 -1
-      0 0
+       0       0
+       0.7071  0.7071
+      -0.7071  0.7071
+      -0.7071 -0.7071
+       0.7071 -0.7071
     </Vertices>
     <Topology dim="1">
       0 1
+      0 2
+      0 3
+      0 4
       1 2
       2 3
-      3 0
-      0 4
-      1 4
-      2 4
       3 4
+      4 1
     </Topology>
     <Topology dim="2">
-      0 1 4
-      1 2 4
-      2 3 4
-      3 0 4
+      0 1 2
+      0 2 3
+      0 3 4
+      0 4 1
     </Topology>
   </Mesh>
   <MeshPart name="bnd:o" parent="root" chart="outer" topology="full" size="5 4">
     <Mapping dim="0">
-      0
       1
       2
       3
-      0
+      4
+      1
     </Mapping>
     <Mapping dim="1">
-      0
-      1
-      2
-      3
+      4
+      5
+      6
+      7
     </Mapping>
     <Topology dim="1">
       0 1
@@ -51,21 +51,11 @@
       3 4
     </Topology>
     <Attribute name="param" dim="1">
-      0
-      1
-      2
-      3
-      4
+      0.5
+      1.5
+      2.5
+      3.5
+      4.5
     </Attribute>
   </MeshPart>
-  <Partition name="auto" priority="1" level="0" size="2 4">
-    <Patch rank="0" size="2">
-      0
-      1
-    </Patch>
-    <Patch rank="1" size="2">
-      2
-      3
-    </Patch>
-  </Partition>
 </FeatMeshFile>

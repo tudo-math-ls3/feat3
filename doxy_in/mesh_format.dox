@@ -1,40 +1,345 @@
 /** \page mesh_file_format FEAT Mesh File Format
-This page describes the structure of the FEAT mesh file format.
+This page describes the structure of the XML-based FEAT mesh file format and gives some important insights into
+the terminology and the internal definition of the topologies managed by the mesh classes of FEAT.
 
 \tableofcontents
 
 \section meshfile_basic Basic Information
-FEAT3 meshes are stored in xml files containing vertex coordinates, mesh topology, boundary descriptions and also mesh parts (see section \ref meshfile_meshpart). FEAT3 supports hypercube and simplex meshes in dimensions 2 and 3, but not hybrid meshes containing both cell types.
 
-As FEAT3 is designed to be run in parallel in a distributed environment, the mesh format also contains some functionality for that.
+FEAT supports both hypercube (quadrilateral & hexahedral) and simplex (triangular & tetrahedral) meshes in arbitrary
+dimensions, but it does support not hybrid meshes containing both cell types at the same time. In consequence, the
+FEAT mesh file format also only supports meshes of a single cell type.
 
-The a most basic example is this:
+\subsection meshfile_basic_terminology Mesh Terminology
+
+In the context of meshes, the following topological terms are commonly used in FEAT and throughout this page:
+- (topological) <em>entity</em>: a vertex, edge, face or volume (and their higher-dimensional equivalents)
+- <em>vertex</em>: a geometric point in space, topological dimension 0.
+- <em>edge</em>: connection of two vertices, topological dimension 1.
+- <em>face</em>: a quadrilateral (for hypercube meshes) comprised of 4 or a triangle (for simplex meshes) comprised of 3 vertices, topological dimension 2
+- <em>volume</em>: a hexahedron (for hypercube meshes) comprised of 8 or a tetrahedron (for simplex meshes) comprised of 4 vertices, topological dimension 3
+
+In FEAT, topological entities are typically referenced by their topological dimension rather than their names ("edge", "triangle", etc),
+which is unambiguous and more consistent between hypercube and simplex meshes, which is possible because FEAT does not support hybrid meshes anyways.
+
+A <em>mesh</em> is defined by
+- its geometry information (vertices and their coordinates) and
+- topology information (how the vertices form entities like edges, faces and volumes).
+
+In the context of meshes, the following dimension terms are used:
+- <em>shape dimension</em>: the dimension of the highest-dimensional entity that is contained in the mesh
+- <em>world dimension</em>: the number of coordinates per vertex
+
+Usually, the shape and world dimensions are identical, however, if a mesh discretizes a surface of an object rather than the object
+itself, e.g. in the FEM-on-manifolds scenario, then the world dimension is greater than the shape dimension. However, the world
+dimension of a mesh can never be less than its shape dimension.
+
+The <em>root mesh</em> (see \ref meshfile_mesh) is a disambiguation term used for the main mesh defined by the file,
+which is used to discretize the computational domain that a simulation is to be performed on.
+
+A <em>mesh-part</em> (see \ref meshfile_meshpart) represents a named and possibly parameterized sub-set of the topological entities of root mesh.
+Mesh-parts are used to identify certain regions of interest such as boundary regions.
+
+A <em>chart</em> (see \ref meshfile_charts) is a description of a boundary, e.g. by an analytic description or even a discrete surface triangulation.
+
+A <em>partitioning</em> (see \ref meshfile_partition) is a splitting of the root mesh into several <c>patches</c>,
+which can be used in an MPI parallel simulation to distribute the domain among the MPI processes.
+
+\subsection meshfile_basic_topology Mesh Topology
+This section describes the topology ordering for the four supported 2D and 3D shapes, namely triangles, quadrilaterals,
+tetrahedra and hexahedra. In principle, FEAT also supports higher dimensional shapes of simplex and hypercube type,
+however, some parts of the mesh management classes are missing specializations for higher-dimensional shapes, so the
+documentation of the corresponding higher-dimensional topologies is omitted here.
+
+\note The edge and face numberings presented below are irrelevant for the documentation of the mesh file format,
+as mesh files dot not supply any information that would require their definition.
+These orderings are only documented here for the sake of completeness.
+
+\subsubsection meshfile_shape_numbering_tria Triangle Topology Ordering
+The ordering of the triangle topology is as follows:
+\image html images/shape_topo_tria2d.svg
+
+- The vertices (black) of a triangle are ordered in counter-clockwise manner:
+  - vertex 0: (0, 0)
+  - vertex 1: (0, 1)
+  - vertex 2: (1, 0)
+- The edges (red) of a triangle are also ordered in counter-clockwise manner,
+where edge 0 is on the opposite side of vertex 0, namely:
+  - edge 0: (1, 2)
+  - edge 1: (2, 0)
+  - edge 2: (0, 1)
+
+\subsubsection meshfile_shape_numbering_quad Quadrilateral Topology Ordering
+The ordering of the quadrilateral topology is as follows:
+\image html images/shape_topo_quad2d.svg
+
+- The vertices (black) of a quadrilateral are ordered in an S-shape zig-zag pattern:
+  - vertex 0: (-1,-1)
+  - vertex 1: (-1,+1)
+  - vertex 2: (+1,-1)
+  - vertex 3: (+1,+1)
+- The edges (red) of a quadrilateral are ordered in an alternating pattern:
+  - First, all edges parallel to the X-axis, sorted by their Y-coords, namely:
+    - edge 0: (0, 1)
+    - edge 1: (2, 3)
+  - Then, all edges parallel to the Y-axis, sorted by their X-coords.
+    - edge 2: (0, 2)
+    - edge 3: (1, 3)
+
+\note This zig-zag pattern of the vertices is derived from the following idea:
+Assume that the quad represents the square [0,1]x[0,1], then the coordinates of
+a vertex are given by the binary digits of its index. Please note that the reference
+element is [-1,+1]x[-1,+1] and not [0,1]x[0,1].
+
+
+\subsubsection meshfile_shape_numbering_tetra Tetrahedral Topology Ordering
+The ordering of the tetrahedron topology is as follows:
+\image html images/shape_topo_tetra3d.svg
+
+- The vertices (black) of a tetrahedron are ordered by the right-hand-rule.
+  - vertex 0: (0, 0, 0)
+  - vertex 1: (1, 0, 0)
+  - vertex 2: (0, 1, 0)
+  - vertex 3: (0, 0, 1)
+- The edges (red) of a tetrahedron are not ordered to any particular pattern,
+  as it seems that there exists no real useful pattern for tetrahedra edges.
+  - edge 0: (0, 1)
+  - edge 1: (0, 2)
+  - edge 2: (0, 3)
+  - edge 3: (1, 2)
+  - edge 4: (1, 3)
+  - edge 5: (2, 3)
+- The faces (blue) are of a tetrahedron are ordered by the right-hand-rule,
+  where face 0 is on the opposite side of vertex 0.
+  - face 0: (1, 2, 3)
+  - face 1: (0, 2, 3)
+  - face 2: (0, 1, 3)
+  - face 3: (0, 1, 2)
+
+\subsubsection meshfile_shape_numbering_hexa Hexahedral Topology Ordering
+The ordering of the hexahedron topology is as follows:
+\image html images/shape_topo_hexa3d.svg
+
+- The vertices (black) of a hexahedron are ordered in an S-shape zig-zag pattern.
+  - vertex 0: (-1,-1,-1)
+  - vertex 1: (-1,+1,-1)
+  - vertex 2: (+1,-1,-1)
+  - vertex 3: (+1,+1,-1)
+  - vertex 4: (-1,-1,+1)
+  - vertex 5: (-1,+1,+1)
+  - vertex 6: (+1,-1,+1)
+  - vertex 7: (+1,+1,+1)
+- The edges (red) of a hexahedron are ordered in an alternating pattern:
+  - First, all edges parallel to the X-axis, sorted by their YZ-coords.
+    - edge 0: (0, 1)
+    - edge 1: (2, 3)
+    - edge 2: (4, 5)
+    - edge 3: (6, 7)
+  - Then, all edges parallel to the Y-axis, sorted by their XZ-coords.
+    - edge 4: (0, 2)
+    - edge 5: (1, 3)
+    - edge 6: (4, 6)
+    - edge 7: (5, 7)
+  - Then, all edges parallel to the Z-axis, sorted by their XY-coords.
+    - edge 8: (0, 4)
+    - edge 9: (1, 5)
+    - edge 10: (2, 6)
+    - edge 11: (3, 7)
+- The faces (blue) of a hexahedron are ordered in an alternating pattern:
+  - First, all faces parallel to the XY-plane, sorted by their Z-coords.
+    - face 0: (0, 1, 2, 3)
+    - face 1: (4, 5, 6, 7)
+  - Then, all faces parallel to the XZ-plane, sorted by their Y-coords.
+    - face 2: (0, 1, 4, 5)
+    - face 3: (2, 3, 6, 7)
+  - Then, all faces parallel to the YZ-plane, sorted by their X-coords.
+    - face 4: (0, 2, 4, 6)
+    - face 5: (1, 3, 5, 7)
+
+\note Just as for quadrilaterals, the zig-zag pattern of the vertex numbering
+for hexahedra is derived from the fact that the binary digits of the vertex
+indices represent the vertex coordinates of the unit-cube.
+
+
+\subsection meshfile_parameterization Boundary Parameterization by Charts and Mesh-Parts
+This section describes both the explicit and implicit boundary parameterization mechanisms used in FEAT based on charts
+(see \ref meshfile_charts) and mesh-parts (see \ref meshfile_meshpart).
+
+Mesh-parts can be used (amongst other things) to represent the boundary (or a part thereof) of the root mesh that it is
+defined on and mesh-parts may furthermore be linked to a specific chart that describes the boundary of the analytical
+domain that the mesh discretizes/approximates. Once a mesh gets refined by FEAT's mesh management classes (namely the
+FEAT::Geometry::RootMeshNode class), all of its mesh-parts are also refined and (unless otherwise specified by the user)
+all mesh-parts, which are linked to charts, will be used to \em adapt the root mesh by moving the newly created boundary
+vertices onto the boundary of the analytical domain.
+
+As already hinted above, there exist two mechanisms in FEAT to perform this task of boundary adaption: \em explicit and
+\em implicit boundary parameterization. The decision which of these two mechanisms is chosen by the mesh management
+classes depends the following various factors, namely:
+- Does the type of chart offer the possibility for explicit parameterization?
+- Does the mesh-part contain a topology?
+- Does the mesh-part contain a <c>"param"</c> attribute that specifies the boundary vertex parameters?
+
+If all of the above points are met, then the boundary adaption is performed by explicit parameterization, otherwise
+the it is performed by implicit parameterization. See the next two sub-sections for details.
+
+\subsubsection meshfile_parameterization_explicit Boundary Adaption by Explicit Parameterization
+Boundary adaption by explicit parameterization is best explained by an example, so we will have a closer look at the
+main contents of the <c>unit_circle_tria_4.xml</c> mesh file. This mesh discretizes the 2D unit-circle by four triangles:
+\image html images/boundary_param_1.svg
+The mesh file contains a chart named <c>"outer"</c> that represents the (red) circle of radius 1 around the midpoint (0,0)
+and furthermore it states that the circle is parameterized by the parameter range [0,4], where both the start-point 0
+and the end-point 4 of the parameter range coincide with the East point on the circle (i.e. the point with the maximum
+X coordinate), which is marked by a small dash in the image above. For the exact parameterization formula, see
+\ref meshfile_chart_circle_param.
+
 \code{.xml}
-<Mesh type="conformal:hypercube:2:2" size="4 4 1">
-  <Vertices>
-    0 0
-    1 0
-    0 1
-    1 1
-  </Vertices>
-  <Topology dim="1">
-    0 1
-    2 3
-    0 2
-    1 3
-  </Topology>
-  <Topology dim="2">
-    0 1 2 3
-  </Topology>
-</Mesh>
+<FeatMeshFile version="1" mesh="conformal:simplex:2:2">
+  <Chart name="outer">
+    <Circle radius="1" midpoint="0 0" domain="0 4" />
+  </Chart>
 \endcode
-- Line 1 states that this is a mesh of shape (topological) dimension 2 in world (space) dimension 2.
-- Lines 2-7: the coordinates for the four vertices of the mesh
-- Lines 8-13: the vertex indices for the four edges of the mesh
-- Lines 14-16: the vertex indices for the one and only quadrilateral of the mesh
+Next in the mesh file comes the actual root mesh with 5 vertices (center vertex first) , 8 edges (inner edges first) and
+the four triangles:
+\code{.xml}
+  <Mesh type="conformal:simplex:2:2" size="5 8 4">
+    <Vertices>
+       0       0
+       0.7071  0.7071
+      -0.7071  0.7071
+      -0.7071 -0.7071
+       0.7071 -0.7071
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      0 2
+      0 3
+      0 4
+      1 2
+      2 3
+      3 4
+      4 1
+    </Topology>
+    <Topology dim="2">
+      0 1 2
+      0 2 3
+      0 3 4
+      0 4 1
+    </Topology>
+  </Mesh>
+\endcode
+Finally, there is the one and only mesh-part named <c>"bnd:o"</c> that is linked to the chart named
+<c>"outer"</c> that we have seen above and this mesh-part also contains the full topology of the
+mesh-part, which is required for the computation of the vertex parameters as we will see below.
+\code{.xml}
+<MeshPart name="bnd:o" parent="root" chart="outer" topology="full" size="5 4">
+\endcode
+We need to specify parameter attributes for each vertex in the mesh-part (at least if we want to
+make use of explicit parameterization) and because this mesh-part discretizes the entire closed
+2D boundary and not just an open part of it, we have to use a "life hack" and specify one of the
+vertices twice, because we need two assign two different parameters for them (you will see below why).
+We pick the upper right vertex, which is vertex number 1 in the root mesh, to be the one that is
+contained twice in the mesh-part; all other boundary vertices are contained in the mesh-part only once:
+\code{.xml}
+    <Mapping dim="0">
+      1
+      2
+      3
+      4
+      1
+    </Mapping>
+\endcode
+Next comes the list of all root mesh boundary edges, there's nothing particularly interesting here:
+\code{.xml}
+    <Mapping dim="1">
+      4
+      5
+      6
+      7
+    </Mapping>
+\endcode
+Now comes the topology of the mesh-part, which describes for each mesh-part edge which mesh-part
+vertices form that mesh-part edge; keep in mind that vertex 0 and 4 in this mesh-part actually
+refer to the same vertex 1 in the root mesh:
+\code{.xml}
+    <Topology dim="1">
+      0 1
+      1 2
+      2 3
+      3 4
+    </Topology>
+\endcode
+Finally comes the <c>"param"</c> attribute for this mesh-part, which specifies the parameters
+of each mesh-part vertex with respect to the explicit parameterization of the chart that this
+mesh-part is linked to. Because our circle chart has been defined on the domain [0,4] and the
+endpoints 0 and 4 coincide to the East point on the circle, the parameter for the upper right vertex
+in the mesh (which is contained twice in this mesh-part) can be chosen as 4*N+0.5 for any integer N,
+so we (arbitrarily) pick N=0 and thus 0.5 as the parameter for the first mesh-part vertex, which is
+the upper-right vertex in the root mesh, and then we assign the parameters 1.5, 2.5 and 3.5
+counter-clockwise to the corresponding vertices accordingly. Finally, the second instance of the
+upper-right vertex gets assigned the parameter 4.5, which is equivalent to the parameter 0.5 that
+we have chosen for the first instance for the same root mesh vertex:
+\code{.xml}
+    <Attribute name="param" dim="1">
+      0.5
+      1.5
+      2.5
+      3.5
+      4.5
+    </Attribute>
+  </MeshPart>
+</FeatMeshFile>
+\endcode
 
-\subsection meshfile_file_structure Overall File Structure
-The overall mesh structures looks like this:
+After the root mesh has been refined, the mesh management class will also refine all mesh-parts
+accordingly, and initially all newly created vertices are placed at the centers of the edges that
+spawned them (or the centers of faces or volumes, respectively). In the next step, the attributes
+of the mesh-parts are interpolated linearly from the attributes of the coarse mesh and this is where
+the mesh-part topology is required, because it specifies the mesh-part vertices for each mesh-part
+edge that are used to interpolate the new vertex parameter attributes from.
+
+Consider the top edge in the image above: this edge number 1 of the mesh part (which corresponds to
+edge number 4 in the root mesh) and the topology of the mesh-part states that the this mesh-part edge
+is formed by the mesh-part vertices 0 and 1 (which correspond to vertices 1 and 2 in the root mesh,
+respectively). The parameter for mesh-part vertex 0 is 0.5 and the parameter for mesh-part vertex 1
+is 1.5, so the interpolated midpoint parameter is 1.0 and this is what is assigned as a parameter to
+the newly created vertex on the midpoint of that top edge. Analogously, the new vertices on the left
+and bottom edge are assigned the parameters 2.0 and 3.0 by interpolating the edge vertex parameters.
+Finally, the right mesh-part edge is formed by the mesh-part vertices 3 and 4 (which correspond to
+vertices 4 and 1 in the root mesh, respectively) which have the parameters 3.5 and 4.5 assigned to
+them, respectively, so the parameter of the newly spawned vertex on the right edge is 4.0
+(which is equivalent to 0.0 for our circle chart).
+
+\image html images/boundary_param_2.svg
+
+Now that all mesh-part vertex parameters are known, the management classes will use the chart class
+to explicitly compute the new vertex coordinates of all the root mesh vertices based on their
+parameters by using the parameterization formula of the corresponding chart, and we finally obtain
+the boundary adapted mesh:
+\image html images/boundary_param_3.svg
+
+\subsubsection meshfile_parameterization_implicit Boundary Adaption by Implicit Parameterization
+
+Not all chart types offer the possibility to explicitly parameterize the boundary, e.g. the Sphere
+chart (see \ref meshfile_chart_sphere) or the SurfaceMesh chart (see \ref meshfile_chart_surfmesh),
+but all chart classes are mandated to offer an implicit boundary adaption method, which can be used
+to project newly created vertices onto the analytical boundary by some sort of orthogonal projection
+or closest-point projection.
+
+There is nothing special to considered for the implicit parameterization from the mesh file point of view,
+because all that is required is a mesh-part with a mapping of all boundary vertices, edges and (in 3D) faces
+and that is linked to a chart, but no mesh-part topology, no mesh-part parameter attributes are required;
+the mesh management classes will automatically ask the chart to project all vertices contained in the
+mesh-part onto the boundary by whatever means the chart implements to accomplish this task.
+
+\section meshfile_file_structure Overall Mesh File Structure
+
+FEAT meshes are stored in XML format containing the root mesh itself (consisting of its vertex coordinates
+and its mesh topology), boundary descriptions, mesh parts and partitionings.
+FEAT mesh files do not need to be self-contained, i.e. it is possible to split the individual parts (i.e. the
+root mesh, the charts, the mesh-parts and partitioning) across several files which are then passed together as
+a set of input files to the FEAT::Geometry::MeshFileReader or the FEAT::Control::Domain::PartiDomainControl classes.
+
+The overall mesh file structure looks as follows:
 
 \verbatim
  FeatMeshFile
@@ -62,133 +367,111 @@ The overall mesh structures looks like this:
     +- Patch
 \endverbatim
 
-\subsection meshfile_basic_terminology Terminology
-The (optional) <c>Info</c> section can contain text, e.g. describing the mesh.
+The most simple example of a 2D unit-square mesh file without any optional features is this:
+\code{.xml}
+<FeatMeshFile version="1">
+  <Mesh type="conformal:hypercube:2:2" size="4 4 1">
+    <Vertices>
+      0 0
+      1 0
+      0 1
+      1 1
+    </Vertices>
+    <Topology dim="1">
+      0 1
+      2 3
+      0 2
+      1 3
+    </Topology>
+    <Topology dim="2">
+      0 1 2 3
+    </Topology>
+  </Mesh>
+</FeatMeshFile>
+\endcode
+- Line 1 contains the mandatory root marker indicating that this is a file in FEAT mesh file format.
+- Line 2 states that this is a hypercube mesh of shape (topological) dimension 2 in world (space) dimension 2 (i.e.
+  a 2D quadrilateral mesh) containing 4 vertices, 4 edges and 1 face (element).
+- Lines 3-8 contain the coordinates for the four vertices of the mesh.
+- Lines 9-14 contain the vertex indices for the four edges of the mesh.
+- Lines 15-17 contain the vertex indices for the one and only quadrilateral of the mesh.
+- Lines 18-19 contain the terminators of the mesh marker and the root marker from lines 2 and 1, respectively.
 
-A <c>Mesh</c> is defined by
-- its geometry information (vertices and their coordinates) and
-- topology information (how the vertices form entities like edges, faces and volumes).
+\note
+Most mesh files that are contained in FEAT's repository are indented as shown in the example above, however, the
+FEAT mesh file reader ignores all indentation, so it is perfectly valid to write FEAT mesh files without any
+indentation to conserve some disk space.
 
-Commonly used topological terms are:
-- (topological) Entity: A vertex, edge, face or volume
-- Vertex: A geometric point in space, topological dimension 0.
-- Edge: Connection of two vertices, topological dimension 1.
-- Face: A quadrilateral (for hypercube meshes) comprised of 4 or a triangle (for simplex meshes) comprised of 3 vertices
-- Volume: A hexahedron (for hypercube meshes) comprised of 8 or a tetrahedron (for simplex meshes) comprised of 4 vertices
+\attention
+It is important to note that the FEAT mesh file format has some syntactical restrictions regarding the valid XML syntax,
+which is to ensure that the files can be parsed efficiently into the corresponding mesh objects on-the-fly without the
+need to perform sophisticated analysis of the XML node tree. The most important restriction (as compared to the standard
+XML format) is that each XML marker must be contained alone in a single line, i.e. it is not allowed to split a single
+XML marker across more than one line and it is not allowed that two or more XML markers are contained in the same line.\n\n
+For example, the following is \b not a syntactically legal FEAT mesh file, although it is a syntactically legal XML
+file and semantically equivalent to the unit-square example above:
+\code{.xml}
+<FeatMeshFile version="1"><Mesh
+    type="conformal:hypercube:2:2"
+    size="4 4 1">
+    <Vertices>
+      0 0
+      1 0
+      0 1
+      1 1
+    </Vertices><Topology dim="1">
+      0 1
+      2 3
+      0 2
+      1 3
+    </Topology><Topology dim="2">
+      0 1 2 3
+    </Topology>
+  </Mesh>
+</FeatMeshFile>
+\endcode
 
-In FEAT3 mesh files, topological entities will be referenced by their topological dimension, which is unambiguous and more consistent between hypercube and simplex meshes.
-
-The <c>root mesh</c> (see \ref meshfile_root) is a disambiguation term used for the main mesh defined by the file, as opposed to MeshParts, Partitions, ...
-
-A <c>MeshPart</c> (see \ref meshfile_meshpart) always refers to topological entities of the root mesh, e.g. for identifying boundaries.
-
-A <c>Chart</c> (see \ref meshfile_charts) is a description of a boundary, e.g. by an analytic description or even a surface mesh.
-
-A <c>Partition</c> (see \ref meshfile_partition) is a splitting of the root mesh into several <c>patches</c>, which can be used instead of calling an external partitioner for the given number of processes.
-
-Currently, it is not possible to write out the partitioning at runtime (e.g. for reproducibility).
-
-\subsection meshfile_basic_encoding Encoding
-The mesh files use the xml format and encoding. Due to limitations of the parser implementation, the standard should be followed closely.
-
-\subsection meshfile_basic_parser_info Parser limitations
-\todo basic parser info
-
-\section meshfile_shape_numbering Topology Ordering
-This section describes the topology ordering for the four supported shapes.
-
-\note The edge and face numberings presented below are irrelevant for the documentation of the mesh file format,
-as mesh files dot not supply any information that would require their definition.
-These orderings are only documented here for the sake of completeness.
-
-\subsection meshfile_shape_numbering_tria Triangle Topology Ordering
-The ordering of the triangle topology is as follows:
-\image html images/shape_topo_tria2d.svg
-
-- The vertices (black) of a triangle are ordered in counter-clockwise manner.
-- The edges (red) of a triangle are also ordered in counter-clockwise manner,
-where edge 0 is on the opposite side of vertex 0.
-
-\subsection meshfile_shape_numbering_quad Quadrilateral Topology Ordering
-The ordering of the quadrilateral topology is as follows:
-\image html images/shape_topo_quad2d.svg
-
-- The vertices (black) of a quadrilateral are ordered in an S-shape zig-zag pattern.
-- The edges (red) of a quadrilateral are ordered in an alternating pattern:
-  - First, all edges parallel to the X-axis, sorted by their Y-coords.
-  - Then, all edges parallel to the Y-axis, sorted by their X-coords.
-
-\note This zig-zag pattern of the vertices is derived from the following idea:
-Assume that the quad represents the square [0,1]x[0,1], then the coordinates of
-a vertex are given by the binary digits of its index:
-  - vertex 0: (0,0)
-  - vertex 1: (0,1)
-  - vertex 2: (1,0)
-  - vertex 3: (1,1)
-
-\subsection meshfile_shape_numbering_tetra Tetrahedral Topology Ordering
-The ordering of the tetrahedron topology is as follows:
-\image html images/shape_topo_tetra3d.svg
-
-- The vertices (black) of a tetrahedron are ordered by the right-hand-rule.
-- The edges (red) of a tetrahedron are not ordered to any particular pattern,
-  as it seems that there exists no real useful pattern for tetrahedra edges.
-  - edge 0: (0, 1)
-  - edge 1: (0, 2)
-  - edge 2: (0, 3)
-  - edge 3: (1, 2)
-  - edge 4: (1, 3)
-  - edge 5: (2, 3)
-- The faces (blue) are of a tetrahedron are ordered by the right-hand-rule,
-  where face 0 is on the opposite side of vertex 0.
-  - face 0: (1, 2, 3)
-  - face 1: (0, 2, 3)
-  - face 2: (0, 1, 3)
-  - face 3: (0, 1, 2)
-
-\subsection meshfile_shape_numbering_hexa Hexahedral Topology Ordering
-The ordering of the hexahedron topology is as follows:
-\image html images/shape_topo_hexa3d.svg
-
-- The vertices (black) of a quadrilateral are ordered in an S-shape zig-zag pattern.
-- The edges (red) of a quadrilateral are ordered in an alternating pattern:
-  - First, all edges parallel to the X-axis, sorted by their YZ-coords.
-  - Then, all edges parallel to the Y-axis, sorted by their XZ-coords.
-  - Then, all edges parallel to the Z-axis, sorted by their XY-coords.
-- The faces (blue) of a quadrilateral are ordered in an alternating pattern:
-  - First, all faces parallel to the XY-plane, sorted by their Z-coords.
-  - Then, all faces parallel to the XZ-plane, sorted by their Y-coords.
-  - Then, all faces parallel to the YZ-plane, sorted by their X-coords.
-
-\note Just as for quadrilaterals, the zig-zag pattern of the vertex numbering
-for hexahedra is derived from the fact that the binary digits of the vertex
-indices represent the vertex coordinates of the unit-cube.
+\note
+The FEAT mesh file reader ignores <b>single-line</b> XML comments of the form\n<c>\<!\-- This is an XML comment. \--\></c>\n
+however, it is recommended to make use of the optional <c>Info</c> node for remarks and comments instead, see \ref meshfile_info.
+Multi-line XML comments are not supported and will lead to parser errors.
 
 \subsection meshfile_meshtype Mesh Type Specification
-The meshtype value is a string consisting of four tokens joined by colons:
+The <em>meshtype value</em> is a string consisting of four tokens joined by colons:
 \verbatim
 <class>:<shape>:<shape-dim>:<world-dim>
 \endverbatim
 where:
-- <c><class></c> is the mesh class\n
-  Currently, the only valid option is \c conformal, which represents an unstructured conformal mesh.
-- <c><shape></c> is the shape-type of the mesh elements\n
-  This can be one of the following:
+- <c>\<class\></c> is the mesh class: Currently, the only valid option is <c>"conformal"</c>,
+  which represents an unstructured conformal mesh with no hanging nodes.
+- <c>\<shape\></c> is the shape-type of the mesh elements: This must be one of the following:
   - \c simplex if the elements are simplices (triangles, tetrahedra)
   - \c hypercube if the elements are hypercubes (quadrilateral, hexahedra)
-- <c><shape-dim></c> is the shape dimension of the mesh elements:
+- <c>\<shape-dim\></c> is the shape dimension of the mesh elements:
   - \c 2 for 2-dimensional shapes (triangles, quadrilaterals)
-  - \c 3 for 3-dimensional shaped (tetrahedra, hexahedra)
-- <c><world-dim></c> is the world dimension of the mesh, i.e. the number of coordinates per vertex
-  - <c><world-dim></c> is always equal to <c><shape-dim></c>, unless you have a surface mesh
+  - \c 3 for 3-dimensional shapes (tetrahedra, hexahedra)
+- <c>\<world-dim\></c> is the world dimension of the mesh, i.e. the number of coordinates per vertex
+  - <c>\<world-dim\></c> is always equal to <c>\<shape-dim\></c>, unless this is a surface mesh,
+    in which case it is greater than <c>\<shape-dim\></c>
 
 <b>Examples:</b>
-- <c>conformal:simplex:2:2</c> represents a 2D unstructured conformal triangular mesh
-- <c>conformal:simplex:3:3</c> represents a 3D unstructured conformal tetrahedral mesh
-- <c>conformal:hypercube:2:2</c> represents a 2D unstructured conformal quadrilateral mesh
-- <c>conformal:hypercube:3:3</c> represents a 3D unstructured conformal hexahedral mesh
+Although the FEAT mesh file format (and most of FEAT's internal mesh management classes) can also handle meshes of
+higher dimensions, the following mesh types are the ones that are currently being used in applications:
+- <c>"conformal:hypercube:1:1"</c> represents a 1D mesh (technically treated as an unstructured conformal mesh)
+- <c>"conformal:hypercube:1:2"</c> represents a 1D mesh embedded in 2D (technically treated as an unstructured conformal mesh)
+- <c>"conformal:hypercube:1:3"</c> represents a 1D mesh embedded in 3D (technically treated as an unstructured conformal mesh)
+- <c>"conformal:hypercube:2:2"</c> represents a 2D unstructured conformal quadrilateral mesh
+- <c>"conformal:hypercube:2:3"</c> represents a 2D unstructured conformal quadrilateral surface mesh embedded in 3D
+- <c>"conformal:hypercube:3:3"</c> represents a 3D unstructured conformal hexahedral mesh
+- <c>"conformal:simplex:2:2"</c> represents a 2D unstructured conformal triangular mesh
+- <c>"conformal:simplex:2:3"</c> represents a 2D unstructured conformal triangular surface mesh embedded in 3D
+- <c>"conformal:simplex:3:3"</c> represents a 3D unstructured conformal tetrahedral mesh
 
-\section meshfile_root The Root Node
+\note
+<c>"conformal:simplex:1:x"</c> is not a valid mesh type for any value of \c x; this is purely by convention to avoid
+having two incompatible definitions of a 1D mesh.
+
+\section meshfile_root Mesh File Root XML Node Description
 
 The root node of all valid FEAT mesh files is the <c>FeatMeshFile</c> node.
 
@@ -201,9 +484,9 @@ file. See \ref meshfile_meshtype for possible values for this attribute.
 This attribute is optional, because not all mesh files actually contain a root mesh, as they may just store
 charts, mesh-parts or partitions.
 
-\note Even if the file contains a root mesh, the \b meshtype attribute is not mandatory, but it is highly recommended to
-be declared, as some applications or tools (e.g. the <c>mesh2vtk</c> tool) may require this attribute to choose the
-correct execution path.
+\note Even if the file contains a root mesh, the \b meshtype attribute is not mandatory, but it is \b highly recommended
+to be declared in this case, as some applications or tools (e.g. the <c>mesh2vtk</c> tool) may require this attribute
+to choose the correct execution path.
 
 \note It is recommended to obey the following rule of thumb:\n
 The mesh file root marker specifies the \b meshtype attribute <em>if and only if</em> the mesh file also contains the root mesh.
@@ -223,11 +506,29 @@ If the mesh file contains a 2D quadrilateral mesh, then the root node would be
 </FeatMeshFile>
 \endcode
 
-\section meshfile_charts Chart Description
-Charts are descriptions of geometric object like circles, spheres or splines, which are often used for parameterization
-of domain boundaries or ficticious boundaries within the domain.
+\section meshfile_info Info XML Node Description
+Each mesh file may contain an optional multi-line Info node, which contains a block of arbitrary remarks or information
+about the file and/or its contents. The Info node is ignored by the mesh file reader.
 
-Each chart is embedded in a seperate <c>Chart</c> node, whose one and only attribute is the mandatory \b name attribute,
+Example:
+\code{.xml}
+<FeatMeshFile version="1">
+  <Info>
+    This file represents the unit-square [0,1]x[0,1] discretized into a single quadrilateral.
+    This is probably the most popular mesh for PDE simulations of all time for good reasons.
+  </Info>
+  <Mesh type="conformal:hypercube:2:2" size="4 4 1">
+    ...
+  </Mesh>
+</FeatMeshFile>
+
+\endcode
+
+\section meshfile_charts Chart XML Node Description
+Charts are descriptions of geometric object like circles, spheres or splines, which are often used for parameterization
+of domain boundaries or fictitious boundaries within the domain.
+
+Each chart is embedded in a separate <c>Chart</c> node, whose one and only attribute is the mandatory \b name attribute,
 which specifies the unique name of the chart. See the following subsections for examples of this node.
 
 \subsection meshfile_chart_circle 2D Circle Chart Description
@@ -235,16 +536,22 @@ The most simple chart is the \c Circle chart, which represents a simple 2D circl
 
 The Circle chart supports the following attributes:
 - \b radius (mandatory): the radius of the circle
-- \b midpoint (mandatory): the X- and Y-coordinates of the circle midpoint, separated by whitespace(s)
+- \b midpoint (mandatory): the X- and Y-coordinates of the circle midpoint, separated by white-space(s)
 - \b domain (optional): the left and right borders of the interval that is mapped onto the circle.
 
-\subsection meshfile_chart_circle_param Circle Parameterization
+The \b domain attribute is required for explicit boundary parameterization (see \ref meshfile_parameterization_explicit);
+without it the Circle chart only supports implicit boundary parameterization.
+
+\subsubsection meshfile_chart_circle_param 2D Circle Parameterization
 
 Let \f$m_x, m_y\f$ denote the coordinates of the circle midpoint, \f$r\f$ the circle radius and \f$d_L, d_R\f$
 the left and right domain interval borders, then the parameterization of the circle is defined as follows:
 
 \f[\alpha(t) := \frac{2\pi\cdot(t-d_L)}{d_R-d_L}\f]
 \f[t \mapsto \begin{bmatrix} m_x + r\cdot\cos(\alpha(t))\\ m_y + r\cdot\sin(\alpha(t))\end{bmatrix}\f]
+
+See \ref meshfile_parameterization_explicit for a practical example of how this parameterization is used for the
+adaption of boundary vertices.
 
 \subsubsection meshfile_chart_circle_examples 2D Circle Chart Examples
 A (unparameterized) circle of radius 0.2 around the midpoint (0.5, 1.0) named "myCircle" would be defined by:
@@ -267,7 +574,9 @@ The \c Sphere chart is the 3D analogon of the \c Circle chart, which represents 
 
 The Sphere chart supports the following attributes:
 - \b radius (mandatory): the radius of the sphere
-- \b midpoint (mandatory): the X-, Y- and Z-coordinates of the sphere midpoint, separated by whitespace(s)
+- \b midpoint (mandatory): the X-, Y- and Z-coordinates of the sphere midpoint, separated by white-space(s)
+
+The Sphere chart only supports implicit boundary parameterization.
 
 \subsubsection meshfile_chart_sphere_examples 3D Sphere Chart Examples
 A sphere of radius 0.2 around the midpoint (0.5, 1.0, 0.7) named "mySphere" would be defined by:
@@ -281,24 +590,24 @@ A sphere of radius 0.2 around the midpoint (0.5, 1.0, 0.7) named "mySphere" woul
 The \c Bezier chart represents a 2D Bezier-Spline (aka "Polybezier" aka "composite Bezier curve"), which can be used
 to describe quite complex objects by a continuous composition of Bezier curves of possibly varying degree.
 
-\subsection meshfile_terminology Terminology
+<b>Terminology:</b>
 - A <b>vertex point</b> is a point which denotes the start and/or end of one ore more Bezier curve segment(s).\n
-  This includes the start- and end-points of the whole Spline as well as each inner point connecting two consecutive
+  This includes the start- and end-points of the whole spline as well as each inner point connecting two consecutive
   Bezier curves.
 - A <b>control point</b> is a point which controls the shape of the Bezier curve segment spanned between two consecutive
   vertex points.
 
 The \c Bezier chart contains the following attributes:
 - \b dim (mandatory): specifies the dimension of the spline, must be equal to 2
-- \b size (mandatory): specifies the total number of vertex points of the spline
+- \b size (mandatory): specifies the total number of <b>vertex points</b> of the spline (i.e. not counting the control points)
 - \b type (optional): specifies whether the spline is \b open or \b closed.
   If not given, the spline is assumed to be open.
-- \b orientiation (optional): specifies the orientation of the spline, which may be either +1 or -1.
+- \b orientation (optional): specifies the orientation of the spline, which may be either +1 or -1.
   If not given, the spline is assumed to have positive orientation.
 
 \note
-If a spline is declared as \b closed, then it is silently assumed that the start- and end-vertex points of the spline
-coincide.
+If a Bezier chart is declared as \b closed, then it is silently assumed that the start- and end-vertex points of the Bezier
+spline coincide, otherwise the chart is ill-formed.
 
 Each \c Bezier chart must contain a child node named <c>Points</c> which encapsulates the coordinates of the
 vertex and control points, see \ref meshfile_chart_bezier_points for details.
@@ -323,11 +632,12 @@ where
 A Bezier curve without any inner control points is a simple line segment.
 
 \note
-The first vertex point of a Bezier spline must \b not be preceeded by any control points.
+The first vertex point of a Bezier spline must \b not be preceded by any control points.
 
 \subsubsection meshfile_chart_bezier_params Bezier Parameters
 A \c Bezier chart may also be explicitly parameterized. In this case, the \c Bezier node contains a child node named
-\c Params, which contain the 1D parameter values of the vertex points.
+\c Params, which contain the 1D parameter values of the vertex points. Without this \c Param sub-node, the \c Bezier
+chart only support implicit boundary parameterization.
 
 \subsubsection meshfile_chart_bezier_examples 2D Bezier Chart Examples
 A Bezier spline representing a simple line segment from (0.1, 0.5) to (0.7, 0.2) would be:
@@ -408,7 +718,9 @@ A \c SurfaceMesh has the following attributes:
 
 The definition of a \c SurfaceMesh is pretty straight forward: it only contains
 two child nodes named \c Vertices and \c Triangles, which contain the
-vertex coordinate triplets and the triangle vertex index triplets, respr.
+vertex coordinate triplets and the triangle vertex index triplets, respectively.
+
+The \c SurfaceMesh chart only supports implicit boundary parameterization.
 
 \subsubsection meshfile_chart_surfmesh_examples 3D SurfaceMesh Chart Examples
 A surface triangulation of the 3D unit cube [0,1] x [0,1] x [0,1] consisting of
@@ -452,6 +764,10 @@ The \c Extrude chart supports the following 2D child charts:
 - \c Circle, see \ref meshfile_chart_circle
 - \c Bezier, see \ref meshfile_chart_bezier
 
+The \c Extrude chart supports explicit boundary parameterization if and only if its child \c Circle or \c Bezier chart
+supports its; but the \c Extrude chart always supports implicit  boundary parameterization.
+
+
 \subsubsection meshfile_chart_extrude_transform Transformation
 The \c Extrude chart supports the three attributes \c origin, \c offset and \c angles to define a "proper rigid
 transformation" (a transformation that consists only of translations and rotations) for the extruded chart.
@@ -461,9 +777,9 @@ the following transformation mapping:
 \f[ x \mapsto w + R \cdot(x - v)\f]
 
 Each of the three components is optional and can be specified by the following attributes:
-- \c origin: specifies the X- and Y-coordinates of the origin vector \e v, separated by whitespaces
-- \c offset: specifies the X-, Y- and Z-coordinates of the offset vector \e w, separated by whitespaces
-- \c angles: specifies the yaw, pitch and roll angles of the rotation matrix \e R, separated by whitespaces
+- \c origin: specifies the X- and Y-coordinates of the origin vector \e v, separated by white-spaces
+- \c offset: specifies the X-, Y- and Z-coordinates of the offset vector \e w, separated by white-spaces
+- \c angles: specifies the yaw, pitch and roll angles of the rotation matrix \e R, separated by white-spaces
 
 \attention
 The angles are given in revolutions (aka rotations aka full turns) rather than radians or degrees to avoid angles with
@@ -485,12 +801,12 @@ Extruding a 2D \c Circle chart effectively yields a 3D cylinder:
 \endcode
 
 \subsection meshfile_chart_CGAL_surfacemesh 3D CGAL based SurfaceMesh Chart Description
-The \c CGALSurfaceMesh chart represents a surface triangulation of a 3D object very simliar
-to the SurfaceMesh chart, but is handled by the CGAL thirdparty package.
+The \c CGALSurfaceMesh chart represents a surface triangulation of a 3D object very similar
+to the SurfaceMesh chart, but is handled by the CGAL third-party package.
 
-\attention Due to several consistency problems with file pathes in mesh files, it was decided to disable defining a CGAL meshchart in
+\attention Due to several consistency problems with file paths in mesh files, it was decided to disable defining a CGAL chart in
 the xml file itself.
-If you want to use this, you are required to create CGAL meshpart by hand.
+If you want to use this, you are required to create CGAL mesh-part by hand.
 For this, suppose you already have an Atlas object created.
 Then simply call
 \code{.cpp}
@@ -498,54 +814,54 @@ auto cgal_ptr = CGALSurfaceMesh<MeshType>::create_cgal_surface_mesh(filename);
 atlas.add_mesh_chart(<name>, cgal_ptr);
 \endcode
 
-
-\b filename (mandatory): specifies the absolute path to the file that contains the geometric surface data. Has to be either an <a href="https://segeval.cs.princeton.edu/public/off_format.html"> off</a> or an
+\b filename (mandatory): specifies the absolute path to the file that contains the geometric surface data.
+Has to be either an <a href="https://segeval.cs.princeton.edu/public/off_format.html"> off</a> or an
  <a href="https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml"> obj</a> file.
 
+\section meshfile_mesh Mesh XML Node Description
+The \c Mesh node defines the actual <em>root mesh</em>, i.e. the mesh that is used for the domain discretization.
 
+\attention
+A mesh file may contain at most one root mesh and therefore at most one \c Mesh XML node, otherwise it is ill-formed.
 
-
-\section meshfile_mesh Root Mesh Description
-The \c RootMesh node defines the actual root mesh, i.e. the mesh that is used for the domain discretization.
-Note that each mesh file can contain at most one root mesh.
-
-The \c RootMesh node has the following attributes:
+A \c Mesh node has the following attributes:
 - \b type (mandatory): specifies the mesh type, see \ref meshfile_meshtype
-- \b size (mandatory): specifies the number of mesh entities, separated by whitespaces
+- \b size (mandatory): specifies the number of mesh entities, separated by white-spaces and sorted by their dimensions
 
-The root mesh is defined by two mandatory sets of information:
+A mesh is defined by two mandatory sets of information:
 - The vertices, i.e. the set of all coordinate tuples for each vertex, see \ref meshfile_mesh_vertices
 - The topologies, i.e. the sets of all vertex indices for each face of each dimension, see \ref meshfile_mesh_topology
 
-\subsection meshfile_mesh_vertices Vertices Description
+\subsection meshfile_mesh_vertices Vertices Sub-Node Description
 The \c Vertices child node specifies the set of all vertices of the mesh.
 
 This node does not have any attributes because:
-- The number of coordinates per vertices is specified by the \b type attribute of the parent \c RootMesh node.
-- The number of vertices in the mesh is specified by the \b size attribute of the parent \c RootMesh node.
+- The number of coordinates per vertices is specified by the \b type attribute of the parent mesh node.
+- The number of vertices in the mesh is specified by the \b size attribute of the parent mesh node.
 
-Each content line of the \c Vertices node specifies the coordinate tuple for one vertex, separated by whitespaces.
+Each content line of the \c Vertices node specifies the coordinate tuple for one vertex, separated by white-spaces.
 
 See \ref meshfile_mesh_examples for examples.
 
-\subsection meshfile_mesh_topology Topology Description
+\subsection meshfile_mesh_topology Topology Sub-Node Description
 Each \c Topology child node specifies the topology for one entity dimension, i.e. the index tuple of all vertices
 adjacent to one entity (edge, triangle, etc).
 
-Each \c Topology node has one mandatory attribute \b dim, which specifies the dimension of the entities that the
+The \c Topology node has one mandatory attribute \b dim, which specifies the dimension of the entities that the
 \c Topology refers to.
 
 \attention
-In the FEAT mesh file format, you need to specify \b all topologies up to the dimension of the root mesh,
-i.e. it is \b not sufficient to specify only the topology for the highest-dimensional shape!\n
-Example: if you have a 3D hexahedral mesh, then you need to explicitly specify the topologies of
-- the edges (dim = 1)
-- the quadrilaterals (dim = 2)
-- the hexahedra (dim = 3)
+In the FEAT mesh file format, you need to specify \b all topologies up to the shape dimension of the root mesh,
+i.e. it is \b not sufficient to specify only the topology for the highest-dimensional shape, so there must
+exists exactly one \c Topology sub-node for each entity dimension > 0, otherwise the mesh file is ill-formed!\n\n
+So, if you have a 3D hexahedral mesh, then you need to explicitly specify the topologies of
+- all edges (shape dim = 1)
+- all quadrilaterals (shape dim = 2)
+- all hexahedra (shape dim = 3)
 
 See \ref meshfile_mesh_examples for examples.
 
-\subsection meshfile_mesh_examples RootMesh Examples
+\subsection meshfile_mesh_examples Mesh Examples
 \subsubsection meshfile_mesh_examples_2d_unit_square_quad 2D Quadrilateral Unit-Square
 The following example shows the definition of the unit-square mesh consisting of 4 vertices, 4 edges and 1 quadrilateral:
 \code{.xml}
@@ -652,7 +968,7 @@ and 1 hexahedron:
 - Lines 26-33: the vertex indices for the six quadrilaterals of the mesh
 - Lines 34-36: the vertex indices for the one and only hexahedron of the mesh
 
-\section meshfile_meshpart Mesh-Part Description
+\section meshfile_meshpart MeshPart XML Node Description
 Mesh-parts are used to represent certain regions of interest of the root mesh such as e.g. boundary regions.
 In the most simple case, a mesh-part consists only of a list of vertices, edges, etc. of the root mesh that are
 assigned to that mesh-part. In more complex cases, mesh parts may have their own topology as well as sets of attributes
@@ -660,19 +976,19 @@ that are assigned to the mesh-part's vertices and can be used for e.g. boundary 
 
 A \c MeshPart node has the following attributes:
 - \b name (mandatory): a unique name for the mesh-part
-- \b parent (mandatory): specifies the name of the parent mesh; this must be <c>root</c>.
-- \b size (mandatory): specifies the number of mesh entities in the mesh part, separated by whitespaces.
+- \b parent (mandatory): specifies the name of the parent mesh; this must be <c>"root"</c>.
+- \b size (mandatory): specifies the number of mesh entities in the mesh part, separated by white-spaces and sorted by their dimension.
 - \b topology (mandatory): specifies the type of the topology for the mesh part; must be one of:
-  - \c none: the mesh part does not have a topology
-  - \c full: the full topology for the mesh-part is explicitly given
-  - \c parent: the full topology is deducted automatically from the parent mesh
+  - <c>"none"</c>: the mesh part does not have a topology
+  - <c>"full"</c>: the full topology for the mesh-part is explicitly given
+  - <c>"parent"</c>: the full topology is deducted automatically from the parent mesh
 - \b chart (optional): specifies the name of the chart for the parameterization of the mesh-part.
 
 
-\subsection meshfile_meshpart_mapping Mapping Description
-A \c Mapping node specifies the (root) mesh entities that belong to the particular mesh-part.
+\subsection meshfile_meshpart_mapping Mapping Sub-Node Description
+A \c Mapping child node specifies the (root) mesh entities of a particular dimension that belong to the particular mesh-part.
 
-A \c Mapping node has only one mandatory attribute \b dim, which specifies the dimension that this
+A \c Mapping child node has only one mandatory attribute \b dim, which specifies the entity dimension that this
 \c Mapping node refers to.
 
 Each content line of a \c Mapping node contains the index of a single root mesh entity of the given dimension
@@ -681,9 +997,9 @@ The number of entities in a \c Mapping node is given in the \b size attribute of
 
 \subsection meshfile_meshpart_topology Topology Description
 In analogy to the root mesh, also mesh-parts may have a topology defined on its entities. If the \b topology attribute
-of the \c MeshPart node is set to \c full, then the toplogy is specifies just the same way as for the root mesh.
+of the \c MeshPart node is set to \c full, then the topology is specifies just the same way as for the root mesh.
 
-\attention
+\note
 If the \b topology attribute of the \c MeshPart node is set to \c parent, then the topology must \b not be specified
 explicitly by using \c Topology nodes, but it is automatically derived from the root mesh instead.
 
@@ -700,6 +1016,12 @@ An \c Attribute node has two attributes:
 
 One special case of an attribute is the parameterization, which is represented by the name \c param,
 which is used to define the (root mesh) vertex coordinates via the chart that the mesh-part is assigned to.
+
+Another application of mesh-part attributes is the specification of certain properties for the mesh-part, e.g.
+a temperature distribution on a boundary part described by that mesh-part.
+
+See \ref meshfile_parameterization_explicit for a practical example of how the \c param attribute is used for the
+adaption of boundary vertices.
 
 \subsection meshfile_meshpart_examples MeshPart Examples
 
@@ -757,19 +1079,27 @@ total number of vertex indices is 5. The mesh-part contains all four boundary ed
   </MeshPart>
 \endcode
 
-\section meshfile_partition Partition Description
+\section meshfile_partition Partition XML Node Description
 
-A \c Partition node specifies a partitioning of the root mesh into a number of patches (aka sub-domains aka partitions).
-
-\todo talk about auto-partitioner
+A \c Partition node specifies a partitioning of the root mesh into a number of patches aka sub-domains aka partitions.
 
 A \c Partition node has the following attributes:
-- \b size (mandatory): specifies the number of patches and the number of elements of this partitioning, separated by a whitespace.
+- \b size (mandatory): specifies the number of patches and the number of elements of this partitioning, separated by a white-space.
 - \b name (optional): specifies the name of the partitioning. If not given, the partition will remain unnamed.
 - \b level (optional): specifies the refinement level of the root mesh that this partition belongs to. If not given, level 0 is assumed.
 - \b priority (optional): specifies the priority of this partitioning. If not given, priority 0 is assumed.
 
-\subsection meshfile_partition_patch Patch Description
+\remark
+Unless requested otherwise by the user, the FEAT::Control::Domain::PartiDomainControl class will go through all
+partitionings of all the input files that have been passed to it and it will check if any of the partitionings with
+a priority greater than 0 matches the number of patches that the domain controller has to create, which in the most
+simple case corresponds to the number of MPI processes that the application was started with.
+If there are multiple partitionings for the given number of patches, then it will pick the one of the ones with
+the highest priority. By default, the partitioner considers all partitionings of all the given input files,
+but it can be restricted to only consider partitioning with a specific name by explicitly stating the set
+of allowed partitioning names via the <c>\--parti-extern-name</c> command line parameter.
+
+\subsection meshfile_partition_patch Patch Sub-Node Description
 A \c Patch node specifies the elements that belong to a specific patch/partition/sub-domain/process.
 
 A \c Patch node has the following attributes:
@@ -812,5 +1142,5 @@ the domain into 2 patches with 2 elements each.
   </Partition>
 \endcode
 
-\author Peter Zajac
+\author Peter Zajac, Jordi Paul
 **/

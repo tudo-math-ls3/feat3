@@ -292,9 +292,9 @@ struct MeshoptRefinementApp
     }
     else if(test_number == 2)
     {
-      if( Math::abs(edge_angle - DT_(26.103429982165846)) > Math::sqrt(Math::eps<DataType>()))
+      if( Math::abs(edge_angle - DT_(26.102795912453782)) > Math::sqrt(Math::eps<DataType>()))
       {
-        comm.print("FAILED: Initial worst angle should be >= "+stringify_fp_fix(26.103429982165846)+ " but is "
+        comm.print("FAILED: Initial worst angle should be >= "+stringify_fp_fix(26.102795912453782)+ " but is "
             +stringify_fp_fix(edge_angle));
         ret++;
       }
