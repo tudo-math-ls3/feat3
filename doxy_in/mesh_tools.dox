@@ -5,13 +5,9 @@
 This page gives an overview over the mesh-file related tools and scripts that can be found in the tools/mesh_tools
 directory.
 
-- \ref meshtools_meshgen
-- \ref meshtools_mesh_extruder
-- \ref meshtools_mesh_indexer
-
 \section meshtools_meshgen Mesh Generator Scripts
 There exist a few Python scripts that can be used to generate FEAT 3 mesh-files for some simple 2D and 3D domains.
- lease check the documentation of the scripts for details.
+Please check the documentation of the scripts for details.
 
 \subsection meshtools_2d_quad_circle 2d_quad_circle.py
 Creates a 2D quadrilateral mesh that discretizes a circle domain with 4*N+1 quadrilateral elements, which looks roughly
@@ -71,14 +67,14 @@ Creates a 2D triangular mesh that discretizes a rectangular domain with 2*M*N qu
 is the triangular version of the 2d_quad_rect.py script, which subdivides each quadrilateral into 2 triangles.
 
 \subsection meshtools_3d_hexa_cube 3d_hexa_cube.py
-Creates a 3D hexahedral mesh that discretizes a rectoid domain with M*N*L hexahedral elements.
+Creates a 3D hexahedral mesh that discretizes a cuboid domain with M*N*L hexahedral elements.
 
 
 
-\section meshtools_mesh_extruder The mesh-extruder Tool
+\section meshtools_mesh_extruder The mesh-extruder tool
 This tool can be used to create a 3D hexahedral mesh from a 2D quadrilateral mesh by extruding it in Z direction thus
 forming a "2.5D" mesh, which also includes an extrusion of the 2D charts that were used to parameterize the 2D input
-mesh. The 3D mesh can optionally also be rotated and translated by specifing an origin, an offset and a set of
+mesh. The 3D mesh can optionally also be rotated and translated by specifying an origin, an offset and a set of
 yaw-pitch-roll rotation angles given in revolutions
 
 This tool accepts the following command line parameters:
@@ -87,7 +83,7 @@ Mandatory: Specifies the 2D quadrilateral input mesh file(s).
 - <c>\--out <output-meshfile></c>\n
 Mandatory: Specifies the 3D hexahedral output mesh file.
 - <c>\--z-list <z_0> <z_1> ... <z_n></c>\n
-Mandatory: Specifies the acending list of Z-coordinates at which the 3D mesh is to be sliced, where the first and the
+Mandatory: Specifies the ascending list of Z-coordinates at which the 3D mesh is to be sliced, where the first and the
 last entry in the list specify the total Z-extend of the 3D mesh. Mutually exclusive with \--z-range.
 - <c>\--z-range <z-min> <z-max> <n></c>\n
 Mandatory: Specifies the Z-coordinate range and the number of slices in Z-direction. Mutually exclusive with \--z-list.
@@ -121,7 +117,7 @@ center translated to (0,0,0) and rotated by 45 degrees (=1/8 revolution) around 
 mesh-extruder --in unit_circle_quad_12.xml --out cylinder_tilted.xml --z-list 0.0 0.1 0.9 1.0 --offset 0 0 -0.5 --angles 0.125 0 0
 \endverbatim
 
-\section meshtools_mesh_indexer The mesh-indexer Tool
+\section meshtools_mesh_indexer The mesh-indexer tool
 This tool can be used to create a FEAT mesh file from a set of vertex coordinate and vertices@element indices text files.
 This is especially helpful if one needs to create a FEAT mesh file from some other mesh file format and if no other tool
 chain exists that could make that conversion possible in a more convenient way.
@@ -139,12 +135,12 @@ Mandatory: Specifies the shape of the mesh to be generated. Must be one of the f
   - s23 : Simplex<2> mesh with 3D coordinates
 - <c>\--vtx <filenames...></c>\n
 Mandatory: Specifies the name(s) of the input text file(s) that contain the vertex coordinates.
-Each line of this file should contain the coordinate tuple (seperated by spaces) of a single vertex
+Each line of this file should contain the coordinate tuple (separated by spaces) of a single vertex
 and the number of coordinates must match the mesh shape specified by <c>\--shape</c>.
 Empty lines and lines beginning with the hash character '#' are ignored.
 - <c>\--idx <filenames...></c>\n
 Mandatory: Specifies the name(s) of the input text file(s) that contain the 0-based vertices@element indices.
-Each line of this file should contain the vertex-index tuple (seperated by spaces) of a single element
+Each line of this file should contain the vertex-index tuple (separated by spaces) of a single element
 and the number of indices must match the mesh shape specified by <c>\--shape</c>. The indices are expected to be given
 in the correct order according to the FEAT 3 numbering, see \ref meshfile_shape_numbering for details.
 Empty lines and lines beginning with the hash character '#' are ignored.
@@ -159,7 +155,7 @@ its coordinates or midpoint coordinates, respectively.
 
 \attention Please note that the <c>\--parts</c> option can only be used if FEAT is configured and linked against the
 'fparser' third-party library. Also, it is highly recommended to enclose each formula in a pair of double-quotation
-marks to ensure your command line interpreter doesn't get confused by more complex fomulae.
+marks to ensure your command line interpreter doesn't get confused by more complex formulae.
 
 
 The number of vertex coordinates files passed to the \--vtx argument must always be equal to the number of element
@@ -187,11 +183,96 @@ contains indices of the vertices in \c verts_a.txt and \c elems_b.txt contains i
 mesh-indexer --out mesh.xml --shape s3 --vtx verts_a.txt verts_b.txt  --idx elems_a.txt elems_b.txt
 \endverbatim
 
+\section meshtools_mesh_partitioner The mesh-partitioner tool
+This tool can be used to create a partitioning file for a given mesh file, which is then saved
+as a separate mesh file and which can be passed to MPI parallel applications in addition to the
+original mesh file to ensure that these applications picks one of the pre-computed partitionings
+instead of applying a partitioner at simulation time.
 
-\section meshtools_mesh2vtk The mesh2vtk Tool
+\attention
+Please note that this tool can only be really useful if FEAT was configured and linked against the
+ParMETIS and/or Zoltan libraries, because FEAT does not provide any 'real' partitioners by its own
+except for a very experimental genetic partitioner that should not be used for real world use cases.
+In consequence, this tool must be compiled with MPI as both of these libraries require MPI.
+
+This tool allows you to specify the number of desired partitions/patches independently of the number
+of MPI processes that this tool is run with, however, not all MPI processes may be used to run the
+partitioner if the workload is too small to distribute over all MPI processes.
+
+This tool allows you to specify the refinement level of the mesh that is to be partitioned, if the
+unrefined mesh stored in the mesh file that you want to partition is too coarse for the number of
+patches that you want to create. The chosen partitioning level is then also written to the output
+file and the PartiDomainControl will also refine the mesh to the required level if it chooses to
+select the corresponding partitioning.
+
+By default, the partitioning is named 'auto', which tells the PartiDomainControl, which is used to
+read in the partition mesh file, that the corresponding partitioning can be chosen automatically
+if the number of MPI processes matches the number of patches in the partitioning. If you choose a
+different name for the partitioning, you will have to tell the PartiDomainControl explicitly that
+you want to use that particular partitioning by supplying its name to the '--part-extern-name'
+command line parameter of the PartDomainControl object. Unless you indent to try out different
+partitionings for the same number of patches, it is recommended to simply leave the partition name
+as 'auto'.
+
+By default, this tool creates the dual graph for the partitioner based on the facet-adjacency of
+the elements, however, you can also specify that the dual graph is to be defined based on the
+vertex-adjacency of the elements. The former one usually results in nicer partitionings, but you
+might want to try out the vertex-based adjacency if the facet-based element adjacency does not yield
+satisfactory results for the mesh that you are trying to partition.
+
+If you want to visualize the partitioning created by this tool, you can simply use the 'mesh2vtk'
+tool and supply both the input mesh file as well as the partitioning mesh file written by this tool
+as input mesh files and the mesh2vtk tool will write out the partitioning as a cell variable in the
+resulting VTK file. If you have created the partitioning on a refinement level greater than 0, you
+also have to tell the mesh2vtk tool to write out the refined mesh on at least the same level to
+visualize the partitioning because it is not available on lower refinement levels, of course.
+
+This tool supports the following command line parameters:
+
+- <c>\--mesh <meshfile></c>\n
+Mandatory: Specifies the name of the input mesh file to be partitioned.
+
+- <c>\--out <partition-file></c>\n
+Mandatory: Specifies the name of the output partition mesh file.
+
+- <c>\--parts <n></c>\n
+Mandatory: Specifies the number of partitions/patches to create.
+
+- <c>\--dual-by-verts</c>\n
+Optional: Specifies that the dual graph is to be computed by vertices rather than by facets.
+
+- <c>\--level <n></c>\n
+Optional: Specifies the mesh partitioning level; defaults to 0.
+
+- <c>\--name <name></c>\n
+Optional: Specifies the name of the partitioning; defaults to 'auto'.
+
+- <c>\--prio <priority></c>\n
+Optional: Specifies the priority of the partitioning; defaults to 1.
+
+- <c>\--no-2lvl</c>\n
+Optional: Specifies that the 2-level partitioner should not be used.
+
+- <c>\--genetic <time-init> <time-mutate></c>\n
+Optional: Specifies that the genetic partitioner should be used.
+This partitioner is highly experimental and should not be used by mere mortals like you.
+
+- <c>\--no-parmetis</c>\n
+Optional: Specifies that the ParMETIS partitioner should not be used.
+
+- <c>\--no-zoltan</c>\n
+Optional: Specifies that the Zoltan partitioner should not be used.
+
+\section meshtools_mesh_validator The mesh-validator tool
+This tool performs some basic sanity checks on a given mesh file to identify orphaned entities and other invalid
+adjacency combinations. Please note that this tool is very basic and does not offer any sophisticated checks (yet),
+but it can still be useful if one has created or modified a mesh file manually or via some custom script or
+conversion tool.
+
+\section meshtools_mesh2vtk The mesh2vtk tool
 This tool converts a mesh from the FEAT 3 mesh file format to a corresponding VTK format, which currently always
-correpsonds the XML-based VTU file format for unstructured meshes. This tool can optionally also apply a rigid body
-transformation given by an origin-angles-offset tuplet.
+corresponds the XML-based VTU file format for unstructured meshes. This tool can optionally also apply a rigid body
+transformation given by an origin-angles-offset tuple.
 
 This tool accepts the following command line parameters:
 - <c>\--mesh <filenames...></c>\n
@@ -242,12 +323,11 @@ its coordinates or midpoint coordinates, respectively.
 
 \attention Please note that the <c>\--hit-test</c> option can only be used if FEAT is configured and linked against the
 'fparser' third-party library. Also, it is highly recommended to enclose each formula in a pair of double-quotation
-marks to ensure your command line interpreter doesn't get confused by more complex fomulae.
+marks to ensure your command line interpreter doesn't get confused by more complex formulae.
 
 
-
-\section meshtools_mesh2eps The mesh2eps Tool
-This tool converts a 2D triangular or quadrilateral mesh from the FEAT 3 mesh file format to an ecapsulated post-script
+\section meshtools_mesh2eps The mesh2eps tool
+This tool converts a 2D triangular or quadrilateral mesh from the FEAT 3 mesh file format to an encapsulated post-script
 (EPS) file, so that it may be included as a vector graphic in e.g. a LaTeX document.
 
 This tool accepts the following command line parameters:
@@ -276,7 +356,38 @@ Specifies the extra offset of the figure in millimeters. If not given, an offset
 Optional: Disables the adaption of the mesh boundary based on the charts stored in the mesh file.
 
 
-\section meshtools_mesh2tri The mesh2tri Tool
+\section meshtools_mesh2svg The mesh2svg tool
+This tool converts a 2D triangular or quadrilateral mesh from the FEAT 3 mesh file format to a scalable vector graphics
+(SVG) file, which can be either displayed directly in an internet browser or converted to another vector graphics
+format such as EPS or PDF via some vector graphics application like e.g. Inkscape.
+
+This tool accepts the following command line parameters:
+- <c>\--mesh <filenames...></c>\n
+Mandatory: Specifies the filenames of the input mesh files in FEAT 3 mesh file format. Typically, one only specifies
+a single filename here, unless the information (e.g. charts and root mesh) is split up across several files.
+
+- <c>\--svg <filename></c>\n
+Optional: Specifies the filename of the output SVG file. If not given, the name of the first input mesh file is
+used, but with the extension .svg instead of .xml.
+
+- <c>\--level <lvl_max> [<lvl_min>]</c>\n
+Optional: Specifies the minimum and maximum refinement level of the mesh for which the EPS files are to be written.
+If not given, on the input level (0) is processed.
+
+- <c>\--box <width> <height></c>\n
+Specifies the bounding box of the figure in millimeters. If not given, a bounding box of 100 x 100 millimeters is used.
+
+- <c>\--stroke <width></c>\n
+Specifies the stroke width of the edges in millimeters. If not given, a stroke width of 0.1 millimeters is used.
+
+- <c>\--extra <offset></c>\n
+Specifies the extra offset of the figure in millimeters. If not given, an offset of 0.5 millimeters is used.
+
+- <c>\--no-adapt</c>\n
+Optional: Disables the adaption of the mesh boundary based on the charts stored in the mesh file.
+
+
+\section meshtools_mesh2tri The mesh2tri tool
 This tool converts a mesh from the FEAT 3 mesh file format to the legacy FEATFLOW 1/2 TRI mesh file format.
 
 This tool accepts the following command line parameters:
@@ -308,7 +419,7 @@ then you can specify that group of mesh-parts by specifying their names in a dou
 will yield 3 nodal property groups:
 bnd:l -> 1, bnd:t -> 2, bnd:b -> 2, bnd:r -> 3, the rest -> 0
 
-\section meshtools_tri2mesh The tri2mesh Tool
+\section meshtools_tri2mesh The tri2mesh tool
 This tool converts a 3D hexahedral mesh from the legacy FEATFLOW 1/2 TRI mesh file format to the FEAT 3 mesh file format.
 
 This tool has a fixed command line argument structure:

@@ -119,12 +119,14 @@ namespace FEAT
 {
   namespace Geometry
   {
-    PartiZoltan::PartiZoltan(const Dist::Comm& comm) :
+    PartiZoltan::PartiZoltan(const Dist::Comm& comm, Index min_elems, int max_procs) :
       _comm(comm),
       _zoltan_comm(Dist::Comm::null()),
-      _hypergraph(),
+      _max_procs(max_procs),
+      _min_elems(min_elems),
       _num_elems(0u),
       _num_parts(0u),
+      _hypergraph(),
       _coloring(),
       _zz(nullptr)
     {
@@ -146,8 +148,10 @@ namespace FEAT
       this->_num_elems = faces_at_elem.get_num_nodes_domain();
 
       // first of all, determine how many processes we want to use for Zoltan
-      int num_procs = Math::max(1, int(faces_at_elem.get_num_nodes_domain() / min_elems));
-      Math::mini(num_procs, max_procs);
+      int num_procs = Math::max(1, int(faces_at_elem.get_num_nodes_domain() / _min_elems));
+      if(_max_procs > 0)
+        Math::mini(num_procs, _max_procs);
+      Math::mini(num_procs, int(num_parts));
       Math::mini(num_procs, _comm.size());
 
       // do we need to create a sub-communicator for Zoltan?

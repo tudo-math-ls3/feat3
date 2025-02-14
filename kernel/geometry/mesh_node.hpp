@@ -333,6 +333,12 @@ namespace FEAT
         return _mesh_part_nodes.erase(part_name) > std::size_t(0);
       }
 
+      /// Removes all mesh parts from this mesh node
+      void remove_all_mesh_parts()
+      {
+        _mesh_part_nodes.clear();
+      }
+
       /**
        * \brief Sets the chart for a particular mesh part.
        *

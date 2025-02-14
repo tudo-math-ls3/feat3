@@ -431,6 +431,15 @@ namespace FEAT
         _os << "</FeatMeshFile>\n";
       }
 
+      void write_only(const PartitionSet& part_set)
+      {
+        _os << "<FeatMeshFile version=\"1\">\n";
+        _push_indent();
+        write_partition_set(part_set);
+        _pop_indent();
+        _os << "</FeatMeshFile>\n";
+      }
+
     protected:
       /**
        * \brief Writes a vertex-set of a mesh into the file

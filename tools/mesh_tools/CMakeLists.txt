@@ -10,6 +10,9 @@ target_link_libraries(mesh-indexer feat)
 add_executable(mesh-extruder mesh_extruder.cpp)
 target_link_libraries(mesh-extruder feat)
 
+add_executable(mesh-partitioner mesh_partitioner.cpp)
+target_link_libraries(mesh-partitioner feat)
+
 add_executable(mesh-validator mesh_validator.cpp)
 target_link_libraries(mesh-validator feat)
 

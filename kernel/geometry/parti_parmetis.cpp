@@ -15,9 +15,11 @@ namespace FEAT
 {
   namespace Geometry
   {
-    PartiParMETIS::PartiParMETIS(const Dist::Comm& comm) :
+    PartiParMETIS::PartiParMETIS(const Dist::Comm& comm, Index min_elems, int max_procs) :
       _comm(comm),
       _sub_comm(Dist::Comm::null()),
+      _max_procs(max_procs),
+      _min_elems(min_elems),
       _num_elems(0u),
       _num_parts(0u),
       _first_elem(0u),
@@ -27,6 +29,8 @@ namespace FEAT
       _parts(),
       _coloring()
     {
+      XASSERT(max_procs >= 0);
+      XASSERT(min_elems > 0u);
     }
 
     PartiParMETIS::~PartiParMETIS()
@@ -40,8 +44,10 @@ namespace FEAT
       this->_num_elems = faces_at_elem.get_num_nodes_domain();
 
       // first of all, determine how many processes we want to use for Zoltan
-      int num_procs = Math::max(1, int(faces_at_elem.get_num_nodes_domain() / min_elems));
-      Math::mini(num_procs, max_procs);
+      int num_procs = Math::max(1, int(faces_at_elem.get_num_nodes_domain() / _min_elems));
+      if(_max_procs > 0)
+        Math::mini(num_procs, _max_procs);
+      Math::mini(num_procs, int(num_parts));
       Math::mini(num_procs, _comm.size());
 
       // do we need to create a sub-communicator for ParMETIS?

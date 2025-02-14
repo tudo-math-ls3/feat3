@@ -37,11 +37,6 @@ namespace FEAT
      */
     class PartiZoltan
     {
-      // maximum number of processes to use by Zoltan
-      static constexpr int max_procs = 1000;
-      // minimum number of elements per process for Zoltan
-      static constexpr int min_elems = 1000;
-
     public:
       /// internal data class to be used by callback functions
       class Hypergraph
@@ -67,12 +62,16 @@ namespace FEAT
       const Dist::Comm& _comm;
       /// a sub-communicator for the partitioner
       Dist::Comm _zoltan_comm;
-      /// out hypergraph structure
-      Hypergraph _hypergraph;
+      /// maximum number of MPI processes to use
+      int _max_procs;
+      /// minimum number of elements per MPI process
+      Index _min_elems;
       /// the total number of elements
       Index _num_elems;
       /// the desired number of partitions
       Index _num_parts;
+      /// our hypergraph structure
+      Hypergraph _hypergraph;
       /// the element coloring
       Adjacency::Coloring _coloring;
       /// zoltan internal data
@@ -90,7 +89,7 @@ namespace FEAT
        * too many ranks in the communicator for the given number of mesh elements or desired number
        * of partitions to improve the computation vs communication trade-off.
        */
-      explicit PartiZoltan(const Dist::Comm& comm);
+      explicit PartiZoltan(const Dist::Comm& comm, Index min_elems = 1000u, int max_procs = 1000);
 
       /// virtual destructor
       virtual ~PartiZoltan();
@@ -146,6 +145,16 @@ namespace FEAT
       Adjacency::Graph build_elems_at_rank() const
       {
         return _coloring.create_partition_graph();
+      }
+
+      /**
+      * \brief Returns the size of the internal sub-communicator.
+      *
+      * This only gives useful results after the execute() function has been called.
+      */
+      int get_sub_comm_size() const
+      {
+        return _zoltan_comm.size();
       }
 
     protected:

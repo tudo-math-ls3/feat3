@@ -18,6 +18,9 @@
 
 namespace FEAT
 {
+  /**
+   * \brief Control namespace
+   */
   namespace Control
   {
     /**

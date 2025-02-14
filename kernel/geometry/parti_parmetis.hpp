@@ -24,16 +24,15 @@ namespace FEAT
      */
     class PartiParMETIS
     {
-      // maximum number of processes to use by ParMETIS
-      static constexpr int max_procs = 1000;
-      // minimum number of elements per process for ParMETIS
-      static constexpr int min_elems = 1000;
-
     private:
       /// our main communicator
       const Dist::Comm& _comm;
       /// a sub-communicator for the partitioner
       Dist::Comm _sub_comm;
+      /// maximum number of MPI processes to use
+      int _max_procs;
+      /// minimum number of elements per MPI process
+      Index _min_elems;
       /// the total number of elements
       Index _num_elems;
       /// the desired number of partitions
@@ -65,7 +64,7 @@ namespace FEAT
        * too many ranks in the communicator for the given number of mesh elements or desired number
        * of partitions to improve the computation vs communication trade-off.
        */
-      explicit PartiParMETIS(const Dist::Comm& comm);
+      explicit PartiParMETIS(const Dist::Comm& comm, Index min_elems = 1000u, int max_procs = 1000);
 
       /// virtual destructor
       virtual ~PartiParMETIS();
@@ -113,6 +112,16 @@ namespace FEAT
       Adjacency::Graph build_elems_at_rank() const
       {
         return _coloring.create_partition_graph();
+      }
+
+      /**
+       * \brief Returns the size of the internal sub-communicator.
+       *
+       * This only gives useful results after the execute() function has been called.
+       */
+      int get_sub_comm_size() const
+      {
+        return _sub_comm.size();
       }
 
     protected:
