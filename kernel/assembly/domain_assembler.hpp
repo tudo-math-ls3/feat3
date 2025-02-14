@@ -1225,8 +1225,13 @@ namespace FEAT
         // no worker threads?
         if(this->_num_worker_threads <= 0)
         {
+#ifdef FEAT_HAVE_OMP
+          // assemble via OpenMP instead
+          assemble_omp(job);
+#else
           // assemble on master thread instead
           assemble_master(job);
+#endif // FEAT_HAVE_OMP
           FEAT_KERNEL_MARKER_STOP("dom_asm:assemble");
           return;
         }
@@ -1351,6 +1356,130 @@ namespace FEAT
 
         // perform work
         worker();
+      }
+
+      template<typename Job_>
+      void assemble_omp(Job_& job)
+      {
+        typedef typename Job_::Task TaskType;
+
+        XASSERTM(_compiled, "assembler has not been compiled yet");
+
+        // no elements to assemble on?
+        if(this->_element_indices.empty())
+          return;
+
+        // for single threaded, just use normal master assembly
+        if(this->_strategy == ThreadingStrategy::single)
+        {
+          assemble_master(job);
+          return;
+        }
+
+        bool need_scatter = false;
+        bool need_combine = false;
+
+        // OpenMP parallel region
+        FEAT_PRAGMA_OMP(parallel shared(need_scatter, need_combine))
+        {
+          // create a task for this thread
+          std::unique_ptr<TaskType> task(new TaskType(job));
+
+          // do we need to scatter and/or combine?
+          FEAT_PRAGMA_OMP(atomic)
+          need_scatter |= task->need_scatter;
+          FEAT_PRAGMA_OMP(atomic)
+          need_combine |= task->need_combine;
+          FEAT_PRAGMA_OMP(barrier)
+
+          // doesn't the task need any scatter?
+          if(!need_scatter)
+          {
+            // that's simple, just iterate
+            Index elem_end = this->_element_indices.size();
+
+            // just assemble in parallel then
+            FEAT_PRAGMA_OMP(for)
+            for(Index elem = 0u; elem < elem_end; ++elem)
+            {
+              // prepare task
+              task->prepare(this->_element_indices.at(elem));
+
+              // assemble task
+              task->assemble();
+
+              // finish
+              task->finish();
+            }
+          }
+          else if(this->_strategy == ThreadingStrategy::colored)
+          {
+            // loop over all layers/colors
+            for(std::size_t icol(0); icol+1u < this->_color_elements.size(); ++icol)
+            {
+              // get number of elements for this color
+              Index elem_beg = this->_color_elements.at(icol);
+              Index elem_end = this->_color_elements.at(icol+1u);
+
+              // loop over all elements
+              FEAT_PRAGMA_OMP(for)
+              for(Index elem = elem_beg; elem < elem_end; ++elem)
+              {
+                // prepare task
+                task->prepare(this->_element_indices.at(elem));
+
+                // assemble task
+                task->assemble();
+
+                // scatter
+                task->scatter();
+
+                // finish
+                task->finish();
+              }
+            } // next color layer
+          }
+          //else if((this->_strategy == ThreadingStrategy::layered) || (this->_strategy == ThreadingStrategy::layered_sorted))
+          else // any other threading strategy
+          {
+            // that's simple, just iterate
+            Index elem_end = this->_element_indices.size();
+
+            // just assemble in parallel then
+            FEAT_PRAGMA_OMP(for)
+            for(Index elem = 0u; elem < elem_end; ++elem)
+            {
+              // prepare task
+              task->prepare(this->_element_indices.at(elem));
+
+              // assemble task
+              task->assemble();
+
+              // scatter
+              FEAT_PRAGMA_OMP(critical)
+              {
+                task->scatter();
+              }
+
+              // finish
+              task->finish();
+            }
+          }
+
+          // do we have to combine the assembly?
+          if(need_combine)
+          {
+            FEAT_PRAGMA_OMP(master)
+            {
+              // combine the assembly
+              task->combine();
+            }
+          }
+
+          // delete task object
+          task.reset();
+
+        } // FEAT_PRAGMA_OMP(parallel)
       }
 
       /**
