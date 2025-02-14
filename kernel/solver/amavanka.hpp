@@ -106,6 +106,9 @@ namespace FEAT
       // stop watch for apply time
       StopWatch watch_apply;
 
+      /// number of threads for numeric factorization
+      int _num_threads;
+
     public:
       /**
        * \brief Constructor
@@ -339,91 +342,97 @@ namespace FEAT
         watch_init_numeric.start();
         BaseClass::init_numeric();
 
+        this->_vanka.format();
+
         // get maximum macro size
         const Index num_macros = Index(this->_macro_dofs.front().get_num_nodes_domain());
         const Index stride = Intern::AmaVankaCore::calc_stride(this->_vanka, this->_macro_dofs);
 
-        // allocate arrays for local matrix
-        std::vector<DataType> vec_local(stride*stride, DataType(0)), vec_local_t(stride*stride, DataType(0));
-        std::vector<Index> vec_pivot(stride);
-        DataType* local = vec_local.data();
-        DataType* local_t = vec_local_t.data();
-        Index* pivot = vec_pivot.data();
-
-        this->_vanka.format();
-
-        // loop over all macros
-        for(Index imacro(0); imacro < num_macros; ++imacro)
+        FEAT_PRAGMA_OMP(parallel)
         {
-          // gather local matrix
-          const std::pair<Index,Index> nrc = Intern::AmaVankaCore::gather(this->_matrix,
-            local, stride, imacro, this->_macro_dofs, Index(0), Index(0), Index(0), Index(0));
+          // allocate arrays for local matrix
+          std::vector<DataType> vec_local(stride*stride, DataType(0)), vec_local_t(stride*stride, DataType(0));
+          std::vector<Index> vec_pivot(stride);
+          DataType* local = vec_local.data();
+          DataType* local_t = vec_local_t.data();
+          Index* pivot = vec_pivot.data();
 
-          // make sure we have gathered a square matrix
-          XASSERTM(nrc.first == nrc.second, "local matrix is not square");
-
-          // do we check for singular macros?
-          if(this->_skip_singular)
+          // loop over all macros
+          FEAT_PRAGMA_OMP(for)
+          for(Index imacro = 0; imacro < num_macros; ++imacro)
           {
-            // the approach used for checking the regularity of the local matrix is to check whether
-            //
-            //     || I - A*A^{-1} ||_F^2 < eps
-            //
-            // we could try to analyse the pivots returned by invert_matrix function instead, but
-            // unfortunately this approach sometimes leads to false positives
+            // gather local matrix
+            const std::pair<Index,Index> nrc = Intern::AmaVankaCore::gather(this->_matrix,
+              local, stride, imacro, this->_macro_dofs, Index(0), Index(0), Index(0), Index(0));
 
-            // make a backup if checking for singularity
-            for(Index i(0); i < nrc.first; ++i)
-              for(Index j(0); j < nrc.second; ++j)
-                local_t[i*stride+j] = local[i*stride+j];
+            // make sure we have gathered a square matrix
+            XASSERTM(nrc.first == nrc.second, "local matrix is not square");
 
-            // invert local matrix
-            Math::invert_matrix(nrc.first, stride, local, pivot);
+            // assume a non-singular matrix
+            bool singular = false;
 
-            // compute (squared) Frobenius norm of (I - A*A^{-1})
-            DataType norm = DataType(0);
-            for(Index i(0); i < nrc.first; ++i)
+            // do we check for singular macros?
+            if(this->_skip_singular)
             {
-              for(Index j(0); j < nrc.first; ++j)
+              // the approach used for checking the regularity of the local matrix is to check whether
+              //
+              //     || I - A*A^{-1} ||_F^2 < eps
+              //
+              // we could try to analyse the pivots returned by invert_matrix function instead, but
+              // unfortunately this approach sometimes leads to false positives
+
+              // make a backup if checking for singularity
+              for(Index i(0); i < nrc.first; ++i)
+                for(Index j(0); j < nrc.second; ++j)
+                  local_t[i*stride+j] = local[i*stride+j];
+
+              // invert local matrix
+              Math::invert_matrix(nrc.first, stride, local, pivot);
+
+              // compute (squared) Frobenius norm of (I - A*A^{-1})
+              DataType norm = DataType(0);
+              for(Index i(0); i < nrc.first; ++i)
               {
-                DataType xij = DataType(i == j ? 1 : 0);
-                for(Index k(0); k < nrc.first; ++k)
-                  xij -= local_t[i*stride+k] * local[k*stride+j]; // A_ik * (A^{-1})_kj
-                norm += xij * xij;
+                for(Index j(0); j < nrc.first; ++j)
+                {
+                  DataType xij = DataType(i == j ? 1 : 0);
+                  for(Index k(0); k < nrc.first; ++k)
+                    xij -= local_t[i*stride+k] * local[k*stride+j]; // A_ik * (A^{-1})_kj
+                  norm += xij * xij;
+                }
               }
+
+              // is the matrix block singular?
+              // Note: we check for !(norm < eps) instead of (norm >= eps),
+              // because the latter one evaluates to false if norm is NaN,
+              // which would result in a false negative
+              singular = !(norm < eps);
+
+              // set macro regularity mask
+              this->_macro_mask[imacro] = (singular ? 0 : 1);
             }
-
-            // is the matrix block singular?
-            // Note: we check for !(norm < eps) instead of (norm >= eps),
-            // because the latter one evaluates to false if norm is NaN,
-            // which would result in a false negative
-            const bool singular = !(norm < eps);
-
-            // set macro regularity mask
-            this->_macro_mask[imacro] = (singular ? 0 : 1);
+            else // no singularity check
+            {
+              // invert local matrix
+              Math::invert_matrix(nrc.first, stride, local, pivot);
+            }
 
             // scatter local matrix
             if(!singular)
             {
-              Intern::AmaVankaCore::scatter_add(this->_vanka, local, stride, imacro, this->_macro_dofs,
-                Index(0), Index(0), Index(0), Index(0));
+              FEAT_PRAGMA_OMP(critical)
+              {
+                Intern::AmaVankaCore::scatter_add(this->_vanka, local, stride, imacro, this->_macro_dofs,
+                  Index(0), Index(0), Index(0), Index(0));
+              }
             }
-          }
-          else // no singularity check
-          {
-            // invert local matrix
-            Math::invert_matrix(nrc.first, stride, local, pivot);
 
-            // scatter local matrix
-            Intern::AmaVankaCore::scatter_add(this->_vanka, local, stride, imacro, this->_macro_dofs,
-              Index(0), Index(0), Index(0), Index(0));
-          }
-
-          // reformat local matrix
-          for(Index i(0); i < nrc.first; ++i)
-            for(Index j(0); j < nrc.second; ++j)
-              local[i*stride+j] = DataType(0);
-        }
+            // reformat local matrix
+            for(Index i(0); i < nrc.first; ++i)
+              for(Index j(0); j < nrc.second; ++j)
+                local[i*stride+j] = DataType(0);
+          } // #pragma omp for
+        } // #pragma omp parallel
 
         // scale rows of Vanka matrix
         Solver::Intern::AmaVankaCore::scale_rows(this->_vanka, this->_omega, this->_dof_macros, this->_macro_mask, Index(0), Index(0));
