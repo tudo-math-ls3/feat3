@@ -3,6 +3,7 @@ var namespace_f_e_a_t =
     [ "Adjacency", "namespace_f_e_a_t_1_1_adjacency.html", "namespace_f_e_a_t_1_1_adjacency" ],
     [ "Analytic", "namespace_f_e_a_t_1_1_analytic.html", "namespace_f_e_a_t_1_1_analytic" ],
     [ "Assembly", "namespace_f_e_a_t_1_1_assembly.html", "namespace_f_e_a_t_1_1_assembly" ],
+    [ "Control", "namespace_f_e_a_t_1_1_control.html", "namespace_f_e_a_t_1_1_control" ],
     [ "Cubature", "namespace_f_e_a_t_1_1_cubature.html", "namespace_f_e_a_t_1_1_cubature" ],
     [ "Dist", "namespace_f_e_a_t_1_1_dist.html", "namespace_f_e_a_t_1_1_dist" ],
     [ "Geometry", "namespace_f_e_a_t_1_1_geometry.html", "namespace_f_e_a_t_1_1_geometry" ],

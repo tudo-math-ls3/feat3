@@ -343,12 +343,12 @@ $(document).ready(function(){initNavTree('graph_8hpp_source.html',''); initResiz
 <div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>        FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span> schedule(dynamic, 64))</div>
 <div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>        for(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i = 0; i &lt; adj.get_num_nodes_domain(); ++i)</div>
 <div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span>        {</div>
-<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>* idx = &amp;<a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a>[<a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>[i]];</div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> k = <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>[i];</div>
 <div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>          AImIt cur(adj.image_begin(i));</div>
 <div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>          AImIt end(adj.image_end(i));</div>
-<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>          <span class="keywordflow">for</span>(; cur != end; ++cur, ++idx)</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>          <span class="keywordflow">for</span>(; cur != end; ++cur, ++k)</div>
 <div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>          {</div>
-<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>            *idx = *cur;</div>
+<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>            <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a>[k] = *cur;</div>
 <div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>          }</div>
 <div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>        }</div>
 <div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>      }</div>
@@ -576,21 +576,21 @@ $(document).ready(function(){initNavTree('graph_8hpp_source.html',''); initResiz
 <div class="line"><a id="l00671" name="l00671"></a><span class="lineno">  671</span>        num_indices_image = <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>[adj1.get_num_nodes_domain()];</div>
 <div class="line"><a id="l00672" name="l00672"></a><span class="lineno">  672</span> </div>
 <div class="line"><a id="l00673" name="l00673"></a><span class="lineno">  673</span>        <span class="comment">// allocate and build index vector</span></div>
-<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a> =<a class="code hl_typedef" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394">IndexVector</a>(num_indices_image);</div>
+<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a> = <a class="code hl_typedef" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394">IndexVector</a>(num_indices_image);</div>
 <div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span> </div>
 <div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span>        FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span> schedule(dynamic, 64))</div>
 <div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span>        for(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i = 0; i &lt; adj1.get_num_nodes_domain(); ++i)</div>
 <div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span>        {</div>
-<div class="line"><a id="l00679" name="l00679"></a><span class="lineno">  679</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>* idx = &amp;<a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a>[<a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>[i]];</div>
+<div class="line"><a id="l00679" name="l00679"></a><span class="lineno">  679</span>          <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> k = <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>[i];</div>
 <div class="line"><a id="l00680" name="l00680"></a><span class="lineno">  680</span>          AImIt1 cur1(adj1.image_begin(i));</div>
 <div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span>          AImIt1 end1(adj1.image_end(i));</div>
 <div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span>          <span class="keywordflow">for</span>(; cur1 != end1; ++cur1)</div>
 <div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>          {</div>
 <div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span>            AImIt2 cur2(adj2.image_begin(*cur1));</div>
 <div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span>            AImIt2 end2(adj2.image_end(*cur1));</div>
-<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span>            <span class="keywordflow">for</span>(; cur2 != end2; ++cur2, ++idx)</div>
+<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span>            <span class="keywordflow">for</span>(; cur2 != end2; ++cur2, ++k)</div>
 <div class="line"><a id="l00687" name="l00687"></a><span class="lineno">  687</span>            {</div>
-<div class="line"><a id="l00688" name="l00688"></a><span class="lineno">  688</span>              *idx = *cur2;</div>
+<div class="line"><a id="l00688" name="l00688"></a><span class="lineno">  688</span>              <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a>[k] = *cur2;</div>
 <div class="line"><a id="l00689" name="l00689"></a><span class="lineno">  689</span>            }</div>
 <div class="line"><a id="l00690" name="l00690"></a><span class="lineno">  690</span>          }</div>
 <div class="line"><a id="l00691" name="l00691"></a><span class="lineno">  691</span>        }</div>
@@ -696,7 +696,7 @@ $(document).ready(function(){initNavTree('graph_8hpp_source.html',''); initResiz
 <div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_indices_image = 0;</div>
 <div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span> </div>
 <div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>        <span class="comment">// allocate and format pointer vector</span></div>
-<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a> =<a class="code hl_typedef" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394">IndexVector</a>(adj2.get_num_nodes_image() + 1, <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0));</div>
+<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a> = <a class="code hl_typedef" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394">IndexVector</a>(adj2.get_num_nodes_image() + 1, <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0));</div>
 <div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span> </div>
 <div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>        <span class="comment">// count number of adjacencies</span></div>
 <div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> j(0); j &lt; adj1.get_num_nodes_domain(); ++j)</div>
@@ -722,7 +722,7 @@ $(document).ready(function(){initNavTree('graph_8hpp_source.html',''); initResiz
 <div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span>        num_indices_image = <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>[adj2.get_num_nodes_image()];</div>
 <div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span> </div>
 <div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>        <span class="comment">// allocate and build index vector</span></div>
-<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a> =<a class="code hl_typedef" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394">IndexVector</a>(num_indices_image);</div>
+<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a> = <a class="code hl_typedef" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a3791a7885e4035765a8ee12882f32394">IndexVector</a>(num_indices_image);</div>
 <div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span>        std::vector&lt;Index*&gt; vimg_ptr(adj2.get_num_nodes_image(), <span class="keyword">nullptr</span>);</div>
 <div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>** image_ptr = vimg_ptr.data();</div>
 <div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span>        <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>* image_idx = <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a>.data();</div>

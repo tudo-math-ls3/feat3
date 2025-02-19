@@ -180,7 +180,7 @@ var annotated_dup =
         [ "VelocityAnalyser", "class_f_e_a_t_1_1_assembly_1_1_velocity_analyser.html", "class_f_e_a_t_1_1_assembly_1_1_velocity_analyser" ],
         [ "VelocityInfo", "struct_f_e_a_t_1_1_assembly_1_1_velocity_info.html", "struct_f_e_a_t_1_1_assembly_1_1_velocity_info" ]
       ] ],
-      [ "Control", null, [
+      [ "Control", "namespace_f_e_a_t_1_1_control.html", [
         [ "Domain", "namespace_f_e_a_t_1_1_control_1_1_domain.html", [
           [ "DomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control" ],
           [ "DomainLayer", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer" ],

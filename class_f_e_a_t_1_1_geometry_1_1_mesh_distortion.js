@@ -1,6 +1,7 @@
 var class_f_e_a_t_1_1_geometry_1_1_mesh_distortion =
 [
-    [ "MeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html#a5e9d972137ebb792e56f72588b893462", null ],
+    [ "MeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html#ad07fc80bcd02a6873d2914caf00ad8c9", null ],
+    [ "MeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html#a7a56018a472510b50c6ae122d1d98756", null ],
     [ "_calc_boundary_facets", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html#acafb51dc678b649590d86af3eee410f7", null ],
     [ "_calc_boundary_vertices", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html#a93e80a00a83fae441f721f42313e5626", null ],
     [ "_calc_shortest_edge", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html#afcf6d5131a7d272d5430cac12350c305", null ],

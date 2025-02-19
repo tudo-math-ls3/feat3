@@ -263,11 +263,11 @@ template&lt;typename Matrix_ , typename Vector_ , typename TargetSpace_ , typena
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transfer matrix is assumed to be valid, otherwise the transfer matrix <em>may</em> be invalid. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00854">854</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00875">875</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>, <a class="el" href="math_8hpp_source.html#l01292">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01224">assemble_intermesh_transfer_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01245">assemble_intermesh_transfer_direct()</a>.</p>
 
 </div>
 </div>
@@ -341,9 +341,9 @@ Use this function only in serial simulations!</dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transfer matrix is assumed to be valid, otherwise the transfer matrix <em>may</em> be invalid. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01224">1224</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01245">1245</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00854">assemble_intermesh_transfer()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00875">assemble_intermesh_transfer()</a>.</p>
 
 </div>
 </div>
@@ -491,7 +491,7 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
 
 <p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00081">assemble_prolongation()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00081">assemble_prolongation()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00411">assemble_prolongation_direct()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00081">assemble_prolongation()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00421">assemble_prolongation_direct()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>.</p>
 
 </div>
 </div>
@@ -556,7 +556,7 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00411">411</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00421">421</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00081">assemble_prolongation()</a>.</p>
 
@@ -623,11 +623,11 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00376">376</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00386">386</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00376">assemble_prolongation_direct()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00386">assemble_prolongation_direct()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00376">assemble_prolongation_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00386">assemble_prolongation_direct()</a>.</p>
 
 </div>
 </div>
@@ -698,7 +698,7 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00497">497</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00507">507</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00143">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01530">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01292">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01579">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02004">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01255">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01265">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -771,11 +771,11 @@ template&lt;typename Matrix_ , typename Vector_ , typename FineSpace_ , typename
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00458">458</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00468">468</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00458">assemble_truncation()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00468">assemble_truncation()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00458">assemble_truncation()</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l00788">assemble_truncation_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00468">assemble_truncation()</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l00809">assemble_truncation_direct()</a>.</p>
 
 </div>
 </div>
@@ -840,9 +840,9 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00788">788</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00809">809</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00458">assemble_truncation()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00468">assemble_truncation()</a>.</p>
 
 </div>
 </div>
@@ -907,11 +907,11 @@ Use this function only in serial simulations!</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00753">753</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l00774">774</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00753">assemble_truncation_direct()</a>.</p>
+<p class="reference">References <a class="el" href="grid__transfer_8hpp_source.html#l00774">assemble_truncation_direct()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00753">assemble_truncation_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l00774">assemble_truncation_direct()</a>.</p>
 
 </div>
 </div>
@@ -990,11 +990,11 @@ template&lt;typename Vector_ , typename FineSpace_ , typename CoarseSpace_ &gt; 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01282">1282</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01303">1303</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00143">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01530">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="math_8hpp_source.html#l01292">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01579">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::norm_frobenius()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02004">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01255">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::sn</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01265">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01556">prolongate_vector_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01577">prolongate_vector_direct()</a>.</p>
 
 </div>
 </div>
@@ -1065,9 +1065,9 @@ template&lt;typename Vector_ , typename FineSpace_ , typename CoarseSpace_ &gt; 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01556">1556</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01577">1577</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l01282">prolongate_vector()</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l01303">prolongate_vector()</a>.</p>
 
 </div>
 </div>
@@ -1155,7 +1155,7 @@ template&lt;typename Vector_ , typename TargetSpace_ , typename SourceSpace_ , t
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transfer matrix is assumed to be valid, otherwise the transfer matrix <em>may</em> be invalid. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01624">1624</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01645">1645</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>, <a class="el" href="math_8hpp_source.html#l01292">FEAT::Math::invert_matrix()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#a20291d8982f3ed313bc13e4bc92bda3c">FEAT::Math::isnormal()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -1238,11 +1238,11 @@ Use this function only in serial simulations!</dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of cubature points that failed to be unmapped onto the source mesh. If the return value is 0, then all points were unmapped successfully and therefore the transferred vector is assumed to be valid, otherwise the transferred vector <em>may</em> be invalid. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l01997">1997</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="grid__transfer_8hpp_source.html#l02018">2018</a> of file <a class="el" href="grid__transfer_8hpp_source.html">grid_transfer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l01997">transfer_intermesh_vector_direct()</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, and <a class="el" href="grid__transfer_8hpp_source.html#l02018">transfer_intermesh_vector_direct()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l01997">transfer_intermesh_vector_direct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="grid__transfer_8hpp_source.html#l02018">transfer_intermesh_vector_direct()</a>.</p>
 
 </div>
 </div>

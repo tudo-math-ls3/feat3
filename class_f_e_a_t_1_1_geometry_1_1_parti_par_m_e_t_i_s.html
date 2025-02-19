@@ -105,7 +105,6 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_parti_p
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Geometry::PartiParMETIS Class Reference</div></div>
 </div><!--header-->
@@ -118,9 +117,9 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_parti_p
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2cf0a9154bc497e5fc142c29d7893369"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a2cf0a9154bc497e5fc142c29d7893369">PartiParMETIS</a> (const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;comm)</td></tr>
-<tr class="memdesc:a2cf0a9154bc497e5fc142c29d7893369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a2cf0a9154bc497e5fc142c29d7893369">More...</a><br /></td></tr>
-<tr class="separator:a2cf0a9154bc497e5fc142c29d7893369"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9bd5c761612d795b59eb326e467b14a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#ad9bd5c761612d795b59eb326e467b14a">PartiParMETIS</a> (const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;comm, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> min_elems=1000u, int max_procs=1000)</td></tr>
+<tr class="memdesc:ad9bd5c761612d795b59eb326e467b14a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#ad9bd5c761612d795b59eb326e467b14a">More...</a><br /></td></tr>
+<tr class="separator:ad9bd5c761612d795b59eb326e467b14a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae177f5995f8a91bfe9b5adc983ba9440"><td class="memItemLeft" align="right" valign="top"><a id="ae177f5995f8a91bfe9b5adc983ba9440" name="ae177f5995f8a91bfe9b5adc983ba9440"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~PartiParMETIS</b> ()</td></tr>
 <tr class="memdesc:ae177f5995f8a91bfe9b5adc983ba9440"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor <br /></td></tr>
@@ -132,6 +131,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~PartiParMETIS</b>
 <tr class="memitem:a5e06ddaaa8f18ba6cbabf69807670fb6"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a5e06ddaaa8f18ba6cbabf69807670fb6">execute</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html">IndexSet</a>&lt; nf_ &gt; &amp;faces_at_elem, const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html">IndexSet</a>&lt; nv_ &gt; &amp;verts_at_elem, const VertexSet_ &amp;vertices, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_parts, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt; &amp;weights)</td></tr>
 <tr class="memdesc:a5e06ddaaa8f18ba6cbabf69807670fb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the ParMETIS graph partitioner.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a5e06ddaaa8f18ba6cbabf69807670fb6">More...</a><br /></td></tr>
 <tr class="separator:a5e06ddaaa8f18ba6cbabf69807670fb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03f423b7396d4ff5eac02cb64fe4ea08"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a03f423b7396d4ff5eac02cb64fe4ea08">get_sub_comm_size</a> () const</td></tr>
+<tr class="memdesc:a03f423b7396d4ff5eac02cb64fe4ea08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the internal sub-communicator.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a03f423b7396d4ff5eac02cb64fe4ea08">More...</a><br /></td></tr>
+<tr class="separator:a03f423b7396d4ff5eac02cb64fe4ea08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -171,9 +173,15 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a45da9c1c6b4fd72979bb63bd6079cee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a45da9c1c6b4fd72979bb63bd6079cee6">_first_elem</a></td></tr>
 <tr class="memdesc:a45da9c1c6b4fd72979bb63bd6079cee6"><td class="mdescLeft">&#160;</td><td class="mdescRight">first element for this process  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a45da9c1c6b4fd72979bb63bd6079cee6">More...</a><br /></td></tr>
 <tr class="separator:a45da9c1c6b4fd72979bb63bd6079cee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90c510d4d313dc6c4765a57252d2d3ca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a90c510d4d313dc6c4765a57252d2d3ca">_max_procs</a></td></tr>
+<tr class="memdesc:a90c510d4d313dc6c4765a57252d2d3ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">maximum number of MPI processes to use  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a90c510d4d313dc6c4765a57252d2d3ca">More...</a><br /></td></tr>
+<tr class="separator:a90c510d4d313dc6c4765a57252d2d3ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe89725763ffd96abf0834cd7e6e521a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#abe89725763ffd96abf0834cd7e6e521a">_midpoints</a></td></tr>
 <tr class="memdesc:abe89725763ffd96abf0834cd7e6e521a"><td class="mdescLeft">&#160;</td><td class="mdescRight">element midpoints  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#abe89725763ffd96abf0834cd7e6e521a">More...</a><br /></td></tr>
 <tr class="separator:abe89725763ffd96abf0834cd7e6e521a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86d63dade0e9c5259f9d428638f733c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a86d63dade0e9c5259f9d428638f733c3">_min_elems</a></td></tr>
+<tr class="memdesc:a86d63dade0e9c5259f9d428638f733c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">minimum number of elements per MPI process  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a86d63dade0e9c5259f9d428638f733c3">More...</a><br /></td></tr>
+<tr class="separator:a86d63dade0e9c5259f9d428638f733c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f297b3b0d429098ead75fee0b364675"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a1f297b3b0d429098ead75fee0b364675">_num_elems</a></td></tr>
 <tr class="memdesc:a1f297b3b0d429098ead75fee0b364675"><td class="mdescLeft">&#160;</td><td class="mdescRight">the total number of elements  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a1f297b3b0d429098ead75fee0b364675">More...</a><br /></td></tr>
 <tr class="separator:a1f297b3b0d429098ead75fee0b364675"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,13 +203,6 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a6207021df939f7675617c7adc59a2922"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a6207021df939f7675617c7adc59a2922">_weights</a></td></tr>
 <tr class="memdesc:a6207021df939f7675617c7adc59a2922"><td class="mdescLeft">&#160;</td><td class="mdescRight">elements weights; empty if not weighted  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a6207021df939f7675617c7adc59a2922">More...</a><br /></td></tr>
 <tr class="separator:a6207021df939f7675617c7adc59a2922"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:ae4e631d7449b784a6a4b0686d6047690"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#ae4e631d7449b784a6a4b0686d6047690">max_procs</a> = 1000</td></tr>
-<tr class="separator:ae4e631d7449b784a6a4b0686d6047690"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea2b712844214c652fec63b18e1c56f0"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#aea2b712844214c652fec63b18e1c56f0">min_elems</a> = 1000</td></tr>
-<tr class="separator:aea2b712844214c652fec63b18e1c56f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >ParMETIS mesh/graph partitioner backend. </p>
@@ -209,8 +210,8 @@ Static Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00025">25</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a2cf0a9154bc497e5fc142c29d7893369" name="a2cf0a9154bc497e5fc142c29d7893369"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2cf0a9154bc497e5fc142c29d7893369">&#9670;&#160;</a></span>PartiParMETIS()</h2>
+<a id="ad9bd5c761612d795b59eb326e467b14a" name="ad9bd5c761612d795b59eb326e467b14a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9bd5c761612d795b59eb326e467b14a">&#9670;&#160;</a></span>PartiParMETIS()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -222,8 +223,24 @@ Static Private Attributes</h2></td></tr>
           <td class="memname">FEAT::Geometry::PartiParMETIS::PartiParMETIS </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;&#160;</td>
-          <td class="paramname"><em>comm</em></td><td>)</td>
+          <td class="paramname"><em>comm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>min_elems</em> = <code>1000u</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>max_procs</em> = <code>1000</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -283,11 +300,11 @@ template&lt;int nv_, typename VertexSet_ &gt; </div>
 
 <p>auxiliary function: compute element midpoints from vertex coordinates </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00131">131</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00140">140</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00048">_midpoints</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00044">_num_local_elems</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00047">_midpoints</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00043">_num_local_elems</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00100">execute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00099">execute()</a>.</p>
 
 </div>
 </div>
@@ -316,9 +333,9 @@ template&lt;int nv_, typename VertexSet_ &gt; </div>
 
 <p>Builds and returns the elements-at-rank graph representing the partitioning. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00113">113</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00112">112</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00054">_coloring</a>, and <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00053">_coloring</a>, and <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01391">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>.</p>
 
@@ -391,11 +408,43 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the partitioning was successful, or <code>false</code>, if some error occurred. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00100">100</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00099">99</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00131">_compute_midpoints()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a787e4c4104ed889a743a6ed1c1d22130">_create_subgraph()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a49b6bb57d5306aff0de58c8c9d03c7b4">_execute()</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00050">_weights</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00140">_compute_midpoints()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a787e4c4104ed889a743a6ed1c1d22130">_create_subgraph()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a49b6bb57d5306aff0de58c8c9d03c7b4">_execute()</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00049">_weights</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01391">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>.</p>
+
+</div>
+</div>
+<a id="a03f423b7396d4ff5eac02cb64fe4ea08" name="a03f423b7396d4ff5eac02cb64fe4ea08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03f423b7396d4ff5eac02cb64fe4ea08">&#9670;&#160;</a></span>get_sub_comm_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FEAT::Geometry::PartiParMETIS::get_sub_comm_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the size of the internal sub-communicator. </p>
+<p >This only gives useful results after the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#a5e06ddaaa8f18ba6cbabf69807670fb6" title="Executes the ParMETIS graph partitioner.">execute()</a> function has been called. </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00122">122</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00031">_sub_comm</a>, and <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>.</p>
 
 </div>
 </div>
@@ -422,9 +471,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the element coloring </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00054">54</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00053">53</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00113">build_elems_at_rank()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00112">build_elems_at_rank()</a>.</p>
 
 </div>
 </div>
@@ -450,7 +499,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>our main communicator </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00034">34</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00029">29</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -476,7 +525,33 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>first element for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00042">42</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00041">41</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a90c510d4d313dc6c4765a57252d2d3ca" name="a90c510d4d313dc6c4765a57252d2d3ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90c510d4d313dc6c4765a57252d2d3ca">&#9670;&#160;</a></span>_max_procs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FEAT::Geometry::PartiParMETIS::_max_procs</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>maximum number of MPI processes to use </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00033">33</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -502,9 +577,35 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>element midpoints </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00048">48</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00047">47</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00131">_compute_midpoints()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00140">_compute_midpoints()</a>.</p>
+
+</div>
+</div>
+<a id="a86d63dade0e9c5259f9d428638f733c3" name="a86d63dade0e9c5259f9d428638f733c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86d63dade0e9c5259f9d428638f733c3">&#9670;&#160;</a></span>_min_elems</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> FEAT::Geometry::PartiParMETIS::_min_elems</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>minimum number of elements per MPI process </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00035">35</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -530,7 +631,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the total number of elements </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00038">38</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00037">37</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -556,9 +657,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>number of elements for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00044">44</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00043">43</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00131">_compute_midpoints()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00140">_compute_midpoints()</a>.</p>
 
 </div>
 </div>
@@ -584,7 +685,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the desired number of partitions </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00040">40</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00039">39</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -610,7 +711,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>element partitioning </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00052">52</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00051">51</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -636,7 +737,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>a sub-communicator for the partitioner </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00036">36</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00031">31</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00122">get_sub_comm_size()</a>.</p>
 
 </div>
 </div>
@@ -662,7 +765,7 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>the adjacency sub-graph for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00046">46</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00045">45</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
 </div>
 </div>
@@ -688,57 +791,9 @@ template&lt;int nf_, int nv_, typename VertexSet_ &gt; </div>
 
 <p>elements weights; empty if not weighted </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00050">50</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00049">49</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00100">execute()</a>.</p>
-
-</div>
-</div>
-<a id="ae4e631d7449b784a6a4b0686d6047690" name="ae4e631d7449b784a6a4b0686d6047690"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4e631d7449b784a6a4b0686d6047690">&#9670;&#160;</a></span>max_procs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr int FEAT::Geometry::PartiParMETIS::max_procs = 1000</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00028">28</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
-
-</div>
-</div>
-<a id="aea2b712844214c652fec63b18e1c56f0" name="aea2b712844214c652fec63b18e1c56f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea2b712844214c652fec63b18e1c56f0">&#9670;&#160;</a></span>min_elems</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr int FEAT::Geometry::PartiParMETIS::min_elems = 1000</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parti__parmetis_8hpp_source.html#l00030">30</a> of file <a class="el" href="parti__parmetis_8hpp_source.html">parti_parmetis.hpp</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00099">execute()</a>.</p>
 
 </div>
 </div>

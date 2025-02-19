@@ -201,6 +201,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac3c13c8f38d7fcabad8f6e555706548f"><td class="memItemLeft" align="right" valign="top">std::deque&lt; <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#ac3c13c8f38d7fcabad8f6e555706548f">get_mesh_part_names</a> (bool no_internals=false) const</td></tr>
 <tr class="memdesc:ac3c13c8f38d7fcabad8f6e555706548f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the names of all mesh parts of this node.  <a href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#ac3c13c8f38d7fcabad8f6e555706548f">More...</a><br /></td></tr>
 <tr class="separator:ac3c13c8f38d7fcabad8f6e555706548f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52f00c9291d03c6452d88b7479a3c4fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#a52f00c9291d03c6452d88b7479a3c4fb">remove_all_mesh_parts</a> ()</td></tr>
+<tr class="memdesc:a52f00c9291d03c6452d88b7479a3c4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all mesh parts from this mesh node.  <a href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#a52f00c9291d03c6452d88b7479a3c4fb">More...</a><br /></td></tr>
+<tr class="separator:a52f00c9291d03c6452d88b7479a3c4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2367136c5b680432ce6646d88b0a002"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#af2367136c5b680432ce6646d88b0a002">remove_mesh_part</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;part_name)</td></tr>
 <tr class="memdesc:af2367136c5b680432ce6646d88b0a002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a mesh-part and its corresponding node.  <a href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html#af2367136c5b680432ce6646d88b0a002">More...</a><br /></td></tr>
 <tr class="separator:af2367136c5b680432ce6646d88b0a002"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -608,7 +611,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00473">473</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00479">479</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -661,7 +664,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if this node was adapted successfully or <code>false</code> if no node is associated with <code>part_name</code> or if the node did not contain any chart. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00515">515</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00521">521</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -731,7 +734,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00314">314</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00279">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00648">FEAT::Geometry::MeshPartNode&lt; RootMesh_ &gt;::make_unique()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00279">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00654">FEAT::Geometry::MeshPartNode&lt; RootMesh_ &gt;::make_unique()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mesh__extruder_8hpp_source.html#l00755">FEAT::Geometry::MeshExtruder&lt; ConformalMesh&lt; Shape::Hypercube&lt; 2 &gt;, 2, Coord_ &gt; &gt;::extrude_root_node()</a>.</p>
 
@@ -801,7 +804,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00314">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00569">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00314">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00575">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>.</p>
 
 </div>
 </div>
@@ -872,9 +875,9 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part associated with <code>part_name</code> or <code>nullptr</code> if no such node was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00390">390</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00396">396</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00368">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00374">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00307">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::HyperelasticityFunctional()</a>, <a class="el" href="mesh__extruder_8hpp_source.html#l00755">FEAT::Geometry::MeshExtruder&lt; ConformalMesh&lt; Shape::Hypercube&lt; 2 &gt;, 2, Coord_ &gt; &gt;::extrude_root_node()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l00981">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::set_mesh_node()</a>, and <a class="el" href="mesh__file__writer_8hpp_source.html#l00373">FEAT::Geometry::MeshFileWriter::write()</a>.</p>
 
@@ -915,9 +918,9 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part associated with <code>part_name</code> or <code>nullptr</code> if no such node was found.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00397">397</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00403">403</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00368">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00374">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>.</p>
 
 </div>
 </div>
@@ -956,7 +959,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the chart associated with <code>part_name</code> of <code>nullptr</code> if no such node was found or if the corresponding node did not have a chart. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00413">413</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00419">419</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -997,7 +1000,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The name of the chart associated with <code>part_name</code> or an empty string is no such node was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00429">429</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00435">435</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -1040,11 +1043,11 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part node associated with <code>part_name</code> or <code>nullptr</code> if no such node was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00368">368</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00374">374</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00390">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00396">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part()</a>.</p>
 
 </div>
 </div>
@@ -1083,7 +1086,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part node associated with <code>part_name</code> or <code>nullptr</code> if no such node was found.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00375">375</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00381">381</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -1121,7 +1124,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01295">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01444">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_genetic()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01391">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01486">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_naive()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01339">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00468">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_check_parti()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00875">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_check_parti_2level()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00879">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_mesh_node()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00493">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01248">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::add_constraint_grad()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01027">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01225">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_constraint()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01377">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_add()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01413">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_max()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01447">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_min()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01178">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01112">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_h()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01061">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_sum_det()</a>, <a class="el" href="mesh__extruder_8hpp_source.html#l00755">FEAT::Geometry::MeshExtruder&lt; ConformalMesh&lt; Shape::Hypercube&lt; 2 &gt;, 2, Coord_ &gt; &gt;::extrude_root_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00390">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part()</a>, <a class="el" href="mesh__quality__functional_8hpp_source.html#l00126">FEAT::Meshopt::MeshQualityFunctional&lt; MeshType_ &gt;::get_mesh()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l00981">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::set_mesh_node()</a>, and <a class="el" href="mesh__file__writer_8hpp_source.html#l00373">FEAT::Geometry::MeshFileWriter::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01295">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01444">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_genetic()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01391">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01486">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_naive()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01339">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00497">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_check_parti()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00875">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_check_parti_2level()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00879">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_mesh_node()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00522">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01248">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::add_constraint_grad()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01027">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01225">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_constraint()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01377">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_add()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01413">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_max()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01447">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_min()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01178">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01112">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_h()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01061">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_sum_det()</a>, <a class="el" href="mesh__extruder_8hpp_source.html#l00755">FEAT::Geometry::MeshExtruder&lt; ConformalMesh&lt; Shape::Hypercube&lt; 2 &gt;, 2, Coord_ &gt; &gt;::extrude_root_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00396">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part()</a>, <a class="el" href="mesh__quality__functional_8hpp_source.html#l00126">FEAT::Meshopt::MeshQualityFunctional&lt; MeshType_ &gt;::get_mesh()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l00981">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::set_mesh_node()</a>, and <a class="el" href="mesh__file__writer_8hpp_source.html#l00373">FEAT::Geometry::MeshFileWriter::write()</a>.</p>
 
 </div>
 </div>
@@ -1230,7 +1233,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 <p>Returns the name of the class. </p>
 <dl class="section return"><dt>Returns</dt><dd>The name of the class as a <a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00545">545</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00551">551</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1268,9 +1271,9 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00557">557</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00563">563</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00569">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00575">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>.</p>
 
 </div>
 </div>
@@ -1308,11 +1311,44 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00569">569</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00575">575</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00279">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part_node()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00557">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_children()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00563">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_children()</a>.</p>
+
+</div>
+</div>
+<a id="a52f00c9291d03c6452d88b7479a3c4fb" name="a52f00c9291d03c6452d88b7479a3c4fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52f00c9291d03c6452d88b7479a3c4fb">&#9670;&#160;</a></span>remove_all_mesh_parts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_node.html">FEAT::Geometry::MeshNode</a>&lt; RootMesh_, ThisMesh_ &gt;::remove_all_mesh_parts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Removes all mesh parts from this mesh node. </p>
+
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00337">337</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
 </div>
 </div>
@@ -1391,7 +1427,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00441">441</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00447">447</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -1479,7 +1515,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the chart was assigned successfully or <code>false</code> if no mesh part with the specified name was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00349">349</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00355">355</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::_mesh_part_nodes</a>.</p>
 
@@ -1512,7 +1548,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00180">180</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00473">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00515">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt_by_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00207">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00569">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00479">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00521">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt_by_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00207">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00575">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>.</p>
 
 </div>
 </div>
@@ -1542,7 +1578,7 @@ template&lt;typename RootMesh_ , typename ThisMesh_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00182">182</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00473">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00515">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt_by_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00279">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00207">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00413">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_chart()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00429">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_chart_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00368">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00249">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh_part_names()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00569">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00331">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::remove_mesh_part()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00441">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::rename_mesh_parts()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00349">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::set_mesh_part_chart()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00479">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00521">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt_by_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00279">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::add_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00207">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00419">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_chart()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00435">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_chart_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00374">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::find_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00249">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh_part_names()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00575">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::refine_mesh_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00337">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::remove_all_mesh_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00331">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::remove_mesh_part()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00447">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::rename_mesh_parts()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00355">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::set_mesh_part_chart()</a>.</p>
 
 </div>
 </div>

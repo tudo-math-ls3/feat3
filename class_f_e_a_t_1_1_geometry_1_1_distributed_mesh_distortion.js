@@ -1,6 +1,7 @@
 var class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion =
 [
-    [ "DistributedMeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html#a6ac6cffccc0b237b791494439160938d", null ],
+    [ "DistributedMeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html#af212068d92d46f226172599e33ea84fe", null ],
+    [ "DistributedMeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html#a0ad99dd65d4f48688b8d87f47971bea4", null ],
     [ "~DistributedMeshDistortion", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html#a9499b7f374fd8af661c06c560d75c206", null ],
     [ "_calc_boundary_facets", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html#aa4599510b1c9752ee1b57b9c99887d4a", null ],
     [ "_calc_boundary_vertices", "class_f_e_a_t_1_1_geometry_1_1_distributed_mesh_distortion.html#a93e80a00a83fae441f721f42313e5626", null ],

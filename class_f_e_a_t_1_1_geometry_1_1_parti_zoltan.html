@@ -106,7 +106,6 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_parti_z
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Geometry::PartiZoltan Class Reference</div></div>
 </div><!--header-->
@@ -125,9 +124,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:acadec8d882dc21f65bd0a7982e1623e8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#acadec8d882dc21f65bd0a7982e1623e8">PartiZoltan</a> (const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;comm)</td></tr>
-<tr class="memdesc:acadec8d882dc21f65bd0a7982e1623e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#acadec8d882dc21f65bd0a7982e1623e8">More...</a><br /></td></tr>
-<tr class="separator:acadec8d882dc21f65bd0a7982e1623e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae80ed49d4a46a98112ab97fc86b3d7a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#ae80ed49d4a46a98112ab97fc86b3d7a8">PartiZoltan</a> (const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;comm, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> min_elems=1000u, int max_procs=1000)</td></tr>
+<tr class="memdesc:ae80ed49d4a46a98112ab97fc86b3d7a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#ae80ed49d4a46a98112ab97fc86b3d7a8">More...</a><br /></td></tr>
+<tr class="separator:ae80ed49d4a46a98112ab97fc86b3d7a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff8405ce9e462cd5a3cc2d04d09063e4"><td class="memItemLeft" align="right" valign="top"><a id="aff8405ce9e462cd5a3cc2d04d09063e4" name="aff8405ce9e462cd5a3cc2d04d09063e4"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~PartiZoltan</b> ()</td></tr>
 <tr class="memdesc:aff8405ce9e462cd5a3cc2d04d09063e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor <br /></td></tr>
@@ -142,6 +141,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~PartiZoltan</b> (
 <tr class="memitem:ab9423ccb8908d0a47e0bb26519dc675a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#ab9423ccb8908d0a47e0bb26519dc675a">execute</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html">IndexSet</a>&lt; n_ &gt; &amp;faces_at_elem, const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_parts, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt; &amp;weights)</td></tr>
 <tr class="memdesc:ab9423ccb8908d0a47e0bb26519dc675a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the Zoltan partitioner.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#ab9423ccb8908d0a47e0bb26519dc675a">More...</a><br /></td></tr>
 <tr class="separator:ab9423ccb8908d0a47e0bb26519dc675a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa80dcc22a37383ed73b48f129bfcfb20"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#aa80dcc22a37383ed73b48f129bfcfb20">get_sub_comm_size</a> () const</td></tr>
+<tr class="memdesc:aa80dcc22a37383ed73b48f129bfcfb20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the internal sub-communicator.  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#aa80dcc22a37383ed73b48f129bfcfb20">More...</a><br /></td></tr>
+<tr class="separator:aa80dcc22a37383ed73b48f129bfcfb20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -171,8 +173,14 @@ Private Attributes</h2></td></tr>
 <tr class="memdesc:ac309aabb25b2ed65e473f0b5c9e4885f"><td class="mdescLeft">&#160;</td><td class="mdescRight">our main communicator  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#ac309aabb25b2ed65e473f0b5c9e4885f">More...</a><br /></td></tr>
 <tr class="separator:ac309aabb25b2ed65e473f0b5c9e4885f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a966c18f25cc416c0532522f32a56096c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan_1_1_hypergraph.html">Hypergraph</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a966c18f25cc416c0532522f32a56096c">_hypergraph</a></td></tr>
-<tr class="memdesc:a966c18f25cc416c0532522f32a56096c"><td class="mdescLeft">&#160;</td><td class="mdescRight">out hypergraph structure  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a966c18f25cc416c0532522f32a56096c">More...</a><br /></td></tr>
+<tr class="memdesc:a966c18f25cc416c0532522f32a56096c"><td class="mdescLeft">&#160;</td><td class="mdescRight">our hypergraph structure  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a966c18f25cc416c0532522f32a56096c">More...</a><br /></td></tr>
 <tr class="separator:a966c18f25cc416c0532522f32a56096c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97dba05de789ee54b2b1312fe3503e3d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a97dba05de789ee54b2b1312fe3503e3d">_max_procs</a></td></tr>
+<tr class="memdesc:a97dba05de789ee54b2b1312fe3503e3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">maximum number of MPI processes to use  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a97dba05de789ee54b2b1312fe3503e3d">More...</a><br /></td></tr>
+<tr class="separator:a97dba05de789ee54b2b1312fe3503e3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0395a9a64ba2db0bc0ca7b5861634919"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a0395a9a64ba2db0bc0ca7b5861634919">_min_elems</a></td></tr>
+<tr class="memdesc:a0395a9a64ba2db0bc0ca7b5861634919"><td class="mdescLeft">&#160;</td><td class="mdescRight">minimum number of elements per MPI process  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a0395a9a64ba2db0bc0ca7b5861634919">More...</a><br /></td></tr>
+<tr class="separator:a0395a9a64ba2db0bc0ca7b5861634919"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74db2b8ee4a766fac4b45400da0d074e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a74db2b8ee4a766fac4b45400da0d074e">_num_elems</a></td></tr>
 <tr class="memdesc:a74db2b8ee4a766fac4b45400da0d074e"><td class="mdescLeft">&#160;</td><td class="mdescRight">the total number of elements  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a74db2b8ee4a766fac4b45400da0d074e">More...</a><br /></td></tr>
 <tr class="separator:a74db2b8ee4a766fac4b45400da0d074e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,13 +193,6 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a2995c6c67d93cd4b9b69f81446b3d5db"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a2995c6c67d93cd4b9b69f81446b3d5db">_zz</a></td></tr>
 <tr class="memdesc:a2995c6c67d93cd4b9b69f81446b3d5db"><td class="mdescLeft">&#160;</td><td class="mdescRight">zoltan internal data  <a href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a2995c6c67d93cd4b9b69f81446b3d5db">More...</a><br /></td></tr>
 <tr class="separator:a2995c6c67d93cd4b9b69f81446b3d5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a9b2e00085dc26af4d2c666a006986f83"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#a9b2e00085dc26af4d2c666a006986f83">max_procs</a> = 1000</td></tr>
-<tr class="separator:a9b2e00085dc26af4d2c666a006986f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0e23e83ae3e5eade91e7bd54713a569"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#af0e23e83ae3e5eade91e7bd54713a569">min_elems</a> = 1000</td></tr>
-<tr class="separator:af0e23e83ae3e5eade91e7bd54713a569"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Zoltan hypergraph partitioner backend. </p>
@@ -204,8 +205,8 @@ Static Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00038">38</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="acadec8d882dc21f65bd0a7982e1623e8" name="acadec8d882dc21f65bd0a7982e1623e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acadec8d882dc21f65bd0a7982e1623e8">&#9670;&#160;</a></span>PartiZoltan()</h2>
+<a id="ae80ed49d4a46a98112ab97fc86b3d7a8" name="ae80ed49d4a46a98112ab97fc86b3d7a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae80ed49d4a46a98112ab97fc86b3d7a8">&#9670;&#160;</a></span>PartiZoltan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,8 +218,24 @@ Static Private Attributes</h2></td></tr>
           <td class="memname">FEAT::Geometry::PartiZoltan::PartiZoltan </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;&#160;</td>
-          <td class="paramname"><em>comm</em></td><td>)</td>
+          <td class="paramname"><em>comm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>min_elems</em> = <code>1000u</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>max_procs</em> = <code>1000</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -265,9 +282,9 @@ Static Private Attributes</h2></td></tr>
 
 <p>Builds and returns the elements-at-rank graph representing the partitioning. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00146">146</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00145">145</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__zoltan_8hpp_source.html#l00077">_coloring</a>, and <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>.</p>
+<p class="reference">References <a class="el" href="parti__zoltan_8hpp_source.html#l00076">_coloring</a>, and <a class="el" href="coloring_8cpp_source.html#l00292">FEAT::Adjacency::Coloring::create_partition_graph()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01339">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>.</p>
 
@@ -371,11 +388,43 @@ template&lt;int n_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the partitioning was successful, or <code>false</code>, if some error occurred. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00117">117</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00116">116</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>, and <a class="el" href="parti__zoltan_8hpp_source.html#l00117">execute()</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>, and <a class="el" href="parti__zoltan_8hpp_source.html#l00116">execute()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01339">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>, and <a class="el" href="parti__zoltan_8hpp_source.html#l00117">execute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01339">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>, and <a class="el" href="parti__zoltan_8hpp_source.html#l00116">execute()</a>.</p>
+
+</div>
+</div>
+<a id="aa80dcc22a37383ed73b48f129bfcfb20" name="aa80dcc22a37383ed73b48f129bfcfb20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa80dcc22a37383ed73b48f129bfcfb20">&#9670;&#160;</a></span>get_sub_comm_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FEAT::Geometry::PartiZoltan::get_sub_comm_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the size of the internal sub-communicator. </p>
+<p >This only gives useful results after the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html#ab9423ccb8908d0a47e0bb26519dc675a" title="Executes the Zoltan partitioner.">execute()</a> function has been called. </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00155">155</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="parti__zoltan_8hpp_source.html#l00064">_zoltan_comm</a>, and <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>.</p>
 
 </div>
 </div>
@@ -402,9 +451,9 @@ template&lt;int n_&gt; </div>
 
 <p>the element coloring </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00077">77</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00076">76</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__zoltan_8hpp_source.html#l00146">build_elems_at_rank()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__zoltan_8hpp_source.html#l00145">build_elems_at_rank()</a>.</p>
 
 </div>
 </div>
@@ -430,7 +479,7 @@ template&lt;int n_&gt; </div>
 
 <p>our main communicator </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00067">67</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00062">62</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
 </div>
 </div>
@@ -454,9 +503,61 @@ template&lt;int n_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>out hypergraph structure </p>
+<p>our hypergraph structure </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00071">71</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00074">74</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a97dba05de789ee54b2b1312fe3503e3d" name="a97dba05de789ee54b2b1312fe3503e3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97dba05de789ee54b2b1312fe3503e3d">&#9670;&#160;</a></span>_max_procs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FEAT::Geometry::PartiZoltan::_max_procs</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>maximum number of MPI processes to use </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00066">66</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0395a9a64ba2db0bc0ca7b5861634919" name="a0395a9a64ba2db0bc0ca7b5861634919"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0395a9a64ba2db0bc0ca7b5861634919">&#9670;&#160;</a></span>_min_elems</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> FEAT::Geometry::PartiZoltan::_min_elems</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>minimum number of elements per MPI process </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00068">68</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
 </div>
 </div>
@@ -482,7 +583,7 @@ template&lt;int n_&gt; </div>
 
 <p>the total number of elements </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00073">73</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00070">70</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +609,7 @@ template&lt;int n_&gt; </div>
 
 <p>the desired number of partitions </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00075">75</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00072">72</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
 </div>
 </div>
@@ -534,7 +635,9 @@ template&lt;int n_&gt; </div>
 
 <p>a sub-communicator for the partitioner </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00069">69</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00064">64</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="parti__zoltan_8hpp_source.html#l00155">get_sub_comm_size()</a>.</p>
 
 </div>
 </div>
@@ -560,55 +663,7 @@ template&lt;int n_&gt; </div>
 
 <p>zoltan internal data </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00079">79</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a9b2e00085dc26af4d2c666a006986f83" name="a9b2e00085dc26af4d2c666a006986f83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b2e00085dc26af4d2c666a006986f83">&#9670;&#160;</a></span>max_procs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr int FEAT::Geometry::PartiZoltan::max_procs = 1000</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00041">41</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
-
-</div>
-</div>
-<a id="af0e23e83ae3e5eade91e7bd54713a569" name="af0e23e83ae3e5eade91e7bd54713a569"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af0e23e83ae3e5eade91e7bd54713a569">&#9670;&#160;</a></span>min_elems</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr int FEAT::Geometry::PartiZoltan::min_elems = 1000</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00043">43</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__zoltan_8hpp_source.html#l00078">78</a> of file <a class="el" href="parti__zoltan_8hpp_source.html">parti_zoltan.hpp</a>.</p>
 
 </div>
 </div>

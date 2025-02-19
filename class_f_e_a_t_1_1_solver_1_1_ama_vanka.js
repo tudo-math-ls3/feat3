@@ -31,6 +31,7 @@ var class_f_e_a_t_1_1_solver_1_1_ama_vanka =
     [ "_macro_mask", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a2710642435b49b1906c7e460e7e7455e", null ],
     [ "_matrix", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a0c1b70ddda92eaf4c44cdf34e45f7602", null ],
     [ "_num_steps", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a4985150f434f53cf2fa7fa1e351ee302", null ],
+    [ "_num_threads", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a6c7226f4ecf4e826b6eb87c8feaa1e31", null ],
     [ "_omega", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a67a3cee4f00ac13bb67068c4eeca4a80", null ],
     [ "_skip_singular", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a6a8ccda8eae633d6aa78a4abaaf99476", null ],
     [ "_vanka", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#abf7ae2f4d2e3585d276567e25163f60d", null ],

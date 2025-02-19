@@ -2,12 +2,12 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="77.893333mm"
-   height="77.893333mm"
-   viewBox="0 0 276 276"
+   width="81.255081mm"
+   height="80.99778mm"
+   viewBox="0 0 287.9117 287.00001"
    id="svg5169"
    version="1.1"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
    sodipodi:docname="shape_topo_tetra3d.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="94.954339"
-     inkscape:cy="128.79445"
+     inkscape:zoom="1.9952423"
+     inkscape:cx="96.980704"
+     inkscape:cy="130.56059"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -49,8 +49,11 @@
     <inkscape:grid
        type="xygrid"
        id="grid5177"
-       originx="0.5"
-       originy="0.49999528" />
+       originx="5"
+       originy="6.9999954"
+       spacingy="1"
+       spacingx="1"
+       units="px" />
   </sodipodi:namedview>
   <metadata
      id="metadata5174">
@@ -60,7 +63,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -68,21 +70,26 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0.5,-776.8622)">
+     transform="translate(5,-770.3622)">
     <path
-       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.9375px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 70,772.3622 -5,1052.3622 0,1057.3622 281,981.3622 282.91172,976.3622 77,770.3622 Z"
+       id="path1"
+       sodipodi:nodetypes="ccccccc" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 276.56251,977.36221 75.000002,775.79971 7.7745225e-7,1052.3622 Z"
        id="path5183"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#808080;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 0,1052.3622 75,977.3622 275,977.3622"
+       d="M 0,1052.3622 75,977.3622 H 275"
        id="path5187"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#808080;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 75,977.3622 75,777.3622"
+       d="M 75,977.3622 V 777.3622"
        id="path5189"
        inkscape:connector-curvature="0" />
     <text

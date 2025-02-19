@@ -34,6 +34,7 @@ var class_f_e_a_t_1_1_geometry_1_1_mesh_part_node =
     [ "refine_children", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#a6a7cd2ccafc7c98c839a6d1a313a3fac", null ],
     [ "refine_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#a9f4626787d7443c58f2248869920db84", null ],
     [ "refine_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#ad1daab7479306846e9c83fcf95d989f1", null ],
+    [ "remove_all_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#a52f00c9291d03c6452d88b7479a3c4fb", null ],
     [ "remove_mesh_part", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#af2367136c5b680432ce6646d88b0a002", null ],
     [ "rename_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#a322a377ee1064468c89070ea4ebb9b40", null ],
     [ "set_mesh_part_chart", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_node.html#a05545de762224ad7675b004f4769d1f9", null ],

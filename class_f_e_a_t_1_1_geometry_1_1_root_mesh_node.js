@@ -48,6 +48,7 @@ var class_f_e_a_t_1_1_geometry_1_1_root_mesh_node =
     [ "refine_children", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a6a7cd2ccafc7c98c839a6d1a313a3fac", null ],
     [ "refine_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a9f4626787d7443c58f2248869920db84", null ],
     [ "refine_unique", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#aae419963e335a0006958b8462b0b0a05", null ],
+    [ "remove_all_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a52f00c9291d03c6452d88b7479a3c4fb", null ],
     [ "remove_mesh_part", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#af2367136c5b680432ce6646d88b0a002", null ],
     [ "rename_halos", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#af888c2d56abdee9f46b12c898f9479f5", null ],
     [ "rename_mesh_parts", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a322a377ee1064468c89070ea4ebb9b40", null ],
