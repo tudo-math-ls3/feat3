@@ -26,10 +26,10 @@
      showgrid="true"
      inkscape:zoom="2.8504211"
      inkscape:cx="87.180101"
-     inkscape:cy="112.43953"
+     inkscape:cy="112.79035"
      inkscape:window-width="1920"
      inkscape:window-height="1027"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
@@ -96,12 +96,11 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-37,-97)">
-    <circle
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.495;stroke-dasharray:none;stroke-opacity:1"
-       id="path5"
-       cx="70"
-       cy="130"
-       r="33" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 70.000001,97.000003 C 99.999999,97.000003 103,100 103,130 103,159.97607 99.999999,163 70.000001,163 40.048042,163 37.000001,160 37.000001,130 37.000001,100 39.996018,97.147098 70.000001,97.000003 Z"
+       id="path8-9"
+       sodipodi:nodetypes="ccccc" />
     <ellipse
        style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:0.495;stroke-dasharray:none;stroke-opacity:1"
        id="path1"
