@@ -90,7 +90,7 @@ namespace FEAT
          * The system filter.
          *
          */
-        explicit SecantLinesearch(const String& section_name, PropertyMap* section,
+        explicit SecantLinesearch(const String& section_name, const PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass("S-LS", section_name, section, functional, filter),
           _secant_step(secant_step_default)
@@ -340,7 +340,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<SecantLinesearch<Functional_, Filter_>> new_secant_linesearch(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional, Filter_& filter)
       {
         return std::make_shared<SecantLinesearch<Functional_, Filter_>>(section_name, section, functional, filter);

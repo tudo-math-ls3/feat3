@@ -220,7 +220,7 @@ namespace FEAT
          * The preconditioner. May be \c nullptr.
          *
          */
-        explicit BiCGStab(const String& section_name, PropertyMap* section,
+        explicit BiCGStab(const String& section_name, const PropertyMap* section,
           const MatrixType& matrix, const FilterType& filter,
           std::shared_ptr<PrecondType> precond = nullptr)
            :
@@ -613,7 +613,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BiCGStab<Matrix_, Filter_>> new_bicgstab(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {

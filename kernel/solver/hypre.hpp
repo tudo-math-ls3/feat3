@@ -266,7 +266,7 @@ namespace FEAT
         _dparam[1] = 0.05;
       }
 
-      explicit ParaSailsPrecond(const String& section_name, PropertyMap* section,
+      explicit ParaSailsPrecond(const String& section_name, const PropertyMap* section,
         const Matrix_& matrix, const Filter_& filter)
          :
         ParaSailsPrecond(matrix, filter)
@@ -368,7 +368,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<ParaSailsPrecond<Matrix_, Filter_>> new_parasails_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<ParaSailsPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);
@@ -416,7 +416,7 @@ namespace FEAT
         _dparam[0] = 0.0;
       }
 
-      explicit EuclidPrecond(const String& section_name, PropertyMap* section,
+      explicit EuclidPrecond(const String& section_name, const PropertyMap* section,
         const Matrix_& matrix, const Filter_& filter)
          :
         EuclidPrecond(matrix, filter)
@@ -508,7 +508,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<EuclidPrecond<Matrix_, Filter_>> new_euclid_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<EuclidPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);
@@ -556,7 +556,7 @@ namespace FEAT
         _dparam[0] = 0.0;
       }
 
-      explicit BoomerAMG(const String& DOXY(section_name), PropertyMap* DOXY(section),
+      explicit BoomerAMG(const String& DOXY(section_name), const PropertyMap* DOXY(section),
         const Matrix_& matrix, const Filter_& filter)
          :
         BoomerAMG(matrix, filter)
@@ -642,7 +642,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<BoomerAMG<Matrix_, Filter_>> new_boomeramg(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<BoomerAMG<Matrix_, Filter_>>(section_name, section, matrix, filter);

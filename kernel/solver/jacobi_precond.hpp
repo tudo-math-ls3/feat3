@@ -93,7 +93,7 @@ namespace FEAT
        * \returns
        * A shared pointer to a new JacobiPrecond object.
        */
-      explicit JacobiPrecond(const String& section_name, PropertyMap* section,
+      explicit JacobiPrecond(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section),
         _matrix(matrix),
@@ -202,7 +202,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<JacobiPrecond<Matrix_, Filter_>> new_jacobi_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<JacobiPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);

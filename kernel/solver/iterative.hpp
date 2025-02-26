@@ -249,7 +249,7 @@ namespace FEAT
        * The name of the solver.
        *
        */
-      explicit IterativeSolver(const String& plot_name, const String& section_name, PropertyMap* section) :
+      explicit IterativeSolver(const String& plot_name, const String& section_name, const PropertyMap* section) :
         IterativeSolver(plot_name)
       {
         auto plot_mode_p = section->get_entry("plot_mode");
@@ -1001,7 +1001,7 @@ namespace FEAT
        * A pointer to the preconditioner. May be nullptr.
        */
       explicit PreconditionedIterativeSolver(const String& plot_name, const String& section_name,
-        PropertyMap* section, std::shared_ptr<PrecondType> precond = nullptr) :
+        const PropertyMap* section, std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass(plot_name, section_name, section),
         _precond(precond)
       {

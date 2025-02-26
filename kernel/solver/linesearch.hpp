@@ -154,7 +154,7 @@ namespace FEAT
          * Filter to apply to the functional's gradient
          *
          */
-        explicit Linesearch(const String& plot_name, const String& section_name, PropertyMap* section,
+        explicit Linesearch(const String& plot_name, const String& section_name, const PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass(plot_name, section_name, section),
           _functional(functional),

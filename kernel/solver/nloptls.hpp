@@ -142,7 +142,7 @@ namespace FEAT
          * The preconditioner, defaults to nullptr. Cannot be const, see functional.
          *
          */
-        explicit NLOptLS(const String& plot_name, const String& section_name, PropertyMap* section,
+        explicit NLOptLS(const String& plot_name, const String& section_name, const PropertyMap* section,
           Functional_& functional, Filter_& filter, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass(plot_name, section_name, section, precond),
           _functional(functional),

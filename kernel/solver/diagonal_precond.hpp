@@ -48,7 +48,7 @@ namespace FEAT
       {
       }
 
-      explicit DiagonalPrecond(const String& section_name, PropertyMap* section,
+      explicit DiagonalPrecond(const String& section_name, const PropertyMap* section,
       const VectorType& diag, const FilterType& filter) :
         BaseClass(section_name, section),
         _diag(diag),
@@ -87,6 +87,32 @@ namespace FEAT
       const Vector_& diag, const Filter_& filter)
     {
       return std::make_shared<DiagonalPrecond<Vector_, Filter_>>(diag, filter);
+    }
+
+    /**
+     * \brief Creates a new DiagonalPrecond solver object
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] diag
+     * The vector representing the diagonal matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new DiagonalPrecond object.
+     */
+    template<typename Vector_, typename Filter_>
+    inline std::shared_ptr<DiagonalPrecond<Vector_, Filter_>> new_diagonal_precond(
+      const String& section_name, const PropertyMap* section,
+      const Vector_& diag, const Filter_& filter)
+    {
+      return std::make_shared<DiagonalPrecond<Vector_, Filter_>>(section_name, section, diag, filter);
     }
   } // namespace Solver
 } // namespace FEAT

@@ -99,7 +99,7 @@ namespace FEAT
        * \returns
        * A shared pointer to a new PMR object.
        */
-      explicit PMR(const String& section_name, PropertyMap* section,
+      explicit PMR(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("PMR", section_name, section, precond),
@@ -294,7 +294,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PMR<Matrix_, Filter_>> new_pmr(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {

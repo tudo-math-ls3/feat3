@@ -109,7 +109,7 @@ namespace FEAT
          * \param[in] inner_solver
          * The inner solver for solving the penalized unconstrained optimization problem.
          */
-        explicit QPenalty(const String& section_name, PropertyMap* section,
+        explicit QPenalty(const String& section_name, const PropertyMap* section,
           FunctionalType& functional, std::shared_ptr<IterativeSolver<VectorType>> inner_solver) :
           BaseClass("QPenalty", section_name, section),
           _functional(functional),
@@ -419,7 +419,7 @@ namespace FEAT
      */
     template<typename Functional_>
     inline std::shared_ptr<QPenalty<Functional_>> new_qpenalty(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional, std::shared_ptr<IterativeSolver<typename Functional_::VectorTypeR>> inner_solver)
     {
       return std::make_shared<QPenalty<Functional_>>(section_name, section, functional, inner_solver);

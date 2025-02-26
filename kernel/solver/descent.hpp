@@ -131,7 +131,7 @@ namespace FEAT
        * \returns
        * A shared pointer to a new Descent object.
        */
-      explicit Descent(const String& section_name, PropertyMap* section,
+      explicit Descent(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("Descent", section_name, section, precond),
@@ -362,7 +362,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<Descent<Matrix_, Filter_>> new_pmr(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {

@@ -108,7 +108,7 @@ namespace FEAT
        * \param[in] filter
        * The global filter that is to be applied.
        */
-      explicit SchwarzPrecond(const String& section_name, PropertyMap* section,
+      explicit SchwarzPrecond(const String& section_name, const PropertyMap* section,
         std::shared_ptr<LocalSolverType> local_solver, const GlobalFilterType& filter) :
         BaseClass(section_name, section),
         _local_solver(local_solver),
@@ -256,7 +256,7 @@ namespace FEAT
       >
     >
     new_schwarz_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       std::shared_ptr<SolverBase<typename LocalFilter_::VectorType>> local_solver,
       const Global::Filter<LocalFilter_, Mirror_>& filter)
     {

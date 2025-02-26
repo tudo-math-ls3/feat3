@@ -152,7 +152,7 @@ namespace FEAT
          * The system filter.
          *
          */
-        explicit ALGLIBMinLBFGS(const String& section_name, PropertyMap* section,
+        explicit ALGLIBMinLBFGS(const String& section_name, const PropertyMap* section,
         Functional_& functional_, Filter_& filter_) :
           BaseClass("ALGLIBMinLBFGS", section_name, section, functional_, filter_, nullptr),
           _lbfgs_dim(0),
@@ -559,7 +559,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinLBFGS<Functional_, Filter_>> new_alglib_minlbfgs(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional_, Filter_& filter_)
       {
         return std::make_shared<ALGLIBMinLBFGS<Functional_, Filter_>>(section_name, section, functional_, filter_);
@@ -675,7 +675,7 @@ namespace FEAT
          * The system filter.
          *
          */
-        explicit ALGLIBMinCG(const String& section_name, PropertyMap* section,
+        explicit ALGLIBMinCG(const String& section_name, const PropertyMap* section,
         Functional_& functional_, Filter_& filter_) :
           BaseClass("ALGLIBMinCG", section_name, section, functional_, filter_, nullptr),
           _direction_update(direction_update_default),
@@ -1085,7 +1085,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<ALGLIBMinCG<Functional_, Filter_>> new_alglib_mincg(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional_, Filter_& filter_)
     {
       return std::make_shared<ALGLIBMinCG<Functional_, Filter_>>(section_name, section, functional_, filter_);

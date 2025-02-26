@@ -77,7 +77,7 @@ namespace FEAT
          * \returns
          * A shared pointer to a new NewtonRaphsonLinesearch object.
          */
-        explicit NewtonRaphsonLinesearch(const String& section_name, PropertyMap* section,
+        explicit NewtonRaphsonLinesearch(const String& section_name, const PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass("NR-LS", section_name, section, functional, filter)
           {
@@ -280,7 +280,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<NewtonRaphsonLinesearch<Functional_, Filter_>> new_newton_raphson_linesearch(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional, Filter_& filter)
       {
         return std::make_shared<NewtonRaphsonLinesearch<Functional_, Filter_>>(section_name, section, functional, filter);

@@ -127,7 +127,7 @@ namespace FEAT
          * The linesearch to use.
          *
          */
-        explicit NLSD(const String& section_name, PropertyMap* section,
+        explicit NLSD(const String& section_name, const PropertyMap* section,
         Functional_& functional_, Filter_& filter_, std::shared_ptr<LinesearchType> linesearch_,
         std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLSD", section_name, section, functional_, filter_, precond),
@@ -426,7 +426,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLSD<Functional_, Filter_>> new_nlsd(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional, Filter_& filter, Linesearch_& linesearch,
       std::shared_ptr<NLOptPrecond<typename Functional_::VectorTypeL, Filter_>> precond = nullptr)
       {

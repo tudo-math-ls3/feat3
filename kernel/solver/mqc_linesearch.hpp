@@ -108,7 +108,7 @@ namespace FEAT
          * The system filter.
          *
          */
-        explicit MQCLinesearch(const String& section_name, PropertyMap* section,
+        explicit MQCLinesearch(const String& section_name, const PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass("MQC-LS", section_name, section, functional, filter),
           _alpha_hard_max(DataType(0)),
@@ -839,7 +839,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<MQCLinesearch<Functional_, Filter_>> new_mqc_linesearch(
-      const String& section_name, PropertyMap* section, Functional_& functional, Filter_& filter)
+      const String& section_name, const PropertyMap* section, Functional_& functional, Filter_& filter)
       {
         return std::make_shared<MQCLinesearch<Functional_, Filter_>> (section_name, section, functional, filter);
       }

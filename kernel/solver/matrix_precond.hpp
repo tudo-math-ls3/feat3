@@ -28,6 +28,7 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      typedef SolverBase<VectorType> BaseClass;
 
     protected:
       const MatrixType& _matrix;
@@ -44,6 +45,29 @@ namespace FEAT
        * The system filter.
        */
       explicit MatrixPrecond(const MatrixType& matrix, const FilterType& filter) :
+        _matrix(matrix),
+        _filter(filter)
+      {
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] section_name
+       * The name of the config section, which it does not know by itself
+       *
+       * \param[in] section
+       * A pointer to the PropertyMap section configuring this solver
+       *
+       * \param[in] matrix
+       * The matrix to be used.
+       *
+       * \param[in] filter
+       * The system filter.
+       */
+      explicit MatrixPrecond(const String& section_name, const PropertyMap* section,
+                             const MatrixType& matrix, const FilterType& filter) :
+        BaseClass(section_name, section),
         _matrix(matrix),
         _filter(filter)
       {
@@ -92,6 +116,32 @@ namespace FEAT
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<MatrixPrecond<Matrix_, Filter_>>(matrix, filter);
+    }
+
+    /**
+     * \brief Creates a new MatrixPrecond solver object
+     *
+     * \param[in] section_name
+     * The name of the config section, which it does not know by itself
+     *
+     * \param[in] section
+     * A pointer to the PropertyMap section configuring this solver
+     *
+     * \param[in] matrix
+     * The system matrix.
+     *
+     * \param[in] filter
+     * The system filter.
+     *
+     * \returns
+     * A shared pointer to a new JacobiPrecond object.
+     */
+    template<typename Matrix_, typename Filter_>
+    inline std::shared_ptr<MatrixPrecond<Matrix_, Filter_>> new_matrix_precond(
+      const String& section_name, const PropertyMap* section,
+      const Matrix_& matrix, const Filter_& filter)
+    {
+      return std::make_shared<MatrixPrecond<Matrix_, Filter_>>(section_name, section, matrix, filter);
     }
   } // namespace Solver
 } // namespace FEAT

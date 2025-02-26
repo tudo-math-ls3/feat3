@@ -133,7 +133,7 @@ namespace FEAT
         set_inner_res_scale(inner_res_scale);
       }
 
-      explicit GMRES(const String& section_name, PropertyMap* section,
+      explicit GMRES(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter, std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("GMRES", section_name, section, precond),
         _system_matrix(matrix),
@@ -464,7 +464,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<GMRES<Matrix_, Filter_>> new_gmres(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {

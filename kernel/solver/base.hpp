@@ -208,7 +208,7 @@ namespace FEAT
        * A pointer to the PropertyMap section configuring this solver
        *
        */
-      explicit SolverBase(const String& DOXY(section_name), PropertyMap* DOXY(config_section))
+      explicit SolverBase(const String& DOXY(section_name), const PropertyMap* DOXY(config_section))
       {
       }
 

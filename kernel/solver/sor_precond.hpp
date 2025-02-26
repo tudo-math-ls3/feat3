@@ -131,7 +131,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit SORPrecondWithBackend(const String& section_name, PropertyMap* section,
+      explicit SORPrecondWithBackend(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -309,7 +309,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit SORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
+      explicit SORPrecondWithBackend(const String& /*section_name*/, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -462,7 +462,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit SORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
+      explicit SORPrecondWithBackend(const String& /*section_name*/, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -604,7 +604,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit SORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
+      explicit SORPrecondWithBackend(const String& /*section_name*/, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -693,7 +693,7 @@ namespace FEAT
       {
       }
 
-      explicit SORPrecondWithBackend(const String&, PropertyMap*, const Matrix_&, const Filter_&)
+      explicit SORPrecondWithBackend(const String&, const PropertyMap*, const Matrix_&, const Filter_&)
       {
       }
 
@@ -807,7 +807,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      SORPrecond(const String& section_name, PropertyMap* section, PreferredBackend backend, const MatrixType& matrix, const FilterType& filter, DataType omega = DataType(1)) :
+      SORPrecond(const String& section_name, const PropertyMap* section, PreferredBackend backend, const MatrixType& matrix, const FilterType& filter, DataType omega = DataType(1)) :
         BaseClass(section_name, section)
       {
         switch (backend)
@@ -912,7 +912,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<SORPrecond<Matrix_, Filter_>> new_sor_precond(
-      const String& section_name, PropertyMap* section, PreferredBackend backend,
+      const String& section_name, const PropertyMap* section, PreferredBackend backend,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<SORPrecond<Matrix_, Filter_>>(section_name, section, backend, matrix, filter);

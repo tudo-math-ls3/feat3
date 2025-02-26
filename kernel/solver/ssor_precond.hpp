@@ -121,7 +121,7 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecondWithBackend(const String& section_name, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -316,7 +316,7 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& /*section_name*/, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -453,7 +453,7 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& /*section_name*/, const PropertyMap* section,
       const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -581,7 +581,7 @@ namespace FEAT
         }
       }
 
-      explicit SSORPrecondWithBackend(const String& /*section_name*/, PropertyMap* section,
+      explicit SSORPrecondWithBackend(const String& /*section_name*/, const PropertyMap* section,
       const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -672,7 +672,7 @@ namespace FEAT
       {
       }
 
-      explicit SSORPrecondWithBackend(const String&, PropertyMap*, const Matrix_&, const Filter_&)
+      explicit SSORPrecondWithBackend(const String&, const PropertyMap*, const Matrix_&, const Filter_&)
       {
       }
 
@@ -779,7 +779,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      SSORPrecond(const PreferredBackend backend, const String& section_name, PropertyMap* section, const MatrixType& matrix, const FilterType& filter, DataType omega = DataType(1)) :
+      SSORPrecond(const PreferredBackend backend, const String& section_name, const PropertyMap* section, const MatrixType& matrix, const FilterType& filter, DataType omega = DataType(1)) :
         BaseClass(section_name, section)
       {
         switch (backend)
@@ -885,7 +885,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<SSORPrecond<Matrix_, Filter_>> new_ssor_precond(
-      const String& section_name, PropertyMap* section, PreferredBackend backend,
+      const String& section_name, const PropertyMap* section, PreferredBackend backend,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<SSORPrecond<Matrix_, Filter_>>

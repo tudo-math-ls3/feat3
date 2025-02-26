@@ -92,7 +92,7 @@ namespace FEAT
        * The preconditioner. May be \c nullptr.
        *
        */
-      explicit PCR(const String& section_name, PropertyMap* section,
+      explicit PCR(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter,
         std::shared_ptr<PrecondType> precond = nullptr) :
         BaseClass("PCR", section_name, section, precond),
@@ -327,7 +327,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCR<Matrix_, Filter_>> new_pcr(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter,
       std::shared_ptr<SolverBase<typename Matrix_::VectorTypeL>> precond = nullptr)
     {

@@ -280,7 +280,7 @@ namespace FEAT
     }
 
     /** \copydoc get_parent() */
-    PropertyMap* get_parent() const
+    const PropertyMap* get_parent() const
     {
       return _parent;
     }

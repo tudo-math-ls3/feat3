@@ -1006,7 +1006,7 @@ namespace FEAT
       {
       }
 
-      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -1140,7 +1140,7 @@ namespace FEAT
       {
       }
 
-      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter),
@@ -1283,7 +1283,7 @@ namespace FEAT
       {
       }
 
-      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter)
@@ -1514,7 +1514,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit ILUPrecondWithBackend(const String& section_name, PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter)
@@ -1618,7 +1618,7 @@ namespace FEAT
       {
       }
 
-      explicit ILUPrecondWithBackend(const String& , PropertyMap*, const Matrix_& , const Filter_& )
+      explicit ILUPrecondWithBackend(const String& , const PropertyMap*, const Matrix_& , const Filter_& )
       {
       }
 
@@ -1729,7 +1729,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      ILUPrecond(const String& section_name, PropertyMap* section, PreferredBackend backend, const MatrixType& matrix, const FilterType& filter) :
+      ILUPrecond(const String& section_name, const PropertyMap* section, PreferredBackend backend, const MatrixType& matrix, const FilterType& filter) :
         BaseClass(section_name, section)
       {
         switch (backend)
@@ -1843,7 +1843,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<ILUPrecond<Matrix_, Filter_>> new_ilu_precond(
-      const String& section_name, PropertyMap* section, PreferredBackend backend,
+      const String& section_name, const PropertyMap* section, PreferredBackend backend,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<ILUPrecond<Matrix_, Filter_>>(section_name, section, backend, matrix, filter);

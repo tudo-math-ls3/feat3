@@ -78,7 +78,7 @@ namespace FEAT
          * \returns
          * A shared pointer to a new FixedStepLinesearch object.
          */
-        explicit FixedStepLinesearch(const String& section_name, PropertyMap* section,
+        explicit FixedStepLinesearch(const String& section_name, const PropertyMap* section,
         Functional_& functional, Filter_& filter) :
           BaseClass("FS-LS", section_name, section, functional, filter),
           _step_length(-1)
@@ -219,7 +219,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_>
     inline std::shared_ptr<FixedStepLinesearch<Functional_, Filter_>> new_fixed_step_linesearch(
-      const String& section_name, PropertyMap* section, Functional_& functional, Filter_& filter)
+      const String& section_name, const PropertyMap* section, Functional_& functional, Filter_& filter)
       {
         return
           std::make_shared<FixedStepLinesearch<Functional_, Filter_>>(section_name, section, functional, filter);

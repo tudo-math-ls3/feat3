@@ -218,7 +218,7 @@ namespace FEAT
          * The linesearch to use.
          *
          */
-        explicit NLCG(const String& section_name, PropertyMap* section, Functional_& functional, Filter_& filter,
+        explicit NLCG(const String& section_name, const PropertyMap* section, Functional_& functional, Filter_& filter,
         std::shared_ptr<LinesearchType> linesearch, std::shared_ptr<PrecondType> precond = nullptr) :
           BaseClass("NLCG", section_name, section, functional, filter, precond),
           _linesearch(linesearch),
@@ -944,7 +944,7 @@ namespace FEAT
      */
     template<typename Functional_, typename Filter_, typename Linesearch_>
     inline std::shared_ptr<NLCG<Functional_, Filter_>> new_nlcg(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       Functional_& functional, Filter_& filter, Linesearch_& linesearch,
       std::shared_ptr<NLOptPrecond<typename Functional_::VectorTypeL, Filter_>> precond = nullptr)
       {

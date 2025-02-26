@@ -58,7 +58,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit ScalePrecond(const String& section_name, PropertyMap* section,
+      explicit ScalePrecond(const String& section_name, const PropertyMap* section,
         const Filter_& filter) :
         BaseClass(section_name, section),
         _filter(filter),
@@ -142,7 +142,7 @@ namespace FEAT
      */
     template<typename Filter_>
     inline std::shared_ptr<ScalePrecond<typename Filter_::VectorType, Filter_>> new_scale_precond(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Filter_& filter)
     {
       return std::make_shared<ScalePrecond<typename Filter_::VectorType, Filter_>>(

@@ -106,7 +106,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit PCGNRILU(const String& section_name, PropertyMap* section,
+      explicit PCGNRILU(const String& section_name, const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         BaseClass("PCGNRILU", section_name, section),
         _system_matrix(matrix),
@@ -396,7 +396,7 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<PCGNRILU<Matrix_, Filter_>> new_pcgnrilu(
-      const String& section_name, PropertyMap* section,
+      const String& section_name, const PropertyMap* section,
       const Matrix_& matrix, const Filter_& filter)
     {
       return std::make_shared<PCGNRILU<Matrix_, Filter_>>(section_name, section, matrix, filter);
