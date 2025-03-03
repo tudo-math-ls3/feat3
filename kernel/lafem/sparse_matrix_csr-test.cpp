@@ -1680,3 +1680,102 @@ SparseMatrixCSRMinElementTest <double, std::uint32_t> cuda_sm_csr_min_element_te
 SparseMatrixCSRMinElementTest <float, std::uint64_t> cuda_sm_csr_min_element_test_float_uint64(PreferredBackend::cuda);
 SparseMatrixCSRMinElementTest <double, std::uint64_t> cuda_sm_csr_min_element_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+
+template<typename DT_, typename IT_>
+class SparseMatrixCSRAddDoubleMatMultTest
+  : public UnitTest
+{
+public:
+  SparseMatrixCSRAddDoubleMatMultTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRAddDoubleMatMultTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixCSRAddDoubleMatMultTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    SparseMatrixFactory<DT_, IT_> b_fac(IT_(4), IT_(3));
+    SparseMatrixFactory<DT_, IT_> d_fac(IT_(3), IT_(4));
+    SparseMatrixFactory<DT_, IT_> s_fac(IT_(3), IT_(3));
+    SparseMatrixFactory<DT_, IT_> s_fac2(IT_(3), IT_(3));
+
+    b_fac.add(IT_(0), IT_(0), DT_(2));
+    b_fac.add(IT_(0), IT_(1), DT_(3));
+    b_fac.add(IT_(1), IT_(0), DT_(4));
+    b_fac.add(IT_(1), IT_(2), DT_(5));
+    b_fac.add(IT_(2), IT_(1), DT_(6));
+    b_fac.add(IT_(2), IT_(2), DT_(7));
+    b_fac.add(IT_(3), IT_(1), DT_(8));
+    d_fac.add(IT_(0), IT_(0), DT_(5));
+    d_fac.add(IT_(0), IT_(1), DT_(7));
+    d_fac.add(IT_(1), IT_(0), DT_(3));
+    d_fac.add(IT_(1), IT_(2), DT_(2));
+    d_fac.add(IT_(2), IT_(1), DT_(8));
+    d_fac.add(IT_(2), IT_(2), DT_(6));
+    d_fac.add(IT_(2), IT_(3), DT_(4));
+    s_fac.add(IT_(0), IT_(0), DT_(104));
+    s_fac.add(IT_(0), IT_(1), DT_(30));
+    s_fac.add(IT_(0), IT_(2), DT_(105));
+    s_fac.add(IT_(1), IT_(0), DT_(12));
+    s_fac.add(IT_(1), IT_(1), DT_(66));
+    s_fac.add(IT_(1), IT_(2), DT_(56));
+    s_fac.add(IT_(2), IT_(0), DT_(96));
+    s_fac.add(IT_(2), IT_(1), DT_(304));
+    s_fac.add(IT_(2), IT_(2), DT_(288));
+    s_fac2.add(IT_(0), IT_(0), DT_(696));
+    s_fac2.add(IT_(0), IT_(1), DT_(120));
+    s_fac2.add(IT_(0), IT_(2), DT_(770));
+    s_fac2.add(IT_(1), IT_(0), DT_(48));
+    s_fac2.add(IT_(1), IT_(1), DT_(504));
+    s_fac2.add(IT_(1), IT_(2), DT_(504));
+    s_fac2.add(IT_(2), IT_(0), DT_(704));
+    s_fac2.add(IT_(2), IT_(1), DT_(2896));
+    s_fac2.add(IT_(2), IT_(2), DT_(2392));
+
+    SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
+    SparseMatrixCSR<DT_, IT_> d(d_fac.make_csr());
+    SparseMatrixCSR<DT_, IT_> s(s_fac.make_csr());
+
+    DenseVector<DT_, IT_> a(4u);
+    a.elements()[0] = DT_(2);
+    a.elements()[1] = DT_(3);
+    a.elements()[2] = DT_(4);
+    a.elements()[3] = DT_(5);
+
+    // perform double matrix product and check result
+    s.add_double_mat_product(d, a, b, -DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(s.norm_frobenius(), DT_(0), tol);
+
+    // convert matrices to blocked variants
+    SparseMatrixBCSR<DT_, IT_, 2, 1> b2(b.layout());
+    SparseMatrixBCSR<DT_, IT_, 1, 2> d2(d.layout());
+    SparseMatrixCSR<DT_, IT_> s2(s_fac2.make_csr());
+    for(Index i(0); i < b.used_elements();  ++i)
+      b2.val()[i][0][0] = DT_(2) * (b2.val()[i][1][0] = b.val()[i]);
+    for(Index i(0); i < d.used_elements();  ++i)
+      d2.val()[i][0][0] = DT_(3) * (d2.val()[i][0][1] = d.val()[i]);
+
+    DenseVectorBlocked<DT_, IT_, 2> a2(4u);
+    a2.elements()[0][0] = DT_(1);
+    a2.elements()[0][1] = DT_(2);
+    a2.elements()[1][0] = DT_(3);
+    a2.elements()[1][1] = DT_(4);
+    a2.elements()[2][0] = DT_(5);
+    a2.elements()[2][1] = DT_(6);
+    a2.elements()[3][0] = DT_(7);
+    a2.elements()[3][1] = DT_(8);
+
+    s2.add_double_mat_product(d2, a2, b2, -DT_(1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(s2.norm_frobenius(), DT_(0), tol);
+  }
+};
+
+SparseMatrixCSRAddDoubleMatMultTest <float, std::uint32_t> sm_csr_add_double_mat_mult_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRAddDoubleMatMultTest <double, std::uint32_t> sm_csr_add_double_mat_mult_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRAddDoubleMatMultTest <float, std::uint64_t> sm_csr_add_double_mat_mult_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRAddDoubleMatMultTest <double, std::uint64_t> sm_csr_add_double_mat_mult_test_double_uint64(PreferredBackend::generic);
