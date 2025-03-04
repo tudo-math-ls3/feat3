@@ -99,7 +99,10 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
   elif "opt" in buildid:
     cxxflags += " -funsafe-loop-optimizations"
     if "lto" in buildid:
-      cxxflags += " -flto"
+      if major > 11 or (major == 11 and minor >= 4):
+        cxxflags += " -flto=auto"
+      else:
+        cxxflags += " -flto"
       #use gcc provided binutils for lto
       cmake_flags += " -DCMAKE_RANLIB:PATH=" + find_exe("gcc-ranlib")
       cmake_flags += " -DCMAKE_AR:PATH=" + find_exe("gcc-ar")
