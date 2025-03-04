@@ -45,47 +45,47 @@ namespace FEAT
 
         template <typename DT_, typename IT_>
         static void dsd(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index used_elements,
-                                         const DT_ * y, const Index rows, const Index columns, const Index inner)
+                                         const DT_ * const y, const Index rows, const Index columns, const Index inner)
         {
           dsd_generic(r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner);
         }
 
 #ifdef FEAT_HAVE_HALFMATH
         static void dsd(Half * r, const Half alpha, const Half beta, const Half * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index used_elements,
-                                         const Half * y, const Index rows,  const Index columns, const Index inner)
+                                         const Half * const y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 #endif
 
         static void dsd(float * r, const float alpha, const float beta, const float * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index used_elements,
-                                         const float * y, const Index rows,  const Index columns, const Index inner)
+                                         const float * const y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 
         static void dsd(double * r, const double alpha, const double beta, const double * const val, const std::uint64_t * const col_ind, const std::uint64_t * const row_ptr, const Index used_elements,
-                                         const double * y, const Index rows,  const Index columns, const Index inner)
+                                         const double * const y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 
 #ifdef FEAT_HAVE_HALFMATH
         static void dsd(Half * r, const Half alpha, const Half beta, const Half * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index used_elements,
-                                         const Half * y, const Index rows,  const Index columns, const Index inner)
+                                         const Half * const y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 #endif
 
         static void dsd(float * r, const float alpha, const float beta, const float * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index used_elements,
-                                         const float * y, const Index rows,  const Index columns, const Index inner)
+                                         const float * const y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
 
         static void dsd(double * r, const double alpha, const double beta, const double * const val, const std::uint32_t * const col_ind, const std::uint32_t * const row_ptr, const Index used_elements,
-                                         const double * y, const Index rows,  const Index columns, const Index inner)
+                                         const double * const y, const Index rows,  const Index columns, const Index inner)
         {
           BACKEND_SKELETON_VOID(dsd_cuda, dsd_generic, dsd_generic, r, alpha, beta, val, col_ind, row_ptr, used_elements, y, rows, columns, inner)
         }
@@ -101,17 +101,23 @@ namespace FEAT
 
         template <typename DT_, typename IT_>
         static void dsd_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index used_elements,
-                                         const DT_ * y, const Index rows,  const Index columns, const Index inner);
+                                         const DT_ * const y, const Index rows,  const Index columns, const Index inner);
 
         template <typename DT_, typename IT_>
         static void dsd_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index used_elements,
-                                         const DT_ * y, const Index rows,  const Index columns, const Index inner);
+                                         const DT_ * const y, const Index rows,  const Index columns, const Index inner);
 
       };
 
 #ifdef FEAT_EICKT
       extern template void ProductMatMat::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index, const Index);
       extern template void ProductMatMat::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index, const Index);
+
+      extern template void ProductMatMat::dsd_generic(float *, const float, const float, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const float * const, const Index, const Index, const Index);
+      extern template void ProductMatMat::dsd_generic(double *, const double, const double, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const double *const , const Index, const Index, const Index);
+
+      extern template void ProductMatMat::dsd_generic(float *, const float, const float, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const float * const, const Index, const Index, const Index);
+      extern template void ProductMatMat::dsd_generic(double *, const double, const double, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const double * const, const Index, const Index, const Index);
 #endif
 
     } // namespace Arch

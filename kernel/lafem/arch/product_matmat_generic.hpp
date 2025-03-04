@@ -64,7 +64,7 @@ namespace FEAT
 
       template <typename DT_, typename IT_>
       void ProductMatMat::dsd_generic(DT_ * r, const DT_ alpha, const DT_ beta, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const Index /*used_elements*/,
-                                         const DT_ * y, const Index rows,  const Index columns, const Index /*inner*/)
+                                         const DT_ * const y, const Index rows,  const Index columns, const Index /*inner*/)
       {
         if (Math::abs(beta) < Math::eps<DT_>())
         {

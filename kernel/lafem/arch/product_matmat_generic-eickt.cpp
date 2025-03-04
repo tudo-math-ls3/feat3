@@ -15,3 +15,9 @@ using namespace FEAT::LAFEM::Arch;
 
 template void ProductMatMat::dense_generic(float *, const float, const float, const float * const, const float * const, const float * const, const Index, const Index, const Index);
 template void ProductMatMat::dense_generic(double *, const double, const double, const double * const, const double * const, const double * const, const Index, const Index, const Index);
+
+template void ProductMatMat::dsd_generic(float *, const float, const float, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const float * const, const Index, const Index, const Index);
+template void ProductMatMat::dsd_generic(double *, const double, const double, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const double *const , const Index, const Index, const Index);
+
+template void ProductMatMat::dsd_generic(float *, const float, const float, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const float * const, const Index, const Index, const Index);
+template void ProductMatMat::dsd_generic(double *, const double, const double, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const double * const, const Index, const Index, const Index);
