@@ -8,7 +8,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/kahan_summation.hpp>
+#include <kernel/util/kahan_accumulator.hpp>
 #include <kernel/solver/expression.hpp>
 
 #include <list>
@@ -34,43 +34,43 @@ namespace FEAT
       static Index _flops;
 
       /// global time of execution for reduction type operations
-      static KahanAccumulation _time_reduction;
+      static KahanAccumulator<double> _time_reduction;
 
       /// global time of execution for blas-2 type operations
-      static KahanAccumulation _time_blas2;
+      static KahanAccumulator<double> _time_blas2;
 
       /// global time of execution for blas-3 type operations
-      static KahanAccumulation _time_blas3;
+      static KahanAccumulator<double> _time_blas3;
 
       /// global time of execution for blas-1 type operations
-      static KahanAccumulation _time_axpy;
+      static KahanAccumulator<double> _time_axpy;
 
       /// global time of execution for special preconditioner kernel type operations
-      static KahanAccumulation _time_precon;
+      static KahanAccumulator<double> _time_precon;
 
       /// global time of execution for mpi related idle/wait tasks of (scalar) reduction operations
-      static KahanAccumulation _time_mpi_execute_reduction;
+      static KahanAccumulator<double> _time_mpi_execute_reduction;
 
       /// global time of execution for mpi related idle/wait tasks of blas-2 operations
-      static KahanAccumulation _time_mpi_execute_blas2;
+      static KahanAccumulator<double> _time_mpi_execute_blas2;
 
       /// global time of execution for mpi related idle/wait tasks of blas-3 operations
-      static KahanAccumulation _time_mpi_execute_blas3;
+      static KahanAccumulator<double> _time_mpi_execute_blas3;
 
       /// global time of execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
-      static KahanAccumulation _time_mpi_execute_collective;
+      static KahanAccumulator<double> _time_mpi_execute_collective;
 
       /// global time of wait execution for mpi related idle/wait tasks of (scalar) reduction operations
-      static KahanAccumulation _time_mpi_wait_reduction;
+      static KahanAccumulator<double> _time_mpi_wait_reduction;
 
       /// global time of wait execution for mpi related idle/wait tasks of blas2 operations
-      static KahanAccumulation _time_mpi_wait_blas2;
+      static KahanAccumulator<double> _time_mpi_wait_blas2;
 
       /// global time of wait execution for mpi related idle/wait tasks of blas3 operations
-      static KahanAccumulation _time_mpi_wait_blas3;
+      static KahanAccumulator<double> _time_mpi_wait_blas3;
 
       /// global time of wait execution for mpi related idle/wait tasks of collective operations (without scalar reduction)
-      static KahanAccumulation _time_mpi_wait_collective;
+      static KahanAccumulator<double> _time_mpi_wait_collective;
 
       /// a consecutive list of all solver actions
       static std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> _solver_expressions;
@@ -233,108 +233,108 @@ namespace FEAT
 
       inline static void add_time_reduction(double seconds)
       {
-        _time_reduction = KahanSum(_time_reduction, seconds);
+        _time_reduction += seconds;
       }
       inline static void add_time_blas2(double seconds)
       {
-        _time_blas2 = KahanSum(_time_blas2, seconds);
+        _time_blas2 += seconds;
       }
       inline static void add_time_blas3(double seconds)
       {
-        _time_blas3 = KahanSum(_time_blas3, seconds);
+        _time_blas3 += seconds;
       }
       inline static void add_time_axpy(double seconds)
       {
-        _time_axpy = KahanSum(_time_axpy, seconds);
+        _time_axpy += seconds;
       }
       inline static void add_time_precon(double seconds)
       {
-        _time_precon = KahanSum(_time_precon, seconds);
+        _time_precon += seconds;
       }
       inline static void add_time_mpi_execute_reduction(double seconds)
       {
-        _time_mpi_execute_reduction = KahanSum(_time_mpi_execute_reduction, seconds);
+        _time_mpi_execute_reduction += seconds;
       }
       inline static void add_time_mpi_execute_blas2(double seconds)
       {
-        _time_mpi_execute_blas2 = KahanSum(_time_mpi_execute_blas2, seconds);
+        _time_mpi_execute_blas2 += seconds;
       }
       inline static void add_time_mpi_execute_blas3(double seconds)
       {
-        _time_mpi_execute_blas3 = KahanSum(_time_mpi_execute_blas3, seconds);
+        _time_mpi_execute_blas3 += seconds;
       }
       inline static void add_time_mpi_execute_collective(double seconds)
       {
-        _time_mpi_execute_collective = KahanSum(_time_mpi_execute_collective, seconds);
+        _time_mpi_execute_collective += seconds;
       }
       inline static void add_time_mpi_wait_reduction(double seconds)
       {
-        _time_mpi_wait_reduction = KahanSum(_time_mpi_wait_reduction, seconds);
+        _time_mpi_wait_reduction += seconds;
       }
       inline static void add_time_mpi_wait_blas2(double seconds)
       {
-        _time_mpi_wait_blas2 = KahanSum(_time_mpi_wait_blas2, seconds);
+        _time_mpi_wait_blas2 += seconds;
       }
       inline static void add_time_mpi_wait_blas3(double seconds)
       {
-        _time_mpi_wait_blas3 = KahanSum(_time_mpi_wait_blas3, seconds);
+        _time_mpi_wait_blas3 += seconds;
       }
       inline static void add_time_mpi_wait_collective(double seconds)
       {
-        _time_mpi_wait_collective = KahanSum(_time_mpi_wait_collective, seconds);
+        _time_mpi_wait_collective += seconds;
       }
 
       inline static double get_time_reduction()
       {
-        return _time_reduction.sum;
+        return _time_reduction;
       }
       inline static double get_time_blas2()
       {
-        return _time_blas2.sum;
+        return _time_blas2.value;
       }
       inline static double get_time_blas3()
       {
-        return _time_blas3.sum;
+        return _time_blas3.value;
       }
       inline static double get_time_axpy()
       {
-        return _time_axpy.sum;
+        return _time_axpy.value;
       }
       inline static double get_time_precon()
       {
-        return _time_precon.sum;
+        return _time_precon.value;
       }
       inline static double get_time_mpi_execute_reduction()
       {
-        return _time_mpi_execute_reduction.sum;
+        return _time_mpi_execute_reduction.value;
       }
       inline static double get_time_mpi_execute_blas2()
       {
-        return _time_mpi_execute_blas2.sum;
+        return _time_mpi_execute_blas2.value;
       }
       inline static double get_time_mpi_execute_blas3()
       {
-        return _time_mpi_execute_blas3.sum;
+        return _time_mpi_execute_blas3.value;
       }
       inline static double get_time_mpi_execute_collective()
       {
-        return _time_mpi_execute_collective.sum;
+        return _time_mpi_execute_collective.value;
       }
       inline static double get_time_mpi_wait_reduction()
       {
-        return _time_mpi_wait_reduction.sum;
+        return _time_mpi_wait_reduction.value;
       }
       inline static double get_time_mpi_wait_blas2()
       {
-        return _time_mpi_wait_blas2.sum;
+        return _time_mpi_wait_blas2.value;
       }
       inline static double get_time_mpi_wait_blas3()
       {
-        return _time_mpi_wait_blas3.sum;
+        return _time_mpi_wait_blas3.value;
       }
       inline static double get_time_mpi_wait_collective()
       {
-        return _time_mpi_wait_collective.sum;
+        return _time_mpi_wait_collective.value;
       }
 
       inline static void add_solver_expression(std::shared_ptr<Solver::ExpressionBase> expression)
@@ -513,32 +513,19 @@ namespace FEAT
       /// Reset all global timer counters
       static void reset_times()
       {
-        _time_reduction.sum = 0.;
-        _time_reduction.correction = 0.;
-        _time_blas2.sum = 0.;
-        _time_blas2.correction = 0.;
-        _time_blas3.sum = 0.;
-        _time_blas3.correction = 0.;
-        _time_axpy.sum = 0.;
-        _time_axpy.correction = 0.;
-        _time_precon.sum = 0.;
-        _time_precon.correction = 0.;
-        _time_mpi_execute_reduction.sum = 0.;
-        _time_mpi_execute_reduction.correction = 0.;
-        _time_mpi_execute_blas2.sum = 0.;
-        _time_mpi_execute_blas2.correction = 0.;
-        _time_mpi_execute_blas3.sum = 0.;
-        _time_mpi_execute_blas3.correction = 0.;
-        _time_mpi_execute_collective.sum = 0.;
-        _time_mpi_execute_collective.correction = 0.;
-        _time_mpi_wait_reduction.sum = 0.;
-        _time_mpi_wait_reduction.correction = 0.;
-        _time_mpi_wait_blas2.sum = 0.;
-        _time_mpi_wait_blas2.correction = 0.;
-        _time_mpi_wait_blas3.sum = 0.;
-        _time_mpi_wait_blas3.correction = 0.;
-        _time_mpi_wait_collective.sum = 0.;
-        _time_mpi_wait_collective.correction = 0.;
+        _time_reduction.clear();
+        _time_blas2.clear();
+        _time_blas3.clear();
+        _time_axpy.clear();
+        _time_precon.clear();
+        _time_mpi_execute_reduction.clear();
+        _time_mpi_execute_blas2.clear();
+        _time_mpi_execute_blas3.clear();
+        _time_mpi_execute_collective.clear();
+        _time_mpi_wait_reduction.clear();
+        _time_mpi_wait_blas2.clear();
+        _time_mpi_wait_blas3.clear();
+        _time_mpi_wait_collective.clear();
       }
 
       /*

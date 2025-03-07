@@ -11,6 +11,7 @@ set(benchmarks
   io_bench
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
+  parperf-bench
   pcg-bench
   poisson_multigrid-bench
   product_matmat-bench

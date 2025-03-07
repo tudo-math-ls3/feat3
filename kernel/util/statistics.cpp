@@ -14,19 +14,19 @@ using namespace FEAT;
 
 // static member initialization
 Index Statistics::_flops = Index(0);
-KahanAccumulation Statistics::_time_reduction;
-KahanAccumulation Statistics::_time_blas2;
-KahanAccumulation Statistics::_time_blas3;
-KahanAccumulation Statistics::_time_axpy;
-KahanAccumulation Statistics::_time_precon;
-KahanAccumulation Statistics::_time_mpi_execute_reduction;
-KahanAccumulation Statistics::_time_mpi_execute_blas2;
-KahanAccumulation Statistics::_time_mpi_execute_blas3;
-KahanAccumulation Statistics::_time_mpi_execute_collective;
-KahanAccumulation Statistics::_time_mpi_wait_reduction;
-KahanAccumulation Statistics::_time_mpi_wait_blas2;
-KahanAccumulation Statistics::_time_mpi_wait_blas3;
-KahanAccumulation Statistics::_time_mpi_wait_collective;
+KahanAccumulator<double> Statistics::_time_reduction;
+KahanAccumulator<double> Statistics::_time_blas2;
+KahanAccumulator<double> Statistics::_time_blas3;
+KahanAccumulator<double> Statistics::_time_axpy;
+KahanAccumulator<double> Statistics::_time_precon;
+KahanAccumulator<double> Statistics::_time_mpi_execute_reduction;
+KahanAccumulator<double> Statistics::_time_mpi_execute_blas2;
+KahanAccumulator<double> Statistics::_time_mpi_execute_blas3;
+KahanAccumulator<double> Statistics::_time_mpi_execute_collective;
+KahanAccumulator<double> Statistics::_time_mpi_wait_reduction;
+KahanAccumulator<double> Statistics::_time_mpi_wait_blas2;
+KahanAccumulator<double> Statistics::_time_mpi_wait_blas3;
+KahanAccumulator<double> Statistics::_time_mpi_wait_collective;
 std::map<String, std::list<std::shared_ptr<Solver::ExpressionBase>>> Statistics::_solver_expressions;
 std::map<String, String> Statistics::_formatted_solver_trees;
 std::map<String, std::list<double>> Statistics::_overall_toe;
@@ -476,23 +476,23 @@ String Statistics::get_formatted_times(double total_time)
   if (total_time == 0.)
     return result;
 
-  KahanAccumulation measured_time;
-  measured_time = KahanSum(measured_time, get_time_reduction());
-  measured_time = KahanSum(measured_time, get_time_blas2());
-  measured_time = KahanSum(measured_time, get_time_blas3());
-  measured_time = KahanSum(measured_time, get_time_axpy());
-  measured_time = KahanSum(measured_time, get_time_precon());
-  measured_time = KahanSum(measured_time, get_time_mpi_execute_reduction());
-  measured_time = KahanSum(measured_time, get_time_mpi_execute_blas2());
-  measured_time = KahanSum(measured_time, get_time_mpi_execute_blas3());
-  measured_time = KahanSum(measured_time, get_time_mpi_execute_collective());
-  measured_time = KahanSum(measured_time, get_time_mpi_wait_reduction());
-  measured_time = KahanSum(measured_time, get_time_mpi_wait_blas2());
-  measured_time = KahanSum(measured_time, get_time_mpi_wait_blas3());
-  measured_time = KahanSum(measured_time, get_time_mpi_wait_collective());
+  KahanAccumulator<double> measured_time;
+  measured_time += get_time_reduction();
+  measured_time += get_time_blas2();
+  measured_time += get_time_blas3();
+  measured_time += get_time_axpy();
+  measured_time += get_time_precon();
+  measured_time += get_time_mpi_execute_reduction();
+  measured_time += get_time_mpi_execute_blas2();
+  measured_time += get_time_mpi_execute_blas3();
+  measured_time += get_time_mpi_execute_collective();
+  measured_time += get_time_mpi_wait_reduction();
+  measured_time += get_time_mpi_wait_blas2();
+  measured_time += get_time_mpi_wait_blas3();
+  measured_time += get_time_mpi_wait_collective();
 
   result += "\n";
-  result += "Accumulated op time: " + stringify(measured_time.sum) + "\n";
+  result += "Accumulated op time: " + stringify(measured_time.value) + "\n";
 
   result += "\n";
 
@@ -501,7 +501,7 @@ String Statistics::get_formatted_times(double total_time)
   double t_max[14];
   double t_min[14];
   double t_local[14];
-  t_local[0] = total_time - measured_time.sum;
+  t_local[0] = total_time - measured_time;
   t_local[1] = get_time_reduction();
   t_local[2] = get_time_axpy();
   t_local[3] = get_time_blas2();
