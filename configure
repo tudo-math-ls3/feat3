@@ -152,7 +152,8 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  Explicitly instantiate common kernel templates.")
   print ("")
   print ("--ovr_mpi_ops")
-  print ("  Override MPI operations with custom implementations. Required if both quadmath and MPI are used.")
+  print ("  Override MPI operations with custom implementations.")
+  print ("  Is automatically enabled if both quadmath and MPI are used.")
   print ("")
   print ("--in-source")
   print ("  Allow for in-source builds; not recommended.")
@@ -722,13 +723,15 @@ if "cotire" in buildid:
   remove_string(unused_tokens, "cotire")
   cmake_flags += " -DFEAT_COTIRE:BOOL=ON"
 
-# print a warning that quadmath + mpi requires overriding of MPI operations to function properly if not given
-if ("quadmath" in buildid) and ("mpi" in buildid) and not ("--ovr_mpi_ops" in extra_options):
-  # this is just a warning, not an error
+# print a warning that half/quadmath + mpi requires overriding of MPI operations to function properly if not given
+if (("half" in buildid) or ("quadmath" in buildid)) and ("mpi" in buildid) and not ("--ovr_mpi_ops" in extra_options):
   print("")
-  print("Warning: both 'quadmath' and 'mpi' are specified in build-id, but MPI operations are not overridden;")
-  print("please also specify the '--ovr_mpi_ops' option to enable use of quadmath in combination with MPI.")
+  print("WARNING: 'half' or 'quadmath' and 'mpi' are specified in build-id, but MPI operations were not overridden;")
+  print("automatically enabling MPI operations overrides because MPI applications would crash otherwise.")
+  print("Please manually add the '--ovr_mpi_ops' option to this configure script call when configuring with")
+  print("'half' or 'quadmath' support enabled to suppress this warning message.")
   print("")
+  cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
 
 if "trilinos" in buildid:
   remove_string(unused_tokens, "trilinos")
