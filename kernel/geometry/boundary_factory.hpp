@@ -90,6 +90,40 @@ namespace FEAT
       }
 
     }; // class BoundaryFactory<...>
+
+    /**
+     * \brief Creates a new boundary mesh-part for a given mesh
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a boundary mesh-part is to be created.
+     *
+     * \returns
+     * A mesh-part containing all entities for which lie on the mesh boundary
+     */
+    template<typename Mesh_>
+    MeshPart<Mesh_> make_boundary_meshpart(const Mesh_& mesh)
+    {
+      BoundaryFactory<Mesh_> factory(mesh);
+      return factory.make();
+    }
+
+    /**
+     * \brief Creates a new boundary mesh-part for a given mesh
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a boundary mesh-part is to be created.
+     *
+     * \returns
+     * A mesh-part containing all entities for which lie on the mesh boundary
+     */
+    template<typename Mesh_>
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_boundary_meshpart(const Mesh_& mesh)
+    {
+      BoundaryFactory<Mesh_> factory(mesh);
+      return factory.make_unique();
+    }
+
+
     /**
      * \brief MaskedBoundaryFactory implementation
      *

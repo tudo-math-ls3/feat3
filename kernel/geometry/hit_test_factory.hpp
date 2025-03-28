@@ -48,8 +48,8 @@ namespace FEAT
     template<
       typename HitFunc_,
       typename Mesh_>
-    class HitTestFactory
-      : public Factory< MeshPart<Mesh_> >
+    class HitTestFactory :
+      public Factory< MeshPart<Mesh_> >
     {
     public:
       /// The shape type of the mesh
@@ -109,6 +109,44 @@ namespace FEAT
       }
 
     }; // class HitTestFactory
+
+    /**
+     * \brief Creates a new mesh-part from a hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] hit_func
+     * An object implementing the hit-test function interface.
+     *
+     * \returns
+     * A mesh-part containing all entities for which the hit-test function evaluated to \c true.
+     */
+    template<typename Mesh_, typename HitFunc_>
+    MeshPart<Mesh_> make_meshpart_by_hit_test(const Mesh_& mesh, const HitFunc_& hit_func)
+    {
+      HitTestFactory<HitFunc_, Mesh_> factory(mesh, hit_func);
+      return factory.make();
+    }
+
+    /**
+     * \brief Creates a new mesh-part from a hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] hit_func
+     * An object implementing the hit-test function interface.
+     *
+     * \returns
+     * A unique-pointer to a mesh-part containing all entities for which the hit-test function evaluated to \c true.
+     */
+    template<typename Mesh_, typename HitFunc_>
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_hit_test(const Mesh_& mesh, const HitFunc_& hit_func)
+    {
+      HitTestFactory<HitFunc_, Mesh_> factory(mesh, hit_func);
+      return factory.make_unique();
+    }
 
     /// \cond internal
     namespace Intern
@@ -424,5 +462,188 @@ namespace FEAT
         // do nothing as the object has no index sets
       }
     }; // class ChartHitTestFactory
+
+    /**
+     * \brief Creates a new mesh-part from a chart hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] chart
+     * A chart object whose signed-distance function is to be used for hit-testing.
+     *
+     * \returns
+     * A mesh-part containing all entities for which the chart signed distance is <= 0.
+     */
+    template<typename Mesh_, typename Chart_>
+    MeshPart<Mesh_> make_meshpart_by_chart_hit_test(const Mesh_& mesh, const Chart_& chart, bool invert = false)
+    {
+      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, chart, invert);
+      return factory.make();
+    }
+
+    /**
+     * \brief Creates a new mesh-part from a chart hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] chart
+     * A chart object whose signed-distance function is to be used for hit-testing.
+     *
+     * \returns
+     * A unique-pointer to a mesh-part containing all entities for which the chart signed distance is <= 0.
+     */
+    template<typename Mesh_, typename Chart_>
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_chart_hit_test(const Mesh_& mesh, const Chart_& chart, bool invert = false)
+    {
+      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, chart, invert);
+      return factory.make_unique();
+    }
+
+    /**
+     * \brief Lambda Hit-Test Factory class template
+     *
+     * This class template can be used to create a MeshPart for a particular mesh which consists of all entities that
+     * are inside the region characterized by a lambda expression hit-test function.
+     *
+     * \tparam Mesh_
+     * The type of the mesh for which the cell sub-set is to be computed.
+     *
+     * \tparam Lambda_
+     * A lambda expression in the X/Y/Z coordinates returning a bool that specifies whether the tested point is
+     * inside the mesh-part region or not.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Mesh_, typename Lambda_>
+    class LambdaHitTestFactory :
+      public Factory< MeshPart<Mesh_> >
+    {
+    public:
+      /// The shape type of the mesh
+      typedef typename Mesh_::ShapeType ShapeType;
+      /// mesh part type
+      typedef MeshPart<Mesh_> MeshType;
+      /// target set holder type
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
+    protected:
+      /// helper class for hit test
+      class HitTestLambda
+      {
+      public:
+        Lambda_ lambda;
+
+        explicit HitTestLambda(Lambda_&& lb) :
+          lambda(std::forward<Lambda_>(lb))
+        {
+        }
+
+        /// 1D point overload
+        template<typename T_, int s_>
+        bool operator()(const Tiny::Vector<T_, 1, s_>& p) const
+        {
+          return lambda(p[0]);
+        }
+
+        /// 2D point overload
+        template<typename T_, int s_>
+        bool operator()(const Tiny::Vector<T_, 2, s_>& p) const
+        {
+          return lambda(p[0], p[1]);
+        }
+
+        /// 3D point overload
+        template<typename T_, int s_>
+        bool operator()(const Tiny::Vector<T_, 3, s_>& p) const
+        {
+          return lambda(p[0], p[1], p[3]);
+        }
+      } _hit_func;
+      /// reference to the input mesh
+      const Mesh_& _mesh;
+      /// internal data storing the indices
+      std::vector<std::vector<Index>> _target_data;
+
+    public:
+      /**
+       * \brief Creates the factory.
+       *
+       * \param[in] mesh
+       * A \resident reference to the mesh for which the cell sub-set is to be computed.
+       *
+       * \param[in] lambda
+       * A lambda expression in the point coordinates for the hit-test
+       */
+      explicit LambdaHitTestFactory(const Mesh_& mesh,  Lambda_&& lambda) :
+        _hit_func(std::forward<Lambda_>(lambda)),
+        _mesh(mesh),
+        _target_data(std::size_t(_mesh.shape_dim+1))
+      {
+        // call wrapper
+        Intern::HitTestCompute<HitTestLambda, Mesh_, ShapeType>::wrap(_target_data, _mesh, _hit_func);
+      }
+
+      /// \copydoc Factory::get_num_entities()
+      virtual Index get_num_entities(int dim) override
+      {
+        return Index(_target_data.at(std::size_t(dim)).size());
+      }
+
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
+      {
+        // call wrapper
+        Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
+      }
+
+      virtual void fill_attribute_sets(typename MeshType::AttributeSetContainer&) override
+      {
+        // do nothing as the object has no attribute sets
+      }
+
+      virtual void fill_index_sets(std::unique_ptr<typename MeshType::IndexSetHolderType>&) override
+      {
+        // do nothing as the object has no index sets
+      }
+    }; // class LambdaHitTestFactory
+
+    /**
+     * \brief Creates a new mesh-part from a lambda hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] lambda
+     * A lambda expression in X/Y/Z coordinates that returns \c true, if a point is inside, otherwise \c false.
+     *
+     * \returns
+     * A mesh-part containing all entities for which the lambda evaluated to \c true.
+     */
+    template<typename Mesh_, typename Lambda_>
+    MeshPart<Mesh_> make_meshpart_by_lambda_hit_test(const Mesh_& mesh, Lambda_&& lambda)
+    {
+      LambdaHitTestFactory<Mesh_, Lambda_> factory(mesh, std::forward<Lambda_>(lambda));
+      return factory.make();
+    }
+
+    /**
+     * \brief Creates a new mesh-part from a lambda hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] lambda
+     * A lambda expression in X/Y/Z coordinates that returns \c true, if a point is inside, otherwise \c false.
+     *
+     * \returns
+     * A unique-pointer to a mesh-part containing all entities for which the lambda evaluated to \c true.
+     */
+    template<typename Mesh_, typename Lambda_>
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_lambda_hit_test(const Mesh_& mesh, Lambda_&& lambda)
+    {
+      LambdaHitTestFactory<Mesh_, Lambda_> factory(mesh, std::forward<Lambda_>(lambda));
+      return factory.make_unique();
+    }
   } // namespace Geometry
 } // namespace FEAT
