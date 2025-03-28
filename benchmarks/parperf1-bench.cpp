@@ -4,7 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 // ====================================================================================================================
-// Linear Algebra Backend Parallel Performance Benchmark
+// Linear Algebra Backend Parallel Performance Benchmark #1
 // --------------------------------------------------------------------------------------------------------------------
 // This benchmark measures the parallel performance of different linear algebra backends by performing a modified power
 // iteration loop on the 2D FEM 9-point stencil matrix, which converges towards the eigenvector corresponding to the
@@ -30,12 +30,11 @@
 //
 // --------------------------------------------------------------------------------------------------------------------
 //
-// USAGE: parperf-bench <nx> <ny> <mx> <my>  <min_time> [<backend>] [<dt-it>]
+// USAGE: parperf-bench-1 <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]
 //
 // Parameters:
-// <nx> <ny>    Dimensions of local mesh per MPI process.
-// <mx> <my>    Dimensions of MPI process grid; it must hold that
-//              mx*my = np, where np is the number of MPI processes.
+// <mx> <my>    Dimensions of MPI process grid.
+// <nx> <ny>    Dimensions of global mesh; must be multiples of process grid dimensions mx and my.
 // <min_time>   Minimum wall-clock runtime of power iteration in seconds.
 // <backend>    The desired linear algebra backend; must be one of:
 //              'none'   : use raw OpenMP-parallelized loops
@@ -52,12 +51,6 @@
 //              'qi':      quad   + 32-bit unsigned int (requires quadmath)
 //              'ql':      quad   + 64-bit unsigned int (requires quadmath)
 //
-// Notes:
-// The total (global) virtual 2D mesh size is (mx*nx) by (my*ny), so if you
-// are benchmarking various combinations of MPI process counts and OpenMP/MKL
-// thread counts, you should make sure that mx*nx stays the same for all
-// your benchmark cases; the same holds true analogously for my*ny, of course.
-//
 // \author Peter Zajac
 //
 
@@ -68,6 +61,7 @@
 #include <kernel/util/kahan_accumulator.hpp>
 #include <kernel/util/likwid_marker.hpp>
 #include <kernel/util/memory_usage.hpp>
+#include <kernel/util/stop_watch.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
@@ -79,20 +73,20 @@
 
 using namespace FEAT;
 
-/*void dump_matrix(Index nx, Index ny)
+/*void dump_matrix(Index lx, Index ly)
 {
   typedef Geometry::StructuredMesh<2, 2> MeshType;
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
-  Index ne[] = {nx, ny};
+  Index ne[] = {lx, ly};
   MeshType mesh(ne);
   auto& vtx = mesh.get_vertex_set();
-  for(Index iy = 0; iy <= ny; ++iy)
+  for(Index iy = 0; iy <= ly; ++iy)
   {
-    for(Index ix = 0; ix <= nx; ++ix)
+    for(Index ix = 0; ix <= lx; ++ix)
     {
-      auto&v = vtx[iy*(nx+1)+ix];
+      auto&v = vtx[iy*(lx+1)+ix];
       v[0] = double(ix);
       v[1] = double(iy);
     }
@@ -126,10 +120,10 @@ LAFEM::VectorMirror<DT_, IT_> create_mirror(Index n, Index k, Index i, Index o)
 
 /// creates a gate with all required mirrors for this rank
 template<typename DT_, typename IT_>
-Global::Gate<LAFEM::DenseVector<DT_, IT_>, LAFEM::VectorMirror<DT_, IT_>> create_gate(const Dist::Comm& comm, Index mx, Index my, Index nx, Index ny)
+Global::Gate<LAFEM::DenseVector<DT_, IT_>, LAFEM::VectorMirror<DT_, IT_>> create_gate(const Dist::Comm& comm, Index mx, Index my, Index lx, Index ly)
 {
   const int rank = comm.rank();
-  const Index num_dofs_l = (nx+1u)*(ny+1u);
+  const Index num_dofs_l = (lx+1u)*(ly+1u);
   const Index imx = Index(rank) % mx;
   const Index imy = Index(rank) / mx;
 
@@ -137,41 +131,41 @@ Global::Gate<LAFEM::DenseVector<DT_, IT_>, LAFEM::VectorMirror<DT_, IT_>> create
 
   // add lower neighbor
   if(imy > 0u)
-    gate.push(int((imy-1)*mx + imx), create_mirror<DT_, IT_>(num_dofs_l, nx+1u, 1u, 0u));
+    gate.push(int((imy-1)*mx + imx), create_mirror<DT_, IT_>(num_dofs_l, lx+1u, 1u, 0u));
   // add upper neighbor
   if(imy+1 < my)
-    gate.push(int((imy+1)*mx + imx), create_mirror<DT_, IT_>(num_dofs_l, nx+1u, 1u, ny*(nx+1u)));
+    gate.push(int((imy+1)*mx + imx), create_mirror<DT_, IT_>(num_dofs_l, lx+1u, 1u, ly*(lx+1u)));
   // add left neighbor
   if(imx > 0u)
-    gate.push(int(imy*mx + imx - 1), create_mirror<DT_, IT_>(num_dofs_l, ny+1u, nx+1u, 0u));
+    gate.push(int(imy*mx + imx - 1), create_mirror<DT_, IT_>(num_dofs_l, ly+1u, lx+1u, 0u));
   // add right neighbor
   if(imx+1 < mx)
-    gate.push(int(imy*mx + imx + 1), create_mirror<DT_, IT_>(num_dofs_l, ny+1u, nx+1u, nx));
+    gate.push(int(imy*mx + imx + 1), create_mirror<DT_, IT_>(num_dofs_l, ly+1u, lx+1u, lx));
 
   // add lower left neighbor
   if((imy > 0u) && (imx > 0u))
     gate.push(int((imy-1)*mx + imx - 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, 0u));
   // add lower right neighbor
   if((imy > 0u) && (imx+1 < mx))
-    gate.push(int((imy-1)*mx + imx + 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, nx));
+    gate.push(int((imy-1)*mx + imx + 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, lx));
   // add upper left neighbor
   if((imy+1 < my) && (imx > 0u))
-    gate.push(int((imy+1)*mx + imx - 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, ny*(nx+1u)));
+    gate.push(int((imy+1)*mx + imx - 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, ly*(lx+1u)));
   // add upper right neighbor
   if((imy+1 < my) && (imx+1 < mx))
-    gate.push(int((imy+1)*mx + imx + 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, (ny+1)*(nx+1u)-1u));
+    gate.push(int((imy+1)*mx + imx + 1u), create_mirror<DT_, IT_>(num_dofs_l, 1u, 1u, (ly+1)*(lx+1u)-1u));
 
   // compile gate
-  gate.compile(LAFEM::DenseVector<DT_, IT_>((nx+1u)*(ny+1u)));
+  gate.compile(LAFEM::DenseVector<DT_, IT_>((lx+1u)*(ly+1u)));
   return gate;
 }
 
 /// creates a (type-0) 2D 9-point stencil matrix (with Neumann boundary)
 template<typename DT_, typename IT_>
-LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
+LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index lx, Index ly)
 {
-  const Index num_dofs_l = (nx+1u)*(ny+1u);
-  const Index num_nze_l = (3u*(nx+1)-2u)*(3u*(ny+1)-2u);
+  const Index num_dofs_l = (lx+1u)*(ly+1u);
+  const Index num_nze_l = (3u*(lx+1)-2u)*(3u*(ly+1)-2u);
 
   LAFEM::SparseMatrixCSR<DT_, IT_> matrix(num_dofs_l, num_dofs_l, num_nze_l);
 
@@ -183,16 +177,16 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
 
   // loop over Y-rows
   FEAT_PRAGMA_OMP(parallel for)
-  for(Index iy = 0; iy <= ny; ++iy)
+  for(Index iy = 0; iy <= ly; ++iy)
   {
     // loop over elements in Y-row
-    for(Index ix = 0; ix <= nx; ++ix)
+    for(Index ix = 0; ix <= lx; ++ix)
     {
       // compute row number
-      const IT_ irow = IT_(iy*(nx+1)+ix);
+      const IT_ irow = IT_(iy*(lx+1)+ix);
 
       // compute row offset (don't ask)
-      IT_ inze = IT_((iy > 0u ? 3*iy-1u : 0u)*(3u*(nx+1)-2u) + (ix > 0u ? 3*ix-1u : 0u)*((iy > 0u) && (iy < ny) ? 3u : 2u));
+      IT_ inze = IT_((iy > 0u ? 3*iy-1u : 0u)*(3u*(lx+1)-2u) + (ix > 0u ? 3*ix-1u : 0u)*((iy > 0u) && (iy < ly) ? 3u : 2u));
 #ifdef FEAT_HAVE_OMP
       row_ptr[irow] = inze;
 #else
@@ -203,7 +197,7 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
       // add lower row couplings
       if(iy > 0u)
       {
-        Index ikl = (iy-1u)*(nx+1u);
+        Index ikl = (iy-1u)*(lx+1u);
         // add lower left coupling
         if(ix > 0u)
         {
@@ -214,11 +208,11 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
         // add lower coupling
         {
           col_idx[inze] = IT_(ikl + ix);
-          val[inze] = -DT_((ix > 0 ? 1 : 0) + (ix < nx ? 1 : 0));
+          val[inze] = -DT_((ix > 0 ? 1 : 0) + (ix < lx ? 1 : 0));
           ++inze;
         }
         // add lower right coupling
-        if(ix < nx)
+        if(ix < lx)
         {
           col_idx[inze] = IT_(ikl + ix+1u);
           val[inze] = -DT_(2);
@@ -228,33 +222,33 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
 
       // add center row couplings
       {
-        Index ikl = (iy)*(nx+1u);
+        Index ikl = (iy)*(lx+1u);
         // add left coupling
         if(ix > 0u)
         {
           col_idx[inze] = IT_(ikl + ix-1u);
-          val[inze] = -DT_((iy > 0 ? 1 : 0) + (iy < ny ? 1 : 0));
+          val[inze] = -DT_((iy > 0 ? 1 : 0) + (iy < ly ? 1 : 0));
           ++inze;
         }
         // add center coupling
         {
           col_idx[inze] = IT_(ikl + ix);
-          val[inze] = DT_(4 * ((iy > 0 ? 1 : 0) + (iy < ny ? 1 : 0)) * ((ix > 0 ? 1 : 0) + (ix < nx ? 1 : 0)));
+          val[inze] = DT_(4 * ((iy > 0 ? 1 : 0) + (iy < ly ? 1 : 0)) * ((ix > 0 ? 1 : 0) + (ix < lx ? 1 : 0)));
           ++inze;
         }
         // add right coupling
-        if(ix < nx)
+        if(ix < lx)
         {
           col_idx[inze] = IT_(ikl + ix+1u);
-          val[inze] = -DT_((iy > 0 ? 1 : 0) + (iy < ny ? 1 : 0));
+          val[inze] = -DT_((iy > 0 ? 1 : 0) + (iy < ly ? 1 : 0));
           ++inze;
         }
       }
 
       // add upper row couplings
-      if(iy < ny)
+      if(iy < ly)
       {
-        Index ikl = (iy+1u)*(nx+1u);
+        Index ikl = (iy+1u)*(lx+1u);
         // add lower left coupling
         if(ix > 0u)
         {
@@ -265,11 +259,11 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
         // add lower coupling
         {
           col_idx[inze] = IT_(ikl + ix);
-          val[inze] = -DT_((ix > 0 ? 1 : 0) + (ix < nx ? 1 : 0));
+          val[inze] = -DT_((ix > 0 ? 1 : 0) + (ix < lx ? 1 : 0));
           ++inze;
         }
         // add lower right coupling
-        if(ix < nx)
+        if(ix < lx)
         {
           col_idx[inze] = IT_(ikl + ix+1u);
           val[inze] = -DT_(2);
@@ -293,32 +287,32 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index nx, Index ny)
 }
 /// creates a 9-point stencil matrix
 template<typename DT_, typename IT_>
-LAFEM::DenseVector<DT_, IT_> create_vector_init(int rank, Index mx, Index my, Index nx, Index ny)
+LAFEM::DenseVector<DT_, IT_> create_vector_init(int rank, Index mx, Index my, Index lx, Index ly)
 {
-  LAFEM::DenseVector<DT_, IT_> vector((nx+1u)*(ny+1u));
+  LAFEM::DenseVector<DT_, IT_> vector((lx+1u)*(ly+1u));
 
   DT_* val = vector.elements();
 
   const Index jy = rank / mx;
   const Index jx = rank % mx;
-  const DT_ imnx = DT_(1) / DT_(mx*nx+1);
-  const DT_ imny = DT_(1) / DT_(my*ny+1);
+  const DT_ imnx = DT_(1) / DT_(mx*lx+1);
+  const DT_ imny = DT_(1) / DT_(my*ly+1);
 
   // loop over Y-rows
   FEAT_PRAGMA_OMP(parallel for)
-  for(Index iy = 0; iy <= ny; ++iy)
+  for(Index iy = 0; iy <= ly; ++iy)
   {
     // compute global Y-coordinate
-    DT_ y = imny * DT_(jy*ny + iy);
+    DT_ y = imny * DT_(jy*ly + iy);
 
     // loop over elements in Y-row
-    for(Index ix = 0; ix <= nx; ++ix)
+    for(Index ix = 0; ix <= lx; ++ix)
     {
       // compute global X-coordinate
-      DT_ x = imnx * DT_(jx*nx + ix);
+      DT_ x = imnx * DT_(jx*lx + ix);
 
       // set value u(x,y) := x*(1-x)*y*(1-y)
-      val[iy*(nx+1)+ix] = x*(DT_(1) - x)*y*(DT_(1) - y);
+      val[iy*(lx+1)+ix] = x*(DT_(1) - x)*y*(DT_(1) - y);
     } // next ix
   } // next iy
 
@@ -364,14 +358,13 @@ int main(int argc, char ** argv)
 
   if(argc < 6)
   {
-    comm.print("\nUSAGE: parperf-bench <nx> <ny> <mx> <my> <min_time> [<backend>] [<dt-it>]\n");
+    comm.print("\nUSAGE: parperf-bench-1 <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]\n");
     comm.print("This benchmark measures the parallel performance of the FEAT linear algebra");
     comm.print("backends by performing a power iteration to estimate the largest eigenvalue");
     comm.print("of the 2D 9-point stencil matrix stored in the standard CSR matrix format.");
     comm.print("\nCommand Line Parameters:");
-    comm.print("<nx> <ny>    Dimensions of local mesh per MPI process.");
-    comm.print("<mx> <my>    Dimensions of MPI process grid; it must hold that");
-    comm.print("             mx*my = np, where np is the number of MPI processes.");
+    comm.print("<mx> <my>    Dimensions of MPI process grid.");
+    comm.print("<nx> <ny>    Dimensions of global mesh; must be multiples of process grid dimensions.");
     comm.print("<min_time>   Minimum wall-clock runtime of power iteration in seconds.");
     comm.print("<backend>    The desired linear algebra backend; must be one of:");
     comm.print("             'generic': use generic (OpenMP-parallelized) backend.");
@@ -386,11 +379,6 @@ int main(int argc, char ** argv)
     comm.print("             'dl':      double + 64-bit unsigned int");
     comm.print("             'qi':      quad   + 32-bit unsigned int (requires quadmath)");
     comm.print("             'ql':      quad   + 64-bit unsigned int (requires quadmath)");
-    comm.print("\nNotes:");
-    comm.print("The total (global) virtual 2D mesh size is (mx*nx) by (my*ny), so if you");
-    comm.print("are benchmarking various combinations of MPI process counts and OpenMP/MKL");
-    comm.print("thread counts, you should make sure that mx*nx stays the same for all");
-    comm.print("your benchmark cases; the same holds true analogously for my*ny, of course.");
     return 0;
   }
 
@@ -404,24 +392,24 @@ int main(int argc, char ** argv)
   Index nx(0), ny(0), mx(0), my(0);
   double min_runtime(0.0);
   int dt_it = 8008; // 1000*sizeof(DT_) + sizeof(IT_)
-  if(!String(argv[1]).parse(nx) || (nx < 1u))
+  if(!String(argv[1]).parse(mx) || (mx < 1u))
   {
-    comm.print("ERROR: Failed to parse '" + String(argv[1]) + "' as local grid dimension 'nx' >= 1");
+    comm.print("ERROR: Failed to parse '" + String(argv[1]) + "' as process grid dimension 'mx' >= 1");
     return 1;
   }
-  if(!String(argv[2]).parse(ny) || (ny < 1u))
+  if(!String(argv[2]).parse(my) || (my < 1u))
   {
-    comm.print("ERROR: Failed to parse '" + String(argv[2]) + "' as local grid dimension 'ny' >= 1");
+    comm.print("ERROR: Failed to parse '" + String(argv[2]) + "' as process grid dimension 'my' >= 1");
     return 1;
   }
-  if(!String(argv[3]).parse(mx) || (mx < 1u))
+  if(!String(argv[3]).parse(nx) || (nx < 1u))
   {
-    comm.print("ERROR: Failed to parse '" + String(argv[3]) + "' as process grid dimension 'mx' >= 1");
+    comm.print("ERROR: Failed to parse '" + String(argv[3]) + "' as global grid dimension 'nx' >= 1");
     return 1;
   }
-  if(!String(argv[4]).parse(my) || (my < 1u))
+  if(!String(argv[4]).parse(ny) || (ny < 1u))
   {
-    comm.print("ERROR: Failed to parse '" + String(argv[4]) + "' as process grid dimension 'my' >= 1");
+    comm.print("ERROR: Failed to parse '" + String(argv[4]) + "' as global grid dimension 'ny' >= 1");
     return 1;
   }
   if(!String(argv[5]).parse(min_runtime) || (min_runtime < 1e-3))
@@ -519,6 +507,18 @@ int main(int argc, char ** argv)
     return 1;
   }
 
+  // ensure that the global grid dimensions are multiples of the process grid dimensions
+  if((nx < mx) || (nx % mx != 0u))
+  {
+    comm.print("ERROR: global grid dimension nx = " + stringify(nx) + " must be a multiple of process grid dimension mx = " + stringify(mx));
+    return 1;
+  }
+  if((ny < my) || (ny % my != 0u))
+  {
+    comm.print("ERROR: global grid dimension ny = " + stringify(ny) + " must be a multiple of process grid dimension my = " + stringify(my));
+    return 1;
+  }
+
   // ensure that the selected backend is actually available
 #if !defined(FEAT_HAVE_CUDA)
   if(selected_backend == SelectedBackend::cuda)
@@ -540,30 +540,30 @@ int main(int argc, char ** argv)
   {
 #ifdef FEAT_HAVE_HALFMATH
   case 2004: // half, int32
-    return run<Half, std::uint32_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<Half, std::uint32_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 
   case 2008: // half, int64
-    return run<Half, std::uint64_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<Half, std::uint64_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 #endif // FEAT_HAVE_HALFMATH
 
   case 4004: // float, int32
-    return run<float, std::uint32_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<float, std::uint32_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 
   case 4008: // float, int64
-    return run<float, std::uint64_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<float, std::uint64_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 
   case 8004: // double, int32
-    return run<double, std::uint32_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<double, std::uint32_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 
   case 8008: // double, int64
-    return run<double, std::uint64_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<double, std::uint64_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 
 #ifdef FEAT_HAVE_QUADMATH
   case 16004: // quadruple, int32
-    return run<__float128, std::uint32_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<__float128, std::uint32_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 
   case 16008: // quadruple, int64
-    return run<__float128, std::uint64_t>(comm, nx, ny, mx, my, min_runtime, selected_backend);
+    return run<__float128, std::uint64_t>(comm, mx, my, nx, ny, min_runtime, selected_backend);
 #endif // FEAT_HAVE_QUADMATH
 
   default:
@@ -573,19 +573,19 @@ int main(int argc, char ** argv)
 }
 
 template<typename DT_, typename IT_>
-int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, const Index my, double min_runtime, SelectedBackend selected_backend)
+int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, const Index ny, double min_runtime, SelectedBackend selected_backend)
 {
   typedef DT_ DataType;
   typedef IT_ IndexType;
 
-  // total mesh dimensions
-  const Index mnx = mx * nx;
-  const Index mny = my * ny;
+  // local mesh dimensions
+  const Index lx = nx / mx;
+  const Index ly = ny / my;
 
   // matrix dimensions
-  const Index num_dofs_l = (nx+1u)*(ny+1u);
-  const Index num_nze_l = (3u*(nx+1)-2u)*(3u*(ny+1)-2u);
-  const Index num_dofs_g = (mnx+1)*(mny+1);
+  const Index num_dofs_l = (lx+1u)*(ly+1u);
+  const Index num_nze_l = (3u*(lx+1)-2u)*(3u*(ly+1)-2u);
+  const Index num_dofs_g = (nx+1)*(ny+1);
   const Index num_nze_g = num_nze_l*mx*my;
 
   // compute bytes to be allocated (just for statistics)
@@ -594,7 +594,7 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
   const std::size_t bytes_mat_l = sizeof(DataType)*num_nze_l + sizeof(IndexType)*(num_dofs_l+num_nze_l);
   const std::size_t bytes_mat_g = bytes_mat_l*mx*my;
   // total size: 1x matrix + 3x vector[x+t+f] + mirrors + mirror buffers
-  const std::size_t bytes_tot_g = bytes_mat_g + 3*bytes_vec_g + (sizeof(DataType)+sizeof(IndexType))*((mx-1)*ny + (my-1)*nx);
+  const std::size_t bytes_tot_g = bytes_mat_g + 3*bytes_vec_g + (sizeof(DataType)+sizeof(IndexType))*((mx-1)*ly + (my-1)*lx);
 
   PreferredBackend preferred_backend = PreferredBackend::generic;
   switch(selected_backend)
@@ -632,11 +632,11 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
 #else
   comm.print("MKL Threads per Process..:             -N/A-");
 #endif
+  comm.print("Total   Grid Dimensions..:" + stringify(nx).pad_front(8) + " x" + stringify(ny).pad_front(8));
   comm.print("Process Grid Dimensions..:" + stringify(mx).pad_front(8) + " x" + stringify(my).pad_front(8));
-  comm.print("Local   Grid Dimensions..:" + stringify(nx).pad_front(8) + " x" + stringify(ny).pad_front(8));
-  comm.print("Total   Grid Dimensions..:" + stringify(mnx).pad_front(8) + " x" + stringify(mny).pad_front(8));
-  comm.print("Local Number of Elements.:" + stringify(nx*ny).pad_front(18));
-  comm.print("Total Number of Elements.:" + stringify(mnx*mny).pad_front(18));
+  comm.print("Local   Grid Dimensions..:" + stringify(lx).pad_front(8) + " x" + stringify(ly).pad_front(8));
+  comm.print("Local Number of Elements.:" + stringify(lx*ly).pad_front(18));
+  comm.print("Total Number of Elements.:" + stringify(nx*ny).pad_front(18));
   comm.print("Local Number of DOFs.....:" + stringify(num_dofs_l).pad_front(18));
   comm.print("Total Number of DOFs.....:" + stringify(num_dofs_g).pad_front(18));
   comm.print("Local Number of NZEs.....:" + stringify(num_nze_l).pad_front(18));
@@ -660,16 +660,19 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
   typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
   typedef LAFEM::VectorMirror<DataType, IndexType> MirrorType;
 
+  StopWatch watch_setup;
+  watch_setup.start();
+
   // create the gate
-  Global::Gate<LocalVectorType, MirrorType> gate = create_gate<DataType, IndexType>(comm, mx, my, nx, ny);
+  Global::Gate<LocalVectorType, MirrorType> gate = create_gate<DataType, IndexType>(comm, mx, my, lx, ly);
   const LocalVectorType& vec_f = gate.get_freqs();
 
   // create local matrix
-  LocalMatrixType matrix = create_matrix<DataType, IndexType>(nx, ny);
+  LocalMatrixType matrix = create_matrix<DataType, IndexType>(lx, ly);
   //matrix.write_out(LAFEM::FileMode::fm_mtx, "A.mtx");
 
   // create vectors (their content is more or less arbitrary)
-  LocalVectorType vec_x = create_vector_init<DataType, IndexType>(comm.rank(), mx, my, nx, ny);
+  LocalVectorType vec_x = create_vector_init<DataType, IndexType>(comm.rank(), mx, my, lx, ly);
   LocalVectorType vec_t = matrix.create_vector_l();
   //vec_x.format(Math::sqrt(DataType(1) / DataType(num_dofs_g)));
   vec_t.format(Math::sqrt(DataType(3.14159) /  DataType(num_dofs_g)));
@@ -700,6 +703,8 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
     // ensure that the mirrors are also touched by firing a useless sync
     gate.sync_0(vec_t);
   }
+
+  watch_setup.stop();
 
   // define statistics variables
   TimeStamp stamp_begin, stamp_end, stamp_1, stamp_2, stamp_3, stamp_4, stamp_5;
@@ -911,7 +916,8 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
   accum_time_sanity += accum_time_sync_0.value;
 
   // compute minimum/maximum/sum times
-  double times_min[6], times_max[6], times_sum[6], times_avg[6], times_tot[6];
+  static const std::size_t num_times = 12u;
+  double times_min[num_times], times_max[num_times], times_sum[num_times], times_avg[num_times], times_tot[num_times];
   times_min[0] = times_max[0] = times_sum[0] = accum_time_sanity.value;
   times_min[1] = times_max[1] = times_sum[1] = accum_time_matvec.value;
   times_min[2] = times_max[2] = times_sum[2] = accum_time_tridot.value;
@@ -919,19 +925,23 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
   times_min[4] = times_max[4] = times_sum[4] = accum_time_sync_0.value;
   times_min[5] = times_max[5] = times_sum[5] = accum_time_reduce.value;
 
-  comm.allreduce(times_min, times_min, std::size_t(6), Dist::op_min);
-  comm.allreduce(times_max, times_max, std::size_t(6), Dist::op_max);
-  comm.allreduce(times_sum, times_sum, std::size_t(6), Dist::op_sum);
+  comm.allreduce(times_min, times_min, num_times, Dist::op_min);
+  comm.allreduce(times_max, times_max, num_times, Dist::op_max);
+  comm.allreduce(times_sum, times_sum, num_times, Dist::op_sum);
 
   // compute average times
-  for(int i = 0; i < 6; ++i)
+  for(std::size_t i = 0; i < num_times; ++i)
   {
     times_avg[i] = times_sum[i] / double(comm.size());
     times_tot[i] = times_avg[i] / double(comm.size()); // only required for total bandwidth/flops
   }
 
+  double time_setup = watch_setup.elapsed();
+  comm.allreduce(&time_setup, &time_setup, std::size_t(1), Dist::op_max);
+
   // print runtime summary
   comm.print("\nRuntime Summary:" + String("Minimum").pad_front(24) + String("Average").pad_front(25) + String("Maximum").pad_front(25));
+  comm.print("Total Setup Runtime......:" + stringify_fp_fix(time_setup, 6, 14));
   comm.print("Loop Iteration Runtime...:" + stringify_fp_fix(time_total/double(iter), 6, 14));
   comm.print("Total Loop Runtime.......:" + stringify_fp_fix(time_total, 6, 14));
   comm.print("Time Sum Sanity Check....:" +
@@ -1046,6 +1056,6 @@ int run(const Dist::Comm& comm, const Index nx, const Index ny, const Index mx, 
   comm.allreduce(&peak_p, &peak_p, std::size_t(1), Dist::op_sum);
   comm.print("\nPeak Total Memory Usage.: " + stringify_bytes(peak_p));
 
-  comm.print("\nThank you for choosing parperf-bench, have a nice and productive day!");
+  comm.print("\nThank you for choosing parperf1-bench, have a nice and productive day!");
   return 0;
 }
