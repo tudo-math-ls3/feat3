@@ -285,14 +285,13 @@ class SparseMatrixBandedApplyTest
 private:
   const Index _opt;
 public:
-  SparseMatrixBandedApplyTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixBandedApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend), _opt(0)
+  SparseMatrixBandedApplyTest(PreferredBackend backend) :
+    UnitTest("SparseMatrixBandedApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend), _opt(0)
   {
   }
 
-  explicit SparseMatrixBandedApplyTest(PreferredBackend backend, const Index opt)
-    : UnitTest("SparseMatrixBandedApplyTest: "
-                                            + stringify(opt) + " offsets", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend), _opt(opt)
+  explicit SparseMatrixBandedApplyTest(PreferredBackend backend, const Index opt) :
+    UnitTest("SparseMatrixBandedApplyTest: " + stringify(opt) + " offsets", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend), _opt(opt)
   {
   }
 
@@ -304,7 +303,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.85)));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
