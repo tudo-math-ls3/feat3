@@ -1369,13 +1369,6 @@ namespace FEAT
         if(this->_element_indices.empty())
           return;
 
-        // for single threaded, just use normal master assembly
-        if(this->_strategy == ThreadingStrategy::single)
-        {
-          assemble_master(job);
-          return;
-        }
-
         bool need_scatter = false;
         bool need_combine = false;
 
