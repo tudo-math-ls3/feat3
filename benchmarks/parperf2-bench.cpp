@@ -30,11 +30,12 @@
 //
 // --------------------------------------------------------------------------------------------------------------------
 //
-// USAGE: parperf-bench-1 <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]
+// USAGE: parperf2-bench <mx> <my> <nx> <ny> <level> <min_time> [<backend>] [<dt-it>]
 //
 // Parameters:
 // <mx> <my>    Dimensions of MPI process grid.
-// <nx> <ny>    Dimensions of global mesh; must be multiples of process grid dimensions mx and my.
+// <nx> <ny>    Dimensions of global coarse mesh; must be multiples of process grid dimensions mx and my.
+// <level>      Refinement level of mesh.
 // <min_time>   Minimum wall-clock runtime of power iteration in seconds.
 // <backend>    The desired linear algebra backend; must be one of:
 //              'none'   : use raw OpenMP-parallelized loops
@@ -154,13 +155,14 @@ int main(int argc, char ** argv)
 
   if(argc < 7)
   {
-    comm.print("\nUSAGE: parperf-bench-2 <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]\n");
+    comm.print("\nUSAGE: parperf2-bench <mx> <my> <nx> <ny> <level> <min_time> [<backend>] [<dt-it>]\n");
     comm.print("This benchmark measures the parallel performance of the FEAT linear algebra");
     comm.print("backends by performing a power iteration to estimate the largest eigenvalue");
     comm.print("of the 2D 9-point stencil matrix stored in the standard CSR matrix format.");
     comm.print("\nCommand Line Parameters:");
     comm.print("<mx> <my>    Dimensions of MPI process grid.");
-    comm.print("<nx> <ny>    Dimensions of global mesh; must be multiples of process grid dimensions.");
+    comm.print("<nx> <ny>    Dimensions of global coarse mesh; must be multiples of process grid dimensions.");
+    comm.print("<level>      Refinement level of global mesh.");
     comm.print("<min_time>   Minimum wall-clock runtime of power iteration in seconds.");
     comm.print("<backend>    The desired linear algebra backend; must be one of:");
     comm.print("             'generic': use generic (OpenMP-parallelized) backend.");

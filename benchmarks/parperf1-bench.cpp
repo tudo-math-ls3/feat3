@@ -30,7 +30,7 @@
 //
 // --------------------------------------------------------------------------------------------------------------------
 //
-// USAGE: parperf-bench-1 <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]
+// USAGE: parperf1-bench <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]
 //
 // Parameters:
 // <mx> <my>    Dimensions of MPI process grid.
@@ -358,7 +358,7 @@ int main(int argc, char ** argv)
 
   if(argc < 6)
   {
-    comm.print("\nUSAGE: parperf-bench-1 <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]\n");
+    comm.print("\nUSAGE: parperf1-bench <mx> <my> <nx> <ny> <min_time> [<backend>] [<dt-it>]\n");
     comm.print("This benchmark measures the parallel performance of the FEAT linear algebra");
     comm.print("backends by performing a power iteration to estimate the largest eigenvalue");
     comm.print("of the 2D 9-point stencil matrix stored in the standard CSR matrix format.");
