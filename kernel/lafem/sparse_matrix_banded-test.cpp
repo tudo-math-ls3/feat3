@@ -303,7 +303,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.85)));
+    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
