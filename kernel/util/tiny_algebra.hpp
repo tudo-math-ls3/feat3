@@ -1229,6 +1229,24 @@ namespace FEAT
       #endif
     }
 
+    /**
+     *  \brief Calculates the projected vector
+     *
+     * \param[in] x Vector to be projected
+     * \param[in] y Vector to be projected on
+     *
+     * \returns The projected vector
+     */
+    template<typename T_, int dim_>
+    CUDA_HOST inline Vector<T_, dim_> project_onto(const Vector<T_, dim_>& x, const Vector<T_, dim_>& y)
+    {
+      T_ norm2(y.template norm_euclid_n<dim_>());
+      if(norm2 < Math::eps<T_>())
+        norm2 = T_(1);
+      const auto tmp_normalized = (T_(1)/norm2) * y;
+      return dot(x, tmp_normalized) * tmp_normalized;
+    }
+
 
     /* ************************************************************************************************************* */
     /* ************************************************************************************************************* */

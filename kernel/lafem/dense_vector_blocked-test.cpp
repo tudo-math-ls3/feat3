@@ -1260,3 +1260,67 @@ DenseVectorBlockedPermuteTest <double, std::uint32_t, 2> cuda_dv_permute_test_do
 DenseVectorBlockedPermuteTest <float, std::uint64_t, 3> cuda_dv_permute_test_float_uint64(PreferredBackend::cuda);
 DenseVectorBlockedPermuteTest <double, std::uint64_t, 3> cuda_dv_permute_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedProjectTest
+  : public UnitTest
+{
+public:
+  DenseVectorBlockedProjectTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedPermuteTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorBlockedProjectTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    constexpr Index size = Index(1e4);
+
+    DenseVectorBlocked<DT_, IT_, block_size_> vec(rng, size, DT_(-1e4), DT_(1e+4));
+    DenseVectorBlocked<DT_, IT_, block_size_> normal(size, DT_(0));
+
+    Tiny::Vector<DT_, block_size_> tmp_tiny(DT_(0));
+    tmp_tiny[0] = DT_(1);
+
+    for(int i = 0; i < int(normal.size()); ++i)
+    {
+      normal(i, tmp_tiny);
+    }
+
+    auto projected_vec = vec.clone();
+
+    vec.project_onto(projected_vec, normal);
+
+    for(int i = 0; i < int(vec.size()); ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(projected_vec(i)[0], vec(i)[0],  eps);
+    }
+  }
+};
+DenseVectorBlockedProjectTest <float, std::uint32_t, 2> dv_project_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedProjectTest <double, std::uint32_t, 2> dv_project_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedProjectTest <float, std::uint64_t, 3> dv_project_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedProjectTest <double, std::uint64_t, 3> dv_project_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseVectorBlockedProjectTest <float, std::uint64_t, 2> mkl_dv_project_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedProjectTest <double, std::uint64_t, 3> mkl_dv_project_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedProjectTest <__float128, std::uint32_t, 2> dv_project_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedProjectTest <__float128, std::uint64_t, 3> dv_project_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorBlockedProjectTest <Half, std::uint32_t, 2> dv_blocked_project_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedProjectTest <Half, std::uint64_t, 3> dv_blocked_project_test_half_uint64(PreferredBackend::generic);
+#endif

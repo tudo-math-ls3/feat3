@@ -1359,6 +1359,27 @@ namespace FEAT
 
         return lhs;
       }
+
+      /**
+       * \brief Projects this vector onto a another one
+       *
+       * \param[out] projected_vector A correctly allocated vector which will be overriden with the projected data
+       * \param[in] normal_vector The vector to be projected on.
+       *
+       * \note The normal vector does not need to be normalized, which in turn leads to the vectors being scaled by the magintude of the entries, besides
+       *       the projection.
+       */
+      template<typename DT2_, typename IT2_>
+      void project_onto(DenseVectorBlocked<DT_, IT_, BlockSize_>& projected_vector, const LAFEM::DenseVectorBlocked<DT2_, IT2_, BlockSize_>& normal_vector) const
+      {
+        XASSERTM(this->size() == normal_vector.size(), "Sizes do not match");
+        XASSERTM(this->size() == projected_vector.size(), "Target size do not match");
+
+        for(Index i = 0; i < this->size(); ++i)
+        {
+          projected_vector(i, Tiny::project_onto(this->operator()(i), normal_vector(i)));
+        }
+      }
     }; // class DenseVectorBlocked<...>
 
   } // namespace LAFEM
