@@ -278,10 +278,9 @@ public:
 
     Cubature::DynamicFactory cubature("auto-degree:5");
 
-    matrix.format();
-
     // assemble A, B and D
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
+    mat_a.format();
 
     Assembly::Common::DuDvOperatorBlocked<dim> dudv_op;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a, dudv_op, space_v, cubature);

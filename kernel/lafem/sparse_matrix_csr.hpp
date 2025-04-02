@@ -404,39 +404,22 @@ namespace FEAT
        * Creates a CSR matrix based on a given adjacency graph, representing the sparsity pattern.
        */
       explicit SparseMatrixCSR(const Adjacency::Graph & graph) :
-        Container<DT_, IT_>(0)
+        SparseMatrixCSR(graph.get_num_nodes_domain(), graph.get_num_nodes_image(), graph.get_num_indices())
       {
-        Index num_rows = graph.get_num_nodes_domain();
-        Index num_cols = graph.get_num_nodes_image();
-        Index num_nnze = graph.get_num_indices();
-
-        if (num_nnze == 0)
-        {
-          this->move(SparseMatrixCSR(num_rows, num_cols));
-          return;
-        }
-
-        // create temporary vectors
-        LAFEM::DenseVector<IT_, IT_> vrow_ptr(num_rows+1);
-        LAFEM::DenseVector<IT_, IT_> vcol_idx(num_nnze);
-        LAFEM::DenseVector<DT_, IT_> vdata(num_nnze, DT_(0));
-
+        const Index num_nnze = graph.get_num_indices();
+        const Index num_rows = graph.get_num_nodes_domain();
         const Index * dom_ptr(graph.get_domain_ptr());
         const Index * img_idx(graph.get_image_idx());
-        IT_ * prow_ptr(vrow_ptr.elements());
-        IT_ * pcol_idx(vcol_idx.elements());
+        IT_ * prow_ptr(this->row_ptr());
+        IT_ * pcol_idx(this->col_ind());
 
-        // build row-end
-        prow_ptr[0] = IT_(dom_ptr[0]);
-        for(Index i(0); i < num_rows; ++i)
-          prow_ptr[i+1] = IT_(dom_ptr[i+1]);
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i <= num_rows; ++i)
+          prow_ptr[i] = IT_(dom_ptr[i]);
 
-        // build col-idx
-        for(Index i(0); i < num_nnze; ++i)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i < num_nnze; ++i)
           pcol_idx[i] = IT_(img_idx[i]);
-
-        // build the matrix
-        this->move(SparseMatrixCSR<DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
       }
 
       /**

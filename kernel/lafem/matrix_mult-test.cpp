@@ -197,7 +197,7 @@ class MatrixMultTest2
 
 public:
   MatrixMultTest2(PreferredBackend backend)
-    : UnitTest("MatrixMultTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+    : UnitTest("MatrixMultTest2", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
@@ -235,9 +235,10 @@ public:
     MatrixType b(factory_B.make_csr());
 
 
-   //create matrix adjacency structure for X=D*B
+    //create matrix adjacency structure for X=D*B
     Adjacency::Graph graph_db(Adjacency::RenderType::injectify_sorted, d, b);
     MatrixType x(graph_db);
+    x.format();
 
     // calculate X=D*B
     x.add_mat_mat_product(d, b);
