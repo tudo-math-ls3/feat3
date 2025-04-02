@@ -190,7 +190,8 @@ namespace FEAT
 #endif
             case PreferredBackend::generic:
             default:
-              for (Index i(0) ; i < count ; ++i)
+              FEAT_PRAGMA_OMP(parallel for)
+              for (Index i = 0 ; i < count ; ++i)
               {
                 address[i] = val;
               }
@@ -216,6 +217,7 @@ namespace FEAT
             case PreferredBackend::generic:
             default:
             {
+              // we don't use OpenMP here, because this would result in a non-deterministic vector
               for (Index i(0) ; i < count ; ++i)
               {
                 address[i] = rng(min, max);
@@ -241,7 +243,15 @@ namespace FEAT
 #endif
             case PreferredBackend::generic:
             default:
+#ifdef FEAT_HAVE_OMP
+              FEAT_PRAGMA_OMP(parallel for)
+              for (Index i = 0 ; i < count ; ++i)
+              {
+                dest[i] = src[i];
+              }
+#else
               ::memcpy(dest, src, count * sizeof(DT_));
+#endif
               return;
           }
         }
@@ -253,7 +263,15 @@ namespace FEAT
           if (dest == src)
             return;
 
+#ifdef FEAT_HAVE_OMP
+          FEAT_PRAGMA_OMP(parallel for)
+          for (Index i = 0 ; i < count ; ++i)
+          {
+            dest[i] = src[i];
+          }
+#else
           ::memcpy(dest, src, count * sizeof(DT_));
+#endif
         }
 
         /// Convert datatype DT2_ from src into DT1_ in dest
@@ -270,7 +288,8 @@ namespace FEAT
 #endif
             case PreferredBackend::generic:
             default:
-              for (Index i(0) ; i < count ; ++i)
+              FEAT_PRAGMA_OMP(parallel for)
+              for (Index i = 0 ; i < count ; ++i)
               {
                 dest[i] = DT1_(src[i]);
               }
