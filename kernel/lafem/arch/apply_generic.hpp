@@ -58,7 +58,7 @@ namespace FEAT
         }
         else
         {
-          FEAT_PRAGMA_OMP(parallel for)
+          FEAT_PRAGMA_OMP(parallel for schedule(static, 2000))
           for (Index row = 0 ; row < rows ; ++row)
           {
             DT_ sum(0);
@@ -111,7 +111,7 @@ namespace FEAT
         }
         else
         {
-          FEAT_PRAGMA_OMP(parallel for)
+          FEAT_PRAGMA_OMP(parallel for schedule(static, 2000))
           for (Index nzrow = 0 ; nzrow < used_rows ; ++nzrow)
           {
             const Index row(row_numbers[nzrow]);
@@ -143,7 +143,7 @@ namespace FEAT
           MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockHeight_);
         }
 
-        FEAT_PRAGMA_OMP(parallel for)
+        FEAT_PRAGMA_OMP(parallel for schedule(static, 2000))
         for (Index row = 0 ; row < rows ; ++row)
         {
           Tiny::Vector<DT_, BlockHeight_> bsum(0);
@@ -209,7 +209,7 @@ namespace FEAT
           MemoryPool::copy(r, y, /*(transposed?columns:rows)*/ rows * BlockSize_);
         }
 
-        FEAT_PRAGMA_OMP(parallel for)
+        FEAT_PRAGMA_OMP(parallel for schedule(static, 2000))
         for (Index row = 0 ; row < rows ; ++row)
         {
           Tiny::Vector<DT_, BlockSize_> bsum(0);
