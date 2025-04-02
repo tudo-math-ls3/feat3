@@ -411,7 +411,7 @@ namespace FEAT
         _domain_ptr = IndexVector(adj.get_num_nodes_domain() + 1);
         _domain_ptr[0] = 0;
         // count number of adjacencies and build pointer vector
-        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
         {
           Index num_indices_here = Index(0);
@@ -431,7 +431,7 @@ namespace FEAT
 
         // allocate and build index vector
         _image_idx = IndexVector(num_indices_image);
-        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
         {
           Index k = _domain_ptr[i];
@@ -463,7 +463,7 @@ namespace FEAT
           char* idx_mask = vidx_mask.data();
 
           // count number of adjacencies and build pointer vector
-          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 1000))
           for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
           {
             Index num_indices_here = Index(0);
@@ -492,7 +492,7 @@ namespace FEAT
         {
           std::vector<char> vidx_mask(adj.get_num_nodes_image(), 0);
           char* idx_mask = vidx_mask.data();
-          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 1000))
           for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
           {
             Index k = _domain_ptr[i];
@@ -646,7 +646,7 @@ namespace FEAT
         _domain_ptr = IndexVector(adj1.get_num_nodes_domain() + 1);
         _domain_ptr[0] = 0;
         // count number of adjacencies and build pointer vector
-        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
         {
           Index num_indices_here = Index(0);
@@ -673,7 +673,7 @@ namespace FEAT
         // allocate and build index vector
         _image_idx = IndexVector(num_indices_image);
 
-        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 64))
+        FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
         {
           Index k = _domain_ptr[i];
@@ -716,7 +716,7 @@ namespace FEAT
           char* idx_mask = vidx_mask.data();
 
           // count number of adjacencies and build pointer vector
-          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 1000))
           for(Index i=0; i < adj1.get_num_nodes_domain(); ++i)
           {
             Index num_indices_here = Index(0);
@@ -750,7 +750,7 @@ namespace FEAT
         {
           std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
           char* idx_mask = vidx_mask.data();
-          FEAT_PRAGMA_OMP(for schedule(dynamic, 64))
+          FEAT_PRAGMA_OMP(for schedule(dynamic, 1000))
           for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
           {
             Index k = _domain_ptr[i];
