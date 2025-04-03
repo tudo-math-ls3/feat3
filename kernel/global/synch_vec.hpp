@@ -136,18 +136,18 @@ namespace FEAT
       SynchVectorTicket(SynchVectorTicket&& other) :
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
         _finished(other._finished),
-        _target(other->_target),
-        _comm(other->_comm),
-        _mirrors(other->_mirrors),
+        _target(other._target),
+        _comm(other._comm),
+        _mirrors(other._mirrors),
         _send_reqs(std::forward<Dist::RequestVector>(other._send_reqs)),
         _recv_reqs(std::forward<Dist::RequestVector>(other._recv_reqs)),
         _send_bufs(std::forward<std::vector<BufferType>>(other._send_bufs)),
         _recv_bufs(std::forward<std::vector<BufferType>>(other._recv_bufs))
       {
-        other->_finished = true;
-        other->_comm = nullptr;
-        other->_target = nullptr;
-        other->_mirrors = nullptr;
+        other._finished = true;
+        other._comm = nullptr;
+        other._target = nullptr;
+        other._mirrors = nullptr;
       }
 #else
         _finished(other._finished)
@@ -164,9 +164,9 @@ namespace FEAT
 
 #if defined(FEAT_HAVE_MPI) || defined(DOXYGEN)
         _finished = other._finished;
-        _target = other->_target;
-        _comm = other->_comm;
-        _mirrors = other->_mirrors;
+        _target = other._target;
+        _comm = other._comm;
+        _mirrors = other._mirrors;
         _send_reqs = std::forward<Dist::RequestVector>(other._send_reqs);
         _recv_reqs = std::forward<Dist::RequestVector>(other._recv_reqs);
         _send_bufs = std::forward<std::vector<BufferType>>(other._send_bufs);
@@ -178,7 +178,7 @@ namespace FEAT
         other->_mirrors = nullptr;
 #else
         _finished = other._finished;
-        other->_finished = true;
+        other._finished = true;
 #endif // FEAT_HAVE_MPI
 
         return *this;
