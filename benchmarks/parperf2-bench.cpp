@@ -483,6 +483,7 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
   StopWatch watch_asm_domain_asm;
   watch_asm_domain_asm.start();
   Assembly::DomainAssembler<TrafoType> domain_asm(trafo);
+  domain_asm.set_threading_strategy(Assembly::ThreadingStrategy::colored);
   domain_asm.compile_all_elements();
   watch_asm_domain_asm.stop();
 

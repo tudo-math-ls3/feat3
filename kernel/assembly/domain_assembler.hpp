@@ -1582,8 +1582,12 @@ namespace FEAT
         }
 
         // do we want multi-threading?
+        // note: if OpenMP is enabled, we also process the threading strategy even
+        // if no explicit worker threads were requested
         this->_num_worker_threads = 0;
+#if !defined(FEAT_HAVE_OMP)
         if(this->_max_worker_threads > 0)
+#endif
         {
           // build the graphs for our element list
           this->_build_graphs();
@@ -1611,7 +1615,7 @@ namespace FEAT
             break;
 
           default:
-            // go no, there's nothing to see here...
+            // go on, there's nothing to see here...
             break;
           }
         }
