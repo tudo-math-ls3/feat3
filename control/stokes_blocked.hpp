@@ -408,6 +408,7 @@ namespace FEAT
           Assembly::SymbolicAssembler::assemble_matrix_std2(this->matrix_b.local(), space_velo, space_pres);
 
         // assemble matrix B
+        this->matrix_b.local().format();
         Assembly::Common::GradientTestOperatorBlocked<dim_> grad_op;
         Assembly::assemble_bilinear_operator_matrix_2(
           dom_asm, this->matrix_b.local(), grad_op, space_velo, space_pres, cubature, -DataType(1));
