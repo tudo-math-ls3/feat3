@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -147,8 +146,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2940dc4f89d1e594a3d540e0fa77226d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#a2940dc4f89d1e594a3d540e0fa77226d">GMRES</a> (const MatrixType &amp;matrix, const FilterType &amp;filter, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> krylov_dim, DataType inner_res_scale=DataType(0), std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
 <tr class="memdesc:a2940dc4f89d1e594a3d540e0fa77226d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#a2940dc4f89d1e594a3d540e0fa77226d">More...</a><br /></td></tr>
 <tr class="separator:a2940dc4f89d1e594a3d540e0fa77226d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a608d58e367b688d7cac4d2af5aa3c1ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#a608d58e367b688d7cac4d2af5aa3c1ff">GMRES</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
-<tr class="separator:a608d58e367b688d7cac4d2af5aa3c1ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3d6fc801122161fc373c00e5148d401"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#ad3d6fc801122161fc373c00e5148d401">GMRES</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
+<tr class="separator:ad3d6fc801122161fc373c00e5148d401"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa31268152cb828a06c8b8e179dc76685"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#aa31268152cb828a06c8b8e179dc76685">~GMRES</a> ()</td></tr>
 <tr class="memdesc:aa31268152cb828a06c8b8e179dc76685"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty virtual destructor.  <a href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#aa31268152cb828a06c8b8e179dc76685">More...</a><br /></td></tr>
 <tr class="separator:aa31268152cb828a06c8b8e179dc76685"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -639,8 +638,8 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 </div>
 </div>
-<a id="a608d58e367b688d7cac4d2af5aa3c1ff" name="a608d58e367b688d7cac4d2af5aa3c1ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a608d58e367b688d7cac4d2af5aa3c1ff">&#9670;&#160;</a></span>GMRES() <span class="overload">[2/2]</span></h2>
+<a id="ad3d6fc801122161fc373c00e5148d401" name="ad3d6fc801122161fc373c00e5148d401"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3d6fc801122161fc373c00e5148d401">&#9670;&#160;</a></span>GMRES() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -659,7 +658,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
           <td class="paramname"><em>section</em>, </td>
         </tr>
         <tr>

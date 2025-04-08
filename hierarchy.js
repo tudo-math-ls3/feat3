@@ -191,6 +191,7 @@ var hierarchy =
     [ "FEAT::Geometry::Factory< MeshPart< Mesh_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory.html", [
       [ "FEAT::Geometry::ChartHitTestFactory< Mesh_, Chart_ >", "class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory.html", null ],
       [ "FEAT::Geometry::HitTestFactory< HitFunc_, Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_hit_test_factory.html", null ],
+      [ "FEAT::Geometry::LambdaHitTestFactory< Mesh_, Lambda_ >", "class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory.html", null ],
       [ "FEAT::Geometry::ParsedHitTestFactory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html", null ]
     ] ],
     [ "FEAT::Geometry::Factory< MeshPart< ParentMesh_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory.html", [
@@ -608,6 +609,7 @@ var hierarchy =
     [ "FEAT::Geometry::Intern::CoarseFineCellMapping< FineMesh_, CoarseMesh_, is_structured_ >", "class_f_e_a_t_1_1_geometry_1_1_intern_1_1_coarse_fine_cell_mapping.html", null ],
     [ "FEAT::Geometry::Intern::PartiIterativeIndividual< Shape_, num_coords_, Coord_ >", "class_f_e_a_t_1_1_geometry_1_1_intern_1_1_parti_iterative_individual.html", null ],
     [ "FEAT::Geometry::Intern::PartiIterativeItem", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_parti_iterative_item.html", null ],
+    [ "FEAT::Geometry::LambdaHitTestFactory< Mesh_, Lambda_ >::HitTestLambda", "class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory_1_1_hit_test_lambda.html", null ],
     [ "FEAT::Geometry::MacroFactory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_macro_factory.html", null ],
     [ "FEAT::Geometry::MeshAtlas< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", null ],
     [ "FEAT::Geometry::MeshDistortion< MeshType_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_distortion.html", [
@@ -688,7 +690,7 @@ var hierarchy =
     [ "FEAT::Global::SynchVectorTicket< VT_, VMT_ >", "class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html", null ],
     [ "FEAT::Global::Transfer< LocalTransfer_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Vector< LocalVector_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_vector.html", null ],
-    [ "FEAT::KahanAccumulation", "struct_f_e_a_t_1_1_kahan_accumulation.html", null ],
+    [ "FEAT::KahanAccumulator< DT_ >", "class_f_e_a_t_1_1_kahan_accumulator.html", null ],
     [ "FEAT::LAFEM::Arch::Apply", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_apply.html", null ],
     [ "FEAT::LAFEM::Arch::Axpy", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html", null ],
     [ "FEAT::LAFEM::Arch::ComponentCopy", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_component_copy.html", null ],
@@ -1346,6 +1348,7 @@ var hierarchy =
       [ "FEAT::Cubature::TrapezoidalDriver< Shape::Hypercube< dim_ > >", "class_f_e_a_t_1_1_cubature_1_1_trapezoidal_driver_3_01_shape_1_1_hypercube_3_01dim___01_4_01_4.html", null ],
       [ "FEAT::Cubature::TrapezoidalDriver< Shape::Simplex< dim_ > >", "class_f_e_a_t_1_1_cubature_1_1_trapezoidal_driver_3_01_shape_1_1_simplex_3_01dim___01_4_01_4.html", null ]
     ] ],
+    [ "FEAT::KahanAccumulator< double >", "class_f_e_a_t_1_1_kahan_accumulator.html", null ],
     [ "FEAT::VoxelAssembly::LagrangeDataHandler< SpaceType, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler.html", null ],
     [ "FEAT::Tiny::Matrix< CoordType, 3, 3 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 2, 2 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],

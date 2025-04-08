@@ -1,6 +1,7 @@
 var class_f_e_a_t_1_1_solver_1_1_matrix_precond =
 [
     [ "MatrixPrecond", "class_f_e_a_t_1_1_solver_1_1_matrix_precond.html#aaedced38ffe46a8b39a467705cb0f8b0", null ],
+    [ "MatrixPrecond", "class_f_e_a_t_1_1_solver_1_1_matrix_precond.html#a967163ee48ef4bc533d8ad94965c99c9", null ],
     [ "apply", "class_f_e_a_t_1_1_solver_1_1_matrix_precond.html#ae162070c491d897ae6f91d263200af40", null ],
     [ "done", "class_f_e_a_t_1_1_solver_1_1_matrix_precond.html#acacbcaccbf7ec307778128928a901d59", null ],
     [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_matrix_precond.html#af2ea6e8c96de45c8408f3dcc59b8f186", null ],

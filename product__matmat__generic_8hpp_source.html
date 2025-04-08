@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -170,7 +169,7 @@ $(document).ready(function(){initNavTree('product__matmat__generic_8hpp_source.h
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>      <span class="keyword">template</span> &lt;<span class="keyword">typename</span> DT_, <span class="keyword">typename</span> IT_&gt;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>      <span class="keywordtype">void</span> ProductMatMat::dsd_generic(DT_ * r, <span class="keyword">const</span> DT_ alpha, <span class="keyword">const</span> DT_ beta, <span class="keyword">const</span> DT_ * <span class="keyword">const</span> val, <span class="keyword">const</span> IT_ * <span class="keyword">const</span> col_ind, <span class="keyword">const</span> IT_ * <span class="keyword">const</span> row_ptr, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <span class="comment">/*used_elements*/</span>,</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>                                         <span class="keyword">const</span> DT_ * y, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> rows,  <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> columns, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <span class="comment">/*inner*/</span>)</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>                                         <span class="keyword">const</span> DT_ * <span class="keyword">const</span> y, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> rows,  <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> columns, <span class="keyword">const</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <span class="comment">/*inner*/</span>)</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>      {</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a286aac96ac3f73267cf1cca71bd79c27">Math::abs</a>(beta) &lt; Math::eps&lt;DT_&gt;())</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        {</div>

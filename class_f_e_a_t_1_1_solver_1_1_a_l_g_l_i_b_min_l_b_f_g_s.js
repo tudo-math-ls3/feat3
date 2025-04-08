@@ -9,7 +9,7 @@ var class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s =
     [ "PrecondType", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#a56577364f0e1c733a57cc7fa4220e6bc", null ],
     [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#aa12bfd0e63a5f4b58faf7a90709b9e29", null ],
     [ "ALGLIBMinLBFGS", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#afdab194291fa20255ceef55c662d6548", null ],
-    [ "ALGLIBMinLBFGS", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#a5eb138938e82b67b515b79bb1e25c4f4", null ],
+    [ "ALGLIBMinLBFGS", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#aa183dceaca2eae4b9883cd27b82e7a0e", null ],
     [ "~ALGLIBMinLBFGS", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#a25544cfa4d64f23bd0593921736dfd58", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_apply_intern", "class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#a5d1e24c8790b05394499d0238e7730e0", null ],

@@ -12,9 +12,10 @@ var searchData=
   ['hierarchunitcubedomaincontrol_9',['HierarchUnitCubeDomainControl',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control.html',1,'FEAT::Control::Domain']]],
   ['hierarchunitcubedomaincontrol2_10',['HierarchUnitCubeDomainControl2',['../class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2.html',1,'FEAT::Control::Domain']]],
   ['hittestfactory_11',['HitTestFactory',['../class_f_e_a_t_1_1_geometry_1_1_hit_test_factory.html',1,'FEAT::Geometry']]],
-  ['hypercube_12',['Hypercube',['../struct_f_e_a_t_1_1_shape_1_1_hypercube.html',1,'FEAT::Shape']]],
-  ['hyperelasticityfunctional_13',['HyperelasticityFunctional',['../class_f_e_a_t_1_1_meshopt_1_1_hyperelasticity_functional.html',1,'FEAT::Meshopt']]],
-  ['hyperelasticityfunctionalcontrol_14',['HyperelasticityFunctionalControl',['../class_f_e_a_t_1_1_control_1_1_meshopt_1_1_hyperelasticity_functional_control.html',1,'FEAT::Control::Meshopt']]],
-  ['hypergraph_15',['Hypergraph',['../class_f_e_a_t_1_1_geometry_1_1_parti_zoltan_1_1_hypergraph.html',1,'FEAT::Geometry::PartiZoltan']]],
-  ['hypresolverbase_16',['HypreSolverBase',['../class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html',1,'FEAT::Solver']]]
+  ['hittestlambda_12',['HitTestLambda',['../class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory_1_1_hit_test_lambda.html',1,'FEAT::Geometry::LambdaHitTestFactory']]],
+  ['hypercube_13',['Hypercube',['../struct_f_e_a_t_1_1_shape_1_1_hypercube.html',1,'FEAT::Shape']]],
+  ['hyperelasticityfunctional_14',['HyperelasticityFunctional',['../class_f_e_a_t_1_1_meshopt_1_1_hyperelasticity_functional.html',1,'FEAT::Meshopt']]],
+  ['hyperelasticityfunctionalcontrol_15',['HyperelasticityFunctionalControl',['../class_f_e_a_t_1_1_control_1_1_meshopt_1_1_hyperelasticity_functional_control.html',1,'FEAT::Control::Meshopt']]],
+  ['hypergraph_16',['Hypergraph',['../class_f_e_a_t_1_1_geometry_1_1_parti_zoltan_1_1_hypergraph.html',1,'FEAT::Geometry::PartiZoltan']]],
+  ['hypresolverbase_17',['HypreSolverBase',['../class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html',1,'FEAT::Solver']]]
 ];

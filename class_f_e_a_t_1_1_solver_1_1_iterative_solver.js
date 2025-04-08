@@ -4,7 +4,7 @@ var class_f_e_a_t_1_1_solver_1_1_iterative_solver =
     [ "DataType", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a4435bf86ccac68b54c06b2e476dd097d", null ],
     [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a7b7d9563a388dba3a9cd2d284879aefc", null ],
     [ "IterativeSolver", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a16f527ebfa7b2e516f4e8cd72a38c4d7", null ],
-    [ "IterativeSolver", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#af84ade8f981311673e4fbf52013e3141", null ],
+    [ "IterativeSolver", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#adb61890b0fd5383c267a820e0b3b410e", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_calc_def_norm", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a9920812266b8f49921c9b133dd1451b4", null ],
     [ "_plot_iter", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa7281f8e3498245d411c5829b9d0cec0", null ],

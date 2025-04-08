@@ -1,7 +1,7 @@
 var class_f_e_a_t_1_1_solver_1_1_descent =
 [
     [ "Descent", "class_f_e_a_t_1_1_solver_1_1_descent.html#af306f062a82e4251f091fe9d2e876ed8", null ],
-    [ "Descent", "class_f_e_a_t_1_1_solver_1_1_descent.html#a666dbfc5edac533d96961947fb0fa95d", null ],
+    [ "Descent", "class_f_e_a_t_1_1_solver_1_1_descent.html#a054ac5603e32a11fced42a58d10bb116", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_descent.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_apply_precond", "class_f_e_a_t_1_1_solver_1_1_descent.html#af8e655f0cdc31c3b245587b58a14d5b3", null ],
     [ "_calc_def_norm", "class_f_e_a_t_1_1_solver_1_1_descent.html#a9920812266b8f49921c9b133dd1451b4", null ],

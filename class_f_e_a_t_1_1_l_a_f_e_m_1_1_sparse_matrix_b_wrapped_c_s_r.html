@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -428,6 +427,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0e9aa0ab58b7e196d737446a3f9a5f3d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html#a0e9aa0ab58b7e196d737446a3f9a5f3d">add_double_mat_product</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; DT_, IT_ &gt; &amp;d, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DT_, IT_ &gt; &amp;a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; DT_, IT_ &gt; &amp;b, const DT_ alpha=DT_(1), const bool allow_incomplete=false)</td></tr>
 <tr class="memdesc:a0e9aa0ab58b7e196d737446a3f9a5f3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a double-matrix product onto this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html#a0e9aa0ab58b7e196d737446a3f9a5f3d">More...</a><br /></td></tr>
 <tr class="separator:a0e9aa0ab58b7e196d737446a3f9a5f3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3040eb470d53b5f6e3f365679520bf0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html#aa3040eb470d53b5f6e3f365679520bf0">add_double_mat_product</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, 1, bs_ &gt; &amp;d, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DT_, IT_, bs_ &gt; &amp;a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, bs_, 1 &gt; &amp;b, const DT_ alpha=DT_(1), const bool allow_incomplete=false)</td></tr>
+<tr class="memdesc:aa3040eb470d53b5f6e3f365679520bf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a double-matrix product onto this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html#aa3040eb470d53b5f6e3f365679520bf0">More...</a><br /></td></tr>
+<tr class="separator:aa3040eb470d53b5f6e3f365679520bf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30449f1e07430243b6d3da00c35b5654"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html#a30449f1e07430243b6d3da00c35b5654">add_mat_mat_product</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; DT_, IT_ &gt; &amp;d, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; DT_, IT_ &gt; &amp;b, const DT_ alpha=DT_(1), const bool allow_incomplete=false)</td></tr>
 <tr class="memdesc:a30449f1e07430243b6d3da00c35b5654"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a matrix-matrix product onto this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html#a30449f1e07430243b6d3da00c35b5654">More...</a><br /></td></tr>
 <tr class="separator:a30449f1e07430243b6d3da00c35b5654"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1273,8 +1275,86 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
 
 </div>
 </div>
+<a id="aa3040eb470d53b5f6e3f365679520bf0" name="aa3040eb470d53b5f6e3f365679520bf0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3040eb470d53b5f6e3f365679520bf0">&#9670;&#160;</a></span>add_double_mat_product() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">FEAT::LAFEM::SparseMatrixCSR</a>&lt; DT_, IT_ &gt;::add_double_mat_product </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, 1, bs_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>d</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DT_, IT_, bs_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, bs_, 1 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_&#160;</td>
+          <td class="paramname"><em>alpha</em> = <code>DT_(1)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>allow_incomplete</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds a double-matrix product onto this matrix. </p>
+<p >This function performs the following computation: </p><p class="formulaDsp">
+\[ X \leftarrow X + \alpha D\cdot \textnormal{diag}(A)\cdot B\]
+</p>
+<p >where</p><ul>
+<li><em>X</em> denotes this m-by-n matrix</li>
+<li><em>D</em> denotes a m-by-l matrix</li>
+<li><em>A</em> denotes a vector representing a l-by-l diagonal matrix</li>
+<li><em>B</em> denotes a l-by-n matrix</li>
+</ul>
+<dl class="section attention"><dt>Attention</dt><dd>This function assumes that the output matrix already contains the required sparsity pattern. This function will throw an exception if the sparsity pattern of the output matrix is incomplete unless <code>allow_incomplete</code> is set to <code>true</code>.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This function currently only supports data in main memory.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The vector representing the diagonal matrix A.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">d,b</td><td>The left and right multiplicand matrices</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the product</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allow_incomplete</td><td>Specifies whether the output matrix structure is allowed to be incomplete. If set to <code>false</code>, this function will throw an exception on incompleteness, otherwise the missing entries are ignored (dropped). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02211">2211</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a0e9aa0ab58b7e196d737446a3f9a5f3d" name="a0e9aa0ab58b7e196d737446a3f9a5f3d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e9aa0ab58b7e196d737446a3f9a5f3d">&#9670;&#160;</a></span>add_double_mat_product() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e9aa0ab58b7e196d737446a3f9a5f3d">&#9670;&#160;</a></span>add_double_mat_product() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1347,12 +1427,12 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02109">2109</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02092">2092</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a34c1f6862697f1377d4d59ad6c3e50a6" name="a34c1f6862697f1377d4d59ad6c3e50a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34c1f6862697f1377d4d59ad6c3e50a6">&#9670;&#160;</a></span>add_double_mat_product() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a34c1f6862697f1377d4d59ad6c3e50a6">&#9670;&#160;</a></span>add_double_mat_product() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1424,7 +1504,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01982">1982</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01965">1965</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1494,7 +1574,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02223">2223</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02328">2328</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1542,7 +1622,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01736">1736</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01719">1719</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1605,7 +1685,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01837">1837</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01820">1820</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1654,7 +1734,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01801">1801</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01784">1784</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1718,7 +1798,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Every element of each block in the vector x is multiplied with the corresponding single scalar entry in the matrix. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01920">1920</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01903">1903</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1766,7 +1846,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01767">1767</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01750">1750</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1829,7 +1909,7 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01877">1877</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01860">1860</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1872,9 +1952,9 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00280">280</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="memory__pool_8hpp_source.html#l00251">FEAT::MemoryPool::convert()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00108">FEAT::MemoryPool::increase_memory()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00123">FEAT::MemoryPool::release_memory()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="memory__pool_8hpp_source.html#l00261">FEAT::MemoryPool::convert()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00108">FEAT::MemoryPool::increase_memory()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00123">FEAT::MemoryPool::release_memory()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="container_8hpp_source.html#l00975">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00227">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00402">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00430">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00248">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00648">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00524">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00492">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00585">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00201">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::convert()</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00693">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="container_8hpp_source.html#l00975">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00227">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00402">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00430">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00248">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00648">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00506">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00492">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00568">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00201">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::convert()</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00693">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
@@ -1923,7 +2003,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>All three matrices must have the same non zero layout. This operation assumes this silently and does not check this on its own! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01398">1398</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01381">1381</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -1970,7 +2050,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01308">1308</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01291">1291</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2017,7 +2097,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01284">1284</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01267">1267</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2088,7 +2168,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="reference">References <a class="el" href="container_8hpp_source.html#l00226">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_elements</a>, <a class="el" href="container_8hpp_source.html#l00238">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_foreign_memory</a>, <a class="el" href="container_8hpp_source.html#l00228">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_indices</a>, and <a class="el" href="memory__pool_8hpp_source.html#l00123">FEAT::MemoryPool::release_memory()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__quality__functional_8hpp_source.html#l00097">FEAT::Meshopt::MeshQualityFunctional&lt; MeshType_ &gt;::~MeshQualityFunctional()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00131">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::clear()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00710">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::clear()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00984">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00166">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="container_8hpp_source.html#l00902">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l00758">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00449">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00712">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00335">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, and <a class="el" href="sparse__vector_8hpp_source.html#l00584">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::read_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__quality__functional_8hpp_source.html#l00097">FEAT::Meshopt::MeshQualityFunctional&lt; MeshType_ &gt;::~MeshQualityFunctional()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00131">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::clear()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00710">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::clear()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00984">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00166">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="container_8hpp_source.html#l00902">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l00758">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00449">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00712">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00335">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, and <a class="el" href="sparse__vector_8hpp_source.html#l00584">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::read_from()</a>.</p>
 
 </div>
 </div>
@@ -2128,7 +2208,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html#l00127">127</a> of file <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html">sparse_matrix_bwrappedcsr.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html#l00076">FEAT::LAFEM::SparseMatrixBWrappedCSR&lt; DT_, IT_, BlockSize_ &gt;::SparseMatrixBWrappedCSR()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00556">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::clone()</a>.</p>
+<p class="reference">References <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html#l00076">FEAT::LAFEM::SparseMatrixBWrappedCSR&lt; DT_, IT_, BlockSize_ &gt;::SparseMatrixBWrappedCSR()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00539">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::clone()</a>.</p>
 
 </div>
 </div>
@@ -2182,7 +2262,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fac9baacf6cca6c54626e594639081177f">FEAT::LAFEM::Allocate</a>, <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">FEAT::LAFEM::Deep</a>, <a class="el" href="memory__pool_8hpp_source.html#l00108">FEAT::MemoryPool::increase_memory()</a>, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::Layout</a>, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c">FEAT::LAFEM::Shallow</a>, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa7324e3727807d95037eb19d304fd91ec">FEAT::LAFEM::Weak</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00975">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00214">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00389">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00417">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00235">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00602">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00511">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00479">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00572">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00248">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00272">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, and <a class="el" href="vector__mirror_8hpp_source.html#l00189">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::clone()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00975">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00214">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00389">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00417">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00235">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00602">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00493">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00479">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00555">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00248">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00272">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, and <a class="el" href="vector__mirror_8hpp_source.html#l00189">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::clone()</a>.</p>
 
 </div>
 </div>
@@ -2284,7 +2364,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00572">572</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00555">555</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2314,7 +2394,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 <p>Retrieve column indices array. </p>
 <dl class="section return"><dt>Returns</dt><dd>Column indices array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01219">1219</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01202">1202</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2341,7 +2421,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01227">1227</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01210">1210</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2371,7 +2451,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 <p>Retrieve matrix column count. </p>
 <dl class="section return"><dt>Returns</dt><dd>Matrix column count. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01197">1197</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01180">1180</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2408,7 +2488,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </dl>
 <p>Creates a CSR matrix based on a given adjacency graph, representing the sparsity pattern. </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00777">777</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00760">760</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2445,7 +2525,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </dl>
 <p>Converts any matrix to SparseMatrixCSR-format </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00731">731</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00714">714</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2482,7 +2562,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </dl>
 <p>Use source matrix content as content of current matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">598</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">581</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2519,7 +2599,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </dl>
 <p>Use source matrix content as content of current matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00676">676</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00659">659</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2589,7 +2669,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 <p>Assigns own matrix values to target matrix</p>
 <dl class="section warning"><dt>Warning</dt><dd>This method assumes, that ideally this csr matrix was created from the target matrix a earlier and thus, both (nonzero) layouts match perfectly. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00793">793</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00776">776</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2636,7 +2716,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01382">1382</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01365">1365</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2670,7 +2750,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html#l00098">98</a> of file <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html">sparse_matrix_bwrappedcsr.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01186">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>.</p>
+<p class="reference">References <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01169">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>.</p>
 
 </div>
 </div>
@@ -2704,7 +2784,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html#l00109">109</a> of file <a class="el" href="sparse__matrix__bwrappedcsr_8hpp_source.html">sparse_matrix_bwrappedcsr.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01197">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::columns()</a>.</p>
+<p class="reference">References <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01180">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::columns()</a>.</p>
 
 </div>
 </div>
@@ -2741,7 +2821,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </dl>
 <p>Recreate a complete container entity by a single binary array. </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00848">848</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00831">831</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2807,7 +2887,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>extract main diagonal vector from matrix </p>
 <dl class="section return"><dt>Returns</dt><dd>The vector containing the diagonal entry values </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02370">2370</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02475">2475</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2843,7 +2923,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02359">2359</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02464">2464</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2890,7 +2970,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02337">2337</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02442">2442</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2920,7 +3000,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>extract main diagonal vector from matrix </p>
 <dl class="section return"><dt>Returns</dt><dd>A vector containing the indices of the diagonal entries </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02396">2396</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02501">2501</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2956,7 +3036,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02383">2383</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02488">2488</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -2998,7 +3078,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="reference">References <a class="el" href="container_8hpp_source.html#l00226">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_elements</a>, <a class="el" href="container_8hpp_source.html#l00230">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_elements_size</a>, <a class="el" href="memory__pool_8hpp_source.html#l00182">FEAT::MemoryPool::set_memory()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="function__integral__jobs_8hpp_source.html#l01835">FEAT::Assembly::CellErrorFunctionIntegralJob&lt; Function_, Vector_, Space_, max_der_ &gt;::CellErrorFunctionIntegralJob()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00320">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00347">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l01192">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::_compute_lambda_uniform()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00422">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01382">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00963">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01736">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00436">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01416">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00992">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01767">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="gpdv__assembler_8hpp_source.html#l00092">FEAT::Assembly::GradPresDivVeloAssembler::assemble()</a>, <a class="el" href="grad__operator__assembler_8hpp_source.html#l00069">FEAT::Assembly::GradOperatorAssembler::assemble()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00366">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::assemble_characteristic_vector()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01027">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01178">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01112">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_h()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00180">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, GlobalFilter_, SolverBase_ &gt;::init_symbolic()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l01848">FEAT::Assembly::CellErrorFunctionIntegralJob&lt; Function_, Vector_, Space_, max_der_ &gt;::result()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01139">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="function__integral__jobs_8hpp_source.html#l01835">FEAT::Assembly::CellErrorFunctionIntegralJob&lt; Function_, Vector_, Space_, max_der_ &gt;::CellErrorFunctionIntegralJob()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00320">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00347">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l01192">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::_compute_lambda_uniform()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00422">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01364">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00963">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01719">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00436">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01398">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00992">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01750">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="gpdv__assembler_8hpp_source.html#l00092">FEAT::Assembly::GradPresDivVeloAssembler::assemble()</a>, <a class="el" href="grad__operator__assembler_8hpp_source.html#l00069">FEAT::Assembly::GradOperatorAssembler::assemble()</a>, <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00366">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::assemble_characteristic_vector()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01027">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01178">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_conc()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01112">FEAT::Meshopt::MeshConcentrationFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_grad_h()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00180">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, GlobalFilter_, SolverBase_ &gt;::init_symbolic()</a>, <a class="el" href="function__integral__jobs_8hpp_source.html#l01848">FEAT::Assembly::CellErrorFunctionIntegralJob&lt; Function_, Vector_, Space_, max_der_ &gt;::result()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01139">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>.</p>
 
 </div>
 </div>
@@ -3258,7 +3338,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p>Returns the number of NNZ-elements of the selected row. </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02551">2551</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02656">2656</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3287,7 +3367,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02596">2596</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02701">2701</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3316,7 +3396,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02602">2602</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02707">2707</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3414,7 +3494,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02608">2608</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02713">2713</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3444,7 +3524,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02615">2615</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02720">2720</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3474,7 +3554,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve convenient sparse matrix layout object. </p>
 <dl class="section return"><dt>Returns</dt><dd>An object containing the sparse matrix layout. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01175">1175</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01158">1158</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3505,7 +3585,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p >Each entry in the returned lumped rows vector contains the the sum of all matrix elements in the corresponding row.</p>
 <dl class="section return"><dt>Returns</dt><dd>The lumped vector. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02321">2321</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02426">2426</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3535,7 +3615,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02305">2305</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02410">2410</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3565,7 +3645,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve the absolute maximum value of this matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>The largest absolute value. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01531">1531</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01514">1514</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3595,7 +3675,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve the maximum value of this matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>The largest value. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01573">1573</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01556">1556</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3625,7 +3705,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve the absolute minimum value of this matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>The smallest absolute value </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01552">1552</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01535">1535</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3655,7 +3735,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve the minimum value of this matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>The smallest value. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01593">1593</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01576">1576</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3698,7 +3778,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="reference">References <a class="el" href="memory__pool_8hpp_source.html#l00123">FEAT::MemoryPool::release_memory()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00104">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00474">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00341">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00364">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00406">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00536">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00505">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00731">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00437">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00183">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00358">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00387">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00205">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00571">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00480">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00448">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00541">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00217">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00241">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00112">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00799">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00335">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00584">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02486">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::shrink()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00857">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::transpose()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01276">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::transpose()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01625">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::transpose()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00104">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00474">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00364">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00518">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00505">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00714">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00437">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00183">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00358">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00387">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00205">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00571">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00462">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00448">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00524">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00217">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00241">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00112">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00799">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00335">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00584">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02591">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::shrink()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00857">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::transpose()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01258">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::transpose()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01608">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::transpose()</a>.</p>
 
 </div>
 </div>
@@ -3728,7 +3808,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Returns a descriptive string. </p>
 <dl class="section return"><dt>Returns</dt><dd>A string describing the container. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01371">1371</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01354">1354</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3758,7 +3838,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Calculates the Frobenius norm of this matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>The Frobenius norm of this matrix. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01441">1441</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01424">1424</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3806,7 +3886,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Specific matrix element. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01150">1150</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01133">1133</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3846,7 +3926,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p>Permutate matrix rows and columns according to the given Permutations. </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02404">2404</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02509">2509</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3894,7 +3974,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01359">1359</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01342">1342</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3942,7 +4022,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01323">1323</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01306">1306</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -3989,7 +4069,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00875">875</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00858">858</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4036,7 +4116,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">893</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">876</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4113,7 +4193,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01460">1460</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01443">1443</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4149,7 +4229,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01479">1479</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01462">1462</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4206,7 +4286,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 \]
 </p>
  
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01511">1511</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01494">1494</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4236,7 +4316,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve row start index array. </p>
 <dl class="section return"><dt>Returns</dt><dd>Row start index array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01261">1261</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01244">1244</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4263,7 +4343,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01269">1269</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01252">1252</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4293,7 +4373,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Retrieve matrix row count. </p>
 <dl class="section return"><dt>Returns</dt><dd>Matrix row count. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01186">1186</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01169">1169</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4340,7 +4420,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01421">1421</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01404">1404</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4387,7 +4467,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01711">1711</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01694">1694</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4434,7 +4514,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01688">1688</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01671">1671</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4473,7 +4553,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 <p>Serialize a complete container entity into a single binary array.</p>
 <p >See <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html#a3d2a2536488a06809e3b435c0d8435a4">FEAT::LAFEM::Container::_serialize</a> for details. </p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00864">864</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00847">847</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4554,7 +4634,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02486">2486</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02591">2591</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4594,7 +4674,7 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 
 <p class="reference">References <a class="el" href="container_8hpp_source.html#l00234">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_scalar_index</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dense__vector_8hpp_source.html#l00241">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00307">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::HyperelasticityFunctional()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00147">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00412">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00418">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00260">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00482">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::UnitFilter()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00111">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::UnitFilterBlocked()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l01192">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::_compute_lambda_uniform()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01752">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_gather_data()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01778">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_scatter_data()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02109">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::add_double_mat_product()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02560">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::add_trace_double_mat_mult()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00757">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::allgather()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00606">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00422">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00950">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01382">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00963">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01736">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="cusolver_8hpp_source.html#l00071">FEAT::Solver::CuSolverLU::apply()</a>, <a class="el" href="cusolver_8hpp_source.html#l00113">FEAT::Solver::CuSolverQR::apply()</a>, <a class="el" href="ilu__precond_8hpp_source.html#l01079">FEAT::Solver::ILUPrecondWithBackend&lt; PreferredBackend::generic, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;, Filter_ &gt;::apply()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00629">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00436">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00981">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01416">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00992">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01767">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01236">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_discrete_integral()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01011">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_flow_accum()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00585">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00812">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00942">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::col_ind()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00840">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::compare_layout()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00875">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::component_copy()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00895">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::component_copy_to()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00856">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::component_invert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00833">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::component_product()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00920">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::dot()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00817">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l00320">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::download_vector()</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l01096">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::extract_diag()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02337">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::extract_diag()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02426">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::extract_diag_indices()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02383">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::extract_diag_indices()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00358">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::filter_def()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00332">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00314">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::gather()</a>, <a class="el" href="meta__matrix__test__base_8hpp_source.html#l00136">FEAT::LAFEM::MetaMatrixTestBase&lt; DataType_, IndexType_ &gt;::gen_system()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00157">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::get_num_local_dofs()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00657">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::get_num_nodes_image()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00483">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::inflate_to_blocks()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="fe__interpolator_8hpp_source.html#l00293">FEAT::Assembly::FEInterpolator&lt; Space::Lagrange1::Element&lt; Trafo_ &gt;, Space::Lagrange2::Element&lt; Trafo_ &gt; &gt;::interpolate()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02305">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::lump_rows()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00147">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::make_empty()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00191">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::map_local_to_global_index()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00604">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::mask_scatter()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00765">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::multiply()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00939">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::norm2()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00760">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00799">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01460">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_norm2()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01479">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_norm2sqr()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00545">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::scale()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00875">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::scale()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01711">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::scale_cols()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01688">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::scale_rows()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00344">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::scatter_axpy()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00897">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::triple_dot()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00787">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::upload()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01139">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l00287">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::upload_vector()</a>, <a class="el" href="container_8hpp_source.html#l01155">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00969">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::val()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00689">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::write_out()</a>, and <a class="el" href="sparse__vector_8hpp_source.html#l00719">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::write_out()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dense__vector_8hpp_source.html#l00241">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00307">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::HyperelasticityFunctional()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00147">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00412">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00400">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00260">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00465">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00079">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::UnitFilter()</a>, <a class="el" href="unit__filter__blocked_8hpp_source.html#l00111">FEAT::LAFEM::UnitFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::UnitFilterBlocked()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l01192">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::_compute_lambda_uniform()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01752">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_gather_data()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01778">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::_scatter_data()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02092">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::add_double_mat_product()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02542">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::add_trace_double_mat_mult()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00757">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::allgather()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00606">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00422">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00950">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01364">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00963">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01719">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply()</a>, <a class="el" href="cusolver_8hpp_source.html#l00071">FEAT::Solver::CuSolverLU::apply()</a>, <a class="el" href="cusolver_8hpp_source.html#l00113">FEAT::Solver::CuSolverQR::apply()</a>, <a class="el" href="ilu__precond_8hpp_source.html#l01079">FEAT::Solver::ILUPrecondWithBackend&lt; PreferredBackend::generic, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;, Filter_ &gt;::apply()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00629">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="null__matrix_8hpp_source.html#l00436">FEAT::LAFEM::NullMatrix&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00981">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01398">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00992">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01750">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::apply_transposed()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01236">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_discrete_integral()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01011">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_flow_accum()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00585">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00812">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00924">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::col_ind()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00840">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::compare_layout()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00875">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::component_copy()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00895">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::component_copy_to()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00856">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::component_invert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00833">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::component_product()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00920">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::dot()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00817">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::download()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l00320">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::download_vector()</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l01096">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::extract_diag()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02442">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::extract_diag()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02408">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::extract_diag_indices()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02488">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::extract_diag_indices()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00358">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::filter_def()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00332">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00314">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::gather()</a>, <a class="el" href="meta__matrix__test__base_8hpp_source.html#l00136">FEAT::LAFEM::MetaMatrixTestBase&lt; DataType_, IndexType_ &gt;::gen_system()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00157">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::get_num_local_dofs()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00657">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::get_num_nodes_image()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00483">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::inflate_to_blocks()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="fe__interpolator_8hpp_source.html#l00293">FEAT::Assembly::FEInterpolator&lt; Space::Lagrange1::Element&lt; Trafo_ &gt;, Space::Lagrange2::Element&lt; Trafo_ &gt; &gt;::interpolate()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02410">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::lump_rows()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00147">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::make_empty()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00191">FEAT::Global::AlgDofParti&lt; LAFEM::DenseVector&lt; DT_, IT_ &gt;, LAFEM::VectorMirror&lt; DT_, IT_ &gt; &gt;::map_local_to_global_index()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00604">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::mask_scatter()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00765">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::multiply()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00939">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::norm2()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00760">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00799">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01443">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_norm2()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01462">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_norm2sqr()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00545">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::scale()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00875">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::scale()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01694">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::scale_cols()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01671">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::scale_rows()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00344">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::scatter_axpy()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00897">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::triple_dot()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00787">FEAT::Global::AlgDofPartiVector&lt; LocalVector_, Mirror_ &gt;::upload()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01139">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l00287">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::upload_vector()</a>, <a class="el" href="container_8hpp_source.html#l01155">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00951">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::val()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00689">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::write_out()</a>, and <a class="el" href="sparse__vector_8hpp_source.html#l00719">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::write_out()</a>.</p>
 
 </div>
 </div>
@@ -4624,7 +4704,7 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 <p>Calculate \(this^\top \). </p>
 <dl class="section return"><dt>Returns</dt><dd>The transposed matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01613">1613</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01596">1596</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4660,7 +4740,7 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01625">1625</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01608">1608</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4750,7 +4830,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 <p>Retrieve non zero element count. </p>
 <dl class="section return"><dt>Returns</dt><dd>Non zero element count. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01208">1208</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01191">1191</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4780,7 +4860,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 <p>Retrieve non zero element array. </p>
 <dl class="section return"><dt>Returns</dt><dd>Non zero element array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01240">1240</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01223">1223</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4807,7 +4887,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01248">1248</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01231">1231</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4864,7 +4944,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 <dd>
 Only uses symmetric properties if mode is mtx! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01035">1035</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01018">1018</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4921,7 +5001,7 @@ Only uses symmetric properties if mode is mtx! </dd></dl>
 <dd>
 Only uses symmetric properties if mode is mtx! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01065">1065</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01048">1048</a> of file <a class="el" href="sparse__matrix__csr_8hpp_source.html">sparse_matrix_csr.hpp</a>.</p>
 
 </div>
 </div>
@@ -4952,7 +5032,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00226">226</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dense__matrix_8hpp_source.html#l00092">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::DenseMatrix()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00169">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00204">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="container_8hpp_source.html#l00811">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::~Container()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00237">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00736">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00277">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00501">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00303">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>, <a class="el" href="container_8hpp_source.html#l00851">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::format()</a>, <a class="el" href="container_8hpp_source.html#l01068">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_elements()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00326">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00373">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00706">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00270">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00548">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00814">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00362">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00829">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00811">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01240">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00969">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::val()</a>, and <a class="el" href="dense__vector_8hpp_source.html#l00689">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::write_out()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dense__matrix_8hpp_source.html#l00092">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::DenseMatrix()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00169">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00204">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="container_8hpp_source.html#l00811">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::~Container()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00237">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00736">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00277">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00501">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00303">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>, <a class="el" href="container_8hpp_source.html#l00851">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::format()</a>, <a class="el" href="container_8hpp_source.html#l01068">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_elements()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00326">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00373">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00706">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00270">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00530">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00797">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00362">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00829">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00811">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01223">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::val()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00951">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::val()</a>, and <a class="el" href="dense__vector_8hpp_source.html#l00689">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::write_out()</a>.</p>
 
 </div>
 </div>
@@ -4982,7 +5062,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00230">230</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dense__matrix_8hpp_source.html#l00092">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::DenseMatrix()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00169">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00204">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="container_8hpp_source.html#l01042">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::bytes()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l00851">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::format()</a>, <a class="el" href="container_8hpp_source.html#l01088">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_elements_size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00408">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00359">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00548">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00814">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dense__matrix_8hpp_source.html#l00092">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::DenseMatrix()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00169">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00204">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="container_8hpp_source.html#l01042">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::bytes()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l00851">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::format()</a>, <a class="el" href="container_8hpp_source.html#l01088">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_elements_size()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00408">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00359">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00530">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00797">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>.</p>
 
 </div>
 </div>
@@ -5042,7 +5122,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00228">228</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dense__vector_8hpp_source.html#l00215">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00246">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00094">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::VectorMirror()</a>, <a class="el" href="container_8hpp_source.html#l00811">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::~Container()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00341">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00942">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::col_ind()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00790">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01219">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l01078">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_indices()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02814">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::image_begin()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02608">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::image_begin()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00663">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::image_begin()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02821">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::image_end()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02615">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::image_end()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00670">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::image_end()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00301">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::indices()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00231">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::indices()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00776">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00887">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00736">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01175">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00844">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::offsets()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00408">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00359">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00706">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00548">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00814">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00853">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::row_numbers()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00383">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00993">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00832">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01261">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_ptr()</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00472">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::sort()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dense__vector_8hpp_source.html#l00215">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::DenseVector()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00246">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::DenseVectorBlocked()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00094">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::VectorMirror()</a>, <a class="el" href="container_8hpp_source.html#l00811">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::~Container()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00341">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00924">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::col_ind()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00790">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01202">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l01078">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_indices()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02796">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::image_begin()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02713">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::image_begin()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00663">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::image_begin()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02803">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::image_end()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02720">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::image_end()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00670">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::image_end()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00301">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::indices()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00331">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::indices()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00231">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::indices()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00776">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00869">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00736">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01158">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00844">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::offsets()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00408">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00359">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00706">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00530">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00797">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00853">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::row_numbers()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00383">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00975">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00832">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01244">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_ptr()</a>, and <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00472">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::sort()</a>.</p>
 
 </div>
 </div>
@@ -5072,7 +5152,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00232">232</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00094">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::VectorMirror()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="container_8hpp_source.html#l01042">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::bytes()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l01098">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_indices_size()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00776">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00887">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00736">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01175">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00408">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00359">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00548">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00814">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00388">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00293">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00161">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00345">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00131">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00197">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00094">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::VectorMirror()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="container_8hpp_source.html#l01042">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::bytes()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l01098">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_indices_size()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00776">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00869">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00736">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01158">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00408">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00359">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00530">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00797">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>.</p>
 
 </div>
 </div>
@@ -5132,7 +5212,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00234">234</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00800">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::Container()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00077">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::DenseMatrix()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00372">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00255">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00120">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00307">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00096">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00120">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00074">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::VectorMirror()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00779">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::alloc_increment()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00747">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::alloc_increment()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00767">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::allocated_elements()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00735">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::allocated_elements()</a>, <a class="el" href="container_8hpp_source.html#l01042">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::bytes()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00493">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00296">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00798">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00914">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00758">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01197">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00598">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00318">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::entries_per_nonzero()</a>, <a class="el" href="container_8hpp_source.html#l01108">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_scalar_index()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00776">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00887">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00736">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01175">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00211">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::num_indices()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00819">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::num_of_offsets()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00326">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00373">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00751">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00548">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00814">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00893">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00584">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00483">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00285">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00787">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00899">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00747">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01186">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00791">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::sorted()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00759">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::sorted()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00307">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00809">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00929">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00780">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01208">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00753">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00769">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::used_rows()</a>, and <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00331">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::val_size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00800">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::Container()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00077">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::DenseMatrix()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00079">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::MatrixMirrorBuffer()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00372">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::SparseMatrixBanded()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00255">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::SparseMatrixBCSR()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00120">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::SparseMatrixCSCR()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00307">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::SparseMatrixCSR()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00096">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::SparseVector()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00120">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::SparseVectorBlocked()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00074">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::VectorMirror()</a>, <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>, <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00779">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::alloc_increment()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00747">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::alloc_increment()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00767">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::allocated_elements()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00735">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::allocated_elements()</a>, <a class="el" href="container_8hpp_source.html#l01042">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::bytes()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00493">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00296">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00798">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00896">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00758">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01180">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00443">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00415">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00581">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00318">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::entries_per_nonzero()</a>, <a class="el" href="container_8hpp_source.html#l01108">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::get_scalar_index()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00776">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00869">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00736">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01158">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::layout()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00211">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::num_indices()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00819">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::num_of_offsets()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00326">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00373">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00751">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator()()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00614">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00530">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00561">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00797">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::operator=()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00547">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00609">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::read_from()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00876">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00584">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::read_from()</a>, <a class="el" href="dense__matrix_8hpp_source.html#l00483">FEAT::LAFEM::DenseMatrix&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00285">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00787">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00881">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00747">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01169">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00791">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::sorted()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00759">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::sorted()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00307">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__banded_8hpp_source.html#l00809">FEAT::LAFEM::SparseMatrixBanded&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00911">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00780">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01191">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00753">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::used_elements()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00720">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>, <a class="el" href="sparse__matrix__cscr_8hpp_source.html#l00769">FEAT::LAFEM::SparseMatrixCSCR&lt; DT_, IT_ &gt;::used_rows()</a>, and <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00331">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::val_size()</a>.</p>
 
 </div>
 </div>

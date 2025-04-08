@@ -20,16 +20,16 @@
      borderopacity="1.0"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
+     inkscape:pagecheckerboard="true"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="4.219286"
-     inkscape:cx="126.91721"
-     inkscape:cy="104.16454"
+     inkscape:zoom="3.1394886"
+     inkscape:cx="78.515971"
+     inkscape:cy="134.57606"
      inkscape:window-width="1920"
      inkscape:window-height="1027"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
@@ -172,12 +172,11 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-37,-97)">
-    <circle
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.495;stroke-dasharray:none;stroke-opacity:1"
-       id="path5"
-       cx="70"
-       cy="130"
-       r="33" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 70.000002,97.000002 C 100,97.000002 103,99.999999 103,130 103,159.97607 100,163 70.000002,163 40.048043,163 37.000002,160 37.000002,130 37.000002,99.999999 39.996019,97.147097 70.000002,97.000002 Z"
+       id="path8-9"
+       sodipodi:nodetypes="ccccc" />
     <ellipse
        style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:0.495;stroke-dasharray:none;stroke-opacity:1"
        id="path1"

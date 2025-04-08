@@ -5,7 +5,7 @@ var class_f_e_a_t_1_1_solver_1_1_q_penalty =
     [ "FunctionalType", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a15e9ab111a417f8da026fa4e8fbbc8d9", null ],
     [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#ad245b84211ad7cb543c477d0a148ddb1", null ],
     [ "QPenalty", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#ab60b76865412e2284442667ff62a6ecd", null ],
-    [ "QPenalty", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a3ade90d8b0d132532c7b1a031bc44c46", null ],
+    [ "QPenalty", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a3e7d484ed66891884912ca64078ad5d3", null ],
     [ "QPenalty", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#af474e62d6cd749c65ebcd8028787187e", null ],
     [ "~QPenalty", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a3909a4c7a0c59fb76721baca514a0de5", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],

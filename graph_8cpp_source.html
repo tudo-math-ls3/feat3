@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -303,7 +302,7 @@ $(document).ready(function(){initNavTree('graph_8cpp_source.html',''); initResiz
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>      <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>(!<a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a07cfb63eb6c19f36e01ec816d75455e1">_image_idx</a>.empty(), <span class="stringliteral">&quot;image index vector is missing&quot;</span>);</div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>      <span class="comment">// loop over all domain nodes</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>      FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span>)</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>      FEAT_PRAGMA_OMP(parallel <span class="keywordflow">for</span> schedule(dynamic, 1000))</div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>      <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i=0; i &lt; <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html#a08f225b75ed4b90e805df4adad1e4974">_domain_ptr</a>.size()-1; ++i)</div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>      {</div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        <span class="comment">// let the STL do the sorting work</span></div>

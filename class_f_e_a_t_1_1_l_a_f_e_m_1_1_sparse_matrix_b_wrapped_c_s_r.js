@@ -17,6 +17,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r =
     [ "_serialize", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#a3d2a2536488a06809e3b435c0d8435a4", null ],
     [ "_serialize", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#ade7d7a8fe820d08f0c855a8e81f5fb53", null ],
     [ "_serialized_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#a83fec5dca47080be3ee7d4e0fd9129bc", null ],
+    [ "add_double_mat_product", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#aa3040eb470d53b5f6e3f365679520bf0", null ],
     [ "add_double_mat_product", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#a0e9aa0ab58b7e196d737446a3f9a5f3d", null ],
     [ "add_double_mat_product", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#a34c1f6862697f1377d4d59ad6c3e50a6", null ],
     [ "add_mat_mat_product", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_wrapped_c_s_r.html#a30449f1e07430243b6d3da00c35b5654", null ],

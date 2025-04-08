@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -147,9 +146,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a599fecc4c0770e582f7029da0363934e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a599fecc4c0770e582f7029da0363934e">PMR</a> (const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
 <tr class="memdesc:a599fecc4c0770e582f7029da0363934e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a599fecc4c0770e582f7029da0363934e">More...</a><br /></td></tr>
 <tr class="separator:a599fecc4c0770e582f7029da0363934e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96d7c2134c0f82e5dae7f5058c480e83"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a96d7c2134c0f82e5dae7f5058c480e83">PMR</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
-<tr class="memdesc:a96d7c2134c0f82e5dae7f5058c480e83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a96d7c2134c0f82e5dae7f5058c480e83">More...</a><br /></td></tr>
-<tr class="separator:a96d7c2134c0f82e5dae7f5058c480e83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9111a9192306f0a303a748dc05014b84"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a9111a9192306f0a303a748dc05014b84">PMR</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
+<tr class="memdesc:a9111a9192306f0a303a748dc05014b84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a9111a9192306f0a303a748dc05014b84">More...</a><br /></td></tr>
+<tr class="separator:a9111a9192306f0a303a748dc05014b84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae162070c491d897ae6f91d263200af40"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">apply</a> (Vector_ &amp;vec_cor, const Vector_ &amp;vec_def)=0</td></tr>
 <tr class="memdesc:ae162070c491d897ae6f91d263200af40"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_solver.html" title="Solver namespace.">Solver</a> application method.  <a href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">More...</a><br /></td></tr>
 <tr class="separator:ae162070c491d897ae6f91d263200af40"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -601,8 +600,8 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 </div>
 </div>
-<a id="a96d7c2134c0f82e5dae7f5058c480e83" name="a96d7c2134c0f82e5dae7f5058c480e83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96d7c2134c0f82e5dae7f5058c480e83">&#9670;&#160;</a></span>PMR() <span class="overload">[2/2]</span></h2>
+<a id="a9111a9192306f0a303a748dc05014b84" name="a9111a9192306f0a303a748dc05014b84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9111a9192306f0a303a748dc05014b84">&#9670;&#160;</a></span>PMR() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -621,7 +620,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
           <td class="paramname"><em>section</em>, </td>
         </tr>
         <tr>

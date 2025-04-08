@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -167,7 +166,7 @@ $(document).ready(function(){initNavTree('idrs_8hpp_source.html',''); initResiza
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        this-&gt;<a class="code hl_function" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5e276e3ab4c84a834377997024bf746e">_set_comm_by_matrix</a>(matrix);</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>      }</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>      <span class="keyword">explicit</span> <a class="code hl_class" href="class_f_e_a_t_1_1_solver_1_1_i_d_r_s.html">IDRS</a>(<span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a>&amp; section_name, <a class="code hl_class" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a>* section,</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>      <span class="keyword">explicit</span> <a class="code hl_class" href="class_f_e_a_t_1_1_solver_1_1_i_d_r_s.html">IDRS</a>(<span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a>&amp; section_name, <span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a>* section,</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>      <span class="keyword">const</span> MatrixType&amp; matrix, <span class="keyword">const</span> FilterType&amp; filter, std::shared_ptr&lt;PrecondType&gt; precond = <span class="keyword">nullptr</span>) :</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        BaseClass(<span class="stringliteral">&quot;IDRS&quot;</span>, section_name, section, precond),</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_i_d_r_s.html#aea834246192db1e94132053c7a25d038">_system_matrix</a>(matrix),</div>
@@ -481,8 +480,8 @@ $(document).ready(function(){initNavTree('idrs_8hpp_source.html',''); initResiza
 <div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>    }</div>
 <div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span> </div>
 <div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Matrix_, <span class="keyword">typename</span> Filter_&gt;</div>
-<div class="line"><a id="l00476" name="l00476"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_solver.html#a29ed901c6634352c3f97e7d9336f274b">  476</a></span>    <span class="keyword">inline</span> std::shared_ptr&lt;IDRS&lt;Matrix_, Filter_&gt;&gt; <a class="code hl_function" href="namespace_f_e_a_t_1_1_solver.html#ae2e182a2b77cb054dea748799147f44b">new_idrs</a>(</div>
-<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span>      <span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a>&amp; section_name, <a class="code hl_class" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a>* section,</div>
+<div class="line"><a id="l00476" name="l00476"></a><span class="lineno"><a class="line" href="namespace_f_e_a_t_1_1_solver.html#a4d274814bcd271c2f766da294dd41a4d">  476</a></span>    <span class="keyword">inline</span> std::shared_ptr&lt;IDRS&lt;Matrix_, Filter_&gt;&gt; <a class="code hl_function" href="namespace_f_e_a_t_1_1_solver.html#ae2e182a2b77cb054dea748799147f44b">new_idrs</a>(</div>
+<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span>      <span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_string.html">String</a>&amp; section_name, <span class="keyword">const</span> <a class="code hl_class" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a>* section,</div>
 <div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span>      <span class="keyword">const</span> Matrix_&amp; matrix, <span class="keyword">const</span> Filter_&amp; filter,</div>
 <div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>      std::shared_ptr&lt;<a class="code hl_class" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase&lt;typename Matrix_::VectorTypeL&gt;</a>&gt; precond = <span class="keyword">nullptr</span>)</div>
 <div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>    {</div>

@@ -6,7 +6,7 @@ var class_f_e_a_t_1_1_solver_1_1_chebyshev =
     [ "MatrixType", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a5abd1c269d9b1e36dc29bd2a08f7f26e", null ],
     [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#af95a79c5f8ee7501aec73bd7fb1c0540", null ],
     [ "Chebyshev", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#ac2c2858e0683d73695204f77564a8c02", null ],
-    [ "Chebyshev", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a6b7891a14d427fdf241f09926c3cf0d5", null ],
+    [ "Chebyshev", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a1a071a0656a9769acf26c029c7d98fbc", null ],
     [ "~Chebyshev", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#aefc717842ccdba061db4ae272abfe474", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_calc_def_norm", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html#a9920812266b8f49921c9b133dd1451b4", null ],

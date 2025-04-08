@@ -2,7 +2,7 @@ var class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond =
 [
     [ "BaseClass", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#afa798bb227096b3bfe284314e5ade36a", null ],
     [ "SSORPrecond", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#a991f63be7dd04d9d056557f7ee8e03bd", null ],
-    [ "SSORPrecond", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#abc6de6b334826d822d3fb9f589ef88b6", null ],
+    [ "SSORPrecond", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#aa295e35d685ca50ae3644a1302686399", null ],
     [ "~SSORPrecond", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#ac004161b579c2dc25127783c04d04737", null ],
     [ "apply", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#ae162070c491d897ae6f91d263200af40", null ],
     [ "done", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#acacbcaccbf7ec307778128928a901d59", null ],

@@ -1,7 +1,7 @@
 var class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g =
 [
     [ "PipePCG", "class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#a7f8881cc9a2bc7be4afdde2722adb71b", null ],
-    [ "PipePCG", "class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#a99d469a123e9813be88f8ebf26e39009", null ],
+    [ "PipePCG", "class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#a7c11d10d7ef28e013e149aa424941762", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_apply_intern", "class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#ab4b11d92a51f8b551a5ee12e1fdba7aa", null ],
     [ "_apply_precond", "class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#af8e655f0cdc31c3b245587b58a14d5b3", null ],

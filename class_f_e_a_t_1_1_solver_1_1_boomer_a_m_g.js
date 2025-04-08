@@ -2,7 +2,7 @@ var class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g =
 [
     [ "BaseClass", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#aba88d3e7d3a36b8cc1f83df3fa10ab2e", null ],
     [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#ab8b1f9ade67e6d44803a9b0e9128d94f", null ],
-    [ "BoomerAMG", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#a17705d2fbba6928818b5ce63a0c88575", null ],
+    [ "BoomerAMG", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#a0571087ad642a7ab4b1167fc115609cc", null ],
     [ "_download_cor", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#a8c34d07a55cd09eaafef49269f140536", null ],
     [ "_download_vec_cor", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#a71026e1b65bb662a65070d016e24ca0b", null ],
     [ "_download_vec_def", "class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#a61acb04bb9f6091f557181fdbdc314b4", null ],

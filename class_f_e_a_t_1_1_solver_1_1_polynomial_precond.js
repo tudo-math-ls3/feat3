@@ -6,7 +6,7 @@ var class_f_e_a_t_1_1_solver_1_1_polynomial_precond =
     [ "MatrixType", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a8f6f1edff5af1ffa18a3cee49e2ab6b4", null ],
     [ "VectorType", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ac1fb944402f5fda01412384225e5c180", null ],
     [ "PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a85d4787bf4b51cc165f524ace74a7a89", null ],
-    [ "PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a0ba920e5c5e19a9c0311841a425b4087", null ],
+    [ "PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a08e3e9737bd4a36d8a201ac50330392c", null ],
     [ "~PolynomialPrecond", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a2e21c4fc79bd90973adc65b590f040f7", null ],
     [ "apply", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#ae162070c491d897ae6f91d263200af40", null ],
     [ "apply", "class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a25e7d4394f26f6198f7b1a1711583bc9", null ],

@@ -1,7 +1,7 @@
 var class_f_e_a_t_1_1_solver_1_1_richardson =
 [
     [ "Richardson", "class_f_e_a_t_1_1_solver_1_1_richardson.html#a463615e05f140ea8dd1357643d61ee2c", null ],
-    [ "Richardson", "class_f_e_a_t_1_1_solver_1_1_richardson.html#a7fc6e6207f0e376819b24f0eba6851f8", null ],
+    [ "Richardson", "class_f_e_a_t_1_1_solver_1_1_richardson.html#a81d3ab60e188db9034bbc8377d81a557", null ],
     [ "~Richardson", "class_f_e_a_t_1_1_solver_1_1_richardson.html#a4c11796c53851c2e9f599168917ef6ec", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_richardson.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_apply_precond", "class_f_e_a_t_1_1_solver_1_1_richardson.html#af8e655f0cdc31c3b245587b58a14d5b3", null ],

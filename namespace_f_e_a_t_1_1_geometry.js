@@ -22,6 +22,7 @@ var namespace_f_e_a_t_1_1_geometry =
     [ "IndexSet", "class_f_e_a_t_1_1_geometry_1_1_index_set.html", "class_f_e_a_t_1_1_geometry_1_1_index_set" ],
     [ "IndexTree", "class_f_e_a_t_1_1_geometry_1_1_index_tree.html", "class_f_e_a_t_1_1_geometry_1_1_index_tree" ],
     [ "IndexTuple", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple.html", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple" ],
+    [ "LambdaHitTestFactory", "class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory.html", "class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory" ],
     [ "MacroFactory", "class_f_e_a_t_1_1_geometry_1_1_macro_factory.html", null ],
     [ "MaskedBoundaryFactory", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory.html", "class_f_e_a_t_1_1_geometry_1_1_masked_boundary_factory" ],
     [ "MeshAtlas", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas" ],
@@ -113,5 +114,13 @@ var namespace_f_e_a_t_1_1_geometry =
       [ "cuthill_mckee_reversed", "namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a65ca520f30bbe0884c8e47c99e653e3e", null ],
       [ "geometric_cuthill_mckee", "namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6aefc732406db315400af509456a1d8390", null ],
       [ "geometric_cuthill_mckee_reversed", "namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6ad0366dcc6ad4109dd4738fe41999f99a", null ]
-    ] ]
+    ] ],
+    [ "make_boundary_meshpart", "namespace_f_e_a_t_1_1_geometry.html#afe0f0e0adc688bbbb1267dd633c66ef0", null ],
+    [ "make_meshpart_by_chart_hit_test", "namespace_f_e_a_t_1_1_geometry.html#a64019e5dbc4abe9e48f381d35f1ea1e1", null ],
+    [ "make_meshpart_by_hit_test", "namespace_f_e_a_t_1_1_geometry.html#aae45ccbc7624862a8f30b4ac91a9f6e0", null ],
+    [ "make_meshpart_by_lambda_hit_test", "namespace_f_e_a_t_1_1_geometry.html#ad08cec1c1f99ea0f899900d0308892f0", null ],
+    [ "make_unique_boundary_meshpart", "namespace_f_e_a_t_1_1_geometry.html#a080d8966761f53a34ee992a2ab277545", null ],
+    [ "make_unique_meshpart_by_chart_hit_test", "namespace_f_e_a_t_1_1_geometry.html#a02770044a083827eaf33f52ef99bd7c4", null ],
+    [ "make_unique_meshpart_by_hit_test", "namespace_f_e_a_t_1_1_geometry.html#ace0b966bf049cbb25277d16d51cd2c04", null ],
+    [ "make_unique_meshpart_by_lambda_hit_test", "namespace_f_e_a_t_1_1_geometry.html#a8e01674dba7106231ec0b972e0300110", null ]
 ];

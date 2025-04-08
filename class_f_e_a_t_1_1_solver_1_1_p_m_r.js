@@ -1,7 +1,7 @@
 var class_f_e_a_t_1_1_solver_1_1_p_m_r =
 [
     [ "PMR", "class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a599fecc4c0770e582f7029da0363934e", null ],
-    [ "PMR", "class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a96d7c2134c0f82e5dae7f5058c480e83", null ],
+    [ "PMR", "class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a9111a9192306f0a303a748dc05014b84", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_apply_precond", "class_f_e_a_t_1_1_solver_1_1_p_m_r.html#af8e655f0cdc31c3b245587b58a14d5b3", null ],
     [ "_calc_def_norm", "class_f_e_a_t_1_1_solver_1_1_p_m_r.html#a9920812266b8f49921c9b133dd1451b4", null ],

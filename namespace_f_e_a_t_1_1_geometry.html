@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -184,6 +183,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_geometry_1_1_index_tuple.html">IndexTuple</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index Tuple class template.  <a href="struct_f_e_a_t_1_1_geometry_1_1_index_tuple.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory.html">LambdaHitTestFactory</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lambda Hit-Test <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_factory.html" title="Mesh Factory class template.">Factory</a> class template.  <a href="class_f_e_a_t_1_1_geometry_1_1_lambda_hit_test_factory.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_macro_factory.html">MacroFactory</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -433,6 +435,38 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:afe0f0e0adc688bbbb1267dd633c66ef0"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ &gt; </td></tr>
+<tr class="memitem:afe0f0e0adc688bbbb1267dd633c66ef0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#afe0f0e0adc688bbbb1267dd633c66ef0">make_boundary_meshpart</a> (const Mesh_ &amp;mesh)</td></tr>
+<tr class="memdesc:afe0f0e0adc688bbbb1267dd633c66ef0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new boundary mesh-part for a given mesh.  <a href="namespace_f_e_a_t_1_1_geometry.html#afe0f0e0adc688bbbb1267dd633c66ef0">More...</a><br /></td></tr>
+<tr class="separator:afe0f0e0adc688bbbb1267dd633c66ef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64019e5dbc4abe9e48f381d35f1ea1e1"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ , typename Chart_ &gt; </td></tr>
+<tr class="memitem:a64019e5dbc4abe9e48f381d35f1ea1e1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a64019e5dbc4abe9e48f381d35f1ea1e1">make_meshpart_by_chart_hit_test</a> (const Mesh_ &amp;mesh, const Chart_ &amp;chart, bool invert=false)</td></tr>
+<tr class="memdesc:a64019e5dbc4abe9e48f381d35f1ea1e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mesh-part from a chart hit-test function.  <a href="namespace_f_e_a_t_1_1_geometry.html#a64019e5dbc4abe9e48f381d35f1ea1e1">More...</a><br /></td></tr>
+<tr class="separator:a64019e5dbc4abe9e48f381d35f1ea1e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae45ccbc7624862a8f30b4ac91a9f6e0"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ , typename HitFunc_ &gt; </td></tr>
+<tr class="memitem:aae45ccbc7624862a8f30b4ac91a9f6e0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#aae45ccbc7624862a8f30b4ac91a9f6e0">make_meshpart_by_hit_test</a> (const Mesh_ &amp;mesh, const HitFunc_ &amp;hit_func)</td></tr>
+<tr class="memdesc:aae45ccbc7624862a8f30b4ac91a9f6e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mesh-part from a hit-test function.  <a href="namespace_f_e_a_t_1_1_geometry.html#aae45ccbc7624862a8f30b4ac91a9f6e0">More...</a><br /></td></tr>
+<tr class="separator:aae45ccbc7624862a8f30b4ac91a9f6e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad08cec1c1f99ea0f899900d0308892f0"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ , typename Lambda_ &gt; </td></tr>
+<tr class="memitem:ad08cec1c1f99ea0f899900d0308892f0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#ad08cec1c1f99ea0f899900d0308892f0">make_meshpart_by_lambda_hit_test</a> (const Mesh_ &amp;mesh, Lambda_ &amp;&amp;lambda)</td></tr>
+<tr class="memdesc:ad08cec1c1f99ea0f899900d0308892f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mesh-part from a lambda hit-test function.  <a href="namespace_f_e_a_t_1_1_geometry.html#ad08cec1c1f99ea0f899900d0308892f0">More...</a><br /></td></tr>
+<tr class="separator:ad08cec1c1f99ea0f899900d0308892f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a080d8966761f53a34ee992a2ab277545"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ &gt; </td></tr>
+<tr class="memitem:a080d8966761f53a34ee992a2ab277545"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a080d8966761f53a34ee992a2ab277545">make_unique_boundary_meshpart</a> (const Mesh_ &amp;mesh)</td></tr>
+<tr class="memdesc:a080d8966761f53a34ee992a2ab277545"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new boundary mesh-part for a given mesh.  <a href="namespace_f_e_a_t_1_1_geometry.html#a080d8966761f53a34ee992a2ab277545">More...</a><br /></td></tr>
+<tr class="separator:a080d8966761f53a34ee992a2ab277545"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02770044a083827eaf33f52ef99bd7c4"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ , typename Chart_ &gt; </td></tr>
+<tr class="memitem:a02770044a083827eaf33f52ef99bd7c4"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a02770044a083827eaf33f52ef99bd7c4">make_unique_meshpart_by_chart_hit_test</a> (const Mesh_ &amp;mesh, const Chart_ &amp;chart, bool invert=false)</td></tr>
+<tr class="memdesc:a02770044a083827eaf33f52ef99bd7c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mesh-part from a chart hit-test function.  <a href="namespace_f_e_a_t_1_1_geometry.html#a02770044a083827eaf33f52ef99bd7c4">More...</a><br /></td></tr>
+<tr class="separator:a02770044a083827eaf33f52ef99bd7c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace0b966bf049cbb25277d16d51cd2c04"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ , typename HitFunc_ &gt; </td></tr>
+<tr class="memitem:ace0b966bf049cbb25277d16d51cd2c04"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#ace0b966bf049cbb25277d16d51cd2c04">make_unique_meshpart_by_hit_test</a> (const Mesh_ &amp;mesh, const HitFunc_ &amp;hit_func)</td></tr>
+<tr class="memdesc:ace0b966bf049cbb25277d16d51cd2c04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mesh-part from a hit-test function.  <a href="namespace_f_e_a_t_1_1_geometry.html#ace0b966bf049cbb25277d16d51cd2c04">More...</a><br /></td></tr>
+<tr class="separator:ace0b966bf049cbb25277d16d51cd2c04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e01674dba7106231ec0b972e0300110"><td class="memTemplParams" colspan="2">template&lt;typename Mesh_ , typename Lambda_ &gt; </td></tr>
+<tr class="memitem:a8e01674dba7106231ec0b972e0300110"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a8e01674dba7106231ec0b972e0300110">make_unique_meshpart_by_lambda_hit_test</a> (const Mesh_ &amp;mesh, Lambda_ &amp;&amp;lambda)</td></tr>
+<tr class="memdesc:a8e01674dba7106231ec0b972e0300110"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mesh-part from a lambda hit-test function.  <a href="namespace_f_e_a_t_1_1_geometry.html#a8e01674dba7106231ec0b972e0300110">More...</a><br /></td></tr>
+<tr class="separator:a8e01674dba7106231ec0b972e0300110"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3c324ec1ad810bc5a947c4daafa0ae2"><td class="memItemLeft" align="right" valign="top"><a id="ae3c324ec1ad810bc5a947c4daafa0ae2" name="ae3c324ec1ad810bc5a947c4daafa0ae2"></a>
 template void&#160;</td><td class="memItemRight" valign="bottom"><b>MeshFileReader::parse&lt; ConformalMesh&lt; Shape::Hypercube&lt; 2 &gt;, 2, Real &gt; &gt;</b> (<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_node_linker.html">MeshNodeLinker</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html">ConformalMesh</a>&lt; <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_hypercube.html">Shape::Hypercube</a>&lt; 2 &gt;, 2, <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt; &gt; &amp;, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">RootMeshNode</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html">ConformalMesh</a>&lt; <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_hypercube.html">Shape::Hypercube</a>&lt; 2 &gt;, 2, <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt; &gt; &amp;, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html">MeshAtlas</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html">ConformalMesh</a>&lt; <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_hypercube.html">Shape::Hypercube</a>&lt; 2 &gt;, 2, <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> &gt; &gt; &amp;, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_partition_set.html">PartitionSet</a> *)</td></tr>
 <tr class="separator:ae3c324ec1ad810bc5a947c4daafa0ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -645,6 +679,333 @@ template&lt;typename MeshType_ &gt; </div>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="mesh__permutation_8hpp_source.html#l00190">190</a> of file <a class="el" href="mesh__permutation_8hpp_source.html">mesh_permutation.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="afe0f0e0adc688bbbb1267dd633c66ef0" name="afe0f0e0adc688bbbb1267dd633c66ef0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe0f0e0adc688bbbb1267dd633c66ef0">&#9670;&#160;</a></span>make_boundary_meshpart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; FEAT::Geometry::make_boundary_meshpart </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new boundary mesh-part for a given mesh. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a boundary mesh-part is to be created.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A mesh-part containing all entities for which lie on the mesh boundary </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00104">104</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a64019e5dbc4abe9e48f381d35f1ea1e1" name="a64019e5dbc4abe9e48f381d35f1ea1e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64019e5dbc4abe9e48f381d35f1ea1e1">&#9670;&#160;</a></span>make_meshpart_by_chart_hit_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename Chart_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; FEAT::Geometry::make_meshpart_by_chart_hit_test </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Chart_ &amp;&#160;</td>
+          <td class="paramname"><em>chart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>invert</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new mesh-part from a chart hit-test function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a mesh-part is to be created.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">chart</td><td>A chart object whose signed-distance function is to be used for hit-testing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A mesh-part containing all entities for which the chart signed distance is &lt;= 0. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00479">479</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aae45ccbc7624862a8f30b4ac91a9f6e0" name="aae45ccbc7624862a8f30b4ac91a9f6e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae45ccbc7624862a8f30b4ac91a9f6e0">&#9670;&#160;</a></span>make_meshpart_by_hit_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename HitFunc_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; FEAT::Geometry::make_meshpart_by_hit_test </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const HitFunc_ &amp;&#160;</td>
+          <td class="paramname"><em>hit_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new mesh-part from a hit-test function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a mesh-part is to be created.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hit_func</td><td>An object implementing the hit-test function interface.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A mesh-part containing all entities for which the hit-test function evaluated to <code>true</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00126">126</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad08cec1c1f99ea0f899900d0308892f0" name="ad08cec1c1f99ea0f899900d0308892f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad08cec1c1f99ea0f899900d0308892f0">&#9670;&#160;</a></span>make_meshpart_by_lambda_hit_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename Lambda_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; FEAT::Geometry::make_meshpart_by_lambda_hit_test </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Lambda_ &amp;&amp;&#160;</td>
+          <td class="paramname"><em>lambda</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new mesh-part from a lambda hit-test function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a mesh-part is to be created.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lambda</td><td>A lambda expression in X/Y/Z coordinates that returns <code>true</code>, if a point is inside, otherwise <code>false</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A mesh-part containing all entities for which the lambda evaluated to <code>true</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00624">624</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a080d8966761f53a34ee992a2ab277545" name="a080d8966761f53a34ee992a2ab277545"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a080d8966761f53a34ee992a2ab277545">&#9670;&#160;</a></span>make_unique_boundary_meshpart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt; FEAT::Geometry::make_unique_boundary_meshpart </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new boundary mesh-part for a given mesh. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a boundary mesh-part is to be created.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A mesh-part containing all entities for which lie on the mesh boundary </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="boundary__factory_8hpp_source.html#l00120">120</a> of file <a class="el" href="boundary__factory_8hpp_source.html">boundary_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a02770044a083827eaf33f52ef99bd7c4" name="a02770044a083827eaf33f52ef99bd7c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02770044a083827eaf33f52ef99bd7c4">&#9670;&#160;</a></span>make_unique_meshpart_by_chart_hit_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename Chart_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt; FEAT::Geometry::make_unique_meshpart_by_chart_hit_test </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Chart_ &amp;&#160;</td>
+          <td class="paramname"><em>chart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>invert</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new mesh-part from a chart hit-test function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a mesh-part is to be created.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">chart</td><td>A chart object whose signed-distance function is to be used for hit-testing.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A unique-pointer to a mesh-part containing all entities for which the chart signed distance is &lt;= 0. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00498">498</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ace0b966bf049cbb25277d16d51cd2c04" name="ace0b966bf049cbb25277d16d51cd2c04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace0b966bf049cbb25277d16d51cd2c04">&#9670;&#160;</a></span>make_unique_meshpart_by_hit_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename HitFunc_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt; FEAT::Geometry::make_unique_meshpart_by_hit_test </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const HitFunc_ &amp;&#160;</td>
+          <td class="paramname"><em>hit_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new mesh-part from a hit-test function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a mesh-part is to be created.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hit_func</td><td>An object implementing the hit-test function interface.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A unique-pointer to a mesh-part containing all entities for which the hit-test function evaluated to <code>true</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00145">145</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a8e01674dba7106231ec0b972e0300110" name="a8e01674dba7106231ec0b972e0300110"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e01674dba7106231ec0b972e0300110">&#9670;&#160;</a></span>make_unique_meshpart_by_lambda_hit_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename Lambda_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; Mesh_ &gt; &gt; FEAT::Geometry::make_unique_meshpart_by_lambda_hit_test </td>
+          <td>(</td>
+          <td class="paramtype">const Mesh_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Lambda_ &amp;&amp;&#160;</td>
+          <td class="paramname"><em>lambda</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a new mesh-part from a lambda hit-test function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mesh</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the mesh for which a mesh-part is to be created.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lambda</td><td>A lambda expression in X/Y/Z coordinates that returns <code>true</code>, if a point is inside, otherwise <code>false</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A unique-pointer to a mesh-part containing all entities for which the lambda evaluated to <code>true</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00643">643</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
 
 </div>
 </div>

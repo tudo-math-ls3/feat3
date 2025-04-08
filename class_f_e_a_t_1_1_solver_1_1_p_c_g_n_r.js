@@ -1,7 +1,7 @@
 var class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r =
 [
     [ "PCGNR", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#a13691003811b54072aa44a6d88da3f54", null ],
-    [ "PCGNR", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#af1b9cd895e0457ab7b65dd96094f1898", null ],
+    [ "PCGNR", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#af33d382743ac35d8eadac33994d0d3a7", null ],
     [ "_analyse_defect", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#a50df7223074bef35a5a7cbd0c8ec9bec", null ],
     [ "_apply_intern", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#afa7c400a10c25597f690c515d6471e94", null ],
     [ "_calc_def_norm", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#a9920812266b8f49921c9b133dd1451b4", null ],

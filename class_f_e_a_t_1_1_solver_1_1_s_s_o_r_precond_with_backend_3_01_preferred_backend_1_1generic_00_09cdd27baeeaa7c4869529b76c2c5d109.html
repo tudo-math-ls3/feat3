@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -143,8 +142,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1a94519497c4d11e7fc4e590e604a1f8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109.html#a1a94519497c4d11e7fc4e590e604a1f8">SSORPrecondWithBackend</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">MatrixType</a> &amp;matrix, const FilterType &amp;filter, const DataType omega=DataType(1))</td></tr>
 <tr class="memdesc:a1a94519497c4d11e7fc4e590e604a1f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109.html#a1a94519497c4d11e7fc4e590e604a1f8">More...</a><br /></td></tr>
 <tr class="separator:a1a94519497c4d11e7fc4e590e604a1f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69e71051999d580d62088df883d4b34f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109.html#a69e71051999d580d62088df883d4b34f">SSORPrecondWithBackend</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">MatrixType</a> &amp;matrix, const FilterType &amp;filter)</td></tr>
-<tr class="separator:a69e71051999d580d62088df883d4b34f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee7cb1ba401f03e0c3c5aeb63908b6b4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109.html#aee7cb1ba401f03e0c3c5aeb63908b6b4">SSORPrecondWithBackend</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">MatrixType</a> &amp;matrix, const FilterType &amp;filter)</td></tr>
+<tr class="separator:aee7cb1ba401f03e0c3c5aeb63908b6b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af533d2265b6c21d8b7399b118e9f94b3"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109.html#af533d2265b6c21d8b7399b118e9f94b3">apply</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">VectorType</a> &amp;vec_cor, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">VectorType</a> &amp;vec_def) override</td></tr>
 <tr class="separator:af533d2265b6c21d8b7399b118e9f94b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b63750743e603fca766aba8b9b1d38f"><td class="memItemLeft" align="right" valign="top"><a id="a9b63750743e603fca766aba8b9b1d38f" name="a9b63750743e603fca766aba8b9b1d38f"></a>
@@ -335,12 +334,12 @@ template&lt;typename Filter_ , typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="ssor__precond_8hpp_source.html#l00113">113</a> of file <a class="el" href="ssor__precond_8hpp_source.html">ssor_precond.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01197">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01186">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01180">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01169">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
 </div>
 </div>
-<a id="a69e71051999d580d62088df883d4b34f" name="a69e71051999d580d62088df883d4b34f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69e71051999d580d62088df883d4b34f">&#9670;&#160;</a></span>SSORPrecondWithBackend() <span class="overload">[2/2]</span></h2>
+<a id="aee7cb1ba401f03e0c3c5aeb63908b6b4" name="aee7cb1ba401f03e0c3c5aeb63908b6b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee7cb1ba401f03e0c3c5aeb63908b6b4">&#9670;&#160;</a></span>SSORPrecondWithBackend() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -359,7 +358,7 @@ template&lt;typename Filter_ , typename DT_ , typename IT_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
           <td class="paramname"><em>section</em>, </td>
         </tr>
         <tr>

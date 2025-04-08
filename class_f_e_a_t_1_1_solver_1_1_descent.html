@@ -26,7 +26,6 @@ window.MathJax = {
 };
 </script>
 <script type="text/javascript" id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script type="text/javascript" src="darkmode_toggle.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -147,9 +146,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af306f062a82e4251f091fe9d2e876ed8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html#af306f062a82e4251f091fe9d2e876ed8">Descent</a> (const MatrixType &amp;matrix, const FilterType &amp;filter, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7">DescentVariant</a> variant, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
 <tr class="memdesc:af306f062a82e4251f091fe9d2e876ed8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_solver_1_1_descent.html#af306f062a82e4251f091fe9d2e876ed8">More...</a><br /></td></tr>
 <tr class="separator:af306f062a82e4251f091fe9d2e876ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a666dbfc5edac533d96961947fb0fa95d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html#a666dbfc5edac533d96961947fb0fa95d">Descent</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
-<tr class="memdesc:a666dbfc5edac533d96961947fb0fa95d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="class_f_e_a_t_1_1_solver_1_1_descent.html#a666dbfc5edac533d96961947fb0fa95d">More...</a><br /></td></tr>
-<tr class="separator:a666dbfc5edac533d96961947fb0fa95d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a054ac5603e32a11fced42a58d10bb116"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html#a054ac5603e32a11fced42a58d10bb116">Descent</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond=nullptr)</td></tr>
+<tr class="memdesc:a054ac5603e32a11fced42a58d10bb116"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="class_f_e_a_t_1_1_solver_1_1_descent.html#a054ac5603e32a11fced42a58d10bb116">More...</a><br /></td></tr>
+<tr class="separator:a054ac5603e32a11fced42a58d10bb116"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae162070c491d897ae6f91d263200af40"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">apply</a> (Vector_ &amp;vec_cor, const Vector_ &amp;vec_def)=0</td></tr>
 <tr class="memdesc:ae162070c491d897ae6f91d263200af40"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_solver.html" title="Solver namespace.">Solver</a> application method.  <a href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">More...</a><br /></td></tr>
 <tr class="separator:ae162070c491d897ae6f91d263200af40"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -607,8 +606,8 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 </div>
 </div>
-<a id="a666dbfc5edac533d96961947fb0fa95d" name="a666dbfc5edac533d96961947fb0fa95d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a666dbfc5edac533d96961947fb0fa95d">&#9670;&#160;</a></span>Descent() <span class="overload">[2/2]</span></h2>
+<a id="a054ac5603e32a11fced42a58d10bb116" name="a054ac5603e32a11fced42a58d10bb116"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a054ac5603e32a11fced42a58d10bb116">&#9670;&#160;</a></span>Descent() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -627,7 +626,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
           <td class="paramname"><em>section</em>, </td>
         </tr>
         <tr>
