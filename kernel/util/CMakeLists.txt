@@ -4,6 +4,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(KERNEL_LIBRARY_FILES
   dist.cpp
   dist_file_io.cpp
+  hash.cpp
   memory_pool.cpp
   property_map.cpp
   statistics.cpp
