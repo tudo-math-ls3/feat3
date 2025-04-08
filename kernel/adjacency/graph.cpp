@@ -53,7 +53,7 @@ namespace FEAT
       }
     }
 
-    // "Copy-Vector" Constructor
+    // "Copy-Vectors" Constructor
     Graph::Graph(
       Index num_nodes_image,
       const IndexVector& domain_ptr,
@@ -61,6 +61,17 @@ namespace FEAT
       _num_nodes_image(num_nodes_image),
       _domain_ptr(domain_ptr),
       _image_idx(image_idx)
+    {
+    }
+
+    // "Move-Vectors" Constructor
+    Graph::Graph(
+      Index num_nodes_image,
+      IndexVector&& domain_ptr,
+      IndexVector&& image_idx) :
+      _num_nodes_image(num_nodes_image),
+      _domain_ptr(std::forward<IndexVector>(domain_ptr)),
+      _image_idx(std::forward<IndexVector>(image_idx))
     {
     }
 

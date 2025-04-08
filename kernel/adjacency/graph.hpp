@@ -10,6 +10,7 @@
 #include <kernel/adjacency/adjactor.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/omp_util.hpp>
 
 // includes, system
 #include <vector>
@@ -122,7 +123,7 @@ namespace FEAT
         const Index* image_idx);
 
       /**
-       * \brief "Copy-Vector" Constructor
+       * \brief "Copy-Vectors" Constructor
        *
        * This constructor creates a new graph using copies of the vectors passed to this function.
        *
@@ -139,6 +140,25 @@ namespace FEAT
         Index num_nodes_image,
         const IndexVector& domain_ptr,
         const IndexVector& image_idx);
+
+      /**
+       * \brief "Move-Vectors" Constructor
+       *
+       * This constructor creates a new graph using copies of the vectors passed to this function.
+       *
+       * \param[in] num_nodes_image
+       * The total number of image nodes for the graph.
+       *
+       * \param[in] domain_ptr
+       * The \transient domain pointer vector for the graph. Must not be \c nullptr.
+       *
+       * \param[in] image_idx
+       * The \transient image node index vector for the graph. Must not be \c nullptr.
+       */
+      explicit Graph(
+        Index num_nodes_image,
+        IndexVector&& domain_ptr,
+        IndexVector&& image_idx);
 
       /**
        * \brief Render constructor
@@ -408,8 +428,9 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj.get_num_nodes_domain() + 1);
+        _domain_ptr.resize(adj.get_num_nodes_domain() + 1);
         _domain_ptr[0] = 0;
+
         // count number of adjacencies and build pointer vector
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
@@ -423,14 +444,13 @@ namespace FEAT
           }
           _domain_ptr[i+1] = num_indices_here;
         }
-        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
-        {
-          _domain_ptr[i+1] += _domain_ptr[i];
-        }
+
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj.get_num_nodes_domain()+1u, _domain_ptr.data(), _domain_ptr.data());
         num_indices_image = _domain_ptr[adj.get_num_nodes_domain()];
 
         // allocate and build index vector
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj.get_num_nodes_domain(); ++i)
         {
@@ -453,7 +473,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj.get_num_nodes_domain() + 1);
+        _domain_ptr.resize(adj.get_num_nodes_domain() + 1);
         _domain_ptr[0] = 0;
 
         FEAT_PRAGMA_OMP(parallel)
@@ -480,13 +500,13 @@ namespace FEAT
               idx_mask[*it] = 0;
           }
         }
-        for(Index i(0); i < adj.get_num_nodes_domain(); ++i)
-        {
-          _domain_ptr[i+1] += _domain_ptr[i];
-        }
+
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj.get_num_nodes_domain()+1u, _domain_ptr.data(), _domain_ptr.data());
         num_indices_image = _domain_ptr[adj.get_num_nodes_domain()];
+
         // allocate and build index vector
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
 
         FEAT_PRAGMA_OMP(parallel)
         {
@@ -522,7 +542,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate and format pointer vector
-        _domain_ptr = IndexVector(adj.get_num_nodes_image() + 1, Index(0));
+        _domain_ptr.resize(adj.get_num_nodes_image() + 1, Index(0));
 
         // count number of adjacencies
         for(Index j(0); j < adj.get_num_nodes_domain(); ++j)
@@ -535,15 +555,12 @@ namespace FEAT
           }
         }
 
-        // build pointer vector
-        for(Index i(0); i < adj.get_num_nodes_image(); ++i)
-        {
-          _domain_ptr[i+1] += _domain_ptr[i];
-        }
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj.get_num_nodes_image()+1u, _domain_ptr.data(), _domain_ptr.data());
         num_indices_image = _domain_ptr[adj.get_num_nodes_image()];
 
         // allocate and build index vector
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
         std::vector<Index*> vimg_ptr(adj.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
         Index* image_idx = _image_idx.data();
@@ -574,7 +591,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj.get_num_nodes_image() + 1, Index(0));
+        _domain_ptr.resize(adj.get_num_nodes_image() + 1, Index(0));
         // allocate auxiliary mask vector
         std::vector<char> vidx_mask(adj.get_num_nodes_image(), 0);
         char* idx_mask = vidx_mask.data();
@@ -595,14 +612,15 @@ namespace FEAT
             idx_mask[*it] = 0;
         }
 
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
         std::vector<Index*> vimg_ptr(adj.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
         Index* image_idx = _image_idx.data();
-        // build pointer vectors
-        for(Index i(0); i <adj.get_num_nodes_image(); ++i)
+
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj.get_num_nodes_image()+1u, _domain_ptr.data(), _domain_ptr.data());
+        for(Index i(0); i < adj.get_num_nodes_image(); ++i)
         {
-          _domain_ptr[i+1] += _domain_ptr[i];
           image_ptr[i] = &image_idx[_domain_ptr[i]];
         }
 
@@ -643,7 +661,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj1.get_num_nodes_domain() + 1);
+        _domain_ptr.resize(adj1.get_num_nodes_domain() + 1);
         _domain_ptr[0] = 0;
         // count number of adjacencies and build pointer vector
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
@@ -664,14 +682,12 @@ namespace FEAT
           _domain_ptr[i+1] = num_indices_here;
         }
 
-        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
-        {
-          _domain_ptr[i+1] += _domain_ptr[i];
-        }
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj1.get_num_nodes_domain()+1u, _domain_ptr.data(), _domain_ptr.data());
         num_indices_image = _domain_ptr[adj1.get_num_nodes_domain()];
 
         // allocate and build index vector
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
 
         FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
         for(Index i = 0; i < adj1.get_num_nodes_domain(); ++i)
@@ -707,7 +723,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj1.get_num_nodes_domain() + 1);
+        _domain_ptr.resize(adj1.get_num_nodes_domain() + 1);
         _domain_ptr[0] = Index(0);
         FEAT_PRAGMA_OMP(parallel)
         {
@@ -739,12 +755,10 @@ namespace FEAT
           }
         }
 
-        for(Index i(0); i < adj1.get_num_nodes_domain(); ++i)
-        {
-          _domain_ptr[i+1] += _domain_ptr[i];
-        }
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj1.get_num_nodes_domain()+1u, _domain_ptr.data(), _domain_ptr.data());
         num_indices_image = _domain_ptr[adj1.get_num_nodes_domain()];
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
 
         FEAT_PRAGMA_OMP(parallel)
         {
@@ -793,7 +807,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate and format pointer vector
-        _domain_ptr = IndexVector(adj2.get_num_nodes_image() + 1, Index(0));
+        _domain_ptr.resize(adj2.get_num_nodes_image() + 1, Index(0));
 
         // count number of adjacencies
         for(Index j(0); j < adj1.get_num_nodes_domain(); ++j)
@@ -811,15 +825,12 @@ namespace FEAT
           }
         }
 
-        // build pointer vector
-        for(Index i(0); i < adj2.get_num_nodes_image(); ++i)
-        {
-          _domain_ptr[i+1] += _domain_ptr[i];
-        }
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj2.get_num_nodes_image()+1u, _domain_ptr.data(), _domain_ptr.data());
         num_indices_image = _domain_ptr[adj2.get_num_nodes_image()];
 
         // allocate and build index vector
-        _image_idx = IndexVector(num_indices_image);
+        _image_idx.resize(num_indices_image);
         std::vector<Index*> vimg_ptr(adj2.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
         Index* image_idx = _image_idx.data();
@@ -863,7 +874,7 @@ namespace FEAT
         Index num_indices_image = 0;
 
         // allocate pointer vector
-        _domain_ptr = IndexVector(adj2.get_num_nodes_image() + 1, Index(0));
+        _domain_ptr.resize(adj2.get_num_nodes_image() + 1, Index(0));
 
         // allocate auxiliary mask vector
         std::vector<char> vidx_mask(adj2.get_num_nodes_image(), 0);
@@ -878,7 +889,6 @@ namespace FEAT
             {
               if(idx_mask[*jt] == 0)
               {
-                ++num_indices_image;
                 ++_domain_ptr[(*jt)+1];
                 idx_mask[*jt] = 1;
               }
@@ -890,7 +900,11 @@ namespace FEAT
               idx_mask[*jt] = 0;
         }
 
-        _image_idx = IndexVector(num_indices_image);
+        // perform inclusive scan to obtain domain pointer
+        feat_omp_in_scan(adj2.get_num_nodes_image()+1u, _domain_ptr.data(), _domain_ptr.data());
+        num_indices_image = _domain_ptr[adj2.get_num_nodes_image()];
+
+        _image_idx.resize(num_indices_image);
         std::vector<Index*> vimg_ptr(adj2.get_num_nodes_image(), nullptr);
         Index** image_ptr = vimg_ptr.data();
         Index* image_idx = _image_idx.data();
@@ -898,7 +912,6 @@ namespace FEAT
         // build pointer vector
         for(Index i(0); i < adj2.get_num_nodes_image(); ++i)
         {
-          _domain_ptr[i+1] += _domain_ptr[i];
           image_ptr[i] = &image_idx[_domain_ptr[i]];
         }
 

@@ -92,6 +92,9 @@ target_link_libraries(dbg-trace-2 feat)
 add_executable(dbg-trace-3 dbg_trace_3.cpp)
 target_link_libraries(dbg-trace-3 feat)
 
+add_executable(dbg-graph-omp dbg_graph_omp.cpp)
+target_link_libraries(dbg-graph-omp feat)
+
 add_executable(dbg-stabilize dbg_stabilize.cpp)
 target_link_libraries(dbg-stabilize feat)
 
