@@ -50,7 +50,7 @@ namespace FEAT
         static void bottom_to_top(TargetSetHolderType& _target_set_holder, const IndexSetHolderType& parent_ish)
         {
           // Template recursion: Call the lower dimensional version first
-          TargetSetComputer<end_dim_, current_dim_-1>::template bottom_to_top(_target_set_holder, parent_ish);
+          TargetSetComputer<end_dim_, current_dim_-1>::bottom_to_top(_target_set_holder, parent_ish);
 
           typedef typename IndexSetHolderType::template IndexSet<current_dim_, current_dim_-1>::Type ParentIndexSetType;
 
@@ -133,7 +133,7 @@ namespace FEAT
         static void top_to_bottom(TargetSetHolderType& _target_set_holder, const IndexSetHolderType& parent_ish)
         {
           // Call higher dimensional version first
-          TargetSetComputer<end_dim_, current_dim_+1>::template top_to_bottom(_target_set_holder, parent_ish);
+          TargetSetComputer<end_dim_, current_dim_+1>::top_to_bottom(_target_set_holder, parent_ish);
 
           typedef typename IndexSetHolderType::template IndexSet<current_dim_+1, current_dim_>::Type ParentIndexSetType;
 

@@ -897,6 +897,12 @@ namespace FEAT
         return rows() * columns();
       }
 
+      /// Returns a descriptive string for this container.
+      static String name()
+      {
+        return String("TupleDiagMatrix<") + sub_name_list() + ">";
+      }
+
       void extract_diag(VectorTypeL& diag) const
       {
         first().extract_diag(diag.first());

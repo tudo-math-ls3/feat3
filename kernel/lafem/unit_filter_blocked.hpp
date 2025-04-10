@@ -321,7 +321,7 @@ namespace FEAT
 
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
-        Arch::UnitFilterBlocked::template filter_unit_mat
+        Arch::UnitFilterBlocked::filter_unit_mat
           (matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), BlockSize_, BlockWidth_,
           _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
@@ -334,7 +334,7 @@ namespace FEAT
 
         XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
 
-        Arch::UnitFilterBlocked::template filter_offdiag_row_mat
+        Arch::UnitFilterBlocked::filter_offdiag_row_mat
           (matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), BlockSize_, BlockWidth_,
           _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
@@ -382,7 +382,7 @@ namespace FEAT
         XASSERTM(row_ptr == matrix_m.row_ptr(), "matrix A and M must share their layout");
         XASSERTM(col_idx == matrix_m.col_ind(), "matrix A and M must share their layout");
 
-        Arch::UnitFilterBlocked::template filter_weak_matrix_rows
+        Arch::UnitFilterBlocked::filter_weak_matrix_rows
           (matrix_a.template val<LAFEM::Perspective::pod>(), matrix_m.template val<LAFEM::Perspective::pod>(), row_ptr, BlockSize_, BlockWidth_,
           _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements());
       }
@@ -400,7 +400,7 @@ namespace FEAT
           return;
 
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilterBlocked::template filter_rhs
+        Arch::UnitFilterBlocked::filter_rhs
           (vector.template elements<Perspective::pod>(), BlockSize_, _sv.template elements<Perspective::pod>(),
           _sv.indices(), _sv.used_elements(), _ignore_nans);
       }
@@ -429,7 +429,7 @@ namespace FEAT
           return;
 
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilterBlocked::template filter_def
+        Arch::UnitFilterBlocked::filter_def
           (vector.template elements<Perspective::pod>(), BlockSize_, _sv.template elements<Perspective::pod>(),
           _sv.indices(), _sv.used_elements(), _ignore_nans);
       }

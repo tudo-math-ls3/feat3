@@ -116,6 +116,11 @@ namespace FEAT
       typedef Global::Muxer<LocalPresVector, PresMirror> PresMuxer;
       typedef Global::Muxer<LocalSystemVector, SystemMirror> SystemMuxer;
 
+      // define splitters
+      typedef Global::Splitter<LocalVeloVector, VeloMirror> VeloSplitter;
+      typedef Global::Splitter<LocalPresVector, PresMirror> PresSplitter;
+      typedef Global::Splitter<LocalSystemVector, SystemMirror> SystemSplitter;
+
       // define global vector types
       typedef Global::Vector<LocalVeloVector, VeloMirror> GlobalVeloVector;
       typedef Global::Vector<LocalPresVector, PresMirror> GlobalPresVector;
@@ -148,6 +153,11 @@ namespace FEAT
       VeloMuxer coarse_muxer_velo;
       PresMuxer coarse_muxer_pres;
       SystemMuxer coarse_muxer_sys;
+
+      /// our base-mesh multiplexer
+      VeloSplitter base_splitter_velo;
+      PresSplitter base_splitter_pres;
+      SystemSplitter base_splitter_sys;
 
       /// our global system matrix
       GlobalMatrixBlockA matrix_a;
@@ -252,6 +262,10 @@ namespace FEAT
         coarse_muxer_velo.convert(other.coarse_muxer_velo);
         coarse_muxer_pres.convert(other.coarse_muxer_pres);
         coarse_muxer_sys.convert(other.coarse_muxer_sys);
+
+        base_splitter_velo.convert(other.base_splitter_velo);
+        base_splitter_pres.convert(other.base_splitter_pres);
+        Asm::build_splitter_tuple(this->base_splitter_sys, this->gate_sys.get_freqs(), this->base_splitter_velo, this->base_splitter_pres);
 
         matrix_a.convert(&gate_velo, &gate_velo, other.matrix_a);
         matrix_b.convert(&gate_velo, &gate_pres, other.matrix_b);
