@@ -20,6 +20,7 @@ from build_system.configure_icc import configure_icc
 from build_system.configure_icx import configure_icx
 from build_system.configure_clang import configure_clang
 from build_system.configure_cray import configure_cray
+from build_system.configure_msvc import configure_msvc
 from build_system.feat_util import remove_string
 from build_system.feat_util import remove_substring
 from build_system.feat_util import is_found
@@ -74,6 +75,7 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print (" - 'unixmake': generate GNU make makefiles (default)")
   print (" - 'ninja': generate ninja files")
   print (" - 'xcode': generate XCode project files")
+  print (" - 'vsproject': generate Visual Studio project files")
   print ("")
   print ("* Build system extensions")
   print (" - 'ccache': enable ccache")
@@ -315,6 +317,9 @@ elif "xcode" in buildid:
 elif "unixmake" in buildid:
   remove_string(unused_tokens, "unixmake")
   generator = "Unix Makefiles"
+elif "vsproject" in buildid:
+  remove_string(unused_tokens, "vsproject")
+  generator = "Visual Studio 17 2022"
 else:
   generator = "Unix Makefiles"
 
@@ -649,6 +654,23 @@ elif "cray" in buildid:
   os.environ["LD"] = compiler_cxx
   cxxflags += " " + configure_cray (cputype, buildid, compiler_cxx, restrict_errors)
   cmake_flags += " -DFEAT_COMPILER_ID:STRING=cray"
+elif "msvc" in buildid:
+  if not compiler_cxx:
+    compiler_cxx = "cl"
+  if not is_found(compiler_cxx):
+    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
+    sys.exit(1)
+  if not compiler_cc:
+    compiler_cc = "cl"
+  if not is_found(compiler_cc):
+    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "msvc")
+  os.environ["CC"] = compiler_cc
+  os.environ["CXX"] = compiler_cxx
+  os.environ["LD"] = compiler_cxx
+  cxxflags += " " + configure_msvc (cputype, buildid, compiler_cxx, restrict_errors)
+  cmake_flags += " -DFEAT_COMPILER_ID:STRING=msvc"
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)

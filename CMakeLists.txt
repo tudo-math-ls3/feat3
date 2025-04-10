@@ -39,7 +39,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
   # also, as main project, we have to include testing
   include(CTest)
-  # no call to enable_testing() reuqired...
+  # no call to enable_testing() required...
 
   # do git things
   find_package(Git)

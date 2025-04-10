@@ -8,6 +8,8 @@
 #error This file can only be compiled under Windows.
 #endif
 
+#pragma comment(lib, "DbgHelp.lib")
+
 // Warning:
 // This source file MUST NOT include any other FEAT header file!
 #include <Windows.h>
