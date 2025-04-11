@@ -185,17 +185,21 @@ namespace FEAT
           {
 #ifdef FEAT_HAVE_CUDA
             case PreferredBackend::cuda:
+            {
               FEAT::Util::cuda_set_memory(address, val, count);
               return;
+            }
 #endif
             case PreferredBackend::generic:
             default:
+            {
               FEAT_PRAGMA_OMP(parallel for)
               for (Index i = 0 ; i < count ; ++i)
               {
                 address[i] = val;
               }
               return;
+            }
           }
         }
 
@@ -238,11 +242,14 @@ namespace FEAT
           {
 #ifdef FEAT_HAVE_CUDA
             case PreferredBackend::cuda:
+            {
               FEAT::Util::cuda_copy(dest, src, count * sizeof(DT_));
               return;
+            }
 #endif
             case PreferredBackend::generic:
             default:
+            {
 #ifdef FEAT_HAVE_OMP
               FEAT_PRAGMA_OMP(parallel for)
               for (Index i = 0 ; i < count ; ++i)
@@ -253,6 +260,7 @@ namespace FEAT
               ::memcpy(dest, src, count * sizeof(DT_));
 #endif
               return;
+            }
           }
         }
 
@@ -283,17 +291,21 @@ namespace FEAT
           {
 #ifdef FEAT_HAVE_CUDA
             case PreferredBackend::cuda:
+            {
               FEAT::Util::cuda_convert(dest, src, count);
               return;
+            }
 #endif
             case PreferredBackend::generic:
             default:
+            {
               FEAT_PRAGMA_OMP(parallel for)
               for (Index i = 0 ; i < count ; ++i)
               {
                 dest[i] = DT1_(src[i]);
               }
               return;
+            }
           }
         }
 
