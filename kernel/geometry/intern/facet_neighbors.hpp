@@ -54,6 +54,7 @@ namespace FEAT
           auto shared_by = reinterpret_cast<SharedBy*>(shared_by_vec.data());
 
           // ~Index(0) is the marker for "no neighbor"
+          FEAT_PRAGMA_OMP(parallel for)
           for(Index l(0); l < num_facets; ++l)
           {
             shared_by[l][0] = ~Index(0);
@@ -61,6 +62,7 @@ namespace FEAT
           }
 
           // For each facet, find the cells sharing it
+          FEAT_PRAGMA_OMP(parallel for)
           for(Index k(0); k < num_cells; ++k)
           {
             for(int j(0); j < facet_idx.num_indices; ++j)
@@ -79,6 +81,7 @@ namespace FEAT
 
           // For every cell and for every facet of that cell, the neighbor at a face is the OTHER cell sharing it
           // (if any)
+          FEAT_PRAGMA_OMP(parallel for)
           for(Index k(0); k < num_cells; ++k)
           {
             for(int j(0); j < facet_idx.num_indices; ++j)

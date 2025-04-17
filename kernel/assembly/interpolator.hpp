@@ -35,43 +35,48 @@ namespace FEAT
 
           typedef typename NodeFunc::template Value<Function_>::Type ValueType;
 
-          // create node functional
-          NodeFunc node_func(space);
-
-          // create node data; avoid zero-length vectors
-          Tiny::Vector<ValueType, max_dofs_> node_data;
-
-          // define dof assignment
-          typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
-          DofAssignType dof_assign(space);
-
-          // get the vector data array
-          auto* vals = vector.elements();
-          XASSERT(vals != nullptr);
-
-          // loop over all entities
           const Index num_entities = space.get_mesh().get_num_entities(shape_dim_);
-          for(Index i(0); i < num_entities; ++i)
+
+          FEAT_PRAGMA_OMP(parallel)
           {
-            // evaluate the node functional
-            node_func.prepare(i);
-            node_func(node_data, function);
-            node_func.finish();
+            // create node functional
+            NodeFunc node_func(space);
 
-            // prepare dof-assignment
-            dof_assign.prepare(i);
+            // create node data; avoid zero-length vectors
+            Tiny::Vector<ValueType, max_dofs_> node_data;
 
-            // loop over all assigned DOFs
-            const int num_dofs = dof_assign.get_num_assigned_dofs();
-            for(int j(0); j < num_dofs; ++j)
+            // define dof assignment
+            typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
+            DofAssignType dof_assign(space);
+
+            // get the vector data array
+            auto* vals = vector.elements();
+            XASSERT(vals != nullptr);
+
+            // loop over all entities
+            FEAT_PRAGMA_OMP(for)
+            for(Index i(0); i < num_entities; ++i)
             {
-              vals[dof_assign.get_index(j)] += node_data[j];
-            }
+              // evaluate the node functional
+              node_func.prepare(i);
+              node_func(node_data, function);
+              node_func.finish();
 
-            // finish
-            dof_assign.finish();
+              // prepare dof-assignment
+              dof_assign.prepare(i);
+
+              // loop over all assigned DOFs
+              const int num_dofs = dof_assign.get_num_assigned_dofs();
+              for(int j(0); j < num_dofs; ++j)
+              {
+                vals[dof_assign.get_index(j)] += node_data[j];
+              }
+
+              // finish
+              dof_assign.finish();
+            }
           }
-        }
+        } // omp parallel
       };
 
       template<typename Vector_, typename Function_, typename Space_, int shape_dim_>

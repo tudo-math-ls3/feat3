@@ -106,17 +106,19 @@ namespace FEAT
       static void compute_orientations(CoordType* orientation, const Index* facets, const MeshType& mesh)
       {
         // Various index sets for the parent
-        auto& idx_vert_at_facet(mesh.template get_index_set<facet_dim, 0>());
-        auto& idx_vert_at_shape(mesh.template get_index_set<ShapeType::dimension, 0>());
-        auto& idx_facet_at_shape(mesh.template get_index_set<ShapeType::dimension, facet_dim>());
+        const auto& idx_vert_at_facet(mesh.template get_index_set<facet_dim, 0>());
+        const auto& idx_vert_at_shape(mesh.template get_index_set<ShapeType::dimension, 0>());
+        const auto& idx_facet_at_shape(mesh.template get_index_set<ShapeType::dimension, facet_dim>());
 
         // This will contain the local vertex indices in the reference cell numbering
         typename MeshType::template IndexSet<facet_dim, 0>::Type::IndexTupleType reference_numbering;
         // This will contain the local vertex indices as they are numbered in the mesh
         typename MeshType::template IndexSet<facet_dim, 0>::Type::IndexTupleType my_numbering;
+        Index num_elements = mesh.get_num_elements();
 
         // Go check all cells in the mesh
-        for(Index k(0); k < mesh.get_num_entities(ShapeType::dimension); ++k)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index k = 0; k < num_elements; ++k)
         {
           // Check all facets
           for(int l(0); l < Shape::FaceTraits<ShapeType, facet_dim>::count; ++l)
@@ -140,8 +142,7 @@ namespace FEAT
 
               // Get the orientation code. This describes if the facet given by my_numbering is a rotation of the
               // reference facet or a rotation of an inverted reference facet
-              int orientation_code(
-                Geometry::Intern::CongruencySampler<FacetType>::compare(reference_numbering, my_numbering));
+              int orientation_code = Geometry::Intern::CongruencySampler<FacetType>::compare(reference_numbering, my_numbering);
 
               // The orientation of the facet is the (possibly inverted) orientation of the appropriate facet in
               // the reference cell
