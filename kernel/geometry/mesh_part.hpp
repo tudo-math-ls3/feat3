@@ -546,7 +546,7 @@ namespace FEAT
        */
       void deduct_topology(const ParentIndexSetHolderType& parent_ish)
       {
-        if(_index_set_holder)
+        if(_index_set_holder == nullptr)
           _index_set_holder.reset(new IndexSetHolderType(_num_entities));
 
         Intern::IndexSetFiller<ShapeType::dimension>::fill_ish(
