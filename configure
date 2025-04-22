@@ -96,20 +96,23 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  - 'half': enable CUDA half type (requires CUDA)")
   print ("")
   print ("* Additional third-party libraries:")
-  print ("- 'alglib': download and build ALGLIB library from source")
-  print ("- 'boost': download and include BOOST header library")
-  print ("- 'cgal': download and include CGAL header library (requires BOOST)")
-  print ("- 'cudss': use externally provided CUDSS cuda direct sparse solver")
-  print ("- 'deathhandler': download and build deathhandler library")
-  print ("- 'fparser': download and build fparser library")
-  print ("- 'floatx': download and include floatx header library")
-  print ("- 'hypre': download and build HYPRE library")
-  print ("- 'metis': download and build METIS and ParMETIS libraries")
-  print ("- 'superlu': download and build SuperLU_Dist library")
+  print ("- 'alglib': enable ALGLIB library TPL")
+  print ("- 'boost': enable BOOST TPL")
+  print ("- 'cgal': enable CGAL TPL, requires BOOST")
+  print ("- 'cudss': enable CUDSS cuda direct sparse solver TPL")
+  print ("- 'deathhandler': enable deathhandler TPL")
+  print ("- 'fparser': enable fparser TPL")
+  print ("- 'floatx': enable floatx TPL")
+  print ("- 'hypre': enable HYPRE TPL")
+  print ("- 'metis': enable METIS and ParMETIS TPLs")
+  print ("- 'pmp': enable PMP TPL")
+  print ("- 'superlu': enable SuperLU_Dist TPL")
+  print ("- 'triangle': enable triangle TPL")
   print ("- 'trilinos': link against pre-built Trilinos library")
-  print ("- 'umfpack': download and build UMFPACK library")
-  print ("- 'zlib': download and build ZLIB library")
-  print ("- 'zoltan': download and build Zoltan library")
+  print ("- 'umfpack': enable UMFPACK TPL")
+  print ("- 'zfp': enable zfp TPL")
+  print ("- 'zlib': enale ZLIB TPL")
+  print ("- 'zoltan': enable Zoltan TPL")
   print ("")
   print ("Note that the actual compiler version and mpi implementation is chosen by the")
   print ("'first come, first served' principle corresponding to your $PATH settings.")
@@ -497,7 +500,6 @@ for option in extra_options:
 
   if option.startswith("--no_external_libs"):
     unused_extra_options.remove(option)
-    prefer_external_libs = True
     cmake_flags += " -DFEAT_PREFER_EXTERNAL_TPL:BOOL=OFF"
 
   if option.startswith("--package_install_dir="):
@@ -510,8 +512,7 @@ for option in extra_options:
 
   if option.startswith("--no_external_download"):
     unused_extra_options.remove(option)
-    prefer_external_libs = True
-    cmake_flags += " -DFEAT_NO_EXTERNAL_DOWNLOAD:BOOL=OFF"
+    cmake_flags += " -DFEAT_NO_EXTERNAL_DOWNLOAD:BOOL=ON"
 
   if option.startswith("--allow_unsupported_compiler"):
     unused_extra_options.remove(option)

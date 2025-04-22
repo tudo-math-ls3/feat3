@@ -37,12 +37,12 @@ include(PrintPackageConfig)
 # set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE OPT_IN CACHE STRING "fetch content mode")
 # Enable output during dependency download
 set(FETCHCONTENT_QUIET OFF CACHE BOOL "fetch content verboseness")
-set(FEAT_NO_EXTERNAL_DOWNLOAD OFF CACHE BOOL "no thirdparty download allowed" FORCE)
+set(FEAT_NO_EXTERNAL_DOWNLOAD OFF CACHE BOOL "no thirdparty download allowed")
 
 set(FEAT_PREFER_EXTERNAL_TPL ON CACHE BOOL "try to find external libraries before fetching?")
 if(FEAT_NO_EXTERNAL_DOWNLOAD)
   message(STATUS "External tpl implicitly required")
-  set(FEAT_PREFER_EXTERNAL_TPL OFF CACHE BOOL "try to find external libraries before fetching?" FORCE)
+  set(FEAT_PREFER_EXTERNAL_TPL ON CACHE BOOL "try to find external libraries before fetching?" FORCE)
 endif()
 
 
@@ -63,14 +63,23 @@ mark_as_advanced(MAKE_AVAIL_LIST)
 # PATCH_COMMANDS cause a git conflict. Because all our dependcies are pinned
 # anyway, this isn't a loss of functionality.
 
+# Add "-w" to the C/CXX flags to disable warnings for third-party dependencies.
+# Save the current flags beforehand to be able to restore them after handling
+# third-party dependencies.
+set(CMAKE_CXX_FLAGS_BACKUP ${CMAKE_CXX_FLAGS})
+set(CMAKE_C_FLAGS_BACKUP ${CMAKE_C_FLAGS})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+
 option(FEAT_HAVE_UMFPACK "Use umfpack solver of suitesparse?" OFF)
 if(FEAT_HAVE_UMFPACK)
   # TODO: instead use value of FETCHCONTENT_TRY_FIND_PACKAGE_MODE?
   if(FEAT_PREFER_EXTERNAL_TPL OR UMFPACK_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(UMFPACK REQUIRED GLOBAL)
+      find_package(UMFPACK CONFIG REQUIRED GLOBAL)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(UMFPACK GLOBAL)
+      find_package(UMFPACK CONFIG GLOBAL)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
@@ -104,6 +113,9 @@ if(FEAT_HAVE_UMFPACK)
     # TODO: Check if we can find out if the available blas is 32 or 64 bit
     set(SUITESPARSE_USE_64BIT_BLAS "ON" CACHE BOOL "use 64 bit blas" FORCE)
 
+    # Disable CHOLDMOD tests
+    set(BUILD_TESTING "OFF")
+
     # list(APPEND MAKE_AVAIL_LIST suitesparse)
     list(APPEND MAKE_AVAIL_LIST UMFPACK)
   else()
@@ -115,9 +127,9 @@ option(FEAT_HAVE_HYPRE "Use hypre solvers?" OFF)
 if(FEAT_HAVE_HYPRE)
   if(FEAT_PREFER_EXTERNAL_TPL OR HYPRE_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(HYPRE REQUIRED GLOBAL)
+      find_package(HYPRE CONFIG REQUIRED GLOBAL)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(HYPRE GLOBAL)
+      find_package(HYPRE CONFIG GLOBAL)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
@@ -264,9 +276,9 @@ if(FEAT_HAVE_CGAL)
 
   if(FEAT_PREFER_EXTERNAL_TPL OR CGAL_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(CGAL REQUIRED GLOBAL)
+      find_package(CGAL CONFIG REQUIRED GLOBAL)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(CGAL GLOBAL)
+      find_package(CGAL CONFIG GLOBAL)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
@@ -313,7 +325,7 @@ endif(FEAT_HAVE_ALGLIB)
 
 option(FEAT_HAVE_DEATH_HANDLER "Enable deathhandler" OFF)
 if(FEAT_HAVE_DEATH_HANDLER)
-  if(FEAT_PREFER_EXTERNAL_TPL OR death_handler)
+  if(FEAT_PREFER_EXTERNAL_TPL OR death_handler_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
       find_package(death_handler REQUIRED GLOBAL)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
@@ -368,9 +380,9 @@ option(FEAT_HAVE_ZFP "Enable zfp" OFF)
 if(FEAT_HAVE_ZFP)
   if(FEAT_PREFER_EXTERNAL_TPL OR zfp_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zfp REQUIRED GLOBAL)
+      find_package(zfp CONFIG REQUIRED GLOBAL)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zfp GLOBAL)
+      find_package(zfp CONFIG GLOBAL)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
@@ -386,6 +398,10 @@ if(FEAT_HAVE_ZFP)
     )
 
     set(ZFP_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Enable OpenMP for ZFP" FORCE)
+
+    # Disable zfp tests
+    set(BUILD_TESTING "OFF")
+
     list(APPEND MAKE_AVAIL_LIST zfp)
   else()
     print_package_info(zfp)
@@ -566,9 +582,9 @@ option(FEAT_HAVE_PMP "Enable pmp" OFF)
 if(FEAT_HAVE_PMP)
   if(FEAT_PREFER_EXTERNAL_TPL OR pmp_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(pmp REQUIRED GLOBAL)
+      find_package(pmp CONFIG REQUIRED GLOBAL)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(pmp GLOBAL)
+      find_package(pmp CONFIG GLOBAL)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
@@ -593,7 +609,15 @@ endif()
 # after all target are declared, call now make available
 if(MAKE_AVAIL_LIST)
   message(STATUS "Fetching the following third-party dependencies:  ${MAKE_AVAIL_LIST}")
-  FetchContent_MakeAvailable(${MAKE_AVAIL_LIST})
+  foreach(tpl IN LISTS MAKE_AVAIL_LIST)
+    message(STATUS "-------------------------------------------------------------------")
+    message(STATUS "- Configuring ${tpl}...")
+    message(STATUS "-------------------------------------------------------------------")
+    FetchContent_MakeAvailable(${tpl})
+    message(STATUS "-------------------------------------------------------------------")
+    message(STATUS "- Configuring ${tpl}...done")
+    message(STATUS "-------------------------------------------------------------------")
+  endforeach()
 endif()
 
 # At this point all requested third-party dependencies have either been found
@@ -816,3 +840,7 @@ if(FEAT_HAVE_PMP AND NOT TARGET pmp::pmp)
 
   add_library(pmp::pmp ALIAS feat-extern-pmp)
 endif()
+
+# Restore previous C/CXX flags to re-enable warnings
+set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS_BACKUP})
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_BACKUP})

@@ -1,0 +1,162 @@
+/** \page feat_tpls FEATS's Thirdparty Dependencies
+
+This page describes how to build FEAT3 with thirdparty dependencies using FEATs
+<a href="https://cmake.org/">CMake</a> build system. The main text will walk
+you through using the configure script to enable and manage thirdparty
+dependencies. Throughout the text are note sections. These contain additional
+information about the inner working of the CMake build system for experienced
+CMake users. If you only plan on using the configure script, you can safely
+skip these.
+
+\section Reference
+Reference table of supported thirdparty dependencies:
+
+| Dependency     | Build-id tag | CMake flag             | <TPL>_DIR         | Link                                               | Notes                                         |
+|----------------|--------------|------------------------|-------------------|----------------------------------------------------|-----------------------------------------------|
+| Alglib         | alglib       | FEAT_HAVE_ALGLIB       | Alglib_DIR        | https://www.alglib.net/                            |                                               |
+| Boost          | boost        | FEAT_HAVE_BOOST        | Boost_DIR         | https://www.boost.org/                             |                                               |
+| CGAL           | cgal         | FEAT_HAVE_CGAL         | CGAL_DIR          | https://www.cgal.org/                              |                                               |
+| cuDSS          | cudss        | FEAT_HAVE_CUDSS        | cudss_DIR         | https://developer.nvidia.com/cudss                 |                                               |
+| deathhandler   | deathhandler | FEAT_HAVE_DEATHHANDLER | death_handler_DIR | https://github.com/vmarkovtsev/DeathHandler        |                                               |
+| fparser        | fparser      | FEAT_HAVE_FPARSER      | fparser_DIR       | http://warp.povusers.org/FunctionParser/           |                                               |
+| floatx         | floatx       | FEAT_HAVE_FLOATX       | FloatX_DIR        | https://github.com/oprecomp/FloatX                 |                                               |
+| hypre          | hypre        | FEAT_HAVE_HYPRE        | HYPRE_DIR         | https://github.com/hypre-space/hypre               |                                               |
+| ParMETIS       | metis        | FEAT_HAVE_PARMETIS     | parmetis_DIR      | https://github.com/KarypisLab/ParMETIS             |                                               |
+| SuperLU (dist) | superlu      | FEAT_HAVE_SUPERLU_DIST | superlu_DIR       | https://github.com/xiaoyeli/superlu_dist           |                                               |
+| Triangle       | triangle     | FEAT_HAVE_TRIANGLE     | triangle_DIR      | https://github.com/libigl/triangle                 |                                               |
+| UMFPACK        | umfpack      | FEAT_HAVE_UMFPACK      | UMFPACK_DIR       | https://github.com/DrTimothyAldenDavis/SuiteSparse | Must be built with MKL, if FEAT uses MKL      |
+| zlib           | zlib         | FEAT_HAVE_ZLIB         | zlib_DIR          | https://zlib.net/                                  |                                               |
+| Zoltan         | zoltan       | FEAT_HAVE_ZOLTAN       | zoltan_DIR        | https://sandialabs.github.io/Zoltan/               |                                               |
+| zfp            | zfp          | FEAT_HAVE_ZFP          | zfp_DIR           | https://github.com/LLNL/zfp                        |                                               |
+| PMP            | pmp          | FEAT_HAVE_PMP          | pmp_DIR           | https://www.pmp-library.org/                       |                                               |
+
+\section enabling_tpls Enabling thirdparty dependencies
+
+This document assumes that you are familiar with basic usage of the FEAT3
+configure script such as producing debug and release builds with different
+compilers. You can enable additional features, such as MPI support, the UMFPACK
+solver, or data compression via zlib, by adding additional tags to the build-id
+you pass to the configure script. As an example, to build FEAT3 with the
+UMFPACK solver you can configure it as
+
+\verbatim
+/path/to/configure gcc-opt-umfpack
+\endverbatim
+
+to receive a build system that will build FEAT3 with the GCC C++ compiler, with
+optimizations and the UMFPACK solver. Certain thirdparty dependencies depend on
+each other. The ParMETIS partitioner for example, requires you to also enable
+MPI.  The configure script will warn you in these cases.
+
+\note Internally dependencies are tracked using a set of flags in the CMake
+cache. These flags are named FEAT_HAVE_<TPL>. If you already have a configured
+build directory, you can also add or disable thirdparty dependencies by
+toggling these flags in the CMake cache and then reconfiguring your build
+system.
+
+\section including_tpls Resolving thirdparty dependencies
+
+The CMake build system will do its best to fulfill the third party dependencies
+you requested. By default dependencies are first searched for among the
+libraries installed on the system. If a dependency can not be fulfilled that
+way, CMake will download the dependency itself and include it in the FEAT3
+build.
+
+\subsection including_tpls_finding Finding thirdparty dependencies
+
+CMake will search for thirdparty dependencies in the usual install directories.
+
+\note FEAT relies on the
+<a href="https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html">CMake packages</a>
+exported by thirdparty dependencies, if possible. FEAT ships with custom
+FindModules For any thirdparty dependency that does not produce a CMake package
+on installation.
+
+You can specify an additional directory that FEAT will consider if searching
+for thirdparty dependencies.  To do so, pass the directory to the configure
+script using the \c --package_install_dir option.
+
+\verbatim
+path/to/configure gcc-opt-umfpack --package_install_dir=path/to/umfpack
+\endverbatim
+
+\note The \c --package_install_dir option sets the given path as the
+<a href="https://cmake.org/cmake/help/latest/variable/CMAKE_PREFIX_PATH.html">\c CMAKE_INSTALL_PREFIX </a>.
+
+If you do not want CMake to search among the installed libraries, and instead
+want it to download all dependencies itself, you can pass the \c
+--no_external_libs flag to the configure script. Doing so will stop CMake from
+searching for installed libraries.
+
+\verbatim
+path/to/configure gcc-opt-umfpack --no_external_libs
+\endverbatim
+
+\note The \c --no_external_libs flag sets the CMake flag \c FEAT_PREFER_EXTERNAL_TPL to \c OFF
+
+If you want CMake to only use the locally installed versions of some libraries,
+but download all others, you can first disable searching for any thirdparty
+library using the \c --no_external_libs flag of the configure script. You can
+then manually set the directories of all thirdparty dependencies that you do
+not want CMake to download. To do so, you have to set the corresponding \c
+<TPL>_DIR variables (see the \c <TPL>_DIR column of the table above). The
+configure script provides a way to fill the CMake cache with an initial set of
+values, allowing you to set these variables without having to configure a build
+system beforehand. First create a CMake script that sets up the initial cache.
+For example:
+
+\verbatim
+cat > initial-cache.cmake <<EOF
+set(UMFPACK_DIR "path/to/umfpack" CACHE STRING "Umfpack override path")
+EOF
+\endverbatim
+
+You can then use this script to populate the initial cache using the \c
+--initial-cache-file option of the configure script, like so
+
+\verbatim
+path/to/configure gcc-opt-umfpack-hypre --no_external_libs --initial-cache-file=initial-cache.cmake
+\endverbatim
+
+CMake will then find and use the preinstalled UMFPACK, and download and build HYPRE.
+
+\subsection including_tpls_dowloading Downloading thirdparty dependencies
+
+Thirdparty dependencies that could not be found on the system will be
+downloaded and included in the build. For some of the thirdparty depedencies
+FEAT can make use of the depedencies build system. In these cases the
+configure output of the dependency will be part of FEATs configure output.
+This is intended.
+
+\note FEAT fetches any missing dependencies at configure time using the
+<a href="https://cmake.org/cmake/help/latest/module/FetchContent.html">FetchContent</a>
+module. For dependencies that support doing so, the dependencies CMake build
+system is directly added as a sub-build. For other dependencies FEAT works
+around the dependency and manually builds it "from the outside".  Apart from
+the configure output, the difference is invisible to the user.
+
+CMake will create a \c _deps directory inside your build directory. This
+directory will contain the donwloaded (and extracted) thirdparty dependencies,
+as well as the build directories for these dependencies.
+
+\note The location (and name) of the \c _deps folder is determined by the \c FETCHCONTENT_BASE_DIR CMake variable.
+
+If you do not want FEAT to download any thirdparty dependencies, you can
+disable this behaviour via the \c --no_external_download flag of the configure
+script. In this case all requested thirdparty dependencies have to be installed
+and findable, otherwise the configuring fails.
+
+\verbatim
+path/to/configure gcc-opt --no_external_download
+\endverbatim
+
+\note The \c --no-external-download flag sets the \c FEAT_NO_EXTERNAL_DOWNLOAD
+CMake flag to \c ON
+
+\section developing_feat For FEAT developers
+
+Thirdparty dependency support is implemented in \c thirdparty/CMakeLists.txt.
+Find modules and other scripts are located in \c build_system/cmake.
+
+\author Markus Muegge
+**/
