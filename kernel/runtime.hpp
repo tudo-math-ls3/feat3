@@ -7,6 +7,12 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
+#ifdef FEAT_HAVE_CUDA
+  #include <kernel/util/cuda_util.hpp>
+#endif
+#ifdef FEAT_DEBUG_MODE
+  #include <assert.h>
+#endif
 
 namespace FEAT
 {
@@ -54,6 +60,44 @@ namespace FEAT
         Runtime::finalize();
       }
     }; // class Runtime::Guard
+
+    /**
+     * \brief Runtime sync guard class
+     *
+     * This class defers all explicit cuda_synchronize() calls while in scope
+     * and synchronizes at the end
+     *
+     */
+    class SyncGuard
+    {
+      public:
+      static bool sync_on;
+
+      public:
+      SyncGuard()
+      {
+        #ifdef FEAT_DEBUG_MODE
+        assert((sync_on) && "Already in SyncGuard scope!");
+        #endif
+
+        this->sync_on = false;
+      }
+
+      ~SyncGuard()
+      {
+        #ifdef FEAT_HAVE_CUDA
+          Util::cuda_force_synchronize();
+        #endif
+        this->sync_on = true;
+      }
+
+      static bool enable_synchronize()
+      {
+        return sync_on;
+      }
+
+      friend class Runtime;
+    };
 
     /**
      * \brief FEAT initialization

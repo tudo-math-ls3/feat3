@@ -6,6 +6,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(benchmarks
   axpy-bench
   block_product_matvec-bench
+  cuda_synch_bench
   meshperm_assembly-bench
   dot_product-bench
   io_bench

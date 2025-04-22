@@ -78,6 +78,7 @@ namespace FEAT
     void cuda_initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
     void cuda_finalize();
     NOINLINE void cuda_synchronize();
+    NOINLINE void cuda_force_synchronize();
     void cuda_reset_device();
     void cuda_copy(void * dest, const void * src, const Index bytes);
     void cuda_copy_host_to_device(void * dest, const void * src, const Index bytes);

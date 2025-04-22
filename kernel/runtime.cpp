@@ -38,6 +38,7 @@ using namespace FEAT;
 // static member initialization
 bool Runtime::_initialized = false;
 bool Runtime::_finalized = false;
+bool Runtime::SyncGuard::sync_on = true;
 
 void Runtime::initialize(int& argc, char**& argv)
 {
@@ -388,6 +389,8 @@ void Runtime::initialize(int& argc, char**& argv)
   }
 
   _initialized = true;
+  // finally initialize Syncguard
+  SyncGuard::sync_on = true;
 }
 
 void Runtime::abort(bool dump_call_stack)

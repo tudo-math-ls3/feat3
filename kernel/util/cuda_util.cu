@@ -73,7 +73,8 @@ void FEAT::Util::cuda_set_device(const int device)
 
 void FEAT::Util::cuda_check_last_error()
 {
-  cudaDeviceSynchronize();
+  if(Runtime::SyncGuard::enable_synchronize())
+    cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -218,6 +219,16 @@ void FEAT::Util::cuda_finalize()
 }
 
 void FEAT::Util::cuda_synchronize()
+{
+  if(Runtime::SyncGuard::enable_synchronize())
+  {
+    auto status = cudaDeviceSynchronize();
+    if (status != cudaSuccess)
+      throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed: " + stringify(cudaGetErrorString(status)));
+  }
+}
+
+void FEAT::Util::cuda_force_synchronize()
 {
   auto status = cudaDeviceSynchronize();
   if (status != cudaSuccess)
